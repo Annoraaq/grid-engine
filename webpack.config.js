@@ -1,11 +1,12 @@
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: {
     GridMovementPlugin: './src/main.ts',
-    'GridMovementPlugin.min': './src/main.ts'
+    'GridMovementPlugin.min': './src/main.ts',
   },
   plugins: [
     new CleanWebpackPlugin(),
@@ -23,7 +24,12 @@ module.exports = {
         warnings: false
       },
       warningsFilter: (src) => false
-    })
+    }),
+    new CopyPlugin({
+      patterns: [
+        { from: 'src/GridMovementPlugin.d.ts', to: 'GridMovementPlugin.d.ts' },
+      ],
+    }),
   ],
   module: {
     rules: [
