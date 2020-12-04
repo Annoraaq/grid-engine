@@ -1,0 +1,34 @@
+import { Direction } from "./Direction";
+import { TileSizePerSecond } from "./GridMovementPlugin";
+import { GridPlayer } from "./GridPlayer";
+export declare class GridPhysics {
+    private player;
+    private tileMap;
+    private tileSize;
+    private speed;
+    private movementDirection;
+    private readonly speedPixelsPerSecond;
+    private tileSizePixelsWalked;
+    private decimalPlacesLeft;
+    private movementDirectionVectors;
+    constructor(player: GridPlayer, tileMap: Phaser.Tilemaps.Tilemap, tileSize: number, speed: TileSizePerSecond);
+    movePlayer(direction: Direction): void;
+    update(delta: number): void;
+    private isMoving;
+    private startMoving;
+    private tilePosInDirection;
+    private isBlockingDirection;
+    private hasNoTile;
+    private hasBlockingTile;
+    private updatePlayerPosition;
+    private getIntegerPart;
+    private getDecimalPlaces;
+    private getSpeedPerDelta;
+    private willCrossTileBorderThisUpdate;
+    private movePlayerSpriteRestOfTile;
+    private movePlayerSprite;
+    private updatePlayerFrame;
+    private hasWalkedHalfATile;
+    private stopMoving;
+    private movementDistance;
+}

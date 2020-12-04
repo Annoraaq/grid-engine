@@ -2,11 +2,12 @@
   "name": "phaser-grid-movement-plugin",
   "version": "1.0.0",
   "description": "Phaser3 plugin for grid based movement on a 2D game board.",
-  "main": "src/GridMovementPlugin.ts",
+  "main": "src/main.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack"
   },
+  "types": "src/main.d.ts",
   "author": "Johannes Baum",
   "license": "ISC",
   "devDependencies": {
