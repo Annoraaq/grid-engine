@@ -1,6 +1,7 @@
 import { Direction } from "../Direction/Direction";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
 import { TileSizePerSecond } from "../GridMovementPlugin";
+import * as Phaser from "phaser";
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
@@ -41,6 +42,10 @@ export class GridPhysics {
     if (this.isMoving()) {
       this.updatePlayerPosition(delta);
     }
+  }
+
+  getMovementDirection(): Direction {
+    return this.movementDirection;
   }
 
   private isMoving(): boolean {
