@@ -113,4 +113,21 @@ describe("GridCharacter", () => {
 
     expect(gridCharacter.lastFootLeft).toBe(false);
   });
+
+  it("should get tile pos", () => {
+    spriteMock.height = 20;
+    const playerXOffset = 8;
+    const playerYOffset = -2;
+    const expectedXPos = 5;
+    const expectedYPos = 6;
+    const expectedPos = new Phaser.Math.Vector2(expectedXPos, expectedYPos);
+    spriteMock.getCenter = jest
+      .fn()
+      .mockReturnValue(
+        new Phaser.Math.Vector2(5 * 16 + playerXOffset, 6 * 16 + playerYOffset)
+      );
+    gridCharacter = new GridCharacter(spriteMock, 3, 16);
+
+    expect(gridCharacter.getTilePos()).toEqual(expectedPos);
+  });
 });
