@@ -91,9 +91,9 @@ export class GridCharacter {
       playerCharRow * GridCharacter.FRAMES_CHAR_COL;
     const startFrame = framesInSameRowBefore + rows * framesInRow;
     return {
-      leftFoot: startFrame,
+      rightFoot: startFrame,
       standing: startFrame + 1,
-      rightFoot: startFrame + 2,
+      leftFoot: startFrame + 2,
     };
   }
 }

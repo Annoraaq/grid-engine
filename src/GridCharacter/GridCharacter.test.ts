@@ -53,10 +53,10 @@ describe("GridCharacter", () => {
     gridCharacter.setWalkingFrame(Direction.LEFT);
     gridCharacter.setWalkingFrame(Direction.RIGHT);
 
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(2, 63);
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(3, 36);
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(4, 45);
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(5, 54);
+    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(2, 65);
+    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(3, 38);
+    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(4, 47);
+    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(5, 56);
   });
 
   it("should set correct walking frame with lastFoodLeft = true", () => {
@@ -69,10 +69,10 @@ describe("GridCharacter", () => {
     gridCharacter.setWalkingFrame(Direction.LEFT);
     gridCharacter.setWalkingFrame(Direction.RIGHT);
 
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(2, 65);
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(3, 38);
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(4, 47);
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(5, 56);
+    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(2, 63);
+    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(3, 36);
+    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(4, 45);
+    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(5, 54);
   });
 
   it("should set correct standing frame", () => {
