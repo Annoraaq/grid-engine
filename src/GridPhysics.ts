@@ -1,6 +1,6 @@
 import { Direction } from "./Direction";
+import { GridCharacter } from "./GridCharacter";
 import { TileSizePerSecond } from "./GridMovementPlugin";
-import { GridPlayer } from "./GridPlayer";
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
@@ -20,7 +20,7 @@ export class GridPhysics {
   };
 
   constructor(
-    private player: GridPlayer,
+    private player: GridCharacter,
     private tileMap: Phaser.Tilemaps.Tilemap,
     private tileSize: number,
     private speed: TileSizePerSecond

@@ -1,7 +1,7 @@
+import { GridCharacter } from "./GridCharacter";
 import "phaser";
 import { Direction } from "./Direction";
 import { GridPhysics } from "./GridPhysics";
-import { GridPlayer } from "./GridPlayer";
 
 export type TileSizePerSecond = number;
 
@@ -12,7 +12,7 @@ export interface GridMovementConfig {
 
 export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   private gridPhysics: GridPhysics;
-  private gridPlayer: GridPlayer;
+  private gridPlayer: GridCharacter;
   private config: GridMovementConfig;
   constructor(
     public scene: Phaser.Scene,
@@ -39,7 +39,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     };
     const tilemapScale = tilemap.layers[0].tilemapLayer.scale;
     const tileSize = tilemap.tileWidth * tilemapScale;
-    this.gridPlayer = new GridPlayer(playerSprite, 6, tileSize);
+    this.gridPlayer = new GridCharacter(playerSprite, 6, tileSize);
     this.gridPlayer.setTilePosition(this.config.startPosition);
 
     this.gridPhysics = new GridPhysics(

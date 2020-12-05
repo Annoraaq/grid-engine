@@ -1,4 +1,3 @@
-import { Grid } from "matter";
 import { Direction } from "./Direction";
 
 interface FrameRow {
@@ -7,7 +6,7 @@ interface FrameRow {
   rightFoot: number;
 }
 
-export class GridPlayer {
+export class GridCharacter {
   private static readonly FRAMES_CHAR_ROW = 3;
   private static readonly FRAMES_CHAR_COL = 4;
   private directionToFrameRow: { [key in Direction]?: number } = {
@@ -28,7 +27,7 @@ export class GridPlayer {
     this.charsInRow =
       this.sprite.texture.source[0].width /
       this.sprite.width /
-      GridPlayer.FRAMES_CHAR_ROW;
+      GridCharacter.FRAMES_CHAR_ROW;
     this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
   }
 
@@ -86,11 +85,11 @@ export class GridPlayer {
   private framesOfDirection(direction: Direction): FrameRow {
     const playerCharRow = Math.floor(this.characterIndex / this.charsInRow);
     const playerCharCol = this.characterIndex % this.charsInRow;
-    const framesInRow = this.charsInRow * GridPlayer.FRAMES_CHAR_ROW;
-    const framesInSameRowBefore = GridPlayer.FRAMES_CHAR_ROW * playerCharCol;
+    const framesInRow = this.charsInRow * GridCharacter.FRAMES_CHAR_ROW;
+    const framesInSameRowBefore = GridCharacter.FRAMES_CHAR_ROW * playerCharCol;
     const rows =
       this.directionToFrameRow[direction] +
-      playerCharRow * GridPlayer.FRAMES_CHAR_COL;
+      playerCharRow * GridCharacter.FRAMES_CHAR_COL;
     const startFrame = framesInSameRowBefore + rows * framesInRow;
     return {
       leftFoot: startFrame,
