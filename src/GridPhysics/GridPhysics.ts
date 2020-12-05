@@ -1,6 +1,6 @@
-import { Direction } from "./Direction";
-import { GridCharacter } from "./GridCharacter";
-import { TileSizePerSecond } from "./GridMovementPlugin";
+import { Direction } from "../Direction/Direction";
+import { GridCharacter } from "../GridCharacter/GridCharacter";
+import { TileSizePerSecond } from "../GridMovementPlugin";
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;

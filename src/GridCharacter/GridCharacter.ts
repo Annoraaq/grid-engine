@@ -1,4 +1,4 @@
-import { Direction } from "./Direction";
+import { Direction } from "../Direction/Direction";
 
 interface FrameRow {
   leftFoot: number;
@@ -15,7 +15,6 @@ export class GridCharacter {
     [Direction.RIGHT]: 2,
     [Direction.UP]: 3,
   };
-  private charsInRow: number;
 
   public lastFootLeft = false;
 
@@ -24,10 +23,6 @@ export class GridCharacter {
     private characterIndex: number,
     private tileSize: number
   ) {
-    this.charsInRow =
-      this.sprite.texture.source[0].width /
-      this.sprite.width /
-      GridCharacter.FRAMES_CHAR_ROW;
     this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
   }
 
@@ -83,9 +78,13 @@ export class GridCharacter {
   }
 
   private framesOfDirection(direction: Direction): FrameRow {
-    const playerCharRow = Math.floor(this.characterIndex / this.charsInRow);
-    const playerCharCol = this.characterIndex % this.charsInRow;
-    const framesInRow = this.charsInRow * GridCharacter.FRAMES_CHAR_ROW;
+    const charsInRow =
+      this.sprite.texture.source[0].width /
+      this.sprite.width /
+      GridCharacter.FRAMES_CHAR_ROW;
+    const playerCharRow = Math.floor(this.characterIndex / charsInRow);
+    const playerCharCol = this.characterIndex % charsInRow;
+    const framesInRow = charsInRow * GridCharacter.FRAMES_CHAR_ROW;
     const framesInSameRowBefore = GridCharacter.FRAMES_CHAR_ROW * playerCharCol;
     const rows =
       this.directionToFrameRow[direction] +

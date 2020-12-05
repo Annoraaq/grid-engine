@@ -1,7 +1,7 @@
-import { GridCharacter } from "./GridCharacter";
+import { GridCharacter } from "./GridCharacter/GridCharacter";
 import "phaser";
-import { Direction } from "./Direction";
-import { GridPhysics } from "./GridPhysics";
+import { Direction } from "./Direction/Direction";
+import { GridPhysics } from "./GridPhysics/GridPhysics";
 
 export type TileSizePerSecond = number;
 
