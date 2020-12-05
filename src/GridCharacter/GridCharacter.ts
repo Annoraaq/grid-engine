@@ -16,7 +16,7 @@ export class GridCharacter {
     [Direction.UP]: 3,
   };
 
-  public lastFootLeft = false;
+  lastFootLeft = false;
 
   constructor(
     private sprite: Phaser.GameObjects.Sprite,
@@ -65,7 +65,7 @@ export class GridCharacter {
 
   private isCurrentFrameStanding(direction: Direction): boolean {
     return (
-      Number(this.sprite.frame.name) !=
+      Number(this.sprite.frame.name) ==
       this.framesOfDirection(direction).standing
     );
   }
