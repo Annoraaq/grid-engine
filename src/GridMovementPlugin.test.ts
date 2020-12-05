@@ -2,13 +2,13 @@ import * as Phaser from "phaser";
 import { Direction } from "./Direction/Direction";
 import { GridCharacter } from "./GridCharacter/GridCharacter";
 const mockSetTilePositon = jest.fn();
-const mockMovePlayer = jest.fn();
+const mockMoveCharacter = jest.fn();
 const mockUpdate = jest.fn();
 jest.mock("./GridPhysics/GridPhysics", () => {
   return {
     GridPhysics: jest.fn(() => {
       return {
-        movePlayer: mockMovePlayer,
+        moveCharacter: mockMoveCharacter,
         update: mockUpdate,
       };
     }),
@@ -16,9 +16,10 @@ jest.mock("./GridPhysics/GridPhysics", () => {
 });
 jest.mock("./GridCharacter/GridCharacter", function () {
   return {
-    GridCharacter: jest.fn(() => {
+    GridCharacter: jest.fn((id) => {
       return {
         setTilePosition: mockSetTilePositon,
+        getId: () => id,
       };
     }),
   };
@@ -63,7 +64,12 @@ describe("GridMovementPlugin", () => {
   it("should init player", () => {
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
     gridMovementPlugin.create(playerSpriteMock, tileMapMock);
-    expect(GridCharacter).toHaveBeenCalledWith(playerSpriteMock, 6, 32);
+    expect(GridCharacter).toHaveBeenCalledWith(
+      "player",
+      playerSpriteMock,
+      6,
+      32
+    );
     expect(mockSetTilePositon).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(0, 0)
     );
@@ -109,7 +115,7 @@ describe("GridMovementPlugin", () => {
 
     gridMovementPlugin.movePlayerLeft();
 
-    expect(mockMovePlayer).toHaveBeenCalledWith(Direction.LEFT);
+    expect(mockMoveCharacter).toHaveBeenCalledWith("player", Direction.LEFT);
   });
 
   it("should move player right", () => {
@@ -118,7 +124,7 @@ describe("GridMovementPlugin", () => {
 
     gridMovementPlugin.movePlayerRight();
 
-    expect(mockMovePlayer).toHaveBeenCalledWith(Direction.RIGHT);
+    expect(mockMoveCharacter).toHaveBeenCalledWith("player", Direction.RIGHT);
   });
 
   it("should move player up", () => {
@@ -127,7 +133,7 @@ describe("GridMovementPlugin", () => {
 
     gridMovementPlugin.movePlayerUp();
 
-    expect(mockMovePlayer).toHaveBeenCalledWith(Direction.UP);
+    expect(mockMoveCharacter).toHaveBeenCalledWith("player", Direction.UP);
   });
 
   it("should move player down", () => {
@@ -136,7 +142,7 @@ describe("GridMovementPlugin", () => {
 
     gridMovementPlugin.movePlayerDown();
 
-    expect(mockMovePlayer).toHaveBeenCalledWith(Direction.DOWN);
+    expect(mockMoveCharacter).toHaveBeenCalledWith("player", Direction.DOWN);
   });
 
   it("should update", () => {

@@ -2,7 +2,8 @@
   "compilerOptions": {
     "target": "es5",
     "declaration": true,
-    "allowJs": false
+    "allowJs": false,
+    "downlevelIteration": true
   },
   "include": ["**/*.ts"],
 }

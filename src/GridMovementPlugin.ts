@@ -22,9 +22,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   }
 
   boot() {
-    var eventEmitter = this.systems.events;
-
-    eventEmitter.on("update", this.update, this);
+    this.systems.events.on("update", this.update, this);
   }
 
   create(
@@ -39,11 +37,11 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     };
     const tilemapScale = tilemap.layers[0].tilemapLayer.scale;
     const tileSize = tilemap.tileWidth * tilemapScale;
-    this.gridPlayer = new GridCharacter(playerSprite, 6, tileSize);
+    this.gridPlayer = new GridCharacter("player", playerSprite, 6, tileSize);
     this.gridPlayer.setTilePosition(this.config.startPosition);
 
     this.gridPhysics = new GridPhysics(
-      this.gridPlayer,
+      [this.gridPlayer],
       tilemap,
       tileSize,
       this.config.speed
@@ -51,19 +49,19 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   }
 
   movePlayerLeft() {
-    this.gridPhysics.movePlayer(Direction.LEFT);
+    this.gridPhysics.moveCharacter("player", Direction.LEFT);
   }
 
   movePlayerRight() {
-    this.gridPhysics.movePlayer(Direction.RIGHT);
+    this.gridPhysics.moveCharacter("player", Direction.RIGHT);
   }
 
   movePlayerUp() {
-    this.gridPhysics.movePlayer(Direction.UP);
+    this.gridPhysics.moveCharacter("player", Direction.UP);
   }
 
   movePlayerDown() {
-    this.gridPhysics.movePlayer(Direction.DOWN);
+    this.gridPhysics.moveCharacter("player", Direction.DOWN);
   }
 
   update(_time: number, delta: number) {

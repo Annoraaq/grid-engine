@@ -7,10 +7,11 @@ const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
 
 export class GridPhysics {
-  private movementDirection = Direction.NONE;
+  private movementDirection: Map<string, Direction>;
   private readonly speedPixelsPerSecond: number;
   private tileSizePixelsWalked: number = 0;
   private decimalPlacesLeft = 0;
+  private characters: Map<string, GridCharacter>;
   private movementDirectionVectors: {
     [key in Direction]?: Vector2;
   } = {
@@ -21,49 +22,65 @@ export class GridPhysics {
   };
 
   constructor(
-    private player: GridCharacter,
+    characters: GridCharacter[],
     private tileMap: Phaser.Tilemaps.Tilemap,
     private tileSize: number,
     private speed: TileSizePerSecond
   ) {
     this.speedPixelsPerSecond = this.tileSize * this.speed;
+    this.characters = new Map(characters.map((char) => [char.getId(), char]));
+    this.movementDirection = new Map(
+      characters.map((char) => [char.getId(), Direction.NONE])
+    );
   }
 
-  movePlayer(direction: Direction): void {
-    if (this.isMoving()) return;
-    if (this.isBlockingDirection(direction)) {
-      this.player.setStandingFrame(direction);
+  moveCharacter(characterId: string, direction: Direction): void {
+    if (!this.characters.has(characterId)) return;
+    if (this.isMoving(characterId)) return;
+    if (this.isBlockingDirection(characterId, direction)) {
+      this.characters.get(characterId).setStandingFrame(direction);
     } else {
-      this.startMoving(direction);
+      this.startMoving(characterId, direction);
     }
   }
 
   update(delta: number): void {
-    if (this.isMoving()) {
-      this.updatePlayerPosition(delta);
-    }
+    [...this.characters.keys()].forEach((characterId) => {
+      if (this.isMoving(characterId)) {
+        this.updateCharacterPosition(characterId, delta);
+      }
+    });
   }
 
-  getMovementDirection(): Direction {
-    return this.movementDirection;
+  getMovementDirection(characterId: string): Direction {
+    return this.movementDirection.get(characterId);
   }
 
-  private isMoving(): boolean {
-    return this.movementDirection != Direction.NONE;
+  private isMoving(characterId: string): boolean {
+    return this.movementDirection.get(characterId) != Direction.NONE;
   }
 
-  private startMoving(direction: Direction): void {
-    this.movementDirection = direction;
+  private startMoving(characterId: string, direction: Direction): void {
+    this.movementDirection.set(characterId, direction);
   }
 
-  private tilePosInDirection(direction: Direction): Vector2 {
-    return this.player
+  private tilePosInDirection(
+    characterId: string,
+    direction: Direction
+  ): Vector2 {
+    return this.characters
+      .get(characterId)
       .getTilePos()
       .add(this.movementDirectionVectors[direction]);
   }
 
-  private isBlockingDirection(direction: Direction): boolean {
-    return this.hasBlockingTile(this.tilePosInDirection(direction));
+  private isBlockingDirection(
+    characterId: string,
+    direction: Direction
+  ): boolean {
+    return this.hasBlockingTile(
+      this.tilePosInDirection(characterId, direction)
+    );
   }
 
   private hasNoTile(pos: Vector2): boolean {
@@ -80,7 +97,7 @@ export class GridPhysics {
     });
   }
 
-  private updatePlayerPosition(delta: number): void {
+  private updateCharacterPosition(characterId: string, delta: number): void {
     const pixelsToWalkThisUpdate = this.getIntegerPart(
       this.getSpeedPerDelta(delta) + this.decimalPlacesLeft
     );
@@ -89,9 +106,9 @@ export class GridPhysics {
     );
 
     if (this.willCrossTileBorderThisUpdate(pixelsToWalkThisUpdate)) {
-      this.movePlayerSpriteRestOfTile();
+      this.moveCharacterSpriteRestOfTile(characterId);
     } else {
-      this.movePlayerSprite(pixelsToWalkThisUpdate);
+      this.moveCharacterSprite(characterId, pixelsToWalkThisUpdate);
     }
   }
 
@@ -114,29 +131,37 @@ export class GridPhysics {
     return this.tileSizePixelsWalked + pixelsToWalkThisUpdate >= this.tileSize;
   }
 
-  private movePlayerSpriteRestOfTile(): void {
-    this.movePlayerSprite(this.tileSize - this.tileSizePixelsWalked);
-    this.stopMoving();
+  private moveCharacterSpriteRestOfTile(characterId: string): void {
+    this.moveCharacterSprite(
+      characterId,
+      this.tileSize - this.tileSizePixelsWalked
+    );
+    this.stopMoving(characterId);
   }
 
-  private movePlayerSprite(speed: number): void {
-    const newPlayerPos = this.player
+  private moveCharacterSprite(characterId: string, speed: number): void {
+    const newPlayerPos = this.characters
+      .get(characterId)
       .getPosition()
-      .add(this.movementDistance(speed));
-    this.player.setPosition(newPlayerPos);
+      .add(this.movementDistance(characterId, speed));
+    this.characters.get(characterId).setPosition(newPlayerPos);
     this.tileSizePixelsWalked += speed;
-    this.updatePlayerFrame(this.movementDirection, this.tileSizePixelsWalked);
+    this.updateCharacterFrame(characterId, this.tileSizePixelsWalked);
     this.tileSizePixelsWalked %= this.tileSize;
   }
 
-  private updatePlayerFrame(
-    direction: Direction,
+  private updateCharacterFrame(
+    characterId: string,
     tileSizePixelsWalked: number
   ): void {
     if (this.hasWalkedHalfATile(tileSizePixelsWalked)) {
-      this.player.setStandingFrame(direction);
+      this.characters
+        .get(characterId)
+        .setStandingFrame(this.movementDirection.get(characterId));
     } else {
-      this.player.setWalkingFrame(direction);
+      this.characters
+        .get(characterId)
+        .setWalkingFrame(this.movementDirection.get(characterId));
     }
   }
 
@@ -144,12 +169,14 @@ export class GridPhysics {
     return tileSizePixelsWalked > this.tileSize / 2;
   }
 
-  private stopMoving(): void {
-    this.movementDirection = Direction.NONE;
+  private stopMoving(characterId: string): void {
+    this.movementDirection.set(characterId, Direction.NONE);
   }
 
-  private movementDistance(speed): Vector2 {
-    return this.movementDirectionVectors[this.movementDirection]
+  private movementDistance(characterId: string, speed: number): Vector2 {
+    return this.movementDirectionVectors[
+      this.movementDirection.get(characterId)
+    ]
       .clone()
       .multiply(new Vector2(speed));
   }

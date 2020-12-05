@@ -19,6 +19,7 @@ export class GridCharacter {
   lastFootLeft = false;
 
   constructor(
+    private id: string,
     private sprite: Phaser.GameObjects.Sprite,
     private characterIndex: number,
     private tileSize: number
@@ -28,6 +29,10 @@ export class GridCharacter {
 
   getPosition(): Phaser.Math.Vector2 {
     return this.sprite.getCenter();
+  }
+
+  getId(): string {
+    return this.id;
   }
 
   setTilePosition(tilePosition: Phaser.Math.Vector2): void {
