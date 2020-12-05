@@ -81,10 +81,10 @@ export class GridPhysics {
   }
 
   private updatePlayerPosition(delta: number): void {
-    this.decimalPlacesLeft = this.getDecimalPlaces(
+    const pixelsToWalkThisUpdate = this.getIntegerPart(
       this.getSpeedPerDelta(delta) + this.decimalPlacesLeft
     );
-    const pixelsToWalkThisUpdate = this.getIntegerPart(
+    this.decimalPlacesLeft = this.getDecimalPlaces(
       this.getSpeedPerDelta(delta) + this.decimalPlacesLeft
     );
 
