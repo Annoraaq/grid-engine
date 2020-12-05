@@ -1,6 +1,5 @@
 import "phaser";
 import { Direction } from "./Direction";
-import { GridControls } from "./GridControls";
 import { GridPhysics } from "./GridPhysics";
 import { GridPlayer } from "./GridPlayer";
 
@@ -12,7 +11,6 @@ export interface GridMovementConfig {
 }
 
 export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
-  private gridControls: GridControls;
   private gridPhysics: GridPhysics;
   private gridPlayer: GridPlayer;
   private config: GridMovementConfig;
@@ -50,7 +48,6 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       tileSize,
       this.config.speed
     );
-    // this.gridControls = new GridControls(this.scene.input, this.gridPhysics);
   }
 
   movePlayerLeft() {
@@ -70,7 +67,6 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   }
 
   update(_time: number, delta: number) {
-    this.gridControls?.update();
     this.gridPhysics?.update(delta);
   }
 }
