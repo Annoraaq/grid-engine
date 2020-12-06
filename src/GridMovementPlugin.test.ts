@@ -2,14 +2,14 @@ import * as Phaser from "phaser";
 import { Direction } from "./Direction/Direction";
 import { GridCharacter } from "./GridCharacter/GridCharacter";
 const mockSetTilePositon = jest.fn();
-const mockMoveCharacter = jest.fn();
+const mockMove = jest.fn();
 const mockUpdate = jest.fn();
 jest.mock("./GridCharacter/GridCharacter", function () {
   return {
     GridCharacter: jest.fn((id) => {
       return {
         setTilePosition: mockSetTilePositon,
-        moveCharacter: mockMoveCharacter,
+        move: mockMove,
         update: mockUpdate,
         getId: () => id,
       };
@@ -99,7 +99,7 @@ describe("GridMovementPlugin", () => {
 
     gridMovementPlugin.movePlayerLeft();
 
-    expect(mockMoveCharacter).toHaveBeenCalledWith(Direction.LEFT);
+    expect(mockMove).toHaveBeenCalledWith(Direction.LEFT);
   });
 
   it("should move player right", () => {
@@ -108,7 +108,7 @@ describe("GridMovementPlugin", () => {
 
     gridMovementPlugin.movePlayerRight();
 
-    expect(mockMoveCharacter).toHaveBeenCalledWith(Direction.RIGHT);
+    expect(mockMove).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
   it("should move player up", () => {
@@ -117,7 +117,7 @@ describe("GridMovementPlugin", () => {
 
     gridMovementPlugin.movePlayerUp();
 
-    expect(mockMoveCharacter).toHaveBeenCalledWith(Direction.UP);
+    expect(mockMove).toHaveBeenCalledWith(Direction.UP);
   });
 
   it("should move player down", () => {
@@ -126,7 +126,7 @@ describe("GridMovementPlugin", () => {
 
     gridMovementPlugin.movePlayerDown();
 
-    expect(mockMoveCharacter).toHaveBeenCalledWith(Direction.DOWN);
+    expect(mockMove).toHaveBeenCalledWith(Direction.DOWN);
   });
 
   it("should update", () => {

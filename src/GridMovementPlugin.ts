@@ -49,19 +49,19 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   }
 
   movePlayerLeft() {
-    this.gridPlayer.moveCharacter(Direction.LEFT);
+    this.gridPlayer.move(Direction.LEFT);
   }
 
   movePlayerRight() {
-    this.gridPlayer.moveCharacter(Direction.RIGHT);
+    this.gridPlayer.move(Direction.RIGHT);
   }
 
   movePlayerUp() {
-    this.gridPlayer.moveCharacter(Direction.UP);
+    this.gridPlayer.move(Direction.UP);
   }
 
   movePlayerDown() {
-    this.gridPlayer.moveCharacter(Direction.DOWN);
+    this.gridPlayer.move(Direction.DOWN);
   }
 
   update(_time: number, delta: number) {

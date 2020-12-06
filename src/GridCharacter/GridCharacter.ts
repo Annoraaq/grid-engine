@@ -1,5 +1,9 @@
 import { Direction } from "../Direction/Direction";
 import { GridPhysics } from "../GridPhysics/GridPhysics";
+import * as Phaser from "phaser";
+
+const Vector2 = Phaser.Math.Vector2;
+type Vector2 = Phaser.Math.Vector2;
 
 interface FrameRow {
   leftFoot: number;
@@ -16,8 +20,16 @@ export class GridCharacter {
     [Direction.RIGHT]: 2,
     [Direction.UP]: 3,
   };
-
+  private movementDirectionVectors: {
+    [key in Direction]?: Vector2;
+  } = {
+    [Direction.UP]: Vector2.UP,
+    [Direction.DOWN]: Vector2.DOWN,
+    [Direction.LEFT]: Vector2.LEFT,
+    [Direction.RIGHT]: Vector2.RIGHT,
+  };
   private gridPhysics: GridPhysics;
+  private movementDirection = Direction.NONE;
 
   lastFootLeft = false;
 
@@ -26,11 +38,11 @@ export class GridCharacter {
     private sprite: Phaser.GameObjects.Sprite,
     private characterIndex: number,
     private tileSize: number,
-    tilemap: Phaser.Tilemaps.Tilemap,
+    private tileMap: Phaser.Tilemaps.Tilemap,
     speed: number
   ) {
     this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
-    this.gridPhysics = new GridPhysics(this, tilemap, tileSize, speed);
+    this.gridPhysics = new GridPhysics(this, tileMap, tileSize, speed);
   }
 
   getPosition(): Phaser.Math.Vector2 {
@@ -74,12 +86,21 @@ export class GridCharacter {
     return new Phaser.Math.Vector2(Math.floor(x), Math.floor(y));
   }
 
-  moveCharacter(direction: Direction): void {
-    this.gridPhysics.moveCharacter(direction);
+  move(direction: Direction): void {
+    if (this.isMoving()) return;
+    if (this.isBlockingDirection(direction)) {
+      this.setStandingFrame(direction);
+    } else {
+      this.startMoving(direction);
+    }
   }
 
   update(delta: number): void {
     this.gridPhysics.update(delta);
+  }
+
+  getMovementDirection(): Direction {
+    return this.gridPhysics.getMovementDirection();
   }
 
   private isCurrentFrameStanding(direction: Direction): boolean {
@@ -114,5 +135,35 @@ export class GridCharacter {
       standing: startFrame + 1,
       leftFoot: startFrame + 2,
     };
+  }
+
+  private isMoving(): boolean {
+    return this.movementDirection != Direction.NONE;
+  }
+
+  private startMoving(direction: Direction): void {
+    this.movementDirection = direction;
+  }
+
+  private isBlockingDirection(direction: Direction): boolean {
+    return this.hasBlockingTile(this.tilePosInDirection(direction));
+  }
+
+  private hasBlockingTile(pos: Vector2): boolean {
+    if (this.hasNoTile(pos)) return true;
+    return this.tileMap.layers.some((layer) => {
+      const tile = this.tileMap.getTileAt(pos.x, pos.y, false, layer.name);
+      return tile && tile.properties.collides;
+    });
+  }
+
+  private hasNoTile(pos: Vector2): boolean {
+    return !this.tileMap.layers.some((layer) =>
+      this.tileMap.hasTileAt(pos.x, pos.y, layer.name)
+    );
+  }
+
+  private tilePosInDirection(direction: Direction): Vector2 {
+    return this.getTilePos().add(this.movementDirectionVectors[direction]);
   }
 }
