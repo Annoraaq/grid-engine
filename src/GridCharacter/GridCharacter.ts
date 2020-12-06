@@ -46,37 +46,16 @@ export class GridCharacter {
     this.speedPixelsPerSecond = this.tileSize * speed;
   }
 
-  getPosition(): Phaser.Math.Vector2 {
-    return this.sprite.getCenter();
-  }
-
   getId(): string {
     return this.id;
   }
 
   setTilePosition(tilePosition: Phaser.Math.Vector2): void {
+    if (this.isMoving()) return;
     this.sprite.setPosition(
       tilePosition.x * this.tileSize + this.playerOffsetX(),
       tilePosition.y * this.tileSize + this.playerOffsetY()
     );
-  }
-
-  setPosition(position: Phaser.Math.Vector2): void {
-    this.sprite.setPosition(position.x, position.y);
-  }
-
-  setWalkingFrame(direction: Direction): void {
-    const frameRow = this.framesOfDirection(direction);
-    this.sprite.setFrame(
-      this.lastFootLeft ? frameRow.rightFoot : frameRow.leftFoot
-    );
-  }
-
-  setStandingFrame(direction: Direction): void {
-    if (this.isCurrentFrameStanding(direction)) {
-      this.lastFootLeft = !this.lastFootLeft;
-    }
-    this.sprite.setFrame(this.framesOfDirection(direction).standing);
   }
 
   getTilePos(): Phaser.Math.Vector2 {
@@ -104,6 +83,28 @@ export class GridCharacter {
 
   getMovementDirection(): Direction {
     return this.movementDirection;
+  }
+
+  private setStandingFrame(direction: Direction): void {
+    if (this.isCurrentFrameStanding(direction)) {
+      this.lastFootLeft = !this.lastFootLeft;
+    }
+    this.sprite.setFrame(this.framesOfDirection(direction).standing);
+  }
+
+  private setWalkingFrame(direction: Direction): void {
+    const frameRow = this.framesOfDirection(direction);
+    this.sprite.setFrame(
+      this.lastFootLeft ? frameRow.rightFoot : frameRow.leftFoot
+    );
+  }
+
+  private setPosition(position: Phaser.Math.Vector2): void {
+    this.sprite.setPosition(position.x, position.y);
+  }
+
+  private getPosition(): Phaser.Math.Vector2 {
+    return this.sprite.getCenter();
   }
 
   private isCurrentFrameStanding(direction: Direction): boolean {

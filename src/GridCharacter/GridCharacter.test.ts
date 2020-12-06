@@ -11,6 +11,21 @@ describe("GridCharacter", () => {
   const PLAYER_Y_OFFSET = -2;
   const TILE_SIZE = 16;
 
+  function mockNonBlockingTile() {
+    tileMapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
+    tileMapMock.hasTileAt.mockReturnValue(true);
+  }
+
+  function mockBlockingTile() {
+    tileMapMock.getTileAt.mockReturnValue({ properties: { collides: true } });
+    tileMapMock.hasTileAt.mockReturnValue(true);
+  }
+
+  function mockMissingTile() {
+    tileMapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
+    tileMapMock.hasTileAt.mockReturnValue(false);
+  }
+
   beforeEach(() => {
     tileMapMock = {
       layers: [{ name: "someLayerName" }],
@@ -19,6 +34,7 @@ describe("GridCharacter", () => {
     };
     spriteMock = <any>{
       width: 16,
+      height: 20,
       setFrame: jest.fn(),
       frame: { name: "anything" },
       getCenter: jest
@@ -52,83 +68,117 @@ describe("GridCharacter", () => {
     expect(spriteMock.setFrame).toHaveBeenCalledWith(37);
   });
 
-  it("should get position", () => {
-    const spriteCenterPos = new Phaser.Math.Vector2(3, 4);
-    spriteMock.getCenter = jest.fn().mockReturnValue(spriteCenterPos);
-    expect(gridCharacter.getPosition()).toEqual(spriteCenterPos);
-  });
+  describe("walking frames", () => {
+    beforeEach(() => {
+      spriteMock.setFrame = jest.fn();
+      spriteMock.frame = <any>{ name: 64 };
+      tileMapMock.getTileAt.mockReturnValue({
+        properties: { collides: false },
+      });
+      tileMapMock.hasTileAt.mockReturnValue(true);
+    });
 
-  it("should set tile position", () => {
-    spriteMock.setPosition = jest.fn();
-    gridCharacter.setPosition(new Phaser.Math.Vector2(3, 4));
+    describe("lastFootLeft = false", () => {
+      beforeEach(() => {
+        gridCharacter.lastFootLeft = false;
+      });
 
-    expect(spriteMock.setPosition).toHaveBeenCalledWith(3, 4);
-  });
+      it("should set the correct frame when walking up", () => {
+        gridCharacter.move(Direction.UP);
+        gridCharacter.update(50); // move to 2 / 16 px
+        gridCharacter.update(200); // move to 12 / 16 px
 
-  it("should set correct walking frame with lastFoodLeft = false", () => {
-    spriteMock.setFrame = jest.fn();
-    gridCharacter.lastFootLeft = false;
+        expect(spriteMock.setFrame).toHaveBeenNthCalledWith(1, 65);
+        expect(spriteMock.setFrame).toHaveBeenNthCalledWith(2, 64);
+      });
 
-    gridCharacter.setWalkingFrame(Direction.UP);
-    gridCharacter.setWalkingFrame(Direction.DOWN);
-    gridCharacter.setWalkingFrame(Direction.LEFT);
-    gridCharacter.setWalkingFrame(Direction.RIGHT);
+      it("should set the correct frame when walking down", () => {
+        gridCharacter.move(Direction.DOWN);
+        gridCharacter.update(50); // move to 2 / 16 px
+        gridCharacter.update(200); // move to 12 / 16 px
 
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(1, 65);
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(2, 38);
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(3, 47);
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(4, 56);
-  });
+        expect(spriteMock.setFrame).toHaveBeenNthCalledWith(1, 38);
+        expect(spriteMock.setFrame).toHaveBeenNthCalledWith(2, 37);
+      });
 
-  it("should set correct walking frame with lastFoodLeft = true", () => {
-    spriteMock.setFrame = jest.fn();
-    gridCharacter.lastFootLeft = true;
+      it("should set the correct frame when walking left", () => {
+        gridCharacter.move(Direction.LEFT);
+        gridCharacter.update(50); // move to 2 / 16 px
+        gridCharacter.update(200); // move to 12 / 16 px
 
-    gridCharacter.setWalkingFrame(Direction.UP);
-    gridCharacter.setWalkingFrame(Direction.DOWN);
-    gridCharacter.setWalkingFrame(Direction.LEFT);
-    gridCharacter.setWalkingFrame(Direction.RIGHT);
+        expect(spriteMock.setFrame).toHaveBeenNthCalledWith(1, 47);
+        expect(spriteMock.setFrame).toHaveBeenNthCalledWith(2, 46);
+      });
 
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(1, 63);
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(2, 36);
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(3, 45);
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(4, 54);
-  });
+      it("should set the correct frame when walking right", () => {
+        gridCharacter.move(Direction.RIGHT);
+        gridCharacter.update(50); // move to 2 / 16 px
+        gridCharacter.update(200); // move to 12 / 16 px
 
-  it("should set correct standing frame", () => {
-    spriteMock.setFrame = jest.fn();
-    spriteMock.frame = <any>{ name: "anything" };
-    gridCharacter.lastFootLeft = true;
+        expect(spriteMock.setFrame).toHaveBeenNthCalledWith(1, 56);
+        expect(spriteMock.setFrame).toHaveBeenNthCalledWith(2, 55);
+      });
+    });
 
-    gridCharacter.setStandingFrame(Direction.UP);
-    gridCharacter.setStandingFrame(Direction.DOWN);
-    gridCharacter.setStandingFrame(Direction.LEFT);
-    gridCharacter.setStandingFrame(Direction.RIGHT);
+    describe("lastFootLeft = true", () => {
+      beforeEach(() => {
+        gridCharacter.lastFootLeft = true;
+      });
 
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(1, 64);
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(2, 37);
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(3, 46);
-    expect(spriteMock.setFrame).toHaveBeenNthCalledWith(4, 55);
-  });
+      it("should set the correct frame when walking up", () => {
+        gridCharacter.move(Direction.UP);
+        gridCharacter.update(50); // move to 2 / 16 px
+        gridCharacter.update(200); // move to 12 / 16 px
 
-  it("should toggle lastFootLeft if currently standing", () => {
-    spriteMock.setFrame = jest.fn();
-    spriteMock.frame = <any>{ name: 64 };
-    gridCharacter.lastFootLeft = false;
+        expect(spriteMock.setFrame).toHaveBeenNthCalledWith(1, 63);
+        expect(spriteMock.setFrame).toHaveBeenNthCalledWith(2, 64);
+      });
 
-    gridCharacter.setStandingFrame(Direction.UP);
+      it("should set the correct frame when walking down", () => {
+        gridCharacter.move(Direction.DOWN);
+        gridCharacter.update(50); // move to 2 / 16 px
+        gridCharacter.update(200); // move to 12 / 16 px
 
-    expect(gridCharacter.lastFootLeft).toBe(true);
-  });
+        expect(spriteMock.setFrame).toHaveBeenNthCalledWith(1, 36);
+        expect(spriteMock.setFrame).toHaveBeenNthCalledWith(2, 37);
+      });
 
-  it("should not toggle lastFootLeft if currently not standing", () => {
-    spriteMock.setFrame = jest.fn();
-    spriteMock.frame = <any>{ name: 63 };
-    gridCharacter.lastFootLeft = false;
+      it("should set the correct frame when walking left", () => {
+        gridCharacter.move(Direction.LEFT);
+        gridCharacter.update(50); // move to 2 / 16 px
+        gridCharacter.update(200); // move to 12 / 16 px
 
-    gridCharacter.setStandingFrame(Direction.UP);
+        expect(spriteMock.setFrame).toHaveBeenNthCalledWith(1, 45);
+        expect(spriteMock.setFrame).toHaveBeenNthCalledWith(2, 46);
+      });
 
-    expect(gridCharacter.lastFootLeft).toBe(false);
+      it("should set the correct frame when walking right", () => {
+        gridCharacter.move(Direction.RIGHT);
+        gridCharacter.update(50); // move to 2 / 16 px
+        gridCharacter.update(200); // move to 12 / 16 px
+
+        expect(spriteMock.setFrame).toHaveBeenNthCalledWith(1, 54);
+        expect(spriteMock.setFrame).toHaveBeenNthCalledWith(2, 55);
+      });
+    });
+
+    it("should set players standing frame if direction blocked", () => {
+      mockBlockingTile();
+      expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+
+      gridCharacter.move(Direction.UP);
+      expect(spriteMock.setFrame).toHaveBeenCalledWith(64);
+      expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+    });
+
+    it("should set players standing frame if direction has no tile", () => {
+      mockMissingTile();
+
+      gridCharacter.move(Direction.UP);
+
+      expect(spriteMock.setFrame).toHaveBeenCalledWith(64);
+      expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+    });
   });
 
   it("should get tile pos", () => {
@@ -140,29 +190,8 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getTilePos()).toEqual(expectedPos);
   });
 
-  it("should set players standing frame if direction blocked", () => {
-    tileMapMock.getTileAt.mockReturnValue({ properties: { collides: true } });
-    tileMapMock.hasTileAt.mockReturnValue(true);
-    expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
-
-    gridCharacter.move(Direction.UP);
-    expect(spriteMock.setFrame).toHaveBeenCalledWith(64);
-    expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
-  });
-
-  it("should set players standing frame if direction has no tile", () => {
-    tileMapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    tileMapMock.hasTileAt.mockReturnValue(false);
-
-    gridCharacter.move(Direction.UP);
-
-    expect(spriteMock.setFrame).toHaveBeenCalledWith(64);
-    expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
-  });
-
   it("should start movement", () => {
-    tileMapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    tileMapMock.hasTileAt.mockReturnValue(true);
+    mockNonBlockingTile();
 
     gridCharacter.move(Direction.UP);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
@@ -179,8 +208,7 @@ describe("GridCharacter", () => {
   });
 
   it("should update", () => {
-    tileMapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    tileMapMock.hasTileAt.mockReturnValue(true);
+    mockNonBlockingTile();
 
     gridCharacter.move(Direction.UP);
     gridCharacter.update(250);
@@ -193,8 +221,7 @@ describe("GridCharacter", () => {
   });
 
   it("should update only till tile border", () => {
-    tileMapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    tileMapMock.hasTileAt.mockReturnValue(true);
+    mockNonBlockingTile();
 
     gridCharacter.move(Direction.UP);
     gridCharacter.update(750);
@@ -207,8 +234,7 @@ describe("GridCharacter", () => {
   });
 
   it("should take decimal places of last update into account", () => {
-    tileMapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    tileMapMock.hasTileAt.mockReturnValue(true);
+    mockNonBlockingTile();
 
     gridCharacter.move(Direction.UP);
     gridCharacter.update(100);
@@ -225,5 +251,22 @@ describe("GridCharacter", () => {
       5 * 16 + PLAYER_X_OFFSET,
       6 * 16 + PLAYER_Y_OFFSET - 9
     );
+  });
+
+  it("should set tile position", () => {
+    gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
+
+    expect(spriteMock.setPosition).toHaveBeenCalledWith(
+      3 * TILE_SIZE + PLAYER_X_OFFSET,
+      4 * TILE_SIZE + PLAYER_Y_OFFSET
+    );
+  });
+
+  it("should not set tile position when moving", () => {
+    mockNonBlockingTile();
+    gridCharacter.move(Direction.DOWN);
+    gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
+
+    expect(spriteMock.setPosition).not.toHaveBeenCalled();
   });
 });
