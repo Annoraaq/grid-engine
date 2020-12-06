@@ -37,34 +37,34 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     };
     const tilemapScale = tilemap.layers[0].tilemapLayer.scale;
     const tileSize = tilemap.tileWidth * tilemapScale;
-    this.gridPlayer = new GridCharacter("player", playerSprite, 6, tileSize);
-    this.gridPlayer.setTilePosition(this.config.startPosition);
-
-    this.gridPhysics = new GridPhysics(
-      [this.gridPlayer],
-      tilemap,
+    this.gridPlayer = new GridCharacter(
+      "player",
+      playerSprite,
+      6,
       tileSize,
+      tilemap,
       this.config.speed
     );
+    this.gridPlayer.setTilePosition(this.config.startPosition);
   }
 
   movePlayerLeft() {
-    this.gridPhysics.moveCharacter("player", Direction.LEFT);
+    this.gridPlayer.moveCharacter(Direction.LEFT);
   }
 
   movePlayerRight() {
-    this.gridPhysics.moveCharacter("player", Direction.RIGHT);
+    this.gridPlayer.moveCharacter(Direction.RIGHT);
   }
 
   movePlayerUp() {
-    this.gridPhysics.moveCharacter("player", Direction.UP);
+    this.gridPlayer.moveCharacter(Direction.UP);
   }
 
   movePlayerDown() {
-    this.gridPhysics.moveCharacter("player", Direction.DOWN);
+    this.gridPlayer.moveCharacter(Direction.DOWN);
   }
 
   update(_time: number, delta: number) {
-    this.gridPhysics?.update(delta);
+    this.gridPlayer?.update(delta);
   }
 }

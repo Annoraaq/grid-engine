@@ -1,4 +1,5 @@
 import { Direction } from "../Direction/Direction";
+import { GridPhysics } from "../GridPhysics/GridPhysics";
 
 interface FrameRow {
   leftFoot: number;
@@ -16,15 +17,20 @@ export class GridCharacter {
     [Direction.UP]: 3,
   };
 
+  private gridPhysics: GridPhysics;
+
   lastFootLeft = false;
 
   constructor(
     private id: string,
     private sprite: Phaser.GameObjects.Sprite,
     private characterIndex: number,
-    private tileSize: number
+    private tileSize: number,
+    tilemap: Phaser.Tilemaps.Tilemap,
+    speed: number
   ) {
     this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
+    this.gridPhysics = new GridPhysics(this, tilemap, tileSize, speed);
   }
 
   getPosition(): Phaser.Math.Vector2 {
@@ -66,6 +72,14 @@ export class GridCharacter {
     const y =
       (this.sprite.getCenter().y - this.playerOffsetY()) / this.tileSize;
     return new Phaser.Math.Vector2(Math.floor(x), Math.floor(y));
+  }
+
+  moveCharacter(direction: Direction): void {
+    this.gridPhysics.moveCharacter(direction);
+  }
+
+  update(delta: number): void {
+    this.gridPhysics.update(delta);
   }
 
   private isCurrentFrameStanding(direction: Direction): boolean {

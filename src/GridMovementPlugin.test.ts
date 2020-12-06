@@ -4,21 +4,13 @@ import { GridCharacter } from "./GridCharacter/GridCharacter";
 const mockSetTilePositon = jest.fn();
 const mockMoveCharacter = jest.fn();
 const mockUpdate = jest.fn();
-jest.mock("./GridPhysics/GridPhysics", () => {
-  return {
-    GridPhysics: jest.fn(() => {
-      return {
-        moveCharacter: mockMoveCharacter,
-        update: mockUpdate,
-      };
-    }),
-  };
-});
 jest.mock("./GridCharacter/GridCharacter", function () {
   return {
     GridCharacter: jest.fn((id) => {
       return {
         setTilePosition: mockSetTilePositon,
+        moveCharacter: mockMoveCharacter,
+        update: mockUpdate,
         getId: () => id,
       };
     }),
@@ -26,7 +18,6 @@ jest.mock("./GridCharacter/GridCharacter", function () {
 });
 
 import { GridMovementPlugin } from "./GridMovementPlugin";
-import { GridPhysics } from "./GridPhysics/GridPhysics";
 
 describe("GridMovementPlugin", () => {
   let gridMovementPlugin: GridMovementPlugin;
@@ -68,7 +59,9 @@ describe("GridMovementPlugin", () => {
       "player",
       playerSpriteMock,
       6,
-      32
+      32,
+      tileMapMock,
+      4
     );
     expect(mockSetTilePositon).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(0, 0)
@@ -85,26 +78,17 @@ describe("GridMovementPlugin", () => {
     );
   });
 
-  it("should init gridPhysics", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(playerSpriteMock, tileMapMock);
-    expect(GridPhysics).toHaveBeenCalledWith(
-      expect.any(Object),
-      tileMapMock,
-      32,
-      4
-    );
-  });
-
   it("should use config speed", () => {
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
     gridMovementPlugin.create(playerSpriteMock, tileMapMock, {
       speed: 2,
     });
-    expect(GridPhysics).toHaveBeenCalledWith(
-      expect.any(Object),
-      tileMapMock,
+    expect(GridCharacter).toHaveBeenCalledWith(
+      "player",
+      playerSpriteMock,
+      6,
       32,
+      tileMapMock,
       2
     );
   });
@@ -115,7 +99,7 @@ describe("GridMovementPlugin", () => {
 
     gridMovementPlugin.movePlayerLeft();
 
-    expect(mockMoveCharacter).toHaveBeenCalledWith("player", Direction.LEFT);
+    expect(mockMoveCharacter).toHaveBeenCalledWith(Direction.LEFT);
   });
 
   it("should move player right", () => {
@@ -124,7 +108,7 @@ describe("GridMovementPlugin", () => {
 
     gridMovementPlugin.movePlayerRight();
 
-    expect(mockMoveCharacter).toHaveBeenCalledWith("player", Direction.RIGHT);
+    expect(mockMoveCharacter).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
   it("should move player up", () => {
@@ -133,7 +117,7 @@ describe("GridMovementPlugin", () => {
 
     gridMovementPlugin.movePlayerUp();
 
-    expect(mockMoveCharacter).toHaveBeenCalledWith("player", Direction.UP);
+    expect(mockMoveCharacter).toHaveBeenCalledWith(Direction.UP);
   });
 
   it("should move player down", () => {
@@ -142,7 +126,7 @@ describe("GridMovementPlugin", () => {
 
     gridMovementPlugin.movePlayerDown();
 
-    expect(mockMoveCharacter).toHaveBeenCalledWith("player", Direction.DOWN);
+    expect(mockMoveCharacter).toHaveBeenCalledWith(Direction.DOWN);
   });
 
   it("should update", () => {
