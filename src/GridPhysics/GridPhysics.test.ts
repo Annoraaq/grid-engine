@@ -77,21 +77,33 @@ describe("GridPhysics", () => {
 
   it("should update", () => {
     const playerMock = createCharacterMock("player");
+    const npcMock = createCharacterMock("npc");
     const playerXOffset = 8;
     const playerYOffset = -2;
-    gridPhysics = new GridPhysics([playerMock], tileMapMock, 16, 3);
+    gridPhysics = new GridPhysics([playerMock, npcMock], tileMapMock, 16, 3);
     tileMapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
     tileMapMock.hasTileAt.mockReturnValue(true);
     playerMock.getPosition.mockReturnValue(
       new Phaser.Math.Vector2(5 * 16 + playerXOffset, 6 * 16 + playerYOffset)
     );
     playerMock.getTilePos.mockReturnValue(new Phaser.Math.Vector2(5, 6));
+    npcMock.getPosition.mockReturnValue(
+      new Phaser.Math.Vector2(5 * 16 + playerXOffset, 6 * 16 + playerYOffset)
+    );
+    npcMock.getTilePos.mockReturnValue(new Phaser.Math.Vector2(5, 6));
     expect(gridPhysics.getMovementDirection("player")).toEqual(Direction.NONE);
 
     gridPhysics.moveCharacter("player", Direction.UP);
+    gridPhysics.moveCharacter("npc", Direction.UP);
     gridPhysics.update(250);
 
     expect(playerMock.setPosition).toHaveBeenCalledWith(
+      new Phaser.Math.Vector2(
+        5 * 16 + playerXOffset,
+        6 * 16 + playerYOffset - 12
+      )
+    );
+    expect(npcMock.setPosition).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(
         5 * 16 + playerXOffset,
         6 * 16 + playerYOffset - 12

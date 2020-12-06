@@ -9,8 +9,8 @@ type Vector2 = Phaser.Math.Vector2;
 export class GridPhysics {
   private movementDirection: Map<string, Direction>;
   private readonly speedPixelsPerSecond: number;
-  private tileSizePixelsWalked: number = 0;
-  private decimalPlacesLeft = 0;
+  private tileSizePixelsWalked: Map<string, number>;
+  private decimalPlacesLeft: Map<string, number>;
   private characters: Map<string, GridCharacter>;
   private movementDirectionVectors: {
     [key in Direction]?: Vector2;
@@ -31,6 +31,12 @@ export class GridPhysics {
     this.characters = new Map(characters.map((char) => [char.getId(), char]));
     this.movementDirection = new Map(
       characters.map((char) => [char.getId(), Direction.NONE])
+    );
+    this.tileSizePixelsWalked = new Map(
+      characters.map((char) => [char.getId(), 0])
+    );
+    this.decimalPlacesLeft = new Map(
+      characters.map((char) => [char.getId(), 0])
     );
   }
 
@@ -99,13 +105,18 @@ export class GridPhysics {
 
   private updateCharacterPosition(characterId: string, delta: number): void {
     const pixelsToWalkThisUpdate = this.getIntegerPart(
-      this.getSpeedPerDelta(delta) + this.decimalPlacesLeft
+      this.getSpeedPerDelta(delta) + this.decimalPlacesLeft.get(characterId)
     );
-    this.decimalPlacesLeft = this.getDecimalPlaces(
-      this.getSpeedPerDelta(delta) + this.decimalPlacesLeft
+    this.decimalPlacesLeft.set(
+      characterId,
+      this.getDecimalPlaces(
+        this.getSpeedPerDelta(delta) + this.decimalPlacesLeft.get(characterId)
+      )
     );
 
-    if (this.willCrossTileBorderThisUpdate(pixelsToWalkThisUpdate)) {
+    if (
+      this.willCrossTileBorderThisUpdate(characterId, pixelsToWalkThisUpdate)
+    ) {
       this.moveCharacterSpriteRestOfTile(characterId);
     } else {
       this.moveCharacterSprite(characterId, pixelsToWalkThisUpdate);
@@ -126,15 +137,19 @@ export class GridPhysics {
   }
 
   private willCrossTileBorderThisUpdate(
+    characterId: string,
     pixelsToWalkThisUpdate: number
   ): boolean {
-    return this.tileSizePixelsWalked + pixelsToWalkThisUpdate >= this.tileSize;
+    return (
+      this.tileSizePixelsWalked.get(characterId) + pixelsToWalkThisUpdate >=
+      this.tileSize
+    );
   }
 
   private moveCharacterSpriteRestOfTile(characterId: string): void {
     this.moveCharacterSprite(
       characterId,
-      this.tileSize - this.tileSizePixelsWalked
+      this.tileSize - this.tileSizePixelsWalked.get(characterId)
     );
     this.stopMoving(characterId);
   }
@@ -145,9 +160,18 @@ export class GridPhysics {
       .getPosition()
       .add(this.movementDistance(characterId, speed));
     this.characters.get(characterId).setPosition(newPlayerPos);
-    this.tileSizePixelsWalked += speed;
-    this.updateCharacterFrame(characterId, this.tileSizePixelsWalked);
-    this.tileSizePixelsWalked %= this.tileSize;
+    this.tileSizePixelsWalked.set(
+      characterId,
+      this.tileSizePixelsWalked.get(characterId) + speed
+    );
+    this.updateCharacterFrame(
+      characterId,
+      this.tileSizePixelsWalked.get(characterId)
+    );
+    this.tileSizePixelsWalked.set(
+      characterId,
+      this.tileSizePixelsWalked.get(characterId) % this.tileSize
+    );
   }
 
   private updateCharacterFrame(
