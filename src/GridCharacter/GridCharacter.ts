@@ -31,8 +31,7 @@ export class GridCharacter {
   private decimalPlacesLeft = 0;
   private readonly speedPixelsPerSecond: number;
   private tileSizePixelsWalked = 0;
-
-  lastFootLeft = false;
+  private lastFootLeft = false;
 
   constructor(
     private id: string,

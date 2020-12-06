@@ -79,10 +79,6 @@ describe("GridCharacter", () => {
     });
 
     describe("lastFootLeft = false", () => {
-      beforeEach(() => {
-        gridCharacter.lastFootLeft = false;
-      });
-
       it("should set the correct frame when walking up", () => {
         gridCharacter.move(Direction.UP);
         gridCharacter.update(50); // move to 2 / 16 px
@@ -122,7 +118,9 @@ describe("GridCharacter", () => {
 
     describe("lastFootLeft = true", () => {
       beforeEach(() => {
-        gridCharacter.lastFootLeft = true;
+        gridCharacter.move(Direction.UP);
+        gridCharacter.update(1000); // move till end of tile
+        spriteMock.setFrame = jest.fn();
       });
 
       it("should set the correct frame when walking up", () => {
