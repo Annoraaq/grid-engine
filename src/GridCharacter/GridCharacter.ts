@@ -1,5 +1,4 @@
 import { Direction } from "../Direction/Direction";
-import { GridPhysics } from "../GridPhysics/GridPhysics";
 import * as Phaser from "phaser";
 
 const Vector2 = Phaser.Math.Vector2;
@@ -28,8 +27,10 @@ export class GridCharacter {
     [Direction.LEFT]: Vector2.LEFT,
     [Direction.RIGHT]: Vector2.RIGHT,
   };
-  private gridPhysics: GridPhysics;
   private movementDirection = Direction.NONE;
+  private decimalPlacesLeft = 0;
+  private readonly speedPixelsPerSecond: number;
+  private tileSizePixelsWalked = 0;
 
   lastFootLeft = false;
 
@@ -42,7 +43,7 @@ export class GridCharacter {
     speed: number
   ) {
     this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
-    this.gridPhysics = new GridPhysics(this, tileMap, tileSize, speed);
+    this.speedPixelsPerSecond = this.tileSize * speed;
   }
 
   getPosition(): Phaser.Math.Vector2 {
@@ -96,11 +97,13 @@ export class GridCharacter {
   }
 
   update(delta: number): void {
-    this.gridPhysics.update(delta);
+    if (this.isMoving()) {
+      this.updateCharacterPosition(delta);
+    }
   }
 
   getMovementDirection(): Direction {
-    return this.gridPhysics.getMovementDirection();
+    return this.movementDirection;
   }
 
   private isCurrentFrameStanding(direction: Direction): boolean {
@@ -165,5 +168,74 @@ export class GridCharacter {
 
   private tilePosInDirection(direction: Direction): Vector2 {
     return this.getTilePos().add(this.movementDirectionVectors[direction]);
+  }
+
+  private updateCharacterPosition(delta: number): void {
+    const pixelsToWalkThisUpdate = this.getIntegerPart(
+      this.getSpeedPerDelta(delta) + this.decimalPlacesLeft
+    );
+    this.decimalPlacesLeft = this.getDecimalPlaces(
+      this.getSpeedPerDelta(delta) + this.decimalPlacesLeft
+    );
+
+    if (this.willCrossTileBorderThisUpdate(pixelsToWalkThisUpdate)) {
+      this.moveCharacterSpriteRestOfTile();
+    } else {
+      this.moveCharacterSprite(pixelsToWalkThisUpdate);
+    }
+  }
+
+  private getSpeedPerDelta(delta: number): number {
+    const deltaInSeconds = delta / 1000;
+    return this.speedPixelsPerSecond * deltaInSeconds;
+  }
+
+  private willCrossTileBorderThisUpdate(
+    pixelsToWalkThisUpdate: number
+  ): boolean {
+    return this.tileSizePixelsWalked + pixelsToWalkThisUpdate >= this.tileSize;
+  }
+
+  private moveCharacterSpriteRestOfTile(): void {
+    this.moveCharacterSprite(this.tileSize - this.tileSizePixelsWalked);
+    this.stopMoving();
+  }
+
+  private moveCharacterSprite(speed: number): void {
+    const newPlayerPos = this.getPosition().add(this.movementDistance(speed));
+    this.setPosition(newPlayerPos);
+    this.tileSizePixelsWalked = this.tileSizePixelsWalked + speed;
+    this.updateCharacterFrame(this.tileSizePixelsWalked);
+    this.tileSizePixelsWalked = this.tileSizePixelsWalked % this.tileSize;
+  }
+
+  private stopMoving(): void {
+    this.movementDirection = Direction.NONE;
+  }
+
+  private movementDistance(speed: number): Vector2 {
+    return this.movementDirectionVectors[this.movementDirection]
+      .clone()
+      .multiply(new Vector2(speed));
+  }
+
+  private getIntegerPart(float: number): number {
+    return Math.floor(float);
+  }
+
+  private getDecimalPlaces(float: number): number {
+    return float % 1;
+  }
+
+  private updateCharacterFrame(tileSizePixelsWalked: number): void {
+    if (this.hasWalkedHalfATile(tileSizePixelsWalked)) {
+      this.setStandingFrame(this.movementDirection);
+    } else {
+      this.setWalkingFrame(this.movementDirection);
+    }
+  }
+
+  private hasWalkedHalfATile(tileSizePixelsWalked: number): boolean {
+    return tileSizePixelsWalked > this.tileSize / 2;
   }
 }

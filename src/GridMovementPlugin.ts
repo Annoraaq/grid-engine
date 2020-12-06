@@ -1,7 +1,6 @@
 import { GridCharacter } from "./GridCharacter/GridCharacter";
 import "phaser";
 import { Direction } from "./Direction/Direction";
-import { GridPhysics } from "./GridPhysics/GridPhysics";
 
 export type TileSizePerSecond = number;
 
@@ -11,7 +10,6 @@ export interface GridMovementConfig {
 }
 
 export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
-  private gridPhysics: GridPhysics;
   private gridPlayer: GridCharacter;
   private config: GridMovementConfig;
   constructor(

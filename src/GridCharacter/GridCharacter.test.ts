@@ -7,6 +7,10 @@ describe("GridCharacter", () => {
   let spriteMock: Phaser.GameObjects.Sprite;
   let tileMapMock;
 
+  const PLAYER_X_OFFSET = 8;
+  const PLAYER_Y_OFFSET = -2;
+  const TILE_SIZE = 16;
+
   beforeEach(() => {
     tileMapMock = {
       layers: [{ name: "someLayerName" }],
@@ -16,7 +20,16 @@ describe("GridCharacter", () => {
     spriteMock = <any>{
       width: 16,
       setFrame: jest.fn(),
-      getCenter: jest.fn(),
+      frame: { name: "anything" },
+      getCenter: jest
+        .fn()
+        .mockReturnValue(
+          new Phaser.Math.Vector2(
+            5 * TILE_SIZE + PLAYER_X_OFFSET,
+            6 * TILE_SIZE + PLAYER_Y_OFFSET
+          )
+        ),
+      setPosition: jest.fn(),
       texture: {
         source: [
           {
@@ -31,7 +44,7 @@ describe("GridCharacter", () => {
       3,
       16,
       tileMapMock,
-      4
+      3
     );
   });
 
@@ -120,29 +133,14 @@ describe("GridCharacter", () => {
 
   it("should get tile pos", () => {
     spriteMock.height = 20;
-    const playerXOffset = 8;
-    const playerYOffset = -2;
     const expectedXPos = 5;
     const expectedYPos = 6;
     const expectedPos = new Phaser.Math.Vector2(expectedXPos, expectedYPos);
-    spriteMock.getCenter = jest
-      .fn()
-      .mockReturnValue(
-        new Phaser.Math.Vector2(5 * 16 + playerXOffset, 6 * 16 + playerYOffset)
-      );
 
     expect(gridCharacter.getTilePos()).toEqual(expectedPos);
   });
 
   it("should set players standing frame if direction blocked", () => {
-    const playerXOffset = 8;
-    const playerYOffset = -2;
-    spriteMock.getCenter = jest
-      .fn()
-      .mockReturnValue(
-        new Phaser.Math.Vector2(5 * 16 + playerXOffset, 6 * 16 + playerYOffset)
-      );
-    spriteMock.frame = <any>{ name: "anything" };
     tileMapMock.getTileAt.mockReturnValue({ properties: { collides: true } });
     tileMapMock.hasTileAt.mockReturnValue(true);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
@@ -153,21 +151,79 @@ describe("GridCharacter", () => {
   });
 
   it("should set players standing frame if direction has no tile", () => {
-    const playerXOffset = 8;
-    const playerYOffset = -2;
-    spriteMock.getCenter = jest
-      .fn()
-      .mockReturnValue(
-        new Phaser.Math.Vector2(5 * 16 + playerXOffset, 6 * 16 + playerYOffset)
-      );
-    spriteMock.frame = <any>{ name: "anything" };
     tileMapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
     tileMapMock.hasTileAt.mockReturnValue(false);
-    expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
 
     gridCharacter.move(Direction.UP);
 
     expect(spriteMock.setFrame).toHaveBeenCalledWith(64);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+  });
+
+  it("should start movement", () => {
+    tileMapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
+    tileMapMock.hasTileAt.mockReturnValue(true);
+
+    gridCharacter.move(Direction.UP);
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+
+    gridCharacter.move(Direction.DOWN);
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+  });
+
+  it("should not update if not moving", () => {
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+
+    gridCharacter.update(300);
+    expect(spriteMock.setPosition).not.toHaveBeenCalled();
+  });
+
+  it("should update", () => {
+    tileMapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
+    tileMapMock.hasTileAt.mockReturnValue(true);
+
+    gridCharacter.move(Direction.UP);
+    gridCharacter.update(250);
+
+    expect(spriteMock.setPosition).toHaveBeenCalledWith(
+      5 * TILE_SIZE + PLAYER_X_OFFSET,
+      6 * TILE_SIZE + PLAYER_Y_OFFSET - 12
+    );
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+  });
+
+  it("should update only till tile border", () => {
+    tileMapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
+    tileMapMock.hasTileAt.mockReturnValue(true);
+
+    gridCharacter.move(Direction.UP);
+    gridCharacter.update(750);
+
+    expect(spriteMock.setPosition).toHaveBeenCalledWith(
+      5 * 16 + PLAYER_X_OFFSET,
+      6 * 16 + PLAYER_Y_OFFSET - 16
+    );
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+  });
+
+  it("should take decimal places of last update into account", () => {
+    tileMapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
+    tileMapMock.hasTileAt.mockReturnValue(true);
+
+    gridCharacter.move(Direction.UP);
+    gridCharacter.update(100);
+
+    expect(spriteMock.setPosition).toHaveBeenCalledWith(
+      5 * 16 + PLAYER_X_OFFSET,
+      6 * 16 + PLAYER_Y_OFFSET - 4
+    );
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+
+    gridCharacter.update(100);
+
+    expect(spriteMock.setPosition).toHaveBeenCalledWith(
+      5 * 16 + PLAYER_X_OFFSET,
+      6 * 16 + PLAYER_Y_OFFSET - 9
+    );
   });
 });
