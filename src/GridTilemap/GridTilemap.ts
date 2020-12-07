@@ -31,11 +31,8 @@ export class GridTilemap {
   }
 
   hasBlockingChar(pos: Vector2): boolean {
-    for (let [_key, val] of this.characters) {
-      if (val.getTilePos().equals(pos)) {
-        return true;
-      }
-    }
-    return false;
+    return [...this.characters.values()].some((char) =>
+      char.getTilePos().equals(pos)
+    );
   }
 }
