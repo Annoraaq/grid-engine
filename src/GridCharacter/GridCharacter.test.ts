@@ -1,37 +1,31 @@
 import { GridCharacter } from "./GridCharacter";
 import * as Phaser from "phaser";
 import { Direction } from "../Direction/Direction";
-import { GridTilemap } from "../GridTilemap/GridTilemap";
 
 describe("GridCharacter", () => {
   let gridCharacter: GridCharacter;
   let spriteMock: Phaser.GameObjects.Sprite;
-  let tileMapMock;
+  let gridTilemapMock;
 
   const PLAYER_X_OFFSET = 8;
   const PLAYER_Y_OFFSET = -2;
   const TILE_SIZE = 16;
 
   function mockNonBlockingTile() {
-    tileMapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    tileMapMock.hasTileAt.mockReturnValue(true);
+    gridTilemapMock.hasBlockingTile.mockReturnValue(false);
+    gridTilemapMock.hasNoTile.mockReturnValue(false);
   }
 
   function mockBlockingTile() {
-    tileMapMock.getTileAt.mockReturnValue({ properties: { collides: true } });
-    tileMapMock.hasTileAt.mockReturnValue(true);
-  }
-
-  function mockMissingTile() {
-    tileMapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    tileMapMock.hasTileAt.mockReturnValue(false);
+    gridTilemapMock.hasBlockingTile.mockReturnValue(true);
+    gridTilemapMock.hasNoTile.mockReturnValue(false);
   }
 
   beforeEach(() => {
-    tileMapMock = {
-      layers: [{ name: "someLayerName" }],
-      getTileAt: jest.fn(),
-      hasTileAt: jest.fn(),
+    gridTilemapMock = {
+      hasBlockingTile: jest.fn(),
+      hasNoTile: jest.fn(),
+      hasBlockingChar: jest.fn().mockReturnValue(false),
     };
     spriteMock = <any>{
       width: 16,
@@ -60,7 +54,7 @@ describe("GridCharacter", () => {
       spriteMock,
       3,
       16,
-      new GridTilemap(tileMapMock),
+      gridTilemapMock,
       3
     );
   });
@@ -73,10 +67,7 @@ describe("GridCharacter", () => {
     beforeEach(() => {
       spriteMock.setFrame = jest.fn();
       spriteMock.frame = <any>{ name: 64 };
-      tileMapMock.getTileAt.mockReturnValue({
-        properties: { collides: false },
-      });
-      tileMapMock.hasTileAt.mockReturnValue(true);
+      mockNonBlockingTile();
     });
 
     describe("lastFootLeft = false", () => {
@@ -166,15 +157,6 @@ describe("GridCharacter", () => {
       expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
 
       gridCharacter.move(Direction.UP);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(64);
-      expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
-    });
-
-    it("should set players standing frame if direction has no tile", () => {
-      mockMissingTile();
-
-      gridCharacter.move(Direction.UP);
-
       expect(spriteMock.setFrame).toHaveBeenCalledWith(64);
       expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
     });
