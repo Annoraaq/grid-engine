@@ -1,6 +1,7 @@
 import { GridCharacter } from "./GridCharacter";
 import * as Phaser from "phaser";
 import { Direction } from "../Direction/Direction";
+import { GridTilemap } from "../GridTilemap/GridTilemap";
 
 describe("GridCharacter", () => {
   let gridCharacter: GridCharacter;
@@ -59,7 +60,7 @@ describe("GridCharacter", () => {
       spriteMock,
       3,
       16,
-      tileMapMock,
+      new GridTilemap(tileMapMock),
       3
     );
   });

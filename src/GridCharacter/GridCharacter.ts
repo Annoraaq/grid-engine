@@ -1,5 +1,6 @@
 import { Direction } from "../Direction/Direction";
 import * as Phaser from "phaser";
+import { GridTilemap } from "../GridTilemap/GridTilemap";
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
@@ -38,7 +39,7 @@ export class GridCharacter {
     private sprite: Phaser.GameObjects.Sprite,
     private characterIndex: number,
     private tileSize: number,
-    private tileMap: Phaser.Tilemaps.Tilemap,
+    private tilemap: GridTilemap,
     speed: number
   ) {
     this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
@@ -148,21 +149,10 @@ export class GridCharacter {
     this.movementDirection = direction;
   }
 
-  private isBlockingDirection(direction: Direction): boolean {
-    return this.hasBlockingTile(this.tilePosInDirection(direction));
-  }
-
-  private hasBlockingTile(pos: Vector2): boolean {
-    if (this.hasNoTile(pos)) return true;
-    return this.tileMap.layers.some((layer) => {
-      const tile = this.tileMap.getTileAt(pos.x, pos.y, false, layer.name);
-      return tile && tile.properties.collides;
-    });
-  }
-
-  private hasNoTile(pos: Vector2): boolean {
-    return !this.tileMap.layers.some((layer) =>
-      this.tileMap.hasTileAt(pos.x, pos.y, layer.name)
+  isBlockingDirection(direction: Direction): boolean {
+    return (
+      this.tilemap.hasBlockingTile(this.tilePosInDirection(direction)) ||
+      this.tilemap.hasBlockingChar(this.tilePosInDirection(direction))
     );
   }
 

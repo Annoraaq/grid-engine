@@ -1,17 +1,24 @@
 import { GridCharacter } from "./GridCharacter/GridCharacter";
 import "phaser";
 import { Direction } from "./Direction/Direction";
+import { GridTilemap } from "./GridTilemap/GridTilemap";
 
 export type TileSizePerSecond = number;
 
 export interface GridMovementConfig {
+  characters: CharacterData[];
+}
+
+export interface CharacterData {
+  id: string;
+  sprite: Phaser.GameObjects.Sprite;
+  characterIndex: number;
   speed?: TileSizePerSecond;
   startPosition?: Phaser.Math.Vector2;
 }
 
 export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
-  private gridPlayer: GridCharacter;
-  private config: GridMovementConfig;
+  private gridCharacters: Map<string, GridCharacter>;
   constructor(
     public scene: Phaser.Scene,
     pluginManager: Phaser.Plugins.PluginManager
@@ -23,46 +30,60 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.systems.events.on("update", this.update, this);
   }
 
-  create(
-    playerSprite: Phaser.GameObjects.Sprite,
-    tilemap: Phaser.Tilemaps.Tilemap,
-    config?: GridMovementConfig
-  ) {
-    this.config = {
-      speed: 4,
-      startPosition: new Phaser.Math.Vector2(0, 0),
-      ...config,
-    };
+  create(tilemap: Phaser.Tilemaps.Tilemap, config: GridMovementConfig) {
     const tilemapScale = tilemap.layers[0].tilemapLayer.scale;
     const tileSize = tilemap.tileWidth * tilemapScale;
-    this.gridPlayer = new GridCharacter(
-      "player",
-      playerSprite,
-      6,
-      tileSize,
-      tilemap,
-      this.config.speed
+
+    const enrichedCharData = config.characters.map((charData) => ({
+      speed: 4,
+      startPosition: new Phaser.Math.Vector2(0, 0),
+      ...charData,
+    }));
+    const gridTilemap = new GridTilemap(tilemap);
+    this.gridCharacters = new Map(
+      enrichedCharData.map((charData) => [
+        charData.id,
+        new GridCharacter(
+          charData.id,
+          charData.sprite,
+          charData.characterIndex,
+          tileSize,
+          gridTilemap,
+          charData.speed
+        ),
+      ])
     );
-    this.gridPlayer.setTilePosition(this.config.startPosition);
+    enrichedCharData.forEach((charData) =>
+      this.gridCharacters
+        .get(charData.id)
+        .setTilePosition(charData.startPosition)
+    );
+    for (let [_key, val] of this.gridCharacters) {
+      gridTilemap.addCharacter(val);
+    }
   }
 
-  movePlayerLeft() {
-    this.gridPlayer.move(Direction.LEFT);
+  moveCharLeft(charId: string) {
+    this.gridCharacters.get(charId).move(Direction.LEFT);
   }
 
-  movePlayerRight() {
-    this.gridPlayer.move(Direction.RIGHT);
+  moveCharRight(charId: string) {
+    this.gridCharacters.get(charId).move(Direction.RIGHT);
   }
 
-  movePlayerUp() {
-    this.gridPlayer.move(Direction.UP);
+  moveCharUp(charId: string) {
+    this.gridCharacters.get(charId).move(Direction.UP);
   }
 
-  movePlayerDown() {
-    this.gridPlayer.move(Direction.DOWN);
+  moveCharDown(charId: string) {
+    this.gridCharacters.get(charId).move(Direction.DOWN);
   }
 
   update(_time: number, delta: number) {
-    this.gridPlayer?.update(delta);
+    if (this.gridCharacters) {
+      for (let [_key, val] of this.gridCharacters) {
+        val.update(delta);
+      }
+    }
   }
 }

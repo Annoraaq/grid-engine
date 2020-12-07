@@ -18,6 +18,7 @@ jest.mock("./GridCharacter/GridCharacter", function () {
 });
 
 import { GridMovementPlugin } from "./GridMovementPlugin";
+import { GridTilemap } from "./GridTilemap/GridTilemap";
 
 describe("GridMovementPlugin", () => {
   let gridMovementPlugin: GridMovementPlugin;
@@ -54,13 +55,21 @@ describe("GridMovementPlugin", () => {
 
   it("should init player", () => {
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(playerSpriteMock, tileMapMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+    });
     expect(GridCharacter).toHaveBeenCalledWith(
       "player",
       playerSpriteMock,
-      6,
+      3,
       32,
-      tileMapMock,
+      expect.any(GridTilemap),
       4
     );
     expect(mockSetTilePositon).toHaveBeenCalledWith(
@@ -70,8 +79,15 @@ describe("GridMovementPlugin", () => {
 
   it("should use config startPosition", () => {
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(playerSpriteMock, tileMapMock, {
-      startPosition: new Phaser.Math.Vector2(3, 4),
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+          startPosition: new Phaser.Math.Vector2(3, 4),
+        },
+      ],
     });
     expect(mockSetTilePositon).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(3, 4)
@@ -80,58 +96,105 @@ describe("GridMovementPlugin", () => {
 
   it("should use config speed", () => {
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(playerSpriteMock, tileMapMock, {
-      speed: 2,
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+          speed: 2,
+        },
+      ],
     });
     expect(GridCharacter).toHaveBeenCalledWith(
       "player",
       playerSpriteMock,
-      6,
+      3,
       32,
-      tileMapMock,
+      expect.any(GridTilemap),
       2
     );
   });
 
   it("should move player left", () => {
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(playerSpriteMock, tileMapMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+    });
 
-    gridMovementPlugin.movePlayerLeft();
+    gridMovementPlugin.moveCharLeft("player");
 
     expect(mockMove).toHaveBeenCalledWith(Direction.LEFT);
   });
 
   it("should move player right", () => {
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(playerSpriteMock, tileMapMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+    });
 
-    gridMovementPlugin.movePlayerRight();
+    gridMovementPlugin.moveCharRight("player");
 
     expect(mockMove).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
   it("should move player up", () => {
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(playerSpriteMock, tileMapMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+    });
 
-    gridMovementPlugin.movePlayerUp();
+    gridMovementPlugin.moveCharUp("player");
 
     expect(mockMove).toHaveBeenCalledWith(Direction.UP);
   });
 
   it("should move player down", () => {
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(playerSpriteMock, tileMapMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+    });
 
-    gridMovementPlugin.movePlayerDown();
+    gridMovementPlugin.moveCharDown("player");
 
     expect(mockMove).toHaveBeenCalledWith(Direction.DOWN);
   });
 
   it("should update", () => {
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(playerSpriteMock, tileMapMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+    });
 
     gridMovementPlugin.update(123, 456);
 
