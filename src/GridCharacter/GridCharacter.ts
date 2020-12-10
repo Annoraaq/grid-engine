@@ -33,6 +33,7 @@ export class GridCharacter {
   private readonly speedPixelsPerSecond: number;
   private tileSizePixelsWalked = 0;
   private lastFootLeft = false;
+  private tilePos = new Phaser.Math.Vector2(0, 0);
 
   constructor(
     private id: string,
@@ -52,6 +53,7 @@ export class GridCharacter {
 
   setTilePosition(tilePosition: Phaser.Math.Vector2): void {
     if (this.isMoving()) return;
+    this.tilePos = tilePosition.clone();
     this.sprite.setPosition(
       tilePosition.x * this.tileSize + this.playerOffsetX(),
       tilePosition.y * this.tileSize + this.playerOffsetY()
@@ -59,11 +61,7 @@ export class GridCharacter {
   }
 
   getTilePos(): Phaser.Math.Vector2 {
-    const x =
-      (this.sprite.getCenter().x - this.playerOffsetX()) / this.tileSize;
-    const y =
-      (this.sprite.getCenter().y - this.playerOffsetY()) / this.tileSize;
-    return new Phaser.Math.Vector2(Math.floor(x), Math.floor(y));
+    return this.tilePos.clone();
   }
 
   move(direction: Direction): void {
@@ -146,6 +144,7 @@ export class GridCharacter {
   }
 
   private startMoving(direction: Direction): void {
+    this.tilePos.add(this.movementDirectionVectors[direction]);
     this.movementDirection = direction;
   }
 

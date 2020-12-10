@@ -163,22 +163,25 @@ describe("GridCharacter", () => {
   });
 
   it("should get tile pos", () => {
-    spriteMock.height = 20;
-    const expectedXPos = 5;
-    const expectedYPos = 6;
-    const expectedPos = new Phaser.Math.Vector2(expectedXPos, expectedYPos);
+    const expectedPos = new Phaser.Math.Vector2(5, 6);
+    const newTilePos = new Phaser.Math.Vector2(5, 6);
+    gridCharacter.setTilePosition(newTilePos);
+    newTilePos.x = 20;
 
     expect(gridCharacter.getTilePos()).toEqual(expectedPos);
   });
 
   it("should start movement", () => {
     mockNonBlockingTile();
+    expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, 0));
 
     gridCharacter.move(Direction.UP);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+    expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, -1));
 
     gridCharacter.move(Direction.DOWN);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+    expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, -1));
   });
 
   it("should not update if not moving", () => {
