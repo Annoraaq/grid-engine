@@ -33,7 +33,7 @@ export class GridCharacter {
   private readonly speedPixelsPerSecond: number;
   private tileSizePixelsWalked = 0;
   private lastFootLeft = false;
-  private tilePos = new Phaser.Math.Vector2(0, 0);
+  private readonly _tilePos = new Phaser.Math.Vector2(0, 0);
 
   constructor(
     private id: string,
@@ -45,6 +45,7 @@ export class GridCharacter {
   ) {
     this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
     this.speedPixelsPerSecond = this.tileSize * speed;
+    this.updateZindex();
   }
 
   getId(): string {
@@ -54,6 +55,7 @@ export class GridCharacter {
   setTilePosition(tilePosition: Phaser.Math.Vector2): void {
     if (this.isMoving()) return;
     this.tilePos = tilePosition.clone();
+    this.updateZindex();
     this.sprite.setPosition(
       tilePosition.x * this.tileSize + this.playerOffsetX(),
       tilePosition.y * this.tileSize + this.playerOffsetY()
@@ -81,6 +83,27 @@ export class GridCharacter {
 
   getMovementDirection(): Direction {
     return this.movementDirection;
+  }
+
+  private isBlockingDirection(direction: Direction): boolean {
+    return (
+      this.tilemap.hasBlockingTile(this.tilePosInDirection(direction)) ||
+      this.tilemap.hasBlockingChar(this.tilePosInDirection(direction))
+    );
+  }
+
+  private get tilePos() {
+    return this._tilePos.clone();
+  }
+
+  private set tilePos(newTilePos: Phaser.Math.Vector2) {
+    this._tilePos.x = newTilePos.x;
+    this._tilePos.y = newTilePos.y;
+    this.updateZindex();
+  }
+
+  private updateZindex() {
+    this.sprite.setDepth(GridTilemap.FIRST_PLAYER_LAYER + this.tilePos.y);
   }
 
   private setStandingFrame(direction: Direction): void {
@@ -144,15 +167,8 @@ export class GridCharacter {
   }
 
   private startMoving(direction: Direction): void {
-    this.tilePos.add(this.movementDirectionVectors[direction]);
+    this.tilePos = this.tilePos.add(this.movementDirectionVectors[direction]);
     this.movementDirection = direction;
-  }
-
-  isBlockingDirection(direction: Direction): boolean {
-    return (
-      this.tilemap.hasBlockingTile(this.tilePosInDirection(direction)) ||
-      this.tilemap.hasBlockingChar(this.tilePosInDirection(direction))
-    );
   }
 
   private tilePosInDirection(direction: Direction): Vector2 {

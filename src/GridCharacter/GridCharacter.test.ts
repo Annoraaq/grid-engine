@@ -31,6 +31,7 @@ describe("GridCharacter", () => {
       width: 16,
       height: 20,
       setFrame: jest.fn(),
+      setDepth: jest.fn(),
       frame: { name: "anything" },
       getCenter: jest
         .fn()
@@ -61,6 +62,10 @@ describe("GridCharacter", () => {
 
   it("should initialize with standing face down frame", () => {
     expect(spriteMock.setFrame).toHaveBeenCalledWith(37);
+  });
+
+  it("should set the correct depth on construction", () => {
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(1000);
   });
 
   describe("walking frames", () => {
@@ -168,6 +173,7 @@ describe("GridCharacter", () => {
     gridCharacter.setTilePosition(newTilePos);
     newTilePos.x = 20;
 
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 + expectedPos.y);
     expect(gridCharacter.getTilePos()).toEqual(expectedPos);
   });
 
@@ -178,6 +184,7 @@ describe("GridCharacter", () => {
     gridCharacter.move(Direction.UP);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, -1));
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 - 1);
 
     gridCharacter.move(Direction.DOWN);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);

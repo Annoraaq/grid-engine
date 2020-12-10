@@ -5,8 +5,15 @@ const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
 
 export class GridTilemap {
+  private static readonly MAX_PLAYER_LAYERS = 1000;
+  static readonly FIRST_PLAYER_LAYER = 1000;
   private characters = new Map<string, GridCharacter>();
-  constructor(private tilemap: Phaser.Tilemaps.Tilemap) {}
+  constructor(
+    private tilemap: Phaser.Tilemaps.Tilemap,
+    private firstLayerAboveChar: number
+  ) {
+    this.setLayerDepths();
+  }
 
   addCharacter(character: GridCharacter) {
     this.characters.set(character.getId(), character);
@@ -34,5 +41,17 @@ export class GridTilemap {
     return [...this.characters.values()].some((char) =>
       char.getTilePos().equals(pos)
     );
+  }
+
+  private setLayerDepths() {
+    this.tilemap.layers.forEach((layer, index) => {
+      if (index >= this.firstLayerAboveChar) {
+        layer.tilemapLayer.setDepth(
+          GridTilemap.FIRST_PLAYER_LAYER + GridTilemap.MAX_PLAYER_LAYERS + index
+        );
+      } else {
+        layer.tilemapLayer.setDepth(index);
+      }
+    });
   }
 }

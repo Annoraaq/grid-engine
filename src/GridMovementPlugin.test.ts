@@ -17,6 +17,8 @@ jest.mock("./GridCharacter/GridCharacter", function () {
   };
 });
 
+jest.mock("./GridTilemap/GridTilemap");
+
 import { GridMovementPlugin } from "./GridMovementPlugin";
 import { GridTilemap } from "./GridTilemap/GridTilemap";
 
@@ -35,7 +37,7 @@ describe("GridMovementPlugin", () => {
     tileMapMock = {
       layers: [
         {
-          tilemapLayer: { scale: 2 },
+          tilemapLayer: { scale: 2, setDepth: jest.fn() },
         },
       ],
       tileWidth: 16,
@@ -53,6 +55,21 @@ describe("GridMovementPlugin", () => {
     );
   });
 
+  it("should init tilemap", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    expect(GridTilemap).toHaveBeenCalledWith(tileMapMock, 3);
+  });
+
   it("should init player", () => {
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
     gridMovementPlugin.create(tileMapMock, {
@@ -63,6 +80,7 @@ describe("GridMovementPlugin", () => {
           characterIndex: 3,
         },
       ],
+      firstLayerAboveChar: 3,
     });
     expect(GridCharacter).toHaveBeenCalledWith(
       "player",
@@ -88,6 +106,7 @@ describe("GridMovementPlugin", () => {
           startPosition: new Phaser.Math.Vector2(3, 4),
         },
       ],
+      firstLayerAboveChar: 3,
     });
     expect(mockSetTilePositon).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(3, 4)
@@ -105,6 +124,7 @@ describe("GridMovementPlugin", () => {
           speed: 2,
         },
       ],
+      firstLayerAboveChar: 3,
     });
     expect(GridCharacter).toHaveBeenCalledWith(
       "player",
@@ -126,6 +146,7 @@ describe("GridMovementPlugin", () => {
           characterIndex: 3,
         },
       ],
+      firstLayerAboveChar: 3,
     });
 
     gridMovementPlugin.moveCharLeft("player");
@@ -143,6 +164,7 @@ describe("GridMovementPlugin", () => {
           characterIndex: 3,
         },
       ],
+      firstLayerAboveChar: 3,
     });
 
     gridMovementPlugin.moveCharRight("player");
@@ -160,6 +182,7 @@ describe("GridMovementPlugin", () => {
           characterIndex: 3,
         },
       ],
+      firstLayerAboveChar: 3,
     });
 
     gridMovementPlugin.moveCharUp("player");
@@ -177,6 +200,7 @@ describe("GridMovementPlugin", () => {
           characterIndex: 3,
         },
       ],
+      firstLayerAboveChar: 3,
     });
 
     gridMovementPlugin.moveCharDown("player");
@@ -194,6 +218,7 @@ describe("GridMovementPlugin", () => {
           characterIndex: 3,
         },
       ],
+      firstLayerAboveChar: 3,
     });
 
     gridMovementPlugin.update(123, 456);

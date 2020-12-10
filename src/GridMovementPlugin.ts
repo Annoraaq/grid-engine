@@ -7,6 +7,7 @@ export type TileSizePerSecond = number;
 
 export interface GridMovementConfig {
   characters: CharacterData[];
+  firstLayerAboveChar: number;
 }
 
 export interface CharacterData {
@@ -39,7 +40,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       startPosition: new Phaser.Math.Vector2(0, 0),
       ...charData,
     }));
-    const gridTilemap = new GridTilemap(tilemap);
+    const gridTilemap = new GridTilemap(tilemap, config.firstLayerAboveChar);
     this.gridCharacters = new Map(
       enrichedCharData.map((charData) => [
         charData.id,

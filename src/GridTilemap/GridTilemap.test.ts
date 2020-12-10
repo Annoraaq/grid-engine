@@ -10,9 +10,15 @@ describe("GridTilemapPlugin", () => {
       layers: [
         {
           name: "layer1",
+          tilemapLayer: {
+            setDepth: jest.fn(),
+          },
         },
         {
           name: "layer2",
+          tilemapLayer: {
+            setDepth: jest.fn(),
+          },
         },
       ],
       tileWidth: 16,
@@ -21,8 +27,16 @@ describe("GridTilemapPlugin", () => {
     };
   });
 
+  it("should set layer depths on construction", () => {
+    gridTilemap = new GridTilemap(tilemapMock, 1);
+    expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
+    expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(
+      2001
+    );
+  });
+
   it("should add a character", () => {
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(tilemapMock, 3);
     const charMock1 = <any>{ getId: () => "player" };
     const charMock2 = <any>{ getId: () => "player2" };
     const charMockSameId = <any>{ getId: () => "player2" };
@@ -36,7 +50,7 @@ describe("GridTilemapPlugin", () => {
   it("should detect blocking tiles", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: true } });
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(tilemapMock, 3);
     const isBlocking = gridTilemap.hasBlockingTile(
       new Phaser.Math.Vector2(3, 4)
     );
@@ -53,7 +67,7 @@ describe("GridTilemapPlugin", () => {
   it("should return true if nothing blocks", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(tilemapMock, 3);
     const isBlocking = gridTilemap.hasBlockingTile(
       new Phaser.Math.Vector2(3, 4)
     );
@@ -65,7 +79,7 @@ describe("GridTilemapPlugin", () => {
   it("should return true if no tile", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(tilemapMock, 3);
     const isBlocking = gridTilemap.hasBlockingTile(
       new Phaser.Math.Vector2(3, 4)
     );
@@ -75,21 +89,21 @@ describe("GridTilemapPlugin", () => {
 
   it("should detect if no tile present", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(tilemapMock, 3);
     const hasNoTile = gridTilemap.hasNoTile(new Phaser.Math.Vector2(3, 4));
     expect(hasNoTile).toBe(true);
   });
 
   it("should detect if tile present", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(tilemapMock, 3);
     const hasNoTile = gridTilemap.hasNoTile(new Phaser.Math.Vector2(3, 4));
     expect(hasNoTile).toBe(false);
   });
 
   it("should detect a blocking char", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(tilemapMock, 3);
 
     const char1Pos = new Phaser.Math.Vector2(3, 4);
     const char2Pos = new Phaser.Math.Vector2(6, 8);
@@ -112,7 +126,7 @@ describe("GridTilemapPlugin", () => {
 
   it("should detect an unblocked tile", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(tilemapMock, 3);
 
     const char1Pos = new Phaser.Math.Vector2(3, 4);
     const char2Pos = new Phaser.Math.Vector2(6, 8);
