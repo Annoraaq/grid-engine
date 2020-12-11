@@ -38,7 +38,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.addCharacters(gridTilemap, config, tileSize);
   }
 
-  getPosition(charId: string) {
+  getPosition(charId: string): Phaser.Math.Vector2 {
     return this.gridCharacters.get(charId).getTilePos();
   }
 
