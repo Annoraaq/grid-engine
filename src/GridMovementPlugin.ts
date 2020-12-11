@@ -34,13 +34,56 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridMovementConfig) {
     const tilemapScale = tilemap.layers[0].tilemapLayer.scale;
     const tileSize = tilemap.tileWidth * tilemapScale;
+    const gridTilemap = this.createTilemap(tilemap, config);
+    this.addCharacters(gridTilemap, config, tileSize);
+  }
 
+  getPosition(charId: string) {
+    return this.gridCharacters.get(charId).getTilePos();
+  }
+
+  moveLeft(charId: string) {
+    this.gridCharacters.get(charId).move(Direction.LEFT);
+  }
+
+  moveRight(charId: string) {
+    this.gridCharacters.get(charId).move(Direction.RIGHT);
+  }
+
+  moveUp(charId: string) {
+    this.gridCharacters.get(charId).move(Direction.UP);
+  }
+
+  moveDown(charId: string) {
+    this.gridCharacters.get(charId).move(Direction.DOWN);
+  }
+
+  update(_time: number, delta: number) {
+    if (this.gridCharacters) {
+      for (let [_key, val] of this.gridCharacters) {
+        val.update(delta);
+      }
+    }
+  }
+
+  private createTilemap(
+    tilemap: Phaser.Tilemaps.Tilemap,
+    config: GridMovementConfig
+  ) {
+    return new GridTilemap(tilemap, config.firstLayerAboveChar);
+  }
+
+  private addCharacters(
+    gridTilemap: GridTilemap,
+    config: GridMovementConfig,
+    tileSize: number
+  ) {
     const enrichedCharData = config.characters.map((charData) => ({
       speed: 4,
       startPosition: new Phaser.Math.Vector2(0, 0),
       ...charData,
     }));
-    const gridTilemap = new GridTilemap(tilemap, config.firstLayerAboveChar);
+
     this.gridCharacters = new Map(
       enrichedCharData.map((charData) => [
         charData.id,
@@ -54,37 +97,15 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
         ),
       ])
     );
+
     enrichedCharData.forEach((charData) =>
       this.gridCharacters
         .get(charData.id)
         .setTilePosition(charData.startPosition)
     );
+
     for (let [_key, val] of this.gridCharacters) {
       gridTilemap.addCharacter(val);
-    }
-  }
-
-  moveCharLeft(charId: string) {
-    this.gridCharacters.get(charId).move(Direction.LEFT);
-  }
-
-  moveCharRight(charId: string) {
-    this.gridCharacters.get(charId).move(Direction.RIGHT);
-  }
-
-  moveCharUp(charId: string) {
-    this.gridCharacters.get(charId).move(Direction.UP);
-  }
-
-  moveCharDown(charId: string) {
-    this.gridCharacters.get(charId).move(Direction.DOWN);
-  }
-
-  update(_time: number, delta: number) {
-    if (this.gridCharacters) {
-      for (let [_key, val] of this.gridCharacters) {
-        val.update(delta);
-      }
     }
   }
 }

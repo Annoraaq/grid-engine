@@ -4,6 +4,7 @@ import { GridCharacter } from "./GridCharacter/GridCharacter";
 const mockSetTilePositon = jest.fn();
 const mockMove = jest.fn();
 const mockUpdate = jest.fn();
+const mockGetTilePos = jest.fn();
 jest.mock("./GridCharacter/GridCharacter", function () {
   return {
     GridCharacter: jest.fn((id) => {
@@ -12,6 +13,7 @@ jest.mock("./GridCharacter/GridCharacter", function () {
         move: mockMove,
         update: mockUpdate,
         getId: () => id,
+        getTilePos: mockGetTilePos,
       };
     }),
   };
@@ -149,7 +151,7 @@ describe("GridMovementPlugin", () => {
       firstLayerAboveChar: 3,
     });
 
-    gridMovementPlugin.moveCharLeft("player");
+    gridMovementPlugin.moveLeft("player");
 
     expect(mockMove).toHaveBeenCalledWith(Direction.LEFT);
   });
@@ -167,7 +169,7 @@ describe("GridMovementPlugin", () => {
       firstLayerAboveChar: 3,
     });
 
-    gridMovementPlugin.moveCharRight("player");
+    gridMovementPlugin.moveRight("player");
 
     expect(mockMove).toHaveBeenCalledWith(Direction.RIGHT);
   });
@@ -185,7 +187,7 @@ describe("GridMovementPlugin", () => {
       firstLayerAboveChar: 3,
     });
 
-    gridMovementPlugin.moveCharUp("player");
+    gridMovementPlugin.moveUp("player");
 
     expect(mockMove).toHaveBeenCalledWith(Direction.UP);
   });
@@ -203,7 +205,7 @@ describe("GridMovementPlugin", () => {
       firstLayerAboveChar: 3,
     });
 
-    gridMovementPlugin.moveCharDown("player");
+    gridMovementPlugin.moveDown("player");
 
     expect(mockMove).toHaveBeenCalledWith(Direction.DOWN);
   });
@@ -224,5 +226,24 @@ describe("GridMovementPlugin", () => {
     gridMovementPlugin.update(123, 456);
 
     expect(mockUpdate).toHaveBeenCalledWith(456);
+  });
+
+  it("should get tile position", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    mockGetTilePos.mockReturnValue(new Phaser.Math.Vector2(3, 4));
+
+    expect(gridMovementPlugin.getPosition("player")).toEqual(
+      new Phaser.Math.Vector2(3, 4)
+    );
   });
 });
