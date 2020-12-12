@@ -4,19 +4,31 @@
 
 ## Usage
 
-Install package:
+### Install package (npm):
+
+Install the dependency:
 
 ```
 npm i --save phaser-grid-movement-plugin
 ```
 
+And import it to your code:
+
+```javascript
+import * as GridMovementPlugin from "phaser-grid-movement-plugin";
+```
+
+### Install package (web):
+
+You can also download the `GridMovementPlugin.min.js` from the `dist` folder and import it via:
+
+```html
+<script src="GridMovementPlugin.min.js"></script>
+```
+
 In your GameConfig add:
 
-```
-import * as GridMovementPlugin from "phaser-grid-movement-plugin";
-
-...
-
+```javascript
 const gameConfig = {
 
   ...
@@ -40,7 +52,7 @@ const game = new Phaser.Game(gameConfig);
 
 In your Scenes create method add:
 
-```
+```javascript
 function create () {
 
   ...
