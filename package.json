@@ -1,6 +1,6 @@
 {
   "name": "phaser-grid-movement-plugin",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Phaser3 plugin for grid based movement on a 2D game board.",
   "main": "dist/GridMovementPlugin.min.js",
   "scripts": {
