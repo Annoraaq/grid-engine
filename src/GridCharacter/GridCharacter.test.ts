@@ -114,9 +114,18 @@ describe("GridCharacter", () => {
     });
 
     describe("lastFootLeft = true", () => {
-      beforeEach(() => {
+      function setNonStandingFrame() {
+        spriteMock.frame.name = "65";
+      }
+
+      function takeOneStep() {
         gridCharacter.move(Direction.UP);
-        gridCharacter.update(1000); // move till end of tile
+        gridCharacter.update(1000);
+      }
+
+      beforeEach(() => {
+        setNonStandingFrame();
+        takeOneStep();
         spriteMock.setFrame = jest.fn();
       });
 
@@ -124,7 +133,6 @@ describe("GridCharacter", () => {
         gridCharacter.move(Direction.UP);
         gridCharacter.update(50); // move to 2 / 16 px
         gridCharacter.update(200); // move to 12 / 16 px
-
         expect(spriteMock.setFrame).toHaveBeenNthCalledWith(1, 63);
         expect(spriteMock.setFrame).toHaveBeenNthCalledWith(2, 64);
       });

@@ -107,7 +107,7 @@ export class GridCharacter {
   }
 
   private setStandingFrame(direction: Direction): void {
-    if (this.isCurrentFrameStanding(direction)) {
+    if (!this.isCurrentFrameStanding(direction)) {
       this.lastFootLeft = !this.lastFootLeft;
     }
     this.sprite.setFrame(this.framesOfDirection(direction).standing);
