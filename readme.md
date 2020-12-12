@@ -1,6 +1,6 @@
 # Grid Movement Plugin for Phaser 3
 
-![](images/movemment.gif)
+![](images/movement.gif)
 
 ## Usage
 
