@@ -126,3 +126,15 @@ That's all you need for a minimum configuration. See the examples folder for a c
 - `moveUp(charId: string): Phaser.Math.Vector2`
 
 - `moveDown(charId: string): Phaser.Math.Vector2`
+
+- `setSpeed(charId: string, speed: number): void`
+
+  Sets the speed in tiles per second for a character.
+
+- `moveRandomly(charId: string, delay?: number = 0): void`
+
+  Initiates random movement of the character with the given id. The character will randomly pick one of the non-blocking directions. Optionally a `delay` in milliseconds can be provided. This represents the waiting time after a finished movement, before the next is being initiated.
+
+- `stopMovingRandomly(charId: string): void`
+
+  Stops moving a character randomly.
