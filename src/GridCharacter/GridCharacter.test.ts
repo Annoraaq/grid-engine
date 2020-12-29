@@ -268,4 +268,59 @@ describe("GridCharacter", () => {
 
     expect(spriteMock.setPosition).not.toHaveBeenCalled();
   });
+
+  describe("isBlockingDirection", () => {
+    it("direction NONE never blocks", () => {
+      const direction = Direction.NONE;
+      gridTilemapMock.hasBlockingTile.mockReturnValue(true);
+      gridTilemapMock.hasBlockingChar.mockReturnValue(true);
+
+      const result = gridCharacter.isBlockingDirection(direction);
+      expect(result).toBe(false);
+    });
+
+    it("should detect non-blocking direction", () => {
+      const direction = Direction.RIGHT;
+      gridTilemapMock.hasBlockingTile.mockReturnValue(false);
+      gridTilemapMock.hasBlockingChar.mockReturnValue(false);
+
+      const result = gridCharacter.isBlockingDirection(direction);
+      expect(gridTilemapMock.hasBlockingTile).toHaveBeenCalledWith({
+        x: 1,
+        y: 0,
+      });
+      expect(gridTilemapMock.hasBlockingChar).toHaveBeenCalledWith({
+        x: 1,
+        y: 0,
+      });
+      expect(result).toBe(false);
+    });
+
+    it("should detect blocking direction if map blocks", () => {
+      const direction = Direction.RIGHT;
+      gridTilemapMock.hasBlockingTile.mockReturnValue(true);
+      gridTilemapMock.hasBlockingChar.mockReturnValue(false);
+
+      const result = gridCharacter.isBlockingDirection(direction);
+      expect(result).toBe(true);
+    });
+
+    it("should detect blocking direction if char blocks", () => {
+      const direction = Direction.RIGHT;
+      gridTilemapMock.hasBlockingTile.mockReturnValue(false);
+      gridTilemapMock.hasBlockingChar.mockReturnValue(true);
+
+      const result = gridCharacter.isBlockingDirection(direction);
+      expect(result).toBe(true);
+    });
+
+    it("should detect blocking direction if char and tile block", () => {
+      const direction = Direction.RIGHT;
+      gridTilemapMock.hasBlockingTile.mockReturnValue(true);
+      gridTilemapMock.hasBlockingChar.mockReturnValue(true);
+
+      const result = gridCharacter.isBlockingDirection(direction);
+      expect(result).toBe(true);
+    });
+  });
 });

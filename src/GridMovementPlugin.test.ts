@@ -5,6 +5,10 @@ const mockSetTilePositon = jest.fn();
 const mockMove = jest.fn();
 const mockUpdate = jest.fn();
 const mockGetTilePos = jest.fn();
+const mockAddCharacter = jest.fn();
+const mockRemoveCharacter = jest.fn();
+const mockSetSpeed = jest.fn();
+const mockRandomMovementUpdate = jest.fn();
 jest.mock("./GridCharacter/GridCharacter", function () {
   return {
     GridCharacter: jest.fn((id) => {
@@ -14,10 +18,19 @@ jest.mock("./GridCharacter/GridCharacter", function () {
         update: mockUpdate,
         getId: () => id,
         getTilePos: mockGetTilePos,
+        setSpeed: mockSetSpeed,
       };
     }),
   };
 });
+
+jest.mock("./RandomMovement/RandomMovement", () => ({
+  RandomMovement: jest.fn(() => ({
+    addCharacter: mockAddCharacter,
+    removeCharacter: mockRemoveCharacter,
+    update: mockRandomMovementUpdate,
+  })),
+}));
 
 jest.mock("./GridTilemap/GridTilemap");
 
@@ -225,6 +238,7 @@ describe("GridMovementPlugin", () => {
 
     gridMovementPlugin.update(123, 456);
 
+    expect(mockRandomMovementUpdate).toHaveBeenCalledWith(456);
     expect(mockUpdate).toHaveBeenCalledWith(456);
   });
 
@@ -245,5 +259,53 @@ describe("GridMovementPlugin", () => {
     expect(gridMovementPlugin.getPosition("player")).toEqual(
       new Phaser.Math.Vector2(3, 4)
     );
+  });
+
+  it("should move randomly", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    gridMovementPlugin.moveRandomly("player", 123);
+    expect(mockAddCharacter).toHaveBeenCalledWith(expect.anything(), 123);
+  });
+
+  it("should stop moving randomly", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    gridMovementPlugin.stopMovingRandomly("player");
+    expect(mockRemoveCharacter).toHaveBeenCalled();
+  });
+
+  it("should set speed", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    gridMovementPlugin.setSpeed("player", 2);
+    expect(mockSetSpeed).toHaveBeenCalledWith(2);
   });
 });
