@@ -2,6 +2,7 @@ import { GridCharacter } from "./GridCharacter/GridCharacter";
 import "phaser";
 import { Direction } from "./Direction/Direction";
 import { GridTilemap } from "./GridTilemap/GridTilemap";
+import { RandomMovement } from "./RandomMovement/RandomMovement";
 
 export type TileSizePerSecond = number;
 
@@ -20,11 +21,14 @@ export interface CharacterData {
 
 export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   private gridCharacters: Map<string, GridCharacter>;
+  private randomMovement: RandomMovement;
   constructor(
     public scene: Phaser.Scene,
     pluginManager: Phaser.Plugins.PluginManager
   ) {
     super(scene, pluginManager);
+    this.gridCharacters = new Map();
+    this.randomMovement = new RandomMovement();
   }
 
   boot() {
@@ -58,7 +62,20 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.gridCharacters.get(charId).move(Direction.DOWN);
   }
 
+  moveRandomly(charId: string, delay: number) {
+    this.randomMovement.addCharacter(this.gridCharacters.get(charId), delay);
+  }
+
+  stopMovingRandomly(charId: string) {
+    this.randomMovement.removeCharacter(this.gridCharacters.get(charId));
+  }
+
+  setSpeed(charId: string, speed: number) {
+    this.gridCharacters.get(charId).setSpeed(speed);
+  }
+
   update(_time: number, delta: number) {
+    this.randomMovement.update(delta);
     if (this.gridCharacters) {
       for (let [_key, val] of this.gridCharacters) {
         val.update(delta);

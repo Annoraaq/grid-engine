@@ -27,6 +27,7 @@ export class GridCharacter {
     [Direction.DOWN]: Vector2.DOWN,
     [Direction.LEFT]: Vector2.LEFT,
     [Direction.RIGHT]: Vector2.RIGHT,
+    [Direction.NONE]: Vector2.ZERO,
   };
   private movementDirection = Direction.NONE;
   private decimalPlacesLeft = 0;
@@ -41,7 +42,7 @@ export class GridCharacter {
     private characterIndex: number,
     private tileSize: number,
     private tilemap: GridTilemap,
-    speed: number
+    private speed: number
   ) {
     this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
     this.speedPixelsPerSecond = this.tileSize * speed;
@@ -50,6 +51,14 @@ export class GridCharacter {
 
   getId(): string {
     return this.id;
+  }
+
+  getSpeed(): number {
+    return this.speed;
+  }
+
+  setSpeed(speed: number) {
+    this.speed = speed;
   }
 
   setTilePosition(tilePosition: Phaser.Math.Vector2): void {
@@ -85,7 +94,8 @@ export class GridCharacter {
     return this.movementDirection;
   }
 
-  private isBlockingDirection(direction: Direction): boolean {
+  isBlockingDirection(direction: Direction): boolean {
+    if (direction == Direction.NONE) return false;
     return (
       this.tilemap.hasBlockingTile(this.tilePosInDirection(direction)) ||
       this.tilemap.hasBlockingChar(this.tilePosInDirection(direction))
