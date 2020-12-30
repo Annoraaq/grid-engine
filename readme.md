@@ -131,9 +131,9 @@ That's all you need for a minimum configuration. See the examples folder for a c
 
   Sets the speed in tiles per second for a character.
 
-- `moveRandomly(charId: string, delay?: number = 0): void`
+- `moveRandomly(charId: string, delay?: number = 0, radius?: number = -1): void`
 
-  Initiates random movement of the character with the given id. The character will randomly pick one of the non-blocking directions. Optionally a `delay` in milliseconds can be provided. This represents the waiting time after a finished movement, before the next is being initiated.
+  Initiates random movement of the character with the given id. The character will randomly pick one of the non-blocking directions. Optionally a `delay` in milliseconds can be provided. This represents the waiting time after a finished movement, before the next is being initiated. If a `radius` other than `-1` is provided, the character will not move further than that radius from its initial position (the position it has been, when `moveRandomly` was called). The distance is calculated with the [manhattan distance](https://en.wikipedia.org/wiki/Taxicab_geometry).
 
 - `stopMovingRandomly(charId: string): void`
 
