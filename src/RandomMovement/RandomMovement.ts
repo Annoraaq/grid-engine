@@ -58,19 +58,27 @@ export class RandomMovement {
       Direction.DOWN,
       Direction.LEFT,
     ];
+    const conf = this.randomlyMovingCharacters.get(character.getId()).config;
+
     const unblocked = directions.filter(
       (dir) => !character.isBlockingDirection(dir)
     );
-    const conf = this.randomlyMovingCharacters.get(character.getId()).config;
-    if (conf.radius == -1) return unblocked;
-    return unblocked.filter((dir) => {
-      return (
-        this.manhattenDist(
-          character.getTilePos().add(DirectionVectors[dir]),
-          new Phaser.Math.Vector2(conf.initialCol, conf.initialRow)
-        ) <= conf.radius
-      );
-    });
+
+    return unblocked.filter((dir) => this.isWithinRadius(dir, character, conf));
+  }
+
+  private isWithinRadius(
+    dir: Direction,
+    character: GridCharacter,
+    conf: MovementConfig
+  ) {
+    if (conf.radius == -1) return true;
+    const dist = this.manhattenDist(
+      character.getTilePos().add(DirectionVectors[dir]),
+      new Phaser.Math.Vector2(conf.initialCol, conf.initialRow)
+    );
+
+    return dist <= conf.radius;
   }
 
   private manhattenDist(pos1: Phaser.Math.Vector2, pos2: Phaser.Math.Vector2) {
