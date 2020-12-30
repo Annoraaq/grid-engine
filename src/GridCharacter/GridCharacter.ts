@@ -1,3 +1,4 @@
+import { DirectionVectors } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
 import * as Phaser from "phaser";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
@@ -19,15 +20,6 @@ export class GridCharacter {
     [Direction.LEFT]: 1,
     [Direction.RIGHT]: 2,
     [Direction.UP]: 3,
-  };
-  private movementDirectionVectors: {
-    [key in Direction]?: Vector2;
-  } = {
-    [Direction.UP]: Vector2.UP,
-    [Direction.DOWN]: Vector2.DOWN,
-    [Direction.LEFT]: Vector2.LEFT,
-    [Direction.RIGHT]: Vector2.RIGHT,
-    [Direction.NONE]: Vector2.ZERO,
   };
   private movementDirection = Direction.NONE;
   private decimalPlacesLeft = 0;
@@ -177,12 +169,12 @@ export class GridCharacter {
   }
 
   private startMoving(direction: Direction): void {
-    this.tilePos = this.tilePos.add(this.movementDirectionVectors[direction]);
+    this.tilePos = this.tilePos.add(DirectionVectors[direction]);
     this.movementDirection = direction;
   }
 
   private tilePosInDirection(direction: Direction): Vector2 {
-    return this.getTilePos().add(this.movementDirectionVectors[direction]);
+    return this.getTilePos().add(DirectionVectors[direction]);
   }
 
   private updateCharacterPosition(delta: number): void {
@@ -229,7 +221,7 @@ export class GridCharacter {
   }
 
   private movementDistance(speed: number): Vector2 {
-    return this.movementDirectionVectors[this.movementDirection]
+    return DirectionVectors[this.movementDirection]
       .clone()
       .multiply(new Vector2(speed));
   }

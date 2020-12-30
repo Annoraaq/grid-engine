@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Grid Movement Plugin for Phaser 3 - Example - Move Player</title>
+    <title>Grid Movement Plugin for Phaser 3 - Example - Random Movement</title>
     <script src="GridMovementPlugin.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.24.1/dist/phaser.js"></script>
     <style type="text/css">
@@ -56,7 +56,7 @@
 
   function preload () {
     this.load.image("tiles", "assets/cloud_tileset.png");
-    this.load.tilemapTiledJSON("cloud-city-map", "assets/cloud_city.json");
+    this.load.tilemapTiledJSON("cloud-city-map", "assets/cloud_city_large.json");
     this.load.spritesheet("player", "assets/characters.png", {
       frameWidth: 52,
       frameHeight: 72,
@@ -65,14 +65,23 @@
 
   function create () {
     const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
-    cloudCityTilemap.addTilesetImage("Cloud City", "tiles");
+    cloudCityTilemap.addTilesetImage("cloud_tileset", "tiles");
     for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-      const layer = cloudCityTilemap.createStaticLayer(i, "Cloud City", 0, 0);
+      const layer = cloudCityTilemap.createStaticLayer(i, "cloud_tileset", 0, 0);
       layer.scale = 3;
     }
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
     this.cameras.main.startFollow(playerSprite);
+
+    const npcSprite = this.add.sprite(0, 0, "player");
+    npcSprite.scale = 1.5;
+
+    const npcSprite1 = this.add.sprite(0, 0, "player");
+    npcSprite1.scale = 1.5;
+
+    const npcSprite2 = this.add.sprite(0, 0, "player");
+    npcSprite2.scale = 1.5;
 
     const gridMovementConfig = {
       characters: [
@@ -82,11 +91,34 @@
           characterIndex: 6,
           startPosition: new Phaser.Math.Vector2(8, 8),
         },
+        {
+          id: "npc0",
+          sprite: npcSprite,
+          characterIndex: 0,
+          startPosition: new Phaser.Math.Vector2(12, 8),
+          speed: 3
+        },
+        {
+          id: "npc1",
+          sprite: npcSprite1,
+          characterIndex: 1,
+          startPosition: new Phaser.Math.Vector2(14, 8),
+        },
+        {
+          id: "npc2",
+          sprite: npcSprite2,
+          characterIndex: 3,
+          startPosition: new Phaser.Math.Vector2(6, 8),
+          speed: 2
+        },
       ],
       firstLayerAboveChar: 3,
     };
 
     this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
+    this.gridMovementPlugin.moveRandomly('npc0', 0, 1);
+    this.gridMovementPlugin.moveRandomly('npc1', 500, 2);
+    this.gridMovementPlugin.moveRandomly('npc2', 1500, 3);
   }
 
   function update () {

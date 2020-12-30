@@ -273,8 +273,8 @@ describe("GridMovementPlugin", () => {
       ],
       firstLayerAboveChar: 3,
     });
-    gridMovementPlugin.moveRandomly("player", 123);
-    expect(mockAddCharacter).toHaveBeenCalledWith(expect.anything(), 123);
+    gridMovementPlugin.moveRandomly("player", 123, 3);
+    expect(mockAddCharacter).toHaveBeenCalledWith(expect.anything(), 123, 3);
   });
 
   it("should stop moving randomly", () => {

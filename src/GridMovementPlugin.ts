@@ -62,8 +62,12 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.gridCharacters.get(charId).move(Direction.DOWN);
   }
 
-  moveRandomly(charId: string, delay: number) {
-    this.randomMovement.addCharacter(this.gridCharacters.get(charId), delay);
+  moveRandomly(charId: string, delay: number = 0, radius: number = -1) {
+    this.randomMovement.addCharacter(
+      this.gridCharacters.get(charId),
+      delay,
+      radius
+    );
   }
 
   stopMovingRandomly(charId: string) {
