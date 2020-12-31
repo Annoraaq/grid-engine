@@ -49,27 +49,33 @@ export class RandomMovement {
 
   update(delta: number) {
     this.getStandingCharacters().forEach(({ character, config }) => {
-      if (
-        config.stepsWalked < config.stepSize &&
-        config.currentMovementDirection !== Direction.NONE &&
-        !character.isBlockingDirection(config.currentMovementDirection) &&
-        this.isWithinRadius(config.currentMovementDirection, character, config)
-      ) {
+      if (this.shouldContinueWalkingCurrentDirection(character, config)) {
         config.stepsWalked++;
         character.move(config.currentMovementDirection);
-        return;
-      }
-
-      config.delayLeft -= delta;
-      if (config.delayLeft <= 0) {
-        config.delayLeft = config.delay;
-        const dir = this.getFreeRandomDirection(character);
-        character.move(dir);
-        config.currentMovementDirection = dir;
-        config.stepsWalked = 1;
-        config.stepSize = this.getRandomInt(config.radius) + 1;
+      } else {
+        config.delayLeft -= delta;
+        if (config.delayLeft <= 0) {
+          config.delayLeft = config.delay;
+          const dir = this.getFreeRandomDirection(character);
+          character.move(dir);
+          config.currentMovementDirection = dir;
+          config.stepsWalked = 1;
+          config.stepSize = this.getRandomInt(config.radius) + 1;
+        }
       }
     });
+  }
+
+  private shouldContinueWalkingCurrentDirection(
+    character: GridCharacter,
+    config: MovementConfig
+  ): boolean {
+    return (
+      config.stepsWalked < config.stepSize &&
+      config.currentMovementDirection !== Direction.NONE &&
+      !character.isBlockingDirection(config.currentMovementDirection) &&
+      this.isWithinRadius(config.currentMovementDirection, character, config)
+    );
   }
 
   private getStandingCharacters(): MovementTuple[] {

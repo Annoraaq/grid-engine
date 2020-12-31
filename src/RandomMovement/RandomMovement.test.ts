@@ -117,18 +117,15 @@ describe("RandomMovement", () => {
     mockMath.random = () => 0.5;
     global.Math = mockMath;
 
-    const vec = new Phaser.Math.Vector2(0, 0);
-
     const char1Mock: GridCharacter = <any>{
       getId: () => "char1",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getTilePos: () => vec,
+      getTilePos: () => new Phaser.Math.Vector2(0, 0),
       isMoving: () => false,
     };
     randomMovement.addCharacter(char1Mock, 0, 2);
-    vec.x = 2;
-    vec.y = 2;
+    char1Mock.getTilePos = () => new Phaser.Math.Vector2(2, 2);
     randomMovement.update(1);
 
     expect(char1Mock.move).toHaveBeenCalledWith(Direction.NONE);
@@ -137,18 +134,15 @@ describe("RandomMovement", () => {
   it("should move further than radius if radius is -1", () => {
     mockRandom(0.5);
 
-    const vec = new Phaser.Math.Vector2(0, 0);
-
     const char1Mock: GridCharacter = <any>{
       getId: () => "char1",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getTilePos: () => vec,
+      getTilePos: () => new Phaser.Math.Vector2(0, 0),
       isMoving: () => false,
     };
     randomMovement.addCharacter(char1Mock, 0, -1);
-    vec.x = 2;
-    vec.y = 2;
+    char1Mock.getTilePos = () => new Phaser.Math.Vector2(2, 2);
     randomMovement.update(1);
 
     expect(char1Mock.move).toHaveBeenCalledWith(Direction.DOWN);
@@ -157,13 +151,11 @@ describe("RandomMovement", () => {
   it("should continue moving if in radius and step size", () => {
     mockRandom(0.7);
 
-    const vec = new Phaser.Math.Vector2(0, 0);
-
     const char1Mock: GridCharacter = <any>{
       getId: () => "char1",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getTilePos: () => vec,
+      getTilePos: () => new Phaser.Math.Vector2(0, 0),
       isMoving: () => false,
     };
     randomMovement.addCharacter(char1Mock, 0, 2);
@@ -185,16 +177,61 @@ describe("RandomMovement", () => {
     expect(char1Mock.move).toHaveBeenNthCalledWith(3, Direction.UP);
   });
 
-  it("should reset step size and steps walked on direction change", () => {
+  it("should not continue moving if direction blocked", () => {
     mockRandom(0.7);
-
-    const vec = new Phaser.Math.Vector2(0, 0);
 
     const char1Mock: GridCharacter = <any>{
       getId: () => "char1",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getTilePos: () => vec,
+      getTilePos: () => new Phaser.Math.Vector2(0, 0),
+      isMoving: () => false,
+    };
+    randomMovement.addCharacter(char1Mock, 50, 2);
+
+    // do first step down and set step size 2
+    randomMovement.update(60);
+    expect(char1Mock.move).toHaveBeenNthCalledWith(1, Direction.DOWN);
+    expect(char1Mock.move).toHaveBeenCalledTimes(1);
+
+    char1Mock.isBlockingDirection = () => true;
+
+    // do next step which is blocked
+    randomMovement.update(1);
+    expect(char1Mock.move).toHaveBeenCalledTimes(1);
+  });
+
+  it("should not continue moving if direction is out of radius", () => {
+    mockRandom(0.7);
+
+    const char1Mock: GridCharacter = <any>{
+      getId: () => "char1",
+      isBlockingDirection: () => false,
+      move: jest.fn(),
+      getTilePos: () => new Phaser.Math.Vector2(0, 0),
+      isMoving: () => false,
+    };
+    randomMovement.addCharacter(char1Mock, 50, 2);
+
+    // do first step down and set step size 2
+    randomMovement.update(60);
+    expect(char1Mock.move).toHaveBeenNthCalledWith(1, Direction.DOWN);
+
+    char1Mock.getTilePos = () => new Phaser.Math.Vector2(2, 2);
+
+    // do next step which is out of radius
+    randomMovement.update(1);
+    expect(char1Mock.move).toHaveBeenCalledTimes(1);
+  });
+
+  it("should reset step size and steps walked on direction change", () => {
+    mockRandom(0.7);
+
+    const char1Mock: GridCharacter = <any>{
+      getId: () => "char1",
+      isBlockingDirection: () => false,
+      move: jest.fn(),
+      getTilePos: () => new Phaser.Math.Vector2(0, 0),
       isMoving: () => false,
     };
     randomMovement.addCharacter(char1Mock, 0, 2);
