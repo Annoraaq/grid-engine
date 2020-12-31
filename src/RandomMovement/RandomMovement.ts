@@ -12,6 +12,9 @@ interface MovementConfig {
   initialRow: number;
   initialCol: number;
   radius: number;
+  stepSize: number;
+  stepsWalked: number;
+  currentMovementDirection: Direction;
 }
 
 export class RandomMovement {
@@ -33,6 +36,9 @@ export class RandomMovement {
         initialRow: character.getTilePos().y,
         initialCol: character.getTilePos().x,
         radius,
+        stepSize: this.getRandomInt(radius) + 1,
+        stepsWalked: 0,
+        currentMovementDirection: Direction.NONE,
       },
     });
   }
@@ -42,13 +48,34 @@ export class RandomMovement {
   }
 
   update(delta: number) {
-    this.randomlyMovingCharacters.forEach(({ character, config }) => {
+    this.getStandingCharacters().forEach(({ character, config }) => {
+      if (
+        config.stepsWalked < config.stepSize &&
+        config.currentMovementDirection !== Direction.NONE &&
+        !character.isBlockingDirection(config.currentMovementDirection) &&
+        this.isWithinRadius(config.currentMovementDirection, character, config)
+      ) {
+        config.stepsWalked++;
+        character.move(config.currentMovementDirection);
+        return;
+      }
+
       config.delayLeft -= delta;
       if (config.delayLeft <= 0) {
         config.delayLeft = config.delay;
-        character.move(this.getFreeRandomDirection(character));
+        const dir = this.getFreeRandomDirection(character);
+        character.move(dir);
+        config.currentMovementDirection = dir;
+        config.stepsWalked = 1;
+        config.stepSize = this.getRandomInt(config.radius) + 1;
       }
     });
+  }
+
+  private getStandingCharacters(): MovementTuple[] {
+    return [...this.randomlyMovingCharacters.values()].filter(
+      (tuple) => !tuple.character.isMoving()
+    );
   }
 
   private getFreeDirections(character: GridCharacter): Direction[] {

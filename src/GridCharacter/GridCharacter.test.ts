@@ -270,6 +270,20 @@ describe("GridCharacter", () => {
   });
 
   describe("isBlockingDirection", () => {
+    it("should detect movement", () => {
+      mockNonBlockingTile();
+      gridCharacter.move(Direction.DOWN);
+      expect(gridCharacter.isMoving()).toBeTruthy();
+    });
+
+    it("should detect non-movement", () => {
+      mockBlockingTile();
+      gridCharacter.move(Direction.DOWN);
+      expect(gridCharacter.isMoving()).toBeFalsy();
+    });
+  });
+
+  describe("isBlockingDirection", () => {
     it("direction NONE never blocks", () => {
       const direction = Direction.NONE;
       gridTilemapMock.hasBlockingTile.mockReturnValue(true);

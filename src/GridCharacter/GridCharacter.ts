@@ -94,6 +94,10 @@ export class GridCharacter {
     );
   }
 
+  isMoving(): boolean {
+    return this.movementDirection != Direction.NONE;
+  }
+
   private get tilePos() {
     return this._tilePos.clone();
   }
@@ -162,10 +166,6 @@ export class GridCharacter {
       standing: startFrame + 1,
       leftFoot: startFrame + 2,
     };
-  }
-
-  private isMoving(): boolean {
-    return this.movementDirection != Direction.NONE;
   }
 
   private startMoving(direction: Direction): void {
