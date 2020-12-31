@@ -67,9 +67,10 @@
     const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
     cloudCityTilemap.addTilesetImage("cloud_tileset", "tiles");
     for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-      const layer = cloudCityTilemap.createStaticLayer(i, "cloud_tileset", 0, 0);
+      const layer = cloudCityTilemap.createDynamicLayer(i, "cloud_tileset", 0, 0);
       layer.scale = 3;
     }
+
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
     this.cameras.main.startFollow(playerSprite);
@@ -95,7 +96,7 @@
           id: "npc0",
           sprite: npcSprite,
           characterIndex: 0,
-          startPosition: new Phaser.Math.Vector2(12, 8),
+          startPosition: new Phaser.Math.Vector2(12, 5),
           speed: 3
         },
         {
@@ -119,6 +120,11 @@
     this.gridMovementPlugin.moveRandomly('npc0', 0, 1);
     this.gridMovementPlugin.moveRandomly('npc1', 500, 2);
     this.gridMovementPlugin.moveRandomly('npc2', 1500, 3);
+
+    tintRadius(cloudCityTilemap, 8,6 ,3, 0xffcc4a);
+    tintRadius(cloudCityTilemap, 5,12 ,1, 0xff7a4a);
+    tintRadius(cloudCityTilemap, 8,14 ,2, 0x6eff94);
+
   }
 
   function update () {
@@ -131,6 +137,31 @@
       this.gridMovementPlugin.moveUp("player");
     } else if (cursors.down.isDown) {
       this.gridMovementPlugin.moveDown("player");
+    }
+  }
+
+  function manhattanDist(x1, y1, x2, y2) {
+    return Math.abs(x1-x2) + Math.abs(y1-y2);
+  }
+
+  function tintRadius(tilemap, posX, posY, radius, color) {
+    for (let i = 0; i < tilemap.layers.length; i++) {
+      for(let x=0; x<=radius; x++) {
+        for(let y=0; y<=radius; y++) {
+          if (manhattanDist(posX, posY, posX+x, posY+y) <= radius) {
+            tilemap.layers[i].tilemapLayer.layer.data[posX+x][posY+y].tint = color;
+          }
+          if (manhattanDist(posX, posY, posX-x, posY+y) <= radius) {
+            tilemap.layers[i].tilemapLayer.layer.data[posX-x][posY+y].tint = color;
+          }
+          if (manhattanDist(posX, posY, posX+x, posY-y) <= radius) {
+            tilemap.layers[i].tilemapLayer.layer.data[posX+x][posY-y].tint = color;
+          }
+          if (manhattanDist(posX, posY, posX-x, posY-y) <= radius) {
+            tilemap.layers[i].tilemapLayer.layer.data[posX-x][posY-y].tint = color;
+          }
+        }
+      }
     }
   }
 
