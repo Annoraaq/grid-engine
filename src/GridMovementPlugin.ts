@@ -1,3 +1,4 @@
+import { TargetMovement } from "./TargetMovement/TargetMovement";
 import { GridCharacter } from "./GridCharacter/GridCharacter";
 import "phaser";
 import { Direction } from "./Direction/Direction";
@@ -22,6 +23,7 @@ export interface CharacterData {
 export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   private gridCharacters: Map<string, GridCharacter>;
   private randomMovement: RandomMovement;
+  private targetMovement: TargetMovement;
   constructor(
     public scene: Phaser.Scene,
     pluginManager: Phaser.Plugins.PluginManager
@@ -29,6 +31,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     super(scene, pluginManager);
     this.gridCharacters = new Map();
     this.randomMovement = new RandomMovement();
+    this.targetMovement = new TargetMovement();
   }
 
   boot() {
@@ -67,6 +70,13 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       this.gridCharacters.get(charId),
       delay,
       radius
+    );
+  }
+
+  moveTo(charId: string, targetPos: Phaser.Math.Vector2) {
+    this.targetMovement.addCharacter(
+      this.gridCharacters.get(charId),
+      targetPos
     );
   }
 

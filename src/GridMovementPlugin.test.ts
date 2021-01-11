@@ -9,6 +9,7 @@ const mockAddCharacter = jest.fn();
 const mockRemoveCharacter = jest.fn();
 const mockSetSpeed = jest.fn();
 const mockRandomMovementUpdate = jest.fn();
+const mockTargetMovementAddCharacter = jest.fn();
 jest.mock("./GridCharacter/GridCharacter", function () {
   return {
     GridCharacter: jest.fn((id) => {
@@ -29,6 +30,12 @@ jest.mock("./RandomMovement/RandomMovement", () => ({
     addCharacter: mockAddCharacter,
     removeCharacter: mockRemoveCharacter,
     update: mockRandomMovementUpdate,
+  })),
+}));
+
+jest.mock("./TargetMovement/TargetMovement", () => ({
+  TargetMovement: jest.fn(() => ({
+    addCharacter: mockTargetMovementAddCharacter,
   })),
 }));
 
@@ -275,6 +282,26 @@ describe("GridMovementPlugin", () => {
     });
     gridMovementPlugin.moveRandomly("player", 123, 3);
     expect(mockAddCharacter).toHaveBeenCalledWith(expect.anything(), 123, 3);
+  });
+
+  it("should move to coordinates", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    const targetVec = new Phaser.Math.Vector2(3, 4);
+    gridMovementPlugin.moveTo("player", targetVec);
+    expect(mockTargetMovementAddCharacter).toHaveBeenCalledWith(
+      expect.anything(),
+      targetVec
+    );
   });
 
   it("should stop moving randomly", () => {
