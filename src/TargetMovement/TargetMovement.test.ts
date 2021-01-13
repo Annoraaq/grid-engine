@@ -9,6 +9,7 @@ describe("TargetMovement", () => {
       getId: () => id,
       getTilePos: jest.fn(() => pos),
       move: jest.fn(),
+      isMoving: () => false,
     };
   }
   beforeEach(() => {
@@ -23,15 +24,19 @@ describe("TargetMovement", () => {
     expect(mockChar.move).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
-  it("should move all chars", () => {
+  fit("should move all standing chars", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
-    const mockChar = createMockChar("char1", charPos);
-    const mockChar2 = createMockChar("char2", charPos);
-    targetMovement.addCharacter(mockChar, new Phaser.Math.Vector2(3, 1));
-    targetMovement.addCharacter(mockChar2, new Phaser.Math.Vector2(3, 1));
+    const standingChar = createMockChar("char1", charPos);
+    const standingChar2 = createMockChar("char2", charPos);
+    const movingChar = createMockChar("char3", charPos);
+    movingChar.isMoving = () => true;
+    targetMovement.addCharacter(standingChar, new Phaser.Math.Vector2(3, 1));
+    targetMovement.addCharacter(standingChar2, new Phaser.Math.Vector2(3, 1));
+    targetMovement.addCharacter(movingChar, new Phaser.Math.Vector2(3, 1));
     targetMovement.update(1);
-    expect(mockChar.move).toHaveBeenCalledWith(Direction.RIGHT);
-    expect(mockChar2.move).toHaveBeenCalledWith(Direction.RIGHT);
+    expect(standingChar.move).toHaveBeenCalledWith(Direction.RIGHT);
+    expect(standingChar2.move).toHaveBeenCalledWith(Direction.RIGHT);
+    expect(movingChar.move).not.toHaveBeenCalled();
   });
 
   it("should not move arrived char", () => {

@@ -31,7 +31,7 @@ export class TargetMovement {
   // }
 
   update(delta: number) {
-    this.characters.forEach(({ character, config }) => {
+    this.getStandingCharacters().forEach(({ character, config }) => {
       if (
         this.vec2str(character.getTilePos()) == this.vec2str(config.targetPos)
       ) {
@@ -152,11 +152,11 @@ export class TargetMovement {
   //   );
   // }
 
-  // private getStandingCharacters(): MovementTuple[] {
-  //   return [...this.randomlyMovingCharacters.values()].filter(
-  //     (tuple) => !tuple.character.isMoving()
-  //   );
-  // }
+  private getStandingCharacters(): MovementTuple[] {
+    return [...this.characters.values()].filter(
+      (tuple) => !tuple.character.isMoving()
+    );
+  }
 
   // private getFreeDirections(character: GridCharacter): Direction[] {
   //   const directions = [
