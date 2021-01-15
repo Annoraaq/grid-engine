@@ -24,7 +24,7 @@ describe("TargetMovement", () => {
     expect(mockChar.move).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
-  fit("should move all standing chars", () => {
+  it("should move all standing chars", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
     const standingChar = createMockChar("char1", charPos);
     const standingChar2 = createMockChar("char2", charPos);
