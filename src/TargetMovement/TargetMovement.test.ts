@@ -20,7 +20,7 @@ describe("TargetMovement", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
     const mockChar = createMockChar("char1", charPos);
     targetMovement.addCharacter(mockChar, new Phaser.Math.Vector2(3, 1));
-    targetMovement.update(1);
+    targetMovement.update();
     expect(mockChar.move).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
@@ -33,7 +33,7 @@ describe("TargetMovement", () => {
     targetMovement.addCharacter(standingChar, new Phaser.Math.Vector2(3, 1));
     targetMovement.addCharacter(standingChar2, new Phaser.Math.Vector2(3, 1));
     targetMovement.addCharacter(movingChar, new Phaser.Math.Vector2(3, 1));
-    targetMovement.update(1);
+    targetMovement.update();
     expect(standingChar.move).toHaveBeenCalledWith(Direction.RIGHT);
     expect(standingChar2.move).toHaveBeenCalledWith(Direction.RIGHT);
     expect(movingChar.move).not.toHaveBeenCalled();
@@ -43,7 +43,7 @@ describe("TargetMovement", () => {
     const charPos = new Phaser.Math.Vector2(3, 1);
     const mockChar = createMockChar("char1", charPos);
     targetMovement.addCharacter(mockChar, new Phaser.Math.Vector2(3, 1));
-    targetMovement.update(1);
+    targetMovement.update();
     expect(mockChar.move).not.toHaveBeenCalled();
   });
 });

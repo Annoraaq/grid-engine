@@ -30,7 +30,7 @@ export class TargetMovement {
   //   this.randomlyMovingCharacters.delete(character.getId());
   // }
 
-  update(delta: number) {
+  update() {
     this.getStandingCharacters().forEach(({ character, config }) => {
       if (
         this.vec2str(character.getTilePos()) == this.vec2str(config.targetPos)
