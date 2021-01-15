@@ -1,10 +1,7 @@
 import * as Phaser from "phaser";
+import { VectorUtils } from "../../../Utils/VectorUtils";
 
 export class Bfs {
-  static vec2str(vec: Phaser.Math.Vector2) {
-    return `${vec.x}#${vec.y}`;
-  }
-
   static getShortestPath(
     startPos: Phaser.Math.Vector2,
     targetPos: Phaser.Math.Vector2
@@ -13,15 +10,13 @@ export class Bfs {
       const ret = [];
       let currentNode = stopNode;
       ret.push(currentNode);
-      while (vec2str(currentNode) != vec2str(startNode)) {
-        currentNode = previous.get(vec2str(currentNode));
+      while (
+        VectorUtils.vec2str(currentNode) != VectorUtils.vec2str(startNode)
+      ) {
+        currentNode = previous.get(VectorUtils.vec2str(currentNode));
         ret.push(currentNode);
       }
       return ret.reverse();
-    };
-
-    const vec2str = (vec: Phaser.Math.Vector2) => {
-      return `${vec.x}#${vec.y}`;
     };
 
     const getNeighbours = (pos: Phaser.Math.Vector2) => {
@@ -42,15 +37,15 @@ export class Bfs {
 
       while (queue.length > 0) {
         const { node, dist } = queue.shift();
-        if (vec2str(node) === vec2str(stopNode)) {
+        if (VectorUtils.vec2str(node) === VectorUtils.vec2str(stopNode)) {
           return { shortestDistande: dist, previous };
         }
 
         for (let neighbour of getNeighbours(node)) {
-          if (!visited.has(vec2str(neighbour))) {
-            previous.set(vec2str(neighbour), node);
+          if (!visited.has(VectorUtils.vec2str(neighbour))) {
+            previous.set(VectorUtils.vec2str(neighbour), node);
             queue.push({ node: neighbour, dist: dist + 1 });
-            visited.add(vec2str(neighbour));
+            visited.add(VectorUtils.vec2str(neighbour));
           }
         }
       }

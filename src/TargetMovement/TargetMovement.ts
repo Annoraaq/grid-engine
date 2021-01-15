@@ -1,3 +1,4 @@
+import { VectorUtils } from "./../Utils/VectorUtils";
 import { CharacterData } from "./../GridMovementPlugin.d";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
 import * as Phaser from "phaser";
@@ -34,7 +35,8 @@ export class TargetMovement {
   update() {
     this.getStandingCharacters().forEach(({ character, config }) => {
       if (
-        this.vec2str(character.getTilePos()) == this.vec2str(config.targetPos)
+        VectorUtils.vec2str(character.getTilePos()) ==
+        VectorUtils.vec2str(config.targetPos)
       ) {
         this.characters.delete(character.getId());
       } else {
@@ -63,10 +65,6 @@ export class TargetMovement {
       return Direction.DOWN;
     }
     return Direction.NONE;
-  }
-
-  private vec2str(vec: Phaser.Math.Vector2) {
-    return `${vec.x}#${vec.y}`;
   }
 
   private getStandingCharacters(): MovementTuple[] {
