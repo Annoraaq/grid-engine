@@ -138,3 +138,22 @@ That's all you need for a minimum configuration. See the examples folder for a c
 - `stopMovingRandomly(charId: string): void`
 
   Stops moving a character randomly.
+
+## Troubleshooting
+
+### `Invalid Scene Plugin: gridMovementPlugin`
+
+<img alt="Error in Chrome console" src="https://snipboard.io/OXtASb.jpg" width="50%" />
+
+This error will prevent loading of the plugin, and can occur if your bundler doesn't require `* as` for commonjs modules. To resolve this, try changing the following line:
+
+
+```ts
+import * as GridMovementPlugin from "phaser-grid-movement-plugin";
+```
+
+to
+
+```ts
+import GridMovementPlugin from "phaser-grid-movement-plugin";
+```
