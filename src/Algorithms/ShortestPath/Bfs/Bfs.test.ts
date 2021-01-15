@@ -29,4 +29,11 @@ describe("Bfs", () => {
       new Phaser.Math.Vector2(5, -1),
     ]);
   });
+
+  it("should return path of 1", () => {
+    const startPos = new Phaser.Math.Vector2(3, 3);
+    const targetPos = new Phaser.Math.Vector2(3, 3);
+    const path = Bfs.getShortestPath(startPos, targetPos);
+    expect(path).toEqual([new Phaser.Math.Vector2(3, 3)]);
+  });
 });
