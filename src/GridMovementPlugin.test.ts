@@ -9,6 +9,7 @@ const mockAddCharacter = jest.fn();
 const mockRemoveCharacter = jest.fn();
 const mockSetSpeed = jest.fn();
 const mockRandomMovementUpdate = jest.fn();
+const mockTargetMovementUpdate = jest.fn();
 const mockTargetMovementAddCharacter = jest.fn();
 jest.mock("./GridCharacter/GridCharacter", function () {
   return {
@@ -36,6 +37,7 @@ jest.mock("./RandomMovement/RandomMovement", () => ({
 jest.mock("./TargetMovement/TargetMovement", () => ({
   TargetMovement: jest.fn(() => ({
     addCharacter: mockTargetMovementAddCharacter,
+    update: mockTargetMovementUpdate,
   })),
 }));
 
@@ -65,6 +67,8 @@ describe("GridMovementPlugin", () => {
       tileWidth: 16,
     };
     playerSpriteMock = {};
+    mockTargetMovementUpdate.mockReset();
+    mockRandomMovementUpdate.mockReset();
   });
 
   it("should boot", () => {
@@ -246,6 +250,7 @@ describe("GridMovementPlugin", () => {
     gridMovementPlugin.update(123, 456);
 
     expect(mockRandomMovementUpdate).toHaveBeenCalledWith(456);
+    expect(mockTargetMovementUpdate).toHaveBeenCalled();
     expect(mockUpdate).toHaveBeenCalledWith(456);
   });
 
@@ -334,5 +339,12 @@ describe("GridMovementPlugin", () => {
     });
     gridMovementPlugin.setSpeed("player", 2);
     expect(mockSetSpeed).toHaveBeenCalledWith(2);
+  });
+
+  it("should not call update before create", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.update(123, 456);
+    expect(mockRandomMovementUpdate).not.toHaveBeenCalled();
+    expect(mockTargetMovementUpdate).not.toHaveBeenCalled();
   });
 });

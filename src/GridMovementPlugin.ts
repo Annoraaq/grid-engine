@@ -22,8 +22,10 @@ export interface CharacterData {
 
 export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   private gridCharacters: Map<string, GridCharacter>;
+  private gridTilemap: GridTilemap;
   private randomMovement: RandomMovement;
   private targetMovement: TargetMovement;
+  private isCreated: boolean = false;
   constructor(
     public scene: Phaser.Scene,
     pluginManager: Phaser.Plugins.PluginManager
@@ -31,7 +33,6 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     super(scene, pluginManager);
     this.gridCharacters = new Map();
     this.randomMovement = new RandomMovement();
-    this.targetMovement = new TargetMovement();
   }
 
   boot() {
@@ -41,8 +42,10 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridMovementConfig) {
     const tilemapScale = tilemap.layers[0].tilemapLayer.scale;
     const tileSize = tilemap.tileWidth * tilemapScale;
-    const gridTilemap = this.createTilemap(tilemap, config);
-    this.addCharacters(gridTilemap, config, tileSize);
+    this.gridTilemap = this.createTilemap(tilemap, config);
+    this.addCharacters(this.gridTilemap, config, tileSize);
+    this.targetMovement = new TargetMovement(this.gridTilemap);
+    this.isCreated = true;
   }
 
   getPosition(charId: string): Phaser.Math.Vector2 {
@@ -89,10 +92,13 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   }
 
   update(_time: number, delta: number) {
-    this.randomMovement.update(delta);
-    if (this.gridCharacters) {
-      for (let [_key, val] of this.gridCharacters) {
-        val.update(delta);
+    if (this.isCreated) {
+      this.randomMovement.update(delta);
+      this.targetMovement.update();
+      if (this.gridCharacters) {
+        for (let [_key, val] of this.gridCharacters) {
+          val.update(delta);
+        }
       }
     }
   }
