@@ -1,10 +1,8 @@
 import { VectorUtils } from "./../Utils/VectorUtils";
-import { CharacterData } from "./../GridMovementPlugin.d";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
 import * as Phaser from "phaser";
 import { Direction } from "../Direction/Direction";
 import { Bfs } from "../Algorithms/ShortestPath/Bfs/Bfs";
-// import { Direction, DirectionVectors } from "../Direction/Direction";
 
 interface MovementTuple {
   character: GridCharacter;
@@ -28,9 +26,9 @@ export class TargetMovement {
     });
   }
 
-  // removeCharacter(character: GridCharacter) {
-  //   this.randomlyMovingCharacters.delete(character.getId());
-  // }
+  removeCharacter(character: GridCharacter) {
+    this.characters.delete(character.getId());
+  }
 
   update() {
     this.getStandingCharacters().forEach(({ character, config }) => {
@@ -51,9 +49,6 @@ export class TargetMovement {
     targetPos: Phaser.Math.Vector2
   ): Direction {
     const shortestPath = Bfs.getShortestPath(character.getTilePos(), targetPos);
-    if (shortestPath.length <= 1) {
-      return Direction.NONE;
-    }
     const nextField = shortestPath[1];
     if (nextField.x > character.getTilePos().x) {
       return Direction.RIGHT;
