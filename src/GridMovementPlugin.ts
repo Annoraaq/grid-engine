@@ -90,6 +90,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
 
   update(_time: number, delta: number) {
     this.randomMovement.update(delta);
+    this.targetMovement.update();
     if (this.gridCharacters) {
       for (let [_key, val] of this.gridCharacters) {
         val.update(delta);

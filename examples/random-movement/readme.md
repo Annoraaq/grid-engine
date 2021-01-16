@@ -1,4 +1,4 @@
-# Example: Move Player
+# Example: Random Movement
 
 ## Usage
 

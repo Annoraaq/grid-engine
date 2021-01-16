@@ -1,4 +1,4 @@
-# Example: Move Player
+# Example: Radius Movement
 
 ## Usage
 
