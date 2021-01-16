@@ -1,8 +1,12 @@
+import { GridTilemap } from "./../GridTilemap/GridTilemap";
 import { VectorUtils } from "./../Utils/VectorUtils";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
 import * as Phaser from "phaser";
 import { Direction } from "../Direction/Direction";
 import { Bfs } from "../Algorithms/ShortestPath/Bfs/Bfs";
+
+type Vector2 = Phaser.Math.Vector2;
+const Vector2 = Phaser.Math.Vector2;
 
 interface MovementTuple {
   character: GridCharacter;
@@ -15,7 +19,7 @@ interface MovementConfig {
 
 export class TargetMovement {
   private characters: Map<string, MovementTuple>;
-  constructor() {
+  constructor(private tilemap: GridTilemap) {
     this.characters = new Map();
   }
 
@@ -44,11 +48,22 @@ export class TargetMovement {
     });
   }
 
+  isBlocking = (pos: Vector2): boolean => {
+    return this.tilemap.isBlocking(pos);
+  };
+
   private getDirOnShortestPath(
     character: GridCharacter,
     targetPos: Phaser.Math.Vector2
   ): Direction {
-    const shortestPath = Bfs.getShortestPath(character.getTilePos(), targetPos);
+    const shortestPath = Bfs.getShortestPath(
+      character.getTilePos(),
+      targetPos,
+      this.isBlocking
+    );
+
+    if (shortestPath.length < 1) return Direction.NONE;
+
     const nextField = shortestPath[1];
     if (nextField.x > character.getTilePos().x) {
       return Direction.RIGHT;

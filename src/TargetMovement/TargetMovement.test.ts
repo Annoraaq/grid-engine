@@ -4,6 +4,7 @@ import * as Phaser from "phaser";
 import { Bfs } from "../Algorithms/ShortestPath/Bfs/Bfs";
 describe("TargetMovement", () => {
   let targetMovement: TargetMovement;
+  let gridTilemapMock;
 
   function createMockChar(id: string, pos: Phaser.Math.Vector2) {
     return <any>{
@@ -14,7 +15,13 @@ describe("TargetMovement", () => {
     };
   }
   beforeEach(() => {
-    targetMovement = new TargetMovement();
+    gridTilemapMock = {
+      hasBlockingTile: jest.fn(),
+      hasNoTile: jest.fn(),
+      hasBlockingChar: jest.fn().mockReturnValue(false),
+      isBlocking: jest.fn(),
+    };
+    targetMovement = new TargetMovement(gridTilemapMock);
     Bfs.getShortestPath = jest.fn();
   });
 
@@ -26,6 +33,11 @@ describe("TargetMovement", () => {
     const mockChar = createMockChar("char1", charPos);
     targetMovement.addCharacter(mockChar, new Phaser.Math.Vector2(3, 1));
     targetMovement.update();
+    expect(Bfs.getShortestPath).toHaveBeenCalledWith(
+      charPos,
+      new Phaser.Math.Vector2(3, 1),
+      targetMovement.isBlocking
+    );
     expect(mockChar.move).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
@@ -126,5 +138,27 @@ describe("TargetMovement", () => {
     targetMovement.removeCharacter(mockChar);
     targetMovement.update();
     expect(mockChar.move).not.toHaveBeenCalled();
+  });
+
+  it("should not move if no path exists", () => {
+    const charPos = new Phaser.Math.Vector2(3, 1);
+    Bfs.getShortestPath = jest.fn().mockReturnValue([]);
+    const mockChar = createMockChar("char1", charPos);
+    targetMovement.addCharacter(mockChar, new Phaser.Math.Vector2(3, 2));
+    targetMovement.update();
+    expect(mockChar.move).toHaveBeenCalledWith(Direction.NONE);
+  });
+
+  it("should delegate isBlocking to gridTilemap", () => {
+    const charPos = new Phaser.Math.Vector2(3, 1);
+    gridTilemapMock.isBlocking.mockReturnValue(true);
+    let blocking = targetMovement.isBlocking(charPos);
+    expect(blocking).toEqual(true);
+    expect(gridTilemapMock.isBlocking).toHaveBeenCalledWith(charPos);
+
+    gridTilemapMock.isBlocking.mockReturnValue(false);
+    blocking = targetMovement.isBlocking(charPos);
+    expect(blocking).toEqual(false);
+    expect(gridTilemapMock.isBlocking).toHaveBeenCalledWith(charPos);
   });
 });

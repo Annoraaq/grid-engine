@@ -74,9 +74,15 @@
     playerSprite.scale = 1.5;
     this.cameras.main.startFollow(playerSprite);
 
-    for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-      cloudCityTilemap.layers[i].tilemapLayer.layer.data[18][15].tint = 0xffcc4a;
-    }
+    tintTile(cloudCityTilemap, 18, 15, 0xff7a4a);
+    tintTile(cloudCityTilemap, 19, 15, 0xffcc4a);
+    tintTile(cloudCityTilemap, 20, 15, 0x6eff94);
+
+    const npcSprite = this.add.sprite(0, 0, "player");
+    npcSprite.scale = 1.5;
+
+    const npcSprite1 = this.add.sprite(0, 0, "player");
+    npcSprite1.scale = 1.5;
 
     const npcSprite2 = this.add.sprite(0, 0, "player");
     npcSprite2.scale = 1.5;
@@ -90,6 +96,19 @@
           startPosition: new Phaser.Math.Vector2(8, 8),
         },
         {
+          id: "npc0",
+          sprite: npcSprite,
+          characterIndex: 0,
+          startPosition: new Phaser.Math.Vector2(12, 5),
+          speed: 3
+        },
+        {
+          id: "npc1",
+          sprite: npcSprite1,
+          characterIndex: 1,
+          startPosition: new Phaser.Math.Vector2(14, 8),
+        },
+        {
           id: "npc2",
           sprite: npcSprite2,
           characterIndex: 3,
@@ -101,7 +120,9 @@
     };
 
     this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
-    this.gridMovementPlugin.moveTo('npc2', new Phaser.Math.Vector2(15, 18));
+    this.gridMovementPlugin.moveTo('npc0', new Phaser.Math.Vector2(15, 18));
+    this.gridMovementPlugin.moveTo('npc1', new Phaser.Math.Vector2(15, 19));
+    this.gridMovementPlugin.moveTo('npc2', new Phaser.Math.Vector2(15, 20));
   }
 
   function update () {
@@ -114,6 +135,12 @@
       this.gridMovementPlugin.moveUp("player");
     } else if (cursors.down.isDown) {
       this.gridMovementPlugin.moveDown("player");
+    }
+  }
+
+  function tintTile(tilemap, row, col, color) {
+    for (let i = 0; i < tilemap.layers.length; i++) {
+      tilemap.layers[i].tilemapLayer.layer.data[row][col].tint = color;
     }
   }
 

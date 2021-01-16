@@ -23,6 +23,14 @@ export class GridTilemap {
     return [...this.characters.values()];
   }
 
+  isBlocking(pos: Vector2): boolean {
+    return (
+      this.hasNoTile(pos) ||
+      this.hasBlockingTile(pos) ||
+      this.hasBlockingChar(pos)
+    );
+  }
+
   hasBlockingTile(pos: Vector2): boolean {
     if (this.hasNoTile(pos)) return true;
     return this.tilemap.layers.some((layer) => {

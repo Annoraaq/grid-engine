@@ -51,9 +51,11 @@ describe("GridTilemapPlugin", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: true } });
     gridTilemap = new GridTilemap(tilemapMock, 3);
-    const isBlocking = gridTilemap.hasBlockingTile(
+    const isBlockingTile = gridTilemap.hasBlockingTile(
       new Phaser.Math.Vector2(3, 4)
     );
+    const isBlocking = gridTilemap.isBlocking(new Phaser.Math.Vector2(3, 4));
+    expect(isBlockingTile).toBe(true);
     expect(isBlocking).toBe(true);
     expect(tilemapMock.getTileAt).toHaveBeenCalledWith(3, 4, false, "layer1");
     expect(tilemapMock.getTileAt).not.toHaveBeenCalledWith(
@@ -68,9 +70,11 @@ describe("GridTilemapPlugin", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
     gridTilemap = new GridTilemap(tilemapMock, 3);
-    const isBlocking = gridTilemap.hasBlockingTile(
+    const isBlockingTile = gridTilemap.hasBlockingTile(
       new Phaser.Math.Vector2(3, 4)
     );
+    const isBlocking = gridTilemap.isBlocking(new Phaser.Math.Vector2(3, 4));
+    expect(isBlockingTile).toBe(false);
     expect(isBlocking).toBe(false);
     expect(tilemapMock.getTileAt).toHaveBeenCalledWith(3, 4, false, "layer1");
     expect(tilemapMock.getTileAt).toHaveBeenCalledWith(3, 4, false, "layer2");
@@ -91,7 +95,9 @@ describe("GridTilemapPlugin", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     gridTilemap = new GridTilemap(tilemapMock, 3);
     const hasNoTile = gridTilemap.hasNoTile(new Phaser.Math.Vector2(3, 4));
+    const isBlocking = gridTilemap.isBlocking(new Phaser.Math.Vector2(3, 4));
     expect(hasNoTile).toBe(true);
+    expect(isBlocking).toBe(true);
   });
 
   it("should detect if tile present", () => {
@@ -121,7 +127,9 @@ describe("GridTilemapPlugin", () => {
     const hasBlockingChar = gridTilemap.hasBlockingChar(
       new Phaser.Math.Vector2(3, 4)
     );
+    const isBlocking = gridTilemap.isBlocking(new Phaser.Math.Vector2(3, 4));
     expect(hasBlockingChar).toBe(true);
+    expect(isBlocking).toBe(true);
   });
 
   it("should detect an unblocked tile", () => {
