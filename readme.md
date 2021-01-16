@@ -138,3 +138,7 @@ That's all you need for a minimum configuration. See the examples folder for a c
 - `stopMovingRandomly(charId: string): void`
 
   Stops moving a character randomly.
+
+- `moveTo(charId: string, targetPos: Phaser.Math.Vector2): void`
+
+  Initiates movement toward the specified `targetPos`. The movement will happen along one shortest path. If no such path exists, the character will repeatedly check for a path to open up and remain still in the meantime.
