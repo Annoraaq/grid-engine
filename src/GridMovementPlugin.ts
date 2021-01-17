@@ -22,6 +22,7 @@ export interface CharacterData {
 
 export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   private gridCharacters: Map<string, GridCharacter>;
+  private tilemap: Phaser.Tilemaps.Tilemap;
   private gridTilemap: GridTilemap;
   private randomMovement: RandomMovement;
   private targetMovement: TargetMovement;
@@ -31,8 +32,6 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     pluginManager: Phaser.Plugins.PluginManager
   ) {
     super(scene, pluginManager);
-    this.gridCharacters = new Map();
-    this.randomMovement = new RandomMovement();
   }
 
   boot() {
@@ -40,10 +39,11 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   }
 
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridMovementConfig) {
-    const tilemapScale = tilemap.layers[0].tilemapLayer.scale;
-    const tileSize = tilemap.tileWidth * tilemapScale;
+    this.gridCharacters = new Map();
+    this.randomMovement = new RandomMovement();
+    this.tilemap = tilemap;
     this.gridTilemap = this.createTilemap(tilemap, config);
-    this.addCharacters(this.gridTilemap, config, tileSize);
+    this.addCharacters(config);
     this.targetMovement = new TargetMovement(this.gridTilemap);
     this.isCreated = true;
   }
@@ -103,6 +103,29 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     }
   }
 
+  addCharacter(charData: CharacterData) {
+    const enrichedCharData = {
+      speed: 4,
+      startPosition: new Phaser.Math.Vector2(0, 0),
+      ...charData,
+    };
+
+    const gridChar = new GridCharacter(
+      enrichedCharData.id,
+      enrichedCharData.sprite,
+      enrichedCharData.characterIndex,
+      this.getTileSize(),
+      this.gridTilemap,
+      enrichedCharData.speed
+    );
+
+    this.gridCharacters.set(enrichedCharData.id, gridChar);
+
+    gridChar.setTilePosition(enrichedCharData.startPosition);
+
+    this.gridTilemap.addCharacter(gridChar);
+  }
+
   private createTilemap(
     tilemap: Phaser.Tilemaps.Tilemap,
     config: GridMovementConfig
@@ -110,39 +133,12 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     return new GridTilemap(tilemap, config.firstLayerAboveChar);
   }
 
-  private addCharacters(
-    gridTilemap: GridTilemap,
-    config: GridMovementConfig,
-    tileSize: number
-  ) {
-    const enrichedCharData = config.characters.map((charData) => ({
-      speed: 4,
-      startPosition: new Phaser.Math.Vector2(0, 0),
-      ...charData,
-    }));
+  private getTileSize(): number {
+    const tilemapScale = this.tilemap.layers[0].tilemapLayer.scale;
+    return this.tilemap.tileWidth * tilemapScale;
+  }
 
-    this.gridCharacters = new Map(
-      enrichedCharData.map((charData) => [
-        charData.id,
-        new GridCharacter(
-          charData.id,
-          charData.sprite,
-          charData.characterIndex,
-          tileSize,
-          gridTilemap,
-          charData.speed
-        ),
-      ])
-    );
-
-    enrichedCharData.forEach((charData) =>
-      this.gridCharacters
-        .get(charData.id)
-        .setTilePosition(charData.startPosition)
-    );
-
-    for (let [_key, val] of this.gridCharacters) {
-      gridTilemap.addCharacter(val);
-    }
+  private addCharacters(config: GridMovementConfig) {
+    config.characters.forEach((charData) => this.addCharacter(charData));
   }
 }
