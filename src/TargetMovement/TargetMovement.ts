@@ -30,8 +30,8 @@ export class TargetMovement {
     });
   }
 
-  removeCharacter(character: GridCharacter) {
-    this.characters.delete(character.getId());
+  removeCharacter(charId: string) {
+    this.characters.delete(charId);
   }
 
   update() {

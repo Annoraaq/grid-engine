@@ -151,6 +151,10 @@ That's all you need for a minimum configuration. See the examples folder for a c
 
   Checks whether a character with the given ID is registered.
 
+- `removeCharacter(charId: string)`
+
+  Removes the character with the given ID from the plugin.
+
 ## Troubleshooting
 
 ### `Invalid Scene Plugin: gridMovementPlugin`

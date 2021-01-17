@@ -7,6 +7,7 @@ const mockUpdate = jest.fn();
 const mockGetTilePos = jest.fn();
 const mockAddCharacter = jest.fn();
 const mockRemoveCharacter = jest.fn();
+const mockTargetMovementRemoveCharacter = jest.fn();
 const mockSetSpeed = jest.fn();
 const mockRandomMovementUpdate = jest.fn();
 const mockTargetMovementUpdate = jest.fn();
@@ -37,6 +38,7 @@ jest.mock("./RandomMovement/RandomMovement", () => ({
 jest.mock("./TargetMovement/TargetMovement", () => ({
   TargetMovement: jest.fn(() => ({
     addCharacter: mockTargetMovementAddCharacter,
+    removeCharacter: mockTargetMovementRemoveCharacter,
     update: mockTargetMovementUpdate,
   })),
 }));
@@ -69,6 +71,8 @@ describe("GridMovementPlugin", () => {
     playerSpriteMock = {};
     mockTargetMovementUpdate.mockReset();
     mockRandomMovementUpdate.mockReset();
+    mockRemoveCharacter.mockReset();
+    mockTargetMovementRemoveCharacter.mockReset();
     mockUpdate.mockReset();
   });
 
@@ -364,6 +368,26 @@ describe("GridMovementPlugin", () => {
     expect(mockUpdate).toHaveBeenCalledTimes(1);
   });
 
+  it("should remove chars on the go", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    gridMovementPlugin.removeCharacter("player");
+    gridMovementPlugin.update(123, 456);
+    expect(mockRemoveCharacter).toHaveBeenCalledWith("player");
+    expect(mockTargetMovementRemoveCharacter).toHaveBeenCalledWith("player");
+    expect(mockRemoveCharacter).toHaveBeenCalledWith("player");
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
   it("should check if char is registered", () => {
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
     gridMovementPlugin.create(tileMapMock, {
@@ -457,6 +481,12 @@ describe("GridMovementPlugin", () => {
         )
       ).toThrow("Character unknown");
     });
+
+    it("should throw error if removeCharacter is invoked", () => {
+      expect(() => gridMovementPlugin.removeCharacter("unknownCharId")).toThrow(
+        "Character unknown"
+      );
+    });
   });
 
   describe("invokation of methods if not created properly", () => {
@@ -530,6 +560,12 @@ describe("GridMovementPlugin", () => {
 
     it("should throw error if hasCharacter is invoked", () => {
       expect(() => gridMovementPlugin.hasCharacter("someCharId")).toThrow(
+        "Plugin not initialized"
+      );
+    });
+
+    it("should throw error if removeCharacter is invoked", () => {
+      expect(() => gridMovementPlugin.removeCharacter("someCharId")).toThrow(
         "Plugin not initialized"
       );
     });

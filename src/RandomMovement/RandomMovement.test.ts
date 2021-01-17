@@ -60,7 +60,7 @@ describe("RandomMovement", () => {
     };
     randomMovement.addCharacter(char1Mock);
     randomMovement.addCharacter(char2Mock);
-    randomMovement.removeCharacter(char2Mock);
+    randomMovement.removeCharacter("char2");
     randomMovement.update(5);
 
     expect(char1Mock.move).toHaveBeenCalled();

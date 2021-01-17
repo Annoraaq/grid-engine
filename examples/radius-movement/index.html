@@ -117,6 +117,7 @@
     };
 
     this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
+
     this.gridMovementPlugin.moveRandomly('npc0', 0, 1);
     this.gridMovementPlugin.moveRandomly('npc1', 500, 2);
     this.gridMovementPlugin.moveRandomly('npc2', 1500, 3);
@@ -124,7 +125,6 @@
     tintRadius(cloudCityTilemap, 8,6 ,3, 0xffcc4a);
     tintRadius(cloudCityTilemap, 5,12 ,1, 0xff7a4a);
     tintRadius(cloudCityTilemap, 8,14 ,2, 0x6eff94);
-
   }
 
   function update () {

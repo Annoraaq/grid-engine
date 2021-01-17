@@ -100,7 +100,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   stopMovingRandomly(charId: string) {
     this.initGuard();
     this.unknownCharGuard(charId);
-    this.randomMovement.removeCharacter(this.gridCharacters.get(charId));
+    this.randomMovement.removeCharacter(charId);
   }
 
   setSpeed(charId: string, speed: number) {
@@ -148,6 +148,14 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   hasCharacter(charId: string): boolean {
     this.initGuard();
     return this.gridCharacters.has(charId);
+  }
+
+  removeCharacter(charId: string) {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    this.randomMovement.removeCharacter(charId);
+    this.targetMovement.removeCharacter(charId);
+    this.gridCharacters.delete(charId);
   }
 
   private initGuard() {

@@ -132,10 +132,12 @@ describe("TargetMovement", () => {
 
   it("should not move deleted char", () => {
     const charPos = new Phaser.Math.Vector2(3, 1);
-    Bfs.getShortestPath = jest.fn().mockReturnValue([charPos]);
+    Bfs.getShortestPath = jest
+      .fn()
+      .mockReturnValue([charPos, new Phaser.Math.Vector2(3, 2)]);
     const mockChar = createMockChar("char1", charPos);
-    targetMovement.addCharacter(mockChar, new Phaser.Math.Vector2(3, 1));
-    targetMovement.removeCharacter(mockChar);
+    targetMovement.addCharacter(mockChar, new Phaser.Math.Vector2(3, 2));
+    targetMovement.removeCharacter("char1");
     targetMovement.update();
     expect(mockChar.move).not.toHaveBeenCalled();
   });

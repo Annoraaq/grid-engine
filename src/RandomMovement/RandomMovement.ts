@@ -43,8 +43,8 @@ export class RandomMovement {
     });
   }
 
-  removeCharacter(character: GridCharacter) {
-    this.randomlyMovingCharacters.delete(character.getId());
+  removeCharacter(charId: string) {
+    this.randomlyMovingCharacters.delete(charId);
   }
 
   update(delta: number) {
