@@ -349,7 +349,7 @@ describe("GridMovementPlugin", () => {
     expect(mockTargetMovementUpdate).not.toHaveBeenCalled();
   });
 
-  it("should add players on the go", () => {
+  it("should add chars on the go", () => {
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
     gridMovementPlugin.create(tileMapMock, {
       characters: [],
@@ -362,5 +362,176 @@ describe("GridMovementPlugin", () => {
     });
     gridMovementPlugin.update(123, 456);
     expect(mockUpdate).toHaveBeenCalledTimes(1);
+  });
+
+  it("should check if char is registered", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    gridMovementPlugin.addCharacter({
+      id: "player2",
+      sprite: playerSpriteMock,
+      characterIndex: 3,
+    });
+    expect(gridMovementPlugin.hasCharacter("player")).toBe(true);
+    expect(gridMovementPlugin.hasCharacter("player2")).toBe(true);
+    expect(gridMovementPlugin.hasCharacter("unknownCharId")).toBe(false);
+  });
+
+  describe("Error Handling unknown char id", () => {
+    beforeEach(() => {
+      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+      gridMovementPlugin.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            characterIndex: 3,
+          },
+        ],
+        firstLayerAboveChar: 3,
+      });
+    });
+
+    it("should throw error if getPosition is invoked", () => {
+      expect(() => gridMovementPlugin.getPosition("unknownCharId")).toThrow(
+        "Character unknown"
+      );
+    });
+
+    it("should throw error if moveLeft is invoked", () => {
+      expect(() => gridMovementPlugin.moveLeft("unknownCharId")).toThrow(
+        "Character unknown"
+      );
+    });
+
+    it("should throw error if moveRight is invoked", () => {
+      expect(() => gridMovementPlugin.moveRight("unknownCharId")).toThrow(
+        "Character unknown"
+      );
+    });
+
+    it("should throw error if moveUp is invoked", () => {
+      expect(() => gridMovementPlugin.moveUp("unknownCharId")).toThrow(
+        "Character unknown"
+      );
+    });
+
+    it("should throw error if moveDown is invoked", () => {
+      expect(() => gridMovementPlugin.moveDown("unknownCharId")).toThrow(
+        "Character unknown"
+      );
+    });
+
+    it("should throw error if moveRandomly is invoked", () => {
+      expect(() => gridMovementPlugin.moveRandomly("unknownCharId")).toThrow(
+        "Character unknown"
+      );
+    });
+
+    it("should throw error if stopMovingRandomly is invoked", () => {
+      expect(() =>
+        gridMovementPlugin.stopMovingRandomly("unknownCharId")
+      ).toThrow("Character unknown");
+    });
+
+    it("should throw error if setSpeed is invoked", () => {
+      expect(() => gridMovementPlugin.setSpeed("unknownCharId", 4)).toThrow(
+        "Character unknown"
+      );
+    });
+
+    it("should throw error if moveTo is invoked", () => {
+      expect(() =>
+        gridMovementPlugin.moveTo(
+          "unknownCharId",
+          new Phaser.Math.Vector2(3, 4)
+        )
+      ).toThrow("Character unknown");
+    });
+  });
+
+  describe("invokation of methods if not created properly", () => {
+    beforeEach(() => {
+      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    });
+
+    it("should throw error if getPosition is invoked", () => {
+      expect(() => gridMovementPlugin.getPosition("someCharId")).toThrow(
+        "Plugin not initialized"
+      );
+    });
+
+    it("should throw error if moveLeft is invoked", () => {
+      expect(() => gridMovementPlugin.moveLeft("someCharId")).toThrow(
+        "Plugin not initialized"
+      );
+    });
+
+    it("should throw error if moveRight is invoked", () => {
+      expect(() => gridMovementPlugin.moveRight("someCharId")).toThrow(
+        "Plugin not initialized"
+      );
+    });
+
+    it("should throw error if moveUp is invoked", () => {
+      expect(() => gridMovementPlugin.moveUp("someCharId")).toThrow(
+        "Plugin not initialized"
+      );
+    });
+
+    it("should throw error if moveDown is invoked", () => {
+      expect(() => gridMovementPlugin.moveDown("someCharId")).toThrow(
+        "Plugin not initialized"
+      );
+    });
+
+    it("should throw error if moveRandomly is invoked", () => {
+      expect(() => gridMovementPlugin.moveRandomly("someCharId")).toThrow(
+        "Plugin not initialized"
+      );
+    });
+
+    it("should throw error if moveTo is invoked", () => {
+      expect(() =>
+        gridMovementPlugin.moveTo("someCharId", new Phaser.Math.Vector2(2, 3))
+      ).toThrow("Plugin not initialized");
+    });
+
+    it("should throw error if stopMovingRandomly is invoked", () => {
+      expect(() => gridMovementPlugin.stopMovingRandomly("someCharId")).toThrow(
+        "Plugin not initialized"
+      );
+    });
+
+    it("should throw error if setSpeed is invoked", () => {
+      expect(() => gridMovementPlugin.setSpeed("someCharId", 3)).toThrow(
+        "Plugin not initialized"
+      );
+    });
+
+    it("should throw error if addCharacter is invoked", () => {
+      expect(() =>
+        gridMovementPlugin.addCharacter({
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        })
+      ).toThrow("Plugin not initialized");
+    });
+
+    it("should throw error if hasCharacter is invoked", () => {
+      expect(() => gridMovementPlugin.hasCharacter("someCharId")).toThrow(
+        "Plugin not initialized"
+      );
+    });
   });
 });

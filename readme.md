@@ -111,7 +111,7 @@ That's all you need for a minimum configuration. See the examples folder for a c
 
 - `create(tilemap: Phaser.Tilemaps.Tilemap, config: GridMovementConfig): void`
 
-  Initializes the plugin.
+  Initializes the plugin. This method needs to be called before any other method. One exception is the `update` method. You are allowed to call it even before the `create` method (even though it will have no effect).
 
 - `getPosition(charId: string): Phaser.Math.Vector2`
 
@@ -138,11 +138,18 @@ That's all you need for a minimum configuration. See the examples folder for a c
 - `stopMovingRandomly(charId: string): void`
 
   Stops moving a character randomly.
-  
+
 - `moveTo(charId: string, targetPos: Phaser.Math.Vector2): void`
 
   Initiates movement toward the specified `targetPos`. The movement will happen along one shortest path. If no such path exists, the character will repeatedly check for a path to open up and remain still in the meantime.
 
+- `addCharacter(charData: CharacterData): void`
+
+  Adds a character on the go.
+
+- `hasCharacter(charId: string): boolean`
+
+  Checks whether a character with the given ID is registered.
 
 ## Troubleshooting
 
@@ -151,7 +158,6 @@ That's all you need for a minimum configuration. See the examples folder for a c
 <img alt="Error in Chrome console" src="https://snipboard.io/OXtASb.jpg" width="50%" />
 
 This error will prevent loading of the plugin, and can occur if your bundler doesn't require `* as` for commonjs modules. To resolve this, try changing the following line:
-
 
 ```ts
 import * as GridMovementPlugin from "phaser-grid-movement-plugin";
@@ -162,5 +168,3 @@ to
 ```ts
 import GridMovementPlugin from "phaser-grid-movement-plugin";
 ```
-
-
