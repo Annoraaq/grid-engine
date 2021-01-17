@@ -69,6 +69,7 @@ describe("GridMovementPlugin", () => {
     playerSpriteMock = {};
     mockTargetMovementUpdate.mockReset();
     mockRandomMovementUpdate.mockReset();
+    mockUpdate.mockReset();
   });
 
   it("should boot", () => {
@@ -346,5 +347,20 @@ describe("GridMovementPlugin", () => {
     gridMovementPlugin.update(123, 456);
     expect(mockRandomMovementUpdate).not.toHaveBeenCalled();
     expect(mockTargetMovementUpdate).not.toHaveBeenCalled();
+  });
+
+  it("should add players on the go", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [],
+      firstLayerAboveChar: 3,
+    });
+    gridMovementPlugin.addCharacter({
+      id: "player",
+      sprite: playerSpriteMock,
+      characterIndex: 3,
+    });
+    gridMovementPlugin.update(123, 456);
+    expect(mockUpdate).toHaveBeenCalledTimes(1);
   });
 });
