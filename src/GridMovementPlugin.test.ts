@@ -12,6 +12,22 @@ const mockSetSpeed = jest.fn();
 const mockRandomMovementUpdate = jest.fn();
 const mockTargetMovementUpdate = jest.fn();
 const mockTargetMovementAddCharacter = jest.fn();
+const mockGridTileMap = {
+  addCharacter: jest.fn(),
+  removeCharacter: jest.fn(),
+};
+const mockGridTilemapConstructor = jest.fn(function (
+  _tilemap,
+  _firstLayerAboveChar
+) {
+  return mockGridTileMap;
+});
+
+jest.mock("./GridTilemap/GridTilemap", function () {
+  return {
+    GridTilemap: mockGridTilemapConstructor,
+  };
+});
 jest.mock("./GridCharacter/GridCharacter", function () {
   return {
     GridCharacter: jest.fn((id) => {
@@ -46,7 +62,6 @@ jest.mock("./TargetMovement/TargetMovement", () => ({
 jest.mock("./GridTilemap/GridTilemap");
 
 import { GridMovementPlugin } from "./GridMovementPlugin";
-import { GridTilemap } from "./GridTilemap/GridTilemap";
 
 describe("GridMovementPlugin", () => {
   let gridMovementPlugin: GridMovementPlugin;
@@ -98,7 +113,7 @@ describe("GridMovementPlugin", () => {
       ],
       firstLayerAboveChar: 3,
     });
-    expect(GridTilemap).toHaveBeenCalledWith(tileMapMock, 3);
+    expect(mockGridTilemapConstructor).toHaveBeenCalledWith(tileMapMock, 3);
   });
 
   it("should init player", () => {
@@ -118,7 +133,7 @@ describe("GridMovementPlugin", () => {
       playerSpriteMock,
       3,
       32,
-      expect.any(GridTilemap),
+      mockGridTileMap,
       4
     );
     expect(mockSetTilePositon).toHaveBeenCalledWith(
@@ -162,7 +177,7 @@ describe("GridMovementPlugin", () => {
       playerSpriteMock,
       3,
       32,
-      expect.any(GridTilemap),
+      mockGridTileMap,
       2
     );
   });
@@ -385,6 +400,7 @@ describe("GridMovementPlugin", () => {
     expect(mockRemoveCharacter).toHaveBeenCalledWith("player");
     expect(mockTargetMovementRemoveCharacter).toHaveBeenCalledWith("player");
     expect(mockRemoveCharacter).toHaveBeenCalledWith("player");
+    expect(mockGridTileMap.removeCharacter).toHaveBeenCalledWith("player");
     expect(mockUpdate).not.toHaveBeenCalled();
   });
 

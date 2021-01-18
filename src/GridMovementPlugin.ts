@@ -155,6 +155,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.unknownCharGuard(charId);
     this.randomMovement.removeCharacter(charId);
     this.targetMovement.removeCharacter(charId);
+    this.gridTilemap.removeCharacter(charId);
     this.gridCharacters.delete(charId);
   }
 

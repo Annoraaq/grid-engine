@@ -19,6 +19,10 @@ export class GridTilemap {
     this.characters.set(character.getId(), character);
   }
 
+  removeCharacter(charId: string) {
+    this.characters.delete(charId);
+  }
+
   getCharacters(): GridCharacter[] {
     return [...this.characters.values()];
   }

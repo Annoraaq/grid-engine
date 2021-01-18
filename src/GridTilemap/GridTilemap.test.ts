@@ -47,6 +47,17 @@ describe("GridTilemapPlugin", () => {
     expect(gridTilemap.getCharacters()).toEqual([charMock1, charMockSameId]);
   });
 
+  it("should remove a character", () => {
+    gridTilemap = new GridTilemap(tilemapMock, 3);
+    const charMock1 = <any>{ getId: () => "player" };
+    const charMock2 = <any>{ getId: () => "player2" };
+    gridTilemap.addCharacter(charMock1);
+    gridTilemap.addCharacter(charMock2);
+    gridTilemap.removeCharacter("player");
+
+    expect(gridTilemap.getCharacters()).toEqual([charMock2]);
+  });
+
   it("should detect blocking tiles", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: true } });
