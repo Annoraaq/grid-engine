@@ -12,6 +12,11 @@ const mockSetSpeed = jest.fn();
 const mockRandomMovementUpdate = jest.fn();
 const mockTargetMovementUpdate = jest.fn();
 const mockTargetMovementAddCharacter = jest.fn();
+const mockFollowMovement = {
+  addCharacter: jest.fn(),
+  removeCharacter: jest.fn(),
+  update: jest.fn(),
+};
 const mockGridTileMap = {
   addCharacter: jest.fn(),
   removeCharacter: jest.fn(),
@@ -21,6 +26,25 @@ const mockGridTilemapConstructor = jest.fn(function (
   _firstLayerAboveChar
 ) {
   return mockGridTileMap;
+});
+
+expect.extend({
+  toBeCharacter(receivedChar: GridCharacter, expectedCharId: string) {
+    const pass = receivedChar.getId() == expectedCharId;
+    if (pass) {
+      return {
+        message: () =>
+          `expected ${receivedChar.getId()} not to be ${expectedCharId}`,
+        pass: true,
+      };
+    } else {
+      return {
+        message: () =>
+          `expected ${receivedChar.getId()} to be ${expectedCharId}`,
+        pass: false,
+      };
+    }
+  },
 });
 
 jest.mock("./GridTilemap/GridTilemap", function () {
@@ -57,6 +81,12 @@ jest.mock("./TargetMovement/TargetMovement", () => ({
     removeCharacter: mockTargetMovementRemoveCharacter,
     update: mockTargetMovementUpdate,
   })),
+}));
+
+jest.mock("./FollowMovement/FollowMovement", () => ({
+  FollowMovement: jest.fn(function () {
+    return mockFollowMovement;
+  }),
 }));
 
 jest.mock("./GridTilemap/GridTilemap");
@@ -271,6 +301,7 @@ describe("GridMovementPlugin", () => {
 
     expect(mockRandomMovementUpdate).toHaveBeenCalledWith(456);
     expect(mockTargetMovementUpdate).toHaveBeenCalled();
+    expect(mockFollowMovement.update).toHaveBeenCalled();
     expect(mockUpdate).toHaveBeenCalledWith(456);
   });
 
@@ -400,6 +431,7 @@ describe("GridMovementPlugin", () => {
     expect(mockRemoveCharacter).toHaveBeenCalledWith("player");
     expect(mockTargetMovementRemoveCharacter).toHaveBeenCalledWith("player");
     expect(mockRemoveCharacter).toHaveBeenCalledWith("player");
+    expect(mockFollowMovement.removeCharacter).toHaveBeenCalledWith("player");
     expect(mockGridTileMap.removeCharacter).toHaveBeenCalledWith("player");
     expect(mockUpdate).not.toHaveBeenCalled();
   });
@@ -424,6 +456,32 @@ describe("GridMovementPlugin", () => {
     expect(gridMovementPlugin.hasCharacter("player")).toBe(true);
     expect(gridMovementPlugin.hasCharacter("player2")).toBe(true);
     expect(gridMovementPlugin.hasCharacter("unknownCharId")).toBe(false);
+  });
+
+  it("should follow a char", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+        {
+          id: "player2",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    gridMovementPlugin.follow("player", "player2");
+    expect(mockFollowMovement.addCharacter).toHaveBeenCalledWith(
+      // @ts-ignore
+      expect.toBeCharacter("player"),
+      // @ts-ignore
+      expect.toBeCharacter("player2")
+    );
   });
 
   describe("Error Handling unknown char id", () => {
@@ -502,6 +560,18 @@ describe("GridMovementPlugin", () => {
       expect(() => gridMovementPlugin.removeCharacter("unknownCharId")).toThrow(
         "Character unknown"
       );
+    });
+
+    it("should throw error if follow is invoked", () => {
+      expect(() =>
+        gridMovementPlugin.follow("unknownCharId", "player")
+      ).toThrow("Character unknown");
+      expect(() =>
+        gridMovementPlugin.follow("player", "unknownCharId")
+      ).toThrow("Character unknown");
+      expect(() =>
+        gridMovementPlugin.follow("unknownCharId", "unknownCharId")
+      ).toThrow("Character unknown");
     });
   });
 
@@ -584,6 +654,12 @@ describe("GridMovementPlugin", () => {
       expect(() => gridMovementPlugin.removeCharacter("someCharId")).toThrow(
         "Plugin not initialized"
       );
+    });
+
+    it("should throw error if follow is invoked", () => {
+      expect(() =>
+        gridMovementPlugin.follow("someCharId", "someOtherCharId")
+      ).toThrow("Plugin not initialized");
     });
   });
 });
