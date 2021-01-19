@@ -2,6 +2,8 @@
 
 ![](images/movement.gif)
 
+![](images/radius-movement.gif)
+
 ## Usage
 
 ### Install package (npm):
