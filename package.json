@@ -10,7 +10,7 @@
   "files": [
     "dist"
   ],
-  "types": "src/GridMovementPlugin.d.ts",
+  "types": "dist/GridMovementPlugin.d.ts",
   "author": "Johannes Baum",
   "license": "ISC",
   "devDependencies": {
