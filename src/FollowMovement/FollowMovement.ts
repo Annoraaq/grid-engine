@@ -1,3 +1,4 @@
+import { TargetMovement } from "./../TargetMovement/TargetMovement";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { VectorUtils } from "../Utils/VectorUtils";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
@@ -14,9 +15,28 @@ interface MovementTuple {
 }
 
 export class FollowMovement {
-  addCharacter(character: GridCharacter, charToFollow: GridCharacter) {}
+  private targetMovement: TargetMovement;
+  private characters: Map<string, MovementTuple>;
 
-  removeCharacter(charId: string) {}
+  constructor(gridTilemap: GridTilemap) {
+    this.characters = new Map();
+    this.targetMovement = new TargetMovement(gridTilemap);
+  }
+  addCharacter(character: GridCharacter, charToFollow: GridCharacter) {
+    this.characters.set(character.getId(), {
+      character,
+      charToFollow,
+    });
+  }
 
-  update() {}
+  removeCharacter(charId: string) {
+    this.characters.delete(charId);
+  }
+
+  update() {
+    this.characters.forEach(({ character, charToFollow }) => {
+      this.targetMovement.addCharacter(character, charToFollow.getTilePos());
+    });
+    this.targetMovement.update();
+  }
 }
