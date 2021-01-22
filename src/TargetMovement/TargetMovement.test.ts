@@ -36,7 +36,7 @@ describe("TargetMovement", () => {
     expect(Bfs.getShortestPath).toHaveBeenCalledWith(
       charPos,
       new Phaser.Math.Vector2(3, 1),
-      targetMovement.isBlocking
+      expect.any(Function)
     );
     expect(mockChar.move).toHaveBeenCalledWith(Direction.RIGHT);
   });
@@ -153,15 +153,25 @@ describe("TargetMovement", () => {
 
   it("should delegate isBlocking to gridTilemap", () => {
     const charPos = new Phaser.Math.Vector2(3, 1);
+    const targetPos = new Phaser.Math.Vector2(1, 1);
     gridTilemapMock.isBlocking.mockReturnValue(true);
-    let blocking = targetMovement.isBlocking(charPos);
+    let blocking = targetMovement.isBlocking(targetPos)(charPos);
     expect(blocking).toEqual(true);
     expect(gridTilemapMock.isBlocking).toHaveBeenCalledWith(charPos);
 
     gridTilemapMock.isBlocking.mockReturnValue(false);
-    blocking = targetMovement.isBlocking(charPos);
+    blocking = targetMovement.isBlocking(targetPos)(charPos);
     expect(blocking).toEqual(false);
     expect(gridTilemapMock.isBlocking).toHaveBeenCalledWith(charPos);
+  });
+
+  it("should not block on target pos", () => {
+    const charPos = new Phaser.Math.Vector2(3, 1);
+    const targetPos = new Phaser.Math.Vector2(3, 1);
+    gridTilemapMock.isBlocking.mockReturnValue(true);
+    let blocking = targetMovement.isBlocking(targetPos)(charPos);
+    expect(blocking).toEqual(false);
+    expect(gridTilemapMock.isBlocking).not.toHaveBeenCalled();
   });
 
   it("should clear all chars", () => {

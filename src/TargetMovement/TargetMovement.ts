@@ -48,8 +48,11 @@ export class TargetMovement {
     });
   }
 
-  isBlocking = (pos: Vector2): boolean => {
-    return this.tilemap.isBlocking(pos);
+  isBlocking = (targetPos: Vector2): ((pos: Vector2) => boolean) => {
+    return (pos: Vector2) => {
+      if (VectorUtils.equal(pos, targetPos)) return false;
+      return this.tilemap.isBlocking(pos);
+    };
   };
 
   clear() {
@@ -63,7 +66,7 @@ export class TargetMovement {
     const shortestPath = Bfs.getShortestPath(
       character.getTilePos(),
       targetPos,
-      this.isBlocking
+      this.isBlocking(targetPos)
     );
 
     if (shortestPath.length < 1) return Direction.NONE;
