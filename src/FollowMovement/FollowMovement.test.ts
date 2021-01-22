@@ -1,5 +1,18 @@
-import { Direction } from "../Direction/Direction";
 import { FollowMovement } from "./FollowMovement";
+
+const mockTargetMovement = {
+  addCharacter: jest.fn(),
+  removeCharacter: jest.fn(),
+  update: jest.fn(),
+  clear: jest.fn(),
+};
+
+jest.mock("../TargetMovement/TargetMovement", () => ({
+  TargetMovement: jest.fn(function () {
+    return mockTargetMovement;
+  }),
+}));
+
 describe("FollowMovement", () => {
   let followMovement: FollowMovement;
   let gridTilemapMock;
@@ -21,19 +34,25 @@ describe("FollowMovement", () => {
       isBlocking: jest.fn(),
     };
     followMovement = new FollowMovement(gridTilemapMock);
+    mockTargetMovement.addCharacter.mockReset();
+    mockTargetMovement.removeCharacter.mockReset();
+    mockTargetMovement.clear.mockReset();
   });
 
-  it("should move char in correct direction", () => {
+  it("should update added character", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
     const targetCharPos = new Phaser.Math.Vector2(3, 1);
     const mockChar = createMockChar("char", charPos);
     const targetChar = createMockChar("targetChar", targetCharPos);
     followMovement.addCharacter(mockChar, targetChar);
     followMovement.update();
-    expect(mockChar.move).toHaveBeenCalledWith(Direction.RIGHT);
+    expect(mockTargetMovement.addCharacter).toHaveBeenCalledWith(
+      mockChar,
+      targetCharPos
+    );
   });
 
-  it("should not move deleted char", () => {
+  it("should not update deleted char", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
     const targetCharPos = new Phaser.Math.Vector2(3, 1);
     const mockChar = createMockChar("char", charPos);
@@ -41,6 +60,6 @@ describe("FollowMovement", () => {
     followMovement.addCharacter(mockChar, targetChar);
     followMovement.removeCharacter("char");
     followMovement.update();
-    expect(mockChar.move).not.toHaveBeenCalled();
+    expect(mockTargetMovement.addCharacter).not.toHaveBeenCalled();
   });
 });

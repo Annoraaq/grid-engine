@@ -1,10 +1,7 @@
 import { TargetMovement } from "./../TargetMovement/TargetMovement";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
-import { VectorUtils } from "../Utils/VectorUtils";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
 import * as Phaser from "phaser";
-import { Direction } from "../Direction/Direction";
-import { Bfs } from "../Algorithms/ShortestPath/Bfs/Bfs";
 
 type Vector2 = Phaser.Math.Vector2;
 const Vector2 = Phaser.Math.Vector2;
@@ -34,6 +31,7 @@ export class FollowMovement {
   }
 
   update() {
+    this.targetMovement.clear();
     this.characters.forEach(({ character, charToFollow }) => {
       this.targetMovement.addCharacter(character, charToFollow.getTilePos());
     });

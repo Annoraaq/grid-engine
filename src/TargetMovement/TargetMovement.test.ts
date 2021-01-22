@@ -70,7 +70,7 @@ describe("TargetMovement", () => {
     expect(mockChar.move).not.toHaveBeenCalled();
   });
 
-  it("should move left along path", () => {
+  it("should move right along path", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
     Bfs.getShortestPath = jest
       .fn()
@@ -82,7 +82,7 @@ describe("TargetMovement", () => {
     expect(char.move).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
-  it("should move right along path", () => {
+  it("should move left along path", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
     Bfs.getShortestPath = jest
       .fn()
@@ -162,5 +162,17 @@ describe("TargetMovement", () => {
     blocking = targetMovement.isBlocking(charPos);
     expect(blocking).toEqual(false);
     expect(gridTilemapMock.isBlocking).toHaveBeenCalledWith(charPos);
+  });
+
+  it("should clear all chars", () => {
+    const charPos = new Phaser.Math.Vector2(3, 1);
+    Bfs.getShortestPath = jest
+      .fn()
+      .mockReturnValue([charPos, new Phaser.Math.Vector2(3, 2)]);
+    const mockChar = createMockChar("char1", charPos);
+    targetMovement.addCharacter(mockChar, new Phaser.Math.Vector2(3, 2));
+    targetMovement.clear();
+    targetMovement.update();
+    expect(mockChar.move).not.toHaveBeenCalled();
   });
 });

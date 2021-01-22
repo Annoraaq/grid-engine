@@ -47,7 +47,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.tilemap = tilemap;
     this.gridTilemap = this.createTilemap(tilemap, config);
     this.targetMovement = new TargetMovement(this.gridTilemap);
-    this.followMovement = new FollowMovement();
+    this.followMovement = new FollowMovement(this.gridTilemap);
     this.addCharacters(config);
   }
 

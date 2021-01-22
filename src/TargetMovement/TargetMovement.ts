@@ -52,6 +52,10 @@ export class TargetMovement {
     return this.tilemap.isBlocking(pos);
   };
 
+  clear() {
+    this.characters.clear();
+  }
+
   private getDirOnShortestPath(
     character: GridCharacter,
     targetPos: Phaser.Math.Vector2
