@@ -15,6 +15,7 @@ interface MovementTuple {
 
 interface MovementConfig {
   targetPos: Phaser.Math.Vector2;
+  distance: number;
 }
 
 export class TargetMovement {
@@ -23,10 +24,14 @@ export class TargetMovement {
     this.characters = new Map();
   }
 
-  addCharacter(character: GridCharacter, targetPos: Phaser.Math.Vector2) {
+  addCharacter(
+    character: GridCharacter,
+    targetPos: Phaser.Math.Vector2,
+    distance: number = 0
+  ) {
     this.characters.set(character.getId(), {
       character,
-      config: { targetPos },
+      config: { targetPos, distance },
     });
   }
 
@@ -36,13 +41,15 @@ export class TargetMovement {
 
   update() {
     this.getStandingCharacters().forEach(({ character, config }) => {
-      if (
-        VectorUtils.vec2str(character.getTilePos()) ==
-        VectorUtils.vec2str(config.targetPos)
-      ) {
+      const { dir, dist } = this.getDirOnShortestPath(
+        character,
+        config.targetPos
+      );
+      if (this.noPathExists(dist)) {
+        character.move(Direction.NONE);
+      } else if (dist <= config.distance) {
         this.characters.delete(character.getId());
       } else {
-        const dir = this.getDirOnShortestPath(character, config.targetPos);
         character.move(dir);
       }
     });
@@ -59,29 +66,33 @@ export class TargetMovement {
     this.characters.clear();
   }
 
+  private noPathExists(distance: number): boolean {
+    return distance == -1;
+  }
+
   private getDirOnShortestPath(
     character: GridCharacter,
     targetPos: Phaser.Math.Vector2
-  ): Direction {
+  ): { dir: Direction; dist: number } {
     const shortestPath = Bfs.getShortestPath(
       character.getTilePos(),
       targetPos,
       this.isBlocking(targetPos)
     );
 
-    if (shortestPath.length < 1) return Direction.NONE;
+    if (shortestPath.length == 0) return { dir: Direction.NONE, dist: -1 };
+    if (shortestPath.length == 1) return { dir: Direction.NONE, dist: 0 };
 
     const nextField = shortestPath[1];
     if (nextField.x > character.getTilePos().x) {
-      return Direction.RIGHT;
+      return { dir: Direction.RIGHT, dist: shortestPath.length - 1 };
     } else if (nextField.x < character.getTilePos().x) {
-      return Direction.LEFT;
+      return { dir: Direction.LEFT, dist: shortestPath.length - 1 };
     } else if (nextField.y < character.getTilePos().y) {
-      return Direction.UP;
+      return { dir: Direction.UP, dist: shortestPath.length - 1 };
     } else if (nextField.y > character.getTilePos().y) {
-      return Direction.DOWN;
+      return { dir: Direction.DOWN, dist: shortestPath.length - 1 };
     }
-    return Direction.NONE;
   }
 
   private getStandingCharacters(): MovementTuple[] {

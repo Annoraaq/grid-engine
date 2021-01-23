@@ -70,6 +70,15 @@ describe("TargetMovement", () => {
     expect(mockChar.move).not.toHaveBeenCalled();
   });
 
+  it("should not move char arrived at distance", () => {
+    const charPos = new Phaser.Math.Vector2(3, 1);
+    Bfs.getShortestPath = jest.fn().mockReturnValue([charPos]);
+    const mockChar = createMockChar("char1", charPos);
+    targetMovement.addCharacter(mockChar, new Phaser.Math.Vector2(3, 1), 2);
+    targetMovement.update();
+    expect(mockChar.move).not.toHaveBeenCalled();
+  });
+
   it("should move right along path", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
     Bfs.getShortestPath = jest
@@ -120,14 +129,28 @@ describe("TargetMovement", () => {
 
   it("should not move along path", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
-    Bfs.getShortestPath = jest
-      .fn()
-      .mockReturnValue([charPos, new Phaser.Math.Vector2(1, 1)]);
+    Bfs.getShortestPath = jest.fn().mockReturnValue([charPos]);
     const char = createMockChar("char", charPos);
     targetMovement.addCharacter(char, new Phaser.Math.Vector2(1, 0));
     targetMovement.update();
 
-    expect(char.move).toHaveBeenCalledWith(Direction.NONE);
+    expect(char.move).not.toHaveBeenCalled();
+  });
+
+  it("should not move if distance reached", () => {
+    const charPos = new Phaser.Math.Vector2(1, 1);
+    Bfs.getShortestPath = jest
+      .fn()
+      .mockReturnValue([
+        charPos,
+        new Phaser.Math.Vector2(1, 2),
+        new Phaser.Math.Vector2(1, 3),
+      ]);
+    const char = createMockChar("char", charPos);
+    targetMovement.addCharacter(char, new Phaser.Math.Vector2(1, 3), 3);
+    targetMovement.update();
+
+    expect(char.move).not.toHaveBeenCalled();
   });
 
   it("should not move deleted char", () => {

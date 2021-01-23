@@ -48,7 +48,22 @@ describe("FollowMovement", () => {
     followMovement.update();
     expect(mockTargetMovement.addCharacter).toHaveBeenCalledWith(
       mockChar,
-      targetCharPos
+      targetCharPos,
+      0
+    );
+  });
+
+  it("should update added character with distance", () => {
+    const charPos = new Phaser.Math.Vector2(1, 1);
+    const targetCharPos = new Phaser.Math.Vector2(3, 1);
+    const mockChar = createMockChar("char", charPos);
+    const targetChar = createMockChar("targetChar", targetCharPos);
+    followMovement.addCharacter(mockChar, targetChar, 7);
+    followMovement.update();
+    expect(mockTargetMovement.addCharacter).toHaveBeenCalledWith(
+      mockChar,
+      targetCharPos,
+      7
     );
   });
 

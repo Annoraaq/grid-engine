@@ -8,7 +8,12 @@ const Vector2 = Phaser.Math.Vector2;
 
 interface MovementTuple {
   character: GridCharacter;
+  config: MovementConfig;
+}
+
+interface MovementConfig {
   charToFollow: GridCharacter;
+  distance: number;
 }
 
 export class FollowMovement {
@@ -19,10 +24,18 @@ export class FollowMovement {
     this.characters = new Map();
     this.targetMovement = new TargetMovement(gridTilemap);
   }
-  addCharacter(character: GridCharacter, charToFollow: GridCharacter) {
+
+  addCharacter(
+    character: GridCharacter,
+    charToFollow: GridCharacter,
+    distance: number = 0
+  ) {
     this.characters.set(character.getId(), {
       character,
-      charToFollow,
+      config: {
+        charToFollow,
+        distance,
+      },
     });
   }
 
@@ -32,8 +45,13 @@ export class FollowMovement {
 
   update() {
     this.targetMovement.clear();
-    this.characters.forEach(({ character, charToFollow }) => {
-      this.targetMovement.addCharacter(character, charToFollow.getTilePos());
+    this.characters.forEach(({ character, config }) => {
+      const { charToFollow, distance } = config;
+      this.targetMovement.addCharacter(
+        character,
+        charToFollow.getTilePos(),
+        distance
+      );
     });
     this.targetMovement.update();
   }
