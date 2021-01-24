@@ -162,6 +162,14 @@ To read more about creating compatible tilemaps, take a look at my following blo
 
   Removes the character with the given ID from the plugin.
 
+- `follow(charId: string, charIdToFollow: string, distance: number = 0)`
+
+  Character `charId` will start to walk towards `charIdToFollow` on a shortest path until he has a distance of `distance` to the character to follow.
+
+- `stopFollowing(charId: string)`
+
+  Character `charId` will stop following any character.
+
 ## Troubleshooting
 
 ### `Invalid Scene Plugin: gridMovementPlugin`

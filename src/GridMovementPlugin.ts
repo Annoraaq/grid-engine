@@ -1,3 +1,4 @@
+import { FollowMovement } from "./FollowMovement/FollowMovement";
 import { TargetMovement } from "./TargetMovement/TargetMovement";
 import { GridCharacter } from "./GridCharacter/GridCharacter";
 import "phaser";
@@ -26,6 +27,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   private gridTilemap: GridTilemap;
   private randomMovement: RandomMovement;
   private targetMovement: TargetMovement;
+  private followMovement: FollowMovement;
   private isCreated: boolean = false;
   constructor(
     public scene: Phaser.Scene,
@@ -45,6 +47,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.tilemap = tilemap;
     this.gridTilemap = this.createTilemap(tilemap, config);
     this.targetMovement = new TargetMovement(this.gridTilemap);
+    this.followMovement = new FollowMovement(this.gridTilemap);
     this.addCharacters(config);
   }
 
@@ -113,6 +116,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     if (this.isCreated) {
       this.randomMovement.update(delta);
       this.targetMovement.update();
+      this.followMovement.update();
       if (this.gridCharacters) {
         for (let [_key, val] of this.gridCharacters) {
           val.update(delta);
@@ -155,8 +159,26 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.unknownCharGuard(charId);
     this.randomMovement.removeCharacter(charId);
     this.targetMovement.removeCharacter(charId);
+    this.followMovement.removeCharacter(charId);
     this.gridTilemap.removeCharacter(charId);
     this.gridCharacters.delete(charId);
+  }
+
+  follow(charId: string, charIdToFollow: string, distance: number = 0) {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    this.unknownCharGuard(charIdToFollow);
+    this.followMovement.addCharacter(
+      this.gridCharacters.get(charId),
+      this.gridCharacters.get(charIdToFollow),
+      distance
+    );
+  }
+
+  stopFollowing(charId: string) {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    this.followMovement.removeCharacter(charId);
   }
 
   private initGuard() {
