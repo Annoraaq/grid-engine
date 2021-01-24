@@ -50,7 +50,7 @@ export class FollowMovement {
       this.targetMovement.addCharacter(
         character,
         charToFollow.getTilePos(),
-        distance
+        distance + 1
       );
     });
     this.targetMovement.update();

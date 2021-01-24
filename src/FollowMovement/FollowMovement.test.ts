@@ -49,7 +49,7 @@ describe("FollowMovement", () => {
     expect(mockTargetMovement.addCharacter).toHaveBeenCalledWith(
       mockChar,
       targetCharPos,
-      0
+      1
     );
   });
 
@@ -63,7 +63,7 @@ describe("FollowMovement", () => {
     expect(mockTargetMovement.addCharacter).toHaveBeenCalledWith(
       mockChar,
       targetCharPos,
-      7
+      8
     );
   });
 

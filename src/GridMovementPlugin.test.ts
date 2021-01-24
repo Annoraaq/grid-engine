@@ -119,6 +119,9 @@ describe("GridMovementPlugin", () => {
     mockRemoveCharacter.mockReset();
     mockTargetMovementRemoveCharacter.mockReset();
     mockUpdate.mockReset();
+    mockFollowMovement.addCharacter.mockReset();
+    mockFollowMovement.removeCharacter.mockReset();
+    mockFollowMovement.update.mockReset();
   });
 
   it("should boot", () => {
@@ -475,13 +478,62 @@ describe("GridMovementPlugin", () => {
       ],
       firstLayerAboveChar: 3,
     });
+    gridMovementPlugin.follow("player", "player2", 7);
+    expect(mockFollowMovement.addCharacter).toHaveBeenCalledWith(
+      // @ts-ignore
+      expect.toBeCharacter("player"),
+      // @ts-ignore
+      expect.toBeCharacter("player2"),
+      7
+    );
+  });
+
+  it("should follow a char with default distance", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+        {
+          id: "player2",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
     gridMovementPlugin.follow("player", "player2");
     expect(mockFollowMovement.addCharacter).toHaveBeenCalledWith(
       // @ts-ignore
       expect.toBeCharacter("player"),
       // @ts-ignore
-      expect.toBeCharacter("player2")
+      expect.toBeCharacter("player2"),
+      0
     );
+  });
+
+  it("should stop following", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+        {
+          id: "player2",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    gridMovementPlugin.stopFollowing("player");
+    expect(mockFollowMovement.removeCharacter).toHaveBeenCalledWith("player");
   });
 
   describe("Error Handling unknown char id", () => {
@@ -573,6 +625,12 @@ describe("GridMovementPlugin", () => {
         gridMovementPlugin.follow("unknownCharId", "unknownCharId")
       ).toThrow("Character unknown");
     });
+
+    it("should throw error if stopFollowing is invoked", () => {
+      expect(() => gridMovementPlugin.stopFollowing("unknownCharId")).toThrow(
+        "Character unknown"
+      );
+    });
   });
 
   describe("invokation of methods if not created properly", () => {
@@ -660,6 +718,12 @@ describe("GridMovementPlugin", () => {
       expect(() =>
         gridMovementPlugin.follow("someCharId", "someOtherCharId")
       ).toThrow("Plugin not initialized");
+    });
+
+    it("should throw error if stopFollowing is invoked", () => {
+      expect(() => gridMovementPlugin.stopFollowing("someCharId")).toThrow(
+        "Plugin not initialized"
+      );
     });
   });
 });
