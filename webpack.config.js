@@ -5,7 +5,6 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: {
-    GridMovementPlugin: './src/main.ts',
     'GridMovementPlugin.min': './src/main.ts',
   },
   plugins: [
