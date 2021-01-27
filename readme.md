@@ -187,3 +187,8 @@ to
 ```ts
 import GridMovementPlugin from "phaser-grid-movement-plugin";
 ```
+
+### `Clash with Phaser physics engine`
+
+Make sure that you disable collisions of the physics engine for all the sprites that you add to the plugin.
+Otherwise you might be observing unexplainable misplacements of the characters.
