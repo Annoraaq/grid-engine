@@ -73,25 +73,39 @@ export class TargetMovement {
     character: GridCharacter,
     config: MovementConfig
   ): { dir: Direction; dist: number } {
-    const shortestPath = Bfs.getShortestPath(
+    let { path: shortestPath, closestToTarget } = Bfs.getShortestPath(
       character.getTilePos(),
       config.targetPos,
-      this.isBlocking(config.targetPos),
-      config.closestPointIfBlocked
+      this.isBlocking(config.targetPos)
     );
 
-    if (shortestPath.length == 0) return { dir: Direction.NONE, dist: -1 };
+    let distAdd = 0;
+    if (shortestPath.length == 0) {
+      if (config.closestPointIfBlocked) {
+        shortestPath = Bfs.getShortestPath(
+          character.getTilePos(),
+          closestToTarget,
+          this.isBlocking(config.targetPos)
+        ).path;
+        distAdd = VectorUtils.manhattanDistance(
+          closestToTarget,
+          config.targetPos
+        );
+      } else {
+        return { dir: Direction.NONE, dist: -1 };
+      }
+    }
     if (shortestPath.length == 1) return { dir: Direction.NONE, dist: 0 };
 
     const nextField = shortestPath[1];
     if (nextField.x > character.getTilePos().x) {
-      return { dir: Direction.RIGHT, dist: shortestPath.length - 1 };
+      return { dir: Direction.RIGHT, dist: shortestPath.length - 1 + distAdd };
     } else if (nextField.x < character.getTilePos().x) {
-      return { dir: Direction.LEFT, dist: shortestPath.length - 1 };
+      return { dir: Direction.LEFT, dist: shortestPath.length - 1 + distAdd };
     } else if (nextField.y < character.getTilePos().y) {
-      return { dir: Direction.UP, dist: shortestPath.length - 1 };
+      return { dir: Direction.UP, dist: shortestPath.length - 1 + distAdd };
     } else if (nextField.y > character.getTilePos().y) {
-      return { dir: Direction.DOWN, dist: shortestPath.length - 1 };
+      return { dir: Direction.DOWN, dist: shortestPath.length - 1 + distAdd };
     }
   }
 

@@ -19,19 +19,13 @@ export class Bfs {
   static getShortestPath(
     startPos: Vector2,
     targetPos: Vector2,
-    isBlocked: (pos: Vector2) => boolean,
-    closestPointIfBlocked: boolean = false
-  ): Vector2[] {
+    isBlocked: (pos: Vector2) => boolean
+  ): { path: Vector2[]; closestToTarget: Vector2 } {
     const shortestPath = Bfs.shortestPathBfs(startPos, targetPos, isBlocked);
-    if (closestPointIfBlocked && shortestPath.shortestDistance == -1) {
-      return Bfs.returnPath(
-        Bfs.shortestPathBfs(startPos, shortestPath.closestToTarget, isBlocked)
-          .previous,
-        startPos,
-        shortestPath.closestToTarget
-      );
-    }
-    return Bfs.returnPath(shortestPath.previous, startPos, targetPos);
+    return {
+      path: Bfs.returnPath(shortestPath.previous, startPos, targetPos),
+      closestToTarget: shortestPath.closestToTarget,
+    };
   }
 
   private static shortestPathBfs(
@@ -42,7 +36,7 @@ export class Bfs {
     const previous = new Map<string, Vector2>();
     const visited = new Set<string>();
     const queue: QueueEntry[] = [];
-    let closestToTarget: Vector2;
+    let closestToTarget: Vector2 = startNode;
     let smallestDistToTarget: number = VectorUtils.manhattanDistance(
       startNode,
       stopNode

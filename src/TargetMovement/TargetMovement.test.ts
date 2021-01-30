@@ -27,26 +27,27 @@ describe("TargetMovement", () => {
 
   it("should move char in correct direction", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
-    Bfs.getShortestPath = jest
-      .fn()
-      .mockReturnValue([charPos, new Phaser.Math.Vector2(2, 1)]);
+    Bfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos, new Phaser.Math.Vector2(2, 1)],
+      closestToTarget: new Phaser.Math.Vector2(3, 1),
+    });
     const mockChar = createMockChar("char1", charPos);
     targetMovement.addCharacter(mockChar, new Phaser.Math.Vector2(3, 1));
     targetMovement.update();
     expect(Bfs.getShortestPath).toHaveBeenCalledWith(
       charPos,
       new Phaser.Math.Vector2(3, 1),
-      expect.any(Function),
-      false
+      expect.any(Function)
     );
     expect(mockChar.move).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
   it("should move all standing chars", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
-    Bfs.getShortestPath = jest
-      .fn()
-      .mockReturnValue([charPos, new Phaser.Math.Vector2(2, 1)]);
+    Bfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos, new Phaser.Math.Vector2(2, 1)],
+      closestToTarget: new Phaser.Math.Vector2(3, 1),
+    });
     const standingChar = createMockChar("char1", charPos);
     const standingChar2 = createMockChar("char2", charPos);
     const movingChar = createMockChar("char3", charPos);
@@ -64,7 +65,10 @@ describe("TargetMovement", () => {
 
   it("should not move arrived char", () => {
     const charPos = new Phaser.Math.Vector2(3, 1);
-    Bfs.getShortestPath = jest.fn().mockReturnValue([charPos]);
+    Bfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos],
+      closestToTarget: charPos,
+    });
     const mockChar = createMockChar("char1", charPos);
     targetMovement.addCharacter(mockChar, new Phaser.Math.Vector2(3, 1));
     targetMovement.update();
@@ -73,7 +77,10 @@ describe("TargetMovement", () => {
 
   it("should not move char arrived at distance", () => {
     const charPos = new Phaser.Math.Vector2(3, 1);
-    Bfs.getShortestPath = jest.fn().mockReturnValue([charPos]);
+    Bfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos],
+      closestToTarget: charPos,
+    });
     const mockChar = createMockChar("char1", charPos);
     targetMovement.addCharacter(mockChar, new Phaser.Math.Vector2(3, 1), 2);
     targetMovement.update();
@@ -82,9 +89,10 @@ describe("TargetMovement", () => {
 
   it("should move right along path", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
-    Bfs.getShortestPath = jest
-      .fn()
-      .mockReturnValue([charPos, new Phaser.Math.Vector2(2, 1)]);
+    Bfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos, new Phaser.Math.Vector2(2, 1)],
+      closestToTarget: new Phaser.Math.Vector2(2, 1),
+    });
     const char = createMockChar("char", charPos);
     targetMovement.addCharacter(char, new Phaser.Math.Vector2(2, 1));
     targetMovement.update();
@@ -94,9 +102,10 @@ describe("TargetMovement", () => {
 
   it("should move left along path", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
-    Bfs.getShortestPath = jest
-      .fn()
-      .mockReturnValue([charPos, new Phaser.Math.Vector2(0, 1)]);
+    Bfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos, new Phaser.Math.Vector2(0, 1)],
+      closestToTarget: new Phaser.Math.Vector2(0, 1),
+    });
     const char = createMockChar("char", charPos);
     targetMovement.addCharacter(char, new Phaser.Math.Vector2(0, 1));
     targetMovement.update();
@@ -106,9 +115,10 @@ describe("TargetMovement", () => {
 
   it("should move down along path", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
-    Bfs.getShortestPath = jest
-      .fn()
-      .mockReturnValue([charPos, new Phaser.Math.Vector2(1, 2)]);
+    Bfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos, new Phaser.Math.Vector2(1, 2)],
+      closestToTarget: new Phaser.Math.Vector2(1, 2),
+    });
     const char = createMockChar("char", charPos);
     targetMovement.addCharacter(char, new Phaser.Math.Vector2(1, 2));
     targetMovement.update();
@@ -118,9 +128,10 @@ describe("TargetMovement", () => {
 
   it("should move up along path", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
-    Bfs.getShortestPath = jest
-      .fn()
-      .mockReturnValue([charPos, new Phaser.Math.Vector2(1, 0)]);
+    Bfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos, new Phaser.Math.Vector2(1, 0)],
+      closestToTarget: new Phaser.Math.Vector2(1, 0),
+    });
     const char = createMockChar("char", charPos);
     targetMovement.addCharacter(char, new Phaser.Math.Vector2(1, 0));
     targetMovement.update();
@@ -130,9 +141,12 @@ describe("TargetMovement", () => {
 
   it("should not move along path", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
-    Bfs.getShortestPath = jest.fn().mockReturnValue([charPos]);
+    Bfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos],
+      closestToTarget: new Phaser.Math.Vector2(1, 1),
+    });
     const char = createMockChar("char", charPos);
-    targetMovement.addCharacter(char, new Phaser.Math.Vector2(1, 0));
+    targetMovement.addCharacter(char, new Phaser.Math.Vector2(1, 1));
     targetMovement.update();
 
     expect(char.move).not.toHaveBeenCalled();
@@ -142,7 +156,14 @@ describe("TargetMovement", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
     Bfs.getShortestPath = jest
       .fn()
-      .mockReturnValue([charPos, new Phaser.Math.Vector2(2, 1)]);
+      .mockReturnValueOnce({
+        path: [],
+        closestToTarget: new Phaser.Math.Vector2(2, 1),
+      })
+      .mockReturnValueOnce({
+        path: [charPos, new Phaser.Math.Vector2(2, 1)],
+        closestToTarget: new Phaser.Math.Vector2(2, 1),
+      });
     const mockChar = createMockChar("char1", charPos);
     targetMovement.addCharacter(
       mockChar,
@@ -151,23 +172,49 @@ describe("TargetMovement", () => {
       true
     );
     targetMovement.update();
+
     expect(Bfs.getShortestPath).toHaveBeenCalledWith(
       charPos,
       new Phaser.Math.Vector2(3, 1),
-      expect.any(Function),
-      true
+      expect.any(Function)
     );
+    expect(Bfs.getShortestPath).toHaveBeenCalledWith(
+      charPos,
+      new Phaser.Math.Vector2(2, 1),
+      expect.any(Function)
+    );
+    expect(mockChar.move).toHaveBeenCalled();
+  });
+
+  it("should not move towards closest reachable point if distance is reached", () => {
+    const charPos = new Phaser.Math.Vector2(1, 1);
+    const targetPos = new Phaser.Math.Vector2(3, 1);
+    Bfs.getShortestPath = jest
+      .fn()
+      .mockReturnValueOnce({
+        path: [],
+        closestToTarget: new Phaser.Math.Vector2(2, 1),
+      })
+      .mockReturnValueOnce({
+        path: [charPos, new Phaser.Math.Vector2(2, 1)],
+        closestToTarget: new Phaser.Math.Vector2(2, 1),
+      });
+    const mockChar = createMockChar("char1", charPos);
+    targetMovement.addCharacter(mockChar, targetPos, 2, true);
+    targetMovement.update();
+    expect(mockChar.move).not.toHaveBeenCalled();
   });
 
   it("should not move if distance reached", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
-    Bfs.getShortestPath = jest
-      .fn()
-      .mockReturnValue([
+    Bfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [
         charPos,
         new Phaser.Math.Vector2(1, 2),
         new Phaser.Math.Vector2(1, 3),
-      ]);
+      ],
+      closestToTarget: new Phaser.Math.Vector2(1, 3),
+    });
     const char = createMockChar("char", charPos);
     targetMovement.addCharacter(char, new Phaser.Math.Vector2(1, 3), 3);
     targetMovement.update();
@@ -189,7 +236,9 @@ describe("TargetMovement", () => {
 
   it("should not move if no path exists", () => {
     const charPos = new Phaser.Math.Vector2(3, 1);
-    Bfs.getShortestPath = jest.fn().mockReturnValue([]);
+    Bfs.getShortestPath = jest
+      .fn()
+      .mockReturnValue({ path: [], closestToDistance: charPos });
     const mockChar = createMockChar("char1", charPos);
     targetMovement.addCharacter(mockChar, new Phaser.Math.Vector2(3, 2));
     targetMovement.update();
