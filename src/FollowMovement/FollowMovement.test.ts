@@ -1,4 +1,5 @@
 import { FollowMovement } from "./FollowMovement";
+import * as Phaser from "phaser";
 
 const mockTargetMovement = {
   addCharacter: jest.fn(),

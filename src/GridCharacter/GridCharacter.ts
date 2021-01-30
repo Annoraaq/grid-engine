@@ -22,7 +22,6 @@ export class GridCharacter {
     [Direction.UP]: 3,
   };
   private movementDirection = Direction.NONE;
-  private decimalPlacesLeft = 0;
   private readonly speedPixelsPerSecond: number;
   private tileSizePixelsWalked = 0;
   private lastFootLeft = false;
@@ -179,10 +178,7 @@ export class GridCharacter {
 
   private updateCharacterPosition(delta: number): void {
     const pixelsToWalkThisUpdate = this.getIntegerPart(
-      this.getSpeedPerDelta(delta) + this.decimalPlacesLeft
-    );
-    this.decimalPlacesLeft = this.getDecimalPlaces(
-      this.getSpeedPerDelta(delta) + this.decimalPlacesLeft
+      this.getSpeedPerDelta(delta)
     );
 
     if (this.willCrossTileBorderThisUpdate(pixelsToWalkThisUpdate)) {

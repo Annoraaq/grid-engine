@@ -1,10 +1,6 @@
 import { TargetMovement } from "./../TargetMovement/TargetMovement";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
-import * as Phaser from "phaser";
-
-type Vector2 = Phaser.Math.Vector2;
-const Vector2 = Phaser.Math.Vector2;
 
 interface MovementTuple {
   character: GridCharacter;
