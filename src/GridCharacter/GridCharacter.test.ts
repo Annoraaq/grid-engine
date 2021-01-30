@@ -232,26 +232,6 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
   });
 
-  it("should take decimal places of last update into account", () => {
-    mockNonBlockingTile();
-
-    gridCharacter.move(Direction.UP);
-    gridCharacter.update(100);
-
-    expect(spriteMock.setPosition).toHaveBeenCalledWith(
-      5 * 16 + PLAYER_X_OFFSET,
-      6 * 16 + PLAYER_Y_OFFSET - 4
-    );
-    expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
-
-    gridCharacter.update(100);
-
-    expect(spriteMock.setPosition).toHaveBeenCalledWith(
-      5 * 16 + PLAYER_X_OFFSET,
-      6 * 16 + PLAYER_Y_OFFSET - 9
-    );
-  });
-
   it("should set tile position", () => {
     gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
 
