@@ -50,7 +50,8 @@ describe("FollowMovement", () => {
     expect(mockTargetMovement.addCharacter).toHaveBeenCalledWith(
       mockChar,
       targetCharPos,
-      1
+      1,
+      false
     );
   });
 
@@ -64,7 +65,23 @@ describe("FollowMovement", () => {
     expect(mockTargetMovement.addCharacter).toHaveBeenCalledWith(
       mockChar,
       targetCharPos,
-      8
+      8,
+      false
+    );
+  });
+
+  it("should update added character with distance and closestPointIfBlocked", () => {
+    const charPos = new Phaser.Math.Vector2(1, 1);
+    const targetCharPos = new Phaser.Math.Vector2(3, 1);
+    const mockChar = createMockChar("char", charPos);
+    const targetChar = createMockChar("targetChar", targetCharPos);
+    followMovement.addCharacter(mockChar, targetChar, 7, true);
+    followMovement.update();
+    expect(mockTargetMovement.addCharacter).toHaveBeenCalledWith(
+      mockChar,
+      targetCharPos,
+      8,
+      true
     );
   });
 

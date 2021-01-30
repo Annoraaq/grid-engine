@@ -1,3 +1,4 @@
+import { VectorUtils } from "./../Utils/VectorUtils";
 import { GridCharacter } from "./../GridCharacter/GridCharacter";
 import { Direction, DirectionVectors } from "../Direction/Direction";
 
@@ -106,18 +107,12 @@ export class RandomMovement {
     conf: MovementConfig
   ) {
     if (conf.radius == -1) return true;
-    const dist = this.manhattenDist(
+    const dist = VectorUtils.manhattanDistance(
       character.getTilePos().add(DirectionVectors[dir]),
       new Phaser.Math.Vector2(conf.initialCol, conf.initialRow)
     );
 
     return dist <= conf.radius;
-  }
-
-  private manhattenDist(pos1: Phaser.Math.Vector2, pos2: Phaser.Math.Vector2) {
-    const xDist = Math.abs(pos1.x - pos2.x);
-    const yDist = Math.abs(pos1.y - pos2.y);
-    return xDist + yDist;
   }
 
   private getFreeRandomDirection(character: GridCharacter): Direction {

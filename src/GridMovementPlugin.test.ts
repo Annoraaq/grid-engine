@@ -478,13 +478,14 @@ describe("GridMovementPlugin", () => {
       ],
       firstLayerAboveChar: 3,
     });
-    gridMovementPlugin.follow("player", "player2", 7);
+    gridMovementPlugin.follow("player", "player2", 7, true);
     expect(mockFollowMovement.addCharacter).toHaveBeenCalledWith(
       // @ts-ignore
       expect.toBeCharacter("player"),
       // @ts-ignore
       expect.toBeCharacter("player2"),
-      7
+      7,
+      true
     );
   });
 
@@ -511,7 +512,8 @@ describe("GridMovementPlugin", () => {
       expect.toBeCharacter("player"),
       // @ts-ignore
       expect.toBeCharacter("player2"),
-      0
+      0,
+      false
     );
   });
 

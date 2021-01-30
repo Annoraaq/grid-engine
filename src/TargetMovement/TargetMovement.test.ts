@@ -36,7 +36,8 @@ describe("TargetMovement", () => {
     expect(Bfs.getShortestPath).toHaveBeenCalledWith(
       charPos,
       new Phaser.Math.Vector2(3, 1),
-      expect.any(Function)
+      expect.any(Function),
+      false
     );
     expect(mockChar.move).toHaveBeenCalledWith(Direction.RIGHT);
   });
@@ -135,6 +136,27 @@ describe("TargetMovement", () => {
     targetMovement.update();
 
     expect(char.move).not.toHaveBeenCalled();
+  });
+
+  it("should move towards closest reachable point if path is blocked", () => {
+    const charPos = new Phaser.Math.Vector2(1, 1);
+    Bfs.getShortestPath = jest
+      .fn()
+      .mockReturnValue([charPos, new Phaser.Math.Vector2(2, 1)]);
+    const mockChar = createMockChar("char1", charPos);
+    targetMovement.addCharacter(
+      mockChar,
+      new Phaser.Math.Vector2(3, 1),
+      0,
+      true
+    );
+    targetMovement.update();
+    expect(Bfs.getShortestPath).toHaveBeenCalledWith(
+      charPos,
+      new Phaser.Math.Vector2(3, 1),
+      expect.any(Function),
+      true
+    );
   });
 
   it("should not move if distance reached", () => {

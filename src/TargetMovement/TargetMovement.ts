@@ -16,6 +16,7 @@ interface MovementTuple {
 interface MovementConfig {
   targetPos: Phaser.Math.Vector2;
   distance: number;
+  closestPointIfBlocked: boolean;
 }
 
 export class TargetMovement {
@@ -27,11 +28,12 @@ export class TargetMovement {
   addCharacter(
     character: GridCharacter,
     targetPos: Phaser.Math.Vector2,
-    distance: number = 0
+    distance: number = 0,
+    closestPointIfBlocked: boolean = false
   ) {
     this.characters.set(character.getId(), {
       character,
-      config: { targetPos, distance },
+      config: { targetPos, distance, closestPointIfBlocked },
     });
   }
 
@@ -41,10 +43,7 @@ export class TargetMovement {
 
   update() {
     this.getStandingCharacters().forEach(({ character, config }) => {
-      const { dir, dist } = this.getDirOnShortestPath(
-        character,
-        config.targetPos
-      );
+      const { dir, dist } = this.getDirOnShortestPath(character, config);
       if (this.noPathExists(dist)) {
         character.move(Direction.NONE);
       } else if (dist <= config.distance) {
@@ -72,12 +71,13 @@ export class TargetMovement {
 
   private getDirOnShortestPath(
     character: GridCharacter,
-    targetPos: Phaser.Math.Vector2
+    config: MovementConfig
   ): { dir: Direction; dist: number } {
     const shortestPath = Bfs.getShortestPath(
       character.getTilePos(),
-      targetPos,
-      this.isBlocking(targetPos)
+      config.targetPos,
+      this.isBlocking(config.targetPos),
+      config.closestPointIfBlocked
     );
 
     if (shortestPath.length == 0) return { dir: Direction.NONE, dist: -1 };

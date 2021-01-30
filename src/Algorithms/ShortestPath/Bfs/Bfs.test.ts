@@ -91,4 +91,40 @@ describe("Bfs", () => {
       new Vector2(1, 3),
     ]);
   });
+
+  it("should move to closest point if path is blocked", () => {
+    // s = start
+    // t = target
+    // # = blocked
+    // . = free
+
+    // #####
+    // #s..#
+    // #####
+    // #..t#
+    // #####
+
+    const startPos = new Vector2(1, 1);
+    const targetPos = new Vector2(3, 3);
+    const unblockedTiles = [
+      VectorUtils.vec2str(new Vector2(1, 1)),
+      VectorUtils.vec2str(new Vector2(2, 1)),
+      VectorUtils.vec2str(new Vector2(3, 1)),
+      VectorUtils.vec2str(new Vector2(3, 3)),
+      VectorUtils.vec2str(new Vector2(2, 3)),
+      VectorUtils.vec2str(new Vector2(1, 3)),
+    ];
+
+    const isBlocked = (pos) => {
+      return !unblockedTiles.includes(VectorUtils.vec2str(pos));
+    };
+
+    const path = Bfs.getShortestPath(startPos, targetPos, isBlocked, true);
+
+    expect(path).toEqual([
+      new Vector2(1, 1),
+      new Vector2(2, 1),
+      new Vector2(3, 1),
+    ]);
+  });
 });

@@ -164,14 +164,20 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.gridCharacters.delete(charId);
   }
 
-  follow(charId: string, charIdToFollow: string, distance: number = 0) {
+  follow(
+    charId: string,
+    charIdToFollow: string,
+    distance: number = 0,
+    closestPointIfBlocked: boolean = false
+  ) {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.unknownCharGuard(charIdToFollow);
     this.followMovement.addCharacter(
       this.gridCharacters.get(charId),
       this.gridCharacters.get(charIdToFollow),
-      distance
+      distance,
+      closestPointIfBlocked
     );
   }
 
