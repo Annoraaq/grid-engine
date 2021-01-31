@@ -317,4 +317,36 @@ describe("GridCharacter", () => {
       expect(result).toBe(true);
     });
   });
+
+  describe("turnTowards", () => {
+    beforeEach(() => {
+      (<any>spriteMock.setFrame).mockReset();
+    });
+    it("should turn towards left", () => {
+      gridCharacter.turnTowards(Direction.LEFT);
+      expect(spriteMock.setFrame).toHaveBeenCalledWith(46);
+    });
+
+    it("should turn towards right", () => {
+      gridCharacter.turnTowards(Direction.RIGHT);
+      expect(spriteMock.setFrame).toHaveBeenCalledWith(55);
+    });
+
+    it("should turn towards up", () => {
+      gridCharacter.turnTowards(Direction.UP);
+      expect(spriteMock.setFrame).toHaveBeenCalledWith(64);
+    });
+
+    it("should turn towards down", () => {
+      gridCharacter.turnTowards(Direction.DOWN);
+      expect(spriteMock.setFrame).toHaveBeenCalledWith(37);
+    });
+
+    it("should not turn if moving", () => {
+      gridCharacter.move(Direction.DOWN);
+      (<any>spriteMock.setFrame).mockReset();
+      gridCharacter.turnTowards(Direction.LEFT);
+      expect(spriteMock.setFrame).not.toHaveBeenCalled();
+    });
+  });
 });

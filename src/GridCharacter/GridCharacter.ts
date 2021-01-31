@@ -97,6 +97,11 @@ export class GridCharacter {
     return this.movementDirection != Direction.NONE;
   }
 
+  turnTowards(direction: Direction) {
+    if (this.isMoving()) return;
+    this.sprite.setFrame(this.framesOfDirection(direction).standing);
+  }
+
   private get tilePos() {
     return this._tilePos.clone();
   }
@@ -224,10 +229,6 @@ export class GridCharacter {
 
   private getIntegerPart(float: number): number {
     return Math.floor(float);
-  }
-
-  private getDecimalPlaces(float: number): number {
-    return float % 1;
   }
 
   private updateCharacterFrame(tileSizePixelsWalked: number): void {
