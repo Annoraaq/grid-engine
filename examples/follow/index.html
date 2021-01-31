@@ -116,9 +116,9 @@
     };
 
     this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
-    this.gridMovementPlugin.follow('npc0', 'player', 2);
-    this.gridMovementPlugin.follow('npc1', 'player', 1);
-    this.gridMovementPlugin.follow('npc2', 'player');
+    this.gridMovementPlugin.follow('npc0', 'player', 2, true);
+    this.gridMovementPlugin.follow('npc1', 'player', 1, true);
+    this.gridMovementPlugin.follow('npc2', 'player', 0, true);
   }
 
   function update () {

@@ -16,6 +16,7 @@ interface MovementTuple {
 interface MovementConfig {
   targetPos: Phaser.Math.Vector2;
   distance: number;
+  closestPointIfBlocked: boolean;
 }
 
 export class TargetMovement {
@@ -27,11 +28,12 @@ export class TargetMovement {
   addCharacter(
     character: GridCharacter,
     targetPos: Phaser.Math.Vector2,
-    distance: number = 0
+    distance: number = 0,
+    closestPointIfBlocked: boolean = false
   ) {
     this.characters.set(character.getId(), {
       character,
-      config: { targetPos, distance },
+      config: { targetPos, distance, closestPointIfBlocked },
     });
   }
 
@@ -41,10 +43,7 @@ export class TargetMovement {
 
   update() {
     this.getStandingCharacters().forEach(({ character, config }) => {
-      const { dir, dist } = this.getDirOnShortestPath(
-        character,
-        config.targetPos
-      );
+      const { dir, dist } = this.getDirOnShortestPath(character, config);
       if (this.noPathExists(dist)) {
         character.move(Direction.NONE);
       } else if (dist <= config.distance) {
@@ -70,29 +69,60 @@ export class TargetMovement {
     return distance == -1;
   }
 
-  private getDirOnShortestPath(
+  private getShortestPath(
     character: GridCharacter,
-    targetPos: Phaser.Math.Vector2
-  ): { dir: Direction; dist: number } {
-    const shortestPath = Bfs.getShortestPath(
+    config: MovementConfig
+  ): { path: Vector2[]; distOffset: number } {
+    const { path: shortestPath, closestToTarget } = Bfs.getShortestPath(
       character.getTilePos(),
-      targetPos,
-      this.isBlocking(targetPos)
+      config.targetPos,
+      this.isBlocking(config.targetPos)
     );
 
+    const noPathFound = shortestPath.length == 0;
+
+    if (noPathFound && config.closestPointIfBlocked) {
+      const shortestPathToClosestPoint = Bfs.getShortestPath(
+        character.getTilePos(),
+        closestToTarget,
+        this.isBlocking(config.targetPos)
+      ).path;
+      const distOffset = VectorUtils.manhattanDistance(
+        closestToTarget,
+        config.targetPos
+      );
+      return { path: shortestPathToClosestPoint, distOffset };
+    }
+
+    return { path: shortestPath, distOffset: 0 };
+  }
+
+  private getDirOnShortestPath(
+    character: GridCharacter,
+    config: MovementConfig
+  ): { dir: Direction; dist: number } {
+    const { path: shortestPath, distOffset } = this.getShortestPath(
+      character,
+      config
+    );
     if (shortestPath.length == 0) return { dir: Direction.NONE, dist: -1 };
     if (shortestPath.length == 1) return { dir: Direction.NONE, dist: 0 };
 
     const nextField = shortestPath[1];
+    const result = {
+      dir: undefined,
+      dist: shortestPath.length - 1 + distOffset,
+    };
     if (nextField.x > character.getTilePos().x) {
-      return { dir: Direction.RIGHT, dist: shortestPath.length - 1 };
+      result.dir = Direction.RIGHT;
     } else if (nextField.x < character.getTilePos().x) {
-      return { dir: Direction.LEFT, dist: shortestPath.length - 1 };
+      result.dir = Direction.LEFT;
     } else if (nextField.y < character.getTilePos().y) {
-      return { dir: Direction.UP, dist: shortestPath.length - 1 };
+      result.dir = Direction.UP;
     } else if (nextField.y > character.getTilePos().y) {
-      return { dir: Direction.DOWN, dist: shortestPath.length - 1 };
+      result.dir = Direction.DOWN;
     }
+    return result;
   }
 
   private getStandingCharacters(): MovementTuple[] {

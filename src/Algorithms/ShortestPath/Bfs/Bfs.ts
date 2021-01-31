@@ -7,6 +7,7 @@ type Vector2 = Phaser.Math.Vector2;
 interface ShortestPathTuple {
   shortestDistance: number;
   previous: Map<string, Vector2>;
+  closestToTarget: Vector2;
 }
 
 interface QueueEntry {
@@ -19,12 +20,12 @@ export class Bfs {
     startPos: Vector2,
     targetPos: Vector2,
     isBlocked: (pos: Vector2) => boolean
-  ): Vector2[] {
-    return Bfs.returnPath(
-      Bfs.shortestPathBfs(startPos, targetPos, isBlocked).previous,
-      startPos,
-      targetPos
-    );
+  ): { path: Vector2[]; closestToTarget: Vector2 } {
+    const shortestPath = Bfs.shortestPathBfs(startPos, targetPos, isBlocked);
+    return {
+      path: Bfs.returnPath(shortestPath.previous, startPos, targetPos),
+      closestToTarget: shortestPath.closestToTarget,
+    };
   }
 
   private static shortestPathBfs(
@@ -35,13 +36,23 @@ export class Bfs {
     const previous = new Map<string, Vector2>();
     const visited = new Set<string>();
     const queue: QueueEntry[] = [];
+    let closestToTarget: Vector2 = startNode;
+    let smallestDistToTarget: number = VectorUtils.manhattanDistance(
+      startNode,
+      stopNode
+    );
     queue.push({ node: startNode, dist: 0 });
-    visited.add(startNode.toString());
+    visited.add(VectorUtils.vec2str(startNode));
 
     while (queue.length > 0) {
       const { node, dist } = queue.shift();
+      const distToTarget = VectorUtils.manhattanDistance(node, stopNode);
+      if (distToTarget < smallestDistToTarget) {
+        smallestDistToTarget = distToTarget;
+        closestToTarget = node;
+      }
       if (VectorUtils.equal(node, stopNode)) {
-        return { shortestDistance: dist, previous };
+        return { shortestDistance: dist, previous, closestToTarget };
       }
 
       for (let neighbour of Bfs.getNeighbours(node, isBlocked)) {
@@ -52,7 +63,7 @@ export class Bfs {
         }
       }
     }
-    return { shortestDistance: -1, previous };
+    return { shortestDistance: -1, previous, closestToTarget };
   }
 
   private static getNeighbours(

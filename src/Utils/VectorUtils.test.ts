@@ -25,4 +25,24 @@ describe("VectorUtils", () => {
       expect(VectorUtils.equal(vector2, vector)).toBe(false);
     });
   });
+
+  describe("manhattanDistance", () => {
+    it("should correctly calc positive numbers", () => {
+      const vector = new Phaser.Math.Vector2(5, 6);
+      const vector2 = new Phaser.Math.Vector2(2, 3);
+      expect(VectorUtils.manhattanDistance(vector, vector2)).toEqual(6);
+    });
+
+    it("should correctly calc negative numbers", () => {
+      const vector = new Phaser.Math.Vector2(-5, -6);
+      const vector2 = new Phaser.Math.Vector2(-2, -3);
+      expect(VectorUtils.manhattanDistance(vector, vector2)).toEqual(6);
+    });
+
+    it("should correctly calc zero distance", () => {
+      const vector = new Phaser.Math.Vector2(2, 3);
+      const vector2 = new Phaser.Math.Vector2(2, 3);
+      expect(VectorUtils.manhattanDistance(vector, vector2)).toEqual(0);
+    });
+  });
 });
