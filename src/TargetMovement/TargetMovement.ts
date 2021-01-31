@@ -47,6 +47,7 @@ export class TargetMovement {
       if (this.noPathExists(dist)) {
         character.move(Direction.NONE);
       } else if (dist <= config.distance) {
+        character.turnTowards(dir);
         this.characters.delete(character.getId());
       } else {
         character.move(dir);

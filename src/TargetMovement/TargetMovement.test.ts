@@ -12,6 +12,7 @@ describe("TargetMovement", () => {
       getTilePos: jest.fn(() => pos),
       move: jest.fn(),
       isMoving: () => false,
+      turnTowards: jest.fn(),
     };
   }
   beforeEach(() => {
@@ -218,6 +219,7 @@ describe("TargetMovement", () => {
     const char = createMockChar("char", charPos);
     targetMovement.addCharacter(char, new Phaser.Math.Vector2(1, 3), 3);
     targetMovement.update();
+    expect(char.turnTowards).toHaveBeenCalledWith(Direction.DOWN);
 
     expect(char.move).not.toHaveBeenCalled();
   });
