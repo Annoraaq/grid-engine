@@ -162,9 +162,9 @@ To read more about creating compatible tilemaps, take a look at my following blo
 
   Removes the character with the given ID from the plugin.
 
-- `follow(charId: string, charIdToFollow: string, distance: number = 0)`
+- `follow(charId: string, charIdToFollow: string, distance: number = 0, closestPointIfBlocked: boolean = false)`
 
-  Character `charId` will start to walk towards `charIdToFollow` on a shortest path until he has a distance of `distance` to the character to follow.
+  Character `charId` will start to walk towards `charIdToFollow` on a shortest path until he has a distance of `distance` to the character to follow. If `closestPointIfBlocked` is set to `true`, the character will move to the closest point (manhattan distance) to `charIdToFollow` that is reachable from `charId` in case that there does not exist a path between `charId` and `charIdToFollow`.
 
 - `stopFollowing(charId: string)`
 
