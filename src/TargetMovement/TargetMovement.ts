@@ -69,44 +69,60 @@ export class TargetMovement {
     return distance == -1;
   }
 
-  private getDirOnShortestPath(
+  private getShortestPath(
     character: GridCharacter,
     config: MovementConfig
-  ): { dir: Direction; dist: number } {
-    let { path: shortestPath, closestToTarget } = Bfs.getShortestPath(
+  ): { path: Vector2[]; distOffset: number } {
+    const { path: shortestPath, closestToTarget } = Bfs.getShortestPath(
       character.getTilePos(),
       config.targetPos,
       this.isBlocking(config.targetPos)
     );
 
-    let distAdd = 0;
-    if (shortestPath.length == 0) {
-      if (config.closestPointIfBlocked) {
-        shortestPath = Bfs.getShortestPath(
-          character.getTilePos(),
-          closestToTarget,
-          this.isBlocking(config.targetPos)
-        ).path;
-        distAdd = VectorUtils.manhattanDistance(
-          closestToTarget,
-          config.targetPos
-        );
-      } else {
-        return { dir: Direction.NONE, dist: -1 };
-      }
+    const noPathFound = shortestPath.length == 0;
+
+    if (noPathFound && config.closestPointIfBlocked) {
+      const shortestPathToClosestPoint = Bfs.getShortestPath(
+        character.getTilePos(),
+        closestToTarget,
+        this.isBlocking(config.targetPos)
+      ).path;
+      const distOffset = VectorUtils.manhattanDistance(
+        closestToTarget,
+        config.targetPos
+      );
+      return { path: shortestPathToClosestPoint, distOffset };
     }
+
+    return { path: shortestPath, distOffset: 0 };
+  }
+
+  private getDirOnShortestPath(
+    character: GridCharacter,
+    config: MovementConfig
+  ): { dir: Direction; dist: number } {
+    const { path: shortestPath, distOffset } = this.getShortestPath(
+      character,
+      config
+    );
+    if (shortestPath.length == 0) return { dir: Direction.NONE, dist: -1 };
     if (shortestPath.length == 1) return { dir: Direction.NONE, dist: 0 };
 
     const nextField = shortestPath[1];
+    const result = {
+      dir: undefined,
+      dist: shortestPath.length - 1 + distOffset,
+    };
     if (nextField.x > character.getTilePos().x) {
-      return { dir: Direction.RIGHT, dist: shortestPath.length - 1 + distAdd };
+      result.dir = Direction.RIGHT;
     } else if (nextField.x < character.getTilePos().x) {
-      return { dir: Direction.LEFT, dist: shortestPath.length - 1 + distAdd };
+      result.dir = Direction.LEFT;
     } else if (nextField.y < character.getTilePos().y) {
-      return { dir: Direction.UP, dist: shortestPath.length - 1 + distAdd };
+      result.dir = Direction.UP;
     } else if (nextField.y > character.getTilePos().y) {
-      return { dir: Direction.DOWN, dist: shortestPath.length - 1 + distAdd };
+      result.dir = Direction.DOWN;
     }
+    return result;
   }
 
   private getStandingCharacters(): MovementTuple[] {
