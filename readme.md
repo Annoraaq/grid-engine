@@ -105,6 +105,9 @@ To read more about creating compatible tilemaps, take a look at my following blo
 - `characterIndex: number`
 
   The 0-based index of the character on the spritesheet.
+  Here is an example image showing the character indices:
+
+![](images/charIndex.png)
 
 - `speed: TileSizePerSecond` (optional, default: 4)
 
