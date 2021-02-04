@@ -9,6 +9,7 @@ const mockAddCharacter = jest.fn();
 const mockRemoveCharacter = jest.fn();
 const mockTargetMovementRemoveCharacter = jest.fn();
 const mockSetSpeed = jest.fn();
+const mockSetWalkingAnimationMapping = jest.fn();
 const mockRandomMovementUpdate = jest.fn();
 const mockTargetMovementUpdate = jest.fn();
 const mockTargetMovementAddCharacter = jest.fn();
@@ -62,6 +63,7 @@ jest.mock("./GridCharacter/GridCharacter", function () {
         getId: () => id,
         getTilePos: mockGetTilePos,
         setSpeed: mockSetSpeed,
+        setWalkingAnimationMapping: mockSetWalkingAnimationMapping,
       };
     }),
   };
@@ -164,10 +166,60 @@ describe("GridMovementPlugin", () => {
     expect(GridCharacter).toHaveBeenCalledWith(
       "player",
       playerSpriteMock,
-      3,
       32,
       mockGridTileMap,
-      4
+      4,
+      3,
+      undefined
+    );
+    expect(mockSetTilePositon).toHaveBeenCalledWith(
+      new Phaser.Math.Vector2(0, 0)
+    );
+  });
+
+  it("should init player with animation mapping", () => {
+    const walkingAnimationMapping = {
+      up: {
+        leftFoot: 0,
+        standing: 1,
+        rightFoot: 2,
+      },
+      down: {
+        leftFoot: 36,
+        standing: 37,
+        rightFoot: 38,
+      },
+      left: {
+        leftFoot: 12,
+        standing: 13,
+        rightFoot: 14,
+      },
+      right: {
+        leftFoot: 24,
+        standing: 25,
+        rightFoot: 26,
+      },
+    };
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+          walkingAnimationMapping,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    expect(GridCharacter).toHaveBeenCalledWith(
+      "player",
+      playerSpriteMock,
+      32,
+      mockGridTileMap,
+      4,
+      3,
+      walkingAnimationMapping
     );
     expect(mockSetTilePositon).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(0, 0)
@@ -208,10 +260,11 @@ describe("GridMovementPlugin", () => {
     expect(GridCharacter).toHaveBeenCalledWith(
       "player",
       playerSpriteMock,
-      3,
       32,
       mockGridTileMap,
-      2
+      2,
+      3,
+      undefined
     );
   });
 
@@ -538,6 +591,44 @@ describe("GridMovementPlugin", () => {
     expect(mockFollowMovement.removeCharacter).toHaveBeenCalledWith("player");
   });
 
+  it("should set walkingAnimationMapping", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    const mockMapping = {
+      up: {
+        leftFoot: 0,
+        standing: 1,
+        rightFoot: 2,
+      },
+      right: {
+        leftFoot: 3,
+        standing: 4,
+        rightFoot: 5,
+      },
+      down: {
+        leftFoot: 6,
+        standing: 7,
+        rightFoot: 8,
+      },
+      left: {
+        leftFoot: 9,
+        standing: 10,
+        rightFoot: 11,
+      },
+    };
+    gridMovementPlugin.setWalkingAnimationMapping("player", mockMapping);
+    expect(mockSetWalkingAnimationMapping).toHaveBeenCalledWith(mockMapping);
+  });
+
   describe("Error Handling unknown char id", () => {
     beforeEach(() => {
       gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
@@ -633,6 +724,12 @@ describe("GridMovementPlugin", () => {
         "Character unknown"
       );
     });
+
+    it("should throw error if setWalkingAnimationMapping is invoked", () => {
+      expect(() =>
+        gridMovementPlugin.setWalkingAnimationMapping("unknownCharId", <any>{})
+      ).toThrow("Character unknown");
+    });
   });
 
   describe("invokation of methods if not created properly", () => {
@@ -726,6 +823,12 @@ describe("GridMovementPlugin", () => {
       expect(() => gridMovementPlugin.stopFollowing("someCharId")).toThrow(
         "Plugin not initialized"
       );
+    });
+
+    it("should throw error if setWalkingAnimationMapping is invoked", () => {
+      expect(() =>
+        gridMovementPlugin.setWalkingAnimationMapping("someCharId", <any>{})
+      ).toThrow("Plugin not initialized");
     });
   });
 });

@@ -1,6 +1,6 @@
 import { FollowMovement } from "./FollowMovement/FollowMovement";
 import { TargetMovement } from "./TargetMovement/TargetMovement";
-import { GridCharacter } from "./GridCharacter/GridCharacter";
+import { FrameRow, GridCharacter } from "./GridCharacter/GridCharacter";
 import "phaser";
 import { Direction } from "./Direction/Direction";
 import { GridTilemap } from "./GridTilemap/GridTilemap";
@@ -13,10 +13,18 @@ export interface GridMovementConfig {
   firstLayerAboveChar: number;
 }
 
+export interface WalkingAnimationMapping {
+  [Direction.UP]: FrameRow;
+  [Direction.RIGHT]: FrameRow;
+  [Direction.DOWN]: FrameRow;
+  [Direction.LEFT]: FrameRow;
+}
+
 export interface CharacterData {
   id: string;
   sprite: Phaser.GameObjects.Sprite;
-  characterIndex: number;
+  characterIndex?: number;
+  walkingAnimationMapping?: WalkingAnimationMapping;
   speed?: TileSizePerSecond;
   startPosition?: Phaser.Math.Vector2;
 }
@@ -112,6 +120,17 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.gridCharacters.get(charId).setSpeed(speed);
   }
 
+  setWalkingAnimationMapping(
+    charId: string,
+    walkingAnimationMapping: WalkingAnimationMapping
+  ) {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    this.gridCharacters
+      .get(charId)
+      .setWalkingAnimationMapping(walkingAnimationMapping);
+  }
+
   update(_time: number, delta: number) {
     if (this.isCreated) {
       this.randomMovement.update(delta);
@@ -136,10 +155,11 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     const gridChar = new GridCharacter(
       enrichedCharData.id,
       enrichedCharData.sprite,
-      enrichedCharData.characterIndex,
       this.getTileSize(),
       this.gridTilemap,
-      enrichedCharData.speed
+      enrichedCharData.speed,
+      enrichedCharData.characterIndex,
+      enrichedCharData.walkingAnimationMapping
     );
 
     this.gridCharacters.set(enrichedCharData.id, gridChar);

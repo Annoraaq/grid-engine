@@ -1,3 +1,4 @@
+import { WalkingAnimationMapping } from "./../GridMovementPlugin";
 import { DirectionVectors } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
 import * as Phaser from "phaser";
@@ -6,7 +7,7 @@ import { GridTilemap } from "../GridTilemap/GridTilemap";
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
 
-interface FrameRow {
+export interface FrameRow {
   leftFoot: number;
   standing: number;
   rightFoot: number;
@@ -30,10 +31,11 @@ export class GridCharacter {
   constructor(
     private id: string,
     private sprite: Phaser.GameObjects.Sprite,
-    private characterIndex: number,
     private tileSize: number,
     private tilemap: GridTilemap,
-    private speed: number
+    private speed: number,
+    private characterIndex: number = 0,
+    private walkingAnimationMapping?: WalkingAnimationMapping
   ) {
     this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
     this.speedPixelsPerSecond = this.tileSize * speed;
@@ -50,6 +52,10 @@ export class GridCharacter {
 
   setSpeed(speed: number) {
     this.speed = speed;
+  }
+
+  setWalkingAnimationMapping(walkingAnimationMapping: WalkingAnimationMapping) {
+    this.walkingAnimationMapping = walkingAnimationMapping;
   }
 
   setTilePosition(tilePosition: Phaser.Math.Vector2): void {
@@ -148,11 +154,23 @@ export class GridCharacter {
   private playerOffsetX(): number {
     return this.tileSize / 2;
   }
+
   private playerOffsetY(): number {
     return -(this.sprite.height % this.tileSize) / 2;
   }
 
   private framesOfDirection(direction: Direction): FrameRow {
+    if (this.walkingAnimationMapping) {
+      return this.getFramesForAnimationMapping(direction);
+    }
+    return this.getFramesForCharIndex(direction);
+  }
+
+  private getFramesForAnimationMapping(direction: Direction): FrameRow {
+    return this.walkingAnimationMapping[direction];
+  }
+
+  private getFramesForCharIndex(direction: Direction): FrameRow {
     const charsInRow =
       this.sprite.texture.source[0].width /
       this.sprite.width /
