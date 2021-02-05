@@ -124,6 +124,7 @@ export class GridCharacter {
 
   turnTowards(direction: Direction) {
     if (this.isMoving()) return;
+    if (direction == Direction.NONE) return;
     this.sprite.setFrame(this.framesOfDirection(direction).standing);
   }
 

@@ -313,6 +313,11 @@ describe("GridCharacter", () => {
       gridCharacter.turnTowards(Direction.LEFT);
       expect(spriteMock.setFrame).not.toHaveBeenCalled();
     });
+
+    it("should not turn if direction NONE", () => {
+      gridCharacter.turnTowards(Direction.NONE);
+      expect(spriteMock.setFrame).not.toHaveBeenCalled();
+    });
   });
 
   function checkWalkingFrames(walkingAnimationMapping) {
