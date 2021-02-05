@@ -102,21 +102,33 @@ To read more about creating compatible tilemaps, take a look at my following blo
 
   The characters sprite.
 
-- `characterIndex: number` (optional, default: 0)
+- `characterIndex: number` (DEPRECATED, optional, default: 0)
 
+  _Deprecated. Use `walkingAnimationMapping` instead._
+
+- `walkingAnimationMapping?: number | `[WalkingAnimationMapping](#walkingAnimationMapping)
+
+  In case of `number`:
   The 0-based index of the character on the spritesheet.
-
-  If both, a `characterIndex` and a `walkingAnimationMapping` is set, the `walkingAnimationMapping` is given preference.
 
   Here is an example image showing the character indices:
 
-![](images/charIndex.png)
+  ![](images/charIndex.png)
 
-- `walkingAnimationMapping?: WalkingAnimationMapping`
+  In case of [WalkingAnimationMapping](#walkingAnimationMapping):
+  Alternatively to providing a characterIndex you can also provide a custom frame mapping. This is especially handy if your spritesheet has a different arrangement of frames than you can see in the example image (4 rows with 3 columns). You can provide the frame number for every state of the character.
 
-Alternatively to providing a characterIndex you can also provide a custom frame mapping. This is especially handy if your spritesheet has a different arrangement of frames than you can see in the example image (4 rows with 3 columns). You can provide the frame number for every state of the character.
+  If both, a `characterIndex` and a `walkingAnimationMapping` is set, the walkingAnimationMapping is given preference.
 
-If both, a `characterIndex` and a `walkingAnimationMapping` is set, the walkingAnimationMapping is given preference.
+- `speed: TileSizePerSecond` (optional, default: 4)
+
+  The speed of a player in tiles per second.
+
+- `startPosition: Phaser.Math.Vector2` (optional, default: (0,0))
+
+  Start tile position of the player.
+
+<a name="walkingAnimationMapping"></a>
 
 ### WalkingAnimationMapping
 
@@ -144,14 +156,6 @@ If both, a `characterIndex` and a `walkingAnimationMapping` is set, the walkingA
   }
 }
 ```
-
-- `speed: TileSizePerSecond` (optional, default: 4)
-
-  The speed of a player in tiles per second.
-
-- `startPosition: Phaser.Math.Vector2` (optional, default: (0,0))
-
-  Start tile position of the player.
 
 ### Methods
 
