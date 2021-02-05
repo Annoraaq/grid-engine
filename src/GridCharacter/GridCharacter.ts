@@ -1,8 +1,8 @@
-import { WalkingAnimationMapping } from "./../GridMovementPlugin";
 import { DirectionVectors } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
 import * as Phaser from "phaser";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
+import { WalkingAnimationMapping } from "../GridMovementPlugin";
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
@@ -11,6 +11,16 @@ export interface FrameRow {
   leftFoot: number;
   standing: number;
   rightFoot: number;
+}
+
+export type CharacterIndex = number;
+
+export interface CharConfig {
+  sprite: Phaser.GameObjects.Sprite;
+  tilemap: GridTilemap;
+  tileSize: number;
+  speed: number;
+  walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
 }
 
 export class GridCharacter {
@@ -27,18 +37,27 @@ export class GridCharacter {
   private tileSizePixelsWalked = 0;
   private lastFootLeft = false;
   private readonly _tilePos = new Phaser.Math.Vector2(0, 0);
+  private sprite: Phaser.GameObjects.Sprite;
+  private tilemap: GridTilemap;
+  private tileSize: number;
+  private speed: number;
+  private characterIndex: number = 0;
+  private walkingAnimationMapping: WalkingAnimationMapping;
 
-  constructor(
-    private id: string,
-    private sprite: Phaser.GameObjects.Sprite,
-    private tileSize: number,
-    private tilemap: GridTilemap,
-    private speed: number,
-    private characterIndex: number = 0,
-    private walkingAnimationMapping?: WalkingAnimationMapping
-  ) {
+  constructor(private id: string, config: CharConfig) {
+    if (typeof config.walkingAnimationMapping == "number") {
+      this.characterIndex = config.walkingAnimationMapping;
+    } else {
+      this.walkingAnimationMapping = config.walkingAnimationMapping;
+    }
+
+    this.sprite = config.sprite;
+    this.tilemap = config.tilemap;
+    this.tileSize = config.tileSize;
+    this.speed = config.speed;
+
     this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
-    this.speedPixelsPerSecond = this.tileSize * speed;
+    this.speedPixelsPerSecond = this.tileSize * this.speed;
     this.updateZindex();
   }
 

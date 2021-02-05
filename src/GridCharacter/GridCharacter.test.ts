@@ -51,14 +51,26 @@ describe("GridCharacter", () => {
         ],
       },
     };
-    gridCharacter = new GridCharacter(
-      "player",
-      spriteMock,
-      16,
-      gridTilemapMock,
-      3,
-      3
-    );
+    gridCharacter = new GridCharacter("player", {
+      sprite: spriteMock,
+      tilemap: gridTilemapMock,
+      tileSize: 16,
+      speed: 3,
+      walkingAnimationMapping: 3,
+    });
+  });
+
+  it("should set the correct default charIndex", () => {
+    gridCharacter = new GridCharacter("player", {
+      sprite: spriteMock,
+      tilemap: gridTilemapMock,
+      tileSize: 16,
+      speed: 3,
+    });
+    mockNonBlockingTile();
+    gridCharacter.move(Direction.DOWN);
+    gridCharacter.update(100);
+    expect(spriteMock.setFrame).not.toHaveBeenCalledWith(NaN);
   });
 
   describe("frames by anim mapping", () => {
@@ -86,15 +98,13 @@ describe("GridCharacter", () => {
     };
 
     beforeEach(() => {
-      gridCharacter = new GridCharacter(
-        "player",
-        spriteMock,
-        16,
-        gridTilemapMock,
-        3,
-        0,
-        walkingAnimationMapping
-      );
+      gridCharacter = new GridCharacter("player", {
+        sprite: spriteMock,
+        tilemap: gridTilemapMock,
+        tileSize: 16,
+        speed: 3,
+        walkingAnimationMapping,
+      });
     });
 
     checkWalkingFrames(walkingAnimationMapping);

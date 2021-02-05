@@ -143,7 +143,7 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -158,20 +158,70 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
         },
       ],
       firstLayerAboveChar: 3,
     });
-    expect(GridCharacter).toHaveBeenCalledWith(
-      "player",
-      playerSpriteMock,
-      32,
-      mockGridTileMap,
-      4,
-      3,
-      undefined
+    expect(GridCharacter).toHaveBeenCalledWith("player", {
+      sprite: playerSpriteMock,
+      tilemap: mockGridTileMap,
+      tileSize: 32,
+      speed: 4,
+    });
+    expect(mockSetTilePositon).toHaveBeenCalledWith(
+      new Phaser.Math.Vector2(0, 0)
     );
+  });
+
+  it("should still support deprecated characterIndex property", () => {
+    console.warn = jest.fn();
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 2,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    expect(GridCharacter).toHaveBeenCalledWith("player", {
+      sprite: playerSpriteMock,
+      tilemap: mockGridTileMap,
+      tileSize: 32,
+      speed: 4,
+      walkingAnimationMapping: 2,
+    });
+    expect(mockSetTilePositon).toHaveBeenCalledWith(
+      new Phaser.Math.Vector2(0, 0)
+    );
+
+    expect(console.warn).toHaveBeenCalledWith(
+      "PhaserGridMovementPlugin: CharacterConfig property `characterIndex` is deprecated. Use `walkingAnimtionMapping` instead."
+    );
+  });
+
+  it("should prefer walkingAnimationMapping over charIndex", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          characterIndex: 2,
+          walkingAnimationMapping: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    expect(GridCharacter).toHaveBeenCalledWith("player", {
+      sprite: playerSpriteMock,
+      tilemap: mockGridTileMap,
+      tileSize: 32,
+      speed: 4,
+      walkingAnimationMapping: 3,
+    });
     expect(mockSetTilePositon).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(0, 0)
     );
@@ -206,21 +256,18 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
           walkingAnimationMapping,
         },
       ],
       firstLayerAboveChar: 3,
     });
-    expect(GridCharacter).toHaveBeenCalledWith(
-      "player",
-      playerSpriteMock,
-      32,
-      mockGridTileMap,
-      4,
-      3,
-      walkingAnimationMapping
-    );
+    expect(GridCharacter).toHaveBeenCalledWith("player", {
+      sprite: playerSpriteMock,
+      tileSize: 32,
+      tilemap: mockGridTileMap,
+      speed: 4,
+      walkingAnimationMapping,
+    });
     expect(mockSetTilePositon).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(0, 0)
     );
@@ -233,7 +280,7 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
           startPosition: new Phaser.Math.Vector2(3, 4),
         },
       ],
@@ -251,21 +298,19 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
           speed: 2,
         },
       ],
       firstLayerAboveChar: 3,
     });
-    expect(GridCharacter).toHaveBeenCalledWith(
-      "player",
-      playerSpriteMock,
-      32,
-      mockGridTileMap,
-      2,
-      3,
-      undefined
-    );
+    expect(GridCharacter).toHaveBeenCalledWith("player", {
+      sprite: playerSpriteMock,
+      tileSize: 32,
+      tilemap: mockGridTileMap,
+      speed: 2,
+      walkingAnimationMapping: 3,
+    });
   });
 
   it("should move player left", () => {
@@ -275,7 +320,7 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -293,7 +338,7 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -311,7 +356,7 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -329,7 +374,7 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -347,7 +392,7 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -368,7 +413,7 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -387,7 +432,7 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -403,7 +448,7 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -423,7 +468,7 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -439,7 +484,7 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -464,7 +509,7 @@ describe("GridMovementPlugin", () => {
     gridMovementPlugin.addCharacter({
       id: "player",
       sprite: playerSpriteMock,
-      characterIndex: 3,
+      walkingAnimationMapping: 3,
     });
     gridMovementPlugin.update(123, 456);
     expect(mockUpdate).toHaveBeenCalledTimes(1);
@@ -477,7 +522,7 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -499,7 +544,7 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -507,7 +552,7 @@ describe("GridMovementPlugin", () => {
     gridMovementPlugin.addCharacter({
       id: "player2",
       sprite: playerSpriteMock,
-      characterIndex: 3,
+      walkingAnimationMapping: 3,
     });
     expect(gridMovementPlugin.hasCharacter("player")).toBe(true);
     expect(gridMovementPlugin.hasCharacter("player2")).toBe(true);
@@ -521,12 +566,12 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
         {
           id: "player2",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -549,12 +594,12 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
         {
           id: "player2",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -577,12 +622,12 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
         {
           id: "player2",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -598,7 +643,7 @@ describe("GridMovementPlugin", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         },
       ],
       firstLayerAboveChar: 3,
@@ -637,7 +682,7 @@ describe("GridMovementPlugin", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            characterIndex: 3,
+            walkingAnimationMapping: 3,
           },
         ],
         firstLayerAboveChar: 3,
@@ -796,7 +841,7 @@ describe("GridMovementPlugin", () => {
         gridMovementPlugin.addCharacter({
           id: "player",
           sprite: playerSpriteMock,
-          characterIndex: 3,
+          walkingAnimationMapping: 3,
         })
       ).toThrow("Plugin not initialized");
     });

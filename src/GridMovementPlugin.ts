@@ -1,6 +1,11 @@
 import { FollowMovement } from "./FollowMovement/FollowMovement";
 import { TargetMovement } from "./TargetMovement/TargetMovement";
-import { FrameRow, GridCharacter } from "./GridCharacter/GridCharacter";
+import {
+  CharacterIndex,
+  CharConfig,
+  FrameRow,
+  GridCharacter,
+} from "./GridCharacter/GridCharacter";
 import "phaser";
 import { Direction } from "./Direction/Direction";
 import { GridTilemap } from "./GridTilemap/GridTilemap";
@@ -23,8 +28,8 @@ export interface WalkingAnimationMapping {
 export interface CharacterData {
   id: string;
   sprite: Phaser.GameObjects.Sprite;
-  characterIndex?: number;
-  walkingAnimationMapping?: WalkingAnimationMapping;
+  walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
+  characterIndex?: number; // deprecated
   speed?: TileSizePerSecond;
   startPosition?: Phaser.Math.Vector2;
 }
@@ -146,25 +151,30 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
 
   addCharacter(charData: CharacterData) {
     this.initGuard();
-    const enrichedCharData = {
-      speed: 4,
-      startPosition: new Phaser.Math.Vector2(0, 0),
-      ...charData,
+
+    if (charData.characterIndex != undefined) {
+      console.warn(
+        "PhaserGridMovementPlugin: CharacterConfig property `characterIndex` is deprecated. Use `walkingAnimtionMapping` instead."
+      );
+    }
+
+    const charConfig: CharConfig = {
+      sprite: charData.sprite,
+      speed: charData.speed || 4,
+      tilemap: this.gridTilemap,
+      tileSize: this.getTileSize(),
+      walkingAnimationMapping: charData.walkingAnimationMapping,
     };
+    if (charConfig.walkingAnimationMapping == undefined) {
+      charConfig.walkingAnimationMapping = charData.characterIndex;
+    }
+    const gridChar = new GridCharacter(charData.id, charConfig);
 
-    const gridChar = new GridCharacter(
-      enrichedCharData.id,
-      enrichedCharData.sprite,
-      this.getTileSize(),
-      this.gridTilemap,
-      enrichedCharData.speed,
-      enrichedCharData.characterIndex,
-      enrichedCharData.walkingAnimationMapping
+    this.gridCharacters.set(charData.id, gridChar);
+
+    gridChar.setTilePosition(
+      charData.startPosition || new Phaser.Math.Vector2(0, 0)
     );
-
-    this.gridCharacters.set(enrichedCharData.id, gridChar);
-
-    gridChar.setTilePosition(enrichedCharData.startPosition);
 
     this.gridTilemap.addCharacter(gridChar);
   }
