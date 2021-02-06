@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "phaser": "^3.23.0",
+    "rxjs": "^6.6.3",
     "webpack-cli": "^3.3.12"
   },
   "repository": {

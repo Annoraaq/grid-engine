@@ -10,6 +10,7 @@ import "phaser";
 import { Direction } from "./Direction/Direction";
 import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./RandomMovement/RandomMovement";
+import { Observable } from "rxjs";
 
 export type TileSizePerSecond = number;
 
@@ -29,6 +30,7 @@ export interface CharacterData {
   id: string;
   sprite: Phaser.GameObjects.Sprite;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
+  walkingAnimationEnabled?: boolean;
   characterIndex?: number; // deprecated
   speed?: TileSizePerSecond;
   startPosition?: Phaser.Math.Vector2;
@@ -42,6 +44,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   private targetMovement: TargetMovement;
   private followMovement: FollowMovement;
   private isCreated: boolean = false;
+
   constructor(
     public scene: Phaser.Scene,
     pluginManager: Phaser.Plugins.PluginManager
@@ -164,9 +167,13 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       tilemap: this.gridTilemap,
       tileSize: this.getTileSize(),
       walkingAnimationMapping: charData.walkingAnimationMapping,
+      walkingAnimationEnabled: charData.walkingAnimationEnabled,
     };
     if (charConfig.walkingAnimationMapping == undefined) {
       charConfig.walkingAnimationMapping = charData.characterIndex;
+    }
+    if (charConfig.walkingAnimationEnabled == undefined) {
+      charConfig.walkingAnimationEnabled = true;
     }
     const gridChar = new GridCharacter(charData.id, charConfig);
 
@@ -215,6 +222,18 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.followMovement.removeCharacter(charId);
+  }
+
+  movementStarted(charId: string): Observable<Direction> {
+    return this.gridCharacters.get(charId).movementStarted();
+  }
+
+  movementStopped(charId: string): Observable<Direction> {
+    return this.gridCharacters.get(charId).movementStopped();
+  }
+
+  directionChanged(charId: string): Observable<Direction> {
+    return this.gridCharacters.get(charId).directionChanged();
   }
 
   private initGuard() {

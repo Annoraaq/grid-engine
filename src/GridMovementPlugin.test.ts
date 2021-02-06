@@ -13,6 +13,15 @@ const mockSetWalkingAnimationMapping = jest.fn();
 const mockRandomMovementUpdate = jest.fn();
 const mockTargetMovementUpdate = jest.fn();
 const mockTargetMovementAddCharacter = jest.fn();
+const mockMovementStarted = jest
+  .fn()
+  .mockReturnValue("movementStartedObservable");
+const mockMovementStopped = jest
+  .fn()
+  .mockReturnValue("movementStoppedObservable");
+const mockDirectionChanged = jest
+  .fn()
+  .mockReturnValue("directionChangedObservable");
 const mockFollowMovement = {
   addCharacter: jest.fn(),
   removeCharacter: jest.fn(),
@@ -64,6 +73,9 @@ jest.mock("./GridCharacter/GridCharacter", function () {
         getTilePos: mockGetTilePos,
         setSpeed: mockSetSpeed,
         setWalkingAnimationMapping: mockSetWalkingAnimationMapping,
+        movementStarted: mockMovementStarted,
+        movementStopped: mockMovementStopped,
+        directionChanged: mockDirectionChanged,
       };
     }),
   };
@@ -167,6 +179,7 @@ describe("GridMovementPlugin", () => {
       tilemap: mockGridTileMap,
       tileSize: 32,
       speed: 4,
+      walkingAnimationEnabled: true,
     });
     expect(mockSetTilePositon).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(0, 0)
@@ -192,6 +205,7 @@ describe("GridMovementPlugin", () => {
       tileSize: 32,
       speed: 4,
       walkingAnimationMapping: 2,
+      walkingAnimationEnabled: true,
     });
     expect(mockSetTilePositon).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(0, 0)
@@ -221,6 +235,33 @@ describe("GridMovementPlugin", () => {
       tileSize: 32,
       speed: 4,
       walkingAnimationMapping: 3,
+      walkingAnimationEnabled: true,
+    });
+    expect(mockSetTilePositon).toHaveBeenCalledWith(
+      new Phaser.Math.Vector2(0, 0)
+    );
+  });
+
+  it("should init player without walking animation", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+          walkingAnimationEnabled: false,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    expect(GridCharacter).toHaveBeenCalledWith("player", {
+      sprite: playerSpriteMock,
+      tileSize: 32,
+      tilemap: mockGridTileMap,
+      speed: 4,
+      walkingAnimationMapping: 3,
+      walkingAnimationEnabled: false,
     });
     expect(mockSetTilePositon).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(0, 0)
@@ -267,6 +308,7 @@ describe("GridMovementPlugin", () => {
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping,
+      walkingAnimationEnabled: true,
     });
     expect(mockSetTilePositon).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(0, 0)
@@ -310,6 +352,7 @@ describe("GridMovementPlugin", () => {
       tilemap: mockGridTileMap,
       speed: 2,
       walkingAnimationMapping: 3,
+      walkingAnimationEnabled: true,
     });
   });
 
@@ -672,6 +715,57 @@ describe("GridMovementPlugin", () => {
     };
     gridMovementPlugin.setWalkingAnimationMapping("player", mockMapping);
     expect(mockSetWalkingAnimationMapping).toHaveBeenCalledWith(mockMapping);
+  });
+
+  it("should get chars movementStarted observable", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    const obs = gridMovementPlugin.movementStarted("player");
+    expect(mockMovementStarted).toHaveBeenCalled();
+    expect(obs).toEqual("movementStartedObservable");
+  });
+
+  it("should get chars movementStopped observable", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    const obs = gridMovementPlugin.movementStopped("player");
+    expect(mockMovementStopped).toHaveBeenCalled();
+    expect(obs).toEqual("movementStoppedObservable");
+  });
+
+  it("should get chars directionChanged observable", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    const obs = gridMovementPlugin.directionChanged("player");
+    expect(mockDirectionChanged).toHaveBeenCalled();
+    expect(obs).toEqual("directionChangedObservable");
   });
 
   describe("Error Handling unknown char id", () => {

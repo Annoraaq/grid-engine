@@ -3,6 +3,7 @@ import { Direction } from "../Direction/Direction";
 import * as Phaser from "phaser";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { WalkingAnimationMapping } from "../GridMovementPlugin";
+import { Subject } from "rxjs";
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
@@ -21,6 +22,7 @@ export interface CharConfig {
   tileSize: number;
   speed: number;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
+  walkingAnimationEnabled: boolean;
 }
 
 export class GridCharacter {
@@ -41,8 +43,13 @@ export class GridCharacter {
   private tilemap: GridTilemap;
   private tileSize: number;
   private speed: number;
-  private characterIndex: number = 0;
+  private characterIndex = 0;
   private walkingAnimationMapping: WalkingAnimationMapping;
+  private walkingAnimation: boolean;
+  private movementStarted$ = new Subject<Direction>();
+  private movementStopped$ = new Subject<Direction>();
+  private directionChanged$ = new Subject<Direction>();
+  private lastMovementImpuls = Direction.NONE;
 
   constructor(private id: string, config: CharConfig) {
     if (typeof config.walkingAnimationMapping == "number") {
@@ -55,6 +62,7 @@ export class GridCharacter {
     this.tilemap = config.tilemap;
     this.tileSize = config.tileSize;
     this.speed = config.speed;
+    this.walkingAnimation = config.walkingAnimationEnabled;
 
     this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
     this.speedPixelsPerSecond = this.tileSize * this.speed;
@@ -92,9 +100,13 @@ export class GridCharacter {
   }
 
   move(direction: Direction): void {
+    this.lastMovementImpuls = direction;
     if (this.isMoving()) return;
     if (this.isBlockingDirection(direction)) {
-      this.setStandingFrame(direction);
+      if (this.walkingAnimation) {
+        this.setStandingFrame(direction);
+      }
+      this.directionChanged$.next(direction);
     } else {
       this.startMoving(direction);
     }
@@ -104,6 +116,7 @@ export class GridCharacter {
     if (this.isMoving()) {
       this.updateCharacterPosition(delta);
     }
+    this.lastMovementImpuls = Direction.NONE;
   }
 
   getMovementDirection(): Direction {
@@ -125,7 +138,21 @@ export class GridCharacter {
   turnTowards(direction: Direction) {
     if (this.isMoving()) return;
     if (direction == Direction.NONE) return;
-    this.sprite.setFrame(this.framesOfDirection(direction).standing);
+    if (this.walkingAnimation) {
+      this.sprite.setFrame(this.framesOfDirection(direction).standing);
+    }
+  }
+
+  movementStarted(): Subject<Direction> {
+    return this.movementStarted$;
+  }
+
+  movementStopped(): Subject<Direction> {
+    return this.movementStopped$;
+  }
+
+  directionChanged(): Subject<Direction> {
+    return this.directionChanged$;
   }
 
   private get tilePos() {
@@ -211,6 +238,10 @@ export class GridCharacter {
   }
 
   private startMoving(direction: Direction): void {
+    if (direction == Direction.NONE) return;
+    if (this.movementDirection !== direction) {
+      this.movementStarted$.next(direction);
+    }
     this.tilePos = this.tilePos.add(DirectionVectors[direction]);
     this.movementDirection = direction;
   }
@@ -244,18 +275,28 @@ export class GridCharacter {
 
   private moveCharacterSpriteRestOfTile(): void {
     this.moveCharacterSprite(this.tileSize - this.tileSizePixelsWalked);
-    this.stopMoving();
+    if (
+      this.lastMovementImpuls !== Direction.NONE &&
+      !this.isBlockingDirection(this.lastMovementImpuls)
+    ) {
+      this.startMoving(this.lastMovementImpuls);
+    } else {
+      this.stopMoving();
+    }
   }
 
   private moveCharacterSprite(speed: number): void {
     const newPlayerPos = this.getPosition().add(this.movementDistance(speed));
     this.setPosition(newPlayerPos);
     this.tileSizePixelsWalked = this.tileSizePixelsWalked + speed;
-    this.updateCharacterFrame(this.tileSizePixelsWalked);
+    if (this.walkingAnimation) {
+      this.updateCharacterFrame(this.tileSizePixelsWalked);
+    }
     this.tileSizePixelsWalked = this.tileSizePixelsWalked % this.tileSize;
   }
 
   private stopMoving(): void {
+    this.movementStopped$.next(this.movementDirection);
     this.movementDirection = Direction.NONE;
   }
 
