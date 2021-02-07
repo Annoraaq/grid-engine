@@ -1,3 +1,5 @@
+import { Subject, of } from "rxjs";
+import { take } from "rxjs/operators";
 import * as Phaser from "phaser";
 import { Direction } from "./Direction/Direction";
 import { GridCharacter } from "./GridCharacter/GridCharacter";
@@ -13,15 +15,9 @@ const mockSetWalkingAnimationMapping = jest.fn();
 const mockRandomMovementUpdate = jest.fn();
 const mockTargetMovementUpdate = jest.fn();
 const mockTargetMovementAddCharacter = jest.fn();
-const mockMovementStarted = jest
-  .fn()
-  .mockReturnValue("movementStartedObservable");
-const mockMovementStopped = jest
-  .fn()
-  .mockReturnValue("movementStoppedObservable");
-const mockDirectionChanged = jest
-  .fn()
-  .mockReturnValue("directionChangedObservable");
+const mockMovementStarted = jest.fn();
+const mockMovementStopped = jest.fn();
+const mockDirectionChanged = jest.fn();
 const mockFollowMovement = {
   addCharacter: jest.fn(),
   removeCharacter: jest.fn(),
@@ -136,6 +132,9 @@ describe("GridMovementPlugin", () => {
     mockFollowMovement.addCharacter.mockReset();
     mockFollowMovement.removeCharacter.mockReset();
     mockFollowMovement.update.mockReset();
+    mockMovementStarted.mockReset().mockReturnValue(of());
+    mockMovementStopped.mockReset().mockReturnValue(of());
+    mockDirectionChanged.mockReset().mockReturnValue(of());
   });
 
   it("should boot", () => {
@@ -717,55 +716,162 @@ describe("GridMovementPlugin", () => {
     expect(mockSetWalkingAnimationMapping).toHaveBeenCalledWith(mockMapping);
   });
 
-  it("should get chars movementStarted observable", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
-        },
-      ],
-      firstLayerAboveChar: 3,
-    });
-    const obs = gridMovementPlugin.movementStarted("player");
-    expect(mockMovementStarted).toHaveBeenCalled();
-    expect(obs).toEqual("movementStartedObservable");
-  });
+  describe("Observables", () => {
+    it("should get chars movementStarted observable", async () => {
+      const mockSubject = new Subject<Direction>();
+      mockMovementStarted.mockReturnValue(mockSubject);
+      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+      gridMovementPlugin.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+        firstLayerAboveChar: 3,
+      });
 
-  it("should get chars movementStopped observable", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
-        },
-      ],
-      firstLayerAboveChar: 3,
-    });
-    const obs = gridMovementPlugin.movementStopped("player");
-    expect(mockMovementStopped).toHaveBeenCalled();
-    expect(obs).toEqual("movementStoppedObservable");
-  });
+      const prom = gridMovementPlugin
+        .movementStarted()
+        .pipe(take(1))
+        .toPromise();
 
-  it("should get chars directionChanged observable", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
-        },
-      ],
-      firstLayerAboveChar: 3,
+      mockSubject.next(Direction.LEFT);
+      const res = await prom;
+      expect(res).toEqual(["player", Direction.LEFT]);
     });
-    const obs = gridMovementPlugin.directionChanged("player");
-    expect(mockDirectionChanged).toHaveBeenCalled();
-    expect(obs).toEqual("directionChangedObservable");
+
+    it("should unsubscribe from movementStarted if char removed", async () => {
+      const mockSubject = new Subject<Direction>();
+      mockMovementStarted.mockReturnValue(mockSubject);
+      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+      gridMovementPlugin.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+        firstLayerAboveChar: 3,
+      });
+
+      gridMovementPlugin.removeCharacter("player");
+      const nextMock = jest.fn();
+
+      gridMovementPlugin.movementStarted().subscribe({
+        complete: jest.fn(),
+        next: nextMock,
+      });
+
+      mockSubject.next(Direction.LEFT);
+      expect(nextMock).not.toHaveBeenCalled();
+    });
+
+    it("should get chars movementStopped observable", async () => {
+      const mockSubject = new Subject<Direction>();
+      mockMovementStopped.mockReturnValue(mockSubject);
+      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+      gridMovementPlugin.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+        firstLayerAboveChar: 3,
+      });
+
+      const prom = gridMovementPlugin
+        .movementStopped()
+        .pipe(take(1))
+        .toPromise();
+
+      mockSubject.next(Direction.LEFT);
+      const res = await prom;
+      expect(res).toEqual(["player", Direction.LEFT]);
+    });
+
+    it("should unsubscribe from movementStopped if char removed", async () => {
+      const mockSubject = new Subject<Direction>();
+      mockMovementStopped.mockReturnValue(mockSubject);
+      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+      gridMovementPlugin.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+        firstLayerAboveChar: 3,
+      });
+
+      gridMovementPlugin.removeCharacter("player");
+      const nextMock = jest.fn();
+
+      gridMovementPlugin.movementStopped().subscribe({
+        complete: jest.fn(),
+        next: nextMock,
+      });
+
+      mockSubject.next(Direction.LEFT);
+      expect(nextMock).not.toHaveBeenCalled();
+    });
+
+    it("should get chars directionChanged observable", async () => {
+      const mockSubject = new Subject<Direction>();
+      mockDirectionChanged.mockReturnValue(mockSubject);
+      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+      gridMovementPlugin.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+        firstLayerAboveChar: 3,
+      });
+
+      const prom = gridMovementPlugin
+        .directionChanged()
+        .pipe(take(1))
+        .toPromise();
+
+      mockSubject.next(Direction.LEFT);
+      const res = await prom;
+      expect(res).toEqual(["player", Direction.LEFT]);
+    });
+
+    it("should unsubscribe from directionChanged if char removed", async () => {
+      const mockSubject = new Subject<Direction>();
+      mockDirectionChanged.mockReturnValue(mockSubject);
+      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+      gridMovementPlugin.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+        firstLayerAboveChar: 3,
+      });
+
+      gridMovementPlugin.removeCharacter("player");
+      const nextMock = jest.fn();
+
+      gridMovementPlugin.directionChanged().subscribe({
+        complete: jest.fn(),
+        next: nextMock,
+      });
+
+      mockSubject.next(Direction.LEFT);
+      expect(nextMock).not.toHaveBeenCalled();
+    });
   });
 
   describe("Error Handling unknown char id", () => {

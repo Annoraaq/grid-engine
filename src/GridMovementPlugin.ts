@@ -10,7 +10,8 @@ import "phaser";
 import { Direction } from "./Direction/Direction";
 import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./RandomMovement/RandomMovement";
-import { Observable } from "rxjs";
+import { Observable, Subject } from "rxjs";
+import { takeUntil, filter } from "rxjs/operators";
 
 export type TileSizePerSecond = number;
 
@@ -44,6 +45,10 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   private targetMovement: TargetMovement;
   private followMovement: FollowMovement;
   private isCreated: boolean = false;
+  private movementStopped$ = new Subject<[string, Direction]>();
+  private movementStarted$ = new Subject<[string, Direction]>();
+  private directionChanged$ = new Subject<[string, Direction]>();
+  private charRemoved$ = new Subject<string>();
 
   constructor(
     public scene: Phaser.Scene,
@@ -184,6 +189,31 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     );
 
     this.gridTilemap.addCharacter(gridChar);
+
+    gridChar
+      .movementStopped()
+      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
+      .subscribe((direction: Direction) => {
+        this.movementStopped$.next([gridChar.getId(), direction]);
+      });
+
+    gridChar
+      .movementStarted()
+      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
+      .subscribe((direction: Direction) => {
+        this.movementStarted$.next([gridChar.getId(), direction]);
+      });
+
+    gridChar
+      .directionChanged()
+      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
+      .subscribe((direction: Direction) => {
+        this.directionChanged$.next([gridChar.getId(), direction]);
+      });
+  }
+
+  private takeUntilCharRemoved(charId: string) {
+    return takeUntil(this.charRemoved$.pipe(filter((cId) => cId == charId)));
   }
 
   hasCharacter(charId: string): boolean {
@@ -199,6 +229,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.followMovement.removeCharacter(charId);
     this.gridTilemap.removeCharacter(charId);
     this.gridCharacters.delete(charId);
+    this.charRemoved$.next(charId);
   }
 
   follow(
@@ -224,16 +255,16 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.followMovement.removeCharacter(charId);
   }
 
-  movementStarted(charId: string): Observable<Direction> {
-    return this.gridCharacters.get(charId).movementStarted();
+  movementStarted(): Observable<[string, Direction]> {
+    return this.movementStarted$;
   }
 
-  movementStopped(charId: string): Observable<Direction> {
-    return this.gridCharacters.get(charId).movementStopped();
+  movementStopped(): Observable<[string, Direction]> {
+    return this.movementStopped$;
   }
 
-  directionChanged(charId: string): Observable<Direction> {
-    return this.gridCharacters.get(charId).directionChanged();
+  directionChanged(): Observable<[string, Direction]> {
+    return this.directionChanged$;
   }
 
   private initGuard() {

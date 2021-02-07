@@ -121,18 +121,15 @@
     };
 
     this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
-    this.gridMovementPlugin.movementStarted('player').subscribe((direction) => {
-      console.log('movement started', direction);
+    this.gridMovementPlugin.movementStarted().subscribe(([_charId, direction]) => {
       playerSprite.anims.play(direction);
     })
-    this.gridMovementPlugin.movementStopped('player').subscribe((direction) => {
-      console.log('movement stopped');
-
+    this.gridMovementPlugin.movementStopped().subscribe(([_charId, direction]) => {
       playerSprite.anims.stop();
       playerSprite.setFrame(getStopFrame(direction));
     })
 
-    this.gridMovementPlugin.directionChanged('player').subscribe((direction) => {
+    this.gridMovementPlugin.directionChanged().subscribe(([_charId, direction]) => {
       playerSprite.setFrame(getStopFrame(direction));
     })
   }
