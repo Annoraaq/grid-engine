@@ -49,7 +49,7 @@ export class RandomMovement {
   }
 
   update(delta: number) {
-    this.getStandingCharacters().forEach(({ character, config }) => {
+    this.randomlyMovingCharacters.forEach(({ character, config }) => {
       if (this.shouldContinueWalkingCurrentDirection(character, config)) {
         config.stepsWalked++;
         character.move(config.currentMovementDirection);
@@ -76,12 +76,6 @@ export class RandomMovement {
       config.currentMovementDirection !== Direction.NONE &&
       !character.isBlockingDirection(config.currentMovementDirection) &&
       this.isWithinRadius(config.currentMovementDirection, character, config)
-    );
-  }
-
-  private getStandingCharacters(): MovementTuple[] {
-    return [...this.randomlyMovingCharacters.values()].filter(
-      (tuple) => !tuple.character.isMoving()
     );
   }
 

@@ -42,7 +42,7 @@ export class TargetMovement {
   }
 
   update() {
-    this.getStandingCharacters().forEach(({ character, config }) => {
+    this.characters.forEach(({ character, config }) => {
       const { dir, dist } = this.getDirOnShortestPath(character, config);
       if (this.noPathExists(dist)) {
         character.move(Direction.NONE);
@@ -124,11 +124,5 @@ export class TargetMovement {
       result.dir = Direction.DOWN;
     }
     return result;
-  }
-
-  private getStandingCharacters(): MovementTuple[] {
-    return [...this.characters.values()].filter(
-      (tuple) => !tuple.character.isMoving()
-    );
   }
 }

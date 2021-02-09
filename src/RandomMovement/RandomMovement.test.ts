@@ -94,24 +94,6 @@ describe("RandomMovement", () => {
     expect(char2Mock.move).toHaveBeenCalledWith(Direction.NONE);
   });
 
-  it("should not update non-moving characters", () => {
-    const mockMath = Object.create(global.Math);
-    mockMath.random = () => 0.5;
-    global.Math = mockMath;
-
-    const char1Mock: GridCharacter = <any>{
-      getId: () => "char1",
-      isBlockingDirection: () => false,
-      move: jest.fn(),
-      getTilePos: () => new Phaser.Math.Vector2(0, 0),
-      isMoving: () => true,
-    };
-    randomMovement.addCharacter(char1Mock);
-    randomMovement.update(5);
-
-    expect(char1Mock.move).not.toHaveBeenCalled();
-  });
-
   it("should not move further than radius", () => {
     const mockMath = Object.create(global.Math);
     mockMath.random = () => 0.5;
