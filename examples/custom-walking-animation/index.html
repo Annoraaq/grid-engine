@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Grid Movement Plugin for Phaser 3 - Example - Move to</title>
+    <title>Grid Movement Plugin for Phaser 3 - Example - Move Player</title>
     <script src="../GridMovementPlugin.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.24.1/dist/phaser.js"></script>
     <style type="text/css">
@@ -56,7 +56,7 @@
 
   function preload () {
     this.load.image("tiles", "../assets/cloud_tileset.png");
-    this.load.tilemapTiledJSON("cloud-city-map", "../assets/cloud_city_large.json");
+    this.load.tilemapTiledJSON("cloud-city-map", "../assets/cloud_city.json");
     this.load.spritesheet("player", "../assets/characters.png", {
       frameWidth: 52,
       frameHeight: 72,
@@ -65,60 +65,86 @@
 
   function create () {
     const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
-    cloudCityTilemap.addTilesetImage("cloud_tileset", "tiles");
+    cloudCityTilemap.addTilesetImage("Cloud City", "tiles");
     for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-      const layer = cloudCityTilemap.createDynamicLayer(i, "cloud_tileset", 0, 0);
+      const layer = cloudCityTilemap.createStaticLayer(i, "Cloud City", 0, 0);
       layer.scale = 3;
     }
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
+    playerSprite.setFrame(getStopFrame('down'));
     this.cameras.main.startFollow(playerSprite);
 
-    const npcSprite = this.add.sprite(0, 0, "player");
-    npcSprite.scale = 1.5;
+    this.anims.create({
+      key: 'up',
+      frames: this.anims.generateFrameNumbers('player', { start: 90, end: 92 }),
+      frameRate: 10,
+      repeat: -1,
+      yoyo: true
+    });
 
-    const npcSprite1 = this.add.sprite(0, 0, "player");
-    npcSprite1.scale = 1.5;
+    this.anims.create({
+      key: 'right',
+      frames: this.anims.generateFrameNumbers('player', { start: 78, end: 80 }),
+      frameRate: 10,
+      repeat: -1,
+      yoyo: true
+    });
 
-    const npcSprite2 = this.add.sprite(0, 0, "player");
-    npcSprite2.scale = 1.5;
+    this.anims.create({
+      key: 'down',
+      frames: this.anims.generateFrameNumbers('player', { start: 54, end: 56 }),
+      frameRate: 10,
+      repeat: -1,
+      yoyo: true
+    });
+
+    this.anims.create({
+      key: 'left',
+      frames: this.anims.generateFrameNumbers('player', { start: 66, end: 68 }),
+      frameRate: 10,
+      repeat: -1,
+      yoyo: true
+    });
+
 
     const gridMovementConfig = {
       characters: [
         {
           id: "player",
           sprite: playerSprite,
-          walkingAnimationMapping: 6,
+          walkingAnimationEnabled: false,
           startPosition: new Phaser.Math.Vector2(8, 8),
-        },
-        {
-          id: "npc0",
-          sprite: npcSprite,
-          walkingAnimationMapping: 0,
-          startPosition: new Phaser.Math.Vector2(12, 5),
-          speed: 3
-        },
-        {
-          id: "npc1",
-          sprite: npcSprite1,
-          walkingAnimationMapping: 1,
-          startPosition: new Phaser.Math.Vector2(14, 8),
-        },
-        {
-          id: "npc2",
-          sprite: npcSprite2,
-          walkingAnimationMapping: 3,
-          startPosition: new Phaser.Math.Vector2(5, 10),
-          speed: 2
         },
       ],
       firstLayerAboveChar: 3,
     };
 
     this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
-    this.gridMovementPlugin.follow('npc0', 'player', 2, true);
-    this.gridMovementPlugin.follow('npc1', 'player', 1, true);
-    this.gridMovementPlugin.follow('npc2', 'player', 0, true);
+    this.gridMovementPlugin.movementStarted().subscribe(([_charId, direction]) => {
+      playerSprite.anims.play(direction);
+    })
+    this.gridMovementPlugin.movementStopped().subscribe(([_charId, direction]) => {
+      playerSprite.anims.stop();
+      playerSprite.setFrame(getStopFrame(direction));
+    })
+
+    this.gridMovementPlugin.directionChanged().subscribe(([_charId, direction]) => {
+      playerSprite.setFrame(getStopFrame(direction));
+    })
+  }
+
+  function getStopFrame(direction) {
+    switch (direction) {
+      case 'up':
+        return 91;
+      case 'right':
+        return 79;
+      case 'down':
+        return 55;
+      case 'left':
+        return 67;
+    }
   }
 
   function update () {

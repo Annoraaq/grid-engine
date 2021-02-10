@@ -43,25 +43,21 @@ describe("TargetMovement", () => {
     expect(mockChar.move).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
-  it("should move all standing chars", () => {
+  it("should move all chars", () => {
     const charPos = new Phaser.Math.Vector2(1, 1);
     Bfs.getShortestPath = jest.fn().mockReturnValue({
       path: [charPos, new Phaser.Math.Vector2(2, 1)],
       closestToTarget: new Phaser.Math.Vector2(3, 1),
     });
-    const standingChar = createMockChar("char1", charPos);
-    const standingChar2 = createMockChar("char2", charPos);
-    const movingChar = createMockChar("char3", charPos);
-    movingChar.isMoving = () => true;
-    targetMovement.addCharacter(standingChar, new Phaser.Math.Vector2(3, 1));
-    targetMovement.addCharacter(standingChar2, new Phaser.Math.Vector2(3, 1));
-    targetMovement.addCharacter(movingChar, new Phaser.Math.Vector2(3, 1));
+    const char1 = createMockChar("char1", charPos);
+    const char2 = createMockChar("char2", charPos);
+    targetMovement.addCharacter(char1, new Phaser.Math.Vector2(3, 1));
+    targetMovement.addCharacter(char2, new Phaser.Math.Vector2(3, 1));
     targetMovement.update();
 
     expect(Bfs.getShortestPath).toHaveBeenCalledTimes(2);
-    expect(standingChar.move).toHaveBeenCalledWith(Direction.RIGHT);
-    expect(standingChar2.move).toHaveBeenCalledWith(Direction.RIGHT);
-    expect(movingChar.move).not.toHaveBeenCalled();
+    expect(char1.move).toHaveBeenCalledWith(Direction.RIGHT);
+    expect(char2.move).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
   it("should not move arrived char", () => {

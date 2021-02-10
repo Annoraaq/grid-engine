@@ -1,10 +1,17 @@
 import { FollowMovement } from "./FollowMovement/FollowMovement";
 import { TargetMovement } from "./TargetMovement/TargetMovement";
-import { GridCharacter } from "./GridCharacter/GridCharacter";
+import {
+  CharacterIndex,
+  CharConfig,
+  FrameRow,
+  GridCharacter,
+} from "./GridCharacter/GridCharacter";
 import "phaser";
 import { Direction } from "./Direction/Direction";
 import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./RandomMovement/RandomMovement";
+import { Observable, Subject } from "rxjs";
+import { takeUntil, filter } from "rxjs/operators";
 
 export type TileSizePerSecond = number;
 
@@ -13,10 +20,19 @@ export interface GridMovementConfig {
   firstLayerAboveChar: number;
 }
 
+export interface WalkingAnimationMapping {
+  [Direction.UP]: FrameRow;
+  [Direction.RIGHT]: FrameRow;
+  [Direction.DOWN]: FrameRow;
+  [Direction.LEFT]: FrameRow;
+}
+
 export interface CharacterData {
   id: string;
   sprite: Phaser.GameObjects.Sprite;
-  characterIndex: number;
+  walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
+  walkingAnimationEnabled?: boolean;
+  characterIndex?: number; // deprecated
   speed?: TileSizePerSecond;
   startPosition?: Phaser.Math.Vector2;
 }
@@ -29,6 +45,11 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   private targetMovement: TargetMovement;
   private followMovement: FollowMovement;
   private isCreated: boolean = false;
+  private movementStopped$ = new Subject<[string, Direction]>();
+  private movementStarted$ = new Subject<[string, Direction]>();
+  private directionChanged$ = new Subject<[string, Direction]>();
+  private charRemoved$ = new Subject<string>();
+
   constructor(
     public scene: Phaser.Scene,
     pluginManager: Phaser.Plugins.PluginManager
@@ -112,6 +133,17 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.gridCharacters.get(charId).setSpeed(speed);
   }
 
+  setWalkingAnimationMapping(
+    charId: string,
+    walkingAnimationMapping: WalkingAnimationMapping
+  ) {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    this.gridCharacters
+      .get(charId)
+      .setWalkingAnimationMapping(walkingAnimationMapping);
+  }
+
   update(_time: number, delta: number) {
     if (this.isCreated) {
       this.randomMovement.update(delta);
@@ -127,26 +159,61 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
 
   addCharacter(charData: CharacterData) {
     this.initGuard();
-    const enrichedCharData = {
-      speed: 4,
-      startPosition: new Phaser.Math.Vector2(0, 0),
-      ...charData,
-    };
 
-    const gridChar = new GridCharacter(
-      enrichedCharData.id,
-      enrichedCharData.sprite,
-      enrichedCharData.characterIndex,
-      this.getTileSize(),
-      this.gridTilemap,
-      enrichedCharData.speed
+    if (charData.characterIndex != undefined) {
+      console.warn(
+        "PhaserGridMovementPlugin: CharacterConfig property `characterIndex` is deprecated. Use `walkingAnimtionMapping` instead."
+      );
+    }
+
+    const charConfig: CharConfig = {
+      sprite: charData.sprite,
+      speed: charData.speed || 4,
+      tilemap: this.gridTilemap,
+      tileSize: this.getTileSize(),
+      walkingAnimationMapping: charData.walkingAnimationMapping,
+      walkingAnimationEnabled: charData.walkingAnimationEnabled,
+    };
+    if (charConfig.walkingAnimationMapping == undefined) {
+      charConfig.walkingAnimationMapping = charData.characterIndex;
+    }
+    if (charConfig.walkingAnimationEnabled == undefined) {
+      charConfig.walkingAnimationEnabled = true;
+    }
+    const gridChar = new GridCharacter(charData.id, charConfig);
+
+    this.gridCharacters.set(charData.id, gridChar);
+
+    gridChar.setTilePosition(
+      charData.startPosition || new Phaser.Math.Vector2(0, 0)
     );
 
-    this.gridCharacters.set(enrichedCharData.id, gridChar);
-
-    gridChar.setTilePosition(enrichedCharData.startPosition);
-
     this.gridTilemap.addCharacter(gridChar);
+
+    gridChar
+      .movementStopped()
+      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
+      .subscribe((direction: Direction) => {
+        this.movementStopped$.next([gridChar.getId(), direction]);
+      });
+
+    gridChar
+      .movementStarted()
+      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
+      .subscribe((direction: Direction) => {
+        this.movementStarted$.next([gridChar.getId(), direction]);
+      });
+
+    gridChar
+      .directionChanged()
+      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
+      .subscribe((direction: Direction) => {
+        this.directionChanged$.next([gridChar.getId(), direction]);
+      });
+  }
+
+  private takeUntilCharRemoved(charId: string) {
+    return takeUntil(this.charRemoved$.pipe(filter((cId) => cId == charId)));
   }
 
   hasCharacter(charId: string): boolean {
@@ -162,6 +229,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.followMovement.removeCharacter(charId);
     this.gridTilemap.removeCharacter(charId);
     this.gridCharacters.delete(charId);
+    this.charRemoved$.next(charId);
   }
 
   follow(
@@ -185,6 +253,18 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.followMovement.removeCharacter(charId);
+  }
+
+  movementStarted(): Observable<[string, Direction]> {
+    return this.movementStarted$;
+  }
+
+  movementStopped(): Observable<[string, Direction]> {
+    return this.movementStopped$;
+  }
+
+  directionChanged(): Observable<[string, Direction]> {
+    return this.directionChanged$;
   }
 
   private initGuard() {

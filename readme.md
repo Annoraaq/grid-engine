@@ -102,12 +102,23 @@ To read more about creating compatible tilemaps, take a look at my following blo
 
   The characters sprite.
 
-- `characterIndex: number`
+- `characterIndex: number` (DEPRECATED, optional, default: 0)
 
+  _Deprecated. Use `walkingAnimationMapping` instead._
+
+- `walkingAnimationMapping?: number | `[WalkingAnimationMapping](#walkingAnimationMapping)
+
+  In case of `number`:
   The 0-based index of the character on the spritesheet.
+
   Here is an example image showing the character indices:
 
-![](images/charIndex.png)
+  ![](images/charIndex.png)
+
+  In case of [WalkingAnimationMapping](#walkingAnimationMapping):
+  Alternatively to providing a characterIndex you can also provide a custom frame mapping. This is especially handy if your spritesheet has a different arrangement of frames than you can see in the example image (4 rows with 3 columns). You can provide the frame number for every state of the character.
+
+  If both, a `characterIndex` and a `walkingAnimationMapping` is set, the walkingAnimationMapping is given preference.
 
 - `speed: TileSizePerSecond` (optional, default: 4)
 
@@ -116,6 +127,35 @@ To read more about creating compatible tilemaps, take a look at my following blo
 - `startPosition: Phaser.Math.Vector2` (optional, default: (0,0))
 
   Start tile position of the player.
+
+<a name="walkingAnimationMapping"></a>
+
+### WalkingAnimationMapping
+
+```
+{
+  up: {
+    leftFoot: number,
+    standing: number,
+    rightFoot: number
+  },
+  right: {
+    leftFoot: number,
+    standing: number,
+    rightFoot: number
+  },
+  down: {
+    leftFoot: number,
+    standing: number,
+    rightFoot: number
+  },
+  left: {
+    leftFoot: number,
+    standing: number,
+    rightFoot: number
+  }
+}
+```
 
 ### Methods
 
@@ -140,6 +180,10 @@ To read more about creating compatible tilemaps, take a look at my following blo
 - `setSpeed(charId: string, speed: number): void`
 
   Sets the speed in tiles per second for a character.
+
+- `setWalkingAnimationMapping(charId: string, walkingAnimationMapping: WalkingAnimationMapping): void`
+
+  Sets the WalkingAnimationMapping for a character.
 
 - `moveRandomly(charId: string, delay?: number = 0, radius?: number = -1): void`
 
@@ -172,6 +216,18 @@ To read more about creating compatible tilemaps, take a look at my following blo
 - `stopFollowing(charId: string)`
 
   Character `charId` will stop following any character.
+
+- `movementStarted(): Observable<[string, Direction]>`
+
+  Returns an Observable that on each start of a movement will provide the character ID and the direction.
+
+- `movementStopped(): Observable<[string, Direction]>`
+
+  Returns an Observable that on each stopped movement of a character will provide it's ID and the direction of that movement.
+
+- `directionChanged(): Observable<[string, Direction]>`
+
+  Returns an Observable that will notify about every change of direction that is not part of a movement. This is the case if the character tries to walk towards a blocked tile. The character will turn but not move.
 
 ## Troubleshooting
 
