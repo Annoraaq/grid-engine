@@ -72,6 +72,7 @@
     }
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
+    playerSprite.setFrame(getStopFrame('down'));
     this.cameras.main.startFollow(playerSprite);
 
     this.anims.create({
@@ -112,7 +113,6 @@
         {
           id: "player",
           sprite: playerSprite,
-          walkingAnimationMapping: 6,
           walkingAnimationEnabled: false,
           startPosition: new Phaser.Math.Vector2(8, 8),
         },

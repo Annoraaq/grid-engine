@@ -64,7 +64,9 @@ export class GridCharacter {
     this.speed = config.speed;
     this.walkingAnimation = config.walkingAnimationEnabled;
 
-    this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
+    if (this.walkingAnimation) {
+      this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
+    }
     this.speedPixelsPerSecond = this.tileSize * this.speed;
     this.updateZindex();
   }

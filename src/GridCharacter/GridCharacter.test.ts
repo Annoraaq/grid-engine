@@ -235,6 +235,7 @@ describe("GridCharacter", () => {
 
   describe("non animated mode", () => {
     beforeEach(() => {
+      spriteMock.setFrame = jest.fn();
       gridCharacter = new GridCharacter("player", {
         sprite: spriteMock,
         tilemap: gridTilemapMock,
@@ -243,11 +244,15 @@ describe("GridCharacter", () => {
         walkingAnimationMapping: 3,
         walkingAnimationEnabled: false,
       });
-      spriteMock.setFrame = jest.fn();
       mockNonBlockingTile();
     });
 
+    it("should not set an initial frame", () => {
+      expect(spriteMock.setFrame).not.toHaveBeenCalled();
+    });
+
     it("should set the correct frame when walking up", () => {
+      spriteMock.setFrame = jest.fn();
       gridCharacter.move(Direction.UP);
       gridCharacter.update(50);
 
@@ -255,6 +260,7 @@ describe("GridCharacter", () => {
     });
 
     it("should set the correct frame when walking down", () => {
+      spriteMock.setFrame = jest.fn();
       gridCharacter.move(Direction.DOWN);
       gridCharacter.update(50);
 
@@ -262,6 +268,7 @@ describe("GridCharacter", () => {
     });
 
     it("should set the correct frame when walking left", () => {
+      spriteMock.setFrame = jest.fn();
       gridCharacter.move(Direction.LEFT);
       gridCharacter.update(50);
 
@@ -269,6 +276,7 @@ describe("GridCharacter", () => {
     });
 
     it("should set the correct frame when walking right", () => {
+      spriteMock.setFrame = jest.fn();
       gridCharacter.move(Direction.RIGHT);
       gridCharacter.update(50);
 
@@ -276,11 +284,13 @@ describe("GridCharacter", () => {
     });
 
     it("should not turn towards", () => {
+      spriteMock.setFrame = jest.fn();
       gridCharacter.turnTowards(Direction.DOWN);
       expect(spriteMock.setFrame).not.toHaveBeenCalled();
     });
 
     it("should not turn", () => {
+      spriteMock.setFrame = jest.fn();
       mockBlockingTile();
       gridCharacter.move(Direction.DOWN);
       expect(spriteMock.setFrame).not.toHaveBeenCalled();
