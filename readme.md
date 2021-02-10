@@ -217,6 +217,18 @@ To read more about creating compatible tilemaps, take a look at my following blo
 
   Character `charId` will stop following any character.
 
+- `movementStarted(): Observable<[string, Direction]>`
+
+  Returns an Observable that on each start of a movement will provide the character ID and the direction.
+
+- `movementStopped(): Observable<[string, Direction]>`
+
+  Returns an Observable that on each stopped movement of a character will provide it's ID and the direction of that movement.
+
+- `directionChanged(): Observable<[string, Direction]>`
+
+  Returns an Observable that will notify about every change of direction that is not part of a movement. This is the case if the character tries to walk towards a blocked tile. The character will turn but not move.
+
 ## Troubleshooting
 
 ### `Invalid Scene Plugin: gridMovementPlugin`
