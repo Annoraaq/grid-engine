@@ -17,7 +17,7 @@ export type TileSizePerSecond = number;
 
 export interface GridMovementConfig {
   characters: CharacterData[];
-  firstLayerAboveChar: number;
+  firstLayerAboveChar?: number; // deprecated
 }
 
 export interface WalkingAnimationMapping {
@@ -285,7 +285,14 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     tilemap: Phaser.Tilemaps.Tilemap,
     config: GridMovementConfig
   ) {
-    return new GridTilemap(tilemap, config.firstLayerAboveChar);
+    if (config.firstLayerAboveChar != undefined) {
+      console.warn(
+        "PhaserGridMovementPlugin: Config property `firstLayerAboveChar` is deprecated. Use a property `alwaysTop` on the tilemap layers instead."
+      );
+      return new GridTilemap(tilemap, config.firstLayerAboveChar);
+    } else {
+      return new GridTilemap(tilemap);
+    }
   }
 
   private getTileSize(): number {

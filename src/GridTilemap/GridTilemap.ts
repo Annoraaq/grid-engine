@@ -10,7 +10,7 @@ export class GridTilemap {
   private characters = new Map<string, GridCharacter>();
   constructor(
     private tilemap: Phaser.Tilemaps.Tilemap,
-    private firstLayerAboveChar: number
+    private firstLayerAboveChar?: number
   ) {
     this.setLayerDepths();
   }
@@ -57,7 +57,9 @@ export class GridTilemap {
 
   private setLayerDepths() {
     this.tilemap.layers.forEach((layer, index) => {
-      if (index >= this.firstLayerAboveChar) {
+      const layerProps = layer.properties as [{ name: any; value: any }];
+      let alwaysTopProp = layerProps.find((el) => el.name == "alwaysTop");
+      if (index >= this.firstLayerAboveChar || alwaysTopProp) {
         layer.tilemapLayer.setDepth(
           GridTilemap.FIRST_PLAYER_LAYER + GridTilemap.MAX_PLAYER_LAYERS + index
         );

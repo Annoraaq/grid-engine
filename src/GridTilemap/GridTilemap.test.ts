@@ -13,12 +13,14 @@ describe("GridTilemapPlugin", () => {
           tilemapLayer: {
             setDepth: jest.fn(),
           },
+          properties: [],
         },
         {
           name: "layer2",
           tilemapLayer: {
             setDepth: jest.fn(),
           },
+          properties: [],
         },
       ],
       tileWidth: 16,
@@ -32,6 +34,52 @@ describe("GridTilemapPlugin", () => {
     expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
     expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(
       2001
+    );
+  });
+
+  it("should set layer depths on construction without firstLayerAboveChar", () => {
+    gridTilemap = new GridTilemap(tilemapMock);
+    expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
+    expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(1);
+  });
+
+  it("should consider 'alwaysOnTop' flag of tile layer", () => {
+    tilemapMock.layers = [
+      {
+        name: "layer1",
+        tilemapLayer: {
+          setDepth: jest.fn(),
+        },
+        properties: [],
+      },
+      {
+        name: "layer2",
+        tilemapLayer: {
+          setDepth: jest.fn(),
+        },
+        properties: [
+          {
+            name: "alwaysTop",
+            value: true,
+          },
+        ],
+      },
+      {
+        name: "layer3",
+        tilemapLayer: {
+          setDepth: jest.fn(),
+        },
+        properties: [],
+      },
+    ];
+    gridTilemap = new GridTilemap(tilemapMock, 2);
+
+    expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
+    expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(
+      2001
+    );
+    expect(tilemapMock.layers[2].tilemapLayer.setDepth).toHaveBeenCalledWith(
+      2002
     );
   });
 

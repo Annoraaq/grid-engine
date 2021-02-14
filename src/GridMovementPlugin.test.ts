@@ -29,7 +29,7 @@ const mockGridTileMap = {
 };
 const mockGridTilemapConstructor = jest.fn(function (
   _tilemap,
-  _firstLayerAboveChar
+  _firstLayerAboveChar?
 ) {
   return mockGridTileMap;
 });
@@ -157,9 +157,27 @@ describe("GridMovementPlugin", () => {
           walkingAnimationMapping: 3,
         },
       ],
+    });
+    expect(mockGridTilemapConstructor).toHaveBeenCalledWith(tileMapMock);
+  });
+
+  it("should init tilemap with deprecated firstLayerAboveChar", () => {
+    console.warn = jest.fn();
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
       firstLayerAboveChar: 3,
     });
     expect(mockGridTilemapConstructor).toHaveBeenCalledWith(tileMapMock, 3);
+    expect(console.warn).toHaveBeenCalledWith(
+      "PhaserGridMovementPlugin: Config property `firstLayerAboveChar` is deprecated. Use a property `alwaysTop` on the tilemap layers instead."
+    );
   });
 
   it("should init player", () => {
