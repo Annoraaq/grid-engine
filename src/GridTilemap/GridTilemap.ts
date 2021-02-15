@@ -7,6 +7,7 @@ type Vector2 = Phaser.Math.Vector2;
 export class GridTilemap {
   private static readonly MAX_PLAYER_LAYERS = 1000;
   static readonly FIRST_PLAYER_LAYER = 1000;
+  private static readonly ALWAYS_TOP_PROP_NAME = "gm_alwaysTop";
   private characters = new Map<string, GridCharacter>();
   constructor(
     private tilemap: Phaser.Tilemaps.Tilemap,
@@ -55,10 +56,18 @@ export class GridTilemap {
     );
   }
 
+  private getLayerProp(layer: Phaser.Tilemaps.LayerData, name: string): any {
+    const layerProps = layer.properties as [{ name: any; value: any }];
+    const prop = layerProps.find((el) => el.name == name);
+    return prop?.value;
+  }
+
   private setLayerDepths() {
     this.tilemap.layers.forEach((layer, index) => {
-      const layerProps = layer.properties as [{ name: any; value: any }];
-      let alwaysTopProp = layerProps.find((el) => el.name == "alwaysTop");
+      let alwaysTopProp = this.getLayerProp(
+        layer,
+        GridTilemap.ALWAYS_TOP_PROP_NAME
+      );
       if (index >= this.firstLayerAboveChar || alwaysTopProp) {
         layer.tilemapLayer.setDepth(
           GridTilemap.FIRST_PLAYER_LAYER + GridTilemap.MAX_PLAYER_LAYERS + index

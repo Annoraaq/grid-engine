@@ -59,7 +59,7 @@ describe("GridTilemapPlugin", () => {
         },
         properties: [
           {
-            name: "alwaysTop",
+            name: "gm_alwaysTop",
             value: true,
           },
         ],
