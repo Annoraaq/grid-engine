@@ -49,7 +49,7 @@ export class GridCharacter {
   private movementStarted$ = new Subject<Direction>();
   private movementStopped$ = new Subject<Direction>();
   private directionChanged$ = new Subject<Direction>();
-  private lastMovementImpuls = Direction.NONE;
+  private lastMovementImpulse = Direction.NONE;
 
   constructor(private id: string, config: CharConfig) {
     if (typeof config.walkingAnimationMapping == "number") {
@@ -100,7 +100,8 @@ export class GridCharacter {
   }
 
   move(direction: Direction): void {
-    this.lastMovementImpuls = direction;
+    this.lastMovementImpulse = direction;
+    if (direction == Direction.NONE) return;
     if (this.isMoving()) return;
     if (this.isBlockingDirection(direction)) {
       if (this.walkingAnimation) {
@@ -116,7 +117,7 @@ export class GridCharacter {
     if (this.isMoving()) {
       this.updateCharacterPosition(delta);
     }
-    this.lastMovementImpuls = Direction.NONE;
+    this.lastMovementImpulse = Direction.NONE;
   }
 
   getMovementDirection(): Direction {
@@ -238,12 +239,13 @@ export class GridCharacter {
   }
 
   private startMoving(direction: Direction): void {
-    if (direction == Direction.NONE) return;
-    if (this.movementDirection !== direction) {
-      this.movementStarted$.next(direction);
-    }
-    this.tilePos = this.tilePos.add(DirectionVectors[direction]);
+    this.movementStarted$.next(direction);
     this.movementDirection = direction;
+    this.updateTilePos();
+  }
+
+  private updateTilePos() {
+    this.tilePos = this.tilePos.add(DirectionVectors[this.movementDirection]);
   }
 
   private tilePosInDirection(direction: Direction): Vector2 {
@@ -251,15 +253,27 @@ export class GridCharacter {
   }
 
   private updateCharacterPosition(delta: number): void {
-    const pixelsToWalkThisUpdate = this.getIntegerPart(
-      this.getSpeedPerDelta(delta)
-    );
+    const pixelsToWalkThisUpdate = this.getSpeedPerDelta(delta);
 
-    if (this.willCrossTileBorderThisUpdate(pixelsToWalkThisUpdate)) {
-      this.moveCharacterSpriteRestOfTile();
-    } else {
+    if (!this.willCrossTileBorderThisUpdate(pixelsToWalkThisUpdate)) {
       this.moveCharacterSprite(pixelsToWalkThisUpdate);
+      return;
     }
+
+    if (this.shouldContinueMoving()) {
+      this.moveCharacterSprite(pixelsToWalkThisUpdate);
+      this.updateTilePos();
+    } else {
+      this.moveCharacterSpriteRestOfTile();
+      this.stopMoving();
+    }
+  }
+
+  private shouldContinueMoving(): boolean {
+    return (
+      this.movementDirection == this.lastMovementImpulse &&
+      !this.isBlockingDirection(this.lastMovementImpulse)
+    );
   }
 
   private getSpeedPerDelta(delta: number): number {
@@ -275,14 +289,7 @@ export class GridCharacter {
 
   private moveCharacterSpriteRestOfTile(): void {
     this.moveCharacterSprite(this.tileSize - this.tileSizePixelsWalked);
-    if (
-      this.lastMovementImpuls !== Direction.NONE &&
-      !this.isBlockingDirection(this.lastMovementImpuls)
-    ) {
-      this.startMoving(this.lastMovementImpuls);
-    } else {
-      this.stopMoving();
-    }
+    this.stopMoving();
   }
 
   private moveCharacterSprite(speed: number): void {
@@ -304,10 +311,6 @@ export class GridCharacter {
     return DirectionVectors[this.movementDirection]
       .clone()
       .multiply(new Vector2(speed));
-  }
-
-  private getIntegerPart(float: number): number {
-    return Math.floor(float);
   }
 
   private updateCharacterFrame(tileSizePixelsWalked: number): void {
