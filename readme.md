@@ -63,9 +63,8 @@ function create () {
     characters: [{
       id: "player",
       sprite: playerSprite,
-      characterIndex: 6,
+      walkingAnimationMapping: 6,
     }],
-    firstLayerAboveChar: 3,
   };
 
   this.gridMovementPlugin.create(tilemap, gridMovementConfig);
@@ -89,8 +88,10 @@ To read more about creating compatible tilemaps, take a look at my following blo
 - `characters: CharacterData[]`
   An array of character data. Each describing a character on the map.
 
-- `firstLayerAboveChar: number`
+- `firstLayerAboveChar: number` (DEPRECATED, optional)
   In your tilemap, the index of the first layer that should be rendered on top of all the character layers.
+
+  _Deprecated. Use `gm_alwaysTop` tilemap layer property instead._
 
 ### CharacterData
 
