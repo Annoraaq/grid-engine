@@ -7,10 +7,12 @@ type Vector2 = Phaser.Math.Vector2;
 export class GridTilemap {
   private static readonly MAX_PLAYER_LAYERS = 1000;
   static readonly FIRST_PLAYER_LAYER = 1000;
+  private static readonly ALWAYS_TOP_PROP_NAME = "gm_alwaysTop";
+  private static readonly HEIGHT_SHIFT_PROP_NAME = "gm_heightShift";
   private characters = new Map<string, GridCharacter>();
   constructor(
     private tilemap: Phaser.Tilemaps.Tilemap,
-    private firstLayerAboveChar: number
+    private firstLayerAboveChar?: number
   ) {
     this.setLayerDepths();
   }
@@ -55,15 +57,77 @@ export class GridTilemap {
     );
   }
 
+  private getLayerProp(layer: Phaser.Tilemaps.LayerData, name: string): any {
+    const layerProps = layer.properties as [{ name: any; value: any }];
+    const prop = layerProps.find((el) => el.name == name);
+    return prop?.value;
+  }
+
+  private hasLayerProp(
+    layer: Phaser.Tilemaps.LayerData,
+    name: string
+  ): boolean {
+    return this.getLayerProp(layer, name) != undefined;
+  }
+
+  private isLayerAlwaysOnTop(
+    layerData: Phaser.Tilemaps.LayerData,
+    layerIndex: number
+  ): boolean {
+    return (
+      layerIndex >= this.firstLayerAboveChar ||
+      this.hasLayerProp(layerData, GridTilemap.ALWAYS_TOP_PROP_NAME)
+    );
+  }
+
   private setLayerDepths() {
-    this.tilemap.layers.forEach((layer, index) => {
-      if (index >= this.firstLayerAboveChar) {
-        layer.tilemapLayer.setDepth(
-          GridTilemap.FIRST_PLAYER_LAYER + GridTilemap.MAX_PLAYER_LAYERS + index
+    const layersToDelete: Phaser.Tilemaps.TilemapLayer[] = [];
+    this.tilemap.layers.forEach((layerData, layerIndex) => {
+      if (this.isLayerAlwaysOnTop(layerData, layerIndex)) {
+        layerData.tilemapLayer.setDepth(
+          GridTilemap.FIRST_PLAYER_LAYER +
+            GridTilemap.MAX_PLAYER_LAYERS +
+            layerIndex
         );
+      } else if (
+        this.hasLayerProp(layerData, GridTilemap.HEIGHT_SHIFT_PROP_NAME)
+      ) {
+        this.createLayerForEachRow(layerData, layerIndex);
+        layersToDelete.push(layerData.tilemapLayer);
       } else {
-        layer.tilemapLayer.setDepth(index);
+        layerData.tilemapLayer.setDepth(layerIndex);
       }
     });
+    layersToDelete.forEach((layer) => layer.destroy());
+  }
+
+  private createLayerForEachRow(
+    layer: Phaser.Tilemaps.LayerData,
+    layerIndex: number
+  ) {
+    const heightShift = this.getLayerProp(
+      layer,
+      GridTilemap.HEIGHT_SHIFT_PROP_NAME
+    );
+    for (let row = 0; row < layer.height; row++) {
+      const newLayer = this.tilemap.createBlankLayer(
+        `${layerIndex}#${row}`,
+        layer.tilemapLayer.tileset
+      );
+      for (let col = 0; col < layer.width; col++) {
+        newLayer.putTileAt(layer.data[row][col], col, row);
+      }
+
+      newLayer.scale = layer.tilemapLayer.scale;
+
+      const makeHigherThanPlayerWhenOnSameLevel = 0.5;
+      newLayer.setDepth(
+        GridTilemap.FIRST_PLAYER_LAYER +
+          row +
+          heightShift -
+          1 +
+          makeHigherThanPlayerWhenOnSameLevel
+      );
+    }
   }
 }

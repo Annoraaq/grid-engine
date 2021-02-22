@@ -23,12 +23,12 @@
     "ts-loader": "^7.0.5",
     "typescript": "^3.9.5",
     "uglifyjs-webpack-plugin": "^1.1.2",
-    "webpack": "^4.43.0"
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12"
   },
   "dependencies": {
-    "phaser": "^3.23.0",
-    "rxjs": "^6.6.3",
-    "webpack-cli": "^3.3.12"
+    "phaser": "^3.52.0",
+    "rxjs": "^6.6.3"
   },
   "repository": {
     "type": "git",
@@ -43,6 +43,7 @@
     "RPG",
     "2D",
     "Movement",
-    "Grid"
+    "Grid",
+    "Tile"
   ]
 }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <title>Grid Movement Plugin for Phaser 3 - Example - Move Player</title>
     <script src="../GridMovementPlugin.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.24.1/dist/phaser.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.52.0/dist/phaser.min.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -67,12 +67,13 @@
     const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
     cloudCityTilemap.addTilesetImage("Cloud City", "tiles");
     for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-      const layer = cloudCityTilemap.createStaticLayer(i, "Cloud City", 0, 0);
+      const layer = cloudCityTilemap.createLayer(i, "Cloud City", 0, 0);
       layer.scale = 3;
     }
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
     this.cameras.main.startFollow(playerSprite);
+    this.cameras.main.roundPixels = true;
 
     const gridMovementConfig = {
       characters: [
@@ -83,7 +84,6 @@
           startPosition: new Phaser.Math.Vector2(8, 8),
         },
       ],
-      firstLayerAboveChar: 3,
     };
 
     this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
