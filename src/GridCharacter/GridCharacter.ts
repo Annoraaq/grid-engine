@@ -87,16 +87,18 @@ export class GridCharacter {
 
   setTilePosition(tilePosition: Phaser.Math.Vector2): void {
     if (this.isMoving()) return;
-    this.tilePos = tilePosition.clone();
+    this.tilePos = tilePosition;
     this.updateZindex();
-    this.sprite.setPosition(
-      tilePosition.x * this.tileSize + this.playerOffsetX(),
-      tilePosition.y * this.tileSize + this.playerOffsetY()
+    this.setPosition(
+      new Vector2(
+        tilePosition.x * this.tileSize + this.playerOffsetX(),
+        tilePosition.y * this.tileSize + this.playerOffsetY()
+      )
     );
   }
 
   getTilePos(): Phaser.Math.Vector2 {
-    return this.tilePos.clone();
+    return this.tilePos;
   }
 
   move(direction: Direction): void {
@@ -163,7 +165,6 @@ export class GridCharacter {
   private set tilePos(newTilePos: Phaser.Math.Vector2) {
     this._tilePos.x = newTilePos.x;
     this._tilePos.y = newTilePos.y;
-    this.updateZindex();
   }
 
   private updateZindex() {
@@ -185,11 +186,12 @@ export class GridCharacter {
   }
 
   private setPosition(position: Phaser.Math.Vector2): void {
+    this.sprite.setOrigin(0.5, 1);
     this.sprite.setPosition(position.x, position.y);
   }
 
   private getPosition(): Phaser.Math.Vector2 {
-    return this.sprite.getCenter();
+    return this.sprite.getBottomCenter();
   }
 
   private isCurrentFrameStanding(direction: Direction): boolean {
@@ -204,7 +206,7 @@ export class GridCharacter {
   }
 
   private playerOffsetY(): number {
-    return -(this.sprite.height % this.tileSize) / 2;
+    return this.tileSize;
   }
 
   private framesOfDirection(direction: Direction): FrameRow {
@@ -257,10 +259,7 @@ export class GridCharacter {
 
     if (!this.willCrossTileBorderThisUpdate(pixelsToWalkThisUpdate)) {
       this.moveCharacterSprite(pixelsToWalkThisUpdate);
-      return;
-    }
-
-    if (this.shouldContinueMoving()) {
+    } else if (this.shouldContinueMoving()) {
       this.moveCharacterSprite(pixelsToWalkThisUpdate);
       this.updateTilePos();
     } else {
@@ -297,9 +296,12 @@ export class GridCharacter {
     this.setPosition(newPlayerPos);
     this.tileSizePixelsWalked = this.tileSizePixelsWalked + speed;
     if (this.walkingAnimation) {
-      this.updateCharacterFrame(this.tileSizePixelsWalked);
+      this.updateCharacterFrame();
     }
     this.tileSizePixelsWalked = this.tileSizePixelsWalked % this.tileSize;
+    if (this.hasWalkedHalfATile()) {
+      this.updateZindex();
+    }
   }
 
   private stopMoving(): void {
@@ -313,15 +315,15 @@ export class GridCharacter {
       .multiply(new Vector2(speed));
   }
 
-  private updateCharacterFrame(tileSizePixelsWalked: number): void {
-    if (this.hasWalkedHalfATile(tileSizePixelsWalked)) {
+  private updateCharacterFrame(): void {
+    if (this.hasWalkedHalfATile()) {
       this.setStandingFrame(this.movementDirection);
     } else {
       this.setWalkingFrame(this.movementDirection);
     }
   }
 
-  private hasWalkedHalfATile(tileSizePixelsWalked: number): boolean {
-    return tileSizePixelsWalked > this.tileSize / 2;
+  private hasWalkedHalfATile(): boolean {
+    return this.tileSizePixelsWalked > this.tileSize / 2;
   }
 }

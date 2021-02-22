@@ -9,9 +9,9 @@ describe("GridCharacter", () => {
   let spriteMock: Phaser.GameObjects.Sprite;
   let gridTilemapMock;
 
-  const PLAYER_X_OFFSET = 8;
-  const PLAYER_Y_OFFSET = -2;
   const TILE_SIZE = 16;
+  const PLAYER_X_OFFSET = TILE_SIZE / 2;
+  const PLAYER_Y_OFFSET = TILE_SIZE;
 
   function mockNonBlockingTile() {
     gridTilemapMock.hasBlockingTile.mockReturnValue(false);
@@ -58,7 +58,8 @@ describe("GridCharacter", () => {
       setFrame: jest.fn(),
       setDepth: jest.fn(),
       frame: { name: "anything" },
-      getCenter: jest
+      setOrigin: jest.fn(),
+      getBottomCenter: jest
         .fn()
         .mockReturnValue(
           new Phaser.Math.Vector2(
@@ -124,7 +125,6 @@ describe("GridCharacter", () => {
     gridCharacter.move(Direction.UP);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, -1));
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 - 1);
     const dir = await movementStartedProm;
     expect(dir).toEqual(Direction.UP);
 
@@ -151,6 +151,16 @@ describe("GridCharacter", () => {
       6 * TILE_SIZE + PLAYER_Y_OFFSET - 12
     );
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 - 1);
+  });
+
+  it("should not update z-index if not walked half a tile", () => {
+    mockNonBlockingTile();
+
+    gridCharacter.move(Direction.UP);
+    gridCharacter.update(100);
+
+    expect(spriteMock.setDepth).not.toHaveBeenCalledWith(1000 - 1);
   });
 
   it("should update only till tile border", () => {

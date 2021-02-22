@@ -4,14 +4,22 @@ import { GridTilemap } from "./GridTilemap";
 describe("GridTilemapPlugin", () => {
   let gridTilemap: GridTilemap;
   let tilemapMock;
+  let blankLayerMock;
 
   beforeEach(() => {
+    blankLayerMock = {
+      scale: 0,
+      putTileAt: jest.fn(),
+      setDepth: jest.fn(),
+    };
     tilemapMock = {
       layers: [
         {
           name: "layer1",
           tilemapLayer: {
             setDepth: jest.fn(),
+            scale: 3,
+            tileset: "Cloud City",
           },
           properties: [],
         },
@@ -19,6 +27,8 @@ describe("GridTilemapPlugin", () => {
           name: "layer2",
           tilemapLayer: {
             setDepth: jest.fn(),
+            tileset: "Cloud City",
+            scale: 3,
           },
           properties: [],
         },
@@ -26,6 +36,7 @@ describe("GridTilemapPlugin", () => {
       tileWidth: 16,
       getTileAt: jest.fn(),
       hasTileAt: jest.fn(),
+      createBlankLayer: jest.fn().mockReturnValue(blankLayerMock),
     };
   });
 
@@ -49,6 +60,8 @@ describe("GridTilemapPlugin", () => {
         name: "layer1",
         tilemapLayer: {
           setDepth: jest.fn(),
+          scale: 3,
+          tileset: "Cloud City",
         },
         properties: [],
       },
@@ -56,6 +69,8 @@ describe("GridTilemapPlugin", () => {
         name: "layer2",
         tilemapLayer: {
           setDepth: jest.fn(),
+          scale: 3,
+          tileset: "Cloud City",
         },
         properties: [
           {
@@ -68,6 +83,8 @@ describe("GridTilemapPlugin", () => {
         name: "layer3",
         tilemapLayer: {
           setDepth: jest.fn(),
+          scale: 3,
+          tileset: "Cloud City",
         },
         properties: [],
       },
@@ -81,6 +98,64 @@ describe("GridTilemapPlugin", () => {
     expect(tilemapMock.layers[2].tilemapLayer.setDepth).toHaveBeenCalledWith(
       2002
     );
+  });
+
+  it("should consider 'heightShift' layer", () => {
+    tilemapMock.layers = [
+      {
+        name: "layer1",
+        tilemapLayer: {
+          setDepth: jest.fn(),
+          destroy: jest.fn(),
+          scale: 3,
+          tileset: "Cloud City",
+        },
+        properties: [],
+      },
+      {
+        name: "layer2",
+        height: 2,
+        width: 2,
+        data: [
+          ["r0#c0", "r0#c1"],
+          ["r1#c0", "r1#c1"],
+        ],
+        tilemapLayer: {
+          setDepth: jest.fn(),
+          destroy: jest.fn(),
+          scale: 3,
+          tileset: "Cloud City",
+        },
+        properties: [
+          {
+            name: "gm_heightShift",
+            value: 1,
+          },
+        ],
+      },
+    ];
+    gridTilemap = new GridTilemap(tilemapMock);
+
+    expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
+    expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith(
+      "1#0",
+      "Cloud City"
+    );
+    expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith(
+      "1#1",
+      "Cloud City"
+    );
+
+    expect(blankLayerMock.putTileAt).toHaveBeenCalledTimes(4);
+    expect(blankLayerMock.putTileAt).toHaveBeenNthCalledWith(1, "r0#c0", 0, 0);
+    expect(blankLayerMock.putTileAt).toHaveBeenNthCalledWith(2, "r0#c1", 1, 0);
+    expect(blankLayerMock.putTileAt).toHaveBeenNthCalledWith(3, "r1#c0", 0, 1);
+    expect(blankLayerMock.putTileAt).toHaveBeenNthCalledWith(4, "r1#c1", 1, 1);
+    expect(blankLayerMock.scale).toEqual(3);
+    expect(blankLayerMock.setDepth).toHaveBeenCalledTimes(2);
+    expect(blankLayerMock.setDepth).toHaveBeenNthCalledWith(1, 1000.5);
+    expect(blankLayerMock.setDepth).toHaveBeenNthCalledWith(2, 1001.5);
+    expect(tilemapMock.layers[1].tilemapLayer.destroy).toHaveBeenCalled();
   });
 
   it("should add a character", () => {
