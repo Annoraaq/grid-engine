@@ -578,4 +578,53 @@ describe("GridCharacter", () => {
       });
     });
   }
+
+  describe("container", () => {
+    let containerMock: Phaser.GameObjects.Container;
+    beforeEach(() => {
+      containerMock = <any>{
+        x: 5 * TILE_SIZE,
+        y: 6 * TILE_SIZE,
+        setPosition: jest.fn(),
+        setDepth: jest.fn(),
+      };
+      gridCharacter = new GridCharacter("player", {
+        sprite: spriteMock,
+        tilemap: gridTilemapMock,
+        tileSize: 16,
+        speed: 3,
+        walkingAnimationMapping: 3,
+        walkingAnimationEnabled: true,
+        container: containerMock,
+      });
+    });
+
+    it("should update", () => {
+      mockNonBlockingTile();
+      const pixelsMovedThisUpdate = 12;
+      (<any>spriteMock.setDepth).mockReset();
+
+      gridCharacter.move(Direction.UP);
+      gridCharacter.update(250);
+
+      expect(spriteMock.setPosition).not.toHaveBeenCalled();
+      expect(spriteMock.setDepth).not.toHaveBeenCalled();
+      expect(containerMock.setDepth).toHaveBeenCalledWith(1000 - 1);
+      expect(containerMock.setPosition).toHaveBeenCalledWith(
+        5 * TILE_SIZE,
+        6 * TILE_SIZE - pixelsMovedThisUpdate
+      );
+      expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+    });
+
+    it("should set tile position", () => {
+      gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
+
+      expect(spriteMock.setPosition).not.toHaveBeenCalled();
+      expect(containerMock.setPosition).toHaveBeenCalledWith(
+        3 * TILE_SIZE,
+        4 * TILE_SIZE
+      );
+    });
+  });
 });

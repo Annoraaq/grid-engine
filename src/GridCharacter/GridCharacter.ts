@@ -94,12 +94,21 @@ export class GridCharacter {
     if (this.isMoving()) return;
     this.tilePos = tilePosition;
     this.updateZindex();
-    this.setPosition(
-      new Vector2(
-        tilePosition.x * this.tileSize + this.playerOffsetX(),
-        tilePosition.y * this.tileSize + this.playerOffsetY()
-      )
-    );
+    if (this.container) {
+      this.setPosition(
+        new Vector2(
+          tilePosition.x * this.tileSize,
+          tilePosition.y * this.tileSize
+        )
+      );
+    } else {
+      this.setPosition(
+        new Vector2(
+          tilePosition.x * this.tileSize + this.playerOffsetX(),
+          tilePosition.y * this.tileSize + this.playerOffsetY()
+        )
+      );
+    }
   }
 
   getTilePos(): Phaser.Math.Vector2 {
@@ -173,7 +182,8 @@ export class GridCharacter {
   }
 
   private updateZindex() {
-    this.sprite.setDepth(GridTilemap.FIRST_PLAYER_LAYER + this.tilePos.y);
+    const gameObject = this.container || this.sprite;
+    gameObject.setDepth(GridTilemap.FIRST_PLAYER_LAYER + this.tilePos.y);
   }
 
   private setStandingFrame(direction: Direction): void {
@@ -191,12 +201,20 @@ export class GridCharacter {
   }
 
   private setPosition(position: Phaser.Math.Vector2): void {
-    this.sprite.setOrigin(0.5, 1);
-    this.sprite.setPosition(position.x, position.y);
+    if (this.container) {
+      this.container.setPosition(position.x, position.y);
+    } else {
+      this.sprite.setOrigin(0.5, 1);
+      this.sprite.setPosition(position.x, position.y);
+    }
   }
 
   private getPosition(): Phaser.Math.Vector2 {
-    return this.sprite.getBottomCenter();
+    if (this.container) {
+      return new Phaser.Math.Vector2(this.container.x, this.container.y);
+    } else {
+      return this.sprite.getBottomCenter();
+    }
   }
 
   private isCurrentFrameStanding(direction: Direction): boolean {
