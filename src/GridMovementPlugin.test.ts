@@ -181,12 +181,14 @@ describe("GridMovementPlugin", () => {
   });
 
   it("should init player", () => {
+    const containerMock = {};
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
     gridMovementPlugin.create(tileMapMock, {
       characters: [
         {
           id: "player",
           sprite: playerSpriteMock,
+          container: <any>containerMock,
         },
       ],
       firstLayerAboveChar: 3,
@@ -197,6 +199,7 @@ describe("GridMovementPlugin", () => {
       tileSize: 32,
       speed: 4,
       walkingAnimationEnabled: true,
+      container: containerMock,
     });
     expect(mockSetTilePositon).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(0, 0)

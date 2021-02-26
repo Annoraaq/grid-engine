@@ -23,6 +23,7 @@ export interface CharConfig {
   speed: number;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
   walkingAnimationEnabled: boolean;
+  container?: Phaser.GameObjects.Container;
 }
 
 export class GridCharacter {
@@ -40,6 +41,7 @@ export class GridCharacter {
   private lastFootLeft = false;
   private readonly _tilePos = new Phaser.Math.Vector2(0, 0);
   private sprite: Phaser.GameObjects.Sprite;
+  private container: Phaser.GameObjects.Container;
   private tilemap: GridTilemap;
   private tileSize: number;
   private speed: number;
@@ -59,6 +61,7 @@ export class GridCharacter {
     }
 
     this.sprite = config.sprite;
+    this.container = config.container;
     this.tilemap = config.tilemap;
     this.tileSize = config.tileSize;
     this.speed = config.speed;
