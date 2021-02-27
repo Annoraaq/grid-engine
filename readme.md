@@ -101,13 +101,13 @@ To read more about creating compatible tilemaps, take a look at my following blo
 
 - `sprite: Phaser.GameObjects.Sprite`
 
-  The characters sprite.
+  The character's sprite.
 
 - `characterIndex: number` (DEPRECATED, optional, default: 0)
 
   _Deprecated. Use `walkingAnimationMapping` instead._
 
-- `walkingAnimationMapping?: number | `[WalkingAnimationMapping](#walkingAnimationMapping)
+- `walkingAnimationMapping?: number | `[WalkingAnimationMapping](#walkingAnimationMapping) (optional)
 
   In case of `number`:
   The 0-based index of the character on the spritesheet.
@@ -128,6 +128,10 @@ To read more about creating compatible tilemaps, take a look at my following blo
 - `startPosition: Phaser.Math.Vector2` (optional, default: (0,0))
 
   Start tile position of the player.
+
+- `container?: Phaser.GameObjects.Container` (optional)
+
+  A container that holds the character's sprite. This can be used in order to move more game objects along with the sprite (for example a character's name or health bar). In order to position the container correctly on the tiles, it is necessary that you position the character's sprite on position (0, 0) in the container. For more details see the [container example](https://github.com/Annoraaq/phaser-grid-movement-plugin/tree/master/examples/container)
 
 <a name="walkingAnimationMapping"></a>
 
