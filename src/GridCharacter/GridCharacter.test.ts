@@ -10,8 +10,11 @@ describe("GridCharacter", () => {
   let gridTilemapMock;
 
   const TILE_SIZE = 16;
-  const PLAYER_X_OFFSET = TILE_SIZE / 2;
-  const PLAYER_Y_OFFSET = TILE_SIZE;
+  const PLAYER_X_OFFSET = 0;
+  const PLAYER_Y_OFFSET = -4;
+  const MS_FOR_12_PX = 250;
+  const INITIAL_SPRITE_X_POS = 5 * TILE_SIZE + PLAYER_X_OFFSET;
+  const INITIAL_SPRITE_Y_POS = 6 * TILE_SIZE + PLAYER_Y_OFFSET;
 
   function mockNonBlockingTile() {
     gridTilemapMock.hasBlockingTile.mockReturnValue(false);
@@ -54,20 +57,14 @@ describe("GridCharacter", () => {
     };
     spriteMock = <any>{
       width: 16,
+      scale: 1,
       height: 20,
       setFrame: jest.fn(),
       setDepth: jest.fn(),
       frame: { name: "anything" },
       setOrigin: jest.fn(),
-      getBottomCenter: jest
-        .fn()
-        .mockReturnValue(
-          new Phaser.Math.Vector2(
-            5 * TILE_SIZE + PLAYER_X_OFFSET,
-            6 * TILE_SIZE + PLAYER_Y_OFFSET
-          )
-        ),
-      setPosition: jest.fn(),
+      x: 5 * TILE_SIZE + PLAYER_X_OFFSET,
+      y: 6 * TILE_SIZE + PLAYER_Y_OFFSET,
       texture: {
         source: [
           {
@@ -137,19 +134,18 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
 
     gridCharacter.update(300);
-    expect(spriteMock.setPosition).not.toHaveBeenCalled();
+    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
   });
 
   it("should update", () => {
     mockNonBlockingTile();
 
     gridCharacter.move(Direction.UP);
-    gridCharacter.update(250);
+    gridCharacter.update(MS_FOR_12_PX);
 
-    expect(spriteMock.setPosition).toHaveBeenCalledWith(
-      5 * TILE_SIZE + PLAYER_X_OFFSET,
-      6 * TILE_SIZE + PLAYER_Y_OFFSET - 12
-    );
+    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 12);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 - 1);
   });
@@ -167,24 +163,20 @@ describe("GridCharacter", () => {
     mockNonBlockingTile();
 
     gridCharacter.move(Direction.UP);
-    gridCharacter.update(200);
-    gridCharacter.update(200);
-    gridCharacter.update(200);
+    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.update(MS_FOR_12_PX);
 
-    expect(spriteMock.setPosition).toHaveBeenCalledWith(
-      5 * 16 + PLAYER_X_OFFSET,
-      6 * 16 + PLAYER_Y_OFFSET - 16
-    );
+    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 16);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
   });
 
   it("should set tile position", () => {
     gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
 
-    expect(spriteMock.setPosition).toHaveBeenCalledWith(
-      3 * TILE_SIZE + PLAYER_X_OFFSET,
-      4 * TILE_SIZE + PLAYER_Y_OFFSET
-    );
+    expect(spriteMock.x).toEqual(3 * TILE_SIZE + PLAYER_X_OFFSET);
+    expect(spriteMock.y).toEqual(4 * TILE_SIZE + PLAYER_Y_OFFSET);
   });
 
   it("should not set tile position when moving", () => {
@@ -192,7 +184,8 @@ describe("GridCharacter", () => {
     gridCharacter.move(Direction.DOWN);
     gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
 
-    expect(spriteMock.setPosition).not.toHaveBeenCalled();
+    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
   });
 
   it("should stop moving if no movementImpuls", async () => {
@@ -578,4 +571,48 @@ describe("GridCharacter", () => {
       });
     });
   }
+
+  describe("container", () => {
+    let containerMock: Phaser.GameObjects.Container;
+    beforeEach(() => {
+      containerMock = <any>{
+        x: 5 * TILE_SIZE,
+        y: 6 * TILE_SIZE,
+        setDepth: jest.fn(),
+      };
+      gridCharacter = new GridCharacter("player", {
+        sprite: spriteMock,
+        tilemap: gridTilemapMock,
+        tileSize: 16,
+        speed: 3,
+        walkingAnimationMapping: 3,
+        walkingAnimationEnabled: true,
+        container: containerMock,
+      });
+    });
+
+    it("should update", () => {
+      mockNonBlockingTile();
+      const pixelsMovedThisUpdate = 12;
+      (<any>spriteMock.setDepth).mockReset();
+
+      gridCharacter.move(Direction.UP);
+      gridCharacter.update(MS_FOR_12_PX);
+
+      expect(spriteMock.setDepth).not.toHaveBeenCalled();
+      expect(containerMock.setDepth).toHaveBeenCalledWith(1000 - 1);
+      expect(containerMock.x).toEqual(5 * TILE_SIZE);
+      expect(containerMock.y).toEqual(6 * TILE_SIZE - pixelsMovedThisUpdate);
+      expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+    });
+
+    it("should set tile position", () => {
+      gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
+
+      expect(containerMock.x).toEqual(3 * TILE_SIZE + PLAYER_X_OFFSET);
+      expect(containerMock.y).toEqual(4 * TILE_SIZE + PLAYER_Y_OFFSET);
+      expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+      expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
+    });
+  });
 });

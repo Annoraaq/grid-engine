@@ -35,6 +35,7 @@ export interface CharacterData {
   characterIndex?: number; // deprecated
   speed?: TileSizePerSecond;
   startPosition?: Phaser.Math.Vector2;
+  container?: Phaser.GameObjects.Container;
 }
 
 export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
@@ -173,6 +174,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       tileSize: this.getTileSize(),
       walkingAnimationMapping: charData.walkingAnimationMapping,
       walkingAnimationEnabled: charData.walkingAnimationEnabled,
+      container: charData.container,
     };
     if (charConfig.walkingAnimationMapping == undefined) {
       charConfig.walkingAnimationMapping = charData.characterIndex;

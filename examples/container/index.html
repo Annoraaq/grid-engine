@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Grid Movement Plugin for Phaser 3 - Example - Move Player</title>
+    <title>Grid Movement Plugin for Phaser 3 - Example - Container</title>
     <script src="../GridMovementPlugin.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.52.0/dist/phaser.min.js"></script>
     <style type="text/css">
@@ -22,6 +22,8 @@
   <p>Press arrow keys to move.</p>
 
 <script type="text/javascript">
+
+  const TILE_SIZE = 48;
 
   const config = {
     title: "GridMovementPluginExample1",
@@ -54,7 +56,7 @@
   };
   var game = new Phaser.Game(config);
 
-  function preload () {
+  function preload() {
     this.load.image("tiles", "../assets/cloud_tileset.png");
     this.load.tilemapTiledJSON("cloud-city-map", "../assets/cloud_city.json");
     this.load.spritesheet("player", "../assets/characters.png", {
@@ -63,82 +65,40 @@
     });
   }
 
-  function create () {
+  function create() {
     const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
     cloudCityTilemap.addTilesetImage("Cloud City", "tiles");
     for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-      const layer = cloudCityTilemap.createStaticLayer(i, "Cloud City", 0, 0);
+      const layer = cloudCityTilemap.createLayer(i, "Cloud City", 0, 0);
       layer.scale = 3;
     }
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
-    playerSprite.setFrame(getStopFrame('down'));
-    this.cameras.main.startFollow(playerSprite);
-    this.cameras.main.roundPixels = true;
 
-    createPlayerAnimation.call(this, 'up', 90, 92)
-    createPlayerAnimation.call(this, 'right', 78, 80);
-    createPlayerAnimation.call(this, 'down', 54, 56);
-    createPlayerAnimation.call(this, 'left', 66, 68);
+    const text = this.add.text(0, -10, 'Player 1');
+    text.setColor('#000000');
+
+    const container = this.add.container(0, 0, [ playerSprite, text]);
+    this.cameras.main.startFollow(container);
+    this.cameras.main.roundPixels = true;
 
     const gridMovementConfig = {
       characters: [
         {
           id: "player",
           sprite: playerSprite,
-          walkingAnimationEnabled: false,
+          container,
+          walkingAnimationMapping: 6,
+          walkingAnimationEnabled: true,
           startPosition: new Phaser.Math.Vector2(8, 8),
         },
       ],
-      firstLayerAboveChar: 3,
     };
 
     this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
-    this.gridMovementPlugin.movementStarted().subscribe(([_charId, direction]) => {
-      playerSprite.anims.play(direction);
-    })
-    this.gridMovementPlugin.movementStopped().subscribe(([_charId, direction]) => {
-      playerSprite.anims.stop();
-      playerSprite.setFrame(getStopFrame(direction));
-    })
-
-    this.gridMovementPlugin.directionChanged().subscribe(([_charId, direction]) => {
-      playerSprite.setFrame(getStopFrame(direction));
-    })
   }
 
-  function createPlayerAnimation(
-    name,
-    startFrame,
-    endFrame,
-  ) {
-    this.anims.create({
-      key: name,
-      frames: this.anims.generateFrameNumbers("player", {
-        start: startFrame,
-        end: endFrame,
-      }),
-      frameRate: 10,
-      repeat: -1,
-      yoyo: true,
-    });
-  }
-
-
-  function getStopFrame(direction) {
-    switch (direction) {
-      case 'up':
-        return 91;
-      case 'right':
-        return 79;
-      case 'down':
-        return 55;
-      case 'left':
-        return 67;
-    }
-  }
-
-  function update () {
+  function update() {
     const cursors = this.input.keyboard.createCursorKeys();
     if (cursors.left.isDown) {
       this.gridMovementPlugin.moveLeft("player");
