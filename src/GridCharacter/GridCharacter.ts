@@ -41,7 +41,7 @@ export class GridCharacter {
   private lastFootLeft = false;
   private readonly _tilePos = new Phaser.Math.Vector2(0, 0);
   private sprite: Phaser.GameObjects.Sprite;
-  private container: Phaser.GameObjects.Container;
+  private container?: Phaser.GameObjects.Container;
   private tilemap: GridTilemap;
   private tileSize: number;
   private speed: number;
