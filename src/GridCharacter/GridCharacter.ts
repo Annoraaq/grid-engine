@@ -295,7 +295,6 @@ export class GridCharacter {
 
   private moveCharacterSpriteRestOfTile(): void {
     this.moveCharacterSprite(this.tileSize - this.tileSizePixelsWalked);
-    this.stopMoving();
   }
 
   private moveCharacterSprite(speed: number): void {
