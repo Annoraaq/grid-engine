@@ -61,6 +61,7 @@ export class GridCharacter {
     }
 
     this.sprite = config.sprite;
+    this.sprite.setOrigin(0, 0);
     this.container = config.container;
     this.tilemap = config.tilemap;
     this.tileSize = config.tileSize;
@@ -92,12 +93,18 @@ export class GridCharacter {
 
   setTilePosition(tilePosition: Phaser.Math.Vector2): void {
     if (this.isMoving()) return;
+
+    const offsetX =
+      this.tileSize / 2 -
+      Math.floor((this.sprite.width * this.sprite.scale) / 2);
+    const offsetY = -(this.sprite.height * this.sprite.scale) + this.tileSize;
+
     this.tilePos = tilePosition;
     this.updateZindex();
     this.setPosition(
       new Vector2(
-        tilePosition.x * this.tileSize + this.offsetX(),
-        tilePosition.y * this.tileSize + this.offsetY()
+        tilePosition.x * this.tileSize + offsetX,
+        tilePosition.y * this.tileSize + offsetY
       )
     );
   }
@@ -207,19 +214,6 @@ export class GridCharacter {
       Number(this.sprite.frame.name) ==
       this.framesOfDirection(direction).standing
     );
-  }
-
-  private offsetX(): number {
-    if (this.container) return 0;
-    return (
-      this.tileSize / 2 -
-      Math.floor((this.sprite.width * this.sprite.scale) / 2)
-    );
-  }
-
-  private offsetY(): number {
-    if (this.container) return 0;
-    return -(this.sprite.height * this.sprite.scale) + this.tileSize;
   }
 
   private framesOfDirection(direction: Direction): FrameRow {

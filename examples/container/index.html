@@ -72,11 +72,13 @@
       const layer = cloudCityTilemap.createLayer(i, "Cloud City", 0, 0);
       layer.scale = 3;
     }
-    const playerSprite = this.add.sprite(TILE_SIZE/2, TILE_SIZE, "player");
-    playerSprite.setOrigin(0.5, 1);
+    const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
 
-    const container = this.add.container(0, 0, [ playerSprite  ]);
+    const text = this.add.text(0, -10, 'Player 1');
+    text.setColor('#000000');
+
+    const container = this.add.container(0, 0, [ playerSprite, text]);
     this.cameras.main.startFollow(container);
     this.cameras.main.roundPixels = true;
 

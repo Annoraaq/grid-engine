@@ -609,8 +609,10 @@ describe("GridCharacter", () => {
     it("should set tile position", () => {
       gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
 
-      expect(containerMock.x).toEqual(3 * TILE_SIZE);
-      expect(containerMock.y).toEqual(4 * TILE_SIZE);
+      expect(containerMock.x).toEqual(3 * TILE_SIZE + PLAYER_X_OFFSET);
+      expect(containerMock.y).toEqual(4 * TILE_SIZE + PLAYER_Y_OFFSET);
+      expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+      expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
     });
   });
 });
