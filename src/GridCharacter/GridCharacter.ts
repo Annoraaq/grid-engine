@@ -94,21 +94,12 @@ export class GridCharacter {
     if (this.isMoving()) return;
     this.tilePos = tilePosition;
     this.updateZindex();
-    if (this.container) {
-      this.setPosition(
-        new Vector2(
-          tilePosition.x * this.tileSize,
-          tilePosition.y * this.tileSize
-        )
-      );
-    } else {
-      this.setPosition(
-        new Vector2(
-          tilePosition.x * this.tileSize + this.playerOffsetX(),
-          tilePosition.y * this.tileSize + this.playerOffsetY()
-        )
-      );
-    }
+    this.setPosition(
+      new Vector2(
+        tilePosition.x * this.tileSize + this.offsetX(),
+        tilePosition.y * this.tileSize + this.offsetY()
+      )
+    );
   }
 
   getTilePos(): Phaser.Math.Vector2 {
@@ -201,20 +192,14 @@ export class GridCharacter {
   }
 
   private setPosition(position: Phaser.Math.Vector2): void {
-    if (this.container) {
-      this.container.setPosition(position.x, position.y);
-    } else {
-      this.sprite.setOrigin(0.5, 1);
-      this.sprite.setPosition(position.x, position.y);
-    }
+    const gameObject = this.container || this.sprite;
+    gameObject.x = position.x;
+    gameObject.y = position.y;
   }
 
   private getPosition(): Phaser.Math.Vector2 {
-    if (this.container) {
-      return new Phaser.Math.Vector2(this.container.x, this.container.y);
-    } else {
-      return this.sprite.getBottomCenter();
-    }
+    const gameObject = this.container || this.sprite;
+    return new Phaser.Math.Vector2(gameObject.x, gameObject.y);
   }
 
   private isCurrentFrameStanding(direction: Direction): boolean {
@@ -224,12 +209,17 @@ export class GridCharacter {
     );
   }
 
-  private playerOffsetX(): number {
-    return this.tileSize / 2;
+  private offsetX(): number {
+    if (this.container) return 0;
+    return (
+      this.tileSize / 2 -
+      Math.floor((this.sprite.width * this.sprite.scale) / 2)
+    );
   }
 
-  private playerOffsetY(): number {
-    return this.tileSize;
+  private offsetY(): number {
+    if (this.container) return 0;
+    return -(this.sprite.height * this.sprite.scale) + this.tileSize;
   }
 
   private framesOfDirection(direction: Direction): FrameRow {
