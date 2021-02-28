@@ -8,7 +8,6 @@
 
 * [Install](usage/install.md)
 * [Collisions](usage/collisions.md)
-* [Untitled](usage/untitled.md)
 
 ## API
 
