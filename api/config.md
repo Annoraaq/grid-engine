@@ -5,7 +5,7 @@ The data shape of the configuration object is described here.
 ### Config
 
 * `characters: CharacterData[]`  An array of character data. Each describing a character on the map. 
-* `firstLayerAboveChar: number` \(**DEPRECATED**, optional\)  In your tilemap, the index of the first layer that should be rendered on top of all the character layers. _**Deprecated.** Use `gm_alwaysTop` tilemap layer property instead._
+* `firstLayerAboveChar: number` \(**DEPRECATED**, optional\)  In your tilemap, the index of the first layer that should be rendered on top of all the character layers. _**Deprecated.** Use_ [_`gm_alwaysTop`_](tilemap-layer-properties.md) _tilemap layer property instead._
 
 ### CharacterData
 
