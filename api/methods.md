@@ -21,7 +21,7 @@
 
 * `setWalkingAnimationMapping(charId: string, walkingAnimationMapping: WalkingAnimationMapping): void`
 
-  Sets the WalkingAnimationMapping for a character.  
+  Sets the [WalkingAnimationMapping](config.md#walkinganimationmapping) for a character.  
 
 * `moveRandomly(charId: string, delay?: number = 0, radius?: number = -1): void`
 
