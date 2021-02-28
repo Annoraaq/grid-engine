@@ -4,16 +4,17 @@ This Phaser 3 plugin adds a grid-based \(tile-based\) movement to your game. You
 
 ### Features:
 
-* Grid-based movement
-* Multiple characters
-* Pathfinding \(walk towards a position on the shortest path\)
-* Random movement
-* Random movement within radius
-* Follow other characters
+- Grid-based movement
+- Multiple characters
+- Pathfinding \(walk towards a position on the shortest path\)
+- Random movement
+- Random movement within radius
+- Follow other characters
 
-![](.gitbook/assets/movement.gif)
+[Check out the documentation here](https://app.gitbook.com/@annoraaq/s/phaser-grid-movement-plugin/)
 
+![](images/movement.gif)
 
+![](images/radius-movement.gif)
 
-![](.gitbook/assets/radius-movement.gif)
 
