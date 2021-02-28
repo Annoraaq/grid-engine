@@ -14,7 +14,7 @@
 
 * `moveRight(charId: string): Phaser.Math.Vector2`
 * `moveUp(charId: string): Phaser.Math.Vector2`
-* `moveDown(charId: string): Phaser.Math.Vector2`
+* `moveDown(charId: string): Phaser.Math.Vector2` 
 * `setSpeed(charId: string, speed: number): void`
 
   Sets the speed in tiles per second for a character.  

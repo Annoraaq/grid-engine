@@ -1,8 +1,6 @@
 # Table of contents
 
 * [Introduction](README.md)
-* [examples](examples/README.md)
-  * [Examples](examples/examples.md)
 
 ## Usage
 
