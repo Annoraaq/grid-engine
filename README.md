@@ -11,10 +11,10 @@ This Phaser 3 plugin adds a grid-based \(tile-based\) movement to your game. You
 - Random movement within radius
 - Follow other characters
 
+[Online Examples](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/)
+
 [Check out the documentation here](https://app.gitbook.com/@annoraaq/s/phaser-grid-movement-plugin/)
 
 ![](images/movement.gif)
 
 ![](images/radius-movement.gif)
-
-
