@@ -18,3 +18,7 @@ This Phaser 3 plugin adds a grid-based \(tile-based\) movement to your game. You
 ![](images/movement.gif)
 
 ![](images/radius-movement.gif)
+
+# Supporters
+Special thanks to the supporters of this project:
+@splashsky
