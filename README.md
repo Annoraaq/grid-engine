@@ -13,7 +13,7 @@ This Phaser 3 plugin adds a grid-based \(tile-based\) movement to your game. You
 
 [Online Examples](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/)
 
-[Check out the documentation here](https://app.gitbook.com/@annoraaq/s/phaser-grid-movement-plugin/)
+[Check out the documentation here](https://github.com/Annoraaq/phaser-grid-movement-plugin/wiki)
 
 ![](images/movement.gif)
 
