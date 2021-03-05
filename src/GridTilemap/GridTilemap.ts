@@ -1,3 +1,4 @@
+import { Direction } from "./../Direction/Direction";
 import * as Phaser from "phaser";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
 
@@ -29,19 +30,24 @@ export class GridTilemap {
     return [...this.characters.values()];
   }
 
-  isBlocking(pos: Vector2): boolean {
+  isBlocking(pos: Vector2, direction?: Direction): boolean {
     return (
       this.hasNoTile(pos) ||
-      this.hasBlockingTile(pos) ||
+      this.hasBlockingTile(pos, direction) ||
       this.hasBlockingChar(pos)
     );
   }
 
-  hasBlockingTile(pos: Vector2): boolean {
+  hasBlockingTile(pos: Vector2, direction?: Direction): boolean {
     if (this.hasNoTile(pos)) return true;
+
+    const collidesPropName = `gm_collide_${direction}`;
     return this.tilemap.layers.some((layer) => {
       const tile = this.tilemap.getTileAt(pos.x, pos.y, false, layer.name);
-      return tile?.properties?.collides;
+      return (
+        tile?.properties?.collides ||
+        (tile?.properties && tile?.properties[collidesPropName])
+      );
     });
   }
 
