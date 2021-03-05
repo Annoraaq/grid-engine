@@ -11,6 +11,7 @@
 - Random Character Movement Within Raddius [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/radius-movement/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/radius-movement/index.html)
 - Height Shift Of Tilemap Layer [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/height-shift/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/height-shift/index.html)
 - Container Support [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/container/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/container/index.html)
+- One Way Tile Collision[[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/one-way-collision/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/one-way-collision/index.html)
 
 ## Try Offline
 

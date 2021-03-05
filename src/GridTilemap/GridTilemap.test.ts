@@ -1,4 +1,4 @@
-import { GridCharacter } from "./../GridCharacter/GridCharacter";
+import { Direction } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
 
 describe("GridTilemapPlugin", () => {
@@ -198,6 +198,118 @@ describe("GridTilemapPlugin", () => {
       false,
       "layer2"
     );
+  });
+
+  it("should detect one-way blocking tiles left", () => {
+    tilemapMock.hasTileAt.mockReturnValue(true);
+    tilemapMock.getTileAt.mockReturnValue({
+      properties: { gm_collide_left: true, gm_collide_right: false },
+    });
+    gridTilemap = new GridTilemap(tilemapMock, 3);
+    const isBlockingLeft = gridTilemap.isBlocking(
+      new Phaser.Math.Vector2(3, 4),
+      Direction.LEFT
+    );
+    const isBlockingRight = gridTilemap.isBlocking(
+      new Phaser.Math.Vector2(3, 4),
+      Direction.RIGHT
+    );
+    const isBlockingUp = gridTilemap.isBlocking(
+      new Phaser.Math.Vector2(3, 4),
+      Direction.UP
+    );
+    const isBlockingDown = gridTilemap.isBlocking(
+      new Phaser.Math.Vector2(3, 4),
+      Direction.DOWN
+    );
+    expect(isBlockingLeft).toBe(true);
+    expect(isBlockingRight).toBe(false);
+    expect(isBlockingUp).toBe(false);
+    expect(isBlockingDown).toBe(false);
+  });
+
+  it("should detect one-way blocking tiles right", () => {
+    tilemapMock.hasTileAt.mockReturnValue(true);
+    tilemapMock.getTileAt.mockReturnValue({
+      properties: { gm_collide_right: true },
+    });
+    gridTilemap = new GridTilemap(tilemapMock, 3);
+    const isBlockingLeft = gridTilemap.isBlocking(
+      new Phaser.Math.Vector2(3, 4),
+      Direction.LEFT
+    );
+    const isBlockingRight = gridTilemap.isBlocking(
+      new Phaser.Math.Vector2(3, 4),
+      Direction.RIGHT
+    );
+    const isBlockingUp = gridTilemap.isBlocking(
+      new Phaser.Math.Vector2(3, 4),
+      Direction.UP
+    );
+    const isBlockingDown = gridTilemap.isBlocking(
+      new Phaser.Math.Vector2(3, 4),
+      Direction.DOWN
+    );
+    expect(isBlockingLeft).toBe(false);
+    expect(isBlockingRight).toBe(true);
+    expect(isBlockingUp).toBe(false);
+    expect(isBlockingDown).toBe(false);
+  });
+
+  it("should detect one-way blocking tiles up", () => {
+    tilemapMock.hasTileAt.mockReturnValue(true);
+    tilemapMock.getTileAt.mockReturnValue({
+      properties: { gm_collide_up: true },
+    });
+    gridTilemap = new GridTilemap(tilemapMock, 3);
+    const isBlockingLeft = gridTilemap.isBlocking(
+      new Phaser.Math.Vector2(3, 4),
+      Direction.LEFT
+    );
+    const isBlockingRight = gridTilemap.isBlocking(
+      new Phaser.Math.Vector2(3, 4),
+      Direction.RIGHT
+    );
+    const isBlockingUp = gridTilemap.isBlocking(
+      new Phaser.Math.Vector2(3, 4),
+      Direction.UP
+    );
+    const isBlockingDown = gridTilemap.isBlocking(
+      new Phaser.Math.Vector2(3, 4),
+      Direction.DOWN
+    );
+    expect(isBlockingLeft).toBe(false);
+    expect(isBlockingRight).toBe(false);
+    expect(isBlockingUp).toBe(true);
+    expect(isBlockingDown).toBe(false);
+  });
+
+  it("should detect one-way blocking tiles down", () => {
+    tilemapMock.hasTileAt.mockReturnValue(true);
+    tilemapMock.getTileAt.mockReturnValue({
+      properties: { gm_collide_down: true },
+    });
+    gridTilemap = new GridTilemap(tilemapMock, 3);
+    const isBlockingLeft = gridTilemap.isBlocking(
+      new Phaser.Math.Vector2(3, 4),
+      Direction.LEFT
+    );
+    const isBlockingRight = gridTilemap.isBlocking(
+      new Phaser.Math.Vector2(3, 4),
+      Direction.RIGHT
+    );
+    const isBlockingUp = gridTilemap.isBlocking(
+      new Phaser.Math.Vector2(3, 4),
+      Direction.UP
+    );
+    const isBlockingDown = gridTilemap.isBlocking(
+      new Phaser.Math.Vector2(3, 4),
+      Direction.DOWN
+    );
+    expect(isBlockingLeft).toBe(false);
+    expect(isBlockingRight).toBe(false);
+    expect(isBlockingUp).toBe(false);
+    expect(isBlockingDown).toBe(true);
   });
 
   it("should return true if nothing blocks", () => {

@@ -1,4 +1,4 @@
-import { DirectionVectors } from "./../Direction/Direction";
+import { DirectionVectors, oppositeDirection } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
 import * as Phaser from "phaser";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
@@ -141,8 +141,10 @@ export class GridCharacter {
   isBlockingDirection(direction: Direction): boolean {
     if (direction == Direction.NONE) return false;
     return (
-      this.tilemap.hasBlockingTile(this.tilePosInDirection(direction)) ||
-      this.tilemap.hasBlockingChar(this.tilePosInDirection(direction))
+      this.tilemap.hasBlockingTile(
+        this.tilePosInDirection(direction),
+        oppositeDirection(direction)
+      ) || this.tilemap.hasBlockingChar(this.tilePosInDirection(direction))
     );
   }
 

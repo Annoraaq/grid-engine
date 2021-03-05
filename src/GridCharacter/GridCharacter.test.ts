@@ -326,14 +326,18 @@ describe("GridCharacter", () => {
 
     it("should detect non-blocking direction", () => {
       const direction = Direction.RIGHT;
+      const oppositeDirection = Direction.LEFT;
       gridTilemapMock.hasBlockingTile.mockReturnValue(false);
       gridTilemapMock.hasBlockingChar.mockReturnValue(false);
 
       const result = gridCharacter.isBlockingDirection(direction);
-      expect(gridTilemapMock.hasBlockingTile).toHaveBeenCalledWith({
-        x: 1,
-        y: 0,
-      });
+      expect(gridTilemapMock.hasBlockingTile).toHaveBeenCalledWith(
+        {
+          x: 1,
+          y: 0,
+        },
+        oppositeDirection
+      );
       expect(gridTilemapMock.hasBlockingChar).toHaveBeenCalledWith({
         x: 1,
         y: 0,
