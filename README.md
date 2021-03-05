@@ -10,6 +10,8 @@ This Phaser 3 plugin adds a grid-based \(tile-based\) movement to your game. You
 - Random movement
 - Random movement within radius
 - Follow other characters
+- Tile based collision detection
+- One-way collision detection
 
 [Online Examples](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/)
 
@@ -20,5 +22,6 @@ This Phaser 3 plugin adds a grid-based \(tile-based\) movement to your game. You
 ![](images/radius-movement.gif)
 
 # Supporters
+
 Special thanks to the supporters of this project:
 @splashsky
