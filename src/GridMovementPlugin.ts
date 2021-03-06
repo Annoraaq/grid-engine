@@ -5,6 +5,7 @@ import {
   CharConfig,
   FrameRow,
   GridCharacter,
+  PositionChange,
 } from "./GridCharacter/GridCharacter";
 import "phaser";
 import { Direction } from "./Direction/Direction";
@@ -49,6 +50,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   private movementStopped$ = new Subject<[string, Direction]>();
   private movementStarted$ = new Subject<[string, Direction]>();
   private directionChanged$ = new Subject<[string, Direction]>();
+  private positionChanged$ = new Subject<{ charId: string } & PositionChange>();
   private charRemoved$ = new Subject<string>();
 
   constructor(
@@ -212,6 +214,17 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       .subscribe((direction: Direction) => {
         this.directionChanged$.next([gridChar.getId(), direction]);
       });
+
+    gridChar
+      .positionChanged()
+      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
+      .subscribe(({ exitTile, enterTile }) => {
+        this.positionChanged$.next({
+          charId: gridChar.getId(),
+          exitTile,
+          enterTile,
+        });
+      });
   }
 
   private takeUntilCharRemoved(charId: string) {
@@ -267,6 +280,10 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
 
   directionChanged(): Observable<[string, Direction]> {
     return this.directionChanged$;
+  }
+
+  positionChanged(): Observable<{ charId: string } & PositionChange> {
+    return this.positionChanged$;
   }
 
   private initGuard() {

@@ -16,6 +16,11 @@ export interface FrameRow {
 
 export type CharacterIndex = number;
 
+export interface PositionChange {
+  exitTile: Vector2;
+  enterTile: Vector2;
+}
+
 export interface CharConfig {
   sprite: Phaser.GameObjects.Sprite;
   tilemap: GridTilemap;
@@ -51,6 +56,7 @@ export class GridCharacter {
   private movementStarted$ = new Subject<Direction>();
   private movementStopped$ = new Subject<Direction>();
   private directionChanged$ = new Subject<Direction>();
+  private positionChanged$ = new Subject<PositionChange>();
   private lastMovementImpulse = Direction.NONE;
 
   constructor(private id: string, config: CharConfig) {
@@ -170,6 +176,10 @@ export class GridCharacter {
 
   directionChanged(): Subject<Direction> {
     return this.directionChanged$;
+  }
+
+  positionChanged(): Subject<PositionChange> {
+    return this.positionChanged$;
   }
 
   private get tilePos() {
