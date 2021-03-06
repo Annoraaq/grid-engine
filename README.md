@@ -20,7 +20,7 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
 * Random movement (can also limit to a radius)
 * Following other characters
 
-📖 Our most current documentation [is here](https://annoraaq.github.io/phaser-grid-movement-plugin/wiki/)!  
+📖 Our most current documentation [is here](https://github.com/Annoraaq/phaser-grid-movement-plugin/wiki)!  
 ➡️ You can try/download a list of examples [at this link here](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/).
 
 <p align="center">
