@@ -266,6 +266,12 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.followMovement.removeCharacter(charId);
   }
 
+  isMoving(charId: string): boolean {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    return this.gridCharacters.get(charId).isMoving();
+  }
+
   movementStarted(): Observable<[string, Direction]> {
     return this.movementStarted$;
   }

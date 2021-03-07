@@ -19,6 +19,7 @@ const mockMovementStarted = jest.fn();
 const mockMovementStopped = jest.fn();
 const mockDirectionChanged = jest.fn();
 const mockPositionChanged = jest.fn();
+const mockIsMoving = jest.fn();
 const mockFollowMovement = {
   addCharacter: jest.fn(),
   removeCharacter: jest.fn(),
@@ -74,6 +75,7 @@ jest.mock("./GridCharacter/GridCharacter", function () {
         movementStopped: mockMovementStopped,
         directionChanged: mockDirectionChanged,
         positionChanged: mockPositionChanged,
+        isMoving: mockIsMoving,
       };
     }),
   };
@@ -740,6 +742,26 @@ describe("GridMovementPlugin", () => {
     expect(mockSetWalkingAnimationMapping).toHaveBeenCalledWith(mockMapping);
   });
 
+  it("should delegate isMoving", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
+    });
+
+    mockIsMoving.mockReturnValue(true);
+    let isMoving = gridMovementPlugin.isMoving("player");
+    expect(isMoving).toEqual(true);
+    mockIsMoving.mockReturnValue(false);
+    isMoving = gridMovementPlugin.isMoving("player");
+    expect(isMoving).toEqual(false);
+  });
+
   describe("Observables", () => {
     it("should get chars movementStarted observable", async () => {
       const mockSubject = new Subject<Direction>();
@@ -1058,6 +1080,12 @@ describe("GridMovementPlugin", () => {
         gridMovementPlugin.setWalkingAnimationMapping("unknownCharId", <any>{})
       ).toThrow("Character unknown");
     });
+
+    it("should throw error if isMoving is invoked", () => {
+      expect(() => gridMovementPlugin.isMoving("unknownCharId")).toThrow(
+        "Character unknown"
+      );
+    });
   });
 
   describe("invokation of methods if not created properly", () => {
@@ -1157,6 +1185,12 @@ describe("GridMovementPlugin", () => {
       expect(() =>
         gridMovementPlugin.setWalkingAnimationMapping("someCharId", <any>{})
       ).toThrow("Plugin not initialized");
+    });
+
+    it("should throw error if isMoving is invoked", () => {
+      expect(() => gridMovementPlugin.isMoving("someCharId")).toThrow(
+        "Plugin not initialized"
+      );
     });
   });
 });
