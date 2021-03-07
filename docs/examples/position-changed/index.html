@@ -71,8 +71,14 @@
     }
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
-    this.cameras.main.startFollow(playerSprite);
+
+    const text = this.add.text(-20, -20, '');
+
+    const container = this.add.container(0, 0, [ playerSprite, text]);
+
+    this.cameras.main.startFollow(container);
     this.cameras.main.roundPixels = true;
+
 
     const gridMovementConfig = {
       characters: [
@@ -81,6 +87,7 @@
           sprite: playerSprite,
           walkingAnimationMapping: 6,
           startPosition: new Phaser.Math.Vector2(8, 12),
+          container
         },
       ],
     };
@@ -100,6 +107,7 @@
     this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
 
     this.gridMovementPlugin.positionChanged().subscribe(({charId, exitTile, enterTile}) => {
+      text.text = `exit: (${exitTile.x}, ${exitTile.y})\nenter: (${enterTile.x}, ${enterTile.y})`;
 
       const entersShop = cloudCityTilemap.layers.some((layer) => {
         const tile = cloudCityTilemap.getTileAt(enterTile.x, enterTile.y, false, layer.name);
