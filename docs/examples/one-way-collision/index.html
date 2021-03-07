@@ -65,11 +65,10 @@
 
   function create () {
 
-
-    const cloudCityTilemap = this.make.tilemap({ key: "jungle" });
-    cloudCityTilemap.addTilesetImage("jungle", "tiles");
-    for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-      const layer = cloudCityTilemap.createLayer(i, "jungle", 0, 0);
+    const jungleTilemap = this.make.tilemap({ key: "jungle" });
+    jungleTilemap.addTilesetImage("jungle", "tiles");
+    for (let i = 0; i < jungleTilemap.layers.length; i++) {
+      const layer = jungleTilemap.createLayer(i, "jungle", 0, 0);
       layer.scale = 3;
     }
     const playerSprite = this.add.sprite(0, 0, "player");
@@ -88,7 +87,7 @@
       ],
     };
 
-    this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
+    this.gridMovementPlugin.create(jungleTilemap, gridMovementConfig);
 
     const r1 = this.add.triangle(16 * 48 + 24, 9 * 48 + 24, 0, 0, 24, 0, 12, 24, 0xffffff);
     const r2 = this.add.triangle(16 * 48 + 24, 10 * 48 + 24, 0, 0, 24, 0, 12, 24, 0xffffff);

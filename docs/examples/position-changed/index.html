@@ -64,10 +64,10 @@
   }
 
   function create () {
-    const cloudCityTilemap = this.make.tilemap({ key: "jungle" });
-    cloudCityTilemap.addTilesetImage("jungle", "tiles");
-    for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-      const layer = cloudCityTilemap.createLayer(i, "jungle", 0, 0);
+    const jungleTilemap = this.make.tilemap({ key: "jungle" });
+    jungleTilemap.addTilesetImage("jungle", "tiles");
+    for (let i = 0; i < jungleTilemap.layers.length; i++) {
+      const layer = jungleTilemap.createLayer(i, "jungle", 0, 0);
       layer.scale = 3;
     }
     const playerSprite = this.add.sprite(0, 0, "player");
@@ -95,39 +95,24 @@
     };
 
     const shopText = this.add.text(6* 48, 10*48, 'You are standing on a special tile!', { fontSize: 25, });
-    shopText.setColor('#ffffff');
     shopText.setVisible(false);
     shopText.depth = 3000;
 
     const hint = this.add.text(7* 48, 14*48, 'Step on the colored tile', { fontSize: 25, });
-    hint.setColor('#ffffff');
     hint.depth = 3000;
 
-    tintTile(cloudCityTilemap, 13, 11, 0x6eff94);
+    tintTile(jungleTilemap, 13, 11, 0x6eff94);
 
-    this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
+    this.gridMovementPlugin.create(jungleTilemap, gridMovementConfig);
 
     this.gridMovementPlugin.positionChanged().subscribe(({charId, exitTile, enterTile}) => {
-      positionChangeText.text = `exit: (${exitTile.x}, ${exitTile.y})\nenter: (${enterTile.x}, ${enterTile.y})`;
+      positionChangeText.text = `exit: (${exitTile.x}, ${exitTile.y})\n`
+        + `enter: (${enterTile.x}, ${enterTile.y})`;
 
-      const entersShop = cloudCityTilemap.layers.some((layer) => {
-        const tile = cloudCityTilemap.getTileAt(enterTile.x, enterTile.y, false, layer.name);
-        return (
-          tile?.properties?.trigger
-        );
-      });
-
-      const leavesShop = cloudCityTilemap.layers.some((layer) => {
-        const tile = cloudCityTilemap.getTileAt(exitTile.x, exitTile.y, false, layer.name);
-        return (
-          tile?.properties?.trigger
-        );
-      });
-
-      if (entersShop) {
+      if (hasTrigger(jungleTilemap, enterTile)) {
         shopText.setVisible(true);
       }
-      if (leavesShop) {
+      if (hasTrigger(jungleTilemap, exitTile)) {
         shopText.setVisible(false);
       }
     });
@@ -152,6 +137,13 @@
     for (let i = 0; i < tilemap.layers.length; i++) {
       tilemap.layers[i].tilemapLayer.layer.data[row][col].tint = color;
     }
+  }
+
+  function hasTrigger(tilemap, position) {
+    return tilemap.layers.some((layer) => {
+      const tile = tilemap.getTileAt(position.x, position.y, false, layer.name);
+      return tile?.properties?.trigger;
+    });
   }
 
 </script>
