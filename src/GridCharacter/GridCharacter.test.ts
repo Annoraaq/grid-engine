@@ -111,7 +111,7 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getTilePos()).toEqual(expectedPos);
   });
 
-  it("should start movement", async () => {
+  it("should start movement", async (done) => {
     mockNonBlockingTile();
     expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, 0));
     const movementStartedProm = gridCharacter
@@ -119,8 +119,15 @@ describe("GridCharacter", () => {
       .pipe(take(1))
       .toPromise();
 
+    gridCharacter.positionChanged().subscribe(({ exitTile, enterTile }) => {
+      expect(exitTile).toEqual(new Phaser.Math.Vector2(0, 0));
+      expect(enterTile).toEqual(new Phaser.Math.Vector2(0, -1));
+      done();
+    });
+
     gridCharacter.move(Direction.UP);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+    expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, -1));
     expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, -1));
     const dir = await movementStartedProm;
     expect(dir).toEqual(Direction.UP);

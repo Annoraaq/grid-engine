@@ -227,10 +227,6 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       });
   }
 
-  private takeUntilCharRemoved(charId: string) {
-    return takeUntil(this.charRemoved$.pipe(filter((cId) => cId == charId)));
-  }
-
   hasCharacter(charId: string): boolean {
     this.initGuard();
     return this.gridCharacters.has(charId);
@@ -284,6 +280,10 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
 
   positionChanged(): Observable<{ charId: string } & PositionChange> {
     return this.positionChanged$;
+  }
+
+  private takeUntilCharRemoved(charId: string) {
+    return takeUntil(this.charRemoved$.pipe(filter((cId) => cId == charId)));
   }
 
   private initGuard() {

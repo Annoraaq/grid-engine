@@ -266,7 +266,14 @@ export class GridCharacter {
   }
 
   private updateTilePos() {
-    this.tilePos = this.tilePos.add(DirectionVectors[this.movementDirection]);
+    const newTilePos = this.tilePos.add(
+      DirectionVectors[this.movementDirection]
+    );
+    this.positionChanged$.next({
+      exitTile: this.tilePos,
+      enterTile: newTilePos,
+    });
+    this.tilePos = newTilePos;
   }
 
   private tilePosInDirection(direction: Direction): Vector2 {
