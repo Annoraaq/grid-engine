@@ -58,6 +58,7 @@ export class GridCharacter {
   private directionChanged$ = new Subject<Direction>();
   private positionChanged$ = new Subject<PositionChange>();
   private lastMovementImpulse = Direction.NONE;
+  private facingDirection = Direction.DOWN;
 
   constructor(private id: string, config: CharConfig) {
     if (typeof config.walkingAnimationMapping == "number") {
@@ -124,6 +125,7 @@ export class GridCharacter {
     if (direction == Direction.NONE) return;
     if (this.isMoving()) return;
     if (this.isBlockingDirection(direction)) {
+      this.facingDirection = direction;
       if (this.walkingAnimation) {
         this.setStandingFrame(direction);
       }
@@ -161,9 +163,14 @@ export class GridCharacter {
   turnTowards(direction: Direction) {
     if (this.isMoving()) return;
     if (direction == Direction.NONE) return;
+    this.facingDirection = direction;
     if (this.walkingAnimation) {
       this.sprite.setFrame(this.framesOfDirection(direction).standing);
     }
+  }
+
+  getFacingDirection(): Direction {
+    return this.facingDirection;
   }
 
   movementStarted(): Subject<Direction> {
@@ -262,6 +269,7 @@ export class GridCharacter {
   private startMoving(direction: Direction): void {
     this.movementStarted$.next(direction);
     this.movementDirection = direction;
+    this.facingDirection = direction;
     this.updateTilePos();
   }
 

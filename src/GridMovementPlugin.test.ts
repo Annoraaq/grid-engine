@@ -20,6 +20,8 @@ const mockMovementStopped = jest.fn();
 const mockDirectionChanged = jest.fn();
 const mockPositionChanged = jest.fn();
 const mockIsMoving = jest.fn();
+const mockFacingDirection = jest.fn();
+const mockTurnTowards = jest.fn();
 const mockFollowMovement = {
   addCharacter: jest.fn(),
   removeCharacter: jest.fn(),
@@ -76,6 +78,8 @@ jest.mock("./GridCharacter/GridCharacter", function () {
         directionChanged: mockDirectionChanged,
         positionChanged: mockPositionChanged,
         isMoving: mockIsMoving,
+        getFacingDirection: mockFacingDirection,
+        turnTowards: mockTurnTowards,
       };
     }),
   };
@@ -762,6 +766,39 @@ describe("GridMovementPlugin", () => {
     expect(isMoving).toEqual(false);
   });
 
+  it("should delegate getFacingDirection", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
+    });
+
+    mockFacingDirection.mockReturnValue(Direction.LEFT);
+    const facingDirection = gridMovementPlugin.getFacingDirection("player");
+    expect(facingDirection).toEqual(Direction.LEFT);
+  });
+
+  it("should delegate turnTowards", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
+    });
+
+    gridMovementPlugin.turnTowards("player", Direction.RIGHT);
+    expect(mockTurnTowards).toHaveBeenCalledWith(Direction.RIGHT);
+  });
+
   describe("Observables", () => {
     it("should get chars movementStarted observable", async () => {
       const mockSubject = new Subject<Direction>();
@@ -1086,6 +1123,18 @@ describe("GridMovementPlugin", () => {
         "Character unknown"
       );
     });
+
+    it("should throw error if getFacingDirectiion is invoked", () => {
+      expect(() =>
+        gridMovementPlugin.getFacingDirection("unknownCharId")
+      ).toThrow("Character unknown");
+    });
+
+    it("should throw error if turnTowards is invoked", () => {
+      expect(() =>
+        gridMovementPlugin.turnTowards("unknownCharId", Direction.LEFT)
+      ).toThrow("Character unknown");
+    });
   });
 
   describe("invokation of methods if not created properly", () => {
@@ -1191,6 +1240,18 @@ describe("GridMovementPlugin", () => {
       expect(() => gridMovementPlugin.isMoving("someCharId")).toThrow(
         "Plugin not initialized"
       );
+    });
+
+    it("should throw error if getFacingDirection is invoked", () => {
+      expect(() => gridMovementPlugin.getFacingDirection("someCharId")).toThrow(
+        "Plugin not initialized"
+      );
+    });
+
+    it("should throw error if turnTowards is invoked", () => {
+      expect(() =>
+        gridMovementPlugin.turnTowards("someCharId", Direction.LEFT)
+      ).toThrow("Plugin not initialized");
     });
   });
 });

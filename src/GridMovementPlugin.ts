@@ -272,6 +272,18 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     return this.gridCharacters.get(charId).isMoving();
   }
 
+  getFacingDirection(charId: string): Direction {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    return this.gridCharacters.get(charId).getFacingDirection();
+  }
+
+  turnTowards(charId: string, direction: Direction): void {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    return this.gridCharacters.get(charId).turnTowards(direction);
+  }
+
   movementStarted(): Observable<[string, Direction]> {
     return this.movementStarted$;
   }

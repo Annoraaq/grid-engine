@@ -101,6 +101,10 @@ describe("GridCharacter", () => {
     expect(spriteMock.setDepth).toHaveBeenCalledWith(1000);
   });
 
+  it("should be facing down on construction", () => {
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
+  });
+
   it("should get tile pos", () => {
     const expectedPos = new Phaser.Math.Vector2(5, 6);
     const newTilePos = new Phaser.Math.Vector2(5, 6);
@@ -127,6 +131,7 @@ describe("GridCharacter", () => {
 
     gridCharacter.move(Direction.UP);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, -1));
     expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, -1));
     const dir = await movementStartedProm;
@@ -154,6 +159,7 @@ describe("GridCharacter", () => {
     expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 12);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
     expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 - 1);
   });
 
@@ -177,6 +183,7 @@ describe("GridCharacter", () => {
     expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 16);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
   });
 
   it("should set tile position", () => {
@@ -387,21 +394,25 @@ describe("GridCharacter", () => {
     it("should turn towards left", () => {
       gridCharacter.turnTowards(Direction.LEFT);
       expect(spriteMock.setFrame).toHaveBeenCalledWith(46);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
     });
 
     it("should turn towards right", () => {
       gridCharacter.turnTowards(Direction.RIGHT);
       expect(spriteMock.setFrame).toHaveBeenCalledWith(55);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
     });
 
     it("should turn towards up", () => {
       gridCharacter.turnTowards(Direction.UP);
       expect(spriteMock.setFrame).toHaveBeenCalledWith(64);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
     });
 
     it("should turn towards down", () => {
       gridCharacter.turnTowards(Direction.DOWN);
       expect(spriteMock.setFrame).toHaveBeenCalledWith(37);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
     });
 
     it("should not turn if moving", () => {
