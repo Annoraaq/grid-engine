@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Grid Movement Plugin for Phaser 3 - Example - Position Changed</title>
+    <title>Grid Movement Plugin for Phaser 3 - Example - isMoving</title>
     <script src="../GridMovementPlugin.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.52.0/dist/phaser.min.js"></script>
     <style type="text/css">
@@ -52,6 +52,7 @@
     parent: "game",
   };
   var game = new Phaser.Game(config);
+  let isMovingText;
 
   function preload () {
     this.load.image("tiles", "../assets/tf_jungle_tileset.png");
@@ -72,9 +73,9 @@
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
 
-    const positionChangeText = this.add.text(-20, -50, '');
+    isMovingText = this.add.text(-20, -10, '');
 
-    const container = this.add.container(0, 0, [ playerSprite, positionChangeText ]);
+    const container = this.add.container(0, 0, [ playerSprite, isMovingText]);
 
     this.cameras.main.startFollow(container);
     this.cameras.main.roundPixels = true;
@@ -92,28 +93,8 @@
       ],
     };
 
-    const shopText = this.add.text(6* 48, 10*48, 'You are standing on a special tile!', { fontSize: 25, });
-    shopText.setVisible(false);
-    shopText.depth = 3000;
-
-    const hint = this.add.text(7* 48, 14*48, 'Step on the colored tile', { fontSize: 25, });
-    hint.depth = 3000;
-
-    tintTile(jungleTilemap, 13, 11, 0x6eff94);
 
     this.gridMovementPlugin.create(jungleTilemap, gridMovementConfig);
-
-    this.gridMovementPlugin.positionChanged().subscribe(({charId, exitTile, enterTile}) => {
-      positionChangeText.text = `exit: (${exitTile.x}, ${exitTile.y})\n`
-        + `enter: (${enterTile.x}, ${enterTile.y})`;
-
-      if (hasTrigger(jungleTilemap, enterTile)) {
-        shopText.setVisible(true);
-      }
-      if (hasTrigger(jungleTilemap, exitTile)) {
-        shopText.setVisible(false);
-      }
-    });
   }
 
   function update () {
@@ -127,21 +108,9 @@
     } else if (cursors.down.isDown) {
       this.gridMovementPlugin.moveDown("player");
     }
-  }
 
-  function tintTile(tilemap, row, col, color) {
-    for (let i = 0; i < tilemap.layers.length; i++) {
-      tilemap.layers[i].tilemapLayer.layer.data[row][col].tint = color;
-    }
+    isMovingText.text = `isMoving: ${this.gridMovementPlugin.isMoving('player')}`;
   }
-
-  function hasTrigger(tilemap, position) {
-    return tilemap.layers.some((layer) => {
-      const tile = tilemap.getTileAt(position.x, position.y, false, layer.name);
-      return tile?.properties?.trigger;
-    });
-  }
-
 </script>
 
 </body>
