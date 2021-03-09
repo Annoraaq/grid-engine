@@ -73,7 +73,7 @@
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
 
-    facingDirectionText = this.add.text(-20, -10, '');
+    facingDirectionText = this.add.text(-60, -10, '');
 
     const container = this.add.container(0, 0, [ playerSprite, facingDirectionText]);
 
@@ -87,7 +87,6 @@
           id: "player",
           sprite: playerSprite,
           walkingAnimationMapping: 6,
-          walkingAnimationEnabled: false,
           startPosition: new Phaser.Math.Vector2(8, 12),
           container
         },
