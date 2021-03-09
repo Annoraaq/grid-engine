@@ -13,7 +13,7 @@
 - Container Support [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/container/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/container/index.html)
 - One Way Tile Collision [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/one-way-collision/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/one-way-collision/index.html)
 - Position Changed Observable [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/position-chaanged/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/position-changed/index.html)
-- Check for Movement [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/is-mooving/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/is-moving/index.html)
+- Check for Movement [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/is-moving/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/is-moving/index.html)
 - Facing Direction [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/facing-direction/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/facing-direction/index.html)
 
 ## Try Offline
