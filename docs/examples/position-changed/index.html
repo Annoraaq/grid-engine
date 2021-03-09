@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Grid Movement Plugin for Phaser 3 - Example - One-Way Collision</title>
+    <title>Grid Movement Plugin for Phaser 3 - Example - Position Changed</title>
     <script src="../GridMovementPlugin.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.52.0/dist/phaser.min.js"></script>
     <style type="text/css">
@@ -20,7 +20,6 @@
 
   <div id="game"></div>
   <p>Press arrow keys to move.</p>
-  <p>The liana can only be climbed down, not up.</p>
 
 <script type="text/javascript">
 
@@ -56,7 +55,7 @@
 
   function preload () {
     this.load.image("tiles", "../assets/tf_jungle_tileset.png");
-    this.load.tilemapTiledJSON("jungle", "../assets/one-way.json");
+    this.load.tilemapTiledJSON("jungle", "../assets/jungle-small.json");
     this.load.spritesheet("player", "../assets/characters.png", {
       frameWidth: 52,
       frameHeight: 72,
@@ -64,7 +63,6 @@
   }
 
   function create () {
-
     const jungleTilemap = this.make.tilemap({ key: "jungle" });
     jungleTilemap.addTilesetImage("jungle", "tiles");
     for (let i = 0; i < jungleTilemap.layers.length; i++) {
@@ -73,8 +71,14 @@
     }
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
-    this.cameras.main.startFollow(playerSprite);
+
+    const positionChangeText = this.add.text(-20, -50, '');
+
+    const container = this.add.container(0, 0, [ playerSprite, positionChangeText ]);
+
+    this.cameras.main.startFollow(container);
     this.cameras.main.roundPixels = true;
+
 
     const gridMovementConfig = {
       characters: [
@@ -82,23 +86,33 @@
           id: "player",
           sprite: playerSprite,
           walkingAnimationMapping: 6,
-          startPosition: new Phaser.Math.Vector2(16, 8),
+          startPosition: new Phaser.Math.Vector2(8, 12),
+          container
         },
       ],
     };
 
+    const shopText = this.add.text(6* 48, 10*48, 'You are standing on a special tile!', { fontSize: 25, });
+    shopText.setVisible(false);
+    shopText.depth = 3000;
+
+    const hint = this.add.text(7* 48, 14*48, 'Step on the colored tile', { fontSize: 25, });
+    hint.depth = 3000;
+
+    tintTile(jungleTilemap, 13, 11, 0x6eff94);
+
     this.gridMovementPlugin.create(jungleTilemap, gridMovementConfig);
 
-    const r1 = this.add.triangle(16 * 48 + 24, 9 * 48 + 24, 0, 0, 24, 0, 12, 24, 0xffffff);
-    const r2 = this.add.triangle(16 * 48 + 24, 10 * 48 + 24, 0, 0, 24, 0, 12, 24, 0xffffff);
-    const r3 = this.add.triangle(16 * 48 + 24, 11 * 48 + 24, 0, 0, 24, 0, 12, 24, 0xffffff);
-    this.tweens.add({
-        targets: [r1,r2,r3],
-        alpha: 0.2,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut'
+    this.gridMovementPlugin.positionChanged().subscribe(({charId, exitTile, enterTile}) => {
+      positionChangeText.text = `exit: (${exitTile.x}, ${exitTile.y})\n`
+        + `enter: (${enterTile.x}, ${enterTile.y})`;
 
+      if (hasTrigger(jungleTilemap, enterTile)) {
+        shopText.setVisible(true);
+      }
+      if (hasTrigger(jungleTilemap, exitTile)) {
+        shopText.setVisible(false);
+      }
     });
   }
 
@@ -113,6 +127,19 @@
     } else if (cursors.down.isDown) {
       this.gridMovementPlugin.moveDown("player");
     }
+  }
+
+  function tintTile(tilemap, row, col, color) {
+    for (let i = 0; i < tilemap.layers.length; i++) {
+      tilemap.layers[i].tilemapLayer.layer.data[row][col].tint = color;
+    }
+  }
+
+  function hasTrigger(tilemap, position) {
+    return tilemap.layers.some((layer) => {
+      const tile = tilemap.getTileAt(position.x, position.y, false, layer.name);
+      return tile?.properties?.trigger;
+    });
   }
 
 </script>

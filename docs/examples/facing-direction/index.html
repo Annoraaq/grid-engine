@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Grid Movement Plugin for Phaser 3 - Example - One-Way Collision</title>
+    <title>Grid Movement Plugin for Phaser 3 - Example - Facing Direction</title>
     <script src="../GridMovementPlugin.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.52.0/dist/phaser.min.js"></script>
     <style type="text/css">
@@ -20,7 +20,6 @@
 
   <div id="game"></div>
   <p>Press arrow keys to move.</p>
-  <p>The liana can only be climbed down, not up.</p>
 
 <script type="text/javascript">
 
@@ -53,10 +52,11 @@
     parent: "game",
   };
   var game = new Phaser.Game(config);
+  let facingDirectionText;
 
   function preload () {
     this.load.image("tiles", "../assets/tf_jungle_tileset.png");
-    this.load.tilemapTiledJSON("jungle", "../assets/one-way.json");
+    this.load.tilemapTiledJSON("jungle", "../assets/jungle-small.json");
     this.load.spritesheet("player", "../assets/characters.png", {
       frameWidth: 52,
       frameHeight: 72,
@@ -64,7 +64,6 @@
   }
 
   function create () {
-
     const jungleTilemap = this.make.tilemap({ key: "jungle" });
     jungleTilemap.addTilesetImage("jungle", "tiles");
     for (let i = 0; i < jungleTilemap.layers.length; i++) {
@@ -73,8 +72,14 @@
     }
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
-    this.cameras.main.startFollow(playerSprite);
+
+    facingDirectionText = this.add.text(-60, -10, '');
+
+    const container = this.add.container(0, 0, [ playerSprite, facingDirectionText]);
+
+    this.cameras.main.startFollow(container);
     this.cameras.main.roundPixels = true;
+
 
     const gridMovementConfig = {
       characters: [
@@ -82,24 +87,15 @@
           id: "player",
           sprite: playerSprite,
           walkingAnimationMapping: 6,
-          startPosition: new Phaser.Math.Vector2(16, 8),
+          startPosition: new Phaser.Math.Vector2(8, 12),
+          container
         },
       ],
     };
 
+
     this.gridMovementPlugin.create(jungleTilemap, gridMovementConfig);
-
-    const r1 = this.add.triangle(16 * 48 + 24, 9 * 48 + 24, 0, 0, 24, 0, 12, 24, 0xffffff);
-    const r2 = this.add.triangle(16 * 48 + 24, 10 * 48 + 24, 0, 0, 24, 0, 12, 24, 0xffffff);
-    const r3 = this.add.triangle(16 * 48 + 24, 11 * 48 + 24, 0, 0, 24, 0, 12, 24, 0xffffff);
-    this.tweens.add({
-        targets: [r1,r2,r3],
-        alpha: 0.2,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut'
-
-    });
+    this.gridMovementPlugin.turnTowards("player", 'left');
   }
 
   function update () {
@@ -113,8 +109,9 @@
     } else if (cursors.down.isDown) {
       this.gridMovementPlugin.moveDown("player");
     }
-  }
 
+    facingDirectionText.text = `facingDirection: ${this.gridMovementPlugin.getFacingDirection('player')}`;
+  }
 </script>
 
 </body>
