@@ -77,9 +77,8 @@
 
     const container = this.add.container(0, 0, [ playerSprite, facingDirectionText]);
 
-    this.cameras.main.startFollow(container);
-    this.cameras.main.roundPixels = true;
-
+    this.cameras.main.startFollow(container, true);
+    this.cameras.main.setFollowOffset(- (playerSprite.width/2), -(playerSprite.height));
 
     const gridMovementConfig = {
       characters: [
@@ -92,7 +91,6 @@
         },
       ],
     };
-
 
     this.gridMovementPlugin.create(jungleTilemap, gridMovementConfig);
     this.gridMovementPlugin.turnTowards("player", 'left');
