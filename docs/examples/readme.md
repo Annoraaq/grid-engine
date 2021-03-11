@@ -15,6 +15,7 @@
 - Position Changed Observable [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/position-chaanged/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/position-changed/index.html)
 - Check for Movement [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/is-mooving/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/is-moving/index.html)
 - Facing Direction [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/facing-direction/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/facing-direction/index.html)
+- Custom Offset [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/custom-offset/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/custom-offset/index.html)
 
 ## Try Offline
 
