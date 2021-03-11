@@ -11,7 +11,10 @@
 - Random Character Movement Within Raddius [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/radius-movement/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/radius-movement/index.html)
 - Height Shift Of Tilemap Layer [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/height-shift/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/height-shift/index.html)
 - Container Support [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/container/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/container/index.html)
-- One Way Tile Collision[[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/one-way-collision/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/one-way-collision/index.html)
+- One Way Tile Collision [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/one-way-collision/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/one-way-collision/index.html)
+- Position Changed Observable [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/position-changed/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/position-changed/index.html)
+- Check for Movement [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/is-moving/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/is-moving/index.html)
+- Facing Direction [[🕹 Live]](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/facing-direction/) [[💻 Source]](https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/examples/facing-direction/index.html)
 
 ## Try Offline
 

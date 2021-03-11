@@ -5,6 +5,7 @@ import {
   CharConfig,
   FrameRow,
   GridCharacter,
+  PositionChange,
 } from "./GridCharacter/GridCharacter";
 import "phaser";
 import { Direction } from "./Direction/Direction";
@@ -36,6 +37,8 @@ export interface CharacterData {
   speed?: TileSizePerSecond;
   startPosition?: Phaser.Math.Vector2;
   container?: Phaser.GameObjects.Container;
+  offsetX?: number;
+  offsetY?: number;
 }
 
 export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
@@ -49,6 +52,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   private movementStopped$ = new Subject<[string, Direction]>();
   private movementStarted$ = new Subject<[string, Direction]>();
   private directionChanged$ = new Subject<[string, Direction]>();
+  private positionChanged$ = new Subject<{ charId: string } & PositionChange>();
   private charRemoved$ = new Subject<string>();
 
   constructor(
@@ -175,6 +179,8 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       walkingAnimationMapping: charData.walkingAnimationMapping,
       walkingAnimationEnabled: charData.walkingAnimationEnabled,
       container: charData.container,
+      offsetX: charData.offsetX,
+      offsetY: charData.offsetY,
     };
     if (charConfig.walkingAnimationMapping == undefined) {
       charConfig.walkingAnimationMapping = charData.characterIndex;
@@ -212,10 +218,17 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       .subscribe((direction: Direction) => {
         this.directionChanged$.next([gridChar.getId(), direction]);
       });
-  }
 
-  private takeUntilCharRemoved(charId: string) {
-    return takeUntil(this.charRemoved$.pipe(filter((cId) => cId == charId)));
+    gridChar
+      .positionChanged()
+      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
+      .subscribe(({ exitTile, enterTile }) => {
+        this.positionChanged$.next({
+          charId: gridChar.getId(),
+          exitTile,
+          enterTile,
+        });
+      });
   }
 
   hasCharacter(charId: string): boolean {
@@ -257,6 +270,24 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.followMovement.removeCharacter(charId);
   }
 
+  isMoving(charId: string): boolean {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    return this.gridCharacters.get(charId).isMoving();
+  }
+
+  getFacingDirection(charId: string): Direction {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    return this.gridCharacters.get(charId).getFacingDirection();
+  }
+
+  turnTowards(charId: string, direction: Direction): void {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    return this.gridCharacters.get(charId).turnTowards(direction);
+  }
+
   movementStarted(): Observable<[string, Direction]> {
     return this.movementStarted$;
   }
@@ -267,6 +298,14 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
 
   directionChanged(): Observable<[string, Direction]> {
     return this.directionChanged$;
+  }
+
+  positionChanged(): Observable<{ charId: string } & PositionChange> {
+    return this.positionChanged$;
+  }
+
+  private takeUntilCharRemoved(charId: string) {
+    return takeUntil(this.charRemoved$.pipe(filter((cId) => cId == charId)));
   }
 
   private initGuard() {

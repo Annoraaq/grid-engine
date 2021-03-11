@@ -101,6 +101,10 @@ describe("GridCharacter", () => {
     expect(spriteMock.setDepth).toHaveBeenCalledWith(1000);
   });
 
+  it("should be facing down on construction", () => {
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
+  });
+
   it("should get tile pos", () => {
     const expectedPos = new Phaser.Math.Vector2(5, 6);
     const newTilePos = new Phaser.Math.Vector2(5, 6);
@@ -111,7 +115,7 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getTilePos()).toEqual(expectedPos);
   });
 
-  it("should start movement", async () => {
+  it("should start movement", async (done) => {
     mockNonBlockingTile();
     expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, 0));
     const movementStartedProm = gridCharacter
@@ -119,8 +123,16 @@ describe("GridCharacter", () => {
       .pipe(take(1))
       .toPromise();
 
+    gridCharacter.positionChanged().subscribe(({ exitTile, enterTile }) => {
+      expect(exitTile).toEqual(new Phaser.Math.Vector2(0, 0));
+      expect(enterTile).toEqual(new Phaser.Math.Vector2(0, -1));
+      done();
+    });
+
     gridCharacter.move(Direction.UP);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
+    expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, -1));
     expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, -1));
     const dir = await movementStartedProm;
     expect(dir).toEqual(Direction.UP);
@@ -147,6 +159,7 @@ describe("GridCharacter", () => {
     expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 12);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
     expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 - 1);
   });
 
@@ -170,9 +183,32 @@ describe("GridCharacter", () => {
     expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 16);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
   });
 
   it("should set tile position", () => {
+    const customOffsetX = 10;
+    const customOffsetY = 15;
+    gridCharacter = new GridCharacter("player", {
+      sprite: spriteMock,
+      tilemap: gridTilemapMock,
+      tileSize: 16,
+      speed: 3,
+      walkingAnimationEnabled: true,
+      offsetX: customOffsetX,
+      offsetY: customOffsetY,
+    });
+    gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
+
+    expect(spriteMock.x).toEqual(
+      3 * TILE_SIZE + PLAYER_X_OFFSET + customOffsetX
+    );
+    expect(spriteMock.y).toEqual(
+      4 * TILE_SIZE + PLAYER_Y_OFFSET + customOffsetY
+    );
+  });
+
+  it("should set tile position with custom offset", () => {
     gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
 
     expect(spriteMock.x).toEqual(3 * TILE_SIZE + PLAYER_X_OFFSET);
@@ -380,21 +416,25 @@ describe("GridCharacter", () => {
     it("should turn towards left", () => {
       gridCharacter.turnTowards(Direction.LEFT);
       expect(spriteMock.setFrame).toHaveBeenCalledWith(46);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
     });
 
     it("should turn towards right", () => {
       gridCharacter.turnTowards(Direction.RIGHT);
       expect(spriteMock.setFrame).toHaveBeenCalledWith(55);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
     });
 
     it("should turn towards up", () => {
       gridCharacter.turnTowards(Direction.UP);
       expect(spriteMock.setFrame).toHaveBeenCalledWith(64);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
     });
 
     it("should turn towards down", () => {
       gridCharacter.turnTowards(Direction.DOWN);
       expect(spriteMock.setFrame).toHaveBeenCalledWith(37);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
     });
 
     it("should not turn if moving", () => {

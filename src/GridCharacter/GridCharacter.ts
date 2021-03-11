@@ -16,14 +16,21 @@ export interface FrameRow {
 
 export type CharacterIndex = number;
 
+export interface PositionChange {
+  exitTile: Vector2;
+  enterTile: Vector2;
+}
+
 export interface CharConfig {
   sprite: Phaser.GameObjects.Sprite;
   tilemap: GridTilemap;
   tileSize: number;
   speed: number;
-  walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
   walkingAnimationEnabled: boolean;
+  walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
   container?: Phaser.GameObjects.Container;
+  offsetX?: number;
+  offsetY?: number;
 }
 
 export class GridCharacter {
@@ -51,7 +58,11 @@ export class GridCharacter {
   private movementStarted$ = new Subject<Direction>();
   private movementStopped$ = new Subject<Direction>();
   private directionChanged$ = new Subject<Direction>();
+  private positionChanged$ = new Subject<PositionChange>();
   private lastMovementImpulse = Direction.NONE;
+  private facingDirection = Direction.DOWN;
+  private customOffsetX: number;
+  private customOffsetY: number;
 
   constructor(private id: string, config: CharConfig) {
     if (typeof config.walkingAnimationMapping == "number") {
@@ -67,6 +78,8 @@ export class GridCharacter {
     this.tileSize = config.tileSize;
     this.speed = config.speed;
     this.walkingAnimation = config.walkingAnimationEnabled;
+    this.customOffsetX = config.offsetX || 0;
+    this.customOffsetY = config.offsetY || 0;
 
     if (this.walkingAnimation) {
       this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
@@ -103,8 +116,8 @@ export class GridCharacter {
     this.updateZindex();
     this.setPosition(
       new Vector2(
-        tilePosition.x * this.tileSize + offsetX,
-        tilePosition.y * this.tileSize + offsetY
+        tilePosition.x * this.tileSize + offsetX + this.customOffsetX,
+        tilePosition.y * this.tileSize + offsetY + this.customOffsetY
       )
     );
   }
@@ -118,6 +131,7 @@ export class GridCharacter {
     if (direction == Direction.NONE) return;
     if (this.isMoving()) return;
     if (this.isBlockingDirection(direction)) {
+      this.facingDirection = direction;
       if (this.walkingAnimation) {
         this.setStandingFrame(direction);
       }
@@ -155,9 +169,14 @@ export class GridCharacter {
   turnTowards(direction: Direction) {
     if (this.isMoving()) return;
     if (direction == Direction.NONE) return;
+    this.facingDirection = direction;
     if (this.walkingAnimation) {
       this.sprite.setFrame(this.framesOfDirection(direction).standing);
     }
+  }
+
+  getFacingDirection(): Direction {
+    return this.facingDirection;
   }
 
   movementStarted(): Subject<Direction> {
@@ -170,6 +189,10 @@ export class GridCharacter {
 
   directionChanged(): Subject<Direction> {
     return this.directionChanged$;
+  }
+
+  positionChanged(): Subject<PositionChange> {
+    return this.positionChanged$;
   }
 
   private get tilePos() {
@@ -252,11 +275,19 @@ export class GridCharacter {
   private startMoving(direction: Direction): void {
     this.movementStarted$.next(direction);
     this.movementDirection = direction;
+    this.facingDirection = direction;
     this.updateTilePos();
   }
 
   private updateTilePos() {
-    this.tilePos = this.tilePos.add(DirectionVectors[this.movementDirection]);
+    const newTilePos = this.tilePos.add(
+      DirectionVectors[this.movementDirection]
+    );
+    this.positionChanged$.next({
+      exitTile: this.tilePos,
+      enterTile: newTilePos,
+    });
+    this.tilePos = newTilePos;
   }
 
   private tilePosInDirection(direction: Direction): Vector2 {
