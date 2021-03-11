@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Grid Movement Plugin for Phaser 3 - Example - One-Way Collision</title>
+    <script src="../GridMovementPlugin.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.52.0/dist/phaser.min.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+            background: black;
+        }
+        p {
+          color: white;
+          text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+  <div id="game"></div>
+  <p>Press arrow keys to move.</p>
+  <p>The liana can only be climbed down, not up.</p>
+
+<script type="text/javascript">
+
+  const config = {
+    title: "GridMovementPluginExample1",
+    render: {
+      antialias: false,
+    },
+    type: Phaser.AUTO,
+    plugins: {
+      scene: [
+        {
+          key: "gridMovementPlugin",
+          plugin: GridMovementPlugin,
+          mapping: "gridMovementPlugin",
+        },
+      ],
+    },
+    scale: {
+      width: 720,
+      height: 528,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
+    scene: {
+      preload: preload,
+      create: create,
+      update: update
+    },
+
+    parent: "game",
+  };
+  var game = new Phaser.Game(config);
+
+  function preload () {
+    this.load.image("tiles", "../assets/tf_jungle_tileset.png");
+    this.load.tilemapTiledJSON("jungle", "../assets/one-way.json");
+    this.load.spritesheet("player", "../assets/characters.png", {
+      frameWidth: 52,
+      frameHeight: 72,
+    });
+  }
+
+  function create () {
+
+    const jungleTilemap = this.make.tilemap({ key: "jungle" });
+    jungleTilemap.addTilesetImage("jungle", "tiles");
+    for (let i = 0; i < jungleTilemap.layers.length; i++) {
+      const layer = jungleTilemap.createLayer(i, "jungle", 0, 0);
+      layer.scale = 3;
+    }
+    const playerSprite = this.add.sprite(0, 0, "player");
+    playerSprite.scale = 1.5;
+    this.cameras.main.startFollow(playerSprite, true);
+    this.cameras.main.setFollowOffset(- (playerSprite.width/2), -(playerSprite.height));
+
+    const gridMovementConfig = {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSprite,
+          walkingAnimationMapping: 6,
+          startPosition: new Phaser.Math.Vector2(16, 8),
+        },
+      ],
+    };
+
+    this.gridMovementPlugin.create(jungleTilemap, gridMovementConfig);
+
+    const r1 = this.add.triangle(16 * 48 + 24, 9 * 48 + 24, 0, 0, 24, 0, 12, 24, 0xffffff);
+    const r2 = this.add.triangle(16 * 48 + 24, 10 * 48 + 24, 0, 0, 24, 0, 12, 24, 0xffffff);
+    const r3 = this.add.triangle(16 * 48 + 24, 11 * 48 + 24, 0, 0, 24, 0, 12, 24, 0xffffff);
+    this.tweens.add({
+        targets: [r1,r2,r3],
+        alpha: 0.2,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+
+    });
+  }
+
+  function update () {
+    const cursors = this.input.keyboard.createCursorKeys();
+    if (cursors.left.isDown) {
+      this.gridMovementPlugin.moveLeft("player");
+    } else if (cursors.right.isDown) {
+      this.gridMovementPlugin.moveRight("player");
+    } else if (cursors.up.isDown) {
+      this.gridMovementPlugin.moveUp("player");
+    } else if (cursors.down.isDown) {
+      this.gridMovementPlugin.moveDown("player");
+    }
+  }
+
+</script>
+
+</body>
+</html>

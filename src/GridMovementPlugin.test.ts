@@ -2,7 +2,7 @@ import { Subject, of } from "rxjs";
 import { take } from "rxjs/operators";
 import * as Phaser from "phaser";
 import { Direction } from "./Direction/Direction";
-import { GridCharacter } from "./GridCharacter/GridCharacter";
+import { GridCharacter, PositionChange } from "./GridCharacter/GridCharacter";
 const mockSetTilePositon = jest.fn();
 const mockMove = jest.fn();
 const mockUpdate = jest.fn();
@@ -18,6 +18,10 @@ const mockTargetMovementAddCharacter = jest.fn();
 const mockMovementStarted = jest.fn();
 const mockMovementStopped = jest.fn();
 const mockDirectionChanged = jest.fn();
+const mockPositionChanged = jest.fn();
+const mockIsMoving = jest.fn();
+const mockFacingDirection = jest.fn();
+const mockTurnTowards = jest.fn();
 const mockFollowMovement = {
   addCharacter: jest.fn(),
   removeCharacter: jest.fn(),
@@ -72,6 +76,10 @@ jest.mock("./GridCharacter/GridCharacter", function () {
         movementStarted: mockMovementStarted,
         movementStopped: mockMovementStopped,
         directionChanged: mockDirectionChanged,
+        positionChanged: mockPositionChanged,
+        isMoving: mockIsMoving,
+        getFacingDirection: mockFacingDirection,
+        turnTowards: mockTurnTowards,
       };
     }),
   };
@@ -135,6 +143,7 @@ describe("GridMovementPlugin", () => {
     mockMovementStarted.mockReset().mockReturnValue(of());
     mockMovementStopped.mockReset().mockReturnValue(of());
     mockDirectionChanged.mockReset().mockReturnValue(of());
+    mockPositionChanged.mockReset().mockReturnValue(of());
   });
 
   it("should boot", () => {
@@ -373,6 +382,33 @@ describe("GridMovementPlugin", () => {
       speed: 2,
       walkingAnimationMapping: 3,
       walkingAnimationEnabled: true,
+    });
+  });
+
+  it("should use config offset", () => {
+    const offsetX = 5;
+    const offsetY = 6;
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+          offsetX,
+          offsetY,
+        },
+      ],
+    });
+    expect(GridCharacter).toHaveBeenCalledWith("player", {
+      sprite: playerSpriteMock,
+      tileSize: 32,
+      tilemap: mockGridTileMap,
+      speed: 4,
+      walkingAnimationMapping: 3,
+      walkingAnimationEnabled: true,
+      offsetX,
+      offsetY,
     });
   });
 
@@ -737,6 +773,59 @@ describe("GridMovementPlugin", () => {
     expect(mockSetWalkingAnimationMapping).toHaveBeenCalledWith(mockMapping);
   });
 
+  it("should delegate isMoving", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
+    });
+
+    mockIsMoving.mockReturnValue(true);
+    let isMoving = gridMovementPlugin.isMoving("player");
+    expect(isMoving).toEqual(true);
+    mockIsMoving.mockReturnValue(false);
+    isMoving = gridMovementPlugin.isMoving("player");
+    expect(isMoving).toEqual(false);
+  });
+
+  it("should delegate getFacingDirection", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
+    });
+
+    mockFacingDirection.mockReturnValue(Direction.LEFT);
+    const facingDirection = gridMovementPlugin.getFacingDirection("player");
+    expect(facingDirection).toEqual(Direction.LEFT);
+  });
+
+  it("should delegate turnTowards", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
+    });
+
+    gridMovementPlugin.turnTowards("player", Direction.RIGHT);
+    expect(mockTurnTowards).toHaveBeenCalledWith(Direction.RIGHT);
+  });
+
   describe("Observables", () => {
     it("should get chars movementStarted observable", async () => {
       const mockSubject = new Subject<Direction>();
@@ -893,6 +982,65 @@ describe("GridMovementPlugin", () => {
       mockSubject.next(Direction.LEFT);
       expect(nextMock).not.toHaveBeenCalled();
     });
+
+    it("should get chars positionChanged observable", async () => {
+      const mockSubject = new Subject<PositionChange>();
+      mockPositionChanged.mockReturnValue(mockSubject);
+      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+      gridMovementPlugin.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+      });
+
+      const prom = gridMovementPlugin
+        .positionChanged()
+        .pipe(take(1))
+        .toPromise();
+
+      const exitTile = new Phaser.Math.Vector2(1, 2);
+      const enterTile = new Phaser.Math.Vector2(2, 2);
+
+      mockSubject.next({
+        exitTile,
+        enterTile,
+      });
+      const res = await prom;
+      expect(res).toEqual({ charId: "player", exitTile, enterTile });
+    });
+
+    it("should unsubscribe from positionChanged if char removed", async () => {
+      const mockSubject = new Subject<PositionChange>();
+      mockDirectionChanged.mockReturnValue(mockSubject);
+      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+      gridMovementPlugin.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+      });
+
+      gridMovementPlugin.removeCharacter("player");
+      const nextMock = jest.fn();
+
+      gridMovementPlugin.directionChanged().subscribe({
+        complete: jest.fn(),
+        next: nextMock,
+      });
+
+      const exitTile = new Phaser.Math.Vector2(1, 2);
+      const enterTile = new Phaser.Math.Vector2(2, 2);
+
+      mockSubject.next({ exitTile, enterTile });
+      expect(nextMock).not.toHaveBeenCalled();
+    });
   });
 
   describe("Error Handling unknown char id", () => {
@@ -996,6 +1144,24 @@ describe("GridMovementPlugin", () => {
         gridMovementPlugin.setWalkingAnimationMapping("unknownCharId", <any>{})
       ).toThrow("Character unknown");
     });
+
+    it("should throw error if isMoving is invoked", () => {
+      expect(() => gridMovementPlugin.isMoving("unknownCharId")).toThrow(
+        "Character unknown"
+      );
+    });
+
+    it("should throw error if getFacingDirectiion is invoked", () => {
+      expect(() =>
+        gridMovementPlugin.getFacingDirection("unknownCharId")
+      ).toThrow("Character unknown");
+    });
+
+    it("should throw error if turnTowards is invoked", () => {
+      expect(() =>
+        gridMovementPlugin.turnTowards("unknownCharId", Direction.LEFT)
+      ).toThrow("Character unknown");
+    });
   });
 
   describe("invokation of methods if not created properly", () => {
@@ -1094,6 +1260,24 @@ describe("GridMovementPlugin", () => {
     it("should throw error if setWalkingAnimationMapping is invoked", () => {
       expect(() =>
         gridMovementPlugin.setWalkingAnimationMapping("someCharId", <any>{})
+      ).toThrow("Plugin not initialized");
+    });
+
+    it("should throw error if isMoving is invoked", () => {
+      expect(() => gridMovementPlugin.isMoving("someCharId")).toThrow(
+        "Plugin not initialized"
+      );
+    });
+
+    it("should throw error if getFacingDirection is invoked", () => {
+      expect(() => gridMovementPlugin.getFacingDirection("someCharId")).toThrow(
+        "Plugin not initialized"
+      );
+    });
+
+    it("should throw error if turnTowards is invoked", () => {
+      expect(() =>
+        gridMovementPlugin.turnTowards("someCharId", Direction.LEFT)
       ).toThrow("Plugin not initialized");
     });
   });
