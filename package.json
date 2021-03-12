@@ -1,42 +1,42 @@
 {
-  "name": "phaser-grid-movement-plugin",
-  "version": "1.7.0",
-  "description": "Phaser3 plugin for grid based movement on a 2D game board.",
-  "main": "dist/GridMovementPlugin.min.js",
-  "scripts": {
-    "test": "jest",
-    "build": "webpack"
-  },
-  "files": [
-    "dist"
-  ],
-  "types": "dist/GridMovementPlugin.d.ts",
-  "author": "Johannes Baum",
-  "license": "ISC",
-  "devDependencies": {
-    "canvas": "^2.6.1",
-    "jest": "^26.6.3",
-    "ts-jest": "^26.4.4"
-  },
-  "dependencies": {
-    "esbuild": "^0.9.1",
-    "phaser": "^3.52.0",
-    "rxjs": "^6.6.3"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Annoraaq/phaser-grid-movement-plugin.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Annoraaq/phaser-grid-movement-plugin/issues"
-  },
-  "homepage": "https://github.com/Annoraaq/phaser-grid-movement-plugin#readme",
-  "keywords": [
-    "Phaser",
-    "RPG",
-    "2D",
-    "Movement",
-    "Grid",
-    "Tile"
-  ]
+    "name": "gridengine",
+    "version": "1.7.0",
+    "author": "Johannes Baum @Annoraaq, Skylear Johnson @splashsky",
+    "license": "ISC",
+    "description": "An exceptional plugin for grid-based movement in the Phaser 3 engine. A fork from the @Annoraaq repo, for my personal development. ",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/splashsky/gridengine.git"
+    },
+    "bugs": {
+        "url": "https://github.com/splashsky/gridengine/issues"
+    },
+    "homepage": "https://github.com/splashsky/gridengine#readme",
+    "keywords": [
+        "Phaser",
+        "RPG",
+        "2D",
+        "Movement",
+        "Grid",
+        "Tile"
+    ],
+    "main": "dist/GridEngine.min.js",
+    "scripts": {
+        "test": "jest",
+        "build": "esbuild src/main.ts --bundle --minify --global-name=GridEngine --outfile=dist/GridEngine.min.js"
+    },
+    "files": [
+        "dist"
+    ],
+    "types": "dist/GridMovementPlugin.d.ts",
+    "dependencies": {
+        "esbuild": "^0.9.1",
+        "phaser": "^3.52.0",
+        "rxjs": "^6.6.3"
+    },
+    "devDependencies": {
+        "canvas": "^2.6.1",
+        "jest": "^26.6.3",
+        "ts-jest": "^26.4.4"
+    }
 }
