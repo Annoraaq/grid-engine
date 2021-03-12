@@ -1,0 +1,203 @@
+---
+layout: default
+title: Position Changed
+parent: Examples
+---
+
+# Position Changed Observable
+**Press the arrow keys to move.** This demo demonstrates how to use the `positionChanged` observable on the tilemap, allowing you to track where the characters have moved to, and further allowing you to add custom features to various tiles if you wish. This demo also uses the [Phaser Containers](phaser-container) feature.
+
+<div id="game"></div>
+
+<script src="js/phaser.min.js"></script>
+<script src="js/pgmp.min.js"></script>
+<script src="js/getBasicConfig.js"></script>
+
+<script>
+    const config = getBasicConfig(preload, create, update);
+    var game = new Phaser.Game(config);
+
+    function preload () {
+        this.load.image("tiles", "assets/tf_jungle_tileset.png");
+        this.load.tilemapTiledJSON("jungle", "assets/jungle-small.json");
+        this.load.spritesheet("player", "assets/characters.png", {
+            frameWidth: 52,
+            frameHeight: 72,
+        });
+    }
+
+    function create () {
+        const jungleTilemap = this.make.tilemap({ key: "jungle" });
+        jungleTilemap.addTilesetImage("jungle", "tiles");
+        for (let i = 0; i < jungleTilemap.layers.length; i++) {
+            const layer = jungleTilemap.createLayer(i, "jungle", 0, 0);
+            layer.scale = 3;
+        }
+        const playerSprite = this.add.sprite(0, 0, "player");
+        playerSprite.scale = 1.5;
+
+        const positionChangeText = this.add.text(-20, -50, '');
+
+        const container = this.add.container(0, 0, [ playerSprite, positionChangeText ]);
+
+        this.cameras.main.startFollow(container);
+        this.cameras.main.roundPixels = true;
+
+
+        const gridMovementConfig = {
+            characters: [
+                {
+                    id: "player",
+                    sprite: playerSprite,
+                    walkingAnimationMapping: 6,
+                    startPosition: new Phaser.Math.Vector2(8, 12),
+                    container
+                },
+            ],
+        };
+
+        const shopText = this.add.text(6* 48, 10*48, 'You are standing on a special tile!', { fontSize: 25, });
+        shopText.setVisible(false);
+        shopText.depth = 3000;
+
+        const hint = this.add.text(7* 48, 14*48, 'Step on the colored tile', { fontSize: 25, });
+        hint.depth = 3000;
+
+        tintTile(jungleTilemap, 13, 11, 0x6eff94);
+
+        this.gridMovementPlugin.create(jungleTilemap, gridMovementConfig);
+
+        this.gridMovementPlugin.positionChanged().subscribe(({charId, exitTile, enterTile}) => {
+            positionChangeText.text = `exit: (${exitTile.x}, ${exitTile.y})\n`
+                + `enter: (${enterTile.x}, ${enterTile.y})`;
+
+            if (hasTrigger(jungleTilemap, enterTile)) {
+                shopText.setVisible(true);
+            }
+            if (hasTrigger(jungleTilemap, exitTile)) {
+                shopText.setVisible(false);
+            }
+        });
+    }
+
+    function update () {
+        const cursors = this.input.keyboard.createCursorKeys();
+        if (cursors.left.isDown) {
+            this.gridMovementPlugin.moveLeft("player");
+        } else if (cursors.right.isDown) {
+            this.gridMovementPlugin.moveRight("player");
+        } else if (cursors.up.isDown) {
+            this.gridMovementPlugin.moveUp("player");
+        } else if (cursors.down.isDown) {
+            this.gridMovementPlugin.moveDown("player");
+        }
+    }
+
+    function tintTile(tilemap, row, col, color) {
+        for (let i = 0; i < tilemap.layers.length; i++) {
+            tilemap.layers[i].tilemapLayer.layer.data[row][col].tint = color;
+        }
+    }
+
+    function hasTrigger(tilemap, position) {
+        return tilemap.layers.some((layer) => {
+            const tile = tilemap.getTileAt(position.x, position.y, false, layer.name);
+            return tile?.properties?.trigger;
+        });
+    }
+</script>
+
+## The Code
+```javascript
+// Your game config
+var game = new Phaser.Game(config);
+
+function preload () {
+    this.load.image("tiles", "../assets/tf_jungle_tileset.png");
+    this.load.tilemapTiledJSON("jungle", "../assets/jungle-small.json");
+    this.load.spritesheet("player", "../assets/characters.png", {
+        frameWidth: 52,
+        frameHeight: 72,
+    });
+}
+
+function create () {
+    const jungleTilemap = this.make.tilemap({ key: "jungle" });
+    jungleTilemap.addTilesetImage("jungle", "tiles");
+    for (let i = 0; i < jungleTilemap.layers.length; i++) {
+        const layer = jungleTilemap.createLayer(i, "jungle", 0, 0);
+        layer.scale = 3;
+    }
+    const playerSprite = this.add.sprite(0, 0, "player");
+    playerSprite.scale = 1.5;
+
+    const positionChangeText = this.add.text(-20, -50, '');
+
+    const container = this.add.container(0, 0, [ playerSprite, positionChangeText ]);
+
+    this.cameras.main.startFollow(container);
+    this.cameras.main.roundPixels = true;
+
+
+    const gridMovementConfig = {
+        characters: [
+            {
+                id: "player",
+                sprite: playerSprite,
+                walkingAnimationMapping: 6,
+                startPosition: new Phaser.Math.Vector2(8, 12),
+                container
+            },
+        ],
+    };
+
+    const shopText = this.add.text(6* 48, 10*48, 'You are standing on a special tile!', { fontSize: 25, });
+    shopText.setVisible(false);
+    shopText.depth = 3000;
+
+    const hint = this.add.text(7* 48, 14*48, 'Step on the colored tile', { fontSize: 25, });
+    hint.depth = 3000;
+
+    tintTile(jungleTilemap, 13, 11, 0x6eff94);
+
+    this.gridMovementPlugin.create(jungleTilemap, gridMovementConfig);
+
+    this.gridMovementPlugin.positionChanged().subscribe(({charId, exitTile, enterTile}) => {
+        positionChangeText.text = `exit: (${exitTile.x}, ${exitTile.y})\n`
+            + `enter: (${enterTile.x}, ${enterTile.y})`;
+
+        if (hasTrigger(jungleTilemap, enterTile)) {
+            shopText.setVisible(true);
+        }
+        if (hasTrigger(jungleTilemap, exitTile)) {
+            shopText.setVisible(false);
+        }
+    });
+}
+
+function update () {
+    const cursors = this.input.keyboard.createCursorKeys();
+    if (cursors.left.isDown) {
+        this.gridMovementPlugin.moveLeft("player");
+    } else if (cursors.right.isDown) {
+        this.gridMovementPlugin.moveRight("player");
+    } else if (cursors.up.isDown) {
+        this.gridMovementPlugin.moveUp("player");
+    } else if (cursors.down.isDown) {
+        this.gridMovementPlugin.moveDown("player");
+    }
+}
+
+function tintTile(tilemap, row, col, color) {
+    for (let i = 0; i < tilemap.layers.length; i++) {
+        tilemap.layers[i].tilemapLayer.layer.data[row][col].tint = color;
+    }
+}
+
+function hasTrigger(tilemap, position) {
+    return tilemap.layers.some((layer) => {
+        const tile = tilemap.getTileAt(position.x, position.y, false, layer.name);
+        return tile?.properties?.trigger;
+    });
+}
+```
