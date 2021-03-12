@@ -60,7 +60,7 @@ parent: Examples
         this.gridMovementPlugin.movementStarted().subscribe(([_charId, direction]) => {
             playerSprite.anims.play(direction);
         });
-      
+
         this.gridMovementPlugin.movementStopped().subscribe(([_charId, direction]) => {
             playerSprite.anims.stop();
             playerSprite.setFrame(getStopFrame(direction));
@@ -122,9 +122,9 @@ parent: Examples
 var game = new Phaser.Game(config);
 
 function preload () {
-    this.load.image("tiles", "../assets/cloud_tileset.png");
-    this.load.tilemapTiledJSON("cloud-city-map", "../assets/cloud_city.json");
-    this.load.spritesheet("player", "../assets/characters.png", {
+    this.load.image("tiles", "assets/cloud_tileset.png");
+    this.load.tilemapTiledJSON("cloud-city-map", "assets/cloud_city.json");
+    this.load.spritesheet("player", "assets/characters.png", {
         frameWidth: 52,
         frameHeight: 72,
     });
@@ -164,7 +164,7 @@ function create () {
     this.gridMovementPlugin.movementStarted().subscribe(([_charId, direction]) => {
         playerSprite.anims.play(direction);
     });
-    
+
     this.gridMovementPlugin.movementStopped().subscribe(([_charId, direction]) => {
         playerSprite.anims.stop();
         playerSprite.setFrame(getStopFrame(direction));

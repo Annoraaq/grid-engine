@@ -10,4 +10,4 @@ Just like with individual [tile properties](tile-properties), you can define *Cu
 | Property         | Type    | Effect                                                                 |
 |:-----------------|:--------|:-----------------------------------------------------------------------|
 | `gm_alwaysTop`   | boolean | If set to `true`, layer will **always** be rendered above characters.  |
-| `gm_heightShift` | number  | This property sets the layer's depth sorting relative to the characters. See [the Height Shift guide](/features/height-shift) for more information.  |
+| `gm_heightShift` | number  | This property sets the layer's depth sorting relative to the characters. See [the Height Shift guide](../features/height-shift) for more information.  |

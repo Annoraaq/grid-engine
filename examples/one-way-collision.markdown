@@ -5,7 +5,7 @@ parent: Examples
 ---
 
 # One-Way Collision
-**Press the arrow keys to move.** This demo demonstrates tiles that collide only in one direction. This relies on setting the proper [Tile Properties](/usage/tile-properties) on your tilemaps.
+**Press the arrow keys to move.** This demo demonstrates tiles that collide only in one direction. This relies on setting the proper [Tile Properties](../usage/tile-properties) on your tilemaps.
 
 <div id="game"></div>
 
@@ -84,9 +84,9 @@ parent: Examples
 var game = new Phaser.Game(config);
 
 function preload () {
-    this.load.image("tiles", "../assets/tf_jungle_tileset.png");
-    this.load.tilemapTiledJSON("jungle", "../assets/one-way.json");
-    this.load.spritesheet("player", "../assets/characters.png", {
+    this.load.image("tiles", "assets/tf_jungle_tileset.png");
+    this.load.tilemapTiledJSON("jungle", "assets/one-way.json");
+    this.load.spritesheet("player", "assets/characters.png", {
         frameWidth: 52,
         frameHeight: 72,
     });
