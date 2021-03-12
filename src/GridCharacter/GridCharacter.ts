@@ -26,9 +26,11 @@ export interface CharConfig {
   tilemap: GridTilemap;
   tileSize: number;
   speed: number;
-  walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
   walkingAnimationEnabled: boolean;
+  walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
   container?: Phaser.GameObjects.Container;
+  offsetX?: number;
+  offsetY?: number;
 }
 
 export class GridCharacter {
@@ -59,6 +61,8 @@ export class GridCharacter {
   private positionChanged$ = new Subject<PositionChange>();
   private lastMovementImpulse = Direction.NONE;
   private facingDirection = Direction.DOWN;
+  private customOffsetX: number;
+  private customOffsetY: number;
 
   constructor(private id: string, config: CharConfig) {
     if (typeof config.walkingAnimationMapping == "number") {
@@ -74,6 +78,8 @@ export class GridCharacter {
     this.tileSize = config.tileSize;
     this.speed = config.speed;
     this.walkingAnimation = config.walkingAnimationEnabled;
+    this.customOffsetX = config.offsetX || 0;
+    this.customOffsetY = config.offsetY || 0;
 
     if (this.walkingAnimation) {
       this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
@@ -110,8 +116,8 @@ export class GridCharacter {
     this.updateZindex();
     this.setPosition(
       new Vector2(
-        tilePosition.x * this.tileSize + offsetX,
-        tilePosition.y * this.tileSize + offsetY
+        tilePosition.x * this.tileSize + offsetX + this.customOffsetX,
+        tilePosition.y * this.tileSize + offsetY + this.customOffsetY
       )
     );
   }

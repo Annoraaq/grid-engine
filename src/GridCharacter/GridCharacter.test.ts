@@ -187,6 +187,28 @@ describe("GridCharacter", () => {
   });
 
   it("should set tile position", () => {
+    const customOffsetX = 10;
+    const customOffsetY = 15;
+    gridCharacter = new GridCharacter("player", {
+      sprite: spriteMock,
+      tilemap: gridTilemapMock,
+      tileSize: 16,
+      speed: 3,
+      walkingAnimationEnabled: true,
+      offsetX: customOffsetX,
+      offsetY: customOffsetY,
+    });
+    gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
+
+    expect(spriteMock.x).toEqual(
+      3 * TILE_SIZE + PLAYER_X_OFFSET + customOffsetX
+    );
+    expect(spriteMock.y).toEqual(
+      4 * TILE_SIZE + PLAYER_Y_OFFSET + customOffsetY
+    );
+  });
+
+  it("should set tile position with custom offset", () => {
     gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
 
     expect(spriteMock.x).toEqual(3 * TILE_SIZE + PLAYER_X_OFFSET);

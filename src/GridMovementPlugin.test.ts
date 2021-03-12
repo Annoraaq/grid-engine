@@ -385,6 +385,33 @@ describe("GridMovementPlugin", () => {
     });
   });
 
+  it("should use config offset", () => {
+    const offsetX = 5;
+    const offsetY = 6;
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+          offsetX,
+          offsetY,
+        },
+      ],
+    });
+    expect(GridCharacter).toHaveBeenCalledWith("player", {
+      sprite: playerSpriteMock,
+      tileSize: 32,
+      tilemap: mockGridTileMap,
+      speed: 4,
+      walkingAnimationMapping: 3,
+      walkingAnimationEnabled: true,
+      offsetX,
+      offsetY,
+    });
+  });
+
   it("should move player left", () => {
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
     gridMovementPlugin.create(tileMapMock, {
