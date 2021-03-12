@@ -5,7 +5,7 @@
     "main": "dist/GridMovementPlugin.min.js",
     "scripts": {
         "test": "jest",
-        "build": "esbuild src/main.ts --bundle --minify --global-name=GridMovementPlugin --outfile=dist/GridMovementPlugin.min.js"
+        "build": "esbuild src/main.ts --bundle --minify --global-name=GridMovementPlugin --outfile=dist/GridMovementPlugin.min.js && tsc --emitDeclarationOnly --outDir dist"
     },
     "files": [
         "dist"
