@@ -1,11 +1,11 @@
-const path = require('path');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
+const path = require("path");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: {
-    'GridMovementPlugin.min': './src/main.ts',
+    "GridMovementPlugin.min": "./src/main.ts",
   },
   plugins: [
     new CleanWebpackPlugin(),
@@ -18,15 +18,15 @@ module.exports = {
         ie8: false,
         ecma: 5,
         output: {
-          comments: false
+          comments: false,
         },
-        warnings: false
+        warnings: false,
       },
-      warningsFilter: (src) => false
+      warningsFilter: (src) => false,
     }),
     new CopyPlugin({
       patterns: [
-        { from: 'src/GridMovementPlugin.d.ts', to: 'GridMovementPlugin.d.ts' },
+        { from: "src/GridMovementPlugin.d.ts", to: "GridMovementPlugin.d.ts" },
       ],
     }),
   ],
@@ -34,19 +34,19 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: "ts-loader",
         exclude: /node_modules/,
       },
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js', '.css'],
+    extensions: [".tsx", ".ts", ".js", ".css"],
   },
   output: {
-    filename: '[name].js',
-    path: path.resolve(__dirname, 'dist/'),
-    library: 'GridMovementPlugin',
-    libraryTarget: 'umd',
-    umdNamedDefine: true
+    filename: "[name].js",
+    path: path.resolve(__dirname, "dist/"),
+    library: "GridMovementPlugin",
+    libraryTarget: "umd",
+    umdNamedDefine: true,
   },
 };

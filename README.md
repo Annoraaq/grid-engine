@@ -12,13 +12,13 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
     <img src="https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/assets/other/features-label.png" alt="Features" />
 </p>
 
-* Grid-based movement, of course!
-* Tile-based collision detection
-* One-way collision detection
-* Support for multiple characters
-* Pathfinding (for both NPCs and the player)
-* Random movement (can also limit to a radius)
-* Following other characters
+- Grid-based movement, of course!
+- Tile-based collision detection
+- One-way collision detection
+- Support for multiple characters
+- Pathfinding (for both NPCs and the player)
+- Random movement (can also limit to a radius)
+- Following other characters
 
 📖 Our most current documentation [is here](https://github.com/Annoraaq/phaser-grid-movement-plugin/wiki)!  
 ➡️ You can try/download a list of examples [at this link here](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/).
@@ -30,11 +30,13 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
 Installing the Grid Movement plugin is simple.
 
 ### NPM
+
 ```bash
 npm i --save phaser-grid-movement-plugin
 ```
 
 ### Web
+
 ```html
 <!-- Download the .zip and copy GridMovementPlugin.min.js from dist/ -->
 <script src="GridMovementPlugin.min.js"></script>
@@ -44,19 +46,19 @@ Then, inside your Phaser game config...
 
 ```javascript
 const gameConfig = {
-    // ...
+  // ...
 
-    plugins: {
-        scene: [
-            {
-                key: "gridMovementPlugin",
-                plugin: GridMovementPlugin,
-                mapping: "gridMovementPlugin",
-            },
-        ],
-    },
+  plugins: {
+    scene: [
+      {
+        key: "gridMovementPlugin",
+        plugin: GridMovementPlugin,
+        mapping: "gridMovementPlugin",
+      },
+    ],
+  },
 
-    // ...
+  // ...
 };
 
 const game = new Phaser.Game(gameConfig);
@@ -65,20 +67,22 @@ const game = new Phaser.Game(gameConfig);
 Now you're all set to start using Grid Movement in your scenes!
 
 ```javascript
-function create () {
-    // ...
+function create() {
+  // ...
 
-    const gridMovementConfig = {
-        characters: [{
-            id: "player",
-            sprite: playerSprite,
-            walkingAnimationMapping: 6,
-        }],
-    };
+  const gridMovementConfig = {
+    characters: [
+      {
+        id: "player",
+        sprite: playerSprite,
+        walkingAnimationMapping: 6,
+      },
+    ],
+  };
 
-    this.gridMovementPlugin.create(tilemap, gridMovementConfig);
+  this.gridMovementPlugin.create(tilemap, gridMovementConfig);
 
-    // ...
+  // ...
 }
 ```
 
