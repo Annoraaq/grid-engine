@@ -20,7 +20,7 @@ For the most basic type of collision, read [the Collision guide](collision) to g
 
 | Property   | Type    | Effect                                                                                                                                              |
 | :--------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `collides` | boolean | If set to `true`, characters can not walk over tile from any direction. <br>If set to `false`, characters can walk through tile from any direction. |
+| `gm_collide` | boolean | If set to `true`, characters can not walk over tile from any direction. <br>If set to `false`, characters can walk through tile from any direction. |
 
 ### One-Way
 
