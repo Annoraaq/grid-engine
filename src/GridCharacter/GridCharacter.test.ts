@@ -1,4 +1,3 @@
-import { WalkingAnimationMapping } from "./../GridMovementPlugin";
 import { GridCharacter } from "./GridCharacter";
 import * as Phaser from "phaser";
 import { Direction } from "../Direction/Direction";

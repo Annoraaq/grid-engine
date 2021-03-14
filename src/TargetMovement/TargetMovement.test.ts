@@ -261,7 +261,7 @@ describe("TargetMovement", () => {
     const charPos = new Phaser.Math.Vector2(3, 1);
     const targetPos = new Phaser.Math.Vector2(3, 1);
     gridTilemapMock.isBlocking.mockReturnValue(true);
-    let blocking = targetMovement.isBlocking(targetPos)(charPos);
+    const blocking = targetMovement.isBlocking(targetPos)(charPos);
     expect(blocking).toEqual(false);
     expect(gridTilemapMock.isBlocking).not.toHaveBeenCalled();
   });

@@ -24,11 +24,7 @@ export class RandomMovement {
     this.randomlyMovingCharacters = new Map();
   }
 
-  addCharacter(
-    character: GridCharacter,
-    delay: number = 0,
-    radius: number = -1
-  ) {
+  addCharacter(character: GridCharacter, delay = 0, radius = -1): void {
     this.randomlyMovingCharacters.set(character.getId(), {
       character,
       config: {
@@ -44,11 +40,11 @@ export class RandomMovement {
     });
   }
 
-  removeCharacter(charId: string) {
+  removeCharacter(charId: string): void {
     this.randomlyMovingCharacters.delete(charId);
   }
 
-  update(delta: number) {
+  update(delta: number): void {
     this.randomlyMovingCharacters.forEach(({ character, config }) => {
       if (this.shouldContinueWalkingCurrentDirection(character, config)) {
         config.stepsWalked++;

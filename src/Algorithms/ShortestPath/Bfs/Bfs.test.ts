@@ -1,4 +1,3 @@
-import { Vector } from "matter";
 import * as Phaser from "phaser";
 import { VectorUtils } from "../../../Utils/VectorUtils";
 import { Bfs } from "./Bfs";
@@ -6,8 +5,6 @@ import { Bfs } from "./Bfs";
 const Vector2 = Phaser.Math.Vector2;
 
 describe("Bfs", () => {
-  beforeEach(() => {});
-
   it("should return one simple shortest path", () => {
     const startPos = new Vector2(3, 3);
     const targetPos = new Vector2(4, 4);

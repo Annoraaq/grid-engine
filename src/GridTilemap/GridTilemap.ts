@@ -13,7 +13,7 @@ export class GridTilemap {
   private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "gm_collide_";
   private static readonly LEGACY_COLLIDE_PROP_NAME = "collides";
   private characters = new Map<string, GridCharacter>();
-  private collisionTilePropertyName: string = "gm_collide";
+  private collisionTilePropertyName = "gm_collide";
 
   constructor(
     private tilemap: Phaser.Tilemaps.Tilemap,
@@ -22,11 +22,11 @@ export class GridTilemap {
     this.setLayerDepths();
   }
 
-  addCharacter(character: GridCharacter) {
+  addCharacter(character: GridCharacter): void {
     this.characters.set(character.getId(), character);
   }
 
-  removeCharacter(charId: string) {
+  removeCharacter(charId: string): void {
     this.characters.delete(charId);
   }
 

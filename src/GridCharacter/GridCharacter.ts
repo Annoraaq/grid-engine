@@ -96,11 +96,13 @@ export class GridCharacter {
     return this.speed;
   }
 
-  setSpeed(speed: number) {
+  setSpeed(speed: number): void {
     this.speed = speed;
   }
 
-  setWalkingAnimationMapping(walkingAnimationMapping: WalkingAnimationMapping) {
+  setWalkingAnimationMapping(
+    walkingAnimationMapping: WalkingAnimationMapping
+  ): void {
     this.walkingAnimationMapping = walkingAnimationMapping;
   }
 
@@ -166,7 +168,7 @@ export class GridCharacter {
     return this.movementDirection != Direction.NONE;
   }
 
-  turnTowards(direction: Direction) {
+  turnTowards(direction: Direction): void {
     if (this.isMoving()) return;
     if (direction == Direction.NONE) return;
     this.facingDirection = direction;
