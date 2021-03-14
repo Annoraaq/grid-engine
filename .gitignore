@@ -5,3 +5,4 @@ _site
 vendor
 node_modules
 **/*.d.ts
+.vscode
