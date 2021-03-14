@@ -10,7 +10,11 @@ export class GridTilemap {
   static readonly FIRST_PLAYER_LAYER = 1000;
   private static readonly ALWAYS_TOP_PROP_NAME = "gm_alwaysTop";
   private static readonly HEIGHT_SHIFT_PROP_NAME = "gm_heightShift";
+  private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "gm_collide_";
+  private static readonly LEGACY_COLLIDE_PROP_NAME = "collides";
   private characters = new Map<string, GridCharacter>();
+  private collisionTilePropertyName: string = "gm_collides";
+
   constructor(
     private tilemap: Phaser.Tilemaps.Tilemap,
     private firstLayerAboveChar?: number
@@ -41,12 +45,15 @@ export class GridTilemap {
   hasBlockingTile(pos: Vector2, direction?: Direction): boolean {
     if (this.hasNoTile(pos)) return true;
 
-    const collidesPropName = `gm_collide_${direction}`;
+    const collidesPropName =
+      GridTilemap.ONE_WAY_COLLIDE_PROP_PREFIX + direction;
     return this.tilemap.layers.some((layer) => {
       const tile = this.tilemap.getTileAt(pos.x, pos.y, false, layer.name);
       return (
-        tile?.properties?.collides ||
-        (tile?.properties && tile?.properties[collidesPropName])
+        tile?.properties &&
+        (tile.properties[GridTilemap.LEGACY_COLLIDE_PROP_NAME] ||
+          tile.properties[this.collisionTilePropertyName] ||
+          tile.properties[collidesPropName])
       );
     });
   }
@@ -61,6 +68,10 @@ export class GridTilemap {
     return [...this.characters.values()].some((char) =>
       char.getTilePos().equals(pos)
     );
+  }
+
+  setCollisionTilePropertyName(name: string): void {
+    this.collisionTilePropertyName = name;
   }
 
   private getLayerProp(layer: Phaser.Tilemaps.LayerData, name: string): any {

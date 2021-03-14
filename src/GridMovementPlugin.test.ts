@@ -30,6 +30,7 @@ const mockFollowMovement = {
 const mockGridTileMap = {
   addCharacter: jest.fn(),
   removeCharacter: jest.fn(),
+  setCollisionTilePropertyName: jest.fn(),
 };
 const mockGridTilemapConstructor = jest.fn(function (
   _tilemap,
@@ -166,8 +167,12 @@ describe("GridMovementPlugin", () => {
           walkingAnimationMapping: 3,
         },
       ],
+      collisionTilePropertyName: "custom_collision_prop",
     });
     expect(mockGridTilemapConstructor).toHaveBeenCalledWith(tileMapMock);
+    expect(mockGridTileMap.setCollisionTilePropertyName).toHaveBeenCalledWith(
+      "custom_collision_prop"
+    );
   });
 
   it("should init tilemap with deprecated firstLayerAboveChar", () => {

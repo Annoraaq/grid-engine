@@ -183,7 +183,9 @@ describe("GridTilemapPlugin", () => {
 
   it("should detect blocking tiles", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
-    tilemapMock.getTileAt.mockReturnValue({ properties: { collides: true } });
+    tilemapMock.getTileAt.mockReturnValue({
+      properties: { gm_collides: true },
+    });
     gridTilemap = new GridTilemap(tilemapMock, 3);
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Phaser.Math.Vector2(3, 4)
@@ -198,6 +200,33 @@ describe("GridTilemapPlugin", () => {
       false,
       "layer2"
     );
+  });
+
+  it("should detect blocking tiles with custom property", () => {
+    tilemapMock.hasTileAt.mockReturnValue(true);
+    tilemapMock.getTileAt.mockReturnValue({
+      properties: { custom_collides_prop: true },
+    });
+    gridTilemap = new GridTilemap(tilemapMock, 3);
+    gridTilemap.setCollisionTilePropertyName("custom_collides_prop");
+    const isBlockingTile = gridTilemap.hasBlockingTile(
+      new Phaser.Math.Vector2(3, 4)
+    );
+    const isBlocking = gridTilemap.isBlocking(new Phaser.Math.Vector2(3, 4));
+    expect(isBlockingTile).toBe(true);
+    expect(isBlocking).toBe(true);
+  });
+
+  it("should detect blocking tiles with legacy collide property", () => {
+    tilemapMock.hasTileAt.mockReturnValue(true);
+    tilemapMock.getTileAt.mockReturnValue({ properties: { collides: true } });
+    gridTilemap = new GridTilemap(tilemapMock, 3);
+    const isBlockingTile = gridTilemap.hasBlockingTile(
+      new Phaser.Math.Vector2(3, 4)
+    );
+    const isBlocking = gridTilemap.isBlocking(new Phaser.Math.Vector2(3, 4));
+    expect(isBlockingTile).toBe(true);
+    expect(isBlocking).toBe(true);
   });
 
   it("should detect one-way blocking tiles left", () => {
