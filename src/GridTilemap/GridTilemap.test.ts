@@ -184,7 +184,7 @@ describe("GridTilemapPlugin", () => {
   it("should detect blocking tiles", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({
-      properties: { gm_collides: true },
+      properties: { gm_collide: true },
     });
     gridTilemap = new GridTilemap(tilemapMock, 3);
     const isBlockingTile = gridTilemap.hasBlockingTile(

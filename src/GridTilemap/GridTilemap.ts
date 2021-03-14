@@ -13,7 +13,7 @@ export class GridTilemap {
   private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "gm_collide_";
   private static readonly LEGACY_COLLIDE_PROP_NAME = "collides";
   private characters = new Map<string, GridCharacter>();
-  private collisionTilePropertyName: string = "gm_collides";
+  private collisionTilePropertyName: string = "gm_collide";
 
   constructor(
     private tilemap: Phaser.Tilemaps.Tilemap,
