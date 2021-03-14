@@ -28,20 +28,20 @@ export class TargetMovement {
   addCharacter(
     character: GridCharacter,
     targetPos: Phaser.Math.Vector2,
-    distance: number = 0,
-    closestPointIfBlocked: boolean = false
-  ) {
+    distance = 0,
+    closestPointIfBlocked = false
+  ): void {
     this.characters.set(character.getId(), {
       character,
       config: { targetPos, distance, closestPointIfBlocked },
     });
   }
 
-  removeCharacter(charId: string) {
+  removeCharacter(charId: string): void {
     this.characters.delete(charId);
   }
 
-  update() {
+  update(): void {
     this.characters.forEach(({ character, config }) => {
       const { dir, dist } = this.getDirOnShortestPath(character, config);
       if (this.noPathExists(dist)) {
@@ -62,7 +62,7 @@ export class TargetMovement {
     };
   };
 
-  clear() {
+  clear(): void {
     this.characters.clear();
   }
 

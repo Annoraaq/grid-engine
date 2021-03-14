@@ -2,15 +2,15 @@ import * as Phaser from "phaser";
 type Vector2 = Phaser.Math.Vector2;
 
 export class VectorUtils {
-  static vec2str(vec: Vector2) {
+  static vec2str(vec: Vector2): string {
     return `${vec.x}#${vec.y}`;
   }
 
-  static equal(vec1: Vector2, vec2: Vector2) {
+  static equal(vec1: Vector2, vec2: Vector2): boolean {
     return VectorUtils.vec2str(vec1) == VectorUtils.vec2str(vec2);
   }
 
-  static manhattanDistance(pos1: Vector2, pos2: Vector2) {
+  static manhattanDistance(pos1: Vector2, pos2: Vector2): number {
     const xDist = Math.abs(pos1.x - pos2.x);
     const yDist = Math.abs(pos1.y - pos2.y);
     return xDist + yDist;

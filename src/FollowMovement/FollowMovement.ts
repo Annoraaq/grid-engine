@@ -25,9 +25,9 @@ export class FollowMovement {
   addCharacter(
     character: GridCharacter,
     charToFollow: GridCharacter,
-    distance: number = 0,
-    closestPointIfBlocked: boolean = false
-  ) {
+    distance = 0,
+    closestPointIfBlocked = false
+  ): void {
     this.characters.set(character.getId(), {
       character,
       config: {
@@ -38,11 +38,11 @@ export class FollowMovement {
     });
   }
 
-  removeCharacter(charId: string) {
+  removeCharacter(charId: string): void {
     this.characters.delete(charId);
   }
 
-  update() {
+  update(): void {
     this.targetMovement.clear();
     this.characters.forEach(({ character, config }) => {
       const { charToFollow, distance, closestPointIfBlocked } = config;

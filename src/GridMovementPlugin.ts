@@ -49,7 +49,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   private randomMovement: RandomMovement;
   private targetMovement: TargetMovement;
   private followMovement: FollowMovement;
-  private isCreated: boolean = false;
+  private isCreated = false;
   private movementStopped$ = new Subject<[string, Direction]>();
   private movementStarted$ = new Subject<[string, Direction]>();
   private directionChanged$ = new Subject<[string, Direction]>();
@@ -63,11 +63,11 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     super(scene, pluginManager);
   }
 
-  boot() {
+  boot(): void {
     this.systems.events.on("update", this.update, this);
   }
 
-  create(tilemap: Phaser.Tilemaps.Tilemap, config: GridMovementConfig) {
+  create(tilemap: Phaser.Tilemaps.Tilemap, config: GridMovementConfig): void {
     this.isCreated = true;
     this.gridCharacters = new Map();
     this.randomMovement = new RandomMovement();
@@ -89,31 +89,31 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     return this.gridCharacters.get(charId).getTilePos();
   }
 
-  moveLeft(charId: string) {
+  moveLeft(charId: string): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.gridCharacters.get(charId).move(Direction.LEFT);
   }
 
-  moveRight(charId: string) {
+  moveRight(charId: string): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.gridCharacters.get(charId).move(Direction.RIGHT);
   }
 
-  moveUp(charId: string) {
+  moveUp(charId: string): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.gridCharacters.get(charId).move(Direction.UP);
   }
 
-  moveDown(charId: string) {
+  moveDown(charId: string): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.gridCharacters.get(charId).move(Direction.DOWN);
   }
 
-  moveRandomly(charId: string, delay: number = 0, radius: number = -1) {
+  moveRandomly(charId: string, delay = 0, radius = -1): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.randomMovement.addCharacter(
@@ -123,7 +123,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     );
   }
 
-  moveTo(charId: string, targetPos: Phaser.Math.Vector2) {
+  moveTo(charId: string, targetPos: Phaser.Math.Vector2): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.targetMovement.addCharacter(
@@ -132,13 +132,13 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     );
   }
 
-  stopMovingRandomly(charId: string) {
+  stopMovingRandomly(charId: string): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.randomMovement.removeCharacter(charId);
   }
 
-  setSpeed(charId: string, speed: number) {
+  setSpeed(charId: string, speed: number): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.gridCharacters.get(charId).setSpeed(speed);
@@ -147,7 +147,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   setWalkingAnimationMapping(
     charId: string,
     walkingAnimationMapping: WalkingAnimationMapping
-  ) {
+  ): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.gridCharacters
@@ -155,20 +155,20 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       .setWalkingAnimationMapping(walkingAnimationMapping);
   }
 
-  update(_time: number, delta: number) {
+  update(_time: number, delta: number): void {
     if (this.isCreated) {
       this.randomMovement.update(delta);
       this.targetMovement.update();
       this.followMovement.update();
       if (this.gridCharacters) {
-        for (let [_key, val] of this.gridCharacters) {
+        for (const [_key, val] of this.gridCharacters) {
           val.update(delta);
         }
       }
     }
   }
 
-  addCharacter(charData: CharacterData) {
+  addCharacter(charData: CharacterData): void {
     this.initGuard();
 
     if (charData.characterIndex != undefined) {
@@ -242,7 +242,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     return this.gridCharacters.has(charId);
   }
 
-  removeCharacter(charId: string) {
+  removeCharacter(charId: string): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.randomMovement.removeCharacter(charId);
@@ -256,9 +256,9 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   follow(
     charId: string,
     charIdToFollow: string,
-    distance: number = 0,
-    closestPointIfBlocked: boolean = false
-  ) {
+    distance = 0,
+    closestPointIfBlocked = false
+  ): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.unknownCharGuard(charIdToFollow);
@@ -270,7 +270,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     );
   }
 
-  stopFollowing(charId: string) {
+  stopFollowing(charId: string): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.followMovement.removeCharacter(charId);

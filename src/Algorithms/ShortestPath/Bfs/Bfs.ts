@@ -19,7 +19,7 @@ export class Bfs {
   static getShortestPath(
     startPos: Vector2,
     targetPos: Vector2,
-    isBlocked: (pos: Vector2) => boolean
+    isBlocked: (_pos: Vector2) => boolean
   ): { path: Vector2[]; closestToTarget: Vector2 } {
     const shortestPath = Bfs.shortestPathBfs(startPos, targetPos, isBlocked);
     return {
@@ -31,7 +31,7 @@ export class Bfs {
   private static shortestPathBfs(
     startNode: Vector2,
     stopNode: Vector2,
-    isBlocked: (pos: Vector2) => boolean
+    isBlocked: (_pos: Vector2) => boolean
   ): ShortestPathTuple {
     const previous = new Map<string, Vector2>();
     const visited = new Set<string>();
@@ -55,7 +55,7 @@ export class Bfs {
         return { shortestDistance: dist, previous, closestToTarget };
       }
 
-      for (let neighbour of Bfs.getNeighbours(node, isBlocked)) {
+      for (const neighbour of Bfs.getNeighbours(node, isBlocked)) {
         if (!visited.has(VectorUtils.vec2str(neighbour))) {
           previous.set(VectorUtils.vec2str(neighbour), node);
           queue.push({ node: neighbour, dist: dist + 1 });
@@ -68,7 +68,7 @@ export class Bfs {
 
   private static getNeighbours(
     pos: Vector2,
-    isBlocked: (pos: Vector2) => boolean
+    isBlocked: (_pos: Vector2) => boolean
   ): Vector2[] {
     return [
       new Vector2(pos.x, pos.y + 1),

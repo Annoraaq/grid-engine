@@ -1,3 +1,4 @@
+/*eslint no-global-assign: "off"*/
 import * as Phaser from "phaser";
 import { Direction } from "./../Direction/Direction";
 import { GridCharacter } from "./../GridCharacter/GridCharacter";
