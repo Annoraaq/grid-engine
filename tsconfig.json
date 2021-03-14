@@ -3,7 +3,9 @@
     "target": "es5",
     "declaration": true,
     "allowJs": false,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "types": ["node", "jest"],
+    "lib": ["ES2016", "dom"]
   },
   "include": ["**/*.ts"]
 }

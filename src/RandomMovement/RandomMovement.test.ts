@@ -7,9 +7,9 @@ describe("RandomMovement", () => {
   let randomMovement: RandomMovement;
 
   function mockRandom(val: number) {
-    const mockMath = Object.create(global.Math);
+    const mockMath = Object.create(Math);
     mockMath.random = () => val;
-    global.Math = mockMath;
+    Math = mockMath;
   }
 
   beforeEach(() => {
@@ -68,9 +68,9 @@ describe("RandomMovement", () => {
   });
 
   it("should update only non-blocked characters", () => {
-    const mockMath = Object.create(global.Math);
+    const mockMath = Object.create(Math);
     mockMath.random = () => 0.5;
-    global.Math = mockMath;
+    Math = mockMath;
 
     const char1Mock: GridCharacter = <any>{
       getId: () => "char1",
@@ -95,9 +95,9 @@ describe("RandomMovement", () => {
   });
 
   it("should not move further than radius", () => {
-    const mockMath = Object.create(global.Math);
+    const mockMath = Object.create(Math);
     mockMath.random = () => 0.5;
-    global.Math = mockMath;
+    Math = mockMath;
 
     const char1Mock: GridCharacter = <any>{
       getId: () => "char1",
