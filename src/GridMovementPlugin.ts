@@ -19,6 +19,7 @@ export type TileSizePerSecond = number;
 export interface GridMovementConfig {
   characters: CharacterData[];
   firstLayerAboveChar?: number; // deprecated
+  collisionTilePropertyName?: string;
 }
 
 export interface WalkingAnimationMapping {
@@ -72,6 +73,11 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.randomMovement = new RandomMovement();
     this.tilemap = tilemap;
     this.gridTilemap = this.createTilemap(tilemap, config);
+    if (config.collisionTilePropertyName) {
+      this.gridTilemap.setCollisionTilePropertyName(
+        config.collisionTilePropertyName
+      );
+    }
     this.targetMovement = new TargetMovement(this.gridTilemap);
     this.followMovement = new FollowMovement(this.gridTilemap);
     this.addCharacters(config);
