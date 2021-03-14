@@ -37,8 +37,8 @@ parent: Examples
         const playerSprite = this.add.sprite(0, 0, "player");
         playerSprite.scale = 1.5;
         playerSprite.setFrame(getStopFrame('down'));
-        this.cameras.main.startFollow(playerSprite);
-        this.cameras.main.roundPixels = true;
+        this.cameras.main.startFollow(playerSprite, true);
+        this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
         createPlayerAnimation.call(this, 'up', 90, 92);
         createPlayerAnimation.call(this, 'right', 78, 80);
@@ -88,7 +88,6 @@ parent: Examples
             yoyo: true,
         });
     }
-
 
     function getStopFrame(direction) {
         switch (direction) {
@@ -142,8 +141,8 @@ function create() {
   const playerSprite = this.add.sprite(0, 0, "player");
   playerSprite.scale = 1.5;
   playerSprite.setFrame(getStopFrame("down"));
-  this.cameras.main.startFollow(playerSprite);
-  this.cameras.main.roundPixels = true;
+  this.cameras.main.startFollow(playerSprite, true);
+  this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
   createPlayerAnimation.call(this, "up", 90, 92);
   createPlayerAnimation.call(this, "right", 78, 80);

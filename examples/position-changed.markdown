@@ -41,9 +41,8 @@ parent: Examples
 
         const container = this.add.container(0, 0, [ playerSprite, positionChangeText ]);
 
-        this.cameras.main.startFollow(container);
-        this.cameras.main.roundPixels = true;
-
+        this.cameras.main.startFollow(container, true);
+        this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
         const gridMovementConfig = {
             characters: [
@@ -140,8 +139,8 @@ function create() {
     positionChangeText,
   ]);
 
-  this.cameras.main.startFollow(container);
-  this.cameras.main.roundPixels = true;
+  this.cameras.main.startFollow(container, true);
+  this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
   const gridMovementConfig = {
     characters: [

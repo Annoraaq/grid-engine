@@ -37,8 +37,8 @@ parent: Examples
 
         const playerSprite = this.add.sprite(0, 0, "player");
         playerSprite.scale = 1.5;
-        this.cameras.main.startFollow(playerSprite);
-        this.cameras.main.roundPixels = true;
+        this.cameras.main.startFollow(playerSprite, true);
+        this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
         const npcSprite = this.add.sprite(0, 0, "player");
         npcSprite.scale = 1.5;
@@ -159,8 +159,8 @@ function create() {
 
   const playerSprite = this.add.sprite(0, 0, "player");
   playerSprite.scale = 1.5;
-  this.cameras.main.startFollow(playerSprite);
-  this.cameras.main.roundPixels = true;
+  this.cameras.main.startFollow(playerSprite, true);
+  this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
   const npcSprite = this.add.sprite(0, 0, "player");
   npcSprite.scale = 1.5;

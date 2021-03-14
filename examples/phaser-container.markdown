@@ -41,8 +41,8 @@ function create() {
     text.setColor('#000000');
 
     const container = this.add.container(0, 0, [ playerSprite, text]);
-    this.cameras.main.startFollow(container);
-    this.cameras.main.roundPixels = true;
+    this.cameras.main.startFollow(container, true);
+    this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
     const gridMovementConfig = {
         characters: [
@@ -103,8 +103,8 @@ function create() {
   text.setColor("#000000");
 
   const container = this.add.container(0, 0, [playerSprite, text]);
-  this.cameras.main.startFollow(container);
-  this.cameras.main.roundPixels = true;
+  this.cameras.main.startFollow(container, true);
+  this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
   const gridMovementConfig = {
     characters: [

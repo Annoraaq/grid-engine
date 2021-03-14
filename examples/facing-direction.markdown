@@ -42,9 +42,8 @@ parent: Examples
 
         const container = this.add.container(0, 0, [ playerSprite, facingDirectionText]);
 
-        this.cameras.main.startFollow(container);
-        this.cameras.main.roundPixels = true;
-
+        this.cameras.main.startFollow(container, true);
+        this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
         const gridMovementConfig = {
             characters: [
@@ -57,7 +56,6 @@ parent: Examples
                 },
             ],
         };
-
 
         this.gridMovementPlugin.create(jungleTilemap, gridMovementConfig);
         this.gridMovementPlugin.turnTowards("player", 'left');
@@ -112,8 +110,8 @@ function create() {
     facingDirectionText,
   ]);
 
-  this.cameras.main.startFollow(container);
-  this.cameras.main.roundPixels = true;
+  this.cameras.main.startFollow(container, true);
+  this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
   const gridMovementConfig = {
     characters: [
