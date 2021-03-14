@@ -5,6 +5,7 @@ parent: Examples
 ---
 
 # Phaser Containers
+
 **Press the arrow keys to move.** This demo demonstrates how you can work with Phaser's Containers, enabling other Phaser components (such as text labels) to follow the character.
 
 <div id="game"></div>
@@ -74,62 +75,63 @@ function update() {
 </script>
 
 ## The Code
+
 ```javascript
 // Your game config
 var game = new Phaser.Game(config);
 
 function preload() {
-    this.load.image("tiles", "assets/cloud_tileset.png");
-    this.load.tilemapTiledJSON("cloud-city-map", "assets/cloud_city.json");
-    this.load.spritesheet("player", "assets/characters.png", {
-        frameWidth: 52,
-        frameHeight: 72,
-    });
+  this.load.image("tiles", "assets/cloud_tileset.png");
+  this.load.tilemapTiledJSON("cloud-city-map", "assets/cloud_city.json");
+  this.load.spritesheet("player", "assets/characters.png", {
+    frameWidth: 52,
+    frameHeight: 72,
+  });
 }
 
 function create() {
-    const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
-    cloudCityTilemap.addTilesetImage("Cloud City", "tiles");
-    for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-        const layer = cloudCityTilemap.createLayer(i, "Cloud City", 0, 0);
-        layer.scale = 3;
-    }
-    const playerSprite = this.add.sprite(0, 0, "player");
-    playerSprite.scale = 1.5;
+  const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
+  cloudCityTilemap.addTilesetImage("Cloud City", "tiles");
+  for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
+    const layer = cloudCityTilemap.createLayer(i, "Cloud City", 0, 0);
+    layer.scale = 3;
+  }
+  const playerSprite = this.add.sprite(0, 0, "player");
+  playerSprite.scale = 1.5;
 
-    const text = this.add.text(0, -10, 'Player 1');
-    text.setColor('#000000');
+  const text = this.add.text(0, -10, "Player 1");
+  text.setColor("#000000");
 
-    const container = this.add.container(0, 0, [ playerSprite, text]);
-    this.cameras.main.startFollow(container);
-    this.cameras.main.roundPixels = true;
+  const container = this.add.container(0, 0, [playerSprite, text]);
+  this.cameras.main.startFollow(container);
+  this.cameras.main.roundPixels = true;
 
-    const gridMovementConfig = {
-        characters: [
-            {
-                id: "player",
-                sprite: playerSprite,
-                container,
-                walkingAnimationMapping: 6,
-                walkingAnimationEnabled: true,
-                startPosition: new Phaser.Math.Vector2(8, 8),
-            },
-        ],
-    };
+  const gridMovementConfig = {
+    characters: [
+      {
+        id: "player",
+        sprite: playerSprite,
+        container,
+        walkingAnimationMapping: 6,
+        walkingAnimationEnabled: true,
+        startPosition: new Phaser.Math.Vector2(8, 8),
+      },
+    ],
+  };
 
-    this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
+  this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
 }
 
 function update() {
-    const cursors = this.input.keyboard.createCursorKeys();
-    if (cursors.left.isDown) {
-        this.gridMovementPlugin.moveLeft("player");
-    } else if (cursors.right.isDown) {
-        this.gridMovementPlugin.moveRight("player");
-    } else if (cursors.up.isDown) {
-        this.gridMovementPlugin.moveUp("player");
-    } else if (cursors.down.isDown) {
-        this.gridMovementPlugin.moveDown("player");
-    }
+  const cursors = this.input.keyboard.createCursorKeys();
+  if (cursors.left.isDown) {
+    this.gridMovementPlugin.moveLeft("player");
+  } else if (cursors.right.isDown) {
+    this.gridMovementPlugin.moveRight("player");
+  } else if (cursors.up.isDown) {
+    this.gridMovementPlugin.moveUp("player");
+  } else if (cursors.down.isDown) {
+    this.gridMovementPlugin.moveDown("player");
+  }
 }
 ```

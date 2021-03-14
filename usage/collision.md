@@ -5,6 +5,7 @@ nav_order: 2
 ---
 
 # Collisions
+
 **Grid Movement** makes it super easy to enjoy tile-based collisions in your game, and even getting it set up is a breeze.
 
 You can either read this guide, or check out the Medium article by @Annoraaq that's a tutorial for writing your own grid movement! [Here's the link.](https://medium.com/swlh/grid-based-movement-in-a-top-down-2d-rpg-with-phaser-3-e3a3486eb2fd)

@@ -5,6 +5,7 @@ parent: Examples
 ---
 
 # Following
+
 **Press the arrow keys to move.** This demo demonstrates how you can make a character follow another character.
 
 <div id="game"></div>
@@ -100,88 +101,89 @@ parent: Examples
 </script>
 
 ## The Code
+
 ```javascript
 // Your game config
 var game = new Phaser.Game(config);
 
-function preload () {
-    this.load.image("tiles", "assets/cloud_tileset.png");
-    this.load.tilemapTiledJSON("cloud-city-map", "assets/cloud_city_large.json");
-    this.load.spritesheet("player", "assets/characters.png", {
-        frameWidth: 52,
-        frameHeight: 72,
-    });
+function preload() {
+  this.load.image("tiles", "assets/cloud_tileset.png");
+  this.load.tilemapTiledJSON("cloud-city-map", "assets/cloud_city_large.json");
+  this.load.spritesheet("player", "assets/characters.png", {
+    frameWidth: 52,
+    frameHeight: 72,
+  });
 }
 
-function create () {
-    const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
-    cloudCityTilemap.addTilesetImage("cloud_tileset", "tiles");
-    for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-        const layer = cloudCityTilemap.createDynamicLayer(i, "cloud_tileset", 0, 0);
-        layer.scale = 3;
-    }
-    const playerSprite = this.add.sprite(0, 0, "player");
-    playerSprite.scale = 1.5;
-    this.cameras.main.startFollow(playerSprite);
-    this.cameras.main.roundPixels = true;
+function create() {
+  const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
+  cloudCityTilemap.addTilesetImage("cloud_tileset", "tiles");
+  for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
+    const layer = cloudCityTilemap.createDynamicLayer(i, "cloud_tileset", 0, 0);
+    layer.scale = 3;
+  }
+  const playerSprite = this.add.sprite(0, 0, "player");
+  playerSprite.scale = 1.5;
+  this.cameras.main.startFollow(playerSprite);
+  this.cameras.main.roundPixels = true;
 
-    const npcSprite = this.add.sprite(0, 0, "player");
-    npcSprite.scale = 1.5;
+  const npcSprite = this.add.sprite(0, 0, "player");
+  npcSprite.scale = 1.5;
 
-    const npcSprite1 = this.add.sprite(0, 0, "player");
-    npcSprite1.scale = 1.5;
+  const npcSprite1 = this.add.sprite(0, 0, "player");
+  npcSprite1.scale = 1.5;
 
-    const npcSprite2 = this.add.sprite(0, 0, "player");
-    npcSprite2.scale = 1.5;
+  const npcSprite2 = this.add.sprite(0, 0, "player");
+  npcSprite2.scale = 1.5;
 
-    const gridMovementConfig = {
-        characters: [
-            {
-                id: "player",
-                sprite: playerSprite,
-                walkingAnimationMapping: 6,
-                startPosition: new Phaser.Math.Vector2(8, 8),
-            },
-            {
-                id: "npc0",
-                sprite: npcSprite,
-                walkingAnimationMapping: 0,
-                startPosition: new Phaser.Math.Vector2(12, 5),
-                speed: 3
-            },
-            {
-                id: "npc1",
-                sprite: npcSprite1,
-                walkingAnimationMapping: 1,
-                startPosition: new Phaser.Math.Vector2(14, 8),
-            },
-            {
-                id: "npc2",
-                sprite: npcSprite2,
-                walkingAnimationMapping: 3,
-                startPosition: new Phaser.Math.Vector2(5, 10),
-                speed: 2
-            },
-        ],
-        firstLayerAboveChar: 3,
-    };
+  const gridMovementConfig = {
+    characters: [
+      {
+        id: "player",
+        sprite: playerSprite,
+        walkingAnimationMapping: 6,
+        startPosition: new Phaser.Math.Vector2(8, 8),
+      },
+      {
+        id: "npc0",
+        sprite: npcSprite,
+        walkingAnimationMapping: 0,
+        startPosition: new Phaser.Math.Vector2(12, 5),
+        speed: 3,
+      },
+      {
+        id: "npc1",
+        sprite: npcSprite1,
+        walkingAnimationMapping: 1,
+        startPosition: new Phaser.Math.Vector2(14, 8),
+      },
+      {
+        id: "npc2",
+        sprite: npcSprite2,
+        walkingAnimationMapping: 3,
+        startPosition: new Phaser.Math.Vector2(5, 10),
+        speed: 2,
+      },
+    ],
+    firstLayerAboveChar: 3,
+  };
 
-    this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
-    this.gridMovementPlugin.follow('npc0', 'player', 2, true);
-    this.gridMovementPlugin.follow('npc1', 'player', 1, true);
-    this.gridMovementPlugin.follow('npc2', 'player', 0, true);
+  this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
+  this.gridMovementPlugin.follow("npc0", "player", 2, true);
+  this.gridMovementPlugin.follow("npc1", "player", 1, true);
+  this.gridMovementPlugin.follow("npc2", "player", 0, true);
 }
 
-function update () {
-    const cursors = this.input.keyboard.createCursorKeys();
-    if (cursors.left.isDown) {
-        this.gridMovementPlugin.moveLeft("player");
-    } else if (cursors.right.isDown) {
-        this.gridMovementPlugin.moveRight("player");
-    } else if (cursors.up.isDown) {
-        this.gridMovementPlugin.moveUp("player");
-    } else if (cursors.down.isDown) {
-        this.gridMovementPlugin.moveDown("player");
-    }
+function update() {
+  const cursors = this.input.keyboard.createCursorKeys();
+  if (cursors.left.isDown) {
+    this.gridMovementPlugin.moveLeft("player");
+  } else if (cursors.right.isDown) {
+    this.gridMovementPlugin.moveRight("player");
+  } else if (cursors.up.isDown) {
+    this.gridMovementPlugin.moveUp("player");
+  } else if (cursors.down.isDown) {
+    this.gridMovementPlugin.moveDown("player");
+  }
 }
 ```

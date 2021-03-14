@@ -18,23 +18,26 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
 
 # Features
 
-* Grid-based movement, of course!
-* Tile-based collision detection
-* One-way collision detection
-* Support for multiple characters
-* Pathfinding (for both NPCs and the player)
-* Random movement (can also limit to a radius)
-* Following other characters
+- Grid-based movement, of course!
+- Tile-based collision detection
+- One-way collision detection
+- Support for multiple characters
+- Pathfinding (for both NPCs and the player)
+- Random movement (can also limit to a radius)
+- Following other characters
 
 # Installation
+
 Installing the Grid Movement plugin is simple.
 
 ## NPM
+
 ```bash
 npm i --save phaser-grid-movement-plugin
 ```
 
 ## Web
+
 ```html
 <!-- Download the .zip and copy GridMovementPlugin.min.js from dist/ -->
 <script src="GridMovementPlugin.min.js"></script>
@@ -44,19 +47,19 @@ Then, inside your Phaser game config...
 
 ```javascript
 const gameConfig = {
-    // ...
+  // ...
 
-    plugins: {
-        scene: [
-            {
-                key: "gridMovementPlugin",
-                plugin: GridMovementPlugin,
-                mapping: "gridMovementPlugin",
-            },
-        ],
-    },
+  plugins: {
+    scene: [
+      {
+        key: "gridMovementPlugin",
+        plugin: GridMovementPlugin,
+        mapping: "gridMovementPlugin",
+      },
+    ],
+  },
 
-    // ...
+  // ...
 };
 
 const game = new Phaser.Game(gameConfig);
@@ -65,24 +68,26 @@ const game = new Phaser.Game(gameConfig);
 Now you're all set to start using Grid Movement in your scenes!
 
 ```javascript
-function create () {
-    // ...
+function create() {
+  // ...
 
-    const gridMovementConfig = {
-        characters: [{
-            id: "player",
-            sprite: playerSprite,
-            walkingAnimationMapping: 6,
-        }],
-    };
+  const gridMovementConfig = {
+    characters: [
+      {
+        id: "player",
+        sprite: playerSprite,
+        walkingAnimationMapping: 6,
+      },
+    ],
+  };
 
-    this.gridMovementPlugin.create(tilemap, gridMovementConfig);
+  this.gridMovementPlugin.create(tilemap, gridMovementConfig);
 
-    // ...
+  // ...
 }
 ```
 
 # Example GIFs
+
 <img src="https://github.com/Annoraaq/phaser-grid-movement-plugin/raw/master/images/movement.gif">
 <img src="https://github.com/Annoraaq/phaser-grid-movement-plugin/raw/master/images/radius-movement.gif">
-
