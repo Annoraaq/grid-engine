@@ -14,7 +14,7 @@
   "author": "Johannes Baum",
   "license": "ISC",
   "devDependencies": {
-    "canvas": "^2.6.1",
+    "canvas": "^2.7.0",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^6.3.2",
     "declaration-bundler-webpack-plugin": "^1.0.3",
