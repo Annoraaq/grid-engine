@@ -1286,4 +1286,8 @@ describe("GridMovementPlugin", () => {
       ).toThrow("Plugin not initialized");
     });
   });
+
+  it("should break!", () => {
+    expect(false).toBe(true);
+  });
 });
