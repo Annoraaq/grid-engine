@@ -5,7 +5,8 @@
   "main": "dist/GridMovementPlugin.min.js",
   "scripts": {
     "test": "jest",
-    "build": "webpack"
+    "build": "webpack",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "files": [
     "dist"
