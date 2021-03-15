@@ -9,7 +9,7 @@ Welcome to the **Grid Movement** plugin! This Phaser 3 plugin adds grid-based mo
 This plugin is also compatible (and written in) TypeScript; enjoy full type support!
 
 <p align="center">
-    <img src="https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/assets/other/features-label.png" alt="Features" />
+    <img src="https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/images/features-label.png" alt="Features" />
 </p>
 
 - Grid-based movement, of course!
@@ -20,11 +20,11 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
 - Random movement (can also limit to a radius)
 - Following other characters
 
-📖 Our most current documentation [is here](https://github.com/Annoraaq/phaser-grid-movement-plugin/wiki)!  
+📖 Our most current documentation [is here](https://github.com/Annoraaq/phaser-grid-movement-plugin/wiki)!
 ➡️ You can try/download a list of examples [at this link here](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/).
 
 <p align="center">
-    <img src="https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/assets/other/installation-label.png" alt="Installation" />
+    <img src="https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/images/installation-label.png" alt="Installation" />
 </p>
 
 Installing the Grid Movement plugin is simple.
@@ -87,7 +87,7 @@ function create() {
 ```
 
 <p align="center">
-    <img src="https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/docs/assets/other/gifs-label.png" alt="Example GIFs" />
+    <img src="https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/images/gifs-label.png" alt="Example GIFs" />
 </p>
 <p align="center">
     <img src="https://github.com/Annoraaq/phaser-grid-movement-plugin/raw/master/images/movement.gif" />
