@@ -1,0 +1,29 @@
+{
+  "name": "pgmp-docs",
+  "version": "0.0.1",
+  "description": "An exceptional plugin for grid-based features in Phaser 3.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "esbuild src/index.js --minify --outfile=build/main.js",
+    "run": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Annoraaq/phaser-grid-movement-plugin.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Annoraaq/phaser-grid-movement-plugin/issues"
+  },
+  "homepage": "https://github.com/Annoraaq/phaser-grid-movement-plugin#readme",
+  "dependencies": {
+    "esbuild": "^0.9.2",
+    "front-matter": "^4.0.2",
+    "highlight.js": "^10.6.0",
+    "marked": "^2.0.1",
+    "tailwindcss": "^2.0.3"
+  }
+}
