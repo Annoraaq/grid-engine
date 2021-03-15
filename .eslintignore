@@ -1,6 +1,4 @@
 node_modules
 dist
 .github
-docs
-webpack.config.js
 **/*.d.ts
