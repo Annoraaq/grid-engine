@@ -3,9 +3,10 @@
     "target": "es5",
     "declaration": true,
     "allowJs": false,
-    "downlevelIteration": true,
-    "types": ["node", "jest"],
-    "lib": ["ES2016", "dom"]
+    "downlevelIteration": true
   },
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts"],
+  "exclude": [
+    "./dist/**/*"
+  ]
 }

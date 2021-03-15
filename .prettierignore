@@ -1,5 +1,1 @@
-node_modules
-**/*.d.ts
-docs
-.github
 dist
