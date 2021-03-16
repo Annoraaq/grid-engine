@@ -100,8 +100,20 @@ describe("GridCharacter", () => {
     expect(spriteMock.setDepth).toHaveBeenCalledWith(1000);
   });
 
-  it("should be facing down on construction", () => {
+  it("should be facing down on construction by default", () => {
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
+  });
+
+  it("should set the correct facingDirection", () => {
+    gridCharacter = new GridCharacter("player", {
+      sprite: spriteMock,
+      tilemap: gridTilemapMock,
+      tileSize: 16,
+      speed: 3,
+      walkingAnimationEnabled: true,
+      facingDirection: Direction.LEFT,
+    });
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
   });
 
   it("should get tile pos", () => {

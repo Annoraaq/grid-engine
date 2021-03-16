@@ -220,6 +220,31 @@ describe("GridMovementPlugin", () => {
     );
   });
 
+  it("should init player with facingDirection", () => {
+    const containerMock = {};
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          container: <any>containerMock,
+          facingDirection: Direction.LEFT,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    expect(GridCharacter).toHaveBeenCalledWith(
+      "player",
+      expect.objectContaining({
+        facingDirection: Direction.LEFT,
+      })
+    );
+    expect(mockSetTilePositon).toHaveBeenCalledWith(
+      new Phaser.Math.Vector2(0, 0)
+    );
+  });
+
   it("should still support deprecated characterIndex property", () => {
     console.warn = jest.fn();
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);

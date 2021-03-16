@@ -40,6 +40,7 @@ export interface CharacterData {
   container?: Phaser.GameObjects.Container;
   offsetX?: number;
   offsetY?: number;
+  facingDirection?: Direction;
 }
 
 export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
@@ -187,6 +188,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       container: charData.container,
       offsetX: charData.offsetX,
       offsetY: charData.offsetY,
+      facingDirection: charData.facingDirection,
     };
     if (charConfig.walkingAnimationMapping == undefined) {
       charConfig.walkingAnimationMapping = charData.characterIndex;
