@@ -8,7 +8,8 @@
   "scripts": {
     "test": "jest",
     "dev": "prettier --write src/ && eslint src/",
-    "build": "esbuild src/main.ts --bundle --minify --global-name=GridMovementPlugin --outfile=dist/GridMovementPlugin.min.js && tsc --emitDeclarationOnly --outDir dist"
+    "build": "esbuild src/main.ts --bundle --minify --global-name=GridMovementPlugin --outfile=dist/GridMovementPlugin.min.js && tsc --emitDeclarationOnly --outDir dist",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "files": [
     "dist"
