@@ -218,6 +218,24 @@ describe("GridMovementPlugin", () => {
     expect(mockSetTilePositon).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(0, 0)
     );
+    expect(mockTurnTowards).not.toHaveBeenCalled();
+  });
+
+  it("should init player with facingDirection", () => {
+    const containerMock = {};
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          container: <any>containerMock,
+          facingDirection: Direction.LEFT,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+    expect(mockTurnTowards).toHaveBeenCalledWith(Direction.LEFT);
   });
 
   it("should still support deprecated characterIndex property", () => {

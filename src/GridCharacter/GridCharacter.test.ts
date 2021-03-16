@@ -100,7 +100,7 @@ describe("GridCharacter", () => {
     expect(spriteMock.setDepth).toHaveBeenCalledWith(1000);
   });
 
-  it("should be facing down on construction", () => {
+  it("should be facing down on construction by default", () => {
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
   });
 

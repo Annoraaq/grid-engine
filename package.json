@@ -1,6 +1,6 @@
 {
   "name": "phaser-grid-movement-plugin",
-  "version": "1.7.0",
+  "version": "1.9.0",
   "description": "Phaser3 plugin for grid based movement on a 2D game board.",
   "author": "Johannes Baum",
   "license": "ISC",
@@ -8,7 +8,8 @@
   "scripts": {
     "test": "jest",
     "dev": "prettier --write src/ && eslint src/",
-    "build": "esbuild src/main.ts --bundle --minify --global-name=GridMovementPlugin --outfile=dist/GridMovementPlugin.min.js && tsc --emitDeclarationOnly --outDir dist"
+    "build": "esbuild src/main.ts --bundle --minify --global-name=GridMovementPlugin --outfile=dist/GridMovementPlugin.min.js && tsc --emitDeclarationOnly --outDir dist",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "files": [
     "dist"
@@ -24,6 +25,8 @@
     "@typescript-eslint/parser": "^4.17.0",
     "canvas": "^2.6.1",
     "eslint": "^7.22.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-jest": "^24.3.1",
     "jest": "^26.6.3",
     "prettier": "2.2.1",
     "ts-jest": "^26.4.4",

@@ -60,7 +60,7 @@ export class GridCharacter {
   private directionChanged$ = new Subject<Direction>();
   private positionChanged$ = new Subject<PositionChange>();
   private lastMovementImpulse = Direction.NONE;
-  private facingDirection = Direction.DOWN;
+  private facingDirection: Direction = Direction.DOWN;
   private customOffsetX: number;
   private customOffsetY: number;
 

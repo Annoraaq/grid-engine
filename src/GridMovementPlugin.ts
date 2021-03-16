@@ -40,6 +40,7 @@ export interface CharacterData {
   container?: Phaser.GameObjects.Container;
   offsetX?: number;
   offsetY?: number;
+  facingDirection?: Direction;
 }
 
 export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
@@ -195,6 +196,10 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       charConfig.walkingAnimationEnabled = true;
     }
     const gridChar = new GridCharacter(charData.id, charConfig);
+
+    if (charData.facingDirection) {
+      gridChar.turnTowards(charData.facingDirection);
+    }
 
     this.gridCharacters.set(charData.id, gridChar);
 
