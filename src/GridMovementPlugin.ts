@@ -188,7 +188,6 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       container: charData.container,
       offsetX: charData.offsetX,
       offsetY: charData.offsetY,
-      facingDirection: charData.facingDirection,
     };
     if (charConfig.walkingAnimationMapping == undefined) {
       charConfig.walkingAnimationMapping = charData.characterIndex;
@@ -197,6 +196,10 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       charConfig.walkingAnimationEnabled = true;
     }
     const gridChar = new GridCharacter(charData.id, charConfig);
+
+    if (charData.facingDirection) {
+      gridChar.turnTowards(charData.facingDirection);
+    }
 
     this.gridCharacters.set(charData.id, gridChar);
 

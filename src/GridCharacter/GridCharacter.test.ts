@@ -104,18 +104,6 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
   });
 
-  it("should set the correct facingDirection", () => {
-    gridCharacter = new GridCharacter("player", {
-      sprite: spriteMock,
-      tilemap: gridTilemapMock,
-      tileSize: 16,
-      speed: 3,
-      walkingAnimationEnabled: true,
-      facingDirection: Direction.LEFT,
-    });
-    expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
-  });
-
   it("should get tile pos", () => {
     const expectedPos = new Phaser.Math.Vector2(5, 6);
     const newTilePos = new Phaser.Math.Vector2(5, 6);

@@ -218,6 +218,7 @@ describe("GridMovementPlugin", () => {
     expect(mockSetTilePositon).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(0, 0)
     );
+    expect(mockTurnTowards).not.toHaveBeenCalled();
   });
 
   it("should init player with facingDirection", () => {
@@ -234,15 +235,7 @@ describe("GridMovementPlugin", () => {
       ],
       firstLayerAboveChar: 3,
     });
-    expect(GridCharacter).toHaveBeenCalledWith(
-      "player",
-      expect.objectContaining({
-        facingDirection: Direction.LEFT,
-      })
-    );
-    expect(mockSetTilePositon).toHaveBeenCalledWith(
-      new Phaser.Math.Vector2(0, 0)
-    );
+    expect(mockTurnTowards).toHaveBeenCalledWith(Direction.LEFT);
   });
 
   it("should still support deprecated characterIndex property", () => {

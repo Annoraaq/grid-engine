@@ -31,7 +31,6 @@ export interface CharConfig {
   container?: Phaser.GameObjects.Container;
   offsetX?: number;
   offsetY?: number;
-  facingDirection?: Direction;
 }
 
 export class GridCharacter {
@@ -61,7 +60,7 @@ export class GridCharacter {
   private directionChanged$ = new Subject<Direction>();
   private positionChanged$ = new Subject<PositionChange>();
   private lastMovementImpulse = Direction.NONE;
-  private facingDirection: Direction;
+  private facingDirection: Direction = Direction.DOWN;
   private customOffsetX: number;
   private customOffsetY: number;
 
@@ -81,7 +80,6 @@ export class GridCharacter {
     this.walkingAnimation = config.walkingAnimationEnabled;
     this.customOffsetX = config.offsetX || 0;
     this.customOffsetY = config.offsetY || 0;
-    this.facingDirection = config.facingDirection || Direction.DOWN;
 
     if (this.walkingAnimation) {
       this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
