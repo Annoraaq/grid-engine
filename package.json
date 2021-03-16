@@ -1,6 +1,6 @@
 {
   "name": "phaser-grid-movement-plugin",
-  "version": "1.7.0",
+  "version": "1.9.0",
   "description": "Phaser3 plugin for grid based movement on a 2D game board.",
   "author": "Johannes Baum",
   "license": "ISC",
