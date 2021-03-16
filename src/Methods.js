@@ -54,10 +54,9 @@ function getPageLayout(page) {
 }
 
 function parsePage(layout, data) {
-    layout.replace(/{{\s*(.+?)\s*}}/, (r, k) => data[k]);
-
-    console.log("\n----------------------------------------------------------------------------\n");
-    console.log(layout);
+    return layout.replace(/{{\s*(.+?)\s*}}/g, function(match, p1) {
+        return data[p1];
+    });
 }
 
 function prepPagePath(path, inDir, outDir) {
@@ -69,11 +68,24 @@ function prepPagePath(path, inDir, outDir) {
     return path;
 }
 
+function createPage(path, page) {
+    if (! fs.existsSync(path)) {
+        let dirPath = path.split("/").pop().join("/");
+        fs.mkdirSync(dirPath.join("/"), { recursive: true });
+    }
+
+    fs.writeFile(path, page, e => {
+        if (e) { throw e; }
+        console.log(path, "was created successfully");
+    });
+}
+
 module.exports = {
     findFiles,
     readPage,
     parsePage,
     prepPagePath,
     flattenObject,
-    getPageLayout
+    getPageLayout,
+    createPage
 }
