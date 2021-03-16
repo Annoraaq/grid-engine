@@ -39,17 +39,7 @@ function templatePage(data)  {
     </body>
 </html>
 `;
-};
-
-function readPage(pagePath) {
-    let data = fs.readFileSync(pagePath, "utf8");
-
-    let content = fm(data);
-    content.body = marked(content.body);
-    content.path = pagePath;
-
-    return content;
-};
+}
 
 function createPage(page) {
     let name = page.path.split(".md").shift() + ".html";
@@ -75,9 +65,8 @@ function createPages(pages) {
             }
         );
     });
-};
+}
 
 module.exports = {
-    createPage: createPage,
-    readPage: readPage
+    createPage: createPage
 };

@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "esbuild src/index.js --minify --outfile=build/main.js",
-    "run": "node src/index.js"
+    "build": "esbuild src/Generator.js --minify --platform=node --outfile=dist/Generator.js",
+    "dev": "node src/Generator.js"
   },
   "repository": {
     "type": "git",
