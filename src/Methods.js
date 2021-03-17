@@ -54,6 +54,15 @@ function getPageLayout(page) {
 }
 
 function parsePage(layout, data) {
+    // Handle @include directives
+    layout = layout.replace(/@include\(\s*'(.+)'\s*\)/g, function(match, p1) {
+        let partial = p1.split(".").join("/") + ".html";
+        let partialPath = config.inDir + "/partials/" + partial;
+
+        return fs.readFileSync(partialPath, "utf8");
+    });
+
+    // Finally, handle echo tags and return the result
     return layout.replace(/{{\s*(.+?)\s*}}/g, function(match, p1) {
         return data[p1];
     });
