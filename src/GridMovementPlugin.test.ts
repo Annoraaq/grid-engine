@@ -579,7 +579,17 @@ describe("GridMovementPlugin", () => {
     gridMovementPlugin.moveTo("player", targetVec);
     expect(mockTargetMovementAddCharacter).toHaveBeenCalledWith(
       expect.anything(),
-      targetVec
+      targetVec,
+      0,
+      false
+    );
+
+    gridMovementPlugin.moveTo("player", targetVec, true);
+    expect(mockTargetMovementAddCharacter).toHaveBeenCalledWith(
+      expect.anything(),
+      targetVec,
+      0,
+      true
     );
   });
 

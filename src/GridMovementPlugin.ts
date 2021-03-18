@@ -124,12 +124,18 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     );
   }
 
-  moveTo(charId: string, targetPos: Phaser.Math.Vector2): void {
+  moveTo(
+    charId: string,
+    targetPos: Phaser.Math.Vector2,
+    closestPointIfBlocked = false
+  ): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.targetMovement.addCharacter(
       this.gridCharacters.get(charId),
-      targetPos
+      targetPos,
+      0,
+      closestPointIfBlocked
     );
   }
 
