@@ -663,10 +663,58 @@ describe("GridMovementPlugin", () => {
     gridMovementPlugin.update(123, 456);
     expect(mockRemoveCharacter).toHaveBeenCalledWith("player");
     expect(mockTargetMovementRemoveCharacter).toHaveBeenCalledWith("player");
-    expect(mockRemoveCharacter).toHaveBeenCalledWith("player");
     expect(mockFollowMovement.removeCharacter).toHaveBeenCalledWith("player");
     expect(mockGridTileMap.removeCharacter).toHaveBeenCalledWith("player");
     expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
+  it("should remove all chars", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+        {
+          id: "player2",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
+    });
+    gridMovementPlugin.removeAllCharacters();
+    gridMovementPlugin.update(123, 456);
+    expect(mockRemoveCharacter).toHaveBeenCalledWith("player");
+    expect(mockTargetMovementRemoveCharacter).toHaveBeenCalledWith("player");
+    expect(mockFollowMovement.removeCharacter).toHaveBeenCalledWith("player");
+    expect(mockGridTileMap.removeCharacter).toHaveBeenCalledWith("player");
+    expect(mockRemoveCharacter).toHaveBeenCalledWith("player2");
+    expect(mockTargetMovementRemoveCharacter).toHaveBeenCalledWith("player2");
+    expect(mockFollowMovement.removeCharacter).toHaveBeenCalledWith("player2");
+    expect(mockGridTileMap.removeCharacter).toHaveBeenCalledWith("player2");
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
+  it("should get all chars", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+        {
+          id: "player2",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
+    });
+    const chars = gridMovementPlugin.getAllCharacters();
+    expect(chars).toEqual(["player", "player2"]);
   });
 
   it("should check if char is registered", () => {
@@ -1312,6 +1360,18 @@ describe("GridMovementPlugin", () => {
       expect(() =>
         gridMovementPlugin.turnTowards("someCharId", Direction.LEFT)
       ).toThrow("Plugin not initialized");
+    });
+
+    it("should throw error if removeAllCharacters is invoked", () => {
+      expect(() => gridMovementPlugin.removeAllCharacters()).toThrow(
+        "Plugin not initialized"
+      );
+    });
+
+    it("should throw error if getAllCharacters is invoked", () => {
+      expect(() => gridMovementPlugin.getAllCharacters()).toThrow(
+        "Plugin not initialized"
+      );
     });
   });
 });

@@ -58,6 +58,8 @@ export declare class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     addCharacter(charData: CharacterData): void;
     hasCharacter(charId: string): boolean;
     removeCharacter(charId: string): void;
+    removeAllCharacters(): void;
+    getAllCharacters(): string[];
     follow(charId: string, charIdToFollow: string, distance?: number, closestPointIfBlocked?: boolean): void;
     stopFollowing(charId: string): void;
     isMoving(charId: string): boolean;

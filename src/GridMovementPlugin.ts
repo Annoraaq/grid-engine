@@ -264,6 +264,18 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.charRemoved$.next(charId);
   }
 
+  removeAllCharacters(): void {
+    this.initGuard();
+    for (const charId of this.gridCharacters.keys()) {
+      this.removeCharacter(charId);
+    }
+  }
+
+  getAllCharacters(): string[] {
+    this.initGuard();
+    return [...this.gridCharacters.keys()];
+  }
+
   follow(
     charId: string,
     charIdToFollow: string,
