@@ -18,9 +18,11 @@ export interface PositionChange {
 export interface CharConfig {
     sprite: Phaser.GameObjects.Sprite;
     tilemap: GridTilemap;
-    tileSize: number;
+    tileWidth: number;
+    tileHeight: number;
     speed: number;
     walkingAnimationEnabled: boolean;
+    isometric: boolean;
     walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
     container?: Phaser.GameObjects.Container;
     offsetX?: number;
@@ -33,13 +35,16 @@ export declare class GridCharacter {
     private directionToFrameRow;
     private movementDirection;
     private readonly speedPixelsPerSecond;
-    private tileSizePixelsWalked;
+    private tileSizePixelsWalkedX;
+    private tileSizePixelsWalkedY;
     private lastFootLeft;
     private readonly _tilePos;
     private sprite;
     private container?;
     private tilemap;
     private tileSize;
+    private tileWidth;
+    private tileHeight;
     private speed;
     private characterIndex;
     private walkingAnimationMapping;
@@ -52,6 +57,7 @@ export declare class GridCharacter {
     private facingDirection;
     private customOffsetX;
     private customOffsetY;
+    private isIsometric;
     constructor(id: string, config: CharConfig);
     getId(): string;
     getSpeed(): number;
@@ -91,7 +97,6 @@ export declare class GridCharacter {
     private moveCharacterSpriteRestOfTile;
     private moveCharacterSprite;
     private stopMoving;
-    private movementDistance;
     private updateCharacterFrame;
     private hasWalkedHalfATile;
 }

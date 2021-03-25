@@ -210,7 +210,9 @@ describe("GridMovementPlugin", () => {
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
       tilemap: mockGridTileMap,
-      tileSize: 32,
+      tileWidth: 32,
+      tileHeight: 32,
+      isometric: false,
       speed: 4,
       walkingAnimationEnabled: true,
       container: containerMock,
@@ -254,7 +256,9 @@ describe("GridMovementPlugin", () => {
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
       tilemap: mockGridTileMap,
-      tileSize: 32,
+      tileWidth: 32,
+      tileHeight: 32,
+      isometric: false,
       speed: 4,
       walkingAnimationMapping: 2,
       walkingAnimationEnabled: true,
@@ -284,7 +288,9 @@ describe("GridMovementPlugin", () => {
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
       tilemap: mockGridTileMap,
-      tileSize: 32,
+      tileWidth: 32,
+      tileHeight: 32,
+      isometric: false,
       speed: 4,
       walkingAnimationMapping: 3,
       walkingAnimationEnabled: true,
@@ -309,7 +315,9 @@ describe("GridMovementPlugin", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileSize: 32,
+      tileWidth: 32,
+      tileHeight: 32,
+      isometric: false,
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping: 3,
@@ -356,7 +364,9 @@ describe("GridMovementPlugin", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileSize: 32,
+      tileWidth: 32,
+      tileHeight: 32,
+      isometric: false,
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping,
@@ -400,7 +410,9 @@ describe("GridMovementPlugin", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileSize: 32,
+      tileWidth: 32,
+      tileHeight: 32,
+      isometric: false,
       tilemap: mockGridTileMap,
       speed: 2,
       walkingAnimationMapping: 3,
@@ -425,7 +437,9 @@ describe("GridMovementPlugin", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileSize: 32,
+      tileWidth: 32,
+      tileHeight: 32,
+      isometric: false,
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping: 3,
