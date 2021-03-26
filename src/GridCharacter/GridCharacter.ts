@@ -1,4 +1,9 @@
-import { DirectionVectors, oppositeDirection } from "./../Direction/Direction";
+import { VectorUtils } from "./../Utils/VectorUtils";
+import {
+  DirectionVectors,
+  DirectionVectorsIsometric,
+  oppositeDirection,
+} from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
 import * as Phaser from "phaser";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
@@ -46,28 +51,25 @@ export class GridCharacter {
   };
   private movementDirection = Direction.NONE;
   private speedPixelsPerSecond: Vector2;
-  private tileSizePixelsWalkedX = 0;
-  private tileSizePixelsWalkedY = 0;
+  private tileSizePixelsWalked: Vector2 = Vector2.ZERO.clone();
   private lastFootLeft = false;
   private _tilePos = new Phaser.Math.Vector2(0, 0);
   private sprite: Phaser.GameObjects.Sprite;
   private container?: Phaser.GameObjects.Container;
   private tilemap: GridTilemap;
-  private tileSize: number;
-  private tileWidth: number;
-  private tileHeight: number;
+  private tileDistance: Vector2;
+  private tileSize: Vector2;
   private speed: number;
   private characterIndex = 0;
   private walkingAnimationMapping: WalkingAnimationMapping;
   private walkingAnimation: boolean;
+  private customOffset: Vector2;
   private movementStarted$ = new Subject<Direction>();
   private movementStopped$ = new Subject<Direction>();
   private directionChanged$ = new Subject<Direction>();
   private positionChanged$ = new Subject<PositionChange>();
   private lastMovementImpulse = Direction.NONE;
   private facingDirection: Direction = Direction.DOWN;
-  private customOffsetX: number;
-  private customOffsetY: number;
   private isIsometric: boolean;
 
   constructor(private id: string, config: CharConfig) {
@@ -83,11 +85,14 @@ export class GridCharacter {
     this.tilemap = config.tilemap;
     this.speed = config.speed;
     this.walkingAnimation = config.walkingAnimationEnabled;
-    this.customOffsetX = config.offsetX || 0;
-    this.customOffsetY = config.offsetY || 0;
+    this.customOffset = new Vector2(config.offsetX || 0, config.offsetY || 0);
     this.isIsometric = config.isometric;
-    this.tileWidth = this.isIsometric ? config.tileWidth / 2 : config.tileWidth;
-    this.tileHeight = this.isIsometric
+    this.tileSize = new Vector2(config.tileWidth, config.tileHeight);
+    this.tileDistance = new Vector2();
+    this.tileDistance.x = this.isIsometric
+      ? config.tileWidth / 2
+      : config.tileWidth;
+    this.tileDistance.y = this.isIsometric
       ? config.tileHeight / 2
       : config.tileHeight;
 
@@ -95,17 +100,10 @@ export class GridCharacter {
       this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
     }
 
-    // if (this.isIsometric) {
-    //   this.speedPixelsPerSecond = new Vector2(
-    //     (this.tileWidth / 2) * this.speed,
-    //     (this.tileHeight / 2) * this.speed
-    //   );
-    // } else {
-    this.speedPixelsPerSecond = new Vector2(
-      this.tileWidth * this.speed,
-      this.tileHeight * this.speed
+    this.speedPixelsPerSecond = VectorUtils.scalarMult(
+      this.tileDistance,
+      this.speed
     );
-    // }
     this.updateZindex();
   }
 
@@ -129,28 +127,23 @@ export class GridCharacter {
 
   setTilePosition(tilePosition: Phaser.Math.Vector2): void {
     if (this.isMoving()) return;
-    let offsetX = 0;
-    let offsetY = 0;
-
-    if (this.isIsometric) {
-      offsetX =
-        this.tileWidth -
-        Math.floor((this.sprite.width * this.sprite.scale) / 2);
-      offsetY = -(this.sprite.height * this.sprite.scale) + this.tileHeight * 2;
-    } else {
-      offsetX =
-        this.tileWidth / 2 -
-        Math.floor((this.sprite.width * this.sprite.scale) / 2);
-      offsetY = -(this.sprite.height * this.sprite.scale) + this.tileHeight;
-    }
     this.tilePos = tilePosition;
     this.updateZindex();
     this.setPosition(
-      new Vector2(
-        tilePosition.x * this.tileWidth + offsetX + this.customOffsetX,
-        tilePosition.y * this.tileHeight + offsetY + this.customOffsetY
-      )
+      tilePosition
+        .clone()
+        .multiply(this.tileDistance)
+        .add(this.getOffset())
+        .add(this.customOffset)
     );
+  }
+
+  private getOffset(): Vector2 {
+    const offsetX =
+      this.tileSize.x / 2 -
+      Math.floor((this.sprite.width * this.sprite.scale) / 2);
+    const offsetY = -(this.sprite.height * this.sprite.scale) + this.tileSize.y;
+    return new Vector2(offsetX, offsetY);
   }
 
   getTilePos(): Phaser.Math.Vector2 {
@@ -347,85 +340,50 @@ export class GridCharacter {
   }
 
   private getSpeedPerDelta(delta: number): Vector2 {
-    let dirVecs = DirectionVectors;
-    if (this.isIsometric) {
-      dirVecs = {
-        [Direction.DOWN]: new Vector2(-1, 1),
-        [Direction.UP]: new Vector2(1, -1),
-        [Direction.RIGHT]: new Vector2(1, 1),
-        [Direction.LEFT]: new Vector2(-1, -1),
-      };
-    }
     const deltaInSeconds = delta / 1000;
     return this.speedPixelsPerSecond
       .clone()
       .multiply(new Vector2(deltaInSeconds, deltaInSeconds))
-      .multiply(dirVecs[this.movementDirection]);
+      .multiply(this.getDirectionVecs()[this.movementDirection]);
   }
 
   private willCrossTileBorderThisUpdate(
     pixelsToWalkThisUpdate: Vector2
   ): boolean {
-    // if (this.isIsometric) {
-    //   return (
-    //     this.tileSizePixelsWalkedX + Math.abs(pixelsToWalkThisUpdate.x) >=
-    //       this.tileWidth / 2 ||
-    //     this.tileSizePixelsWalkedY + Math.abs(pixelsToWalkThisUpdate.y) >=
-    //       this.tileHeight / 2
-    //   );
-    // } else {
     return (
-      this.tileSizePixelsWalkedX + Math.abs(pixelsToWalkThisUpdate.x) >=
-        this.tileWidth ||
-      this.tileSizePixelsWalkedY + Math.abs(pixelsToWalkThisUpdate.y) >=
-        this.tileHeight
+      this.tileSizePixelsWalked.x + Math.abs(pixelsToWalkThisUpdate.x) >=
+        this.tileDistance.x ||
+      this.tileSizePixelsWalked.y + Math.abs(pixelsToWalkThisUpdate.y) >=
+        this.tileDistance.y
     );
-    // }
   }
 
   private moveCharacterSpriteRestOfTile(): void {
-    let dirVecs = DirectionVectors;
-    if (this.isIsometric) {
-      dirVecs = {
-        [Direction.DOWN]: new Vector2(-1, 1),
-        [Direction.UP]: new Vector2(1, -1),
-        [Direction.RIGHT]: new Vector2(1, 1),
-        [Direction.LEFT]: new Vector2(-1, -1),
-      };
-    }
-    //   this.moveCharacterSprite(
-    //     new Vector2(
-    //       this.tileWidth / 2 - this.tileSizePixelsWalkedX,
-    //       this.tileHeight / 2 - this.tileSizePixelsWalkedY
-    //     ).multiply(dirVecs[this.movementDirection])
-    //   );
-    // } else {
     this.moveCharacterSprite(
-      new Vector2(
-        this.tileWidth - this.tileSizePixelsWalkedX,
-        this.tileHeight - this.tileSizePixelsWalkedY
-      ).multiply(dirVecs[this.movementDirection])
+      this.tileDistance
+        .clone()
+        .subtract(this.tileSizePixelsWalked)
+        .multiply(this.getDirectionVecs()[this.movementDirection])
     );
-    // }
+  }
+
+  private getDirectionVecs(): { [key in Direction]?: Vector2 } {
+    if (this.isIsometric) {
+      return DirectionVectorsIsometric;
+    }
+    return DirectionVectors;
   }
 
   private moveCharacterSprite(speed: Vector2): void {
     const newPlayerPos = this.getPosition().add(speed);
     this.setPosition(newPlayerPos);
-    this.tileSizePixelsWalkedX = this.tileSizePixelsWalkedX + Math.abs(speed.x);
-    this.tileSizePixelsWalkedY = this.tileSizePixelsWalkedY + Math.abs(speed.y);
+    this.tileSizePixelsWalked.x += Math.abs(speed.x);
+    this.tileSizePixelsWalked.y += Math.abs(speed.y);
     if (this.walkingAnimation) {
       this.updateCharacterFrame();
     }
-    // if (this.isIsometric) {
-    //   this.tileSizePixelsWalkedX =
-    //     this.tileSizePixelsWalkedX % (this.tileWidth / 2);
-    //   this.tileSizePixelsWalkedY =
-    //     this.tileSizePixelsWalkedY % (this.tileHeight / 2);
-    // } else {
-    this.tileSizePixelsWalkedX = this.tileSizePixelsWalkedX % this.tileWidth;
-    this.tileSizePixelsWalkedY = this.tileSizePixelsWalkedY % this.tileHeight;
-    // }
+    this.tileSizePixelsWalked.x %= this.tileDistance.x;
+    this.tileSizePixelsWalked.y %= this.tileDistance.y;
     if (this.hasWalkedHalfATile()) {
       this.updateZindex();
     }
@@ -445,16 +403,9 @@ export class GridCharacter {
   }
 
   private hasWalkedHalfATile(): boolean {
-    // if (this.isIsometric) {
-    //   return (
-    //     this.tileSizePixelsWalkedX > this.tileWidth / 2 / 2 ||
-    //     this.tileSizePixelsWalkedY > this.tileHeight / 2 / 2
-    //   );
-    // } else {
     return (
-      this.tileSizePixelsWalkedX > this.tileWidth / 2 ||
-      this.tileSizePixelsWalkedY > this.tileHeight / 2
+      this.tileSizePixelsWalked.x > this.tileDistance.x / 2 ||
+      this.tileSizePixelsWalked.y > this.tileDistance.y / 2
     );
-    // }
   }
 }
