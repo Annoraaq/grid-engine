@@ -34,11 +34,11 @@ export declare class GridCharacter {
     private static readonly FRAMES_CHAR_COL;
     private directionToFrameRow;
     private movementDirection;
-    private readonly speedPixelsPerSecond;
+    private speedPixelsPerSecond;
     private tileSizePixelsWalkedX;
     private tileSizePixelsWalkedY;
     private lastFootLeft;
-    private readonly _tilePos;
+    private _tilePos;
     private sprite;
     private container?;
     private tilemap;

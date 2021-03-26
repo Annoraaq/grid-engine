@@ -20,6 +20,7 @@ export interface GridMovementConfig {
   characters: CharacterData[];
   firstLayerAboveChar?: number; // deprecated
   collisionTilePropertyName?: string;
+  isometric?: boolean;
 }
 
 export interface WalkingAnimationMapping {
@@ -56,6 +57,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   private directionChanged$ = new Subject<[string, Direction]>();
   private positionChanged$ = new Subject<{ charId: string } & PositionChange>();
   private charRemoved$ = new Subject<string>();
+  private config: GridMovementConfig;
 
   constructor(
     public scene: Phaser.Scene,
@@ -70,6 +72,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
 
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridMovementConfig): void {
     this.isCreated = true;
+    this.config = config;
     this.gridCharacters = new Map();
     this.randomMovement = new RandomMovement();
     this.tilemap = tilemap;
@@ -188,9 +191,9 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       sprite: charData.sprite,
       speed: charData.speed || 4,
       tilemap: this.gridTilemap,
-      tileWidth: this.getTileSize(),
-      tileHeight: this.getTileSize(),
-      isometric: false,
+      tileWidth: this.getTileWidth(),
+      tileHeight: this.getTileHeight(),
+      isometric: !!this.config.isometric,
       walkingAnimationMapping: charData.walkingAnimationMapping,
       walkingAnimationEnabled: charData.walkingAnimationEnabled,
       container: charData.container,
@@ -367,9 +370,14 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     }
   }
 
-  private getTileSize(): number {
+  private getTileWidth(): number {
     const tilemapScale = this.tilemap.layers[0].tilemapLayer.scale;
     return this.tilemap.tileWidth * tilemapScale;
+  }
+
+  private getTileHeight(): number {
+    const tilemapScale = this.tilemap.layers[0].tilemapLayer.scale;
+    return this.tilemap.tileHeight * tilemapScale;
   }
 
   private addCharacters(config: GridMovementConfig) {

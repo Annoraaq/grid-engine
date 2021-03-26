@@ -7,6 +7,7 @@ export interface GridMovementConfig {
     characters: CharacterData[];
     firstLayerAboveChar?: number;
     collisionTilePropertyName?: string;
+    isometric?: boolean;
 }
 export interface WalkingAnimationMapping {
     [Direction.UP]: FrameRow;
@@ -41,6 +42,7 @@ export declare class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     private directionChanged$;
     private positionChanged$;
     private charRemoved$;
+    private config;
     constructor(scene: Phaser.Scene, pluginManager: Phaser.Plugins.PluginManager);
     boot(): void;
     create(tilemap: Phaser.Tilemaps.Tilemap, config: GridMovementConfig): void;
@@ -75,6 +77,7 @@ export declare class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     private initGuard;
     private unknownCharGuard;
     private createTilemap;
-    private getTileSize;
+    private getTileWidth;
+    private getTileHeight;
     private addCharacters;
 }

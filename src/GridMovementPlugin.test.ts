@@ -119,6 +119,10 @@ describe("GridMovementPlugin", () => {
   let tileMapMock;
   let playerSpriteMock;
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   beforeEach(() => {
     // hacky way of avoiding errors in Plugin Initialization because Phaser
     // is not mockable by jest
@@ -131,6 +135,7 @@ describe("GridMovementPlugin", () => {
         },
       ],
       tileWidth: 16,
+      tileHeight: 16,
     };
     playerSpriteMock = {};
     mockTargetMovementUpdate.mockReset();
@@ -138,6 +143,7 @@ describe("GridMovementPlugin", () => {
     mockRemoveCharacter.mockReset();
     mockTargetMovementRemoveCharacter.mockReset();
     mockUpdate.mockReset();
+    // // @ts-ignore
     mockFollowMovement.addCharacter.mockReset();
     mockFollowMovement.removeCharacter.mockReset();
     mockFollowMovement.update.mockReset();
@@ -216,11 +222,32 @@ describe("GridMovementPlugin", () => {
       speed: 4,
       walkingAnimationEnabled: true,
       container: containerMock,
+      offsetX: undefined,
+      offsetY: undefined,
     });
     expect(mockSetTilePositon).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(0, 0)
     );
     expect(mockTurnTowards).not.toHaveBeenCalled();
+  });
+
+  it("should init isometric player", () => {
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+        },
+      ],
+      isometric: true,
+    });
+    expect(GridCharacter).toHaveBeenCalledWith(
+      "player",
+      expect.objectContaining({
+        isometric: true,
+      })
+    );
   });
 
   it("should init player with facingDirection", () => {
