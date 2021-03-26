@@ -18,8 +18,7 @@ export interface PositionChange {
 export interface CharConfig {
     sprite: Phaser.GameObjects.Sprite;
     tilemap: GridTilemap;
-    tileWidth: number;
-    tileHeight: number;
+    tileSize: Vector2;
     speed: number;
     walkingAnimationEnabled: boolean;
     isometric: boolean;

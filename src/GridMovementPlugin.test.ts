@@ -143,7 +143,6 @@ describe("GridMovementPlugin", () => {
     mockRemoveCharacter.mockReset();
     mockTargetMovementRemoveCharacter.mockReset();
     mockUpdate.mockReset();
-    // // @ts-ignore
     mockFollowMovement.addCharacter.mockReset();
     mockFollowMovement.removeCharacter.mockReset();
     mockFollowMovement.update.mockReset();

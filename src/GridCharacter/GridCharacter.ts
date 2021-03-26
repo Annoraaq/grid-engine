@@ -29,8 +29,7 @@ export interface PositionChange {
 export interface CharConfig {
   sprite: Phaser.GameObjects.Sprite;
   tilemap: GridTilemap;
-  tileWidth: number;
-  tileHeight: number;
+  tileSize: Vector2;
   speed: number;
   walkingAnimationEnabled: boolean;
   isometric: boolean;
@@ -87,14 +86,11 @@ export class GridCharacter {
     this.walkingAnimation = config.walkingAnimationEnabled;
     this.customOffset = new Vector2(config.offsetX || 0, config.offsetY || 0);
     this.isIsometric = config.isometric;
-    this.tileSize = new Vector2(config.tileWidth, config.tileHeight);
-    this.tileDistance = new Vector2();
-    this.tileDistance.x = this.isIsometric
-      ? config.tileWidth / 2
-      : config.tileWidth;
-    this.tileDistance.y = this.isIsometric
-      ? config.tileHeight / 2
-      : config.tileHeight;
+    this.tileSize = config.tileSize.clone();
+    this.tileDistance = config.tileSize.clone();
+    if (this.isIsometric) {
+      this.tileDistance = VectorUtils.scalarMult(this.tileDistance, 0.5);
+    }
 
     if (this.walkingAnimation) {
       this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
