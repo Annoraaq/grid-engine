@@ -1,5 +1,6 @@
 import * as Phaser from "phaser";
 type Vector2 = Phaser.Math.Vector2;
+const Vector2 = Phaser.Math.Vector2;
 
 export class VectorUtils {
   static vec2str(vec: Vector2): string {
@@ -14,5 +15,9 @@ export class VectorUtils {
     const xDist = Math.abs(pos1.x - pos2.x);
     const yDist = Math.abs(pos1.y - pos2.y);
     return xDist + yDist;
+  }
+
+  static scalarMult(vec: Vector2, scalar: number): Vector2 {
+    return vec.clone().multiply(new Vector2(scalar, scalar));
   }
 }

@@ -14,6 +14,9 @@ import { RandomMovement } from "./RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 
+const Vector2 = Phaser.Math.Vector2;
+type Vector2 = Phaser.Math.Vector2;
+
 export type TileSizePerSecond = number;
 
 export interface GridMovementConfig {
@@ -36,7 +39,7 @@ export interface CharacterData {
   walkingAnimationEnabled?: boolean;
   characterIndex?: number; // deprecated
   speed?: TileSizePerSecond;
-  startPosition?: Phaser.Math.Vector2;
+  startPosition?: Vector2;
   container?: Phaser.GameObjects.Container;
   offsetX?: number;
   offsetY?: number;
@@ -56,6 +59,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   private directionChanged$ = new Subject<[string, Direction]>();
   private positionChanged$ = new Subject<{ charId: string } & PositionChange>();
   private charRemoved$ = new Subject<string>();
+  private config: GridMovementConfig;
 
   constructor(
     public scene: Phaser.Scene,
@@ -70,6 +74,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
 
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridMovementConfig): void {
     this.isCreated = true;
+    this.config = config;
     this.gridCharacters = new Map();
     this.randomMovement = new RandomMovement();
     this.tilemap = tilemap;
@@ -84,7 +89,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.addCharacters(config);
   }
 
-  getPosition(charId: string): Phaser.Math.Vector2 {
+  getPosition(charId: string): Vector2 {
     this.initGuard();
     this.unknownCharGuard(charId);
     return this.gridCharacters.get(charId).getTilePos();
@@ -126,7 +131,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
 
   moveTo(
     charId: string,
-    targetPos: Phaser.Math.Vector2,
+    targetPos: Vector2,
     closestPointIfBlocked = false
   ): void {
     this.initGuard();
@@ -188,7 +193,9 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       sprite: charData.sprite,
       speed: charData.speed || 4,
       tilemap: this.gridTilemap,
-      tileSize: this.getTileSize(),
+      tileSize: new Vector2(this.getTileWidth(), this.getTileHeight()),
+      isometric:
+        this.tilemap.orientation == `${Phaser.Tilemaps.Orientation.ISOMETRIC}`,
       walkingAnimationMapping: charData.walkingAnimationMapping,
       walkingAnimationEnabled: charData.walkingAnimationEnabled,
       container: charData.container,
@@ -209,9 +216,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
 
     this.gridCharacters.set(charData.id, gridChar);
 
-    gridChar.setTilePosition(
-      charData.startPosition || new Phaser.Math.Vector2(0, 0)
-    );
+    gridChar.setTilePosition(charData.startPosition || new Vector2(0, 0));
 
     this.gridTilemap.addCharacter(gridChar);
 
@@ -365,9 +370,14 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     }
   }
 
-  private getTileSize(): number {
+  private getTileWidth(): number {
     const tilemapScale = this.tilemap.layers[0].tilemapLayer.scale;
     return this.tilemap.tileWidth * tilemapScale;
+  }
+
+  private getTileHeight(): number {
+    const tilemapScale = this.tilemap.layers[0].tilemapLayer.scale;
+    return this.tilemap.tileHeight * tilemapScale;
   }
 
   private addCharacters(config: GridMovementConfig) {

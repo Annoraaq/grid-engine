@@ -1,4 +1,9 @@
-import { DirectionVectors, oppositeDirection } from "./../Direction/Direction";
+import { VectorUtils } from "./../Utils/VectorUtils";
+import {
+  DirectionVectors,
+  DirectionVectorsIsometric,
+  oppositeDirection,
+} from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
 import * as Phaser from "phaser";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
@@ -24,9 +29,10 @@ export interface PositionChange {
 export interface CharConfig {
   sprite: Phaser.GameObjects.Sprite;
   tilemap: GridTilemap;
-  tileSize: number;
+  tileSize: Vector2;
   speed: number;
   walkingAnimationEnabled: boolean;
+  isometric: boolean;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
   container?: Phaser.GameObjects.Container;
   offsetX?: number;
@@ -43,26 +49,27 @@ export class GridCharacter {
     [Direction.UP]: 3,
   };
   private movementDirection = Direction.NONE;
-  private readonly speedPixelsPerSecond: number;
-  private tileSizePixelsWalked = 0;
+  private speedPixelsPerSecond: Vector2;
+  private tileSizePixelsWalked: Vector2 = Vector2.ZERO.clone();
   private lastFootLeft = false;
-  private readonly _tilePos = new Phaser.Math.Vector2(0, 0);
+  private _tilePos = new Phaser.Math.Vector2(0, 0);
   private sprite: Phaser.GameObjects.Sprite;
   private container?: Phaser.GameObjects.Container;
   private tilemap: GridTilemap;
-  private tileSize: number;
+  private tileDistance: Vector2;
+  private tileSize: Vector2;
   private speed: number;
   private characterIndex = 0;
   private walkingAnimationMapping: WalkingAnimationMapping;
   private walkingAnimation: boolean;
+  private customOffset: Vector2;
   private movementStarted$ = new Subject<Direction>();
   private movementStopped$ = new Subject<Direction>();
   private directionChanged$ = new Subject<Direction>();
   private positionChanged$ = new Subject<PositionChange>();
   private lastMovementImpulse = Direction.NONE;
   private facingDirection: Direction = Direction.DOWN;
-  private customOffsetX: number;
-  private customOffsetY: number;
+  private isIsometric: boolean;
 
   constructor(private id: string, config: CharConfig) {
     if (typeof config.walkingAnimationMapping == "number") {
@@ -75,16 +82,24 @@ export class GridCharacter {
     this.sprite.setOrigin(0, 0);
     this.container = config.container;
     this.tilemap = config.tilemap;
-    this.tileSize = config.tileSize;
     this.speed = config.speed;
     this.walkingAnimation = config.walkingAnimationEnabled;
-    this.customOffsetX = config.offsetX || 0;
-    this.customOffsetY = config.offsetY || 0;
+    this.customOffset = new Vector2(config.offsetX || 0, config.offsetY || 0);
+    this.isIsometric = config.isometric;
+    this.tileSize = config.tileSize.clone();
+    this.tileDistance = config.tileSize.clone();
+    if (this.isIsometric) {
+      this.tileDistance = VectorUtils.scalarMult(this.tileDistance, 0.5);
+    }
 
     if (this.walkingAnimation) {
       this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
     }
-    this.speedPixelsPerSecond = this.tileSize * this.speed;
+
+    this.speedPixelsPerSecond = VectorUtils.scalarMult(
+      this.tileDistance,
+      this.speed
+    );
     this.updateZindex();
   }
 
@@ -108,20 +123,23 @@ export class GridCharacter {
 
   setTilePosition(tilePosition: Phaser.Math.Vector2): void {
     if (this.isMoving()) return;
-
-    const offsetX =
-      this.tileSize / 2 -
-      Math.floor((this.sprite.width * this.sprite.scale) / 2);
-    const offsetY = -(this.sprite.height * this.sprite.scale) + this.tileSize;
-
     this.tilePos = tilePosition;
     this.updateZindex();
     this.setPosition(
-      new Vector2(
-        tilePosition.x * this.tileSize + offsetX + this.customOffsetX,
-        tilePosition.y * this.tileSize + offsetY + this.customOffsetY
-      )
+      tilePosition
+        .clone()
+        .multiply(this.tileDistance)
+        .add(this.getOffset())
+        .add(this.customOffset)
     );
+  }
+
+  private getOffset(): Vector2 {
+    const offsetX =
+      this.tileSize.x / 2 -
+      Math.floor((this.sprite.width * this.sprite.scale) / 2);
+    const offsetY = -(this.sprite.height * this.sprite.scale) + this.tileSize.y;
+    return new Vector2(offsetX, offsetY);
   }
 
   getTilePos(): Phaser.Math.Vector2 {
@@ -317,29 +335,51 @@ export class GridCharacter {
     );
   }
 
-  private getSpeedPerDelta(delta: number): number {
+  private getSpeedPerDelta(delta: number): Vector2 {
     const deltaInSeconds = delta / 1000;
-    return this.speedPixelsPerSecond * deltaInSeconds;
+    return this.speedPixelsPerSecond
+      .clone()
+      .multiply(new Vector2(deltaInSeconds, deltaInSeconds))
+      .multiply(this.getDirectionVecs()[this.movementDirection]);
   }
 
   private willCrossTileBorderThisUpdate(
-    pixelsToWalkThisUpdate: number
+    pixelsToWalkThisUpdate: Vector2
   ): boolean {
-    return this.tileSizePixelsWalked + pixelsToWalkThisUpdate >= this.tileSize;
+    return (
+      this.tileSizePixelsWalked.x + Math.abs(pixelsToWalkThisUpdate.x) >=
+        this.tileDistance.x ||
+      this.tileSizePixelsWalked.y + Math.abs(pixelsToWalkThisUpdate.y) >=
+        this.tileDistance.y
+    );
   }
 
   private moveCharacterSpriteRestOfTile(): void {
-    this.moveCharacterSprite(this.tileSize - this.tileSizePixelsWalked);
+    this.moveCharacterSprite(
+      this.tileDistance
+        .clone()
+        .subtract(this.tileSizePixelsWalked)
+        .multiply(this.getDirectionVecs()[this.movementDirection])
+    );
   }
 
-  private moveCharacterSprite(speed: number): void {
-    const newPlayerPos = this.getPosition().add(this.movementDistance(speed));
+  private getDirectionVecs(): { [key in Direction]?: Vector2 } {
+    if (this.isIsometric) {
+      return DirectionVectorsIsometric;
+    }
+    return DirectionVectors;
+  }
+
+  private moveCharacterSprite(speed: Vector2): void {
+    const newPlayerPos = this.getPosition().add(speed);
     this.setPosition(newPlayerPos);
-    this.tileSizePixelsWalked = this.tileSizePixelsWalked + speed;
+    this.tileSizePixelsWalked.x += Math.abs(speed.x);
+    this.tileSizePixelsWalked.y += Math.abs(speed.y);
     if (this.walkingAnimation) {
       this.updateCharacterFrame();
     }
-    this.tileSizePixelsWalked = this.tileSizePixelsWalked % this.tileSize;
+    this.tileSizePixelsWalked.x %= this.tileDistance.x;
+    this.tileSizePixelsWalked.y %= this.tileDistance.y;
     if (this.hasWalkedHalfATile()) {
       this.updateZindex();
     }
@@ -348,12 +388,6 @@ export class GridCharacter {
   private stopMoving(): void {
     this.movementStopped$.next(this.movementDirection);
     this.movementDirection = Direction.NONE;
-  }
-
-  private movementDistance(speed: number): Vector2 {
-    return DirectionVectors[this.movementDirection]
-      .clone()
-      .multiply(new Vector2(speed));
   }
 
   private updateCharacterFrame(): void {
@@ -365,6 +399,9 @@ export class GridCharacter {
   }
 
   private hasWalkedHalfATile(): boolean {
-    return this.tileSizePixelsWalked > this.tileSize / 2;
+    return (
+      this.tileSizePixelsWalked.x > this.tileDistance.x / 2 ||
+      this.tileSizePixelsWalked.y > this.tileDistance.y / 2
+    );
   }
 }

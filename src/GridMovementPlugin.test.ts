@@ -39,6 +39,9 @@ const mockGridTilemapConstructor = jest.fn(function (
   return mockGridTileMap;
 });
 
+const Vector2 = Phaser.Math.Vector2;
+type Vector2 = Phaser.Math.Vector2;
+
 expect.extend({
   toBeCharacter(receivedChar: GridCharacter, expectedCharId: string) {
     const pass = receivedChar.getId() == expectedCharId;
@@ -119,6 +122,10 @@ describe("GridMovementPlugin", () => {
   let tileMapMock;
   let playerSpriteMock;
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   beforeEach(() => {
     // hacky way of avoiding errors in Plugin Initialization because Phaser
     // is not mockable by jest
@@ -131,6 +138,8 @@ describe("GridMovementPlugin", () => {
         },
       ],
       tileWidth: 16,
+      tileHeight: 16,
+      orientation: `${Phaser.Tilemaps.Orientation.ORTHOGONAL}`,
     };
     playerSpriteMock = {};
     mockTargetMovementUpdate.mockReset();
@@ -210,15 +219,37 @@ describe("GridMovementPlugin", () => {
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
       tilemap: mockGridTileMap,
-      tileSize: 32,
+      tileSize: new Vector2(32, 32),
+      isometric: false,
       speed: 4,
       walkingAnimationEnabled: true,
       container: containerMock,
+      offsetX: undefined,
+      offsetY: undefined,
     });
     expect(mockSetTilePositon).toHaveBeenCalledWith(
       new Phaser.Math.Vector2(0, 0)
     );
     expect(mockTurnTowards).not.toHaveBeenCalled();
+  });
+
+  it("should init isometric player", () => {
+    tileMapMock.orientation = `${Phaser.Tilemaps.Orientation.ISOMETRIC}`;
+    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+    gridMovementPlugin.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+        },
+      ],
+    });
+    expect(GridCharacter).toHaveBeenCalledWith(
+      "player",
+      expect.objectContaining({
+        isometric: true,
+      })
+    );
   });
 
   it("should init player with facingDirection", () => {
@@ -254,7 +285,8 @@ describe("GridMovementPlugin", () => {
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
       tilemap: mockGridTileMap,
-      tileSize: 32,
+      tileSize: new Vector2(32, 32),
+      isometric: false,
       speed: 4,
       walkingAnimationMapping: 2,
       walkingAnimationEnabled: true,
@@ -284,7 +316,8 @@ describe("GridMovementPlugin", () => {
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
       tilemap: mockGridTileMap,
-      tileSize: 32,
+      tileSize: new Vector2(32, 32),
+      isometric: false,
       speed: 4,
       walkingAnimationMapping: 3,
       walkingAnimationEnabled: true,
@@ -309,7 +342,8 @@ describe("GridMovementPlugin", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileSize: 32,
+      tileSize: new Vector2(32, 32),
+      isometric: false,
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping: 3,
@@ -356,7 +390,8 @@ describe("GridMovementPlugin", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileSize: 32,
+      tileSize: new Vector2(32, 32),
+      isometric: false,
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping,
@@ -400,7 +435,8 @@ describe("GridMovementPlugin", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileSize: 32,
+      tileSize: new Vector2(32, 32),
+      isometric: false,
       tilemap: mockGridTileMap,
       speed: 2,
       walkingAnimationMapping: 3,
@@ -425,7 +461,8 @@ describe("GridMovementPlugin", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileSize: 32,
+      tileSize: new Vector2(32, 32),
+      isometric: false,
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping: 3,

@@ -11,5 +11,8 @@ export declare enum Direction {
 export declare const DirectionVectors: {
     [key in Direction]?: Vector2;
 };
+export declare const DirectionVectorsIsometric: {
+    [key in Direction]?: Vector2;
+};
 export declare function oppositeDirection(direction: Direction): Direction;
 export {};

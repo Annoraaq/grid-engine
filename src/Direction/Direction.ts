@@ -21,6 +21,16 @@ export const DirectionVectors: {
   [Direction.NONE]: Vector2.ZERO,
 };
 
+export const DirectionVectorsIsometric: {
+  [key in Direction]?: Vector2;
+} = {
+  [Direction.DOWN]: new Vector2(-1, 1),
+  [Direction.UP]: new Vector2(1, -1),
+  [Direction.RIGHT]: new Vector2(1, 1),
+  [Direction.LEFT]: new Vector2(-1, -1),
+  [Direction.NONE]: Vector2.ZERO,
+};
+
 export function oppositeDirection(direction: Direction): Direction {
   switch (direction) {
     case Direction.UP:
