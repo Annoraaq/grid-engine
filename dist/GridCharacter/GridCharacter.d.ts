@@ -1,8 +1,8 @@
 import { Direction } from "../Direction/Direction";
 import * as Phaser from "phaser";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
-import { WalkingAnimationMapping } from "../GridMovementPlugin";
 import { Subject } from "rxjs";
+import { WalkingAnimationMapping } from "../GridEngine";
 declare const Vector2: typeof Phaser.Math.Vector2;
 declare type Vector2 = Phaser.Math.Vector2;
 export interface FrameRow {

@@ -1,3 +1,3 @@
-import { GridMovementPlugin } from "./GridMovementPlugin";
+import { GridEngine } from "./GridEngine";
 
-module.exports = GridMovementPlugin;
+module.exports = GridEngine;

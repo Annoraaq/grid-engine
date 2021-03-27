@@ -113,10 +113,10 @@ jest.mock("./FollowMovement/FollowMovement", () => ({
 
 jest.mock("./GridTilemap/GridTilemap");
 
-import { GridMovementPlugin } from "./GridMovementPlugin";
+import { GridEngine } from "./GridEngine";
 
-describe("GridMovementPlugin", () => {
-  let gridMovementPlugin: GridMovementPlugin;
+describe("GridEngine", () => {
+  let gridEngine: GridEngine;
   let sceneMock;
   let pluginManagerMock;
   let tileMapMock;
@@ -157,18 +157,18 @@ describe("GridMovementPlugin", () => {
   });
 
   it("should boot", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.boot();
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.boot();
     expect(sceneMock.sys.events.on).toHaveBeenCalledWith(
       "update",
-      gridMovementPlugin.update,
-      gridMovementPlugin
+      gridEngine.update,
+      gridEngine
     );
   });
 
   it("should init tilemap", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -186,8 +186,8 @@ describe("GridMovementPlugin", () => {
 
   it("should init tilemap with deprecated firstLayerAboveChar", () => {
     console.warn = jest.fn();
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -199,14 +199,14 @@ describe("GridMovementPlugin", () => {
     });
     expect(mockGridTilemapConstructor).toHaveBeenCalledWith(tileMapMock, 3);
     expect(console.warn).toHaveBeenCalledWith(
-      "PhaserGridMovementPlugin: Config property `firstLayerAboveChar` is deprecated. Use a property `alwaysTop` on the tilemap layers instead."
+      "GridEngine: Config property `firstLayerAboveChar` is deprecated. Use a property `alwaysTop` on the tilemap layers instead."
     );
   });
 
   it("should init player", () => {
     const containerMock = {};
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -235,8 +235,8 @@ describe("GridMovementPlugin", () => {
 
   it("should init isometric player", () => {
     tileMapMock.orientation = `${Phaser.Tilemaps.Orientation.ISOMETRIC}`;
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -254,8 +254,8 @@ describe("GridMovementPlugin", () => {
 
   it("should init player with facingDirection", () => {
     const containerMock = {};
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -271,8 +271,8 @@ describe("GridMovementPlugin", () => {
 
   it("should still support deprecated characterIndex property", () => {
     console.warn = jest.fn();
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -296,13 +296,13 @@ describe("GridMovementPlugin", () => {
     );
 
     expect(console.warn).toHaveBeenCalledWith(
-      "PhaserGridMovementPlugin: CharacterConfig property `characterIndex` is deprecated. Use `walkingAnimtionMapping` instead."
+      "GridEngine: CharacterConfig property `characterIndex` is deprecated. Use `walkingAnimtionMapping` instead."
     );
   });
 
   it("should prefer walkingAnimationMapping over charIndex", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -328,8 +328,8 @@ describe("GridMovementPlugin", () => {
   });
 
   it("should init player without walking animation", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -377,8 +377,8 @@ describe("GridMovementPlugin", () => {
         rightFoot: 26,
       },
     };
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -403,8 +403,8 @@ describe("GridMovementPlugin", () => {
   });
 
   it("should use config startPosition", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -421,8 +421,8 @@ describe("GridMovementPlugin", () => {
   });
 
   it("should use config speed", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -447,8 +447,8 @@ describe("GridMovementPlugin", () => {
   it("should use config offset", () => {
     const offsetX = 5;
     const offsetY = 6;
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -473,8 +473,8 @@ describe("GridMovementPlugin", () => {
   });
 
   it("should move player left", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -485,14 +485,14 @@ describe("GridMovementPlugin", () => {
       firstLayerAboveChar: 3,
     });
 
-    gridMovementPlugin.moveLeft("player");
+    gridEngine.moveLeft("player");
 
     expect(mockMove).toHaveBeenCalledWith(Direction.LEFT);
   });
 
   it("should move player right", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -503,14 +503,14 @@ describe("GridMovementPlugin", () => {
       firstLayerAboveChar: 3,
     });
 
-    gridMovementPlugin.moveRight("player");
+    gridEngine.moveRight("player");
 
     expect(mockMove).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
   it("should move player up", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -521,14 +521,14 @@ describe("GridMovementPlugin", () => {
       firstLayerAboveChar: 3,
     });
 
-    gridMovementPlugin.moveUp("player");
+    gridEngine.moveUp("player");
 
     expect(mockMove).toHaveBeenCalledWith(Direction.UP);
   });
 
   it("should move player down", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -539,14 +539,14 @@ describe("GridMovementPlugin", () => {
       firstLayerAboveChar: 3,
     });
 
-    gridMovementPlugin.moveDown("player");
+    gridEngine.moveDown("player");
 
     expect(mockMove).toHaveBeenCalledWith(Direction.DOWN);
   });
 
   it("should update", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -557,7 +557,7 @@ describe("GridMovementPlugin", () => {
       firstLayerAboveChar: 3,
     });
 
-    gridMovementPlugin.update(123, 456);
+    gridEngine.update(123, 456);
 
     expect(mockRandomMovementUpdate).toHaveBeenCalledWith(456);
     expect(mockTargetMovementUpdate).toHaveBeenCalled();
@@ -566,8 +566,8 @@ describe("GridMovementPlugin", () => {
   });
 
   it("should get tile position", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -579,14 +579,14 @@ describe("GridMovementPlugin", () => {
     });
     mockGetTilePos.mockReturnValue(new Phaser.Math.Vector2(3, 4));
 
-    expect(gridMovementPlugin.getPosition("player")).toEqual(
+    expect(gridEngine.getPosition("player")).toEqual(
       new Phaser.Math.Vector2(3, 4)
     );
   });
 
   it("should move randomly", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -596,13 +596,13 @@ describe("GridMovementPlugin", () => {
       ],
       firstLayerAboveChar: 3,
     });
-    gridMovementPlugin.moveRandomly("player", 123, 3);
+    gridEngine.moveRandomly("player", 123, 3);
     expect(mockAddCharacter).toHaveBeenCalledWith(expect.anything(), 123, 3);
   });
 
   it("should move to coordinates", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -613,7 +613,7 @@ describe("GridMovementPlugin", () => {
       firstLayerAboveChar: 3,
     });
     const targetVec = new Phaser.Math.Vector2(3, 4);
-    gridMovementPlugin.moveTo("player", targetVec);
+    gridEngine.moveTo("player", targetVec);
     expect(mockTargetMovementAddCharacter).toHaveBeenCalledWith(
       expect.anything(),
       targetVec,
@@ -621,7 +621,7 @@ describe("GridMovementPlugin", () => {
       false
     );
 
-    gridMovementPlugin.moveTo("player", targetVec, true);
+    gridEngine.moveTo("player", targetVec, true);
     expect(mockTargetMovementAddCharacter).toHaveBeenCalledWith(
       expect.anything(),
       targetVec,
@@ -631,8 +631,8 @@ describe("GridMovementPlugin", () => {
   });
 
   it("should stop moving randomly", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -642,13 +642,13 @@ describe("GridMovementPlugin", () => {
       ],
       firstLayerAboveChar: 3,
     });
-    gridMovementPlugin.stopMovingRandomly("player");
+    gridEngine.stopMovingRandomly("player");
     expect(mockRemoveCharacter).toHaveBeenCalled();
   });
 
   it("should set speed", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -658,35 +658,35 @@ describe("GridMovementPlugin", () => {
       ],
       firstLayerAboveChar: 3,
     });
-    gridMovementPlugin.setSpeed("player", 2);
+    gridEngine.setSpeed("player", 2);
     expect(mockSetSpeed).toHaveBeenCalledWith(2);
   });
 
   it("should not call update before create", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.update(123, 456);
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.update(123, 456);
     expect(mockRandomMovementUpdate).not.toHaveBeenCalled();
     expect(mockTargetMovementUpdate).not.toHaveBeenCalled();
   });
 
   it("should add chars on the go", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [],
       firstLayerAboveChar: 3,
     });
-    gridMovementPlugin.addCharacter({
+    gridEngine.addCharacter({
       id: "player",
       sprite: playerSpriteMock,
       walkingAnimationMapping: 3,
     });
-    gridMovementPlugin.update(123, 456);
+    gridEngine.update(123, 456);
     expect(mockUpdate).toHaveBeenCalledTimes(1);
   });
 
   it("should remove chars on the go", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -696,8 +696,8 @@ describe("GridMovementPlugin", () => {
       ],
       firstLayerAboveChar: 3,
     });
-    gridMovementPlugin.removeCharacter("player");
-    gridMovementPlugin.update(123, 456);
+    gridEngine.removeCharacter("player");
+    gridEngine.update(123, 456);
     expect(mockRemoveCharacter).toHaveBeenCalledWith("player");
     expect(mockTargetMovementRemoveCharacter).toHaveBeenCalledWith("player");
     expect(mockFollowMovement.removeCharacter).toHaveBeenCalledWith("player");
@@ -706,8 +706,8 @@ describe("GridMovementPlugin", () => {
   });
 
   it("should remove all chars", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -721,8 +721,8 @@ describe("GridMovementPlugin", () => {
         },
       ],
     });
-    gridMovementPlugin.removeAllCharacters();
-    gridMovementPlugin.update(123, 456);
+    gridEngine.removeAllCharacters();
+    gridEngine.update(123, 456);
     expect(mockRemoveCharacter).toHaveBeenCalledWith("player");
     expect(mockTargetMovementRemoveCharacter).toHaveBeenCalledWith("player");
     expect(mockFollowMovement.removeCharacter).toHaveBeenCalledWith("player");
@@ -735,8 +735,8 @@ describe("GridMovementPlugin", () => {
   });
 
   it("should get all chars", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -750,13 +750,13 @@ describe("GridMovementPlugin", () => {
         },
       ],
     });
-    const chars = gridMovementPlugin.getAllCharacters();
+    const chars = gridEngine.getAllCharacters();
     expect(chars).toEqual(["player", "player2"]);
   });
 
   it("should check if char is registered", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -766,19 +766,19 @@ describe("GridMovementPlugin", () => {
       ],
       firstLayerAboveChar: 3,
     });
-    gridMovementPlugin.addCharacter({
+    gridEngine.addCharacter({
       id: "player2",
       sprite: playerSpriteMock,
       walkingAnimationMapping: 3,
     });
-    expect(gridMovementPlugin.hasCharacter("player")).toBe(true);
-    expect(gridMovementPlugin.hasCharacter("player2")).toBe(true);
-    expect(gridMovementPlugin.hasCharacter("unknownCharId")).toBe(false);
+    expect(gridEngine.hasCharacter("player")).toBe(true);
+    expect(gridEngine.hasCharacter("player2")).toBe(true);
+    expect(gridEngine.hasCharacter("unknownCharId")).toBe(false);
   });
 
   it("should follow a char", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -793,7 +793,7 @@ describe("GridMovementPlugin", () => {
       ],
       firstLayerAboveChar: 3,
     });
-    gridMovementPlugin.follow("player", "player2", 7, true);
+    gridEngine.follow("player", "player2", 7, true);
     expect(mockFollowMovement.addCharacter).toHaveBeenCalledWith(
       // @ts-ignore
       expect.toBeCharacter("player"),
@@ -805,8 +805,8 @@ describe("GridMovementPlugin", () => {
   });
 
   it("should follow a char with default distance", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -821,7 +821,7 @@ describe("GridMovementPlugin", () => {
       ],
       firstLayerAboveChar: 3,
     });
-    gridMovementPlugin.follow("player", "player2");
+    gridEngine.follow("player", "player2");
     expect(mockFollowMovement.addCharacter).toHaveBeenCalledWith(
       // @ts-ignore
       expect.toBeCharacter("player"),
@@ -833,8 +833,8 @@ describe("GridMovementPlugin", () => {
   });
 
   it("should stop following", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -849,13 +849,13 @@ describe("GridMovementPlugin", () => {
       ],
       firstLayerAboveChar: 3,
     });
-    gridMovementPlugin.stopFollowing("player");
+    gridEngine.stopFollowing("player");
     expect(mockFollowMovement.removeCharacter).toHaveBeenCalledWith("player");
   });
 
   it("should set walkingAnimationMapping", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -887,13 +887,13 @@ describe("GridMovementPlugin", () => {
         rightFoot: 11,
       },
     };
-    gridMovementPlugin.setWalkingAnimationMapping("player", mockMapping);
+    gridEngine.setWalkingAnimationMapping("player", mockMapping);
     expect(mockSetWalkingAnimationMapping).toHaveBeenCalledWith(mockMapping);
   });
 
   it("should delegate isMoving", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -904,16 +904,16 @@ describe("GridMovementPlugin", () => {
     });
 
     mockIsMoving.mockReturnValue(true);
-    let isMoving = gridMovementPlugin.isMoving("player");
+    let isMoving = gridEngine.isMoving("player");
     expect(isMoving).toEqual(true);
     mockIsMoving.mockReturnValue(false);
-    isMoving = gridMovementPlugin.isMoving("player");
+    isMoving = gridEngine.isMoving("player");
     expect(isMoving).toEqual(false);
   });
 
   it("should delegate getFacingDirection", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -924,13 +924,13 @@ describe("GridMovementPlugin", () => {
     });
 
     mockFacingDirection.mockReturnValue(Direction.LEFT);
-    const facingDirection = gridMovementPlugin.getFacingDirection("player");
+    const facingDirection = gridEngine.getFacingDirection("player");
     expect(facingDirection).toEqual(Direction.LEFT);
   });
 
   it("should delegate turnTowards", () => {
-    gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-    gridMovementPlugin.create(tileMapMock, {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
@@ -940,7 +940,7 @@ describe("GridMovementPlugin", () => {
       ],
     });
 
-    gridMovementPlugin.turnTowards("player", Direction.RIGHT);
+    gridEngine.turnTowards("player", Direction.RIGHT);
     expect(mockTurnTowards).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
@@ -948,8 +948,8 @@ describe("GridMovementPlugin", () => {
     it("should get chars movementStarted observable", async () => {
       const mockSubject = new Subject<Direction>();
       mockMovementStarted.mockReturnValue(mockSubject);
-      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-      gridMovementPlugin.create(tileMapMock, {
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
         characters: [
           {
             id: "player",
@@ -960,10 +960,7 @@ describe("GridMovementPlugin", () => {
         firstLayerAboveChar: 3,
       });
 
-      const prom = gridMovementPlugin
-        .movementStarted()
-        .pipe(take(1))
-        .toPromise();
+      const prom = gridEngine.movementStarted().pipe(take(1)).toPromise();
 
       mockSubject.next(Direction.LEFT);
       const res = await prom;
@@ -973,8 +970,8 @@ describe("GridMovementPlugin", () => {
     it("should unsubscribe from movementStarted if char removed", async () => {
       const mockSubject = new Subject<Direction>();
       mockMovementStarted.mockReturnValue(mockSubject);
-      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-      gridMovementPlugin.create(tileMapMock, {
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
         characters: [
           {
             id: "player",
@@ -985,10 +982,10 @@ describe("GridMovementPlugin", () => {
         firstLayerAboveChar: 3,
       });
 
-      gridMovementPlugin.removeCharacter("player");
+      gridEngine.removeCharacter("player");
       const nextMock = jest.fn();
 
-      gridMovementPlugin.movementStarted().subscribe({
+      gridEngine.movementStarted().subscribe({
         complete: jest.fn(),
         next: nextMock,
       });
@@ -1000,8 +997,8 @@ describe("GridMovementPlugin", () => {
     it("should get chars movementStopped observable", async () => {
       const mockSubject = new Subject<Direction>();
       mockMovementStopped.mockReturnValue(mockSubject);
-      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-      gridMovementPlugin.create(tileMapMock, {
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
         characters: [
           {
             id: "player",
@@ -1012,10 +1009,7 @@ describe("GridMovementPlugin", () => {
         firstLayerAboveChar: 3,
       });
 
-      const prom = gridMovementPlugin
-        .movementStopped()
-        .pipe(take(1))
-        .toPromise();
+      const prom = gridEngine.movementStopped().pipe(take(1)).toPromise();
 
       mockSubject.next(Direction.LEFT);
       const res = await prom;
@@ -1025,8 +1019,8 @@ describe("GridMovementPlugin", () => {
     it("should unsubscribe from movementStopped if char removed", async () => {
       const mockSubject = new Subject<Direction>();
       mockMovementStopped.mockReturnValue(mockSubject);
-      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-      gridMovementPlugin.create(tileMapMock, {
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
         characters: [
           {
             id: "player",
@@ -1037,10 +1031,10 @@ describe("GridMovementPlugin", () => {
         firstLayerAboveChar: 3,
       });
 
-      gridMovementPlugin.removeCharacter("player");
+      gridEngine.removeCharacter("player");
       const nextMock = jest.fn();
 
-      gridMovementPlugin.movementStopped().subscribe({
+      gridEngine.movementStopped().subscribe({
         complete: jest.fn(),
         next: nextMock,
       });
@@ -1052,8 +1046,8 @@ describe("GridMovementPlugin", () => {
     it("should get chars directionChanged observable", async () => {
       const mockSubject = new Subject<Direction>();
       mockDirectionChanged.mockReturnValue(mockSubject);
-      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-      gridMovementPlugin.create(tileMapMock, {
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
         characters: [
           {
             id: "player",
@@ -1064,10 +1058,7 @@ describe("GridMovementPlugin", () => {
         firstLayerAboveChar: 3,
       });
 
-      const prom = gridMovementPlugin
-        .directionChanged()
-        .pipe(take(1))
-        .toPromise();
+      const prom = gridEngine.directionChanged().pipe(take(1)).toPromise();
 
       mockSubject.next(Direction.LEFT);
       const res = await prom;
@@ -1077,8 +1068,8 @@ describe("GridMovementPlugin", () => {
     it("should unsubscribe from directionChanged if char removed", async () => {
       const mockSubject = new Subject<Direction>();
       mockDirectionChanged.mockReturnValue(mockSubject);
-      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-      gridMovementPlugin.create(tileMapMock, {
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
         characters: [
           {
             id: "player",
@@ -1089,10 +1080,10 @@ describe("GridMovementPlugin", () => {
         firstLayerAboveChar: 3,
       });
 
-      gridMovementPlugin.removeCharacter("player");
+      gridEngine.removeCharacter("player");
       const nextMock = jest.fn();
 
-      gridMovementPlugin.directionChanged().subscribe({
+      gridEngine.directionChanged().subscribe({
         complete: jest.fn(),
         next: nextMock,
       });
@@ -1104,8 +1095,8 @@ describe("GridMovementPlugin", () => {
     it("should get chars positionChanged observable", async () => {
       const mockSubject = new Subject<PositionChange>();
       mockPositionChanged.mockReturnValue(mockSubject);
-      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-      gridMovementPlugin.create(tileMapMock, {
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
         characters: [
           {
             id: "player",
@@ -1115,10 +1106,7 @@ describe("GridMovementPlugin", () => {
         ],
       });
 
-      const prom = gridMovementPlugin
-        .positionChanged()
-        .pipe(take(1))
-        .toPromise();
+      const prom = gridEngine.positionChanged().pipe(take(1)).toPromise();
 
       const exitTile = new Phaser.Math.Vector2(1, 2);
       const enterTile = new Phaser.Math.Vector2(2, 2);
@@ -1134,8 +1122,8 @@ describe("GridMovementPlugin", () => {
     it("should unsubscribe from positionChanged if char removed", async () => {
       const mockSubject = new Subject<PositionChange>();
       mockDirectionChanged.mockReturnValue(mockSubject);
-      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-      gridMovementPlugin.create(tileMapMock, {
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
         characters: [
           {
             id: "player",
@@ -1145,10 +1133,10 @@ describe("GridMovementPlugin", () => {
         ],
       });
 
-      gridMovementPlugin.removeCharacter("player");
+      gridEngine.removeCharacter("player");
       const nextMock = jest.fn();
 
-      gridMovementPlugin.directionChanged().subscribe({
+      gridEngine.directionChanged().subscribe({
         complete: jest.fn(),
         next: nextMock,
       });
@@ -1163,8 +1151,8 @@ describe("GridMovementPlugin", () => {
 
   describe("Error Handling unknown char id", () => {
     beforeEach(() => {
-      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
-      gridMovementPlugin.create(tileMapMock, {
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
         characters: [
           {
             id: "player",
@@ -1177,173 +1165,170 @@ describe("GridMovementPlugin", () => {
     });
 
     it("should throw error if getPosition is invoked", () => {
-      expect(() => gridMovementPlugin.getPosition("unknownCharId")).toThrow(
+      expect(() => gridEngine.getPosition("unknownCharId")).toThrow(
         "Character unknown"
       );
     });
 
     it("should throw error if moveLeft is invoked", () => {
-      expect(() => gridMovementPlugin.moveLeft("unknownCharId")).toThrow(
+      expect(() => gridEngine.moveLeft("unknownCharId")).toThrow(
         "Character unknown"
       );
     });
 
     it("should throw error if moveRight is invoked", () => {
-      expect(() => gridMovementPlugin.moveRight("unknownCharId")).toThrow(
+      expect(() => gridEngine.moveRight("unknownCharId")).toThrow(
         "Character unknown"
       );
     });
 
     it("should throw error if moveUp is invoked", () => {
-      expect(() => gridMovementPlugin.moveUp("unknownCharId")).toThrow(
+      expect(() => gridEngine.moveUp("unknownCharId")).toThrow(
         "Character unknown"
       );
     });
 
     it("should throw error if moveDown is invoked", () => {
-      expect(() => gridMovementPlugin.moveDown("unknownCharId")).toThrow(
+      expect(() => gridEngine.moveDown("unknownCharId")).toThrow(
         "Character unknown"
       );
     });
 
     it("should throw error if moveRandomly is invoked", () => {
-      expect(() => gridMovementPlugin.moveRandomly("unknownCharId")).toThrow(
+      expect(() => gridEngine.moveRandomly("unknownCharId")).toThrow(
         "Character unknown"
       );
     });
 
     it("should throw error if stopMovingRandomly is invoked", () => {
-      expect(() =>
-        gridMovementPlugin.stopMovingRandomly("unknownCharId")
-      ).toThrow("Character unknown");
+      expect(() => gridEngine.stopMovingRandomly("unknownCharId")).toThrow(
+        "Character unknown"
+      );
     });
 
     it("should throw error if setSpeed is invoked", () => {
-      expect(() => gridMovementPlugin.setSpeed("unknownCharId", 4)).toThrow(
+      expect(() => gridEngine.setSpeed("unknownCharId", 4)).toThrow(
         "Character unknown"
       );
     });
 
     it("should throw error if moveTo is invoked", () => {
       expect(() =>
-        gridMovementPlugin.moveTo(
-          "unknownCharId",
-          new Phaser.Math.Vector2(3, 4)
-        )
+        gridEngine.moveTo("unknownCharId", new Phaser.Math.Vector2(3, 4))
       ).toThrow("Character unknown");
     });
 
     it("should throw error if removeCharacter is invoked", () => {
-      expect(() => gridMovementPlugin.removeCharacter("unknownCharId")).toThrow(
+      expect(() => gridEngine.removeCharacter("unknownCharId")).toThrow(
         "Character unknown"
       );
     });
 
     it("should throw error if follow is invoked", () => {
-      expect(() =>
-        gridMovementPlugin.follow("unknownCharId", "player")
-      ).toThrow("Character unknown");
-      expect(() =>
-        gridMovementPlugin.follow("player", "unknownCharId")
-      ).toThrow("Character unknown");
-      expect(() =>
-        gridMovementPlugin.follow("unknownCharId", "unknownCharId")
-      ).toThrow("Character unknown");
+      expect(() => gridEngine.follow("unknownCharId", "player")).toThrow(
+        "Character unknown"
+      );
+      expect(() => gridEngine.follow("player", "unknownCharId")).toThrow(
+        "Character unknown"
+      );
+      expect(() => gridEngine.follow("unknownCharId", "unknownCharId")).toThrow(
+        "Character unknown"
+      );
     });
 
     it("should throw error if stopFollowing is invoked", () => {
-      expect(() => gridMovementPlugin.stopFollowing("unknownCharId")).toThrow(
+      expect(() => gridEngine.stopFollowing("unknownCharId")).toThrow(
         "Character unknown"
       );
     });
 
     it("should throw error if setWalkingAnimationMapping is invoked", () => {
       expect(() =>
-        gridMovementPlugin.setWalkingAnimationMapping("unknownCharId", <any>{})
+        gridEngine.setWalkingAnimationMapping("unknownCharId", <any>{})
       ).toThrow("Character unknown");
     });
 
     it("should throw error if isMoving is invoked", () => {
-      expect(() => gridMovementPlugin.isMoving("unknownCharId")).toThrow(
+      expect(() => gridEngine.isMoving("unknownCharId")).toThrow(
         "Character unknown"
       );
     });
 
     it("should throw error if getFacingDirectiion is invoked", () => {
-      expect(() =>
-        gridMovementPlugin.getFacingDirection("unknownCharId")
-      ).toThrow("Character unknown");
+      expect(() => gridEngine.getFacingDirection("unknownCharId")).toThrow(
+        "Character unknown"
+      );
     });
 
     it("should throw error if turnTowards is invoked", () => {
       expect(() =>
-        gridMovementPlugin.turnTowards("unknownCharId", Direction.LEFT)
+        gridEngine.turnTowards("unknownCharId", Direction.LEFT)
       ).toThrow("Character unknown");
     });
   });
 
   describe("invokation of methods if not created properly", () => {
     beforeEach(() => {
-      gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     });
 
     it("should throw error if getPosition is invoked", () => {
-      expect(() => gridMovementPlugin.getPosition("someCharId")).toThrow(
+      expect(() => gridEngine.getPosition("someCharId")).toThrow(
         "Plugin not initialized"
       );
     });
 
     it("should throw error if moveLeft is invoked", () => {
-      expect(() => gridMovementPlugin.moveLeft("someCharId")).toThrow(
+      expect(() => gridEngine.moveLeft("someCharId")).toThrow(
         "Plugin not initialized"
       );
     });
 
     it("should throw error if moveRight is invoked", () => {
-      expect(() => gridMovementPlugin.moveRight("someCharId")).toThrow(
+      expect(() => gridEngine.moveRight("someCharId")).toThrow(
         "Plugin not initialized"
       );
     });
 
     it("should throw error if moveUp is invoked", () => {
-      expect(() => gridMovementPlugin.moveUp("someCharId")).toThrow(
+      expect(() => gridEngine.moveUp("someCharId")).toThrow(
         "Plugin not initialized"
       );
     });
 
     it("should throw error if moveDown is invoked", () => {
-      expect(() => gridMovementPlugin.moveDown("someCharId")).toThrow(
+      expect(() => gridEngine.moveDown("someCharId")).toThrow(
         "Plugin not initialized"
       );
     });
 
     it("should throw error if moveRandomly is invoked", () => {
-      expect(() => gridMovementPlugin.moveRandomly("someCharId")).toThrow(
+      expect(() => gridEngine.moveRandomly("someCharId")).toThrow(
         "Plugin not initialized"
       );
     });
 
     it("should throw error if moveTo is invoked", () => {
       expect(() =>
-        gridMovementPlugin.moveTo("someCharId", new Phaser.Math.Vector2(2, 3))
+        gridEngine.moveTo("someCharId", new Phaser.Math.Vector2(2, 3))
       ).toThrow("Plugin not initialized");
     });
 
     it("should throw error if stopMovingRandomly is invoked", () => {
-      expect(() => gridMovementPlugin.stopMovingRandomly("someCharId")).toThrow(
+      expect(() => gridEngine.stopMovingRandomly("someCharId")).toThrow(
         "Plugin not initialized"
       );
     });
 
     it("should throw error if setSpeed is invoked", () => {
-      expect(() => gridMovementPlugin.setSpeed("someCharId", 3)).toThrow(
+      expect(() => gridEngine.setSpeed("someCharId", 3)).toThrow(
         "Plugin not initialized"
       );
     });
 
     it("should throw error if addCharacter is invoked", () => {
       expect(() =>
-        gridMovementPlugin.addCharacter({
+        gridEngine.addCharacter({
           id: "player",
           sprite: playerSpriteMock,
           walkingAnimationMapping: 3,
@@ -1352,61 +1337,61 @@ describe("GridMovementPlugin", () => {
     });
 
     it("should throw error if hasCharacter is invoked", () => {
-      expect(() => gridMovementPlugin.hasCharacter("someCharId")).toThrow(
+      expect(() => gridEngine.hasCharacter("someCharId")).toThrow(
         "Plugin not initialized"
       );
     });
 
     it("should throw error if removeCharacter is invoked", () => {
-      expect(() => gridMovementPlugin.removeCharacter("someCharId")).toThrow(
+      expect(() => gridEngine.removeCharacter("someCharId")).toThrow(
         "Plugin not initialized"
       );
     });
 
     it("should throw error if follow is invoked", () => {
-      expect(() =>
-        gridMovementPlugin.follow("someCharId", "someOtherCharId")
-      ).toThrow("Plugin not initialized");
+      expect(() => gridEngine.follow("someCharId", "someOtherCharId")).toThrow(
+        "Plugin not initialized"
+      );
     });
 
     it("should throw error if stopFollowing is invoked", () => {
-      expect(() => gridMovementPlugin.stopFollowing("someCharId")).toThrow(
+      expect(() => gridEngine.stopFollowing("someCharId")).toThrow(
         "Plugin not initialized"
       );
     });
 
     it("should throw error if setWalkingAnimationMapping is invoked", () => {
       expect(() =>
-        gridMovementPlugin.setWalkingAnimationMapping("someCharId", <any>{})
+        gridEngine.setWalkingAnimationMapping("someCharId", <any>{})
       ).toThrow("Plugin not initialized");
     });
 
     it("should throw error if isMoving is invoked", () => {
-      expect(() => gridMovementPlugin.isMoving("someCharId")).toThrow(
+      expect(() => gridEngine.isMoving("someCharId")).toThrow(
         "Plugin not initialized"
       );
     });
 
     it("should throw error if getFacingDirection is invoked", () => {
-      expect(() => gridMovementPlugin.getFacingDirection("someCharId")).toThrow(
+      expect(() => gridEngine.getFacingDirection("someCharId")).toThrow(
         "Plugin not initialized"
       );
     });
 
     it("should throw error if turnTowards is invoked", () => {
       expect(() =>
-        gridMovementPlugin.turnTowards("someCharId", Direction.LEFT)
+        gridEngine.turnTowards("someCharId", Direction.LEFT)
       ).toThrow("Plugin not initialized");
     });
 
     it("should throw error if removeAllCharacters is invoked", () => {
-      expect(() => gridMovementPlugin.removeAllCharacters()).toThrow(
+      expect(() => gridEngine.removeAllCharacters()).toThrow(
         "Plugin not initialized"
       );
     });
 
     it("should throw error if getAllCharacters is invoked", () => {
-      expect(() => gridMovementPlugin.getAllCharacters()).toThrow(
+      expect(() => gridEngine.getAllCharacters()).toThrow(
         "Plugin not initialized"
       );
     });
