@@ -1,5 +1,5 @@
 {
-  "name": "phaser-grid-movement-plugin",
+  "name": "grid-engine",
   "version": "1.11.0",
   "description": "Phaser3 plugin for grid based movement on a 2D game board.",
   "author": "Johannes Baum",

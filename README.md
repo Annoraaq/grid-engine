@@ -1,6 +1,6 @@
 <p align="center">
-    <img src="https://img.shields.io/github/v/release/Annoraaq/phaser-grid-movement-plugin?style=for-the-badge&color=brightgreen">
-    <img src="https://img.shields.io/github/stars/Annoraaq/phaser-grid-movement-plugin?style=for-the-badge&color=yellow">
+    <img src="https://img.shields.io/github/v/release/Annoraaq/grid-engine?style=for-the-badge&color=brightgreen">
+    <img src="https://img.shields.io/github/stars/Annoraaq/grid-engine?style=for-the-badge&color=yellow">
     <img src="https://img.shields.io/badge/made%20with-TypeScript-blue?style=for-the-badge">
 </p>
 
@@ -9,7 +9,7 @@ Welcome to the **Grid Movement** plugin! This Phaser 3 plugin adds grid-based mo
 This plugin is also compatible (and written in) TypeScript; enjoy full type support!
 
 <p align="center">
-    <img src="https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/images/features-label.png" alt="Features" />
+    <img src="https://github.com/Annoraaq/grid-engine/blob/master/images/features-label.png" alt="Features" />
 </p>
 
 - Grid-based movement, of course!
@@ -21,11 +21,11 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
 - Following other characters
 - Isometric maps (Beta)
 
-📖 Our most current documentation [is here](https://github.com/Annoraaq/phaser-grid-movement-plugin/wiki)!
-➡️ You can try/download a list of examples [at this link here](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/).
+📖 Our most current documentation [is here](https://github.com/Annoraaq/grid-engine/wiki)!
+➡️ You can try/download a list of examples [at this link here](https://annoraaq.github.io/grid-engine/examples/).
 
 <p align="center">
-    <img src="https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/images/installation-label.png" alt="Installation" />
+    <img src="https://github.com/Annoraaq/grid-engine/blob/master/images/installation-label.png" alt="Installation" />
 </p>
 
 Installing the Grid Movement plugin is simple.
@@ -33,7 +33,7 @@ Installing the Grid Movement plugin is simple.
 ### NPM
 
 ```bash
-npm i --save phaser-grid-movement-plugin
+npm i --save grid-engine
 ```
 
 ### Web
@@ -88,12 +88,12 @@ function create() {
 ```
 
 <p align="center">
-    <img src="https://github.com/Annoraaq/phaser-grid-movement-plugin/blob/master/images/gifs-label.png" alt="Example GIFs" />
+    <img src="https://github.com/Annoraaq/grid-engine/blob/master/images/gifs-label.png" alt="Example GIFs" />
 </p>
 <p align="center">
-    <img src="https://github.com/Annoraaq/phaser-grid-movement-plugin/raw/master/images/movement.gif" />
+    <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/movement.gif" />
 </p>
 
 <p align="center">
-    <img src="https://github.com/Annoraaq/phaser-grid-movement-plugin/raw/master/images/radius-movement.gif" />
+    <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/radius-movement.gif" />
 </p>
