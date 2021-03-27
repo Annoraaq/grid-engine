@@ -2,6 +2,8 @@ import { CharacterIndex, FrameRow, PositionChange } from "./GridCharacter/GridCh
 import "phaser";
 import { Direction } from "./Direction/Direction";
 import { Observable } from "rxjs";
+declare const Vector2: typeof Phaser.Math.Vector2;
+declare type Vector2 = Phaser.Math.Vector2;
 export declare type TileSizePerSecond = number;
 export interface GridMovementConfig {
     characters: CharacterData[];
@@ -22,7 +24,7 @@ export interface CharacterData {
     walkingAnimationEnabled?: boolean;
     characterIndex?: number;
     speed?: TileSizePerSecond;
-    startPosition?: Phaser.Math.Vector2;
+    startPosition?: Vector2;
     container?: Phaser.GameObjects.Container;
     offsetX?: number;
     offsetY?: number;
@@ -46,13 +48,13 @@ export declare class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     constructor(scene: Phaser.Scene, pluginManager: Phaser.Plugins.PluginManager);
     boot(): void;
     create(tilemap: Phaser.Tilemaps.Tilemap, config: GridMovementConfig): void;
-    getPosition(charId: string): Phaser.Math.Vector2;
+    getPosition(charId: string): Vector2;
     moveLeft(charId: string): void;
     moveRight(charId: string): void;
     moveUp(charId: string): void;
     moveDown(charId: string): void;
     moveRandomly(charId: string, delay?: number, radius?: number): void;
-    moveTo(charId: string, targetPos: Phaser.Math.Vector2, closestPointIfBlocked?: boolean): void;
+    moveTo(charId: string, targetPos: Vector2, closestPointIfBlocked?: boolean): void;
     stopMovingRandomly(charId: string): void;
     setSpeed(charId: string, speed: number): void;
     setWalkingAnimationMapping(charId: string, walkingAnimationMapping: WalkingAnimationMapping): void;
@@ -81,3 +83,4 @@ export declare class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     private getTileHeight;
     private addCharacters;
 }
+export {};

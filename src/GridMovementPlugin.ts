@@ -14,6 +14,9 @@ import { RandomMovement } from "./RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 
+const Vector2 = Phaser.Math.Vector2;
+type Vector2 = Phaser.Math.Vector2;
+
 export type TileSizePerSecond = number;
 
 export interface GridMovementConfig {
@@ -37,7 +40,7 @@ export interface CharacterData {
   walkingAnimationEnabled?: boolean;
   characterIndex?: number; // deprecated
   speed?: TileSizePerSecond;
-  startPosition?: Phaser.Math.Vector2;
+  startPosition?: Vector2;
   container?: Phaser.GameObjects.Container;
   offsetX?: number;
   offsetY?: number;
@@ -87,7 +90,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.addCharacters(config);
   }
 
-  getPosition(charId: string): Phaser.Math.Vector2 {
+  getPosition(charId: string): Vector2 {
     this.initGuard();
     this.unknownCharGuard(charId);
     return this.gridCharacters.get(charId).getTilePos();
@@ -129,7 +132,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
 
   moveTo(
     charId: string,
-    targetPos: Phaser.Math.Vector2,
+    targetPos: Vector2,
     closestPointIfBlocked = false
   ): void {
     this.initGuard();
@@ -191,8 +194,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       sprite: charData.sprite,
       speed: charData.speed || 4,
       tilemap: this.gridTilemap,
-      tileWidth: this.getTileWidth(),
-      tileHeight: this.getTileHeight(),
+      tileSize: new Vector2(this.getTileWidth(), this.getTileHeight()),
       isometric: !!this.config.isometric,
       walkingAnimationMapping: charData.walkingAnimationMapping,
       walkingAnimationEnabled: charData.walkingAnimationEnabled,
@@ -214,9 +216,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
 
     this.gridCharacters.set(charData.id, gridChar);
 
-    gridChar.setTilePosition(
-      charData.startPosition || new Phaser.Math.Vector2(0, 0)
-    );
+    gridChar.setTilePosition(charData.startPosition || new Vector2(0, 0));
 
     this.gridTilemap.addCharacter(gridChar);
 
