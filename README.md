@@ -19,6 +19,7 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
 - Pathfinding (for both NPCs and the player)
 - Random movement (can also limit to a radius)
 - Following other characters
+- Isometric maps (Beta)
 
 📖 Our most current documentation [is here](https://github.com/Annoraaq/phaser-grid-movement-plugin/wiki)!
 ➡️ You can try/download a list of examples [at this link here](https://annoraaq.github.io/phaser-grid-movement-plugin/examples/).
