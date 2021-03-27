@@ -134,14 +134,6 @@ export class GridCharacter {
     );
   }
 
-  private getOffset(): Vector2 {
-    const offsetX =
-      this.tileSize.x / 2 -
-      Math.floor((this.sprite.width * this.sprite.scale) / 2);
-    const offsetY = -(this.sprite.height * this.sprite.scale) + this.tileSize.y;
-    return new Vector2(offsetX, offsetY);
-  }
-
   getTilePos(): Phaser.Math.Vector2 {
     return this.tilePos;
   }
@@ -213,6 +205,14 @@ export class GridCharacter {
 
   positionChanged(): Subject<PositionChange> {
     return this.positionChanged$;
+  }
+
+  private getOffset(): Vector2 {
+    const offsetX =
+      this.tileSize.x / 2 -
+      Math.floor((this.sprite.width * this.sprite.scale) / 2);
+    const offsetY = -(this.sprite.height * this.sprite.scale) + this.tileSize.y;
+    return new Vector2(offsetX, offsetY);
   }
 
   private get tilePos() {
