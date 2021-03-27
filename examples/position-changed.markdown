@@ -44,7 +44,7 @@ parent: Examples
         this.cameras.main.startFollow(container, true);
         this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
-        const gridMovementConfig = {
+        const gridEngineConfig = {
             characters: [
                 {
                     id: "player",
@@ -65,9 +65,9 @@ parent: Examples
 
         tintTile(jungleTilemap, 13, 11, 0x6eff94);
 
-        this.gridMovementPlugin.create(jungleTilemap, gridMovementConfig);
+        this.gridEngine.create(jungleTilemap, gridEngineConfig);
 
-        this.gridMovementPlugin.positionChanged().subscribe(({charId, exitTile, enterTile}) => {
+        this.gridEngine.positionChanged().subscribe(({charId, exitTile, enterTile}) => {
             positionChangeText.text = `exit: (${exitTile.x}, ${exitTile.y})\n`
                 + `enter: (${enterTile.x}, ${enterTile.y})`;
 
@@ -83,13 +83,13 @@ parent: Examples
     function update () {
         const cursors = this.input.keyboard.createCursorKeys();
         if (cursors.left.isDown) {
-            this.gridMovementPlugin.moveLeft("player");
+            this.gridEngine.moveLeft("player");
         } else if (cursors.right.isDown) {
-            this.gridMovementPlugin.moveRight("player");
+            this.gridEngine.moveRight("player");
         } else if (cursors.up.isDown) {
-            this.gridMovementPlugin.moveUp("player");
+            this.gridEngine.moveUp("player");
         } else if (cursors.down.isDown) {
-            this.gridMovementPlugin.moveDown("player");
+            this.gridEngine.moveDown("player");
         }
     }
 
@@ -142,7 +142,7 @@ function create() {
   this.cameras.main.startFollow(container, true);
   this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
-  const gridMovementConfig = {
+  const gridEngineConfig = {
     characters: [
       {
         id: "player",
@@ -170,9 +170,9 @@ function create() {
 
   tintTile(jungleTilemap, 13, 11, 0x6eff94);
 
-  this.gridMovementPlugin.create(jungleTilemap, gridMovementConfig);
+  this.gridEngine.create(jungleTilemap, gridEngineConfig);
 
-  this.gridMovementPlugin
+  this.gridEngine
     .positionChanged()
     .subscribe(({ charId, exitTile, enterTile }) => {
       positionChangeText.text =
@@ -191,13 +191,13 @@ function create() {
 function update() {
   const cursors = this.input.keyboard.createCursorKeys();
   if (cursors.left.isDown) {
-    this.gridMovementPlugin.moveLeft("player");
+    this.gridEngine.moveLeft("player");
   } else if (cursors.right.isDown) {
-    this.gridMovementPlugin.moveRight("player");
+    this.gridEngine.moveRight("player");
   } else if (cursors.up.isDown) {
-    this.gridMovementPlugin.moveUp("player");
+    this.gridEngine.moveUp("player");
   } else if (cursors.down.isDown) {
-    this.gridMovementPlugin.moveDown("player");
+    this.gridEngine.moveDown("player");
   }
 }
 

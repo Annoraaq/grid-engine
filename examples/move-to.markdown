@@ -52,7 +52,7 @@ parent: Examples
         const npcSprite2 = this.add.sprite(0, 0, "player");
         npcSprite2.scale = 1.5;
 
-        const gridMovementConfig = {
+        const gridEngineConfig = {
             characters: [
                 {
                     id: "player",
@@ -84,22 +84,22 @@ parent: Examples
             firstLayerAboveChar: 3,
         };
 
-        this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
-        this.gridMovementPlugin.moveTo('npc0', new Phaser.Math.Vector2(15, 18));
-        this.gridMovementPlugin.moveTo('npc1', new Phaser.Math.Vector2(15, 19));
-        this.gridMovementPlugin.moveTo('npc2', new Phaser.Math.Vector2(15, 20));
+        this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
+        this.gridEngine.moveTo('npc0', new Phaser.Math.Vector2(15, 18));
+        this.gridEngine.moveTo('npc1', new Phaser.Math.Vector2(15, 19));
+        this.gridEngine.moveTo('npc2', new Phaser.Math.Vector2(15, 20));
     }
 
     function update () {
         const cursors = this.input.keyboard.createCursorKeys();
         if (cursors.left.isDown) {
-            this.gridMovementPlugin.moveLeft("player");
+            this.gridEngine.moveLeft("player");
         } else if (cursors.right.isDown) {
-            this.gridMovementPlugin.moveRight("player");
+            this.gridEngine.moveRight("player");
         } else if (cursors.up.isDown) {
-            this.gridMovementPlugin.moveUp("player");
+            this.gridEngine.moveUp("player");
         } else if (cursors.down.isDown) {
-            this.gridMovementPlugin.moveDown("player");
+            this.gridEngine.moveDown("player");
         }
     }
 
@@ -150,7 +150,7 @@ function create() {
   const npcSprite2 = this.add.sprite(0, 0, "player");
   npcSprite2.scale = 1.5;
 
-  const gridMovementConfig = {
+  const gridEngineConfig = {
     characters: [
       {
         id: "player",
@@ -182,22 +182,22 @@ function create() {
     firstLayerAboveChar: 3,
   };
 
-  this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
-  this.gridMovementPlugin.moveTo("npc0", new Phaser.Math.Vector2(15, 18));
-  this.gridMovementPlugin.moveTo("npc1", new Phaser.Math.Vector2(15, 19));
-  this.gridMovementPlugin.moveTo("npc2", new Phaser.Math.Vector2(15, 20));
+  this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
+  this.gridEngine.moveTo("npc0", new Phaser.Math.Vector2(15, 18));
+  this.gridEngine.moveTo("npc1", new Phaser.Math.Vector2(15, 19));
+  this.gridEngine.moveTo("npc2", new Phaser.Math.Vector2(15, 20));
 }
 
 function update() {
   const cursors = this.input.keyboard.createCursorKeys();
   if (cursors.left.isDown) {
-    this.gridMovementPlugin.moveLeft("player");
+    this.gridEngine.moveLeft("player");
   } else if (cursors.right.isDown) {
-    this.gridMovementPlugin.moveRight("player");
+    this.gridEngine.moveRight("player");
   } else if (cursors.up.isDown) {
-    this.gridMovementPlugin.moveUp("player");
+    this.gridEngine.moveUp("player");
   } else if (cursors.down.isDown) {
-    this.gridMovementPlugin.moveDown("player");
+    this.gridEngine.moveDown("player");
   }
 }
 

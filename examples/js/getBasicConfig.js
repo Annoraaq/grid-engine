@@ -1,6 +1,6 @@
 function getBasicConfig(preload, create, update) {
   return {
-    title: "GridMovementPluginExample",
+    title: "GridEngineExample",
     render: {
       antialias: false,
     },
@@ -8,9 +8,9 @@ function getBasicConfig(preload, create, update) {
     plugins: {
       scene: [
         {
-          key: "gridMovementPlugin",
-          plugin: GridMovementPlugin,
-          mapping: "gridMovementPlugin",
+          key: "gridEngine",
+          plugin: GridEngine,
+          mapping: "gridEngine",
         },
       ],
     },

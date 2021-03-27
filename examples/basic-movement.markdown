@@ -6,7 +6,7 @@ parent: Examples
 
 # Basic Player Movement
 
-**Press the arrow keys to move.** This is a basic demo of player movement, using a test map and basic **Grid Movement** functionality.
+**Press the arrow keys to move.** This is a basic demo of player movement, using a test map and basic **Grid Engine** functionality.
 
 <div id="game"></div>
 
@@ -39,7 +39,7 @@ parent: Examples
         this.cameras.main.startFollow(playerSprite, true);
         this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
-        const gridMovementConfig = {
+        const gridEngineConfig = {
             characters: [
                 {
                     id: "player",
@@ -50,19 +50,19 @@ parent: Examples
             ],
         };
 
-        this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
+        this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
     }
 
     function update () {
         const cursors = this.input.keyboard.createCursorKeys();
         if (cursors.left.isDown) {
-            this.gridMovementPlugin.moveLeft("player");
+            this.gridEngine.moveLeft("player");
         } else if (cursors.right.isDown) {
-            this.gridMovementPlugin.moveRight("player");
+            this.gridEngine.moveRight("player");
         } else if (cursors.up.isDown) {
-            this.gridMovementPlugin.moveUp("player");
+            this.gridEngine.moveUp("player");
         } else if (cursors.down.isDown) {
-            this.gridMovementPlugin.moveDown("player");
+            this.gridEngine.moveDown("player");
         }
     }
 </script>
@@ -94,7 +94,7 @@ function create() {
   this.cameras.main.startFollow(playerSprite, true);
   this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
-  const gridMovementConfig = {
+  const gridEngineConfig = {
     characters: [
       {
         id: "player",
@@ -105,19 +105,19 @@ function create() {
     ],
   };
 
-  this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
+  this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
 }
 
 function update() {
   const cursors = this.input.keyboard.createCursorKeys();
   if (cursors.left.isDown) {
-    this.gridMovementPlugin.moveLeft("player");
+    this.gridEngine.moveLeft("player");
   } else if (cursors.right.isDown) {
-    this.gridMovementPlugin.moveRight("player");
+    this.gridEngine.moveRight("player");
   } else if (cursors.up.isDown) {
-    this.gridMovementPlugin.moveUp("player");
+    this.gridEngine.moveUp("player");
   } else if (cursors.down.isDown) {
-    this.gridMovementPlugin.moveDown("player");
+    this.gridEngine.moveDown("player");
   }
 }
 ```

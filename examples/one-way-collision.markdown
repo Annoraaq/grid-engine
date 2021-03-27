@@ -40,7 +40,7 @@ parent: Examples
         this.cameras.main.startFollow(playerSprite, true);
         this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
-        const gridMovementConfig = {
+        const gridEngineConfig = {
             characters: [
                 {
                     id: "player",
@@ -51,7 +51,7 @@ parent: Examples
             ],
         };
 
-        this.gridMovementPlugin.create(jungleTilemap, gridMovementConfig);
+        this.gridEngine.create(jungleTilemap, gridEngineConfig);
 
         const r1 = this.add.triangle(16 * 48 + 24, 9 * 48 + 24, 0, 0, 24, 0, 12, 24, 0xffffff);
         const r2 = this.add.triangle(16 * 48 + 24, 10 * 48 + 24, 0, 0, 24, 0, 12, 24, 0xffffff);
@@ -68,13 +68,13 @@ parent: Examples
     function update () {
         const cursors = this.input.keyboard.createCursorKeys();
         if (cursors.left.isDown) {
-            this.gridMovementPlugin.moveLeft("player");
+            this.gridEngine.moveLeft("player");
         } else if (cursors.right.isDown) {
-            this.gridMovementPlugin.moveRight("player");
+            this.gridEngine.moveRight("player");
         } else if (cursors.up.isDown) {
-            this.gridMovementPlugin.moveUp("player");
+            this.gridEngine.moveUp("player");
         } else if (cursors.down.isDown) {
-            this.gridMovementPlugin.moveDown("player");
+            this.gridEngine.moveDown("player");
         }
     }
 </script>
@@ -106,7 +106,7 @@ function create() {
   this.cameras.main.startFollow(playerSprite, true);
   this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
-  const gridMovementConfig = {
+  const gridEngineConfig = {
     characters: [
       {
         id: "player",
@@ -117,7 +117,7 @@ function create() {
     ],
   };
 
-  this.gridMovementPlugin.create(jungleTilemap, gridMovementConfig);
+  this.gridEngine.create(jungleTilemap, gridEngineConfig);
 
   const r1 = this.add.triangle(
     16 * 48 + 24,
@@ -164,13 +164,13 @@ function create() {
 function update() {
   const cursors = this.input.keyboard.createCursorKeys();
   if (cursors.left.isDown) {
-    this.gridMovementPlugin.moveLeft("player");
+    this.gridEngine.moveLeft("player");
   } else if (cursors.right.isDown) {
-    this.gridMovementPlugin.moveRight("player");
+    this.gridEngine.moveRight("player");
   } else if (cursors.up.isDown) {
-    this.gridMovementPlugin.moveUp("player");
+    this.gridEngine.moveUp("player");
   } else if (cursors.down.isDown) {
-    this.gridMovementPlugin.moveDown("player");
+    this.gridEngine.moveDown("player");
   }
 }
 ```

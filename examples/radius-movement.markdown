@@ -49,7 +49,7 @@ parent: Examples
         const npcSprite2 = this.add.sprite(0, 0, "player");
         npcSprite2.scale = 1.5;
 
-        const gridMovementConfig = {
+        const gridEngineConfig = {
             characters: [
                 {
                     id: "player",
@@ -81,11 +81,11 @@ parent: Examples
             firstLayerAboveChar: 3,
         };
 
-        this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
+        this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
 
-        this.gridMovementPlugin.moveRandomly('npc0', 0, 1);
-        this.gridMovementPlugin.moveRandomly('npc1', 500, 2);
-        this.gridMovementPlugin.moveRandomly('npc2', 1500, 3);
+        this.gridEngine.moveRandomly('npc0', 0, 1);
+        this.gridEngine.moveRandomly('npc1', 500, 2);
+        this.gridEngine.moveRandomly('npc2', 1500, 3);
 
         tintRadius(cloudCityTilemap, 8,6 ,3, 0xffcc4a);
         tintRadius(cloudCityTilemap, 5,12 ,1, 0xff7a4a);
@@ -95,13 +95,13 @@ parent: Examples
     function update () {
         const cursors = this.input.keyboard.createCursorKeys();
         if (cursors.left.isDown) {
-            this.gridMovementPlugin.moveLeft("player");
+            this.gridEngine.moveLeft("player");
         } else if (cursors.right.isDown) {
-            this.gridMovementPlugin.moveRight("player");
+            this.gridEngine.moveRight("player");
         } else if (cursors.up.isDown) {
-            this.gridMovementPlugin.moveUp("player");
+            this.gridEngine.moveUp("player");
         } else if (cursors.down.isDown) {
-            this.gridMovementPlugin.moveDown("player");
+            this.gridEngine.moveDown("player");
         }
     }
 
@@ -171,7 +171,7 @@ function create() {
   const npcSprite2 = this.add.sprite(0, 0, "player");
   npcSprite2.scale = 1.5;
 
-  const gridMovementConfig = {
+  const gridEngineConfig = {
     characters: [
       {
         id: "player",
@@ -203,11 +203,11 @@ function create() {
     firstLayerAboveChar: 3,
   };
 
-  this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
+  this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
 
-  this.gridMovementPlugin.moveRandomly("npc0", 0, 1);
-  this.gridMovementPlugin.moveRandomly("npc1", 500, 2);
-  this.gridMovementPlugin.moveRandomly("npc2", 1500, 3);
+  this.gridEngine.moveRandomly("npc0", 0, 1);
+  this.gridEngine.moveRandomly("npc1", 500, 2);
+  this.gridEngine.moveRandomly("npc2", 1500, 3);
 
   tintRadius(cloudCityTilemap, 8, 6, 3, 0xffcc4a);
   tintRadius(cloudCityTilemap, 5, 12, 1, 0xff7a4a);
@@ -217,13 +217,13 @@ function create() {
 function update() {
   const cursors = this.input.keyboard.createCursorKeys();
   if (cursors.left.isDown) {
-    this.gridMovementPlugin.moveLeft("player");
+    this.gridEngine.moveLeft("player");
   } else if (cursors.right.isDown) {
-    this.gridMovementPlugin.moveRight("player");
+    this.gridEngine.moveRight("player");
   } else if (cursors.up.isDown) {
-    this.gridMovementPlugin.moveUp("player");
+    this.gridEngine.moveUp("player");
   } else if (cursors.down.isDown) {
-    this.gridMovementPlugin.moveDown("player");
+    this.gridEngine.moveDown("player");
   }
 }
 

@@ -24,7 +24,7 @@ For the most basic type of collision, read [the Collision guide](collision) to g
 
 ### One-Way
 
-These flags inform **Grid Movement** about how it should handle collisions from certain directions. When a one-way flag is set to true, it won't allow a character to pass through the tile from that direction. Multiple flags can be true at the same time. For a demo, see [the One-Way Collision demo](../examples/one-way-collision).
+These flags inform **Grid Engine** about how it should handle collisions from certain directions. When a one-way flag is set to true, it won't allow a character to pass through the tile from that direction. Multiple flags can be true at the same time. For a demo, see [the One-Way Collision demo](../examples/one-way-collision).
 
 | Property           | Type    | Effect                                                               |
 | :----------------- | :------ | :------------------------------------------------------------------- |

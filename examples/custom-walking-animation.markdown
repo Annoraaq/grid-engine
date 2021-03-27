@@ -45,7 +45,7 @@ parent: Examples
         createPlayerAnimation.call(this, 'down', 54, 56);
         createPlayerAnimation.call(this, 'left', 66, 68);
 
-        const gridMovementConfig = {
+        const gridEngineConfig = {
             characters: [
                 {
                     id: "player",
@@ -57,17 +57,17 @@ parent: Examples
             firstLayerAboveChar: 3,
         };
 
-        this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
-        this.gridMovementPlugin.movementStarted().subscribe(([_charId, direction]) => {
+        this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
+        this.gridEngine.movementStarted().subscribe(([_charId, direction]) => {
             playerSprite.anims.play(direction);
         });
 
-        this.gridMovementPlugin.movementStopped().subscribe(([_charId, direction]) => {
+        this.gridEngine.movementStopped().subscribe(([_charId, direction]) => {
             playerSprite.anims.stop();
             playerSprite.setFrame(getStopFrame(direction));
         });
 
-        this.gridMovementPlugin.directionChanged().subscribe(([_charId, direction]) => {
+        this.gridEngine.directionChanged().subscribe(([_charId, direction]) => {
             playerSprite.setFrame(getStopFrame(direction));
         });
     }
@@ -105,13 +105,13 @@ parent: Examples
     function update () {
         const cursors = this.input.keyboard.createCursorKeys();
         if (cursors.left.isDown) {
-            this.gridMovementPlugin.moveLeft("player");
+            this.gridEngine.moveLeft("player");
         } else if (cursors.right.isDown) {
-            this.gridMovementPlugin.moveRight("player");
+            this.gridEngine.moveRight("player");
         } else if (cursors.up.isDown) {
-            this.gridMovementPlugin.moveUp("player");
+            this.gridEngine.moveUp("player");
         } else if (cursors.down.isDown) {
-            this.gridMovementPlugin.moveDown("player");
+            this.gridEngine.moveDown("player");
         }
     }
 </script>
@@ -149,7 +149,7 @@ function create() {
   createPlayerAnimation.call(this, "down", 54, 56);
   createPlayerAnimation.call(this, "left", 66, 68);
 
-  const gridMovementConfig = {
+  const gridEngineConfig = {
     characters: [
       {
         id: "player",
@@ -161,21 +161,21 @@ function create() {
     firstLayerAboveChar: 3,
   };
 
-  this.gridMovementPlugin.create(cloudCityTilemap, gridMovementConfig);
-  this.gridMovementPlugin
+  this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
+  this.gridEngine
     .movementStarted()
     .subscribe(([_charId, direction]) => {
       playerSprite.anims.play(direction);
     });
 
-  this.gridMovementPlugin
+  this.gridEngine
     .movementStopped()
     .subscribe(([_charId, direction]) => {
       playerSprite.anims.stop();
       playerSprite.setFrame(getStopFrame(direction));
     });
 
-  this.gridMovementPlugin
+  this.gridEngine
     .directionChanged()
     .subscribe(([_charId, direction]) => {
       playerSprite.setFrame(getStopFrame(direction));
@@ -211,13 +211,13 @@ function getStopFrame(direction) {
 function update() {
   const cursors = this.input.keyboard.createCursorKeys();
   if (cursors.left.isDown) {
-    this.gridMovementPlugin.moveLeft("player");
+    this.gridEngine.moveLeft("player");
   } else if (cursors.right.isDown) {
-    this.gridMovementPlugin.moveRight("player");
+    this.gridEngine.moveRight("player");
   } else if (cursors.up.isDown) {
-    this.gridMovementPlugin.moveUp("player");
+    this.gridEngine.moveUp("player");
   } else if (cursors.down.isDown) {
-    this.gridMovementPlugin.moveDown("player");
+    this.gridEngine.moveDown("player");
   }
 }
 ```

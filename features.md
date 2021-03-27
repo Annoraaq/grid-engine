@@ -8,4 +8,4 @@ has_children: true
 
 # Features
 
-These pages go further in-depth about various features of the **Grid Movement** plugin.
+These pages go further in-depth about various features of the **Grid Engine** plugin.
