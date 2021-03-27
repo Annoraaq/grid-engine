@@ -39,8 +39,8 @@ npm i --save phaser-grid-movement-plugin
 ### Web
 
 ```html
-<!-- Download the .zip and copy GridMovementPlugin.min.js from dist/ -->
-<script src="GridMovementPlugin.min.js"></script>
+<!-- Download the .zip and copy GridEngine.min.js from dist/ -->
+<script src="GridEngine.min.js"></script>
 ```
 
 Then, inside your Phaser game config...
@@ -52,9 +52,9 @@ const gameConfig = {
   plugins: {
     scene: [
       {
-        key: "gridMovementPlugin",
-        plugin: GridMovementPlugin,
-        mapping: "gridMovementPlugin",
+        key: "gridEngine",
+        plugin: GridEngine,
+        mapping: "gridEngine",
       },
     ],
   },
@@ -71,7 +71,7 @@ Now you're all set to start using Grid Movement in your scenes!
 function create() {
   // ...
 
-  const gridMovementConfig = {
+  const gridEngineConfig = {
     characters: [
       {
         id: "player",
@@ -81,7 +81,7 @@ function create() {
     ],
   };
 
-  this.gridMovementPlugin.create(tilemap, gridMovementConfig);
+  this.gridEngine.create(tilemap, gridEngineConfig);
 
   // ...
 }

@@ -7,8 +7,8 @@ import {
 import { Direction } from "../Direction/Direction";
 import * as Phaser from "phaser";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
-import { WalkingAnimationMapping } from "../GridMovementPlugin";
 import { Subject } from "rxjs";
+import { WalkingAnimationMapping } from "../GridEngine";
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;

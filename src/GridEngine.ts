@@ -19,7 +19,7 @@ type Vector2 = Phaser.Math.Vector2;
 
 export type TileSizePerSecond = number;
 
-export interface GridMovementConfig {
+export interface GridEngineConfig {
   characters: CharacterData[];
   firstLayerAboveChar?: number; // deprecated
   collisionTilePropertyName?: string;
@@ -46,7 +46,7 @@ export interface CharacterData {
   facingDirection?: Direction;
 }
 
-export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
+export class GridEngine extends Phaser.Plugins.ScenePlugin {
   private gridCharacters: Map<string, GridCharacter>;
   private tilemap: Phaser.Tilemaps.Tilemap;
   private gridTilemap: GridTilemap;
@@ -59,7 +59,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
   private directionChanged$ = new Subject<[string, Direction]>();
   private positionChanged$ = new Subject<{ charId: string } & PositionChange>();
   private charRemoved$ = new Subject<string>();
-  private config: GridMovementConfig;
+  private config: GridEngineConfig;
 
   constructor(
     public scene: Phaser.Scene,
@@ -72,7 +72,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     this.systems.events.on("update", this.update, this);
   }
 
-  create(tilemap: Phaser.Tilemaps.Tilemap, config: GridMovementConfig): void {
+  create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
     this.isCreated = true;
     this.config = config;
     this.gridCharacters = new Map();
@@ -185,7 +185,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
 
     if (charData.characterIndex != undefined) {
       console.warn(
-        "PhaserGridMovementPlugin: CharacterConfig property `characterIndex` is deprecated. Use `walkingAnimtionMapping` instead."
+        "GridEngine: CharacterConfig property `characterIndex` is deprecated. Use `walkingAnimtionMapping` instead."
       );
     }
 
@@ -358,11 +358,11 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
 
   private createTilemap(
     tilemap: Phaser.Tilemaps.Tilemap,
-    config: GridMovementConfig
+    config: GridEngineConfig
   ) {
     if (config.firstLayerAboveChar != undefined) {
       console.warn(
-        "PhaserGridMovementPlugin: Config property `firstLayerAboveChar` is deprecated. Use a property `alwaysTop` on the tilemap layers instead."
+        "GridEngine: Config property `firstLayerAboveChar` is deprecated. Use a property `alwaysTop` on the tilemap layers instead."
       );
       return new GridTilemap(tilemap, config.firstLayerAboveChar);
     } else {
@@ -380,7 +380,7 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     return this.tilemap.tileHeight * tilemapScale;
   }
 
-  private addCharacters(config: GridMovementConfig) {
+  private addCharacters(config: GridEngineConfig) {
     config.characters.forEach((charData) => this.addCharacter(charData));
   }
 }

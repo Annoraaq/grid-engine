@@ -4,17 +4,17 @@
   "description": "Phaser3 plugin for grid based movement on a 2D game board.",
   "author": "Johannes Baum",
   "license": "ISC",
-  "main": "dist/GridMovementPlugin.min.js",
+  "main": "dist/GridEngine.min.js",
   "scripts": {
     "test": "jest",
     "dev": "prettier --write src/ && eslint src/",
-    "build": "esbuild src/main.ts --bundle --minify --global-name=GridMovementPlugin --outfile=dist/GridMovementPlugin.min.js && tsc --emitDeclarationOnly --outDir dist",
+    "build": "esbuild src/main.ts --bundle --minify --global-name=GridEngine --outfile=dist/GridEngine.min.js && tsc --emitDeclarationOnly --outDir dist",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "files": [
     "dist"
   ],
-  "types": "dist/GridMovementPlugin.d.ts",
+  "types": "dist/GridEngine.d.ts",
   "dependencies": {
     "esbuild": "^0.9.1",
     "phaser": "^3.52.0",
@@ -34,12 +34,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Annoraaq/phaser-grid-movement-plugin.git"
+    "url": "git+https://github.com/Annoraaq/grid-engine.git"
   },
   "bugs": {
-    "url": "https://github.com/Annoraaq/phaser-grid-movement-plugin/issues"
+    "url": "https://github.com/Annoraaq/grid-engine/issues"
   },
-  "homepage": "https://github.com/Annoraaq/phaser-grid-movement-plugin#readme",
+  "homepage": "https://github.com/Annoraaq/grid-engine#readme",
   "keywords": [
     "Phaser",
     "RPG",

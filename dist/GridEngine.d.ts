@@ -5,7 +5,7 @@ import { Observable } from "rxjs";
 declare const Vector2: typeof Phaser.Math.Vector2;
 declare type Vector2 = Phaser.Math.Vector2;
 export declare type TileSizePerSecond = number;
-export interface GridMovementConfig {
+export interface GridEngineConfig {
     characters: CharacterData[];
     firstLayerAboveChar?: number;
     collisionTilePropertyName?: string;
@@ -29,7 +29,7 @@ export interface CharacterData {
     offsetY?: number;
     facingDirection?: Direction;
 }
-export declare class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
+export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     scene: Phaser.Scene;
     private gridCharacters;
     private tilemap;
@@ -46,7 +46,7 @@ export declare class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
     private config;
     constructor(scene: Phaser.Scene, pluginManager: Phaser.Plugins.PluginManager);
     boot(): void;
-    create(tilemap: Phaser.Tilemaps.Tilemap, config: GridMovementConfig): void;
+    create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void;
     getPosition(charId: string): Vector2;
     moveLeft(charId: string): void;
     moveRight(charId: string): void;
