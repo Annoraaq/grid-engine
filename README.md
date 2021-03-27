@@ -4,7 +4,7 @@
     <img src="https://img.shields.io/badge/made%20with-TypeScript-blue?style=for-the-badge">
 </p>
 
-Welcome to the **Grid Movement** plugin! This Phaser 3 plugin adds grid-based movement to your tilemap game. Your characters will be able to only move in whole tile sizes, locked to the x-y grid!
+Welcome to the **Grid Engine** plugin! This Phaser 3 plugin adds grid-based movement to your tilemap game. Your characters will be able to only move in whole tile sizes, locked to the x-y grid!
 
 This plugin is also compatible (and written in) TypeScript; enjoy full type support!
 
