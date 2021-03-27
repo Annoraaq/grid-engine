@@ -23,7 +23,6 @@ export interface GridMovementConfig {
   characters: CharacterData[];
   firstLayerAboveChar?: number; // deprecated
   collisionTilePropertyName?: string;
-  isometric?: boolean;
 }
 
 export interface WalkingAnimationMapping {
@@ -195,7 +194,8 @@ export class GridMovementPlugin extends Phaser.Plugins.ScenePlugin {
       speed: charData.speed || 4,
       tilemap: this.gridTilemap,
       tileSize: new Vector2(this.getTileWidth(), this.getTileHeight()),
-      isometric: !!this.config.isometric,
+      isometric:
+        this.tilemap.orientation == `${Phaser.Tilemaps.Orientation.ISOMETRIC}`,
       walkingAnimationMapping: charData.walkingAnimationMapping,
       walkingAnimationEnabled: charData.walkingAnimationEnabled,
       container: charData.container,

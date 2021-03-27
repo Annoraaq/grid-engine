@@ -39,6 +39,9 @@ const mockGridTilemapConstructor = jest.fn(function (
   return mockGridTileMap;
 });
 
+const Vector2 = Phaser.Math.Vector2;
+type Vector2 = Phaser.Math.Vector2;
+
 expect.extend({
   toBeCharacter(receivedChar: GridCharacter, expectedCharId: string) {
     const pass = receivedChar.getId() == expectedCharId;
@@ -136,6 +139,7 @@ describe("GridMovementPlugin", () => {
       ],
       tileWidth: 16,
       tileHeight: 16,
+      orientation: `${Phaser.Tilemaps.Orientation.ORTHOGONAL}`,
     };
     playerSpriteMock = {};
     mockTargetMovementUpdate.mockReset();
@@ -215,8 +219,7 @@ describe("GridMovementPlugin", () => {
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
       tilemap: mockGridTileMap,
-      tileWidth: 32,
-      tileHeight: 32,
+      tileSize: new Vector2(32, 32),
       isometric: false,
       speed: 4,
       walkingAnimationEnabled: true,
@@ -231,6 +234,7 @@ describe("GridMovementPlugin", () => {
   });
 
   it("should init isometric player", () => {
+    tileMapMock.orientation = `${Phaser.Tilemaps.Orientation.ISOMETRIC}`;
     gridMovementPlugin = new GridMovementPlugin(sceneMock, pluginManagerMock);
     gridMovementPlugin.create(tileMapMock, {
       characters: [
@@ -239,7 +243,6 @@ describe("GridMovementPlugin", () => {
           sprite: playerSpriteMock,
         },
       ],
-      isometric: true,
     });
     expect(GridCharacter).toHaveBeenCalledWith(
       "player",
@@ -282,8 +285,7 @@ describe("GridMovementPlugin", () => {
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
       tilemap: mockGridTileMap,
-      tileWidth: 32,
-      tileHeight: 32,
+      tileSize: new Vector2(32, 32),
       isometric: false,
       speed: 4,
       walkingAnimationMapping: 2,
@@ -314,8 +316,7 @@ describe("GridMovementPlugin", () => {
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
       tilemap: mockGridTileMap,
-      tileWidth: 32,
-      tileHeight: 32,
+      tileSize: new Vector2(32, 32),
       isometric: false,
       speed: 4,
       walkingAnimationMapping: 3,
@@ -341,8 +342,7 @@ describe("GridMovementPlugin", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileWidth: 32,
-      tileHeight: 32,
+      tileSize: new Vector2(32, 32),
       isometric: false,
       tilemap: mockGridTileMap,
       speed: 4,
@@ -390,8 +390,7 @@ describe("GridMovementPlugin", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileWidth: 32,
-      tileHeight: 32,
+      tileSize: new Vector2(32, 32),
       isometric: false,
       tilemap: mockGridTileMap,
       speed: 4,
@@ -436,8 +435,7 @@ describe("GridMovementPlugin", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileWidth: 32,
-      tileHeight: 32,
+      tileSize: new Vector2(32, 32),
       isometric: false,
       tilemap: mockGridTileMap,
       speed: 2,
@@ -463,8 +461,7 @@ describe("GridMovementPlugin", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileWidth: 32,
-      tileHeight: 32,
+      tileSize: new Vector2(32, 32),
       isometric: false,
       tilemap: mockGridTileMap,
       speed: 4,

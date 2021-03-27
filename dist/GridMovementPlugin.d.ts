@@ -9,7 +9,6 @@ export interface GridMovementConfig {
     characters: CharacterData[];
     firstLayerAboveChar?: number;
     collisionTilePropertyName?: string;
-    isometric?: boolean;
 }
 export interface WalkingAnimationMapping {
     [Direction.UP]: FrameRow;
