@@ -21,7 +21,7 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
 - Following other characters
 - Isometric maps (Beta)
 
-📖 Our most current documentation [is here](https://github.com/Annoraaq/grid-engine/wiki)!
+📖 Our most current documentation [is here](https://annoraaq.github.io/grid-engine/)!
 ➡️ You can try/download a list of examples [at this link here](https://annoraaq.github.io/grid-engine/examples/).
 
 <p align="center">
