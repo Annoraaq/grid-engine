@@ -8,4 +8,4 @@ has_children: true
 
 # Examples
 
-Here you can examine some already-written examples of various **Grid Engine** features.
+Here you can examine some already-written examples of various **Grid Movement** features.
