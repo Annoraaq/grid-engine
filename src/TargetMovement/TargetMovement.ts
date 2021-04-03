@@ -14,7 +14,7 @@ interface MovementTuple {
 }
 
 interface MovementConfig {
-  targetPos: Phaser.Math.Vector2;
+  targetPos: Vector2;
   distance: number;
   closestPointIfBlocked: boolean;
 }
@@ -27,7 +27,7 @@ export class TargetMovement {
 
   addCharacter(
     character: GridCharacter,
-    targetPos: Phaser.Math.Vector2,
+    targetPos: Vector2,
     distance = 0,
     closestPointIfBlocked = false
   ): void {

@@ -122,7 +122,7 @@ export class GridCharacter {
     this.walkingAnimationMapping = walkingAnimationMapping;
   }
 
-  setTilePosition(tilePosition: Phaser.Math.Vector2): void {
+  setTilePosition(tilePosition: Vector2): void {
     if (this.isMoving()) return;
     this.tilePos = tilePosition;
     this.updateZindex();
@@ -224,7 +224,7 @@ export class GridCharacter {
     return this._tilePos.clone();
   }
 
-  private set tilePos(newTilePos: Phaser.Math.Vector2) {
+  private set tilePos(newTilePos: Vector2) {
     this._tilePos.x = newTilePos.x;
     this._tilePos.y = newTilePos.y;
   }
@@ -248,15 +248,15 @@ export class GridCharacter {
     );
   }
 
-  private setPosition(position: Phaser.Math.Vector2): void {
+  private setPosition(position: Vector2): void {
     const gameObject = this.container || this.sprite;
     gameObject.x = position.x;
     gameObject.y = position.y;
   }
 
-  private getPosition(): Phaser.Math.Vector2 {
+  private getPosition(): Vector2 {
     const gameObject = this.container || this.sprite;
-    return new Phaser.Math.Vector2(gameObject.x, gameObject.y);
+    return new Vector2(gameObject.x, gameObject.y);
   }
 
   private isCurrentFrameStanding(direction: Direction): boolean {

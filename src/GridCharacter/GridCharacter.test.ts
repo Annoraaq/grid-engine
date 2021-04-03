@@ -120,8 +120,8 @@ describe("GridCharacter", () => {
   });
 
   it("should get tile pos", () => {
-    const expectedPos = new Phaser.Math.Vector2(5, 6);
-    const newTilePos = new Phaser.Math.Vector2(5, 6);
+    const expectedPos = new Vector2(5, 6);
+    const newTilePos = new Vector2(5, 6);
     gridCharacter.setTilePosition(newTilePos);
     newTilePos.x = 20;
 
@@ -130,7 +130,7 @@ describe("GridCharacter", () => {
   });
 
   it("should block one tile if not moving", () => {
-    const newTilePos = new Phaser.Math.Vector2(5, 6);
+    const newTilePos = new Vector2(5, 6);
     gridCharacter.setTilePosition(newTilePos);
     expect(gridCharacter.isBlockingTile(newTilePos)).toBe(true);
   });
@@ -157,22 +157,22 @@ describe("GridCharacter", () => {
       .toPromise();
 
     gridCharacter.positionChanged().subscribe(({ exitTile, enterTile }) => {
-      expect(exitTile).toEqual(new Phaser.Math.Vector2(0, 0));
-      expect(enterTile).toEqual(new Phaser.Math.Vector2(0, -1));
+      expect(exitTile).toEqual(new Vector2(0, 0));
+      expect(enterTile).toEqual(new Vector2(0, -1));
       done();
     });
 
     gridCharacter.move(Direction.UP);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
-    expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, -1));
-    expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, -1));
+    expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, -1));
+    expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, -1));
     const dir = await movementStartedProm;
     expect(dir).toEqual(Direction.UP);
 
     gridCharacter.move(Direction.DOWN);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
-    expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, -1));
+    expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, -1));
   });
 
   it("should not update if not moving", () => {
@@ -232,7 +232,7 @@ describe("GridCharacter", () => {
       offsetX: customOffsetX,
       offsetY: customOffsetY,
     });
-    gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
+    gridCharacter.setTilePosition(new Vector2(3, 4));
 
     expect(spriteMock.x).toEqual(
       3 * TILE_WIDTH + PLAYER_X_OFFSET + customOffsetX
@@ -243,7 +243,7 @@ describe("GridCharacter", () => {
   });
 
   it("should set tile position with custom offset", () => {
-    gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
+    gridCharacter.setTilePosition(new Vector2(3, 4));
 
     expect(spriteMock.x).toEqual(3 * TILE_WIDTH + PLAYER_X_OFFSET);
     expect(spriteMock.y).toEqual(4 * TILE_HEIGHT + PLAYER_Y_OFFSET);
@@ -252,7 +252,7 @@ describe("GridCharacter", () => {
   it("should not set tile position when moving", () => {
     mockNonBlockingTile();
     gridCharacter.move(Direction.DOWN);
-    gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
+    gridCharacter.setTilePosition(new Vector2(3, 4));
 
     expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
@@ -688,7 +688,7 @@ describe("GridCharacter", () => {
     });
 
     it("should set tile position", () => {
-      gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
+      gridCharacter.setTilePosition(new Vector2(3, 4));
 
       expect(containerMock.x).toEqual(3 * TILE_WIDTH + PLAYER_X_OFFSET);
       expect(containerMock.y).toEqual(4 * TILE_HEIGHT + PLAYER_Y_OFFSET);
@@ -741,7 +741,7 @@ describe("GridCharacter", () => {
         offsetX: customOffsetX,
         offsetY: customOffsetY,
       });
-      gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
+      gridCharacter.setTilePosition(new Vector2(3, 4));
 
       expect(spriteMock.x).toEqual(
         (3 * TILE_WIDTH_ISOMETRIC) / 2 +

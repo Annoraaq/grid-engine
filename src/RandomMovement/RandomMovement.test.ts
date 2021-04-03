@@ -4,6 +4,9 @@ import { Direction } from "./../Direction/Direction";
 import { GridCharacter } from "./../GridCharacter/GridCharacter";
 import { RandomMovement } from "./RandomMovement";
 
+const Vector2 = Phaser.Math.Vector2;
+type Vector2 = Phaser.Math.Vector2;
+
 describe("RandomMovement", () => {
   let randomMovement: RandomMovement;
 
@@ -22,14 +25,14 @@ describe("RandomMovement", () => {
       getId: () => "char1",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getTilePos: () => new Phaser.Math.Vector2(0, 0),
+      getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
     const char2Mock: GridCharacter = <any>{
       getId: () => "char2",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getTilePos: () => new Phaser.Math.Vector2(0, 0),
+      getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
     randomMovement.addCharacter(char1Mock);
@@ -49,14 +52,14 @@ describe("RandomMovement", () => {
       getId: () => "char1",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getTilePos: () => new Phaser.Math.Vector2(0, 0),
+      getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
     const char2Mock: GridCharacter = <any>{
       getId: () => "char2",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getTilePos: () => new Phaser.Math.Vector2(0, 0),
+      getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
     randomMovement.addCharacter(char1Mock);
@@ -77,14 +80,14 @@ describe("RandomMovement", () => {
       getId: () => "char1",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getTilePos: () => new Phaser.Math.Vector2(0, 0),
+      getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
     const char2Mock: GridCharacter = <any>{
       getId: () => "char2",
       isBlockingDirection: () => true,
       move: jest.fn(),
-      getTilePos: () => new Phaser.Math.Vector2(0, 0),
+      getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
     randomMovement.addCharacter(char1Mock);
@@ -104,11 +107,11 @@ describe("RandomMovement", () => {
       getId: () => "char1",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getTilePos: () => new Phaser.Math.Vector2(0, 0),
+      getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
     randomMovement.addCharacter(char1Mock, 0, 2);
-    char1Mock.getTilePos = () => new Phaser.Math.Vector2(2, 2);
+    char1Mock.getTilePos = () => new Vector2(2, 2);
     randomMovement.update(1);
 
     expect(char1Mock.move).toHaveBeenCalledWith(Direction.NONE);
@@ -121,11 +124,11 @@ describe("RandomMovement", () => {
       getId: () => "char1",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getTilePos: () => new Phaser.Math.Vector2(0, 0),
+      getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
     randomMovement.addCharacter(char1Mock, 0, -1);
-    char1Mock.getTilePos = () => new Phaser.Math.Vector2(2, 2);
+    char1Mock.getTilePos = () => new Vector2(2, 2);
     randomMovement.update(1);
 
     expect(char1Mock.move).toHaveBeenCalledWith(Direction.DOWN);
@@ -138,7 +141,7 @@ describe("RandomMovement", () => {
       getId: () => "char1",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getTilePos: () => new Phaser.Math.Vector2(0, 0),
+      getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
     randomMovement.addCharacter(char1Mock, 0, 2);
@@ -167,7 +170,7 @@ describe("RandomMovement", () => {
       getId: () => "char1",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getTilePos: () => new Phaser.Math.Vector2(0, 0),
+      getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
     randomMovement.addCharacter(char1Mock, 50, 2);
@@ -191,7 +194,7 @@ describe("RandomMovement", () => {
       getId: () => "char1",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getTilePos: () => new Phaser.Math.Vector2(0, 0),
+      getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
     randomMovement.addCharacter(char1Mock, 50, 2);
@@ -200,7 +203,7 @@ describe("RandomMovement", () => {
     randomMovement.update(60);
     expect(char1Mock.move).toHaveBeenNthCalledWith(1, Direction.DOWN);
 
-    char1Mock.getTilePos = () => new Phaser.Math.Vector2(2, 2);
+    char1Mock.getTilePos = () => new Vector2(2, 2);
 
     // do next step which is out of radius
     randomMovement.update(1);
@@ -214,7 +217,7 @@ describe("RandomMovement", () => {
       getId: () => "char1",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getTilePos: () => new Phaser.Math.Vector2(0, 0),
+      getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
     randomMovement.addCharacter(char1Mock, 0, 2);

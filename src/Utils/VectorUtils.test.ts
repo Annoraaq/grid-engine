@@ -50,7 +50,7 @@ describe("VectorUtils", () => {
 
   describe("scalarMult", () => {
     it("should multiply immutably", () => {
-      const vector = new Phaser.Math.Vector2(5, 6);
+      const vector = new Vector2(5, 6);
       expect(VectorUtils.scalarMult(vector, 1)).toEqual(new Vector2(5, 6));
       expect(VectorUtils.scalarMult(vector, 2)).toEqual(new Vector2(10, 12));
       expect(VectorUtils.scalarMult(vector, 0)).toEqual(new Vector2(0, 0));

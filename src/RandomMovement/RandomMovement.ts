@@ -2,6 +2,9 @@ import { VectorUtils } from "./../Utils/VectorUtils";
 import { GridCharacter } from "./../GridCharacter/GridCharacter";
 import { Direction, DirectionVectors } from "../Direction/Direction";
 
+const Vector2 = Phaser.Math.Vector2;
+type Vector2 = Phaser.Math.Vector2;
+
 interface MovementTuple {
   character: GridCharacter;
   config: MovementConfig;
@@ -99,7 +102,7 @@ export class RandomMovement {
     if (conf.radius == -1) return true;
     const dist = VectorUtils.manhattanDistance(
       character.getTilePos().add(DirectionVectors[dir]),
-      new Phaser.Math.Vector2(conf.initialCol, conf.initialRow)
+      new Vector2(conf.initialCol, conf.initialRow)
     );
 
     return dist <= conf.radius;

@@ -227,9 +227,7 @@ describe("GridEngine", () => {
       offsetX: undefined,
       offsetY: undefined,
     });
-    expect(mockSetTilePositon).toHaveBeenCalledWith(
-      new Phaser.Math.Vector2(0, 0)
-    );
+    expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
     expect(mockTurnTowards).not.toHaveBeenCalled();
   });
 
@@ -291,9 +289,7 @@ describe("GridEngine", () => {
       walkingAnimationMapping: 2,
       walkingAnimationEnabled: true,
     });
-    expect(mockSetTilePositon).toHaveBeenCalledWith(
-      new Phaser.Math.Vector2(0, 0)
-    );
+    expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
 
     expect(console.warn).toHaveBeenCalledWith(
       "GridEngine: CharacterConfig property `characterIndex` is deprecated. Use `walkingAnimtionMapping` instead."
@@ -322,9 +318,7 @@ describe("GridEngine", () => {
       walkingAnimationMapping: 3,
       walkingAnimationEnabled: true,
     });
-    expect(mockSetTilePositon).toHaveBeenCalledWith(
-      new Phaser.Math.Vector2(0, 0)
-    );
+    expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
   });
 
   it("should init player without walking animation", () => {
@@ -349,9 +343,7 @@ describe("GridEngine", () => {
       walkingAnimationMapping: 3,
       walkingAnimationEnabled: false,
     });
-    expect(mockSetTilePositon).toHaveBeenCalledWith(
-      new Phaser.Math.Vector2(0, 0)
-    );
+    expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
   });
 
   it("should init player with animation mapping", () => {
@@ -397,9 +389,7 @@ describe("GridEngine", () => {
       walkingAnimationMapping,
       walkingAnimationEnabled: true,
     });
-    expect(mockSetTilePositon).toHaveBeenCalledWith(
-      new Phaser.Math.Vector2(0, 0)
-    );
+    expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
   });
 
   it("should use config startPosition", () => {
@@ -410,14 +400,12 @@ describe("GridEngine", () => {
           id: "player",
           sprite: playerSpriteMock,
           walkingAnimationMapping: 3,
-          startPosition: new Phaser.Math.Vector2(3, 4),
+          startPosition: new Vector2(3, 4),
         },
       ],
       firstLayerAboveChar: 3,
     });
-    expect(mockSetTilePositon).toHaveBeenCalledWith(
-      new Phaser.Math.Vector2(3, 4)
-    );
+    expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(3, 4));
   });
 
   it("should use config speed", () => {
@@ -577,11 +565,9 @@ describe("GridEngine", () => {
       ],
       firstLayerAboveChar: 3,
     });
-    mockGetTilePos.mockReturnValue(new Phaser.Math.Vector2(3, 4));
+    mockGetTilePos.mockReturnValue(new Vector2(3, 4));
 
-    expect(gridEngine.getPosition("player")).toEqual(
-      new Phaser.Math.Vector2(3, 4)
-    );
+    expect(gridEngine.getPosition("player")).toEqual(new Vector2(3, 4));
   });
 
   it("should move randomly", () => {
@@ -612,7 +598,7 @@ describe("GridEngine", () => {
       ],
       firstLayerAboveChar: 3,
     });
-    const targetVec = new Phaser.Math.Vector2(3, 4);
+    const targetVec = new Vector2(3, 4);
     gridEngine.moveTo("player", targetVec);
     expect(mockTargetMovementAddCharacter).toHaveBeenCalledWith(
       expect.anything(),
@@ -1108,8 +1094,8 @@ describe("GridEngine", () => {
 
       const prom = gridEngine.positionChanged().pipe(take(1)).toPromise();
 
-      const exitTile = new Phaser.Math.Vector2(1, 2);
-      const enterTile = new Phaser.Math.Vector2(2, 2);
+      const exitTile = new Vector2(1, 2);
+      const enterTile = new Vector2(2, 2);
 
       mockSubject.next({
         exitTile,
@@ -1141,8 +1127,8 @@ describe("GridEngine", () => {
         next: nextMock,
       });
 
-      const exitTile = new Phaser.Math.Vector2(1, 2);
-      const enterTile = new Phaser.Math.Vector2(2, 2);
+      const exitTile = new Vector2(1, 2);
+      const enterTile = new Vector2(2, 2);
 
       mockSubject.next({ exitTile, enterTile });
       expect(nextMock).not.toHaveBeenCalled();
@@ -1214,7 +1200,7 @@ describe("GridEngine", () => {
 
     it("should throw error if moveTo is invoked", () => {
       expect(() =>
-        gridEngine.moveTo("unknownCharId", new Phaser.Math.Vector2(3, 4))
+        gridEngine.moveTo("unknownCharId", new Vector2(3, 4))
       ).toThrow("Character unknown");
     });
 
@@ -1309,9 +1295,9 @@ describe("GridEngine", () => {
     });
 
     it("should throw error if moveTo is invoked", () => {
-      expect(() =>
-        gridEngine.moveTo("someCharId", new Phaser.Math.Vector2(2, 3))
-      ).toThrow("Plugin not initialized");
+      expect(() => gridEngine.moveTo("someCharId", new Vector2(2, 3))).toThrow(
+        "Plugin not initialized"
+      );
     });
 
     it("should throw error if stopMovingRandomly is invoked", () => {
