@@ -66,7 +66,7 @@ export class GridTilemap {
 
   hasBlockingChar(pos: Vector2): boolean {
     return [...this.characters.values()].some((char) =>
-      char.getTilePos().equals(pos)
+      char.isBlockingTile(pos)
     );
   }
 

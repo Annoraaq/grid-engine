@@ -37,6 +37,7 @@ export declare class GridCharacter {
     private tileSizePixelsWalked;
     private lastFootLeft;
     private _tilePos;
+    private prevTilePos;
     private sprite;
     private container?;
     private tilemap;
@@ -60,11 +61,11 @@ export declare class GridCharacter {
     setSpeed(speed: number): void;
     setWalkingAnimationMapping(walkingAnimationMapping: WalkingAnimationMapping): void;
     setTilePosition(tilePosition: Phaser.Math.Vector2): void;
-    private getOffset;
-    getTilePos(): Phaser.Math.Vector2;
+    getTilePos(): Vector2;
     move(direction: Direction): void;
     update(delta: number): void;
     getMovementDirection(): Direction;
+    isBlockingTile(tilePos: Vector2): boolean;
     isBlockingDirection(direction: Direction): boolean;
     isMoving(): boolean;
     turnTowards(direction: Direction): void;
@@ -73,6 +74,7 @@ export declare class GridCharacter {
     movementStopped(): Subject<Direction>;
     directionChanged(): Subject<Direction>;
     positionChanged(): Subject<PositionChange>;
+    private getOffset;
     private get tilePos();
     private set tilePos(value);
     private updateZindex;
