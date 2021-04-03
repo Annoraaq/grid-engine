@@ -1,3 +1,4 @@
+import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
 import { VectorUtils } from "./../Utils/VectorUtils";
 import {
   DirectionVectors,
@@ -40,18 +41,9 @@ export interface CharConfig {
 }
 
 export class GridCharacter {
-  private static readonly FRAMES_CHAR_ROW = 3;
-  private static readonly FRAMES_CHAR_COL = 4;
-  private directionToFrameRow: { [key in Direction]?: number } = {
-    [Direction.DOWN]: 0,
-    [Direction.LEFT]: 1,
-    [Direction.RIGHT]: 2,
-    [Direction.UP]: 3,
-  };
   private movementDirection = Direction.NONE;
   private speedPixelsPerSecond: Vector2;
   private tileSizePixelsWalked: Vector2 = Vector2.ZERO.clone();
-  private lastFootLeft = false;
   private _tilePos = new Vector2(0, 0);
   private prevTilePos = new Vector2(0, 0);
   private sprite: Phaser.GameObjects.Sprite;
@@ -60,9 +52,6 @@ export class GridCharacter {
   private tileDistance: Vector2;
   private tileSize: Vector2;
   private speed: number;
-  private characterIndex = 0;
-  private walkingAnimationMapping: WalkingAnimationMapping;
-  private walkingAnimation: boolean;
   private customOffset: Vector2;
   private movementStarted$ = new Subject<Direction>();
   private movementStopped$ = new Subject<Direction>();
@@ -71,12 +60,15 @@ export class GridCharacter {
   private lastMovementImpulse = Direction.NONE;
   private facingDirection: Direction = Direction.DOWN;
   private isIsometric: boolean;
+  private animation: CharacterAnimation;
 
   constructor(private id: string, config: CharConfig) {
+    let characterIndex = 0;
+    let walkingAnimationMapping: WalkingAnimationMapping;
     if (typeof config.walkingAnimationMapping == "number") {
-      this.characterIndex = config.walkingAnimationMapping;
+      characterIndex = config.walkingAnimationMapping;
     } else {
-      this.walkingAnimationMapping = config.walkingAnimationMapping;
+      walkingAnimationMapping = config.walkingAnimationMapping;
     }
 
     this.sprite = config.sprite;
@@ -84,7 +76,6 @@ export class GridCharacter {
     this.container = config.container;
     this.tilemap = config.tilemap;
     this.speed = config.speed;
-    this.walkingAnimation = config.walkingAnimationEnabled;
     this.customOffset = new Vector2(config.offsetX || 0, config.offsetY || 0);
     this.isIsometric = config.isometric;
     this.tileSize = config.tileSize.clone();
@@ -93,9 +84,13 @@ export class GridCharacter {
       this.tileDistance = VectorUtils.scalarMult(this.tileDistance, 0.5);
     }
 
-    if (this.walkingAnimation) {
-      this.sprite.setFrame(this.framesOfDirection(Direction.DOWN).standing);
-    }
+    this.animation = new CharacterAnimation(
+      this.sprite,
+      walkingAnimationMapping,
+      characterIndex
+    );
+    this.animation.setIsEnabled(config.walkingAnimationEnabled);
+    this.animation.setStandingFrame(Direction.DOWN);
 
     this.speedPixelsPerSecond = VectorUtils.scalarMult(
       this.tileDistance,
@@ -119,7 +114,7 @@ export class GridCharacter {
   setWalkingAnimationMapping(
     walkingAnimationMapping: WalkingAnimationMapping
   ): void {
-    this.walkingAnimationMapping = walkingAnimationMapping;
+    this.animation.setWalkingAnimationMapping(walkingAnimationMapping);
   }
 
   setTilePosition(tilePosition: Vector2): void {
@@ -145,9 +140,7 @@ export class GridCharacter {
     if (this.isMoving()) return;
     if (this.isBlockingDirection(direction)) {
       this.facingDirection = direction;
-      if (this.walkingAnimation) {
-        this.setStandingFrame(direction);
-      }
+      this.animation.setStandingFrame(direction);
       this.directionChanged$.next(direction);
     } else {
       this.startMoving(direction);
@@ -187,9 +180,7 @@ export class GridCharacter {
     if (this.isMoving()) return;
     if (direction == Direction.NONE) return;
     this.facingDirection = direction;
-    if (this.walkingAnimation) {
-      this.sprite.setFrame(this.framesOfDirection(direction).standing);
-    }
+    this.animation.setStandingFrame(direction);
   }
 
   getFacingDirection(): Direction {
@@ -234,20 +225,6 @@ export class GridCharacter {
     gameObject.setDepth(GridTilemap.FIRST_PLAYER_LAYER + this.tilePos.y);
   }
 
-  private setStandingFrame(direction: Direction): void {
-    if (!this.isCurrentFrameStanding(direction)) {
-      this.lastFootLeft = !this.lastFootLeft;
-    }
-    this.sprite.setFrame(this.framesOfDirection(direction).standing);
-  }
-
-  private setWalkingFrame(direction: Direction): void {
-    const frameRow = this.framesOfDirection(direction);
-    this.sprite.setFrame(
-      this.lastFootLeft ? frameRow.rightFoot : frameRow.leftFoot
-    );
-  }
-
   private setPosition(position: Vector2): void {
     const gameObject = this.container || this.sprite;
     gameObject.x = position.x;
@@ -257,44 +234,6 @@ export class GridCharacter {
   private getPosition(): Vector2 {
     const gameObject = this.container || this.sprite;
     return new Vector2(gameObject.x, gameObject.y);
-  }
-
-  private isCurrentFrameStanding(direction: Direction): boolean {
-    return (
-      Number(this.sprite.frame.name) ==
-      this.framesOfDirection(direction).standing
-    );
-  }
-
-  private framesOfDirection(direction: Direction): FrameRow {
-    if (this.walkingAnimationMapping) {
-      return this.getFramesForAnimationMapping(direction);
-    }
-    return this.getFramesForCharIndex(direction);
-  }
-
-  private getFramesForAnimationMapping(direction: Direction): FrameRow {
-    return this.walkingAnimationMapping[direction];
-  }
-
-  private getFramesForCharIndex(direction: Direction): FrameRow {
-    const charsInRow =
-      this.sprite.texture.source[0].width /
-      this.sprite.width /
-      GridCharacter.FRAMES_CHAR_ROW;
-    const playerCharRow = Math.floor(this.characterIndex / charsInRow);
-    const playerCharCol = this.characterIndex % charsInRow;
-    const framesInRow = charsInRow * GridCharacter.FRAMES_CHAR_ROW;
-    const framesInSameRowBefore = GridCharacter.FRAMES_CHAR_ROW * playerCharCol;
-    const rows =
-      this.directionToFrameRow[direction] +
-      playerCharRow * GridCharacter.FRAMES_CHAR_COL;
-    const startFrame = framesInSameRowBefore + rows * framesInRow;
-    return {
-      rightFoot: startFrame,
-      standing: startFrame + 1,
-      leftFoot: startFrame + 2,
-    };
   }
 
   private startMoving(direction: Direction): void {
@@ -381,9 +320,10 @@ export class GridCharacter {
     this.setPosition(newPlayerPos);
     this.tileSizePixelsWalked.x += Math.abs(speed.x);
     this.tileSizePixelsWalked.y += Math.abs(speed.y);
-    if (this.walkingAnimation) {
-      this.updateCharacterFrame();
-    }
+    this.animation.updateCharacterFrame(
+      this.movementDirection,
+      this.hasWalkedHalfATile()
+    );
     this.tileSizePixelsWalked.x %= this.tileDistance.x;
     this.tileSizePixelsWalked.y %= this.tileDistance.y;
     if (this.hasWalkedHalfATile()) {
@@ -395,14 +335,6 @@ export class GridCharacter {
     this.movementStopped$.next(this.movementDirection);
     this.movementDirection = Direction.NONE;
     this.prevTilePos = this.tilePos.clone();
-  }
-
-  private updateCharacterFrame(): void {
-    if (this.hasWalkedHalfATile()) {
-      this.setStandingFrame(this.movementDirection);
-    } else {
-      this.setWalkingFrame(this.movementDirection);
-    }
   }
 
   private hasWalkedHalfATile(): boolean {

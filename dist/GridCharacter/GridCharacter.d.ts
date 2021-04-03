@@ -29,13 +29,9 @@ export interface CharConfig {
 }
 export declare class GridCharacter {
     private id;
-    private static readonly FRAMES_CHAR_ROW;
-    private static readonly FRAMES_CHAR_COL;
-    private directionToFrameRow;
     private movementDirection;
     private speedPixelsPerSecond;
     private tileSizePixelsWalked;
-    private lastFootLeft;
     private _tilePos;
     private prevTilePos;
     private sprite;
@@ -44,9 +40,6 @@ export declare class GridCharacter {
     private tileDistance;
     private tileSize;
     private speed;
-    private characterIndex;
-    private walkingAnimationMapping;
-    private walkingAnimation;
     private customOffset;
     private movementStarted$;
     private movementStopped$;
@@ -55,12 +48,13 @@ export declare class GridCharacter {
     private lastMovementImpulse;
     private facingDirection;
     private isIsometric;
+    private animation;
     constructor(id: string, config: CharConfig);
     getId(): string;
     getSpeed(): number;
     setSpeed(speed: number): void;
     setWalkingAnimationMapping(walkingAnimationMapping: WalkingAnimationMapping): void;
-    setTilePosition(tilePosition: Phaser.Math.Vector2): void;
+    setTilePosition(tilePosition: Vector2): void;
     getTilePos(): Vector2;
     move(direction: Direction): void;
     update(delta: number): void;
@@ -78,14 +72,8 @@ export declare class GridCharacter {
     private get tilePos();
     private set tilePos(value);
     private updateZindex;
-    private setStandingFrame;
-    private setWalkingFrame;
     private setPosition;
     private getPosition;
-    private isCurrentFrameStanding;
-    private framesOfDirection;
-    private getFramesForAnimationMapping;
-    private getFramesForCharIndex;
     private startMoving;
     private updateTilePos;
     private tilePosInDirection;
@@ -97,7 +85,6 @@ export declare class GridCharacter {
     private getDirectionVecs;
     private moveCharacterSprite;
     private stopMoving;
-    private updateCharacterFrame;
     private hasWalkedHalfATile;
 }
 export {};
