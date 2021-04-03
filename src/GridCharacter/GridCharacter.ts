@@ -52,7 +52,8 @@ export class GridCharacter {
   private speedPixelsPerSecond: Vector2;
   private tileSizePixelsWalked: Vector2 = Vector2.ZERO.clone();
   private lastFootLeft = false;
-  private _tilePos = new Phaser.Math.Vector2(0, 0);
+  private _tilePos = new Vector2(0, 0);
+  private prevTilePos = new Vector2(0, 0);
   private sprite: Phaser.GameObjects.Sprite;
   private container?: Phaser.GameObjects.Container;
   private tilemap: GridTilemap;
@@ -134,7 +135,7 @@ export class GridCharacter {
     );
   }
 
-  getTilePos(): Phaser.Math.Vector2 {
+  getTilePos(): Vector2 {
     return this.tilePos;
   }
 
@@ -162,6 +163,10 @@ export class GridCharacter {
 
   getMovementDirection(): Direction {
     return this.movementDirection;
+  }
+
+  isBlockingTile(tilePos: Vector2): boolean {
+    return this._tilePos.equals(tilePos) || this.prevTilePos.equals(tilePos);
   }
 
   isBlockingDirection(direction: Direction): boolean {
@@ -300,6 +305,7 @@ export class GridCharacter {
   }
 
   private updateTilePos() {
+    this.prevTilePos = this.tilePos.clone();
     const newTilePos = this.tilePos.add(
       DirectionVectors[this.movementDirection]
     );
@@ -388,6 +394,7 @@ export class GridCharacter {
   private stopMoving(): void {
     this.movementStopped$.next(this.movementDirection);
     this.movementDirection = Direction.NONE;
+    this.prevTilePos = this.tilePos.clone();
   }
 
   private updateCharacterFrame(): void {

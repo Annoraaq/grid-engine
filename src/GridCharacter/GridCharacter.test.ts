@@ -129,9 +129,29 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getTilePos()).toEqual(expectedPos);
   });
 
+  it("should block one tile if not moving", () => {
+    const newTilePos = new Phaser.Math.Vector2(5, 6);
+    gridCharacter.setTilePosition(newTilePos);
+    expect(gridCharacter.isBlockingTile(newTilePos)).toBe(true);
+  });
+
+  it("should block two tiles if moving", () => {
+    const tilePos = new Vector2(5, 6);
+    gridCharacter.setTilePosition(tilePos);
+
+    gridCharacter.move(Direction.UP);
+    expect(gridCharacter.isBlockingTile(tilePos)).toBe(true);
+    expect(gridCharacter.isBlockingTile(new Vector2(5, 5))).toBe(true);
+    gridCharacter.update(300);
+    gridCharacter.update(50);
+    // gridCharacter.update(1000);
+    expect(gridCharacter.isBlockingTile(tilePos)).toBe(false);
+    expect(gridCharacter.isBlockingTile(new Vector2(5, 5))).toBe(true);
+  });
+
   it("should start movement", async (done) => {
     mockNonBlockingTile();
-    expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, 0));
+    expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, 0));
     const movementStartedProm = gridCharacter
       .movementStarted()
       .pipe(take(1))

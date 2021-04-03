@@ -1,6 +1,9 @@
 import { Direction } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
 
+const Vector2 = Phaser.Math.Vector2;
+type Vector2 = Phaser.Math.Vector2;
+
 describe("GridTilemapPlugin", () => {
   let gridTilemap: GridTilemap;
   let tilemapMock;
@@ -386,22 +389,17 @@ describe("GridTilemapPlugin", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     gridTilemap = new GridTilemap(tilemapMock, 3);
 
-    const char1Pos = new Phaser.Math.Vector2(3, 4);
-    const char2Pos = new Phaser.Math.Vector2(6, 8);
-
     const char1Mock = <any>{
       getId: () => "player1",
-      getTilePos: () => char1Pos,
+      isBlockingTile: () => true,
     };
     const char2Mock = <any>{
       getId: () => "player2",
-      getTilePos: () => char2Pos,
+      isBlockingTile: () => false,
     };
     gridTilemap.addCharacter(char1Mock);
     gridTilemap.addCharacter(char2Mock);
-    const hasBlockingChar = gridTilemap.hasBlockingChar(
-      new Phaser.Math.Vector2(3, 4)
-    );
+    const hasBlockingChar = gridTilemap.hasBlockingChar(new Vector2(3, 4));
     const isBlocking = gridTilemap.isBlocking(new Phaser.Math.Vector2(3, 4));
     expect(hasBlockingChar).toBe(true);
     expect(isBlocking).toBe(true);
@@ -411,16 +409,13 @@ describe("GridTilemapPlugin", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     gridTilemap = new GridTilemap(tilemapMock, 3);
 
-    const char1Pos = new Phaser.Math.Vector2(3, 4);
-    const char2Pos = new Phaser.Math.Vector2(6, 8);
-
     const char1Mock = <any>{
       getId: () => "player1",
-      getTilePos: () => char1Pos,
+      isBlockingTile: () => false,
     };
     const char2Mock = <any>{
       getId: () => "player2",
-      getTilePos: () => char2Pos,
+      isBlockingTile: () => false,
     };
     gridTilemap.addCharacter(char1Mock);
     gridTilemap.addCharacter(char2Mock);
