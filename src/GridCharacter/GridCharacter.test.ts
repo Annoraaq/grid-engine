@@ -144,7 +144,6 @@ describe("GridCharacter", () => {
     expect(gridCharacter.isBlockingTile(new Vector2(5, 5))).toBe(true);
     gridCharacter.update(300);
     gridCharacter.update(50);
-    // gridCharacter.update(1000);
     expect(gridCharacter.isBlockingTile(tilePos)).toBe(false);
     expect(gridCharacter.isBlockingTile(new Vector2(5, 5))).toBe(true);
   });
