@@ -1,9 +1,10 @@
-import { GridTilemap } from "./../GridTilemap/GridTilemap";
-import { VectorUtils } from "./../Utils/VectorUtils";
-import { GridCharacter } from "../GridCharacter/GridCharacter";
+import { GridTilemap } from "../../GridTilemap/GridTilemap";
+import { VectorUtils } from "../../Utils/VectorUtils";
+import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import * as Phaser from "phaser";
-import { Direction } from "../Direction/Direction";
-import { Bfs } from "../Algorithms/ShortestPath/Bfs/Bfs";
+import { Direction } from "../../Direction/Direction";
+import { Bfs } from "../../Algorithms/ShortestPath/Bfs/Bfs";
+import { Movement } from "../Movement";
 
 type Vector2 = Phaser.Math.Vector2;
 const Vector2 = Phaser.Math.Vector2;
@@ -19,21 +20,25 @@ interface MovementConfig {
   closestPointIfBlocked: boolean;
 }
 
-export class TargetMovement {
+export class TargetMovement implements Movement {
   private characters: Map<string, MovementTuple>;
-  constructor(private tilemap: GridTilemap) {
+  constructor(
+    private tilemap: GridTilemap,
+    private targetPos: Vector2,
+    private distance = 0,
+    private closestPointIfBlocked = false
+  ) {
     this.characters = new Map();
   }
 
-  addCharacter(
-    character: GridCharacter,
-    targetPos: Vector2,
-    distance = 0,
-    closestPointIfBlocked = false
-  ): void {
+  setCharacter(character: GridCharacter): void {
     this.characters.set(character.getId(), {
       character,
-      config: { targetPos, distance, closestPointIfBlocked },
+      config: {
+        targetPos: this.targetPos,
+        distance: this.distance,
+        closestPointIfBlocked: this.closestPointIfBlocked,
+      },
     });
   }
 

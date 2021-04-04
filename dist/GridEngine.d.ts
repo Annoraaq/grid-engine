@@ -34,15 +34,12 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     private gridCharacters;
     private tilemap;
     private gridTilemap;
-    private targetMovement;
-    private followMovement;
     private isCreated;
     private movementStopped$;
     private movementStarted$;
     private directionChanged$;
     private positionChanged$;
     private charRemoved$;
-    private config;
     constructor(scene: Phaser.Scene, pluginManager: Phaser.Plugins.PluginManager);
     boot(): void;
     create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void;

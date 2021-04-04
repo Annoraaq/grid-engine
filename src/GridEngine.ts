@@ -1,5 +1,5 @@
-import { FollowMovement } from "./FollowMovement/FollowMovement";
-import { TargetMovement } from "./TargetMovement/TargetMovement";
+import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
+import { TargetMovement } from "./Movement/TargetMovement/TargetMovement";
 import {
   CharacterIndex,
   CharConfig,
@@ -50,8 +50,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   private gridCharacters: Map<string, GridCharacter>;
   private tilemap: Phaser.Tilemaps.Tilemap;
   private gridTilemap: GridTilemap;
-  private targetMovement: TargetMovement;
-  private followMovement: FollowMovement;
   private isCreated = false;
   private movementStopped$ = new Subject<[string, Direction]>();
   private movementStarted$ = new Subject<[string, Direction]>();
@@ -80,8 +78,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
         config.collisionTilePropertyName
       );
     }
-    this.targetMovement = new TargetMovement(this.gridTilemap);
-    this.followMovement = new FollowMovement(this.gridTilemap);
     this.addCharacters(config);
   }
 
@@ -129,12 +125,13 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   ): void {
     this.initGuard();
     this.unknownCharGuard(charId);
-    this.targetMovement.addCharacter(
-      this.gridCharacters.get(charId),
+    const targetMovement = new TargetMovement(
+      this.gridTilemap,
       targetPos,
       0,
       closestPointIfBlocked
     );
+    this.gridCharacters.get(charId).setMovement(targetMovement);
   }
 
   stopMovingRandomly(charId: string): void {
@@ -164,8 +161,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
 
   update(_time: number, delta: number): void {
     if (this.isCreated) {
-      this.targetMovement.update();
-      this.followMovement.update();
       if (this.gridCharacters) {
         for (const [_key, val] of this.gridCharacters) {
           val.update(delta);
@@ -255,8 +250,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   removeCharacter(charId: string): void {
     this.initGuard();
     this.unknownCharGuard(charId);
-    this.targetMovement.removeCharacter(charId);
-    this.followMovement.removeCharacter(charId);
     this.gridTilemap.removeCharacter(charId);
     this.gridCharacters.delete(charId);
     this.charRemoved$.next(charId);
@@ -283,18 +276,19 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.unknownCharGuard(charIdToFollow);
-    this.followMovement.addCharacter(
-      this.gridCharacters.get(charId),
+    const followMovement = new FollowMovement(
+      this.gridTilemap,
       this.gridCharacters.get(charIdToFollow),
       distance,
       closestPointIfBlocked
     );
+    this.gridCharacters.get(charId).setMovement(followMovement);
   }
 
   stopFollowing(charId: string): void {
     this.initGuard();
     this.unknownCharGuard(charId);
-    this.followMovement.removeCharacter(charId);
+    this.gridCharacters.get(charId).setMovement(undefined);
   }
 
   isMoving(charId: string): boolean {
