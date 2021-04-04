@@ -97,7 +97,7 @@ const mockRandomMovement = {
   update: mockRandomMovementUpdate,
 };
 
-jest.mock("./RandomMovement/RandomMovement", () => ({
+jest.mock("./Movement/RandomMovement/RandomMovement", () => ({
   RandomMovement: jest.fn(() => mockRandomMovement),
 }));
 
@@ -118,7 +118,7 @@ jest.mock("./FollowMovement/FollowMovement", () => ({
 jest.mock("./GridTilemap/GridTilemap");
 
 import { GridEngine } from "./GridEngine";
-import { RandomMovement } from "./RandomMovement/RandomMovement";
+import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;

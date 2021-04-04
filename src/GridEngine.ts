@@ -10,7 +10,7 @@ import {
 import "phaser";
 import { Direction } from "./Direction/Direction";
 import { GridTilemap } from "./GridTilemap/GridTilemap";
-import { RandomMovement } from "./RandomMovement/RandomMovement";
+import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 
@@ -58,7 +58,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   private directionChanged$ = new Subject<[string, Direction]>();
   private positionChanged$ = new Subject<{ charId: string } & PositionChange>();
   private charRemoved$ = new Subject<string>();
-  private config: GridEngineConfig;
 
   constructor(
     public scene: Phaser.Scene,
@@ -73,7 +72,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
 
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
     this.isCreated = true;
-    this.config = config;
     this.gridCharacters = new Map();
     this.tilemap = tilemap;
     this.gridTilemap = this.createTilemap(tilemap, config);

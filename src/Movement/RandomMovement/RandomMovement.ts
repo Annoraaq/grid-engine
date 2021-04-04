@@ -1,11 +1,12 @@
-import { VectorUtils } from "./../Utils/VectorUtils";
-import { GridCharacter } from "./../GridCharacter/GridCharacter";
-import { Direction, DirectionVectors } from "../Direction/Direction";
+import { VectorUtils } from "../../Utils/VectorUtils";
+import { GridCharacter } from "../../GridCharacter/GridCharacter";
+import { Direction, DirectionVectors } from "../../Direction/Direction";
+import { Movement } from "../Movement";
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
 
-export class RandomMovement {
+export class RandomMovement implements Movement {
   private character: GridCharacter;
   private delayLeft: number;
   private initialRow: number;

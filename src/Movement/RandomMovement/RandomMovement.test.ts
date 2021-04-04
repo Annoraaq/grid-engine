@@ -1,7 +1,7 @@
 /*eslint no-global-assign: "off"*/
 import * as Phaser from "phaser";
-import { Direction } from "./../Direction/Direction";
-import { GridCharacter } from "./../GridCharacter/GridCharacter";
+import { Direction } from "../../Direction/Direction";
+import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { RandomMovement } from "./RandomMovement";
 
 const Vector2 = Phaser.Math.Vector2;
