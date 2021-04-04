@@ -5,112 +5,79 @@ import { Direction, DirectionVectors } from "../Direction/Direction";
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
 
-interface MovementTuple {
-  character: GridCharacter;
-  config: MovementConfig;
-}
-
-interface MovementConfig {
-  delay: number;
-  delayLeft: number;
-  initialRow: number;
-  initialCol: number;
-  radius: number;
-  stepSize: number;
-  stepsWalked: number;
-  currentMovementDirection: Direction;
-}
-
 export class RandomMovement {
-  private movementTuple: MovementTuple = {
-    character: undefined,
-    config: undefined,
-  };
+  private character: GridCharacter;
+  private delayLeft: number;
+  private initialRow: number;
+  private initialCol: number;
+  private stepSize: number;
+  private stepsWalked: number;
+  private currentMovementDirection: Direction;
   constructor(private delay = 0, private radius = -1) {}
 
   setCharacter(character: GridCharacter): void {
-    this.movementTuple.character = character;
-    this.movementTuple.config = {
-      delay: this.delay,
-      delayLeft: this.delay,
-      initialRow: character.getTilePos().y,
-      initialCol: character.getTilePos().x,
-      radius: this.radius,
-      stepSize: this.getRandomInt(this.radius) + 1,
-      stepsWalked: 0,
-      currentMovementDirection: Direction.NONE,
-    };
+    this.character = character;
+    this.delayLeft = this.delay;
+    this.initialRow = character.getTilePos().y;
+    this.initialCol = character.getTilePos().x;
+    this.stepSize = this.getRandomInt(this.radius) + 1;
+    this.stepsWalked = 0;
+    this.currentMovementDirection = Direction.NONE;
   }
 
   update(delta: number): void {
-    if (
-      this.shouldContinueWalkingCurrentDirection(
-        this.movementTuple.character,
-        this.movementTuple.config
-      )
-    ) {
-      this.movementTuple.config.stepsWalked++;
-      this.movementTuple.character.move(
-        this.movementTuple.config.currentMovementDirection
-      );
+    if (this.shouldContinueWalkingCurrentDirection()) {
+      this.stepsWalked++;
+      this.character.move(this.currentMovementDirection);
     } else {
-      this.movementTuple.config.delayLeft -= delta;
-      if (this.movementTuple.config.delayLeft <= 0) {
-        this.movementTuple.config.delayLeft = this.movementTuple.config.delay;
-        const dir = this.getFreeRandomDirection(this.movementTuple.character);
-        this.movementTuple.character.move(dir);
-        this.movementTuple.config.currentMovementDirection = dir;
-        this.movementTuple.config.stepsWalked = 1;
-        this.movementTuple.config.stepSize =
-          this.getRandomInt(this.movementTuple.config.radius) + 1;
+      this.delayLeft -= delta;
+      if (this.delayLeft <= 0) {
+        this.delayLeft = this.delay;
+        const dir = this.getFreeRandomDirection();
+        this.character.move(dir);
+        this.currentMovementDirection = dir;
+        this.stepsWalked = 1;
+        this.stepSize = this.getRandomInt(this.radius) + 1;
       }
     }
   }
 
-  private shouldContinueWalkingCurrentDirection(
-    character: GridCharacter,
-    config: MovementConfig
-  ): boolean {
+  private shouldContinueWalkingCurrentDirection(): boolean {
     return (
-      config.stepsWalked < config.stepSize &&
-      config.currentMovementDirection !== Direction.NONE &&
-      !character.isBlockingDirection(config.currentMovementDirection) &&
-      this.isWithinRadius(config.currentMovementDirection, character, config)
+      this.stepsWalked < this.stepSize &&
+      this.currentMovementDirection !== Direction.NONE &&
+      !this.character.isBlockingDirection(this.currentMovementDirection) &&
+      this.isWithinRadius(this.currentMovementDirection)
     );
   }
 
-  private getFreeDirections(character: GridCharacter): Direction[] {
+  private getFreeDirections(): Direction[] {
     const directions = [
       Direction.UP,
       Direction.RIGHT,
       Direction.DOWN,
       Direction.LEFT,
     ];
-    const conf = this.movementTuple.config;
 
     const unblocked = directions.filter(
-      (dir) => !character.isBlockingDirection(dir)
+      (dir) => !this.character.isBlockingDirection(dir)
     );
 
-    return unblocked.filter((dir) => this.isWithinRadius(dir, character, conf));
+    return unblocked.filter((dir) => this.isWithinRadius(dir));
   }
 
-  private isWithinRadius(
-    dir: Direction,
-    character: GridCharacter,
-    conf: MovementConfig
-  ) {
-    if (conf.radius == -1) return true;
+  private isWithinRadius(dir: Direction) {
+    if (this.radius == -1) return true;
     const dist = VectorUtils.manhattanDistance(
-      character.getTilePos().add(DirectionVectors[dir]),
-      new Vector2(conf.initialCol, conf.initialRow)
+      this.character.getTilePos().add(DirectionVectors[dir]),
+      new Vector2(this.initialCol, this.initialRow)
     );
 
-    return dist <= conf.radius;
+    return dist <= this.radius;
   }
 
-  private getFreeRandomDirection(character: GridCharacter): Direction {
-    const freeDirections = this.getFreeDirections(character);
+  private getFreeRandomDirection(): Direction {
+    const freeDirections = this.getFreeDirections();
     if (freeDirections.length == 0) return Direction.NONE;
     return freeDirections[this.getRandomInt(freeDirections.length)];
   }
