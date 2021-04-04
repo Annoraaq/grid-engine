@@ -1,9 +1,10 @@
 import { GridCharacter } from "./../GridCharacter/GridCharacter";
 export declare class RandomMovement {
-    private randomlyMovingCharacters;
-    constructor();
-    addCharacter(character: GridCharacter, delay?: number, radius?: number): void;
-    removeCharacter(charId: string): void;
+    private delay;
+    private radius;
+    private movementTuple;
+    constructor(delay?: number, radius?: number);
+    setCharacter(character: GridCharacter): void;
     update(delta: number): void;
     private shouldContinueWalkingCurrentDirection;
     private getFreeDirections;

@@ -22,48 +22,49 @@ interface MovementConfig {
 }
 
 export class RandomMovement {
-  private randomlyMovingCharacters: Map<string, MovementTuple>;
-  constructor() {
-    this.randomlyMovingCharacters = new Map();
-  }
+  private movementTuple: MovementTuple = {
+    character: undefined,
+    config: undefined,
+  };
+  constructor(private delay = 0, private radius = -1) {}
 
-  addCharacter(character: GridCharacter, delay = 0, radius = -1): void {
-    this.randomlyMovingCharacters.set(character.getId(), {
-      character,
-      config: {
-        delay,
-        delayLeft: delay,
-        initialRow: character.getTilePos().y,
-        initialCol: character.getTilePos().x,
-        radius,
-        stepSize: this.getRandomInt(radius) + 1,
-        stepsWalked: 0,
-        currentMovementDirection: Direction.NONE,
-      },
-    });
-  }
-
-  removeCharacter(charId: string): void {
-    this.randomlyMovingCharacters.delete(charId);
+  setCharacter(character: GridCharacter): void {
+    this.movementTuple.character = character;
+    this.movementTuple.config = {
+      delay: this.delay,
+      delayLeft: this.delay,
+      initialRow: character.getTilePos().y,
+      initialCol: character.getTilePos().x,
+      radius: this.radius,
+      stepSize: this.getRandomInt(this.radius) + 1,
+      stepsWalked: 0,
+      currentMovementDirection: Direction.NONE,
+    };
   }
 
   update(delta: number): void {
-    this.randomlyMovingCharacters.forEach(({ character, config }) => {
-      if (this.shouldContinueWalkingCurrentDirection(character, config)) {
-        config.stepsWalked++;
-        character.move(config.currentMovementDirection);
-      } else {
-        config.delayLeft -= delta;
-        if (config.delayLeft <= 0) {
-          config.delayLeft = config.delay;
-          const dir = this.getFreeRandomDirection(character);
-          character.move(dir);
-          config.currentMovementDirection = dir;
-          config.stepsWalked = 1;
-          config.stepSize = this.getRandomInt(config.radius) + 1;
-        }
+    if (
+      this.shouldContinueWalkingCurrentDirection(
+        this.movementTuple.character,
+        this.movementTuple.config
+      )
+    ) {
+      this.movementTuple.config.stepsWalked++;
+      this.movementTuple.character.move(
+        this.movementTuple.config.currentMovementDirection
+      );
+    } else {
+      this.movementTuple.config.delayLeft -= delta;
+      if (this.movementTuple.config.delayLeft <= 0) {
+        this.movementTuple.config.delayLeft = this.movementTuple.config.delay;
+        const dir = this.getFreeRandomDirection(this.movementTuple.character);
+        this.movementTuple.character.move(dir);
+        this.movementTuple.config.currentMovementDirection = dir;
+        this.movementTuple.config.stepsWalked = 1;
+        this.movementTuple.config.stepSize =
+          this.getRandomInt(this.movementTuple.config.radius) + 1;
       }
-    });
+    }
   }
 
   private shouldContinueWalkingCurrentDirection(
@@ -85,7 +86,7 @@ export class RandomMovement {
       Direction.DOWN,
       Direction.LEFT,
     ];
-    const conf = this.randomlyMovingCharacters.get(character.getId()).config;
+    const conf = this.movementTuple.config;
 
     const unblocked = directions.filter(
       (dir) => !character.isBlockingDirection(dir)

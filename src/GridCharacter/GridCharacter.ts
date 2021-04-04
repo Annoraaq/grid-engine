@@ -10,6 +10,7 @@ import * as Phaser from "phaser";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
 import { WalkingAnimationMapping } from "../GridEngine";
+import { RandomMovement } from "../RandomMovement/RandomMovement";
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
@@ -61,6 +62,7 @@ export class GridCharacter {
   private facingDirection: Direction = Direction.DOWN;
   private isIsometric: boolean;
   private animation: CharacterAnimation;
+  private movement: RandomMovement;
 
   constructor(private id: string, config: CharConfig) {
     let characterIndex = 0;
@@ -111,6 +113,15 @@ export class GridCharacter {
     this.speed = speed;
   }
 
+  setMovement(movement: RandomMovement): void {
+    this.movement = movement;
+    this.movement.setCharacter(this);
+  }
+
+  getMovement(): RandomMovement {
+    return this.movement;
+  }
+
   setWalkingAnimationMapping(
     walkingAnimationMapping: WalkingAnimationMapping
   ): void {
@@ -148,6 +159,7 @@ export class GridCharacter {
   }
 
   update(delta: number): void {
+    this.movement?.update(delta);
     if (this.isMoving()) {
       this.updateCharacterPosition(delta);
     }

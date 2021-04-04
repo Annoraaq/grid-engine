@@ -50,7 +50,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   private gridCharacters: Map<string, GridCharacter>;
   private tilemap: Phaser.Tilemaps.Tilemap;
   private gridTilemap: GridTilemap;
-  private randomMovement: RandomMovement;
   private targetMovement: TargetMovement;
   private followMovement: FollowMovement;
   private isCreated = false;
@@ -76,7 +75,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     this.isCreated = true;
     this.config = config;
     this.gridCharacters = new Map();
-    this.randomMovement = new RandomMovement();
     this.tilemap = tilemap;
     this.gridTilemap = this.createTilemap(tilemap, config);
     if (config.collisionTilePropertyName) {
@@ -122,11 +120,8 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   moveRandomly(charId: string, delay = 0, radius = -1): void {
     this.initGuard();
     this.unknownCharGuard(charId);
-    this.randomMovement.addCharacter(
-      this.gridCharacters.get(charId),
-      delay,
-      radius
-    );
+    const randomMovement = new RandomMovement(delay, radius);
+    this.gridCharacters.get(charId).setMovement(randomMovement);
   }
 
   moveTo(
@@ -147,7 +142,9 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   stopMovingRandomly(charId: string): void {
     this.initGuard();
     this.unknownCharGuard(charId);
-    this.randomMovement.removeCharacter(charId);
+    if (this.gridCharacters.get(charId).getMovement()) {
+      this.gridCharacters.get(charId).setMovement(undefined);
+    }
   }
 
   setSpeed(charId: string, speed: number): void {
@@ -169,7 +166,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
 
   update(_time: number, delta: number): void {
     if (this.isCreated) {
-      this.randomMovement.update(delta);
       this.targetMovement.update();
       this.followMovement.update();
       if (this.gridCharacters) {
@@ -261,7 +257,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   removeCharacter(charId: string): void {
     this.initGuard();
     this.unknownCharGuard(charId);
-    this.randomMovement.removeCharacter(charId);
     this.targetMovement.removeCharacter(charId);
     this.followMovement.removeCharacter(charId);
     this.gridTilemap.removeCharacter(charId);

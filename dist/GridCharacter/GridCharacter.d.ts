@@ -3,6 +3,7 @@ import * as Phaser from "phaser";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
 import { WalkingAnimationMapping } from "../GridEngine";
+import { RandomMovement } from "../RandomMovement/RandomMovement";
 declare const Vector2: typeof Phaser.Math.Vector2;
 declare type Vector2 = Phaser.Math.Vector2;
 export interface FrameRow {
@@ -49,10 +50,13 @@ export declare class GridCharacter {
     private facingDirection;
     private isIsometric;
     private animation;
+    private movement;
     constructor(id: string, config: CharConfig);
     getId(): string;
     getSpeed(): number;
     setSpeed(speed: number): void;
+    setMovement(movement: RandomMovement): void;
+    getMovement(): RandomMovement;
     setWalkingAnimationMapping(walkingAnimationMapping: WalkingAnimationMapping): void;
     setTilePosition(tilePosition: Vector2): void;
     getTilePos(): Vector2;

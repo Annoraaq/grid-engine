@@ -28,6 +28,13 @@ describe("RandomMovement", () => {
       getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
+    randomMovement.setCharacter(char1Mock);
+    randomMovement.update(5);
+
+    expect(char1Mock.move).toHaveBeenCalled();
+  });
+  it("should add and update character", () => {
+    randomMovement = new RandomMovement(10);
     const char2Mock: GridCharacter = <any>{
       getId: () => "char2",
       isBlockingDirection: () => false,
@@ -35,11 +42,9 @@ describe("RandomMovement", () => {
       getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
-    randomMovement.addCharacter(char1Mock);
-    randomMovement.addCharacter(char2Mock, 10);
+    randomMovement.setCharacter(char2Mock);
     randomMovement.update(5);
 
-    expect(char1Mock.move).toHaveBeenCalled();
     expect(char2Mock.move).not.toHaveBeenCalled();
 
     randomMovement.update(6);
@@ -47,42 +52,11 @@ describe("RandomMovement", () => {
     expect(char2Mock.move).toHaveBeenCalled();
   });
 
-  it("should remove character", () => {
-    const char1Mock: GridCharacter = <any>{
-      getId: () => "char1",
-      isBlockingDirection: () => false,
-      move: jest.fn(),
-      getTilePos: () => new Vector2(0, 0),
-      isMoving: () => false,
-    };
-    const char2Mock: GridCharacter = <any>{
-      getId: () => "char2",
-      isBlockingDirection: () => false,
-      move: jest.fn(),
-      getTilePos: () => new Vector2(0, 0),
-      isMoving: () => false,
-    };
-    randomMovement.addCharacter(char1Mock);
-    randomMovement.addCharacter(char2Mock);
-    randomMovement.removeCharacter("char2");
-    randomMovement.update(5);
-
-    expect(char1Mock.move).toHaveBeenCalled();
-    expect(char2Mock.move).not.toHaveBeenCalled();
-  });
-
   it("should update only non-blocked characters", () => {
     const mockMath = Object.create(Math);
     mockMath.random = () => 0.5;
     Math = mockMath;
 
-    const char1Mock: GridCharacter = <any>{
-      getId: () => "char1",
-      isBlockingDirection: () => false,
-      move: jest.fn(),
-      getTilePos: () => new Vector2(0, 0),
-      isMoving: () => false,
-    };
     const char2Mock: GridCharacter = <any>{
       getId: () => "char2",
       isBlockingDirection: () => true,
@@ -90,15 +64,14 @@ describe("RandomMovement", () => {
       getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
-    randomMovement.addCharacter(char1Mock);
-    randomMovement.addCharacter(char2Mock);
+    randomMovement.setCharacter(char2Mock);
     randomMovement.update(5);
 
-    expect(char1Mock.move).toHaveBeenCalledWith(Direction.DOWN);
     expect(char2Mock.move).toHaveBeenCalledWith(Direction.NONE);
   });
 
   it("should not move further than radius", () => {
+    randomMovement = new RandomMovement(0, 2);
     const mockMath = Object.create(Math);
     mockMath.random = () => 0.5;
     Math = mockMath;
@@ -110,7 +83,7 @@ describe("RandomMovement", () => {
       getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
-    randomMovement.addCharacter(char1Mock, 0, 2);
+    randomMovement.setCharacter(char1Mock);
     char1Mock.getTilePos = () => new Vector2(2, 2);
     randomMovement.update(1);
 
@@ -118,6 +91,7 @@ describe("RandomMovement", () => {
   });
 
   it("should move further than radius if radius is -1", () => {
+    randomMovement = new RandomMovement(0, -1);
     mockRandom(0.5);
 
     const char1Mock: GridCharacter = <any>{
@@ -127,7 +101,7 @@ describe("RandomMovement", () => {
       getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
-    randomMovement.addCharacter(char1Mock, 0, -1);
+    randomMovement.setCharacter(char1Mock);
     char1Mock.getTilePos = () => new Vector2(2, 2);
     randomMovement.update(1);
 
@@ -135,6 +109,7 @@ describe("RandomMovement", () => {
   });
 
   it("should continue moving if in radius and step size", () => {
+    randomMovement = new RandomMovement(0, 2);
     mockRandom(0.7);
 
     const char1Mock: GridCharacter = <any>{
@@ -144,7 +119,7 @@ describe("RandomMovement", () => {
       getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
-    randomMovement.addCharacter(char1Mock, 0, 2);
+    randomMovement.setCharacter(char1Mock);
 
     // do first step down and set step size 2
     randomMovement.update(500);
@@ -164,6 +139,7 @@ describe("RandomMovement", () => {
   });
 
   it("should not continue moving if direction blocked", () => {
+    randomMovement = new RandomMovement(50, 2);
     mockRandom(0.7);
 
     const char1Mock: GridCharacter = <any>{
@@ -173,7 +149,7 @@ describe("RandomMovement", () => {
       getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
-    randomMovement.addCharacter(char1Mock, 50, 2);
+    randomMovement.setCharacter(char1Mock);
 
     // do first step down and set step size 2
     randomMovement.update(60);
@@ -188,6 +164,7 @@ describe("RandomMovement", () => {
   });
 
   it("should not continue moving if direction is out of radius", () => {
+    randomMovement = new RandomMovement(50, 2);
     mockRandom(0.7);
 
     const char1Mock: GridCharacter = <any>{
@@ -197,7 +174,7 @@ describe("RandomMovement", () => {
       getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
-    randomMovement.addCharacter(char1Mock, 50, 2);
+    randomMovement.setCharacter(char1Mock);
 
     // do first step down and set step size 2
     randomMovement.update(60);
@@ -211,6 +188,7 @@ describe("RandomMovement", () => {
   });
 
   it("should reset step size and steps walked on direction change", () => {
+    randomMovement = new RandomMovement(0, 2);
     mockRandom(0.7);
 
     const char1Mock: GridCharacter = <any>{
@@ -220,7 +198,7 @@ describe("RandomMovement", () => {
       getTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
     };
-    randomMovement.addCharacter(char1Mock, 0, 2);
+    randomMovement.setCharacter(char1Mock);
 
     // do first step down and init step size with 2
     randomMovement.update(500);

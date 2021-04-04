@@ -34,7 +34,6 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     private gridCharacters;
     private tilemap;
     private gridTilemap;
-    private randomMovement;
     private targetMovement;
     private followMovement;
     private isCreated;
