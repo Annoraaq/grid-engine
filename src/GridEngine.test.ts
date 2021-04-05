@@ -423,7 +423,6 @@ describe("GridEngine", () => {
           speed: 2,
         },
       ],
-      firstLayerAboveChar: 3,
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
@@ -492,7 +491,6 @@ describe("GridEngine", () => {
           walkingAnimationMapping: 3,
         },
       ],
-      firstLayerAboveChar: 3,
     });
 
     gridEngine.moveRight("player");
@@ -510,7 +508,6 @@ describe("GridEngine", () => {
           walkingAnimationMapping: 3,
         },
       ],
-      firstLayerAboveChar: 3,
     });
 
     gridEngine.moveUp("player");
@@ -528,7 +525,6 @@ describe("GridEngine", () => {
           walkingAnimationMapping: 3,
         },
       ],
-      firstLayerAboveChar: 3,
     });
 
     gridEngine.moveDown("player");
@@ -563,7 +559,6 @@ describe("GridEngine", () => {
           walkingAnimationMapping: 3,
         },
       ],
-      firstLayerAboveChar: 3,
     });
     mockGetTilePos.mockReturnValue(new Vector2(3, 4));
 
@@ -580,7 +575,6 @@ describe("GridEngine", () => {
           walkingAnimationMapping: 3,
         },
       ],
-      firstLayerAboveChar: 3,
     });
     gridEngine.moveRandomly("player", 123, 3);
     expect(RandomMovement).toHaveBeenCalledWith(123, 3);
@@ -660,7 +654,6 @@ describe("GridEngine", () => {
           walkingAnimationMapping: 3,
         },
       ],
-      firstLayerAboveChar: 3,
     });
     gridEngine.setSpeed("player", 2);
     expect(mockSetSpeed).toHaveBeenCalledWith(2);
@@ -758,7 +751,6 @@ describe("GridEngine", () => {
           walkingAnimationMapping: 3,
         },
       ],
-      firstLayerAboveChar: 3,
     });
     gridEngine.addCharacter({
       id: "player2",
@@ -854,7 +846,6 @@ describe("GridEngine", () => {
           walkingAnimationMapping: 3,
         },
       ],
-      firstLayerAboveChar: 3,
     });
     const mockMapping = {
       up: {
@@ -948,7 +939,6 @@ describe("GridEngine", () => {
             walkingAnimationMapping: 3,
           },
         ],
-        firstLayerAboveChar: 3,
       });
 
       const prom = gridEngine.movementStarted().pipe(take(1)).toPromise();
@@ -997,7 +987,6 @@ describe("GridEngine", () => {
             walkingAnimationMapping: 3,
           },
         ],
-        firstLayerAboveChar: 3,
       });
 
       const prom = gridEngine.movementStopped().pipe(take(1)).toPromise();
@@ -1046,7 +1035,6 @@ describe("GridEngine", () => {
             walkingAnimationMapping: 3,
           },
         ],
-        firstLayerAboveChar: 3,
       });
 
       const prom = gridEngine.directionChanged().pipe(take(1)).toPromise();
@@ -1068,7 +1056,6 @@ describe("GridEngine", () => {
             walkingAnimationMapping: 3,
           },
         ],
-        firstLayerAboveChar: 3,
       });
 
       gridEngine.removeCharacter("player");
@@ -1151,7 +1138,6 @@ describe("GridEngine", () => {
             walkingAnimationMapping: 3,
           },
         ],
-        firstLayerAboveChar: 3,
       });
     });
 
