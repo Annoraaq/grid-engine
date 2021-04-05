@@ -9,13 +9,11 @@ export declare class TargetMovement implements Movement {
     private targetPos;
     private distance;
     private closestPointIfBlocked;
-    private characters;
+    private character;
     constructor(tilemap: GridTilemap, targetPos: Vector2, distance?: number, closestPointIfBlocked?: boolean);
     setCharacter(character: GridCharacter): void;
-    removeCharacter(charId: string): void;
     update(): void;
     isBlocking: (targetPos: Vector2) => (pos: Vector2) => boolean;
-    clear(): void;
     private noPathExists;
     private getShortestPath;
     private getDirOnShortestPath;
