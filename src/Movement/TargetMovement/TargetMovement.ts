@@ -9,55 +9,28 @@ import { Movement } from "../Movement";
 type Vector2 = Phaser.Math.Vector2;
 const Vector2 = Phaser.Math.Vector2;
 
-interface MovementTuple {
-  character: GridCharacter;
-  config: MovementConfig;
-}
-
-interface MovementConfig {
-  targetPos: Vector2;
-  distance: number;
-  closestPointIfBlocked: boolean;
-}
-
 export class TargetMovement implements Movement {
-  private characters: Map<string, MovementTuple>;
+  private character: GridCharacter;
   constructor(
     private tilemap: GridTilemap,
     private targetPos: Vector2,
     private distance = 0,
     private closestPointIfBlocked = false
-  ) {
-    this.characters = new Map();
-  }
+  ) {}
 
   setCharacter(character: GridCharacter): void {
-    this.characters.set(character.getId(), {
-      character,
-      config: {
-        targetPos: this.targetPos,
-        distance: this.distance,
-        closestPointIfBlocked: this.closestPointIfBlocked,
-      },
-    });
-  }
-
-  removeCharacter(charId: string): void {
-    this.characters.delete(charId);
+    this.character = character;
   }
 
   update(): void {
-    this.characters.forEach(({ character, config }) => {
-      const { dir, dist } = this.getDirOnShortestPath(character, config);
-      if (this.noPathExists(dist)) {
-        character.move(Direction.NONE);
-      } else if (dist <= config.distance) {
-        character.turnTowards(dir);
-        this.characters.delete(character.getId());
-      } else {
-        character.move(dir);
-      }
-    });
+    const { dir, dist } = this.getDirOnShortestPath();
+    if (this.noPathExists(dist)) {
+      this.character.move(Direction.NONE);
+    } else if (dist <= this.distance) {
+      this.character.turnTowards(dir);
+    } else {
+      this.character.move(dir);
+    }
   }
 
   isBlocking = (targetPos: Vector2): ((pos: Vector2) => boolean) => {
@@ -67,35 +40,28 @@ export class TargetMovement implements Movement {
     };
   };
 
-  clear(): void {
-    this.characters.clear();
-  }
-
   private noPathExists(distance: number): boolean {
     return distance == -1;
   }
 
-  private getShortestPath(
-    character: GridCharacter,
-    config: MovementConfig
-  ): { path: Vector2[]; distOffset: number } {
+  private getShortestPath(): { path: Vector2[]; distOffset: number } {
     const { path: shortestPath, closestToTarget } = Bfs.getShortestPath(
-      character.getTilePos(),
-      config.targetPos,
-      this.isBlocking(config.targetPos)
+      this.character.getTilePos(),
+      this.targetPos,
+      this.isBlocking(this.targetPos)
     );
 
     const noPathFound = shortestPath.length == 0;
 
-    if (noPathFound && config.closestPointIfBlocked) {
+    if (noPathFound && this.closestPointIfBlocked) {
       const shortestPathToClosestPoint = Bfs.getShortestPath(
-        character.getTilePos(),
+        this.character.getTilePos(),
         closestToTarget,
-        this.isBlocking(config.targetPos)
+        this.isBlocking(this.targetPos)
       ).path;
       const distOffset = VectorUtils.manhattanDistance(
         closestToTarget,
-        config.targetPos
+        this.targetPos
       );
       return { path: shortestPathToClosestPoint, distOffset };
     }
@@ -103,14 +69,8 @@ export class TargetMovement implements Movement {
     return { path: shortestPath, distOffset: 0 };
   }
 
-  private getDirOnShortestPath(
-    character: GridCharacter,
-    config: MovementConfig
-  ): { dir: Direction; dist: number } {
-    const { path: shortestPath, distOffset } = this.getShortestPath(
-      character,
-      config
-    );
+  private getDirOnShortestPath(): { dir: Direction; dist: number } {
+    const { path: shortestPath, distOffset } = this.getShortestPath();
     if (shortestPath.length == 0) return { dir: Direction.NONE, dist: -1 };
     if (shortestPath.length == 1) return { dir: Direction.NONE, dist: 0 };
 
@@ -119,13 +79,13 @@ export class TargetMovement implements Movement {
       dir: undefined,
       dist: shortestPath.length - 1 + distOffset,
     };
-    if (nextField.x > character.getTilePos().x) {
+    if (nextField.x > this.character.getTilePos().x) {
       result.dir = Direction.RIGHT;
-    } else if (nextField.x < character.getTilePos().x) {
+    } else if (nextField.x < this.character.getTilePos().x) {
       result.dir = Direction.LEFT;
-    } else if (nextField.y < character.getTilePos().y) {
+    } else if (nextField.y < this.character.getTilePos().y) {
       result.dir = Direction.UP;
-    } else if (nextField.y > character.getTilePos().y) {
+    } else if (nextField.y > this.character.getTilePos().y) {
       result.dir = Direction.DOWN;
     }
     return result;

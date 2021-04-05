@@ -54,12 +54,12 @@ describe("TargetMovement", () => {
       path: [charPos, new Vector2(2, 1)],
       closestToTarget: new Vector2(3, 1),
     });
-    const char1 = createMockChar("char1", charPos);
-    targetMovement.setCharacter(char1);
+    const char = createMockChar("char", charPos);
+    targetMovement.setCharacter(char);
     targetMovement.update();
 
     expect(Bfs.getShortestPath).toHaveBeenCalledTimes(1);
-    expect(char1.move).toHaveBeenCalledWith(Direction.RIGHT);
+    expect(char.move).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
   it("should not move arrived char", () => {
@@ -69,7 +69,7 @@ describe("TargetMovement", () => {
       path: [charPos],
       closestToTarget: charPos,
     });
-    const mockChar = createMockChar("char1", charPos);
+    const mockChar = createMockChar("char", charPos);
     targetMovement.setCharacter(mockChar);
     targetMovement.update();
     expect(mockChar.move).not.toHaveBeenCalled();
@@ -82,7 +82,7 @@ describe("TargetMovement", () => {
       path: [charPos],
       closestToTarget: charPos,
     });
-    const mockChar = createMockChar("char1", charPos);
+    const mockChar = createMockChar("char", charPos);
     targetMovement.setCharacter(mockChar);
     targetMovement.update();
     expect(mockChar.move).not.toHaveBeenCalled();
@@ -176,7 +176,7 @@ describe("TargetMovement", () => {
         path: [charPos, new Vector2(2, 1)],
         closestToTarget: new Vector2(2, 1),
       });
-    const mockChar = createMockChar("char1", charPos);
+    const mockChar = createMockChar("char", charPos);
     targetMovement.setCharacter(mockChar);
     targetMovement.update();
 
@@ -207,7 +207,7 @@ describe("TargetMovement", () => {
         path: [charPos, new Vector2(2, 1)],
         closestToTarget: new Vector2(2, 1),
       });
-    const mockChar = createMockChar("char1", charPos);
+    const mockChar = createMockChar("char", charPos);
     targetMovement.setCharacter(mockChar);
     targetMovement.update();
     expect(mockChar.move).not.toHaveBeenCalled();
@@ -228,26 +228,13 @@ describe("TargetMovement", () => {
     expect(char.move).not.toHaveBeenCalled();
   });
 
-  it("should not move deleted char", () => {
-    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 2));
-    const charPos = new Vector2(3, 1);
-    Bfs.getShortestPath = jest
-      .fn()
-      .mockReturnValue([charPos, new Vector2(3, 2)]);
-    const mockChar = createMockChar("char1", charPos);
-    targetMovement.setCharacter(mockChar);
-    targetMovement.removeCharacter("char1");
-    targetMovement.update();
-    expect(mockChar.move).not.toHaveBeenCalled();
-  });
-
   it("should not move if no path exists", () => {
     targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 2));
     const charPos = new Vector2(3, 1);
     Bfs.getShortestPath = jest
       .fn()
       .mockReturnValue({ path: [], closestToDistance: charPos });
-    const mockChar = createMockChar("char1", charPos);
+    const mockChar = createMockChar("char", charPos);
     targetMovement.setCharacter(mockChar);
     targetMovement.update();
     expect(mockChar.move).toHaveBeenCalledWith(Direction.NONE);
@@ -275,18 +262,5 @@ describe("TargetMovement", () => {
     const blocking = targetMovement.isBlocking(targetPos)(charPos);
     expect(blocking).toEqual(false);
     expect(gridTilemapMock.isBlocking).not.toHaveBeenCalled();
-  });
-
-  it("should clear all chars", () => {
-    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 2));
-    const charPos = new Vector2(3, 1);
-    Bfs.getShortestPath = jest
-      .fn()
-      .mockReturnValue([charPos, new Vector2(3, 2)]);
-    const mockChar = createMockChar("char1", charPos);
-    targetMovement.setCharacter(mockChar);
-    targetMovement.clear();
-    targetMovement.update();
-    expect(mockChar.move).not.toHaveBeenCalled();
   });
 });
