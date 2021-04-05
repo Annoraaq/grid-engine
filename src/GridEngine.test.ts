@@ -466,6 +466,24 @@ describe("GridEngine", () => {
     });
   });
 
+  it("should move player", () => {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
+      firstLayerAboveChar: 3,
+    });
+
+    gridEngine.move("player", Direction.LEFT);
+
+    expect(mockMove).toHaveBeenCalledWith(Direction.LEFT);
+  });
+
   it("should move player left", () => {
     gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
@@ -615,6 +633,22 @@ describe("GridEngine", () => {
     expect(mockSetMovement).toHaveBeenCalledWith(mockTargetMovement);
   });
 
+  it("should stop moving", () => {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
+    });
+    mockGetMovement.mockReturnValue({});
+    gridEngine.stopMovement("player");
+    expect(mockSetMovement).toHaveBeenCalledWith(undefined);
+  });
+
   it("should stop moving randomly", () => {
     gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
@@ -629,22 +663,6 @@ describe("GridEngine", () => {
     mockGetMovement.mockReturnValue({});
     gridEngine.stopMovingRandomly("player");
     expect(mockSetMovement).toHaveBeenCalledWith(undefined);
-  });
-
-  it("should stop moving randomly only if randomly moving", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
-    gridEngine.create(tileMapMock, {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
-        },
-      ],
-    });
-    mockGetMovement.mockReturnValue(undefined);
-    gridEngine.stopMovingRandomly("player");
-    expect(mockSetMovement).not.toHaveBeenCalled();
   });
 
   it("should set speed", () => {
@@ -1209,6 +1227,12 @@ describe("GridEngine", () => {
       );
     });
 
+    it("should throw error if move is invoked", () => {
+      expect(() => gridEngine.move("unknownCharId", Direction.LEFT)).toThrow(
+        "Character unknown"
+      );
+    });
+
     it("should throw error if moveLeft is invoked", () => {
       expect(() => gridEngine.moveLeft("unknownCharId")).toThrow(
         "Character unknown"
@@ -1235,6 +1259,12 @@ describe("GridEngine", () => {
 
     it("should throw error if moveRandomly is invoked", () => {
       expect(() => gridEngine.moveRandomly("unknownCharId")).toThrow(
+        "Character unknown"
+      );
+    });
+
+    it("should throw error if stopMovement is invoked", () => {
+      expect(() => gridEngine.stopMovement("unknownCharId")).toThrow(
         "Character unknown"
       );
     });
@@ -1317,6 +1347,12 @@ describe("GridEngine", () => {
       );
     });
 
+    it("should throw error if move is invoked", () => {
+      expect(() => gridEngine.move("someCharId", Direction.LEFT)).toThrow(
+        "Plugin not initialized"
+      );
+    });
+
     it("should throw error if moveLeft is invoked", () => {
       expect(() => gridEngine.moveLeft("someCharId")).toThrow(
         "Plugin not initialized"
@@ -1349,6 +1385,12 @@ describe("GridEngine", () => {
 
     it("should throw error if moveTo is invoked", () => {
       expect(() => gridEngine.moveTo("someCharId", new Vector2(2, 3))).toThrow(
+        "Plugin not initialized"
+      );
+    });
+
+    it("should throw error if stopMovement is invoked", () => {
+      expect(() => gridEngine.stopMovement("someCharId")).toThrow(
         "Plugin not initialized"
       );
     });

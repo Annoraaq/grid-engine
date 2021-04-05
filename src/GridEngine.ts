@@ -91,27 +91,23 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   }
 
   moveLeft(charId: string): void {
-    this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).move(Direction.LEFT);
+    this.moveChar(charId, Direction.LEFT);
   }
 
   moveRight(charId: string): void {
-    this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).move(Direction.RIGHT);
+    this.moveChar(charId, Direction.RIGHT);
   }
 
   moveUp(charId: string): void {
-    this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).move(Direction.UP);
+    this.moveChar(charId, Direction.UP);
   }
 
   moveDown(charId: string): void {
-    this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).move(Direction.DOWN);
+    this.moveChar(charId, Direction.DOWN);
+  }
+
+  move(charId: string, direction: Direction): void {
+    this.moveChar(charId, direction);
   }
 
   moveRandomly(charId: string, delay = 0, radius = -1): void {
@@ -137,12 +133,22 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     this.gridCharacters.get(charId).setMovement(targetMovement);
   }
 
+  // deprecated
   stopMovingRandomly(charId: string): void {
+    console.warn(
+      "GridEngine: `stopMovingRandomly` is deprecated. Use `stopMovement()` instead."
+    );
+    this._stopMovement(charId);
+  }
+
+  stopMovement(charId: string): void {
+    this._stopMovement(charId);
+  }
+
+  private _stopMovement(charId: string) {
     this.initGuard();
     this.unknownCharGuard(charId);
-    if (this.gridCharacters.get(charId).getMovement()) {
-      this.gridCharacters.get(charId).setMovement(undefined);
-    }
+    this.gridCharacters.get(charId).setMovement(undefined);
   }
 
   setSpeed(charId: string, speed: number): void {
@@ -302,10 +308,12 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     this.gridCharacters.get(charId).setMovement(followMovement);
   }
 
+  // deprecated
   stopFollowing(charId: string): void {
-    this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).setMovement(undefined);
+    console.warn(
+      "GridEngine: `stopFollowing` is deprecated. Use `stopMovement()` instead."
+    );
+    this._stopMovement(charId);
   }
 
   isMoving(charId: string): boolean {
@@ -380,5 +388,11 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
 
   private addCharacters(config: GridEngineConfig) {
     config.characters.forEach((charData) => this.addCharacter(charData));
+  }
+
+  private moveChar(charId: string, direction: Direction): void {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    this.gridCharacters.get(charId).move(direction);
   }
 }
