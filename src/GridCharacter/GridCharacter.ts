@@ -45,8 +45,8 @@ export class GridCharacter {
   private movementDirection = Direction.NONE;
   private speedPixelsPerSecond: Vector2;
   private tileSizePixelsWalked: Vector2 = Vector2.ZERO.clone();
+  private _nextTilePos = new Vector2(0, 0);
   private _tilePos = new Vector2(0, 0);
-  private prevTilePos = new Vector2(0, 0);
   private sprite: Phaser.GameObjects.Sprite;
   private container?: Phaser.GameObjects.Container;
   private tilemap: GridTilemap;
@@ -130,6 +130,7 @@ export class GridCharacter {
 
   setTilePosition(tilePosition: Vector2): void {
     if (this.isMoving()) return;
+    this.nextTilePos = tilePosition;
     this.tilePos = tilePosition;
     this.updateZindex();
     this.setPosition(
@@ -171,7 +172,7 @@ export class GridCharacter {
   }
 
   isBlockingTile(tilePos: Vector2): boolean {
-    return this._tilePos.equals(tilePos) || this.prevTilePos.equals(tilePos);
+    return this.nextTilePos.equals(tilePos) || this.tilePos.equals(tilePos);
   }
 
   isBlockingDirection(direction: Direction): boolean {
@@ -223,6 +224,15 @@ export class GridCharacter {
     return new Vector2(offsetX, offsetY);
   }
 
+  private get nextTilePos() {
+    return this._nextTilePos.clone();
+  }
+
+  private set nextTilePos(newTilePos: Vector2) {
+    this._nextTilePos.x = newTilePos.x;
+    this._nextTilePos.y = newTilePos.y;
+  }
+
   private get tilePos() {
     return this._tilePos.clone();
   }
@@ -234,7 +244,7 @@ export class GridCharacter {
 
   private updateZindex() {
     const gameObject = this.container || this.sprite;
-    gameObject.setDepth(GridTilemap.FIRST_PLAYER_LAYER + this.tilePos.y);
+    gameObject.setDepth(GridTilemap.FIRST_PLAYER_LAYER + this.nextTilePos.y);
   }
 
   private setPosition(position: Vector2): void {
@@ -256,15 +266,15 @@ export class GridCharacter {
   }
 
   private updateTilePos() {
-    this.prevTilePos = this.tilePos.clone();
-    const newTilePos = this.tilePos.add(
+    this.tilePos = this.nextTilePos;
+    const newTilePos = this.nextTilePos.add(
       DirectionVectors[this.movementDirection]
     );
     this.positionChanged$.next({
-      exitTile: this.tilePos,
+      exitTile: this.nextTilePos,
       enterTile: newTilePos,
     });
-    this.tilePos = newTilePos;
+    this.nextTilePos = newTilePos;
   }
 
   private tilePosInDirection(direction: Direction): Vector2 {
@@ -346,7 +356,7 @@ export class GridCharacter {
   private stopMoving(): void {
     this.movementStopped$.next(this.movementDirection);
     this.movementDirection = Direction.NONE;
-    this.prevTilePos = this.tilePos.clone();
+    this.tilePos = this.nextTilePos;
   }
 
   private hasWalkedHalfATile(): boolean {

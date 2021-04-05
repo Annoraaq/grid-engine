@@ -169,14 +169,13 @@ describe("GridCharacter", () => {
     gridCharacter.move(Direction.UP);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
-    expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, -1));
-    expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, -1));
+    expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, 0));
     const dir = await movementStartedProm;
     expect(dir).toEqual(Direction.UP);
 
     gridCharacter.move(Direction.DOWN);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
-    expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, -1));
+    expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, 0));
   });
 
   it("should not update if not moving", () => {
