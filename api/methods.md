@@ -43,9 +43,9 @@ nav_order: 2
 |:-------------|
 | Initiates random movement of the character with the given id. The character will randomly pick one of the non-blocking directions. Optionally a `delay` in milliseconds can be provided. This represents the waiting time after a finished movement, before the next is being initiated. If a `radius` other than `-1` is provided, the character will not move further than that radius from its initial position (the position it has been, when `moveRandomly` was called). The distance is calculated with the [manhattan distance](https://en.wikipedia.org/wiki/Taxicab_geometry). Additionally, if a `radius` other than `-1` was given, the character might move more than one tile into a random direction in one run (as long as the route is neither blocked nor outside of the radius). |
 
-| stopMovingRandomly(charId: string): void |
+| stopMovingRandomly(charId: string): void <span class="label label-red">DEPRECATED</span>|
 |:-------------|
-| Stops moving a character randomly. |
+| Stops any automated movement such as random movement (`moveRandomly()`), following (`follow()`) or moving to a specified position (`moveTo()`). __DEPRECATED__: use `stopMovement()` instead.|
 
 | moveTo(charId: string, targetPos: Phaser.Math.Vector2, closestPointIfBlocked: boolean = false): void |
 |:-------------|
@@ -75,9 +75,13 @@ nav_order: 2
 |:-------------|
 | Character `charId` will start to walk towards `charIdToFollow` on a shortest path until he has a distance of distance to the character to follow. If `closestPointIfBlocked` is set to `true`, the character will move to the closest point ([manhattan distance](https://en.wikipedia.org/wiki/Taxicab_geometry)) to `charIdToFollow` that is reachable from `charId` in case that there does not exist a path between `charId` and `charIdToFollow`. |
 
-| stopFollowing(charId: string) |
+| stopFollowing(charId: string) <span class="label label-red">DEPRECATED</span>|
 |:-------------|
-| Character charId will stop following any character. |
+| Stops any automated movement such as random movement (`moveRandomly()`), following (`follow()`) or moving to a specified position (`moveTo()`). __DEPRECATED__: use `stopMovement()` instead.|
+
+| stopMovement(charId: string) |
+|:-------------|
+| Stops any automated movement such as random movement (`moveRandomly()`), following (`follow()`) or moving to a specified position (`moveTo()`) |
 
 | movementStarted(): Observable<[string, [Direction](./config/#direction)]> |
 |:-------------|
@@ -93,4 +97,8 @@ nav_order: 2
 
 | positionChanged(): Observable<{charId: string, exitTile: Phaser.Math.Vector2, enterTile: Phaser.Math.Vector2}> |
 |:-------------|
-| Returns an Observable that will notify about every change of tile position. |
+| Returns an Observable that will notify about every change of tile position. It will notify at the __beginning__ of the movement. |
+
+| positionChangeFinished(): Observable<{charId: string, exitTile: Phaser.Math.Vector2, enterTile: Phaser.Math.Vector2}> |
+|:-------------|
+| Returns an Observable that will notify about every change of tile position. It will notify at the __end__ of the movement. |
