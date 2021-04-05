@@ -74,6 +74,16 @@ export class GridTilemap {
     this.collisionTilePropertyName = name;
   }
 
+  getTileWidth(): number {
+    const tilemapScale = this.tilemap.layers[0].tilemapLayer.scale;
+    return this.tilemap.tileWidth * tilemapScale;
+  }
+
+  getTileHeight(): number {
+    const tilemapScale = this.tilemap.layers[0].tilemapLayer.scale;
+    return this.tilemap.tileHeight * tilemapScale;
+  }
+
   private getLayerProp(layer: Phaser.Tilemaps.LayerData, name: string): any {
     const layerProps = layer.properties as [{ name: any; value: any }];
     const prop = layerProps.find((el) => el.name == name);

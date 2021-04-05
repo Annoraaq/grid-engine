@@ -34,16 +34,13 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     private gridCharacters;
     private tilemap;
     private gridTilemap;
-    private randomMovement;
-    private targetMovement;
-    private followMovement;
     private isCreated;
     private movementStopped$;
     private movementStarted$;
     private directionChanged$;
     private positionChanged$;
+    private positionChangeFinished$;
     private charRemoved$;
-    private config;
     constructor(scene: Phaser.Scene, pluginManager: Phaser.Plugins.PluginManager);
     boot(): void;
     create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void;
@@ -52,9 +49,12 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     moveRight(charId: string): void;
     moveUp(charId: string): void;
     moveDown(charId: string): void;
+    move(charId: string, direction: Direction): void;
     moveRandomly(charId: string, delay?: number, radius?: number): void;
     moveTo(charId: string, targetPos: Vector2, closestPointIfBlocked?: boolean): void;
     stopMovingRandomly(charId: string): void;
+    stopMovement(charId: string): void;
+    private _stopMovement;
     setSpeed(charId: string, speed: number): void;
     setWalkingAnimationMapping(charId: string, walkingAnimationMapping: WalkingAnimationMapping): void;
     update(_time: number, delta: number): void;
@@ -74,12 +74,14 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     positionChanged(): Observable<{
         charId: string;
     } & PositionChange>;
+    positionChangeFinished(): Observable<{
+        charId: string;
+    } & PositionChange>;
     private takeUntilCharRemoved;
     private initGuard;
     private unknownCharGuard;
     private createTilemap;
-    private getTileWidth;
-    private getTileHeight;
     private addCharacters;
+    private moveChar;
 }
 export {};

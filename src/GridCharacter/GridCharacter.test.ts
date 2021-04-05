@@ -2,6 +2,28 @@ import { GridCharacter } from "./GridCharacter";
 import * as Phaser from "phaser";
 import { Direction } from "../Direction/Direction";
 import { take } from "rxjs/operators";
+import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
+
+const mockCharacterAnimation = {
+  updateCharacterFrame: jest.fn(),
+  setStandingFrame: jest.fn(),
+  setIsEnabled: jest.fn(),
+  setWalkingAnimationMapping: jest.fn(),
+};
+
+jest.mock("./CharacterAnimation/CharacterAnimation", function () {
+  return {
+    CharacterAnimation: jest
+      .fn()
+      .mockImplementation(function (
+        _sprite,
+        _walkingAnimationMapping,
+        _characterIndex
+      ) {
+        return mockCharacterAnimation;
+      }),
+  };
+});
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
@@ -38,28 +60,10 @@ describe("GridCharacter", () => {
     gridTilemapMock.hasNoTile.mockReturnValue(false);
   }
 
-  const walkingAnimationMapping = {
-    up: {
-      leftFoot: 65,
-      standing: 64,
-      rightFoot: 63,
-    },
-    down: {
-      leftFoot: 38,
-      standing: 37,
-      rightFoot: 36,
-    },
-    left: {
-      leftFoot: 47,
-      standing: 46,
-      rightFoot: 45,
-    },
-    right: {
-      leftFoot: 56,
-      standing: 55,
-      rightFoot: 54,
-    },
-  };
+  afterEach(() => {
+    mockCharacterAnimation.updateCharacterFrame.mockReset();
+    mockCharacterAnimation.setStandingFrame.mockReset();
+  });
 
   beforeEach(() => {
     gridTilemapMock = {
@@ -108,7 +112,7 @@ describe("GridCharacter", () => {
     mockNonBlockingTile();
     gridCharacter.move(Direction.DOWN);
     gridCharacter.update(100);
-    expect(spriteMock.setFrame).not.toHaveBeenCalledWith(NaN);
+    expect(CharacterAnimation).toHaveBeenCalledWith(spriteMock, undefined, 0);
   });
 
   it("should set the correct depth on construction", () => {
@@ -120,8 +124,8 @@ describe("GridCharacter", () => {
   });
 
   it("should get tile pos", () => {
-    const expectedPos = new Phaser.Math.Vector2(5, 6);
-    const newTilePos = new Phaser.Math.Vector2(5, 6);
+    const expectedPos = new Vector2(5, 6);
+    const newTilePos = new Vector2(5, 6);
     gridCharacter.setTilePosition(newTilePos);
     newTilePos.x = 20;
 
@@ -130,7 +134,7 @@ describe("GridCharacter", () => {
   });
 
   it("should block one tile if not moving", () => {
-    const newTilePos = new Phaser.Math.Vector2(5, 6);
+    const newTilePos = new Vector2(5, 6);
     gridCharacter.setTilePosition(newTilePos);
     expect(gridCharacter.isBlockingTile(newTilePos)).toBe(true);
   });
@@ -157,22 +161,21 @@ describe("GridCharacter", () => {
       .toPromise();
 
     gridCharacter.positionChanged().subscribe(({ exitTile, enterTile }) => {
-      expect(exitTile).toEqual(new Phaser.Math.Vector2(0, 0));
-      expect(enterTile).toEqual(new Phaser.Math.Vector2(0, -1));
+      expect(exitTile).toEqual(new Vector2(0, 0));
+      expect(enterTile).toEqual(new Vector2(0, -1));
       done();
     });
 
     gridCharacter.move(Direction.UP);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
-    expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, -1));
-    expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, -1));
+    expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, 0));
     const dir = await movementStartedProm;
     expect(dir).toEqual(Direction.UP);
 
     gridCharacter.move(Direction.DOWN);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
-    expect(gridCharacter.getTilePos()).toEqual(new Phaser.Math.Vector2(0, -1));
+    expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, 0));
   });
 
   it("should not update if not moving", () => {
@@ -205,6 +208,15 @@ describe("GridCharacter", () => {
     expect(spriteMock.setDepth).not.toHaveBeenCalledWith(1000 - 1);
   });
 
+  it("should set walkingAnimationMapping", () => {
+    const walkingAnimationMappingMock = <any>{};
+    gridCharacter.setWalkingAnimationMapping(walkingAnimationMappingMock);
+
+    expect(
+      mockCharacterAnimation.setWalkingAnimationMapping
+    ).toHaveBeenCalledWith(walkingAnimationMappingMock);
+  });
+
   it("should update only till tile border", () => {
     mockNonBlockingTile();
 
@@ -232,7 +244,7 @@ describe("GridCharacter", () => {
       offsetX: customOffsetX,
       offsetY: customOffsetY,
     });
-    gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
+    gridCharacter.setTilePosition(new Vector2(3, 4));
 
     expect(spriteMock.x).toEqual(
       3 * TILE_WIDTH + PLAYER_X_OFFSET + customOffsetX
@@ -243,7 +255,7 @@ describe("GridCharacter", () => {
   });
 
   it("should set tile position with custom offset", () => {
-    gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
+    gridCharacter.setTilePosition(new Vector2(3, 4));
 
     expect(spriteMock.x).toEqual(3 * TILE_WIDTH + PLAYER_X_OFFSET);
     expect(spriteMock.y).toEqual(4 * TILE_HEIGHT + PLAYER_Y_OFFSET);
@@ -252,7 +264,7 @@ describe("GridCharacter", () => {
   it("should not set tile position when moving", () => {
     mockNonBlockingTile();
     gridCharacter.move(Direction.DOWN);
-    gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
+    gridCharacter.setTilePosition(new Vector2(3, 4));
 
     expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
@@ -273,6 +285,23 @@ describe("GridCharacter", () => {
     expect(dir).toEqual(Direction.DOWN);
   });
 
+  it("should call positionChangeFinished when movement stopped", (done) => {
+    mockNonBlockingTile();
+    gridCharacter.move(Direction.DOWN);
+    gridCharacter.update(1);
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN);
+
+    gridCharacter
+      .positionChangeFinished()
+      .subscribe(({ exitTile, enterTile }) => {
+        expect(exitTile).toEqual(new Vector2(0, 0));
+        expect(enterTile).toEqual(new Vector2(0, 1));
+        done();
+      });
+
+    gridCharacter.update(500);
+  });
+
   it("should not stop moving if movementImpuls", () => {
     mockNonBlockingTile();
     gridCharacter.move(Direction.DOWN);
@@ -280,96 +309,31 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN);
   });
 
+  it("should continue moving", (done) => {
+    mockNonBlockingTile();
+
+    gridCharacter
+      .positionChangeFinished()
+      .subscribe(({ exitTile, enterTile }) => {
+        expect(exitTile).toEqual(new Vector2(0, 0));
+        expect(enterTile).toEqual(new Vector2(0, 1));
+        done();
+      });
+
+    gridCharacter.move(Direction.DOWN);
+    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.move(Direction.DOWN);
+    gridCharacter.update(MS_FOR_12_PX);
+    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS + 24);
+    expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, 1));
+  });
+
   it("should stop moving if blocking", () => {
     mockBlockingTile();
     gridCharacter.move(Direction.DOWN);
     gridCharacter.update(1);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
-  });
-
-  describe("frames by anim mapping", () => {
-    beforeEach(() => {
-      gridCharacter = new GridCharacter("player", {
-        sprite: spriteMock,
-        tilemap: gridTilemapMock,
-        tileSize: new Vector2(16, 16),
-        isometric: false,
-        speed: 3,
-        walkingAnimationMapping,
-        walkingAnimationEnabled: true,
-      });
-    });
-
-    checkWalkingFrames(walkingAnimationMapping);
-  });
-
-  describe("frames by char index", () => {
-    checkWalkingFrames(walkingAnimationMapping);
-  });
-
-  describe("non animated mode", () => {
-    beforeEach(() => {
-      spriteMock.setFrame = jest.fn();
-      gridCharacter = new GridCharacter("player", {
-        sprite: spriteMock,
-        tilemap: gridTilemapMock,
-        tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
-        isometric: false,
-        speed: 3,
-        walkingAnimationMapping: 3,
-        walkingAnimationEnabled: false,
-      });
-      mockNonBlockingTile();
-    });
-
-    it("should not set an initial frame", () => {
-      expect(spriteMock.setFrame).not.toHaveBeenCalled();
-    });
-
-    it("should set the correct frame when walking up", () => {
-      spriteMock.setFrame = jest.fn();
-      gridCharacter.move(Direction.UP);
-      gridCharacter.update(50);
-
-      expect(spriteMock.setFrame).not.toHaveBeenCalled();
-    });
-
-    it("should set the correct frame when walking down", () => {
-      spriteMock.setFrame = jest.fn();
-      gridCharacter.move(Direction.DOWN);
-      gridCharacter.update(50);
-
-      expect(spriteMock.setFrame).not.toHaveBeenCalled();
-    });
-
-    it("should set the correct frame when walking left", () => {
-      spriteMock.setFrame = jest.fn();
-      gridCharacter.move(Direction.LEFT);
-      gridCharacter.update(50);
-
-      expect(spriteMock.setFrame).not.toHaveBeenCalled();
-    });
-
-    it("should set the correct frame when walking right", () => {
-      spriteMock.setFrame = jest.fn();
-      gridCharacter.move(Direction.RIGHT);
-      gridCharacter.update(50);
-
-      expect(spriteMock.setFrame).not.toHaveBeenCalled();
-    });
-
-    it("should not turn towards", () => {
-      spriteMock.setFrame = jest.fn();
-      gridCharacter.turnTowards(Direction.DOWN);
-      expect(spriteMock.setFrame).not.toHaveBeenCalled();
-    });
-
-    it("should not turn", () => {
-      spriteMock.setFrame = jest.fn();
-      mockBlockingTile();
-      gridCharacter.move(Direction.DOWN);
-      expect(spriteMock.setFrame).not.toHaveBeenCalled();
-    });
   });
 
   describe("isBlockingDirection", () => {
@@ -447,210 +411,62 @@ describe("GridCharacter", () => {
 
   describe("turnTowards", () => {
     beforeEach(() => {
-      (<any>spriteMock.setFrame).mockReset();
+      mockCharacterAnimation.setStandingFrame.mockReset();
     });
     it("should turn towards left", () => {
       gridCharacter.turnTowards(Direction.LEFT);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(46);
+      expect(mockCharacterAnimation.setStandingFrame).toHaveBeenCalledWith(
+        Direction.LEFT
+      );
       expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
-    });
-
-    it("should turn towards right", () => {
-      gridCharacter.turnTowards(Direction.RIGHT);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(55);
-      expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
-    });
-
-    it("should turn towards up", () => {
-      gridCharacter.turnTowards(Direction.UP);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(64);
-      expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
-    });
-
-    it("should turn towards down", () => {
-      gridCharacter.turnTowards(Direction.DOWN);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(37);
-      expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
     });
 
     it("should not turn if moving", () => {
       gridCharacter.move(Direction.DOWN);
-      (<any>spriteMock.setFrame).mockReset();
+      mockCharacterAnimation.setStandingFrame.mockReset();
       gridCharacter.turnTowards(Direction.LEFT);
-      expect(spriteMock.setFrame).not.toHaveBeenCalled();
+      expect(mockCharacterAnimation.setStandingFrame).not.toHaveBeenCalled();
     });
 
     it("should not turn if direction NONE", () => {
       gridCharacter.turnTowards(Direction.NONE);
-      expect(spriteMock.setFrame).not.toHaveBeenCalled();
+      expect(mockCharacterAnimation.setStandingFrame).not.toHaveBeenCalled();
     });
   });
 
-  function checkWalkingFrames(walkingAnimationMapping) {
-    describe("walking frames", () => {
-      beforeEach(() => {
-        spriteMock.setFrame = jest.fn();
-        spriteMock.frame = <any>{ name: walkingAnimationMapping.up.standing };
-        mockNonBlockingTile();
-      });
-
-      describe("lastFootLeft = false", () => {
-        it("should set the correct frame when walking up", () => {
-          gridCharacter.move(Direction.UP);
-          gridCharacter.update(50); // move to 2 / 16 px
-          gridCharacter.update(200); // move to 12 / 16 px
-
-          expect(spriteMock.setFrame).toHaveBeenNthCalledWith(
-            1,
-            walkingAnimationMapping.up.leftFoot
-          );
-          expect(spriteMock.setFrame).toHaveBeenNthCalledWith(
-            2,
-            walkingAnimationMapping.up.standing
-          );
-        });
-
-        it("should set the correct frame when walking down", () => {
-          gridCharacter.move(Direction.DOWN);
-          gridCharacter.update(50); // move to 2 / 16 px
-          gridCharacter.update(200); // move to 12 / 16 px
-
-          expect(spriteMock.setFrame).toHaveBeenNthCalledWith(
-            1,
-            walkingAnimationMapping.down.leftFoot
-          );
-          expect(spriteMock.setFrame).toHaveBeenNthCalledWith(
-            2,
-            walkingAnimationMapping.down.standing
-          );
-        });
-
-        it("should set the correct frame when walking left", () => {
-          gridCharacter.move(Direction.LEFT);
-          gridCharacter.update(50); // move to 2 / 16 px
-          gridCharacter.update(200); // move to 12 / 16 px
-
-          expect(spriteMock.setFrame).toHaveBeenNthCalledWith(
-            1,
-            walkingAnimationMapping.left.leftFoot
-          );
-          expect(spriteMock.setFrame).toHaveBeenNthCalledWith(
-            2,
-            walkingAnimationMapping.left.standing
-          );
-        });
-
-        it("should set the correct frame when walking right", () => {
-          gridCharacter.move(Direction.RIGHT);
-          gridCharacter.update(50); // move to 2 / 16 px
-          gridCharacter.update(200); // move to 12 / 16 px
-
-          expect(spriteMock.setFrame).toHaveBeenNthCalledWith(
-            1,
-            walkingAnimationMapping.right.leftFoot
-          );
-          expect(spriteMock.setFrame).toHaveBeenNthCalledWith(
-            2,
-            walkingAnimationMapping.right.standing
-          );
-        });
-      });
-
-      describe("lastFootLeft = true", () => {
-        function setNonStandingFrame() {
-          spriteMock.frame.name = "" + walkingAnimationMapping.up.leftFoot;
-        }
-
-        function takeOneStep() {
-          // take one step to reach the state lastFootLeft = true
-          gridCharacter.move(Direction.UP);
-          // do half a step such that lastFootLeft gets set true
-          gridCharacter.update(200);
-          // mock standing frame so foot does not get swapped again and finish movement
-          spriteMock.frame.name = "" + walkingAnimationMapping.up.standing;
-          gridCharacter.update(500);
-        }
-
-        beforeEach(() => {
-          setNonStandingFrame();
-          takeOneStep();
-          spriteMock.setFrame = jest.fn();
-        });
-
-        it("should set the correct frame when walking up", () => {
-          gridCharacter.move(Direction.UP);
-          gridCharacter.update(50); // move to 2 / 16 px
-          gridCharacter.update(200); // move to 12 / 16 px
-          expect(spriteMock.setFrame).toHaveBeenNthCalledWith(
-            1,
-            walkingAnimationMapping.up.rightFoot
-          );
-          expect(spriteMock.setFrame).toHaveBeenNthCalledWith(
-            2,
-            walkingAnimationMapping.up.standing
-          );
-        });
-
-        it("should set the correct frame when walking down", () => {
-          gridCharacter.move(Direction.DOWN);
-          gridCharacter.update(50); // move to 2 / 16 px
-          gridCharacter.update(200); // move to 12 / 16 px
-
-          expect(spriteMock.setFrame).toHaveBeenNthCalledWith(
-            1,
-            walkingAnimationMapping.down.rightFoot
-          );
-          expect(spriteMock.setFrame).toHaveBeenNthCalledWith(
-            2,
-            walkingAnimationMapping.down.standing
-          );
-        });
-
-        it("should set the correct frame when walking left", () => {
-          gridCharacter.move(Direction.LEFT);
-          gridCharacter.update(50); // move to 2 / 16 px
-          gridCharacter.update(200); // move to 12 / 16 px
-
-          expect(spriteMock.setFrame).toHaveBeenNthCalledWith(
-            1,
-            walkingAnimationMapping.left.rightFoot
-          );
-          expect(spriteMock.setFrame).toHaveBeenNthCalledWith(
-            2,
-            walkingAnimationMapping.left.standing
-          );
-        });
-
-        it("should set the correct frame when walking right", () => {
-          gridCharacter.move(Direction.RIGHT);
-          gridCharacter.update(50); // move to 2 / 16 px
-          gridCharacter.update(200); // move to 12 / 16 px
-
-          expect(spriteMock.setFrame).toHaveBeenNthCalledWith(
-            1,
-            walkingAnimationMapping.right.rightFoot
-          );
-          expect(spriteMock.setFrame).toHaveBeenNthCalledWith(
-            2,
-            walkingAnimationMapping.right.standing
-          );
-        });
-      });
-
-      it("should set players standing frame if direction blocked", (done) => {
-        mockBlockingTile();
-        expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
-        gridCharacter.directionChanged().subscribe((direction) => {
-          expect(direction).toEqual(Direction.UP);
-          done();
-        });
-
-        gridCharacter.move(Direction.UP);
-        expect(spriteMock.setFrame).toHaveBeenCalledWith(64);
-        expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
-      });
+  describe("walking frames", () => {
+    beforeEach(() => {
+      mockNonBlockingTile();
     });
-  }
+
+    it("should set the correct frame when walking", () => {
+      gridCharacter.move(Direction.UP);
+      gridCharacter.update(50); // move to 2 / 16 px
+      gridCharacter.update(200); // move to 12 / 16 px
+
+      expect(
+        mockCharacterAnimation.updateCharacterFrame
+      ).toHaveBeenNthCalledWith(1, Direction.UP, false);
+      expect(
+        mockCharacterAnimation.updateCharacterFrame
+      ).toHaveBeenNthCalledWith(2, Direction.UP, true);
+    });
+
+    it("should set players standing frame if direction blocked", (done) => {
+      mockBlockingTile();
+      expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+      gridCharacter.directionChanged().subscribe((direction) => {
+        expect(direction).toEqual(Direction.UP);
+        done();
+      });
+
+      gridCharacter.move(Direction.UP);
+      expect(mockCharacterAnimation.setStandingFrame).toHaveBeenCalledWith(
+        Direction.UP
+      );
+      expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+    });
+  });
 
   describe("container", () => {
     let containerMock: Phaser.GameObjects.Container;
@@ -688,7 +504,7 @@ describe("GridCharacter", () => {
     });
 
     it("should set tile position", () => {
-      gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
+      gridCharacter.setTilePosition(new Vector2(3, 4));
 
       expect(containerMock.x).toEqual(3 * TILE_WIDTH + PLAYER_X_OFFSET);
       expect(containerMock.y).toEqual(4 * TILE_HEIGHT + PLAYER_Y_OFFSET);
@@ -741,7 +557,7 @@ describe("GridCharacter", () => {
         offsetX: customOffsetX,
         offsetY: customOffsetY,
       });
-      gridCharacter.setTilePosition(new Phaser.Math.Vector2(3, 4));
+      gridCharacter.setTilePosition(new Vector2(3, 4));
 
       expect(spriteMock.x).toEqual(
         (3 * TILE_WIDTH_ISOMETRIC) / 2 +

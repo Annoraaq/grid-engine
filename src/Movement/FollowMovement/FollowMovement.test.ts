@@ -1,11 +1,10 @@
 import { FollowMovement } from "./FollowMovement";
 import * as Phaser from "phaser";
+import { TargetMovement } from "../TargetMovement/TargetMovement";
 
 const mockTargetMovement = {
-  addCharacter: jest.fn(),
-  removeCharacter: jest.fn(),
+  setCharacter: jest.fn(),
   update: jest.fn(),
-  clear: jest.fn(),
 };
 
 jest.mock("../TargetMovement/TargetMovement", () => ({
@@ -34,10 +33,7 @@ describe("FollowMovement", () => {
       hasBlockingChar: jest.fn().mockReturnValue(false),
       isBlocking: jest.fn(),
     };
-    followMovement = new FollowMovement(gridTilemapMock);
-    mockTargetMovement.addCharacter.mockReset();
-    mockTargetMovement.removeCharacter.mockReset();
-    mockTargetMovement.clear.mockReset();
+    mockTargetMovement.setCharacter.mockReset();
   });
 
   it("should update added character", () => {
@@ -45,14 +41,16 @@ describe("FollowMovement", () => {
     const targetCharPos = new Phaser.Math.Vector2(3, 1);
     const mockChar = createMockChar("char", charPos);
     const targetChar = createMockChar("targetChar", targetCharPos);
-    followMovement.addCharacter(mockChar, targetChar);
+    followMovement = new FollowMovement(gridTilemapMock, targetChar);
+    followMovement.setCharacter(mockChar);
     followMovement.update();
-    expect(mockTargetMovement.addCharacter).toHaveBeenCalledWith(
-      mockChar,
+    expect(TargetMovement).toHaveBeenCalledWith(
+      gridTilemapMock,
       targetCharPos,
       1,
       false
     );
+    expect(mockTargetMovement.setCharacter).toHaveBeenCalledWith(mockChar);
   });
 
   it("should update added character with distance", () => {
@@ -60,14 +58,16 @@ describe("FollowMovement", () => {
     const targetCharPos = new Phaser.Math.Vector2(3, 1);
     const mockChar = createMockChar("char", charPos);
     const targetChar = createMockChar("targetChar", targetCharPos);
-    followMovement.addCharacter(mockChar, targetChar, 7);
+    followMovement = new FollowMovement(gridTilemapMock, targetChar, 7);
+    followMovement.setCharacter(mockChar);
     followMovement.update();
-    expect(mockTargetMovement.addCharacter).toHaveBeenCalledWith(
-      mockChar,
+    expect(TargetMovement).toHaveBeenCalledWith(
+      gridTilemapMock,
       targetCharPos,
       8,
       false
     );
+    expect(mockTargetMovement.setCharacter).toHaveBeenCalledWith(mockChar);
   });
 
   it("should update added character with distance and closestPointIfBlocked", () => {
@@ -75,24 +75,15 @@ describe("FollowMovement", () => {
     const targetCharPos = new Phaser.Math.Vector2(3, 1);
     const mockChar = createMockChar("char", charPos);
     const targetChar = createMockChar("targetChar", targetCharPos);
-    followMovement.addCharacter(mockChar, targetChar, 7, true);
+    followMovement = new FollowMovement(gridTilemapMock, targetChar, 7, true);
+    followMovement.setCharacter(mockChar);
     followMovement.update();
-    expect(mockTargetMovement.addCharacter).toHaveBeenCalledWith(
-      mockChar,
+    expect(TargetMovement).toHaveBeenCalledWith(
+      gridTilemapMock,
       targetCharPos,
       8,
       true
     );
-  });
-
-  it("should not update deleted char", () => {
-    const charPos = new Phaser.Math.Vector2(1, 1);
-    const targetCharPos = new Phaser.Math.Vector2(3, 1);
-    const mockChar = createMockChar("char", charPos);
-    const targetChar = createMockChar("targetChar", targetCharPos);
-    followMovement.addCharacter(mockChar, targetChar);
-    followMovement.removeCharacter("char");
-    followMovement.update();
-    expect(mockTargetMovement.addCharacter).not.toHaveBeenCalled();
+    expect(mockTargetMovement.setCharacter).toHaveBeenCalledWith(mockChar);
   });
 });

@@ -1,5 +1,5 @@
-import { FollowMovement } from "./FollowMovement/FollowMovement";
-import { TargetMovement } from "./TargetMovement/TargetMovement";
+import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
+import { TargetMovement } from "./Movement/TargetMovement/TargetMovement";
 import {
   CharacterIndex,
   CharConfig,
@@ -10,7 +10,7 @@ import {
 import "phaser";
 import { Direction } from "./Direction/Direction";
 import { GridTilemap } from "./GridTilemap/GridTilemap";
-import { RandomMovement } from "./RandomMovement/RandomMovement";
+import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 
@@ -50,16 +50,15 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   private gridCharacters: Map<string, GridCharacter>;
   private tilemap: Phaser.Tilemaps.Tilemap;
   private gridTilemap: GridTilemap;
-  private randomMovement: RandomMovement;
-  private targetMovement: TargetMovement;
-  private followMovement: FollowMovement;
   private isCreated = false;
   private movementStopped$ = new Subject<[string, Direction]>();
   private movementStarted$ = new Subject<[string, Direction]>();
   private directionChanged$ = new Subject<[string, Direction]>();
   private positionChanged$ = new Subject<{ charId: string } & PositionChange>();
+  private positionChangeFinished$ = new Subject<
+    { charId: string } & PositionChange
+  >();
   private charRemoved$ = new Subject<string>();
-  private config: GridEngineConfig;
 
   constructor(
     public scene: Phaser.Scene,
@@ -74,9 +73,7 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
 
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
     this.isCreated = true;
-    this.config = config;
     this.gridCharacters = new Map();
-    this.randomMovement = new RandomMovement();
     this.tilemap = tilemap;
     this.gridTilemap = this.createTilemap(tilemap, config);
     if (config.collisionTilePropertyName) {
@@ -84,8 +81,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
         config.collisionTilePropertyName
       );
     }
-    this.targetMovement = new TargetMovement(this.gridTilemap);
-    this.followMovement = new FollowMovement(this.gridTilemap);
     this.addCharacters(config);
   }
 
@@ -96,37 +91,30 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   }
 
   moveLeft(charId: string): void {
-    this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).move(Direction.LEFT);
+    this.moveChar(charId, Direction.LEFT);
   }
 
   moveRight(charId: string): void {
-    this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).move(Direction.RIGHT);
+    this.moveChar(charId, Direction.RIGHT);
   }
 
   moveUp(charId: string): void {
-    this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).move(Direction.UP);
+    this.moveChar(charId, Direction.UP);
   }
 
   moveDown(charId: string): void {
-    this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).move(Direction.DOWN);
+    this.moveChar(charId, Direction.DOWN);
+  }
+
+  move(charId: string, direction: Direction): void {
+    this.moveChar(charId, direction);
   }
 
   moveRandomly(charId: string, delay = 0, radius = -1): void {
     this.initGuard();
     this.unknownCharGuard(charId);
-    this.randomMovement.addCharacter(
-      this.gridCharacters.get(charId),
-      delay,
-      radius
-    );
+    const randomMovement = new RandomMovement(delay, radius);
+    this.gridCharacters.get(charId).setMovement(randomMovement);
   }
 
   moveTo(
@@ -136,18 +124,31 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   ): void {
     this.initGuard();
     this.unknownCharGuard(charId);
-    this.targetMovement.addCharacter(
-      this.gridCharacters.get(charId),
+    const targetMovement = new TargetMovement(
+      this.gridTilemap,
       targetPos,
       0,
       closestPointIfBlocked
     );
+    this.gridCharacters.get(charId).setMovement(targetMovement);
   }
 
+  // deprecated
   stopMovingRandomly(charId: string): void {
+    console.warn(
+      "GridEngine: `stopMovingRandomly` is deprecated. Use `stopMovement()` instead."
+    );
+    this._stopMovement(charId);
+  }
+
+  stopMovement(charId: string): void {
+    this._stopMovement(charId);
+  }
+
+  private _stopMovement(charId: string) {
     this.initGuard();
     this.unknownCharGuard(charId);
-    this.randomMovement.removeCharacter(charId);
+    this.gridCharacters.get(charId).setMovement(undefined);
   }
 
   setSpeed(charId: string, speed: number): void {
@@ -169,9 +170,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
 
   update(_time: number, delta: number): void {
     if (this.isCreated) {
-      this.randomMovement.update(delta);
-      this.targetMovement.update();
-      this.followMovement.update();
       if (this.gridCharacters) {
         for (const [_key, val] of this.gridCharacters) {
           val.update(delta);
@@ -193,7 +191,10 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
       sprite: charData.sprite,
       speed: charData.speed || 4,
       tilemap: this.gridTilemap,
-      tileSize: new Vector2(this.getTileWidth(), this.getTileHeight()),
+      tileSize: new Vector2(
+        this.gridTilemap.getTileWidth(),
+        this.gridTilemap.getTileHeight()
+      ),
       isometric:
         this.tilemap.orientation == `${Phaser.Tilemaps.Orientation.ISOMETRIC}`,
       walkingAnimationMapping: charData.walkingAnimationMapping,
@@ -251,6 +252,17 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
           enterTile,
         });
       });
+
+    gridChar
+      .positionChangeFinished()
+      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
+      .subscribe(({ exitTile, enterTile }) => {
+        this.positionChangeFinished$.next({
+          charId: gridChar.getId(),
+          exitTile,
+          enterTile,
+        });
+      });
   }
 
   hasCharacter(charId: string): boolean {
@@ -261,9 +273,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   removeCharacter(charId: string): void {
     this.initGuard();
     this.unknownCharGuard(charId);
-    this.randomMovement.removeCharacter(charId);
-    this.targetMovement.removeCharacter(charId);
-    this.followMovement.removeCharacter(charId);
     this.gridTilemap.removeCharacter(charId);
     this.gridCharacters.delete(charId);
     this.charRemoved$.next(charId);
@@ -290,18 +299,21 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.unknownCharGuard(charIdToFollow);
-    this.followMovement.addCharacter(
-      this.gridCharacters.get(charId),
+    const followMovement = new FollowMovement(
+      this.gridTilemap,
       this.gridCharacters.get(charIdToFollow),
       distance,
       closestPointIfBlocked
     );
+    this.gridCharacters.get(charId).setMovement(followMovement);
   }
 
+  // deprecated
   stopFollowing(charId: string): void {
-    this.initGuard();
-    this.unknownCharGuard(charId);
-    this.followMovement.removeCharacter(charId);
+    console.warn(
+      "GridEngine: `stopFollowing` is deprecated. Use `stopMovement()` instead."
+    );
+    this._stopMovement(charId);
   }
 
   isMoving(charId: string): boolean {
@@ -338,6 +350,10 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     return this.positionChanged$;
   }
 
+  positionChangeFinished(): Observable<{ charId: string } & PositionChange> {
+    return this.positionChangeFinished$;
+  }
+
   private takeUntilCharRemoved(charId: string) {
     return takeUntil(this.charRemoved$.pipe(filter((cId) => cId == charId)));
   }
@@ -370,17 +386,13 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     }
   }
 
-  private getTileWidth(): number {
-    const tilemapScale = this.tilemap.layers[0].tilemapLayer.scale;
-    return this.tilemap.tileWidth * tilemapScale;
-  }
-
-  private getTileHeight(): number {
-    const tilemapScale = this.tilemap.layers[0].tilemapLayer.scale;
-    return this.tilemap.tileHeight * tilemapScale;
-  }
-
   private addCharacters(config: GridEngineConfig) {
     config.characters.forEach((charData) => this.addCharacter(charData));
+  }
+
+  private moveChar(charId: string, direction: Direction): void {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    this.gridCharacters.get(charId).move(direction);
   }
 }

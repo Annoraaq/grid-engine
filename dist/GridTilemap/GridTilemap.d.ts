@@ -23,6 +23,8 @@ export declare class GridTilemap {
     hasNoTile(pos: Vector2): boolean;
     hasBlockingChar(pos: Vector2): boolean;
     setCollisionTilePropertyName(name: string): void;
+    getTileWidth(): number;
+    getTileHeight(): number;
     private getLayerProp;
     private hasLayerProp;
     private isLayerAlwaysOnTop;

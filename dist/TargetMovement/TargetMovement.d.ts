@@ -7,7 +7,7 @@ export declare class TargetMovement {
     private tilemap;
     private characters;
     constructor(tilemap: GridTilemap);
-    addCharacter(character: GridCharacter, targetPos: Phaser.Math.Vector2, distance?: number, closestPointIfBlocked?: boolean): void;
+    addCharacter(character: GridCharacter, targetPos: Vector2, distance?: number, closestPointIfBlocked?: boolean): void;
     removeCharacter(charId: string): void;
     update(): void;
     isBlocking: (targetPos: Vector2) => (pos: Vector2) => boolean;

@@ -37,10 +37,12 @@ describe("GridTilemapPlugin", () => {
         },
       ],
       tileWidth: 16,
+      tileHeight: 16,
       getTileAt: jest.fn(),
       hasTileAt: jest.fn(),
       createBlankLayer: jest.fn().mockReturnValue(blankLayerMock),
     };
+    gridTilemap = new GridTilemap(tilemapMock);
   });
 
   it("should set layer depths on construction", () => {
@@ -52,7 +54,6 @@ describe("GridTilemapPlugin", () => {
   });
 
   it("should set layer depths on construction without firstLayerAboveChar", () => {
-    gridTilemap = new GridTilemap(tilemapMock);
     expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
     expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(1);
   });
@@ -190,10 +191,8 @@ describe("GridTilemapPlugin", () => {
       properties: { gm_collide: true },
     });
     gridTilemap = new GridTilemap(tilemapMock, 3);
-    const isBlockingTile = gridTilemap.hasBlockingTile(
-      new Phaser.Math.Vector2(3, 4)
-    );
-    const isBlocking = gridTilemap.isBlocking(new Phaser.Math.Vector2(3, 4));
+    const isBlockingTile = gridTilemap.hasBlockingTile(new Vector2(3, 4));
+    const isBlocking = gridTilemap.isBlocking(new Vector2(3, 4));
     expect(isBlockingTile).toBe(true);
     expect(isBlocking).toBe(true);
     expect(tilemapMock.getTileAt).toHaveBeenCalledWith(3, 4, false, "layer1");
@@ -212,10 +211,8 @@ describe("GridTilemapPlugin", () => {
     });
     gridTilemap = new GridTilemap(tilemapMock, 3);
     gridTilemap.setCollisionTilePropertyName("custom_collides_prop");
-    const isBlockingTile = gridTilemap.hasBlockingTile(
-      new Phaser.Math.Vector2(3, 4)
-    );
-    const isBlocking = gridTilemap.isBlocking(new Phaser.Math.Vector2(3, 4));
+    const isBlockingTile = gridTilemap.hasBlockingTile(new Vector2(3, 4));
+    const isBlocking = gridTilemap.isBlocking(new Vector2(3, 4));
     expect(isBlockingTile).toBe(true);
     expect(isBlocking).toBe(true);
   });
@@ -224,10 +221,8 @@ describe("GridTilemapPlugin", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: true } });
     gridTilemap = new GridTilemap(tilemapMock, 3);
-    const isBlockingTile = gridTilemap.hasBlockingTile(
-      new Phaser.Math.Vector2(3, 4)
-    );
-    const isBlocking = gridTilemap.isBlocking(new Phaser.Math.Vector2(3, 4));
+    const isBlockingTile = gridTilemap.hasBlockingTile(new Vector2(3, 4));
+    const isBlocking = gridTilemap.isBlocking(new Vector2(3, 4));
     expect(isBlockingTile).toBe(true);
     expect(isBlocking).toBe(true);
   });
@@ -239,19 +234,19 @@ describe("GridTilemapPlugin", () => {
     });
     gridTilemap = new GridTilemap(tilemapMock, 3);
     const isBlockingLeft = gridTilemap.isBlocking(
-      new Phaser.Math.Vector2(3, 4),
+      new Vector2(3, 4),
       Direction.LEFT
     );
     const isBlockingRight = gridTilemap.isBlocking(
-      new Phaser.Math.Vector2(3, 4),
+      new Vector2(3, 4),
       Direction.RIGHT
     );
     const isBlockingUp = gridTilemap.isBlocking(
-      new Phaser.Math.Vector2(3, 4),
+      new Vector2(3, 4),
       Direction.UP
     );
     const isBlockingDown = gridTilemap.isBlocking(
-      new Phaser.Math.Vector2(3, 4),
+      new Vector2(3, 4),
       Direction.DOWN
     );
     expect(isBlockingLeft).toBe(true);
@@ -267,19 +262,19 @@ describe("GridTilemapPlugin", () => {
     });
     gridTilemap = new GridTilemap(tilemapMock, 3);
     const isBlockingLeft = gridTilemap.isBlocking(
-      new Phaser.Math.Vector2(3, 4),
+      new Vector2(3, 4),
       Direction.LEFT
     );
     const isBlockingRight = gridTilemap.isBlocking(
-      new Phaser.Math.Vector2(3, 4),
+      new Vector2(3, 4),
       Direction.RIGHT
     );
     const isBlockingUp = gridTilemap.isBlocking(
-      new Phaser.Math.Vector2(3, 4),
+      new Vector2(3, 4),
       Direction.UP
     );
     const isBlockingDown = gridTilemap.isBlocking(
-      new Phaser.Math.Vector2(3, 4),
+      new Vector2(3, 4),
       Direction.DOWN
     );
     expect(isBlockingLeft).toBe(false);
@@ -295,19 +290,19 @@ describe("GridTilemapPlugin", () => {
     });
     gridTilemap = new GridTilemap(tilemapMock, 3);
     const isBlockingLeft = gridTilemap.isBlocking(
-      new Phaser.Math.Vector2(3, 4),
+      new Vector2(3, 4),
       Direction.LEFT
     );
     const isBlockingRight = gridTilemap.isBlocking(
-      new Phaser.Math.Vector2(3, 4),
+      new Vector2(3, 4),
       Direction.RIGHT
     );
     const isBlockingUp = gridTilemap.isBlocking(
-      new Phaser.Math.Vector2(3, 4),
+      new Vector2(3, 4),
       Direction.UP
     );
     const isBlockingDown = gridTilemap.isBlocking(
-      new Phaser.Math.Vector2(3, 4),
+      new Vector2(3, 4),
       Direction.DOWN
     );
     expect(isBlockingLeft).toBe(false);
@@ -323,19 +318,19 @@ describe("GridTilemapPlugin", () => {
     });
     gridTilemap = new GridTilemap(tilemapMock, 3);
     const isBlockingLeft = gridTilemap.isBlocking(
-      new Phaser.Math.Vector2(3, 4),
+      new Vector2(3, 4),
       Direction.LEFT
     );
     const isBlockingRight = gridTilemap.isBlocking(
-      new Phaser.Math.Vector2(3, 4),
+      new Vector2(3, 4),
       Direction.RIGHT
     );
     const isBlockingUp = gridTilemap.isBlocking(
-      new Phaser.Math.Vector2(3, 4),
+      new Vector2(3, 4),
       Direction.UP
     );
     const isBlockingDown = gridTilemap.isBlocking(
-      new Phaser.Math.Vector2(3, 4),
+      new Vector2(3, 4),
       Direction.DOWN
     );
     expect(isBlockingLeft).toBe(false);
@@ -348,10 +343,8 @@ describe("GridTilemapPlugin", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
     gridTilemap = new GridTilemap(tilemapMock, 3);
-    const isBlockingTile = gridTilemap.hasBlockingTile(
-      new Phaser.Math.Vector2(3, 4)
-    );
-    const isBlocking = gridTilemap.isBlocking(new Phaser.Math.Vector2(3, 4));
+    const isBlockingTile = gridTilemap.hasBlockingTile(new Vector2(3, 4));
+    const isBlocking = gridTilemap.isBlocking(new Vector2(3, 4));
     expect(isBlockingTile).toBe(false);
     expect(isBlocking).toBe(false);
     expect(tilemapMock.getTileAt).toHaveBeenCalledWith(3, 4, false, "layer1");
@@ -362,9 +355,7 @@ describe("GridTilemapPlugin", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
     gridTilemap = new GridTilemap(tilemapMock, 3);
-    const isBlocking = gridTilemap.hasBlockingTile(
-      new Phaser.Math.Vector2(3, 4)
-    );
+    const isBlocking = gridTilemap.hasBlockingTile(new Vector2(3, 4));
     expect(isBlocking).toBe(true);
     expect(tilemapMock.getTileAt).not.toHaveBeenCalled();
   });
@@ -372,8 +363,8 @@ describe("GridTilemapPlugin", () => {
   it("should detect if no tile present", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     gridTilemap = new GridTilemap(tilemapMock, 3);
-    const hasNoTile = gridTilemap.hasNoTile(new Phaser.Math.Vector2(3, 4));
-    const isBlocking = gridTilemap.isBlocking(new Phaser.Math.Vector2(3, 4));
+    const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4));
+    const isBlocking = gridTilemap.isBlocking(new Vector2(3, 4));
     expect(hasNoTile).toBe(true);
     expect(isBlocking).toBe(true);
   });
@@ -381,7 +372,7 @@ describe("GridTilemapPlugin", () => {
   it("should detect if tile present", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     gridTilemap = new GridTilemap(tilemapMock, 3);
-    const hasNoTile = gridTilemap.hasNoTile(new Phaser.Math.Vector2(3, 4));
+    const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4));
     expect(hasNoTile).toBe(false);
   });
 
@@ -400,7 +391,7 @@ describe("GridTilemapPlugin", () => {
     gridTilemap.addCharacter(char1Mock);
     gridTilemap.addCharacter(char2Mock);
     const hasBlockingChar = gridTilemap.hasBlockingChar(new Vector2(3, 4));
-    const isBlocking = gridTilemap.isBlocking(new Phaser.Math.Vector2(3, 4));
+    const isBlocking = gridTilemap.isBlocking(new Vector2(3, 4));
     expect(hasBlockingChar).toBe(true);
     expect(isBlocking).toBe(true);
   });
@@ -419,9 +410,15 @@ describe("GridTilemapPlugin", () => {
     };
     gridTilemap.addCharacter(char1Mock);
     gridTilemap.addCharacter(char2Mock);
-    const hasBlockingChar = gridTilemap.hasBlockingChar(
-      new Phaser.Math.Vector2(4, 4)
-    );
+    const hasBlockingChar = gridTilemap.hasBlockingChar(new Vector2(4, 4));
     expect(hasBlockingChar).toBe(false);
+  });
+
+  it("should get scaled tile width", () => {
+    expect(gridTilemap.getTileWidth()).toEqual(48);
+  });
+
+  it("should get scaled tile height", () => {
+    expect(gridTilemap.getTileHeight()).toEqual(48);
   });
 });
