@@ -285,11 +285,48 @@ describe("GridCharacter", () => {
     expect(dir).toEqual(Direction.DOWN);
   });
 
+  it("should call positionChangeFinished when movement stopped", (done) => {
+    mockNonBlockingTile();
+    gridCharacter.move(Direction.DOWN);
+    gridCharacter.update(1);
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN);
+
+    gridCharacter
+      .positionChangeFinished()
+      .subscribe(({ exitTile, enterTile }) => {
+        expect(exitTile).toEqual(new Vector2(0, 0));
+        expect(enterTile).toEqual(new Vector2(0, 1));
+        done();
+      });
+
+    gridCharacter.update(500);
+  });
+
   it("should not stop moving if movementImpuls", () => {
     mockNonBlockingTile();
     gridCharacter.move(Direction.DOWN);
     gridCharacter.update(500);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN);
+  });
+
+  it("should continue moving", (done) => {
+    mockNonBlockingTile();
+
+    gridCharacter
+      .positionChangeFinished()
+      .subscribe(({ exitTile, enterTile }) => {
+        expect(exitTile).toEqual(new Vector2(0, 0));
+        expect(enterTile).toEqual(new Vector2(0, 1));
+        done();
+      });
+
+    gridCharacter.move(Direction.DOWN);
+    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.move(Direction.DOWN);
+    gridCharacter.update(MS_FOR_12_PX);
+    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS + 24);
+    expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, 1));
   });
 
   it("should stop moving if blocking", () => {

@@ -58,6 +58,7 @@ export class GridCharacter {
   private movementStopped$ = new Subject<Direction>();
   private directionChanged$ = new Subject<Direction>();
   private positionChanged$ = new Subject<PositionChange>();
+  private positionChangeFinished$ = new Subject<PositionChange>();
   private lastMovementImpulse = Direction.NONE;
   private facingDirection: Direction = Direction.DOWN;
   private isIsometric: boolean;
@@ -216,6 +217,10 @@ export class GridCharacter {
     return this.positionChanged$;
   }
 
+  positionChangeFinished(): Subject<PositionChange> {
+    return this.positionChangeFinished$;
+  }
+
   private getOffset(): Vector2 {
     const offsetX =
       this.tileSize.x / 2 -
@@ -288,6 +293,10 @@ export class GridCharacter {
       this.moveCharacterSprite(pixelsToWalkThisUpdate);
     } else if (this.shouldContinueMoving()) {
       this.moveCharacterSprite(pixelsToWalkThisUpdate);
+      this.positionChangeFinished$.next({
+        exitTile: this.tilePos,
+        enterTile: this.nextTilePos,
+      });
       this.updateTilePos();
     } else {
       this.moveCharacterSpriteRestOfTile();
@@ -355,6 +364,10 @@ export class GridCharacter {
 
   private stopMoving(): void {
     this.movementStopped$.next(this.movementDirection);
+    this.positionChangeFinished$.next({
+      exitTile: this.tilePos,
+      enterTile: this.nextTilePos,
+    });
     this.movementDirection = Direction.NONE;
     this.tilePos = this.nextTilePos;
   }

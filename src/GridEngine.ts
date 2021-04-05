@@ -55,6 +55,9 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   private movementStarted$ = new Subject<[string, Direction]>();
   private directionChanged$ = new Subject<[string, Direction]>();
   private positionChanged$ = new Subject<{ charId: string } & PositionChange>();
+  private positionChangeFinished$ = new Subject<
+    { charId: string } & PositionChange
+  >();
   private charRemoved$ = new Subject<string>();
 
   constructor(
@@ -243,6 +246,17 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
           enterTile,
         });
       });
+
+    gridChar
+      .positionChangeFinished()
+      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
+      .subscribe(({ exitTile, enterTile }) => {
+        this.positionChangeFinished$.next({
+          charId: gridChar.getId(),
+          exitTile,
+          enterTile,
+        });
+      });
   }
 
   hasCharacter(charId: string): boolean {
@@ -326,6 +340,10 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
 
   positionChanged(): Observable<{ charId: string } & PositionChange> {
     return this.positionChanged$;
+  }
+
+  positionChangeFinished(): Observable<{ charId: string } & PositionChange> {
+    return this.positionChangeFinished$;
   }
 
   private takeUntilCharRemoved(charId: string) {

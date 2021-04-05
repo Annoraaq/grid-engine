@@ -46,6 +46,7 @@ export declare class GridCharacter {
     private movementStopped$;
     private directionChanged$;
     private positionChanged$;
+    private positionChangeFinished$;
     private lastMovementImpulse;
     private facingDirection;
     private isIsometric;
@@ -72,6 +73,7 @@ export declare class GridCharacter {
     movementStopped(): Subject<Direction>;
     directionChanged(): Subject<Direction>;
     positionChanged(): Subject<PositionChange>;
+    positionChangeFinished(): Subject<PositionChange>;
     private getOffset;
     private get nextTilePos();
     private set nextTilePos(value);

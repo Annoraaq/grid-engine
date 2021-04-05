@@ -39,6 +39,7 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     private movementStarted$;
     private directionChanged$;
     private positionChanged$;
+    private positionChangeFinished$;
     private charRemoved$;
     constructor(scene: Phaser.Scene, pluginManager: Phaser.Plugins.PluginManager);
     boot(): void;
@@ -68,6 +69,9 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     movementStopped(): Observable<[string, Direction]>;
     directionChanged(): Observable<[string, Direction]>;
     positionChanged(): Observable<{
+        charId: string;
+    } & PositionChange>;
+    positionChangeFinished(): Observable<{
         charId: string;
     } & PositionChange>;
     private takeUntilCharRemoved;

@@ -15,6 +15,7 @@ const mockMovementStarted = jest.fn();
 const mockMovementStopped = jest.fn();
 const mockDirectionChanged = jest.fn();
 const mockPositionChanged = jest.fn();
+const mockPositionChangeFinished = jest.fn();
 const mockIsMoving = jest.fn();
 const mockSetMovement = jest.fn();
 const mockGetMovement = jest.fn();
@@ -80,6 +81,7 @@ jest.mock("./GridCharacter/GridCharacter", function () {
         movementStopped: mockMovementStopped,
         directionChanged: mockDirectionChanged,
         positionChanged: mockPositionChanged,
+        positionChangeFinished: mockPositionChangeFinished,
         isMoving: mockIsMoving,
         getFacingDirection: mockFacingDirection,
         turnTowards: mockTurnTowards,
@@ -158,6 +160,7 @@ describe("GridEngine", () => {
     mockMovementStopped.mockReset().mockReturnValue(of());
     mockDirectionChanged.mockReset().mockReturnValue(of());
     mockPositionChanged.mockReset().mockReturnValue(of());
+    mockPositionChangeFinished.mockReset().mockReturnValue(of());
   });
 
   it("should boot", () => {
@@ -1099,7 +1102,7 @@ describe("GridEngine", () => {
 
     it("should unsubscribe from positionChanged if char removed", async () => {
       const mockSubject = new Subject<PositionChange>();
-      mockDirectionChanged.mockReturnValue(mockSubject);
+      mockPositionChanged.mockReturnValue(mockSubject);
       gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
@@ -1114,7 +1117,66 @@ describe("GridEngine", () => {
       gridEngine.removeCharacter("player");
       const nextMock = jest.fn();
 
-      gridEngine.directionChanged().subscribe({
+      gridEngine.positionChanged().subscribe({
+        complete: jest.fn(),
+        next: nextMock,
+      });
+
+      const exitTile = new Vector2(1, 2);
+      const enterTile = new Vector2(2, 2);
+
+      mockSubject.next({ exitTile, enterTile });
+      expect(nextMock).not.toHaveBeenCalled();
+    });
+
+    it("should get chars positionChangeFinished observable", async () => {
+      const mockSubject = new Subject<PositionChange>();
+      mockPositionChangeFinished.mockReturnValue(mockSubject);
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+      });
+
+      const prom = gridEngine
+        .positionChangeFinished()
+        .pipe(take(1))
+        .toPromise();
+
+      const exitTile = new Vector2(1, 2);
+      const enterTile = new Vector2(2, 2);
+
+      mockSubject.next({
+        exitTile,
+        enterTile,
+      });
+      const res = await prom;
+      expect(res).toEqual({ charId: "player", exitTile, enterTile });
+    });
+
+    it("should unsubscribe from positionChangeFinished if char removed", async () => {
+      const mockSubject = new Subject<PositionChange>();
+      mockPositionChangeFinished.mockReturnValue(mockSubject);
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+      });
+
+      gridEngine.removeCharacter("player");
+      const nextMock = jest.fn();
+
+      gridEngine.positionChangeFinished().subscribe({
         complete: jest.fn(),
         next: nextMock,
       });
