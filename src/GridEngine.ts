@@ -182,7 +182,10 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
       sprite: charData.sprite,
       speed: charData.speed || 4,
       tilemap: this.gridTilemap,
-      tileSize: new Vector2(this.getTileWidth(), this.getTileHeight()),
+      tileSize: new Vector2(
+        this.gridTilemap.getTileWidth(),
+        this.gridTilemap.getTileHeight()
+      ),
       isometric:
         this.tilemap.orientation == `${Phaser.Tilemaps.Orientation.ISOMETRIC}`,
       walkingAnimationMapping: charData.walkingAnimationMapping,
@@ -355,16 +358,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     } else {
       return new GridTilemap(tilemap);
     }
-  }
-
-  private getTileWidth(): number {
-    const tilemapScale = this.tilemap.layers[0].tilemapLayer.scale;
-    return this.tilemap.tileWidth * tilemapScale;
-  }
-
-  private getTileHeight(): number {
-    const tilemapScale = this.tilemap.layers[0].tilemapLayer.scale;
-    return this.tilemap.tileHeight * tilemapScale;
   }
 
   private addCharacters(config: GridEngineConfig) {

@@ -28,6 +28,8 @@ const mockGridTileMap = {
   addCharacter: jest.fn(),
   removeCharacter: jest.fn(),
   setCollisionTilePropertyName: jest.fn(),
+  getTileWidth: () => 32,
+  getTileHeight: () => 32,
 };
 const mockGridTilemapConstructor = jest.fn(function (
   _tilemap,

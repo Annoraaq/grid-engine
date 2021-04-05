@@ -37,10 +37,12 @@ describe("GridTilemapPlugin", () => {
         },
       ],
       tileWidth: 16,
+      tileHeight: 16,
       getTileAt: jest.fn(),
       hasTileAt: jest.fn(),
       createBlankLayer: jest.fn().mockReturnValue(blankLayerMock),
     };
+    gridTilemap = new GridTilemap(tilemapMock);
   });
 
   it("should set layer depths on construction", () => {
@@ -52,7 +54,6 @@ describe("GridTilemapPlugin", () => {
   });
 
   it("should set layer depths on construction without firstLayerAboveChar", () => {
-    gridTilemap = new GridTilemap(tilemapMock);
     expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
     expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(1);
   });
@@ -411,5 +412,13 @@ describe("GridTilemapPlugin", () => {
     gridTilemap.addCharacter(char2Mock);
     const hasBlockingChar = gridTilemap.hasBlockingChar(new Vector2(4, 4));
     expect(hasBlockingChar).toBe(false);
+  });
+
+  it("should get scaled tile width", () => {
+    expect(gridTilemap.getTileWidth()).toEqual(48);
+  });
+
+  it("should get scaled tile height", () => {
+    expect(gridTilemap.getTileHeight()).toEqual(48);
   });
 });
