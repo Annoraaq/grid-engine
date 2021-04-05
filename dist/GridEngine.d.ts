@@ -49,9 +49,12 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     moveRight(charId: string): void;
     moveUp(charId: string): void;
     moveDown(charId: string): void;
+    move(charId: string, direction: Direction): void;
     moveRandomly(charId: string, delay?: number, radius?: number): void;
     moveTo(charId: string, targetPos: Vector2, closestPointIfBlocked?: boolean): void;
     stopMovingRandomly(charId: string): void;
+    stopMovement(charId: string): void;
+    private _stopMovement;
     setSpeed(charId: string, speed: number): void;
     setWalkingAnimationMapping(charId: string, walkingAnimationMapping: WalkingAnimationMapping): void;
     update(_time: number, delta: number): void;
@@ -79,5 +82,6 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     private unknownCharGuard;
     private createTilemap;
     private addCharacters;
+    private moveChar;
 }
 export {};
