@@ -27,7 +27,11 @@ nav_order: 2
 |:-------------|
 | Turns the character towards the given direction without moving it. |
 
-| moveLeft(charId: string): Phaser.Math.Vector2<br />moveRight(charId: string): Phaser.Math.Vector2<br />moveUp(charId: string): Phaser.Math.Vector2<br />moveDown(charId: string): Phaser.Math.Vector2<br />|
+| moveLeft(charId: string): void<br />moveRight(charId: string): void<br />moveUp(charId: string): void<br />moveDown(charId: string): void<br />|
+|:-------------|
+| Initiates movement of the character with the given id. If the character is already moving nothing happens. If the movement direction is currently blocked, the character will only turn towards that direction. Movement commands are __not__ queued. |
+
+| move(charId: string, [Direction](./config/#direction)): void|
 |:-------------|
 | Initiates movement of the character with the given id. If the character is already moving nothing happens. If the movement direction is currently blocked, the character will only turn towards that direction. Movement commands are __not__ queued. |
 
