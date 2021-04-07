@@ -16,7 +16,6 @@
   ],
   "types": "dist/GridEngine.d.ts",
   "dependencies": {
-    "esbuild": "^0.9.1",
     "phaser": "^3.52.0",
     "rxjs": "^6.6.3"
   },
@@ -24,6 +23,7 @@
     "@typescript-eslint/eslint-plugin": "^4.17.0",
     "@typescript-eslint/parser": "^4.17.0",
     "canvas": "^2.6.1",
+    "esbuild": "^0.9.1",
     "eslint": "^7.22.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-jest": "^24.3.1",
