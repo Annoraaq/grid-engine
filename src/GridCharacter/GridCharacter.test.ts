@@ -336,18 +336,16 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
   });
 
-  describe("isBlockingDirection", () => {
-    it("should detect movement", () => {
-      mockNonBlockingTile();
-      gridCharacter.move(Direction.DOWN);
-      expect(gridCharacter.isMoving()).toBeTruthy();
-    });
+  it("should detect movement", () => {
+    mockNonBlockingTile();
+    gridCharacter.move(Direction.DOWN);
+    expect(gridCharacter.isMoving()).toBeTruthy();
+  });
 
-    it("should detect non-movement", () => {
-      mockBlockingTile();
-      gridCharacter.move(Direction.DOWN);
-      expect(gridCharacter.isMoving()).toBeFalsy();
-    });
+  it("should detect non-movement", () => {
+    mockBlockingTile();
+    gridCharacter.move(Direction.DOWN);
+    expect(gridCharacter.isMoving()).toBeFalsy();
   });
 
   describe("isBlockingDirection", () => {
@@ -366,16 +364,19 @@ describe("GridCharacter", () => {
       gridTilemapMock.hasBlockingTile.mockReturnValue(false);
       gridTilemapMock.hasBlockingChar.mockReturnValue(false);
 
+      gridCharacter.move(Direction.RIGHT);
+      gridCharacter.update(10);
+
       const result = gridCharacter.isBlockingDirection(direction);
       expect(gridTilemapMock.hasBlockingTile).toHaveBeenCalledWith(
         {
-          x: 1,
+          x: 2,
           y: 0,
         },
         oppositeDirection
       );
       expect(gridTilemapMock.hasBlockingChar).toHaveBeenCalledWith({
-        x: 1,
+        x: 2,
         y: 0,
       });
       expect(result).toBe(false);
