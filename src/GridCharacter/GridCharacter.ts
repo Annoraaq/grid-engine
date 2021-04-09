@@ -283,7 +283,7 @@ export class GridCharacter {
   }
 
   private tilePosInDirection(direction: Direction): Vector2 {
-    return this.getTilePos().add(DirectionVectors[direction]);
+    return this.nextTilePos.add(DirectionVectors[direction]);
   }
 
   private updateCharacterPosition(delta: number): void {
