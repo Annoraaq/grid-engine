@@ -1,6 +1,6 @@
 import { CharacterIndex, FrameRow, PositionChange } from "./GridCharacter/GridCharacter";
 import "phaser";
-import { Direction } from "./Direction/Direction";
+import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { Observable } from "rxjs";
 declare const Vector2: typeof Phaser.Math.Vector2;
 declare type Vector2 = Phaser.Math.Vector2;
@@ -9,6 +9,7 @@ export interface GridEngineConfig {
     characters: CharacterData[];
     firstLayerAboveChar?: number;
     collisionTilePropertyName?: string;
+    numberOfDirections?: NumberOfDirections;
 }
 export interface WalkingAnimationMapping {
     [Direction.UP]: FrameRow;
@@ -54,7 +55,6 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     moveTo(charId: string, targetPos: Vector2, closestPointIfBlocked?: boolean): void;
     stopMovingRandomly(charId: string): void;
     stopMovement(charId: string): void;
-    private _stopMovement;
     setSpeed(charId: string, speed: number): void;
     setWalkingAnimationMapping(charId: string, walkingAnimationMapping: WalkingAnimationMapping): void;
     update(_time: number, delta: number): void;
@@ -83,5 +83,6 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     private createTilemap;
     private addCharacters;
     private moveChar;
+    private _stopMovement;
 }
 export {};

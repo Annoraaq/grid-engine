@@ -3,7 +3,7 @@ import { VectorUtils } from "./../Utils/VectorUtils";
 import {
   DirectionVectors,
   DirectionVectorsIsometric,
-  oppositeDirection,
+  OppositeDirections,
 } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
 import * as Phaser from "phaser";
@@ -181,7 +181,7 @@ export class GridCharacter {
     return (
       this.tilemap.hasBlockingTile(
         this.tilePosInDirection(direction),
-        oppositeDirection(direction)
+        OppositeDirections[direction]
       ) || this.tilemap.hasBlockingChar(this.tilePosInDirection(direction))
     );
   }

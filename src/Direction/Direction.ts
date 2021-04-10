@@ -6,9 +6,13 @@ type Vector2 = Phaser.Math.Vector2;
 export enum Direction {
   NONE = "none",
   LEFT = "left",
+  UP_LEFT = "up-left",
   UP = "up",
+  UP_RIGHT = "up-right",
   RIGHT = "right",
+  DOWN_RIGHT = "down-right",
   DOWN = "down",
+  DOWN_LEFT = "down-left",
 }
 
 export const DirectionVectors: {
@@ -19,6 +23,10 @@ export const DirectionVectors: {
   [Direction.LEFT]: Vector2.LEFT,
   [Direction.RIGHT]: Vector2.RIGHT,
   [Direction.NONE]: Vector2.ZERO,
+  [Direction.UP_LEFT]: new Vector2(-1, -1),
+  [Direction.UP_RIGHT]: new Vector2(1, -1),
+  [Direction.DOWN_RIGHT]: new Vector2(1, 1),
+  [Direction.DOWN_LEFT]: new Vector2(-1, 1),
 };
 
 export const DirectionVectorsIsometric: {
@@ -31,17 +39,21 @@ export const DirectionVectorsIsometric: {
   [Direction.NONE]: Vector2.ZERO,
 };
 
-export function oppositeDirection(direction: Direction): Direction {
-  switch (direction) {
-    case Direction.UP:
-      return Direction.DOWN;
-    case Direction.DOWN:
-      return Direction.UP;
-    case Direction.LEFT:
-      return Direction.RIGHT;
-    case Direction.RIGHT:
-      return Direction.LEFT;
-    default:
-      return Direction.NONE;
-  }
+export const OppositeDirections: {
+  [key in Direction]?: Direction;
+} = {
+  [Direction.UP]: Direction.DOWN,
+  [Direction.DOWN]: Direction.UP,
+  [Direction.LEFT]: Direction.RIGHT,
+  [Direction.RIGHT]: Direction.LEFT,
+  [Direction.NONE]: Direction.NONE,
+  [Direction.UP_LEFT]: Direction.DOWN_RIGHT,
+  [Direction.UP_RIGHT]: Direction.DOWN_LEFT,
+  [Direction.DOWN_RIGHT]: Direction.UP_LEFT,
+  [Direction.DOWN_LEFT]: Direction.UP_RIGHT,
+};
+
+export enum NumberOfDirections {
+  FOUR = 4,
+  EIGHT = 8,
 }

@@ -8,7 +8,7 @@ import {
   PositionChange,
 } from "./GridCharacter/GridCharacter";
 import "phaser";
-import { Direction } from "./Direction/Direction";
+import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
@@ -23,6 +23,7 @@ export interface GridEngineConfig {
   characters: CharacterData[];
   firstLayerAboveChar?: number; // deprecated
   collisionTilePropertyName?: string;
+  numberOfDirections?: NumberOfDirections;
 }
 
 export interface WalkingAnimationMapping {
@@ -143,12 +144,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
 
   stopMovement(charId: string): void {
     this._stopMovement(charId);
-  }
-
-  private _stopMovement(charId: string) {
-    this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).setMovement(undefined);
   }
 
   setSpeed(charId: string, speed: number): void {
@@ -394,5 +389,11 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.gridCharacters.get(charId).move(direction);
+  }
+
+  private _stopMovement(charId: string) {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    this.gridCharacters.get(charId).setMovement(undefined);
   }
 }
