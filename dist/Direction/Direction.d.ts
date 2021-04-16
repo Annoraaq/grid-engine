@@ -12,15 +12,9 @@ export declare enum Direction {
     DOWN = "down",
     DOWN_LEFT = "down-left"
 }
-export declare const DirectionVectors: {
-    [key in Direction]?: Vector2;
-};
-export declare const DirectionVectorsIsometric: {
-    [key in Direction]?: Vector2;
-};
-export declare const OppositeDirections: {
-    [key in Direction]?: Direction;
-};
+export declare function turnCounterClockwise(direction: Direction): Direction;
+export declare function directionVector(direction: Direction): Vector2;
+export declare function oppositeDirection(direction: Direction): Direction;
 export declare enum NumberOfDirections {
     FOUR = 4,
     EIGHT = 8

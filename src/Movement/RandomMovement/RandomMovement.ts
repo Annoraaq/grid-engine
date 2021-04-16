@@ -1,6 +1,6 @@
 import { VectorUtils } from "../../Utils/VectorUtils";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import { Direction, DirectionVectors } from "../../Direction/Direction";
+import { Direction, directionVector } from "../../Direction/Direction";
 import { Movement } from "../Movement";
 
 const Vector2 = Phaser.Math.Vector2;
@@ -70,7 +70,7 @@ export class RandomMovement implements Movement {
   private isWithinRadius(dir: Direction) {
     if (this.radius == -1) return true;
     const dist = VectorUtils.manhattanDistance(
-      this.character.getTilePos().add(DirectionVectors[dir]),
+      this.character.getTilePos().add(directionVector(dir)),
       new Vector2(this.initialCol, this.initialRow)
     );
 

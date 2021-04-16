@@ -38,7 +38,6 @@ export declare class GridCharacter {
     private sprite;
     private container?;
     private tilemap;
-    private tileDistance;
     private tileSize;
     private speed;
     private customOffset;
@@ -74,6 +73,8 @@ export declare class GridCharacter {
     directionChanged(): Subject<Direction>;
     positionChanged(): Subject<PositionChange>;
     positionChangeFinished(): Subject<PositionChange>;
+    private createSpeedPixelsPerSecond;
+    private getTileDistance;
     private getOffset;
     private get nextTilePos();
     private set nextTilePos(value);
@@ -84,13 +85,13 @@ export declare class GridCharacter {
     private getPosition;
     private startMoving;
     private updateTilePos;
+    private toMapDirection;
     private tilePosInDirection;
     private updateCharacterPosition;
     private shouldContinueMoving;
     private getSpeedPerDelta;
     private willCrossTileBorderThisUpdate;
     private moveCharacterSpriteRestOfTile;
-    private getDirectionVecs;
     private moveCharacterSprite;
     private stopMoving;
     private hasWalkedHalfATile;

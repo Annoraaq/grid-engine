@@ -186,7 +186,7 @@ describe("GridCharacter", () => {
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
   });
 
-  it("should update", () => {
+  it("should update vertically", () => {
     mockNonBlockingTile();
 
     gridCharacter.move(Direction.UP);
@@ -197,6 +197,32 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
     expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 - 1);
+  });
+
+  it("should update horizontally", () => {
+    mockNonBlockingTile();
+
+    gridCharacter.move(Direction.RIGHT);
+    gridCharacter.update(MS_FOR_12_PX);
+
+    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 12);
+    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.RIGHT);
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(1000);
+  });
+
+  it("should update diagonally", () => {
+    mockNonBlockingTile();
+
+    gridCharacter.move(Direction.DOWN_LEFT);
+    gridCharacter.update(MS_FOR_12_PX);
+
+    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS - 12);
+    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS + 12);
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN_LEFT);
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN_LEFT);
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 + 1);
   });
 
   it("should not update z-index if not walked half a tile", () => {
@@ -572,14 +598,14 @@ describe("GridCharacter", () => {
       );
     });
 
-    it("should update", () => {
+    it("should move diagonally", () => {
       const tileAmountToWalk = 0.75;
       mockNonBlockingTile();
 
       expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS_ISOMETRIC);
       expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS_ISOMETRIC);
 
-      gridCharacter.move(Direction.UP);
+      gridCharacter.move(Direction.UP_RIGHT);
       gridCharacter.update(1000 * tileAmountToWalk);
 
       expect(spriteMock.x).toEqual(
@@ -590,15 +616,79 @@ describe("GridCharacter", () => {
         INITIAL_SPRITE_Y_POS_ISOMETRIC -
           (TILE_HEIGHT_ISOMETRIC / 2) * tileAmountToWalk
       );
+      expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP_RIGHT);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP_RIGHT);
+      expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 - 1);
+    });
+
+    it("should move vertically", () => {
+      const tileAmountToWalk = 0.75;
+      mockNonBlockingTile();
+
+      expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS_ISOMETRIC);
+      expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS_ISOMETRIC);
+
+      gridCharacter.move(Direction.UP);
+      gridCharacter.update(1000 * tileAmountToWalk);
+
+      expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS_ISOMETRIC);
+      expect(spriteMock.y).toEqual(
+        INITIAL_SPRITE_Y_POS_ISOMETRIC -
+          TILE_HEIGHT_ISOMETRIC * tileAmountToWalk
+      );
       expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
       expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
       expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 - 1);
     });
 
+    it("should move horizontally", () => {
+      const tileAmountToWalk = 0.75;
+      mockNonBlockingTile();
+
+      expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS_ISOMETRIC);
+      expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS_ISOMETRIC);
+
+      gridCharacter.move(Direction.LEFT);
+      gridCharacter.update(1000 * tileAmountToWalk);
+
+      expect(spriteMock.x).toEqual(
+        INITIAL_SPRITE_X_POS_ISOMETRIC - TILE_WIDTH_ISOMETRIC * tileAmountToWalk
+      );
+      expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS_ISOMETRIC);
+      expect(gridCharacter.getMovementDirection()).toEqual(Direction.LEFT);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
+      expect(spriteMock.setDepth).toHaveBeenCalledWith(1000);
+    });
+
+    it("should detect non-blocking direction", () => {
+      const oppositeMapDirection = Direction.DOWN;
+      gridTilemapMock.hasBlockingTile.mockReturnValue(false);
+      gridTilemapMock.hasBlockingChar.mockReturnValue(false);
+
+      gridCharacter.setTilePosition(new Vector2(3, 3));
+
+      gridCharacter.move(Direction.UP_RIGHT);
+      gridCharacter.update(10);
+
+      const result = gridCharacter.isBlockingDirection(Direction.UP_RIGHT);
+      expect(gridTilemapMock.hasBlockingTile).toHaveBeenCalledWith(
+        {
+          x: 3,
+          y: 1,
+        },
+        oppositeMapDirection
+      );
+      expect(gridTilemapMock.hasBlockingChar).toHaveBeenCalledWith({
+        x: 3,
+        y: 1,
+      });
+      expect(result).toBe(false);
+    });
+
     it("should update only till tile border", () => {
       mockNonBlockingTile();
 
-      gridCharacter.move(Direction.UP);
+      gridCharacter.move(Direction.UP_RIGHT);
       gridCharacter.update(750);
       gridCharacter.update(750);
       gridCharacter.update(750);
@@ -610,7 +700,7 @@ describe("GridCharacter", () => {
         INITIAL_SPRITE_Y_POS_ISOMETRIC - TILE_HEIGHT_ISOMETRIC / 2
       );
       expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
-      expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP_RIGHT);
     });
   });
 });
