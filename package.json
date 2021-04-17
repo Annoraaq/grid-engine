@@ -1,14 +1,17 @@
 {
   "name": "grid-engine",
-  "version": "1.12.1",
+  "version": "1.12.2",
   "description": "Phaser3 plugin for grid based movement on a 2D game board.",
   "author": "Johannes Baum",
   "license": "ISC",
-  "main": "dist/GridEngine.min.js",
+  "main": "dist/GridEngine.esm.min.js",
   "scripts": {
     "test": "jest",
     "dev": "prettier --write src/ && eslint src/",
-    "build": "esbuild src/main.ts --bundle --minify --global-name=GridEngine --outfile=dist/GridEngine.min.js && tsc --emitDeclarationOnly --outDir dist",
+    "build-web": "esbuild src/main-iife.ts --bundle --minify --global-name=GridEngine --outfile=dist/GridEngine.min.js",
+    "build-esm": "esbuild src/main-esm.ts --bundle --minify --format=esm  --outfile=dist/GridEngine.esm.min.js",
+    "build-declarations": "tsc --emitDeclarationOnly --outDir dist",
+    "build": "npm run build-web && npm run build-esm && tsc --emitDeclarationOnly --outDir dist",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "files": [
@@ -23,7 +26,7 @@
     "@typescript-eslint/eslint-plugin": "^4.17.0",
     "@typescript-eslint/parser": "^4.17.0",
     "canvas": "^2.6.1",
-    "esbuild": "^0.9.1",
+    "esbuild": "^0.11.11",
     "eslint": "^7.22.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-jest": "^24.3.1",
