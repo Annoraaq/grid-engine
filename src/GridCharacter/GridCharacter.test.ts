@@ -35,20 +35,11 @@ describe("GridCharacter", () => {
 
   const TILE_WIDTH = 16;
   const TILE_HEIGHT = 16;
-  const TILE_WIDTH_ISOMETRIC = 32;
-  const TILE_HEIGHT_ISOMETRIC = 24;
   const PLAYER_X_OFFSET = 0;
   const PLAYER_Y_OFFSET = -4;
-  const PLAYER_X_OFFSET_ISOMETRIC = PLAYER_X_OFFSET + TILE_WIDTH_ISOMETRIC / 4;
-  const SPRITE_HEIGHT = 20;
-  const PLAYER_Y_OFFSET_ISOMETRIC = -SPRITE_HEIGHT + TILE_HEIGHT_ISOMETRIC;
   const MS_FOR_12_PX = 250;
   const INITIAL_SPRITE_X_POS = 5 * TILE_WIDTH + PLAYER_X_OFFSET;
   const INITIAL_SPRITE_Y_POS = 6 * TILE_HEIGHT + PLAYER_Y_OFFSET;
-  const INITIAL_SPRITE_X_POS_ISOMETRIC =
-    (5 * TILE_WIDTH_ISOMETRIC) / 2 + PLAYER_X_OFFSET_ISOMETRIC;
-  const INITIAL_SPRITE_Y_POS_ISOMETRIC =
-    (6 * TILE_HEIGHT_ISOMETRIC) / 2 + PLAYER_Y_OFFSET_ISOMETRIC;
 
   function mockNonBlockingTile() {
     gridTilemapMock.hasBlockingTile.mockReturnValue(false);
@@ -93,7 +84,6 @@ describe("GridCharacter", () => {
       sprite: spriteMock,
       tilemap: gridTilemapMock,
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
-      isometric: false,
       speed: 3,
       walkingAnimationMapping: 3,
       walkingAnimationEnabled: true,
@@ -105,7 +95,6 @@ describe("GridCharacter", () => {
       sprite: spriteMock,
       tilemap: gridTilemapMock,
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
-      isometric: false,
       speed: 3,
       walkingAnimationEnabled: true,
     });
@@ -264,7 +253,6 @@ describe("GridCharacter", () => {
       sprite: spriteMock,
       tilemap: gridTilemapMock,
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
-      isometric: false,
       speed: 3,
       walkingAnimationEnabled: true,
       offsetX: customOffsetX,
@@ -507,7 +495,6 @@ describe("GridCharacter", () => {
         sprite: spriteMock,
         tilemap: gridTilemapMock,
         tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
-        isometric: false,
         speed: 3,
         walkingAnimationMapping: 3,
         walkingAnimationEnabled: true,
@@ -537,170 +524,6 @@ describe("GridCharacter", () => {
       expect(containerMock.y).toEqual(4 * TILE_HEIGHT + PLAYER_Y_OFFSET);
       expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
       expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
-    });
-  });
-
-  describe("Isometric", () => {
-    beforeEach(() => {
-      spriteMock = <any>{
-        width: 16,
-        scale: 1,
-        height: 20,
-        setFrame: jest.fn(),
-        setDepth: jest.fn(),
-        frame: { name: "anything" },
-        setOrigin: jest.fn(),
-        x: (5 * TILE_WIDTH_ISOMETRIC) / 2 + PLAYER_X_OFFSET_ISOMETRIC,
-        y: (6 * TILE_HEIGHT_ISOMETRIC) / 2 + PLAYER_Y_OFFSET_ISOMETRIC,
-        texture: {
-          source: [
-            {
-              width: 144,
-            },
-          ],
-        },
-      };
-      gridCharacter = new GridCharacter("player", {
-        sprite: spriteMock,
-        tilemap: gridTilemapMock,
-        tileSize: new Vector2(TILE_WIDTH_ISOMETRIC, TILE_HEIGHT_ISOMETRIC),
-        isometric: true,
-        speed: 1,
-        walkingAnimationMapping: 3,
-        walkingAnimationEnabled: true,
-      });
-    });
-
-    it("should set tile position", () => {
-      const customOffsetX = 10;
-      const customOffsetY = 15;
-      gridCharacter = new GridCharacter("player", {
-        sprite: spriteMock,
-        tilemap: gridTilemapMock,
-        tileSize: new Vector2(TILE_WIDTH_ISOMETRIC, TILE_HEIGHT_ISOMETRIC),
-        isometric: true,
-        speed: 1,
-        walkingAnimationEnabled: true,
-        offsetX: customOffsetX,
-        offsetY: customOffsetY,
-      });
-      gridCharacter.setTilePosition(new Vector2(3, 4));
-
-      expect(spriteMock.x).toEqual(
-        (3 * TILE_WIDTH_ISOMETRIC) / 2 +
-          PLAYER_X_OFFSET_ISOMETRIC +
-          customOffsetX
-      );
-      expect(spriteMock.y).toEqual(
-        (4 * TILE_HEIGHT_ISOMETRIC) / 2 +
-          PLAYER_Y_OFFSET_ISOMETRIC +
-          customOffsetY
-      );
-    });
-
-    it("should move diagonally", () => {
-      const tileAmountToWalk = 0.75;
-      mockNonBlockingTile();
-
-      expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS_ISOMETRIC);
-      expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS_ISOMETRIC);
-
-      gridCharacter.move(Direction.UP_RIGHT);
-      gridCharacter.update(1000 * tileAmountToWalk);
-
-      expect(spriteMock.x).toEqual(
-        INITIAL_SPRITE_X_POS_ISOMETRIC +
-          (TILE_WIDTH_ISOMETRIC / 2) * tileAmountToWalk
-      );
-      expect(spriteMock.y).toEqual(
-        INITIAL_SPRITE_Y_POS_ISOMETRIC -
-          (TILE_HEIGHT_ISOMETRIC / 2) * tileAmountToWalk
-      );
-      expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP_RIGHT);
-      expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP_RIGHT);
-      expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 - 1);
-    });
-
-    it("should move vertically", () => {
-      const tileAmountToWalk = 0.75;
-      mockNonBlockingTile();
-
-      expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS_ISOMETRIC);
-      expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS_ISOMETRIC);
-
-      gridCharacter.move(Direction.UP);
-      gridCharacter.update(1000 * tileAmountToWalk);
-
-      expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS_ISOMETRIC);
-      expect(spriteMock.y).toEqual(
-        INITIAL_SPRITE_Y_POS_ISOMETRIC -
-          TILE_HEIGHT_ISOMETRIC * tileAmountToWalk
-      );
-      expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
-      expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
-      expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 - 1);
-    });
-
-    it("should move horizontally", () => {
-      const tileAmountToWalk = 0.75;
-      mockNonBlockingTile();
-
-      expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS_ISOMETRIC);
-      expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS_ISOMETRIC);
-
-      gridCharacter.move(Direction.LEFT);
-      gridCharacter.update(1000 * tileAmountToWalk);
-
-      expect(spriteMock.x).toEqual(
-        INITIAL_SPRITE_X_POS_ISOMETRIC - TILE_WIDTH_ISOMETRIC * tileAmountToWalk
-      );
-      expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS_ISOMETRIC);
-      expect(gridCharacter.getMovementDirection()).toEqual(Direction.LEFT);
-      expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
-      expect(spriteMock.setDepth).toHaveBeenCalledWith(1000);
-    });
-
-    it("should detect non-blocking direction", () => {
-      const oppositeMapDirection = Direction.DOWN;
-      gridTilemapMock.hasBlockingTile.mockReturnValue(false);
-      gridTilemapMock.hasBlockingChar.mockReturnValue(false);
-
-      gridCharacter.setTilePosition(new Vector2(3, 3));
-
-      gridCharacter.move(Direction.UP_RIGHT);
-      gridCharacter.update(10);
-
-      const result = gridCharacter.isBlockingDirection(Direction.UP_RIGHT);
-      expect(gridTilemapMock.hasBlockingTile).toHaveBeenCalledWith(
-        {
-          x: 3,
-          y: 1,
-        },
-        oppositeMapDirection
-      );
-      expect(gridTilemapMock.hasBlockingChar).toHaveBeenCalledWith({
-        x: 3,
-        y: 1,
-      });
-      expect(result).toBe(false);
-    });
-
-    it("should update only till tile border", () => {
-      mockNonBlockingTile();
-
-      gridCharacter.move(Direction.UP_RIGHT);
-      gridCharacter.update(750);
-      gridCharacter.update(750);
-      gridCharacter.update(750);
-
-      expect(spriteMock.x).toEqual(
-        INITIAL_SPRITE_X_POS_ISOMETRIC + TILE_WIDTH_ISOMETRIC / 2
-      );
-      expect(spriteMock.y).toEqual(
-        INITIAL_SPRITE_Y_POS_ISOMETRIC - TILE_HEIGHT_ISOMETRIC / 2
-      );
-      expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
-      expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP_RIGHT);
     });
   });
 });

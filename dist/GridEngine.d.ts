@@ -81,6 +81,7 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     private initGuard;
     private unknownCharGuard;
     private createTilemap;
+    private createCharacter;
     private addCharacters;
     private moveChar;
     private _stopMovement;

@@ -1,3 +1,4 @@
+import { IsometricGridCharacter } from "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import { TargetMovement } from "./Movement/TargetMovement/TargetMovement";
 import {
@@ -181,6 +182,8 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
         "GridEngine: CharacterConfig property `characterIndex` is deprecated. Use `walkingAnimtionMapping` instead."
       );
     }
+    const isIsometric =
+      this.tilemap.orientation == `${Phaser.Tilemaps.Orientation.ISOMETRIC}`;
 
     const charConfig: CharConfig = {
       sprite: charData.sprite,
@@ -190,8 +193,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
         this.gridTilemap.getTileWidth(),
         this.gridTilemap.getTileHeight()
       ),
-      isometric:
-        this.tilemap.orientation == `${Phaser.Tilemaps.Orientation.ISOMETRIC}`,
       walkingAnimationMapping: charData.walkingAnimationMapping,
       walkingAnimationEnabled: charData.walkingAnimationEnabled,
       container: charData.container,
@@ -204,7 +205,8 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     if (charConfig.walkingAnimationEnabled == undefined) {
       charConfig.walkingAnimationEnabled = true;
     }
-    const gridChar = new GridCharacter(charData.id, charConfig);
+
+    const gridChar = this.createCharacter(isIsometric, charData.id, charConfig);
 
     if (charData.facingDirection) {
       gridChar.turnTowards(charData.facingDirection);
@@ -378,6 +380,18 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
       return new GridTilemap(tilemap, config.firstLayerAboveChar);
     } else {
       return new GridTilemap(tilemap);
+    }
+  }
+
+  private createCharacter(
+    isIsometric: boolean,
+    id: string,
+    config: CharConfig
+  ): GridCharacter {
+    if (isIsometric) {
+      return new IsometricGridCharacter(id, config);
+    } else {
+      return new GridCharacter(id, config);
     }
   }
 

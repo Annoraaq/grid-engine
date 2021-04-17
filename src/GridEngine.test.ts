@@ -66,31 +66,45 @@ jest.mock("./GridTilemap/GridTilemap", function () {
     GridTilemap: mockGridTilemapConstructor,
   };
 });
+
+function createMockCharConstr() {
+  return (id: string) => {
+    return {
+      setTilePosition: mockSetTilePositon,
+      move: mockMove,
+      update: mockUpdate,
+      getId: () => id,
+      getTilePos: mockGetTilePos,
+      setSpeed: mockSetSpeed,
+      setWalkingAnimationMapping: mockSetWalkingAnimationMapping,
+      movementStarted: mockMovementStarted,
+      movementStopped: mockMovementStopped,
+      directionChanged: mockDirectionChanged,
+      positionChanged: mockPositionChanged,
+      positionChangeFinished: mockPositionChangeFinished,
+      isMoving: mockIsMoving,
+      getFacingDirection: mockFacingDirection,
+      turnTowards: mockTurnTowards,
+      setMovement: mockSetMovement,
+      getMovement: mockGetMovement,
+    };
+  };
+}
+
 jest.mock("./GridCharacter/GridCharacter", function () {
   return {
-    GridCharacter: jest.fn((id) => {
-      return {
-        setTilePosition: mockSetTilePositon,
-        move: mockMove,
-        update: mockUpdate,
-        getId: () => id,
-        getTilePos: mockGetTilePos,
-        setSpeed: mockSetSpeed,
-        setWalkingAnimationMapping: mockSetWalkingAnimationMapping,
-        movementStarted: mockMovementStarted,
-        movementStopped: mockMovementStopped,
-        directionChanged: mockDirectionChanged,
-        positionChanged: mockPositionChanged,
-        positionChangeFinished: mockPositionChangeFinished,
-        isMoving: mockIsMoving,
-        getFacingDirection: mockFacingDirection,
-        turnTowards: mockTurnTowards,
-        setMovement: mockSetMovement,
-        getMovement: mockGetMovement,
-      };
-    }),
+    GridCharacter: jest.fn(createMockCharConstr()),
   };
 });
+
+jest.mock(
+  "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter",
+  function () {
+    return {
+      IsometricGridCharacter: jest.fn(createMockCharConstr()),
+    };
+  }
+);
 
 const mockRandomMovement = {
   addCharacter: mockAddCharacter,
@@ -123,6 +137,7 @@ import { GridEngine } from "./GridEngine";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { TargetMovement } from "./Movement/TargetMovement/TargetMovement";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
+import { IsometricGridCharacter } from "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;
@@ -227,7 +242,6 @@ describe("GridEngine", () => {
       sprite: playerSpriteMock,
       tilemap: mockGridTileMap,
       tileSize: new Vector2(32, 32),
-      isometric: false,
       speed: 4,
       walkingAnimationEnabled: true,
       container: containerMock,
@@ -249,12 +263,18 @@ describe("GridEngine", () => {
         },
       ],
     });
-    expect(GridCharacter).toHaveBeenCalledWith(
-      "player",
-      expect.objectContaining({
-        isometric: true,
-      })
-    );
+    expect(IsometricGridCharacter).toHaveBeenCalledWith("player", {
+      sprite: playerSpriteMock,
+      tilemap: mockGridTileMap,
+      tileSize: new Vector2(32, 32),
+      speed: 4,
+      walkingAnimationEnabled: true,
+      container: undefined,
+      offsetX: undefined,
+      offsetY: undefined,
+    });
+    expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
+    expect(mockTurnTowards).not.toHaveBeenCalled();
   });
 
   it("should init player with facingDirection", () => {
@@ -291,7 +311,6 @@ describe("GridEngine", () => {
       sprite: playerSpriteMock,
       tilemap: mockGridTileMap,
       tileSize: new Vector2(32, 32),
-      isometric: false,
       speed: 4,
       walkingAnimationMapping: 2,
       walkingAnimationEnabled: true,
@@ -320,7 +339,6 @@ describe("GridEngine", () => {
       sprite: playerSpriteMock,
       tilemap: mockGridTileMap,
       tileSize: new Vector2(32, 32),
-      isometric: false,
       speed: 4,
       walkingAnimationMapping: 3,
       walkingAnimationEnabled: true,
@@ -344,7 +362,6 @@ describe("GridEngine", () => {
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
       tileSize: new Vector2(32, 32),
-      isometric: false,
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping: 3,
@@ -390,7 +407,6 @@ describe("GridEngine", () => {
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
       tileSize: new Vector2(32, 32),
-      isometric: false,
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping,
@@ -430,7 +446,6 @@ describe("GridEngine", () => {
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
       tileSize: new Vector2(32, 32),
-      isometric: false,
       tilemap: mockGridTileMap,
       speed: 2,
       walkingAnimationMapping: 3,
@@ -456,7 +471,6 @@ describe("GridEngine", () => {
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
       tileSize: new Vector2(32, 32),
-      isometric: false,
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping: 3,
