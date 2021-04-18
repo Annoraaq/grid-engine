@@ -1,3 +1,4 @@
+import { NumberOfDirections } from "./../../Direction/Direction";
 /*eslint no-global-assign: "off"*/
 import * as Phaser from "phaser";
 import { Direction } from "../../Direction/Direction";
@@ -29,10 +30,11 @@ describe("RandomMovement", () => {
   });
 
   it("should add and update character", () => {
+    mockRandom(0.5);
     randomMovement.setCharacter(charMock);
     randomMovement.update(5);
 
-    expect(charMock.move).toHaveBeenCalled();
+    expect(charMock.move).toHaveBeenCalledWith(Direction.DOWN);
   });
   it("should add and update character", () => {
     randomMovement = new RandomMovement(10);
@@ -157,5 +159,32 @@ describe("RandomMovement", () => {
     randomMovement.update(500);
 
     expect(charMock.move).toHaveBeenNthCalledWith(4, Direction.DOWN);
+  });
+
+  describe("8 directions", () => {
+    beforeEach(() => {
+      randomMovement = new RandomMovement();
+      randomMovement.setNumberOfDirections(NumberOfDirections.EIGHT);
+    });
+
+    it("should add and update character", () => {
+      mockRandom(0.7);
+      randomMovement.setCharacter(charMock);
+      randomMovement.update(5);
+
+      expect(charMock.move).toHaveBeenCalledWith(Direction.DOWN_RIGHT);
+    });
+
+    it("should not move further than radius", () => {
+      randomMovement = new RandomMovement(0, 2);
+      randomMovement.setNumberOfDirections(NumberOfDirections.EIGHT);
+      mockRandom(0.7);
+
+      randomMovement.setCharacter(charMock);
+      charMock.getTilePos = () => new Vector2(4, 4);
+      randomMovement.update(1);
+
+      expect(charMock.move).toHaveBeenCalledWith(Direction.NONE);
+    });
   });
 });

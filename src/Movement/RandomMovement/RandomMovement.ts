@@ -1,4 +1,5 @@
-import { VectorUtils } from "../../Utils/VectorUtils";
+import { DistanceUtils } from "./../../Utils/DistanceUtils";
+import { getDirections, NumberOfDirections } from "./../../Direction/Direction";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Direction, directionVector } from "../../Direction/Direction";
 import { Movement } from "../Movement";
@@ -14,7 +15,13 @@ export class RandomMovement implements Movement {
   private stepSize: number;
   private stepsWalked: number;
   private currentMovementDirection: Direction;
+  private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR;
+
   constructor(private delay = 0, private radius = -1) {}
+
+  setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
+    this.numberOfDirections = numberOfDirections;
+  }
 
   setCharacter(character: GridCharacter): void {
     this.character = character;
@@ -53,14 +60,7 @@ export class RandomMovement implements Movement {
   }
 
   private getFreeDirections(): Direction[] {
-    const directions = [
-      Direction.UP,
-      Direction.RIGHT,
-      Direction.DOWN,
-      Direction.LEFT,
-    ];
-
-    const unblocked = directions.filter(
+    const unblocked = getDirections(this.numberOfDirections).filter(
       (dir) => !this.character.isBlockingDirection(dir)
     );
 
@@ -69,12 +69,16 @@ export class RandomMovement implements Movement {
 
   private isWithinRadius(dir: Direction) {
     if (this.radius == -1) return true;
-    const dist = VectorUtils.manhattanDistance(
-      this.character.getTilePos().add(directionVector(dir)),
-      new Vector2(this.initialCol, this.initialRow)
-    );
 
-    return dist <= this.radius;
+    return this.getDist(dir) <= this.radius;
+  }
+
+  private getDist(dir: Direction): number {
+    return DistanceUtils.distance(
+      this.character.getTilePos().add(directionVector(dir)),
+      new Vector2(this.initialCol, this.initialRow),
+      this.numberOfDirections
+    );
   }
 
   private getFreeRandomDirection(): Direction {

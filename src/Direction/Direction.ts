@@ -15,6 +15,29 @@ export enum Direction {
   DOWN_LEFT = "down-left",
 }
 
+export function getDirections(
+  numberOfDirections: NumberOfDirections
+): Direction[] {
+  const directions = [
+    Direction.UP,
+    Direction.RIGHT,
+    Direction.DOWN,
+    Direction.LEFT,
+  ];
+
+  const diagonals = [
+    Direction.DOWN_LEFT,
+    Direction.DOWN_RIGHT,
+    Direction.UP_RIGHT,
+    Direction.UP_LEFT,
+  ];
+
+  if (numberOfDirections === NumberOfDirections.EIGHT) {
+    return [...directions, ...diagonals];
+  }
+  return directions;
+}
+
 export function turnCounterClockwise(direction: Direction): Direction {
   const mapping = {
     [Direction.LEFT]: Direction.DOWN_LEFT,

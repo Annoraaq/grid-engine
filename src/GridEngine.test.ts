@@ -1,7 +1,7 @@
 import { Subject, of } from "rxjs";
 import { take } from "rxjs/operators";
 import * as Phaser from "phaser";
-import { Direction } from "./Direction/Direction";
+import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { GridCharacter, PositionChange } from "./GridCharacter/GridCharacter";
 const mockSetTilePositon = jest.fn();
 const mockMove = jest.fn();
@@ -109,6 +109,7 @@ jest.mock(
 const mockRandomMovement = {
   addCharacter: mockAddCharacter,
   update: mockRandomMovementUpdate,
+  setNumberOfDirections: jest.fn(),
 };
 
 const mockTargetMovement = {
@@ -613,7 +614,28 @@ describe("GridEngine", () => {
     });
     gridEngine.moveRandomly("player", 123, 3);
     expect(RandomMovement).toHaveBeenCalledWith(123, 3);
+    expect(mockRandomMovement.setNumberOfDirections).toHaveBeenCalledWith(
+      NumberOfDirections.FOUR
+    );
     expect(mockSetMovement).toHaveBeenCalledWith(mockRandomMovement);
+  });
+
+  it("should move randomly with 8 directions", () => {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
+      numberOfDirections: NumberOfDirections.EIGHT,
+    });
+    gridEngine.moveRandomly("player", 123, 3);
+    expect(mockRandomMovement.setNumberOfDirections).toHaveBeenCalledWith(
+      NumberOfDirections.EIGHT
+    );
   });
 
   it("should move to coordinates", () => {

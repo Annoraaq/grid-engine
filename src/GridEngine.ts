@@ -61,6 +61,7 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     { charId: string } & PositionChange
   >();
   private charRemoved$ = new Subject<string>();
+  private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR;
 
   constructor(
     public scene: Phaser.Scene,
@@ -83,6 +84,10 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
         config.collisionTilePropertyName
       );
     }
+
+    this.numberOfDirections =
+      config.numberOfDirections || this.numberOfDirections;
+
     this.addCharacters(config);
   }
 
@@ -116,6 +121,7 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     this.initGuard();
     this.unknownCharGuard(charId);
     const randomMovement = new RandomMovement(delay, radius);
+    randomMovement.setNumberOfDirections(this.numberOfDirections);
     this.gridCharacters.get(charId).setMovement(randomMovement);
   }
 
