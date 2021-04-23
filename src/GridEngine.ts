@@ -138,6 +138,7 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
       0,
       closestPointIfBlocked
     );
+    targetMovement.setNumberOfDirections(this.numberOfDirections);
     this.gridCharacters.get(charId).setMovement(targetMovement);
   }
 

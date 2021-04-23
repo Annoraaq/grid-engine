@@ -116,6 +116,7 @@ const mockTargetMovement = {
   setCharacter: jest.fn(),
   update: jest.fn(),
   removeCharacter: jest.fn(),
+  setNumberOfDirections: jest.fn(),
 };
 
 jest.mock("./Movement/RandomMovement/RandomMovement", () => ({
@@ -656,6 +657,9 @@ describe("GridEngine", () => {
       targetVec,
       0,
       false
+    );
+    expect(mockTargetMovement.setNumberOfDirections).toHaveBeenCalledWith(
+      NumberOfDirections.FOUR
     );
     expect(mockSetMovement).toHaveBeenCalledWith(mockTargetMovement);
 
