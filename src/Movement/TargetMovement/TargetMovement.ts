@@ -113,15 +113,31 @@ export class TargetMovement implements Movement {
       dir: undefined,
       dist: shortestPath.length - 1 + distOffset,
     };
-    if (nextField.x > this.character.getTilePos().x) {
-      result.dir = Direction.RIGHT;
-    } else if (nextField.x < this.character.getTilePos().x) {
-      result.dir = Direction.LEFT;
-    } else if (nextField.y < this.character.getTilePos().y) {
+
+    const charPos = this.character.getTilePos();
+
+    if (nextField.x > charPos.x) {
+      if (nextField.y > charPos.y) {
+        result.dir = Direction.DOWN_RIGHT;
+      } else if (nextField.y < charPos.y) {
+        result.dir = Direction.UP_RIGHT;
+      } else {
+        result.dir = Direction.RIGHT;
+      }
+    } else if (nextField.x < charPos.x) {
+      if (nextField.y > charPos.y) {
+        result.dir = Direction.DOWN_LEFT;
+      } else if (nextField.y < charPos.y) {
+        result.dir = Direction.UP_LEFT;
+      } else {
+        result.dir = Direction.LEFT;
+      }
+    } else if (nextField.y < charPos.y) {
       result.dir = Direction.UP;
-    } else if (nextField.y > this.character.getTilePos().y) {
+    } else if (nextField.y > charPos.y) {
       result.dir = Direction.DOWN;
     }
+
     return result;
   }
 }

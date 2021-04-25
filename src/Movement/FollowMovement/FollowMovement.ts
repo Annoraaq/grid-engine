@@ -1,3 +1,4 @@
+import { NumberOfDirections } from "./../../Direction/Direction";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
@@ -5,6 +6,7 @@ import { Movement } from "../Movement";
 
 export class FollowMovement implements Movement {
   private character: GridCharacter;
+  private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR;
 
   constructor(
     private gridTilemap: GridTilemap,
@@ -12,6 +14,10 @@ export class FollowMovement implements Movement {
     private distance = 0,
     private closestPointIfBlocked = false
   ) {}
+
+  setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
+    this.numberOfDirections = numberOfDirections;
+  }
 
   setCharacter(character: GridCharacter): void {
     this.character = character;
@@ -24,6 +30,7 @@ export class FollowMovement implements Movement {
       this.distance + 1,
       this.closestPointIfBlocked
     );
+    targetMovement.setNumberOfDirections(this.numberOfDirections);
     targetMovement.setCharacter(this.character);
     targetMovement.update();
   }

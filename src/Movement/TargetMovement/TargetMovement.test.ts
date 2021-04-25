@@ -141,6 +141,34 @@ describe("TargetMovement", () => {
     expect(char.move).toHaveBeenCalledWith(Direction.DOWN);
   });
 
+  it("should move down-left along path", () => {
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(1, 2));
+    const charPos = new Vector2(1, 1);
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos, new Vector2(0, 2)],
+      closestToTarget: new Vector2(1, 2),
+    });
+    const char = createMockChar("char", charPos);
+    targetMovement.setCharacter(char);
+    targetMovement.update();
+
+    expect(char.move).toHaveBeenCalledWith(Direction.DOWN_LEFT);
+  });
+
+  it("should move down-right along path", () => {
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(1, 2));
+    const charPos = new Vector2(1, 1);
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos, new Vector2(2, 2)],
+      closestToTarget: new Vector2(1, 2),
+    });
+    const char = createMockChar("char", charPos);
+    targetMovement.setCharacter(char);
+    targetMovement.update();
+
+    expect(char.move).toHaveBeenCalledWith(Direction.DOWN_RIGHT);
+  });
+
   it("should move up along path", () => {
     targetMovement = new TargetMovement(gridTilemapMock, new Vector2(1, 0));
     const charPos = new Vector2(1, 1);
@@ -153,6 +181,34 @@ describe("TargetMovement", () => {
     targetMovement.update();
 
     expect(char.move).toHaveBeenCalledWith(Direction.UP);
+  });
+
+  it("should move up-left along path", () => {
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(1, 0));
+    const charPos = new Vector2(1, 1);
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos, new Vector2(0, 0)],
+      closestToTarget: new Vector2(1, 0),
+    });
+    const char = createMockChar("char", charPos);
+    targetMovement.setCharacter(char);
+    targetMovement.update();
+
+    expect(char.move).toHaveBeenCalledWith(Direction.UP_LEFT);
+  });
+
+  it("should move up-right along path", () => {
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(1, 0));
+    const charPos = new Vector2(1, 1);
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos, new Vector2(2, 0)],
+      closestToTarget: new Vector2(1, 0),
+    });
+    const char = createMockChar("char", charPos);
+    targetMovement.setCharacter(char);
+    targetMovement.update();
+
+    expect(char.move).toHaveBeenCalledWith(Direction.UP_RIGHT);
   });
 
   it("should not move along path", () => {
