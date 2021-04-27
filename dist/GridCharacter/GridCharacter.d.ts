@@ -81,6 +81,7 @@ export declare class GridCharacter {
     private get tilePos();
     private set tilePos(value);
     private updateZindex;
+    protected mapDepth(nextTilePos: Vector2): number;
     private setPosition;
     private getPosition;
     private startMoving;

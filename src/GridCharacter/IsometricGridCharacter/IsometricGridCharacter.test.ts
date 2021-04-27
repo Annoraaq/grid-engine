@@ -142,7 +142,7 @@ describe("IsometricGridCharacter", () => {
     );
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 - 1);
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 - 2);
   });
 
   it("should move horizontally", () => {

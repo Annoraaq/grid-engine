@@ -30,4 +30,8 @@ export class IsometricGridCharacter extends GridCharacter {
   protected toMapDirection(direction: Direction): Direction {
     return turnCounterClockwise(direction);
   }
+
+  protected mapDepth(nextTilePos: Vector2): number {
+    return nextTilePos.x + nextTilePos.y;
+  }
 }

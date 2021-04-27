@@ -6,5 +6,6 @@ export declare class IsometricGridCharacter extends GridCharacter {
     protected tilePosToPixelPos(tilePosition: Vector2): Vector2;
     protected getTileDistance(direction: Direction): Vector2;
     protected toMapDirection(direction: Direction): Direction;
+    protected mapDepth(nextTilePos: Vector2): number;
 }
 export {};

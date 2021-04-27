@@ -266,7 +266,13 @@ export class GridCharacter {
 
   private updateZindex() {
     const gameObject = this.container || this.sprite;
-    gameObject.setDepth(GridTilemap.FIRST_PLAYER_LAYER + this.nextTilePos.y);
+    gameObject.setDepth(
+      GridTilemap.FIRST_PLAYER_LAYER + this.mapDepth(this.nextTilePos)
+    );
+  }
+
+  protected mapDepth(nextTilePos: Vector2): number {
+    return nextTilePos.y;
   }
 
   private setPosition(position: Vector2): void {
