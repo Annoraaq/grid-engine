@@ -15,6 +15,10 @@ nav_order: 2
 |:-------------|
 | Returns the tile position of the character with the given id. |
 
+| setPosition(charId: string, pos: Phaser.Math.Vector2): void |
+|:-------------|
+| Places the character with the given id to the provided tile position. If that character is moving, the movement is stopped. The `positionChanged`  and `positionChangeFinished` observables will fire. If the character was moving, the `movementStopped` observable will also fire. |
+
 | isMoving(charId: string): boolean |
 |:-------------|
 | Returns `true` if the character is currently moving. |
