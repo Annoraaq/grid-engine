@@ -145,12 +145,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     this._stopMovement(charId);
   }
 
-  private _stopMovement(charId: string) {
-    this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).setMovement(undefined);
-  }
-
   setSpeed(charId: string, speed: number): void {
     this.initGuard();
     this.unknownCharGuard(charId);
@@ -334,6 +328,12 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     return this.gridCharacters.get(charId).turnTowards(direction);
   }
 
+  setPosition(charId: string, pos: Vector2): void {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    this.gridCharacters.get(charId).setTilePosition(pos);
+  }
+
   movementStarted(): Observable<[string, Direction]> {
     return this.movementStarted$;
   }
@@ -352,6 +352,12 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
 
   positionChangeFinished(): Observable<{ charId: string } & PositionChange> {
     return this.positionChangeFinished$;
+  }
+
+  private _stopMovement(charId: string) {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    this.gridCharacters.get(charId).setMovement(undefined);
   }
 
   private takeUntilCharRemoved(charId: string) {

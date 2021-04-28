@@ -54,7 +54,6 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     moveTo(charId: string, targetPos: Vector2, closestPointIfBlocked?: boolean): void;
     stopMovingRandomly(charId: string): void;
     stopMovement(charId: string): void;
-    private _stopMovement;
     setSpeed(charId: string, speed: number): void;
     setWalkingAnimationMapping(charId: string, walkingAnimationMapping: WalkingAnimationMapping): void;
     update(_time: number, delta: number): void;
@@ -68,6 +67,7 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     isMoving(charId: string): boolean;
     getFacingDirection(charId: string): Direction;
     turnTowards(charId: string, direction: Direction): void;
+    setPosition(charId: string, pos: Vector2): void;
     movementStarted(): Observable<[string, Direction]>;
     movementStopped(): Observable<[string, Direction]>;
     directionChanged(): Observable<[string, Direction]>;
@@ -77,6 +77,7 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     positionChangeFinished(): Observable<{
         charId: string;
     } & PositionChange>;
+    private _stopMovement;
     private takeUntilCharRemoved;
     private initGuard;
     private unknownCharGuard;

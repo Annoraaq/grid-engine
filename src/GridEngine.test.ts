@@ -586,6 +586,23 @@ describe("GridEngine", () => {
     expect(gridEngine.getPosition("player")).toEqual(new Vector2(3, 4));
   });
 
+  it("should set tile position", () => {
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
+    });
+
+    gridEngine.setPosition("player", new Vector2(3, 4));
+
+    expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(3, 4));
+  });
+
   it("should move randomly", () => {
     gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
@@ -1227,6 +1244,12 @@ describe("GridEngine", () => {
       );
     });
 
+    it("should throw error if setPosition is invoked", () => {
+      expect(() =>
+        gridEngine.setPosition("unknownCharId", new Vector2(1, 2))
+      ).toThrow("Character unknown");
+    });
+
     it("should throw error if move is invoked", () => {
       expect(() => gridEngine.move("unknownCharId", Direction.LEFT)).toThrow(
         "Character unknown"
@@ -1345,6 +1368,12 @@ describe("GridEngine", () => {
       expect(() => gridEngine.getPosition("someCharId")).toThrow(
         "Plugin not initialized"
       );
+    });
+
+    it("should throw error if setPosition is invoked", () => {
+      expect(() =>
+        gridEngine.setPosition("someCharId", new Vector2(1, 2))
+      ).toThrow("Plugin not initialized");
     });
 
     it("should throw error if move is invoked", () => {
