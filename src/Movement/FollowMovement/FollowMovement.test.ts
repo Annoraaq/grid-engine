@@ -1,3 +1,4 @@
+import { NumberOfDirections } from "./../../Direction/Direction";
 import { FollowMovement } from "./FollowMovement";
 import * as Phaser from "phaser";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
@@ -5,6 +6,7 @@ import { TargetMovement } from "../TargetMovement/TargetMovement";
 const mockTargetMovement = {
   setCharacter: jest.fn(),
   update: jest.fn(),
+  setNumberOfDirections: jest.fn(),
 };
 
 jest.mock("../TargetMovement/TargetMovement", () => ({
@@ -50,7 +52,24 @@ describe("FollowMovement", () => {
       1,
       false
     );
+    expect(mockTargetMovement.setNumberOfDirections).toHaveBeenCalledWith(
+      NumberOfDirections.FOUR
+    );
     expect(mockTargetMovement.setCharacter).toHaveBeenCalledWith(mockChar);
+  });
+
+  it("should pass number of directions", () => {
+    const charPos = new Phaser.Math.Vector2(1, 1);
+    const targetCharPos = new Phaser.Math.Vector2(3, 1);
+    const mockChar = createMockChar("char", charPos);
+    const targetChar = createMockChar("targetChar", targetCharPos);
+    followMovement = new FollowMovement(gridTilemapMock, targetChar);
+    followMovement.setNumberOfDirections(NumberOfDirections.EIGHT);
+    followMovement.setCharacter(mockChar);
+    followMovement.update();
+    expect(mockTargetMovement.setNumberOfDirections).toHaveBeenCalledWith(
+      NumberOfDirections.EIGHT
+    );
   });
 
   it("should update added character with distance", () => {

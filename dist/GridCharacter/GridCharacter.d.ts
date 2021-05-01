@@ -22,7 +22,6 @@ export interface CharConfig {
     tileSize: Vector2;
     speed: number;
     walkingAnimationEnabled: boolean;
-    isometric: boolean;
     walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
     container?: Phaser.GameObjects.Container;
     offsetX?: number;
@@ -30,6 +29,8 @@ export interface CharConfig {
 }
 export declare class GridCharacter {
     private id;
+    protected tileSize: Vector2;
+    protected customOffset: Vector2;
     private movementDirection;
     private speedPixelsPerSecond;
     private tileSizePixelsWalked;
@@ -38,10 +39,7 @@ export declare class GridCharacter {
     private sprite;
     private container?;
     private tilemap;
-    private tileDistance;
-    private tileSize;
     private speed;
-    private customOffset;
     private movementStarted$;
     private movementStopped$;
     private directionChanged$;
@@ -49,7 +47,6 @@ export declare class GridCharacter {
     private positionChangeFinished$;
     private lastMovementImpulse;
     private facingDirection;
-    private isIsometric;
     private animation;
     private movement;
     constructor(id: string, config: CharConfig);
@@ -74,12 +71,17 @@ export declare class GridCharacter {
     directionChanged(): Subject<Direction>;
     positionChanged(): Subject<PositionChange>;
     positionChangeFinished(): Subject<PositionChange>;
+    protected tilePosToPixelPos(tilePosition: Vector2): Vector2;
+    protected getTileDistance(direction: Direction): Vector2;
+    protected toMapDirection(direction: Direction): Direction;
     private getOffset;
+    private createSpeedPixelsPerSecond;
     private get nextTilePos();
     private set nextTilePos(value);
     private get tilePos();
     private set tilePos(value);
     private updateZindex;
+    protected mapDepth(nextTilePos: Vector2): number;
     private setPosition;
     private getPosition;
     private startMoving;
@@ -90,7 +92,6 @@ export declare class GridCharacter {
     private getSpeedPerDelta;
     private willCrossTileBorderThisUpdate;
     private moveCharacterSpriteRestOfTile;
-    private getDirectionVecs;
     private moveCharacterSprite;
     private stopMoving;
     private hasWalkedHalfATile;

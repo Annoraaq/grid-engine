@@ -17,6 +17,12 @@ export class VectorUtils {
     return xDist + yDist;
   }
 
+  static chebyshevDistance(pos1: Vector2, pos2: Vector2): number {
+    const xDist = Math.abs(pos1.x - pos2.x);
+    const yDist = Math.abs(pos1.y - pos2.y);
+    return Math.max(xDist, yDist);
+  }
+
   static scalarMult(vec: Vector2, scalar: number): Vector2 {
     return vec.clone().multiply(new Vector2(scalar, scalar));
   }

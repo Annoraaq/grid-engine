@@ -1,8 +1,9 @@
+import { ShortestPathAlgorithm } from "./../../Algorithms/ShortestPath/ShortestPathAlgorithm";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { VectorUtils } from "../../Utils/VectorUtils";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import * as Phaser from "phaser";
-import { Direction } from "../../Direction/Direction";
+import { Direction, NumberOfDirections } from "../../Direction/Direction";
 import { Bfs } from "../../Algorithms/ShortestPath/Bfs/Bfs";
 import { Movement } from "../Movement";
 
@@ -11,12 +12,18 @@ const Vector2 = Phaser.Math.Vector2;
 
 export class TargetMovement implements Movement {
   private character: GridCharacter;
+  private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR;
+
   constructor(
     private tilemap: GridTilemap,
     private targetPos: Vector2,
     private distance = 0,
     private closestPointIfBlocked = false
   ) {}
+
+  setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
+    this.numberOfDirections = numberOfDirections;
+  }
 
   setCharacter(character: GridCharacter): void {
     this.character = character;
@@ -36,11 +43,34 @@ export class TargetMovement implements Movement {
     }
   }
 
-  isBlocking = (targetPos: Vector2): ((pos: Vector2) => boolean) => {
-    return (pos: Vector2) => {
-      if (VectorUtils.equal(pos, targetPos)) return false;
-      return this.tilemap.isBlocking(pos);
-    };
+  getNeighbours = (pos: Vector2): Vector2[] => {
+    const neighbours = this._getNeighbours(pos);
+    return neighbours.filter((pos) => !this.isBlocking(pos));
+  };
+
+  private isBlocking = (pos: Vector2): boolean => {
+    if (VectorUtils.equal(pos, this.targetPos)) return false;
+    return this.tilemap.isBlocking(pos);
+  };
+
+  private _getNeighbours = (pos: Vector2): Vector2[] => {
+    const orthogonalNeighbours = [
+      new Vector2(pos.x, pos.y + 1),
+      new Vector2(pos.x + 1, pos.y),
+      new Vector2(pos.x - 1, pos.y),
+      new Vector2(pos.x, pos.y - 1),
+    ];
+    const diagonalNeighbours = [
+      new Vector2(pos.x + 1, pos.y + 1),
+      new Vector2(pos.x + 1, pos.y - 1),
+      new Vector2(pos.x - 1, pos.y + 1),
+      new Vector2(pos.x - 1, pos.y - 1),
+    ];
+
+    if (this.numberOfDirections === NumberOfDirections.EIGHT) {
+      return [...orthogonalNeighbours, ...diagonalNeighbours];
+    }
+    return orthogonalNeighbours;
   };
 
   private noPathExists(distance: number): boolean {
@@ -48,19 +78,23 @@ export class TargetMovement implements Movement {
   }
 
   private getShortestPath(): { path: Vector2[]; distOffset: number } {
-    const { path: shortestPath, closestToTarget } = Bfs.getShortestPath(
+    const shortestPathAlgo: ShortestPathAlgorithm = new Bfs();
+    const {
+      path: shortestPath,
+      closestToTarget,
+    } = shortestPathAlgo.getShortestPath(
       this.character.getTilePos(),
       this.targetPos,
-      this.isBlocking(this.targetPos)
+      this.getNeighbours
     );
 
     const noPathFound = shortestPath.length == 0;
 
     if (noPathFound && this.closestPointIfBlocked) {
-      const shortestPathToClosestPoint = Bfs.getShortestPath(
+      const shortestPathToClosestPoint = shortestPathAlgo.getShortestPath(
         this.character.getTilePos(),
         closestToTarget,
-        this.isBlocking(this.targetPos)
+        this.getNeighbours
       ).path;
       const distOffset = VectorUtils.manhattanDistance(
         closestToTarget,
@@ -82,15 +116,31 @@ export class TargetMovement implements Movement {
       dir: undefined,
       dist: shortestPath.length - 1 + distOffset,
     };
-    if (nextField.x > this.character.getTilePos().x) {
-      result.dir = Direction.RIGHT;
-    } else if (nextField.x < this.character.getTilePos().x) {
-      result.dir = Direction.LEFT;
-    } else if (nextField.y < this.character.getTilePos().y) {
+
+    const charPos = this.character.getTilePos();
+
+    if (nextField.x > charPos.x) {
+      if (nextField.y > charPos.y) {
+        result.dir = Direction.DOWN_RIGHT;
+      } else if (nextField.y < charPos.y) {
+        result.dir = Direction.UP_RIGHT;
+      } else {
+        result.dir = Direction.RIGHT;
+      }
+    } else if (nextField.x < charPos.x) {
+      if (nextField.y > charPos.y) {
+        result.dir = Direction.DOWN_LEFT;
+      } else if (nextField.y < charPos.y) {
+        result.dir = Direction.UP_LEFT;
+      } else {
+        result.dir = Direction.LEFT;
+      }
+    } else if (nextField.y < charPos.y) {
       result.dir = Direction.UP;
-    } else if (nextField.y > this.character.getTilePos().y) {
+    } else if (nextField.y > charPos.y) {
       result.dir = Direction.DOWN;
     }
+
     return result;
   }
 }

@@ -8,9 +8,13 @@ export class CharacterAnimation {
   private lastFootLeft = false;
   private directionToFrameRow: { [key in Direction]?: number } = {
     [Direction.DOWN]: 0,
+    [Direction.DOWN_LEFT]: 1,
+    [Direction.DOWN_RIGHT]: 2,
     [Direction.LEFT]: 1,
     [Direction.RIGHT]: 2,
     [Direction.UP]: 3,
+    [Direction.UP_LEFT]: 1,
+    [Direction.UP_RIGHT]: 2,
   };
   private _isEnabled = true;
 
@@ -86,7 +90,25 @@ export class CharacterAnimation {
   }
 
   private getFramesForAnimationMapping(direction: Direction): FrameRow {
-    return this.walkingAnimationMapping[direction];
+    return (
+      this.walkingAnimationMapping[direction] ||
+      this.walkingAnimationMapping[this.fallbackDirection(direction)]
+    );
+  }
+
+  private fallbackDirection(direction: Direction): Direction {
+    switch (direction) {
+      case Direction.DOWN_LEFT:
+        return Direction.LEFT;
+      case Direction.DOWN_RIGHT:
+        return Direction.RIGHT;
+      case Direction.UP_LEFT:
+        return Direction.LEFT;
+      case Direction.UP_RIGHT:
+        return Direction.RIGHT;
+    }
+
+    return direction;
   }
 
   private getFramesForCharIndex(direction: Direction): FrameRow {

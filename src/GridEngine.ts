@@ -1,3 +1,4 @@
+import { IsometricGridCharacter } from "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import { TargetMovement } from "./Movement/TargetMovement/TargetMovement";
 import {
@@ -8,7 +9,11 @@ import {
   PositionChange,
 } from "./GridCharacter/GridCharacter";
 import "phaser";
-import { Direction } from "./Direction/Direction";
+import {
+  Direction,
+  isDiagonal,
+  NumberOfDirections,
+} from "./Direction/Direction";
 import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
@@ -23,6 +28,7 @@ export interface GridEngineConfig {
   characters: CharacterData[];
   firstLayerAboveChar?: number; // deprecated
   collisionTilePropertyName?: string;
+  numberOfDirections?: NumberOfDirections;
 }
 
 export interface WalkingAnimationMapping {
@@ -30,6 +36,10 @@ export interface WalkingAnimationMapping {
   [Direction.RIGHT]: FrameRow;
   [Direction.DOWN]: FrameRow;
   [Direction.LEFT]: FrameRow;
+  [Direction.UP_LEFT]?: FrameRow;
+  [Direction.UP_RIGHT]?: FrameRow;
+  [Direction.DOWN_LEFT]?: FrameRow;
+  [Direction.DOWN_RIGHT]?: FrameRow;
 }
 
 export interface CharacterData {
@@ -59,6 +69,7 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     { charId: string } & PositionChange
   >();
   private charRemoved$ = new Subject<string>();
+  private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR;
 
   constructor(
     public scene: Phaser.Scene,
@@ -81,6 +92,10 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
         config.collisionTilePropertyName
       );
     }
+
+    this.numberOfDirections =
+      config.numberOfDirections || this.numberOfDirections;
+
     this.addCharacters(config);
   }
 
@@ -114,6 +129,7 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     this.initGuard();
     this.unknownCharGuard(charId);
     const randomMovement = new RandomMovement(delay, radius);
+    randomMovement.setNumberOfDirections(this.numberOfDirections);
     this.gridCharacters.get(charId).setMovement(randomMovement);
   }
 
@@ -130,6 +146,7 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
       0,
       closestPointIfBlocked
     );
+    targetMovement.setNumberOfDirections(this.numberOfDirections);
     this.gridCharacters.get(charId).setMovement(targetMovement);
   }
 
@@ -189,8 +206,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
         this.gridTilemap.getTileWidth(),
         this.gridTilemap.getTileHeight()
       ),
-      isometric:
-        this.tilemap.orientation == `${Phaser.Tilemaps.Orientation.ISOMETRIC}`,
       walkingAnimationMapping: charData.walkingAnimationMapping,
       walkingAnimationEnabled: charData.walkingAnimationEnabled,
       container: charData.container,
@@ -203,7 +218,8 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     if (charConfig.walkingAnimationEnabled == undefined) {
       charConfig.walkingAnimationEnabled = true;
     }
-    const gridChar = new GridCharacter(charData.id, charConfig);
+
+    const gridChar = this.createCharacter(charData.id, charConfig);
 
     if (charData.facingDirection) {
       gridChar.turnTowards(charData.facingDirection);
@@ -299,6 +315,7 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
       distance,
       closestPointIfBlocked
     );
+    followMovement.setNumberOfDirections(this.numberOfDirections);
     this.gridCharacters.get(charId).setMovement(followMovement);
   }
 
@@ -354,12 +371,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     return this.positionChangeFinished$;
   }
 
-  private _stopMovement(charId: string) {
-    this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).setMovement(undefined);
-  }
-
   private takeUntilCharRemoved(charId: string) {
     return takeUntil(this.charRemoved$.pipe(filter((cId) => cId == charId)));
   }
@@ -392,6 +403,14 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     }
   }
 
+  private createCharacter(id: string, config: CharConfig): GridCharacter {
+    if (this._isIsometric()) {
+      return new IsometricGridCharacter(id, config);
+    } else {
+      return new GridCharacter(id, config);
+    }
+  }
+
   private addCharacters(config: GridEngineConfig) {
     config.characters.forEach((charData) => this.addCharacter(charData));
   }
@@ -399,6 +418,33 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   private moveChar(charId: string, direction: Direction): void {
     this.initGuard();
     this.unknownCharGuard(charId);
+
+    if (this.numberOfDirections === NumberOfDirections.FOUR) {
+      if (!this._isIsometric() && isDiagonal(direction)) {
+        console.warn(
+          `GridEngine: Character '${charId}' can't be moved '${direction}' in 4 direction mode.`
+        );
+        return;
+      } else if (this._isIsometric() && !isDiagonal(direction)) {
+        console.warn(
+          `GridEngine: Character '${charId}' can't be moved '${direction}' in 4 direction isometric mode.`
+        );
+        return;
+      }
+    }
+
     this.gridCharacters.get(charId).move(direction);
+  }
+
+  private _stopMovement(charId: string) {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    this.gridCharacters.get(charId).setMovement(undefined);
+  }
+
+  private _isIsometric(): boolean {
+    return (
+      this.tilemap.orientation == `${Phaser.Tilemaps.Orientation.ISOMETRIC}`
+    );
   }
 }

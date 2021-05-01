@@ -5,14 +5,27 @@ import { Bfs } from "./Bfs";
 const Vector2 = Phaser.Math.Vector2;
 
 describe("Bfs", () => {
+  let bfs: Bfs;
+
+  const getNeighbours = (pos) => [
+    new Vector2(pos.x, pos.y + 1),
+    new Vector2(pos.x + 1, pos.y),
+    new Vector2(pos.x - 1, pos.y),
+    new Vector2(pos.x, pos.y - 1),
+  ];
+
+  beforeEach(() => {
+    bfs = new Bfs();
+  });
+
   it("should return one simple shortest path", () => {
     const startPos = new Vector2(3, 3);
     const targetPos = new Vector2(4, 4);
-    const isBlocked = () => false;
-    const { path, closestToTarget } = Bfs.getShortestPath(
+
+    const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
-      isBlocked
+      getNeighbours
     );
     expect(path).toEqual([
       new Vector2(3, 3),
@@ -25,11 +38,10 @@ describe("Bfs", () => {
   it("should return one medium shortest path", () => {
     const startPos = new Phaser.Math.Vector2(3, 3);
     const targetPos = new Phaser.Math.Vector2(5, -1);
-    const isBlocked = () => false;
-    const { path, closestToTarget } = Bfs.getShortestPath(
+    const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
-      isBlocked
+      getNeighbours
     );
     expect(path).toEqual([
       new Vector2(3, 3),
@@ -46,11 +58,10 @@ describe("Bfs", () => {
   it("should return path of 1", () => {
     const startPos = new Vector2(3, 3);
     const targetPos = new Vector2(3, 3);
-    const isBlocked = () => false;
-    const { path, closestToTarget } = Bfs.getShortestPath(
+    const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
-      isBlocked
+      getNeighbours
     );
     expect(path).toEqual([new Vector2(3, 3)]);
     expect(closestToTarget).toEqual(targetPos);
@@ -59,11 +70,10 @@ describe("Bfs", () => {
   it("should not find a path if every direction is blocked", () => {
     const startPos = new Vector2(3, 3);
     const targetPos = new Vector2(5, 10);
-    const isBlocked = () => true;
-    const { path, closestToTarget } = Bfs.getShortestPath(
+    const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
-      isBlocked
+      () => []
     );
     expect(path).toEqual([]);
     expect(closestToTarget).toEqual(startPos);
@@ -93,14 +103,13 @@ describe("Bfs", () => {
       VectorUtils.vec2str(new Vector2(1, 3)),
     ];
 
-    const isBlocked = (pos) => {
-      return !unblockedTiles.includes(VectorUtils.vec2str(pos));
-    };
-
-    const { path, closestToTarget } = Bfs.getShortestPath(
+    const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
-      isBlocked
+      (pos) =>
+        getNeighbours(pos).filter((n) =>
+          unblockedTiles.includes(VectorUtils.vec2str(n))
+        )
     );
 
     expect(path).toEqual([
@@ -138,14 +147,13 @@ describe("Bfs", () => {
       VectorUtils.vec2str(new Vector2(1, 3)),
     ];
 
-    const isBlocked = (pos) => {
-      return !unblockedTiles.includes(VectorUtils.vec2str(pos));
-    };
-
-    const { path, closestToTarget } = Bfs.getShortestPath(
+    const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
-      isBlocked
+      (pos) =>
+        getNeighbours(pos).filter((n) =>
+          unblockedTiles.includes(VectorUtils.vec2str(n))
+        )
     );
 
     expect(path).toEqual([]);

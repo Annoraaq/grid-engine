@@ -48,6 +48,26 @@ describe("VectorUtils", () => {
     });
   });
 
+  describe("chebyshevDistance", () => {
+    it("should correctly calc positive numbers", () => {
+      const vector = new Vector2(5, 7);
+      const vector2 = new Vector2(2, 3);
+      expect(VectorUtils.chebyshevDistance(vector, vector2)).toEqual(4);
+    });
+
+    it("should correctly calc negative numbers", () => {
+      const vector = new Vector2(-5, -7);
+      const vector2 = new Vector2(-2, -3);
+      expect(VectorUtils.chebyshevDistance(vector, vector2)).toEqual(4);
+    });
+
+    it("should correctly calc zero distance", () => {
+      const vector = new Vector2(2, 3);
+      const vector2 = new Vector2(2, 3);
+      expect(VectorUtils.chebyshevDistance(vector, vector2)).toEqual(0);
+    });
+  });
+
   describe("scalarMult", () => {
     it("should multiply immutably", () => {
       const vector = new Vector2(5, 6);
