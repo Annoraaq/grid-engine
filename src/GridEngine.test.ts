@@ -482,22 +482,158 @@ describe("GridEngine", () => {
     });
   });
 
-  it("should move player", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
-    gridEngine.create(tileMapMock, {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
-        },
-      ],
-      firstLayerAboveChar: 3,
+  describe("move 4 dirs", () => {
+    it("should move player orthogonally", () => {
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+      });
+
+      gridEngine.move("player", Direction.LEFT);
+
+      expect(mockMove).toHaveBeenCalledWith(Direction.LEFT);
     });
 
-    gridEngine.move("player", Direction.LEFT);
+    it("should show warn on vertical move", () => {
+      console.warn = jest.fn();
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+      });
 
-    expect(mockMove).toHaveBeenCalledWith(Direction.LEFT);
+      gridEngine.move("player", Direction.DOWN_LEFT);
+      expect(console.warn).toHaveBeenCalledWith(
+        "GridEngine: Character 'player' can't be moved 'down-left' in 4 direction mode."
+      );
+      expect(mockMove).not.toHaveBeenCalled();
+
+      gridEngine.move("player", Direction.DOWN_RIGHT);
+      expect(console.warn).toHaveBeenCalledWith(
+        "GridEngine: Character 'player' can't be moved 'down-right' in 4 direction mode."
+      );
+      expect(mockMove).not.toHaveBeenCalled();
+
+      gridEngine.move("player", Direction.UP_RIGHT);
+      expect(console.warn).toHaveBeenCalledWith(
+        "GridEngine: Character 'player' can't be moved 'up-right' in 4 direction mode."
+      );
+      expect(mockMove).not.toHaveBeenCalled();
+
+      gridEngine.move("player", Direction.UP_LEFT);
+      expect(console.warn).toHaveBeenCalledWith(
+        "GridEngine: Character 'player' can't be moved 'up-left' in 4 direction mode."
+      );
+      expect(mockMove).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("move 8 dirs", () => {
+    it("should move player orthogonally", () => {
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+        numberOfDirections: NumberOfDirections.EIGHT,
+      });
+
+      gridEngine.move("player", Direction.LEFT);
+
+      expect(mockMove).toHaveBeenCalledWith(Direction.LEFT);
+    });
+
+    it("should move player vertically", () => {
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+        numberOfDirections: NumberOfDirections.EIGHT,
+      });
+
+      gridEngine.move("player", Direction.UP_LEFT);
+
+      expect(mockMove).toHaveBeenCalledWith(Direction.UP_LEFT);
+    });
+  });
+
+  describe("move 4 dirs isometric", () => {
+    it("should move player vertically", () => {
+      tileMapMock.orientation = `${Phaser.Tilemaps.Orientation.ISOMETRIC}`;
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+      });
+
+      gridEngine.move("player", Direction.UP_LEFT);
+
+      expect(mockMove).toHaveBeenCalledWith(Direction.UP_LEFT);
+    });
+
+    it("should show warn on orthogonal move", () => {
+      console.warn = jest.fn();
+      tileMapMock.orientation = `${Phaser.Tilemaps.Orientation.ISOMETRIC}`;
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+      });
+
+      gridEngine.move("player", Direction.DOWN);
+      expect(console.warn).toHaveBeenCalledWith(
+        "GridEngine: Character 'player' can't be moved 'down' in 4 direction isometric mode."
+      );
+      expect(mockMove).not.toHaveBeenCalled();
+
+      gridEngine.move("player", Direction.LEFT);
+      expect(console.warn).toHaveBeenCalledWith(
+        "GridEngine: Character 'player' can't be moved 'left' in 4 direction isometric mode."
+      );
+      expect(mockMove).not.toHaveBeenCalled();
+
+      gridEngine.move("player", Direction.RIGHT);
+      expect(console.warn).toHaveBeenCalledWith(
+        "GridEngine: Character 'player' can't be moved 'right' in 4 direction isometric mode."
+      );
+      expect(mockMove).not.toHaveBeenCalled();
+
+      gridEngine.move("player", Direction.UP);
+      expect(console.warn).toHaveBeenCalledWith(
+        "GridEngine: Character 'player' can't be moved 'up' in 4 direction isometric mode."
+      );
+      expect(mockMove).not.toHaveBeenCalled();
+    });
   });
 
   it("should move player left", () => {

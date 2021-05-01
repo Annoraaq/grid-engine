@@ -9,7 +9,11 @@ import {
   PositionChange,
 } from "./GridCharacter/GridCharacter";
 import "phaser";
-import { Direction, NumberOfDirections } from "./Direction/Direction";
+import {
+  Direction,
+  isDiagonal,
+  NumberOfDirections,
+} from "./Direction/Direction";
 import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
@@ -413,6 +417,21 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   private moveChar(charId: string, direction: Direction): void {
     this.initGuard();
     this.unknownCharGuard(charId);
+
+    if (this.numberOfDirections === NumberOfDirections.FOUR) {
+      if (!this._isIsometric() && isDiagonal(direction)) {
+        console.warn(
+          `GridEngine: Character '${charId}' can't be moved '${direction}' in 4 direction mode.`
+        );
+        return;
+      } else if (this._isIsometric() && !isDiagonal(direction)) {
+        console.warn(
+          `GridEngine: Character '${charId}' can't be moved '${direction}' in 4 direction isometric mode.`
+        );
+        return;
+      }
+    }
+
     this.gridCharacters.get(charId).move(direction);
   }
 
@@ -420,5 +439,11 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.gridCharacters.get(charId).setMovement(undefined);
+  }
+
+  private _isIsometric(): boolean {
+    return (
+      this.tilemap.orientation == `${Phaser.Tilemaps.Orientation.ISOMETRIC}`
+    );
   }
 }
