@@ -298,7 +298,7 @@ describe("TargetMovement", () => {
   it("should not move if distance reached or will be reached", () => {
     targetMovement = new TargetMovement(gridTilemapMock, new Vector2(1, 2));
     const charPos = new Vector2(1, 1);
-    Bfs.getShortestPath = jest.fn().mockReturnValue({
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
       path: [charPos, new Vector2(1, 2)],
       closestToTarget: new Vector2(1, 2),
     });
