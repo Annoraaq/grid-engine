@@ -83,7 +83,6 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     positionChangeFinished(): Observable<{
         charId: string;
     } & PositionChange>;
-    private _stopMovement;
     private takeUntilCharRemoved;
     private initGuard;
     private unknownCharGuard;
