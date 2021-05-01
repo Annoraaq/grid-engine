@@ -21,5 +21,6 @@ export declare class CharacterAnimation {
     private isCurrentFrameStanding;
     private framesOfDirection;
     private getFramesForAnimationMapping;
+    private fallbackDirection;
     private getFramesForCharIndex;
 }

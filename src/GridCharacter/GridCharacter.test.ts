@@ -214,15 +214,6 @@ describe("GridCharacter", () => {
     expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 + 1);
   });
 
-  it("should not update z-index if not walked half a tile", () => {
-    mockNonBlockingTile();
-
-    gridCharacter.move(Direction.UP);
-    gridCharacter.update(100);
-
-    expect(spriteMock.setDepth).not.toHaveBeenCalledWith(1000 - 1);
-  });
-
   it("should set walkingAnimationMapping", () => {
     const walkingAnimationMappingMock = <any>{};
     gridCharacter.setWalkingAnimationMapping(walkingAnimationMappingMock);

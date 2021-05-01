@@ -149,6 +149,7 @@ export class GridCharacter {
     this.movement?.update(delta);
     if (this.isMoving()) {
       this.updateCharacterPosition(delta);
+      this.updateZindex();
     }
     this.lastMovementImpulse = Direction.NONE;
   }
@@ -379,9 +380,6 @@ export class GridCharacter {
     this.tileSizePixelsWalked.y %= this.getTileDistance(
       this.movementDirection
     ).y;
-    if (this.hasWalkedHalfATile()) {
-      this.updateZindex();
-    }
   }
 
   private stopMoving(): void {

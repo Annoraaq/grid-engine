@@ -108,6 +108,28 @@ describe("CharacterAnimation", () => {
       );
     });
 
+    it("Direction.UP_LEFT", () => {
+      characterAnimation.updateCharacterFrame(Direction.UP_LEFT, false);
+      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        walkingAnimationMapping.left.leftFoot
+      );
+      characterAnimation.updateCharacterFrame(Direction.UP_LEFT, true);
+      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        walkingAnimationMapping.left.standing
+      );
+    });
+
+    it("Direction.UP_RIGHT", () => {
+      characterAnimation.updateCharacterFrame(Direction.UP_RIGHT, false);
+      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        walkingAnimationMapping.right.leftFoot
+      );
+      characterAnimation.updateCharacterFrame(Direction.UP_RIGHT, true);
+      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        walkingAnimationMapping.right.standing
+      );
+    });
+
     it("Direction.RIGHT", () => {
       characterAnimation.updateCharacterFrame(Direction.RIGHT, false);
       expect(spriteMock.setFrame).toHaveBeenCalledWith(
@@ -130,6 +152,28 @@ describe("CharacterAnimation", () => {
       );
     });
 
+    it("Direction.DOWN_LEFT", () => {
+      characterAnimation.updateCharacterFrame(Direction.DOWN_LEFT, false);
+      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        walkingAnimationMapping.left.leftFoot
+      );
+      characterAnimation.updateCharacterFrame(Direction.DOWN_LEFT, true);
+      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        walkingAnimationMapping.left.standing
+      );
+    });
+
+    it("Direction.DOWN_RIGHT", () => {
+      characterAnimation.updateCharacterFrame(Direction.DOWN_RIGHT, false);
+      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        walkingAnimationMapping.right.leftFoot
+      );
+      characterAnimation.updateCharacterFrame(Direction.DOWN_RIGHT, true);
+      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        walkingAnimationMapping.right.standing
+      );
+    });
+
     it("Direction.LEFT", () => {
       characterAnimation.updateCharacterFrame(Direction.LEFT, false);
       expect(spriteMock.setFrame).toHaveBeenCalledWith(
@@ -147,6 +191,11 @@ describe("CharacterAnimation", () => {
           leftFoot: 1,
           standing: 2,
           rightFoot: 3,
+        },
+        "up-left": {
+          leftFoot: 4,
+          standing: 5,
+          rightFoot: 6,
         },
         down: {
           leftFoot: 4,
@@ -181,6 +230,28 @@ describe("CharacterAnimation", () => {
         characterAnimation.updateCharacterFrame(Direction.UP, true);
         expect(spriteMock.setFrame).toHaveBeenCalledWith(
           customWalkingAnimationMapping.up.standing
+        );
+      });
+
+      it("should use custom mapping for diagonal movement", () => {
+        characterAnimation.updateCharacterFrame(Direction.UP_LEFT, false);
+        expect(spriteMock.setFrame).toHaveBeenCalledWith(
+          customWalkingAnimationMapping["up-left"].leftFoot
+        );
+        characterAnimation.updateCharacterFrame(Direction.UP_LEFT, true);
+        expect(spriteMock.setFrame).toHaveBeenCalledWith(
+          customWalkingAnimationMapping["up-left"].standing
+        );
+      });
+
+      it("should fall back for diagonal movement", () => {
+        characterAnimation.updateCharacterFrame(Direction.UP_RIGHT, false);
+        expect(spriteMock.setFrame).toHaveBeenCalledWith(
+          customWalkingAnimationMapping.right.leftFoot
+        );
+        characterAnimation.updateCharacterFrame(Direction.UP_RIGHT, true);
+        expect(spriteMock.setFrame).toHaveBeenCalledWith(
+          customWalkingAnimationMapping.right.standing
         );
       });
 

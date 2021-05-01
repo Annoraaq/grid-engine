@@ -32,6 +32,10 @@ export interface WalkingAnimationMapping {
   [Direction.RIGHT]: FrameRow;
   [Direction.DOWN]: FrameRow;
   [Direction.LEFT]: FrameRow;
+  [Direction.UP_LEFT]?: FrameRow;
+  [Direction.UP_RIGHT]?: FrameRow;
+  [Direction.DOWN_LEFT]?: FrameRow;
+  [Direction.DOWN_RIGHT]?: FrameRow;
 }
 
 export interface CharacterData {
