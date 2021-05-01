@@ -317,6 +317,7 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
       distance,
       closestPointIfBlocked
     );
+    followMovement.setNumberOfDirections(this.numberOfDirections);
     this.gridCharacters.get(charId).setMovement(followMovement);
   }
 
@@ -370,12 +371,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
 
   positionChangeFinished(): Observable<{ charId: string } & PositionChange> {
     return this.positionChangeFinished$;
-  }
-
-  private _stopMovement(charId: string) {
-    this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).setMovement(undefined);
   }
 
   private takeUntilCharRemoved(charId: string) {

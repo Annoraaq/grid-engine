@@ -24,6 +24,7 @@ const mockTurnTowards = jest.fn();
 const mockFollowMovement = {
   setCharacter: jest.fn(),
   update: jest.fn(),
+  setNumberOfDirections: jest.fn(),
 };
 const mockGridTileMap = {
   addCharacter: jest.fn(),
@@ -999,6 +1000,9 @@ describe("GridEngine", () => {
       expect.toBeCharacter("player2"),
       7,
       true
+    );
+    expect(mockFollowMovement.setNumberOfDirections).toHaveBeenCalledWith(
+      NumberOfDirections.FOUR
     );
     expect(mockSetMovement).toHaveBeenCalledWith(mockFollowMovement);
   });
