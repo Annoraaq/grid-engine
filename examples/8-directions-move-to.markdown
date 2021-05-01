@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Following
-parent: Examples
+title: Move To
+parent: Examples (8 directions)
 ---
 
-# Following
+# Move Character To
 
-**Press the arrow keys to move.** This demo demonstrates how you can make a character follow another character.
+**Press the arrow keys to move.** This demo demonstrates how you can command characters (including the player) to move to the desired tile, and they will pathfind the shortest route to their destination using 8 directions. Follow the NPCs to their destination!
 
 <div id="game"></div>
 
@@ -18,7 +18,7 @@ parent: Examples
   const config = getBasicConfig(preload, create, update);
   const game = new Phaser.Game(config);
 
-  function preload() {
+  function preload () {
     this.load.image("tiles", "assets/cloud_tileset.png");
     this.load.tilemapTiledJSON("cloud-city-map", "assets/cloud_city_large.json");
     this.load.spritesheet("player", "assets/characters.png", {
@@ -27,7 +27,7 @@ parent: Examples
     });
   }
 
-  function create() {
+  function create () {
     const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
     cloudCityTilemap.addTilesetImage("cloud_tileset", "tiles");
     for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
@@ -37,7 +37,11 @@ parent: Examples
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
     this.cameras.main.startFollow(playerSprite, true);
-    this.cameras.main.setFollowOffset(-playerSprite.width, -playerSprite.height);
+    this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
+
+    tintTile(cloudCityTilemap, 18, 15, 0xff7a4a);
+    tintTile(cloudCityTilemap, 19, 15, 0xffcc4a);
+    tintTile(cloudCityTilemap, 20, 15, 0x6eff94);
 
     const npcSprite = this.add.sprite(0, 0, "player");
     npcSprite.scale = 1.5;
@@ -61,7 +65,7 @@ parent: Examples
           sprite: npcSprite,
           walkingAnimationMapping: 0,
           startPosition: new Phaser.Math.Vector2(12, 5),
-          speed: 3,
+          speed: 3
         },
         {
           id: "npc1",
@@ -72,30 +76,45 @@ parent: Examples
         {
           id: "npc2",
           sprite: npcSprite2,
-          walkingAnimationMapping: 3,
+          characterIndex: 3,
           startPosition: new Phaser.Math.Vector2(5, 10),
-          speed: 2,
+          speed: 2
         },
       ],
       firstLayerAboveChar: 3,
+      numberOfDirections: 8,
     };
 
     this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
-    this.gridEngine.follow("npc0", "player", 2, true);
-    this.gridEngine.follow("npc1", "player", 1, true);
-    this.gridEngine.follow("npc2", "player", 0, true);
+    this.gridEngine.moveTo('npc0', new Phaser.Math.Vector2(15, 18));
+    this.gridEngine.moveTo('npc1', new Phaser.Math.Vector2(15, 19));
+    this.gridEngine.moveTo('npc2', new Phaser.Math.Vector2(15, 20));
   }
 
-  function update() {
+  function update () {
     const cursors = this.input.keyboard.createCursorKeys();
-    if (cursors.left.isDown) {
-      this.gridEngine.moveLeft("player");
+    if (cursors.left.isDown && cursors.up.isDown) {
+      this.gridEngine.move("player", "up-left");
+    } else if (cursors.left.isDown && cursors.down.isDown) {
+      this.gridEngine.move("player", "down-left");
+    } else if (cursors.right.isDown && cursors.up.isDown) {
+      this.gridEngine.move("player", "up-right");
+    } else if (cursors.right.isDown && cursors.down.isDown) {
+      this.gridEngine.move("player", "down-right");
+    } else if (cursors.left.isDown) {
+      this.gridEngine.move("player", "left");
     } else if (cursors.right.isDown) {
-      this.gridEngine.moveRight("player");
+      this.gridEngine.move("player", "right");
     } else if (cursors.up.isDown) {
-      this.gridEngine.moveUp("player");
+      this.gridEngine.move("player", "up");
     } else if (cursors.down.isDown) {
-      this.gridEngine.moveDown("player");
+      this.gridEngine.move("player", "down");
+    }
+  }
+
+  function tintTile(tilemap, row, col, color) {
+    for (let i = 0; i < tilemap.layers.length; i++) {
+      tilemap.layers[i].tilemapLayer.layer.data[row][col].tint = color;
     }
   }
 </script>
@@ -104,7 +123,7 @@ parent: Examples
 
 ```javascript
 // Your game config
-var game = new Phaser.Game(config);
+const game = new Phaser.Game(config);
 
 function preload() {
   this.load.image("tiles", "assets/cloud_tileset.png");
@@ -126,6 +145,10 @@ function create() {
   playerSprite.scale = 1.5;
   this.cameras.main.startFollow(playerSprite, true);
   this.cameras.main.setFollowOffset(-playerSprite.width, -playerSprite.height);
+
+  tintTile(cloudCityTilemap, 18, 15, 0xff7a4a);
+  tintTile(cloudCityTilemap, 19, 15, 0xffcc4a);
+  tintTile(cloudCityTilemap, 20, 15, 0x6eff94);
 
   const npcSprite = this.add.sprite(0, 0, "player");
   npcSprite.scale = 1.5;
@@ -160,30 +183,45 @@ function create() {
       {
         id: "npc2",
         sprite: npcSprite2,
-        walkingAnimationMapping: 3,
+        characterIndex: 3,
         startPosition: new Phaser.Math.Vector2(5, 10),
         speed: 2,
       },
     ],
     firstLayerAboveChar: 3,
+    numberOfDirections: 8,
   };
 
   this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
-  this.gridEngine.follow("npc0", "player", 2, true);
-  this.gridEngine.follow("npc1", "player", 1, true);
-  this.gridEngine.follow("npc2", "player", 0, true);
+  this.gridEngine.moveTo("npc0", new Phaser.Math.Vector2(15, 18));
+  this.gridEngine.moveTo("npc1", new Phaser.Math.Vector2(15, 19));
+  this.gridEngine.moveTo("npc2", new Phaser.Math.Vector2(15, 20));
 }
 
 function update() {
   const cursors = this.input.keyboard.createCursorKeys();
-  if (cursors.left.isDown) {
-    this.gridEngine.moveLeft("player");
+  if (cursors.left.isDown && cursors.up.isDown) {
+    this.gridEngine.move("player", "up-left");
+  } else if (cursors.left.isDown && cursors.down.isDown) {
+    this.gridEngine.move("player", "down-left");
+  } else if (cursors.right.isDown && cursors.up.isDown) {
+    this.gridEngine.move("player", "up-right");
+  } else if (cursors.right.isDown && cursors.down.isDown) {
+    this.gridEngine.move("player", "down-right");
+  } else if (cursors.left.isDown) {
+    this.gridEngine.move("player", "left");
   } else if (cursors.right.isDown) {
-    this.gridEngine.moveRight("player");
+    this.gridEngine.move("player", "right");
   } else if (cursors.up.isDown) {
-    this.gridEngine.moveUp("player");
+    this.gridEngine.move("player", "up");
   } else if (cursors.down.isDown) {
-    this.gridEngine.moveDown("player");
+    this.gridEngine.move("player", "down");
+  }
+}
+
+function tintTile(tilemap, row, col, color) {
+  for (let i = 0; i < tilemap.layers.length; i++) {
+    tilemap.layers[i].tilemapLayer.layer.data[row][col].tint = color;
   }
 }
 ```

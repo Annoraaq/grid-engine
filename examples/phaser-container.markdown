@@ -11,74 +11,76 @@ parent: Examples
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-1.12.2.min.js"></script>
+<script src="js/grid-engine-1.14.0.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
-const config = getBasicConfig(preload, create, update);
-var game = new Phaser.Game(config);
+  const config = getBasicConfig(preload, create, update);
+  const game = new Phaser.Game(config);
 
-function preload() {
+  function preload() {
     this.load.image("tiles", "assets/cloud_tileset.png");
     this.load.tilemapTiledJSON("cloud-city-map", "assets/cloud_city.json");
     this.load.spritesheet("player", "assets/characters.png", {
-        frameWidth: 52,
-        frameHeight: 72,
+      frameWidth: 52,
+      frameHeight: 72,
     });
-}
+  }
 
-function create() {
+  function create() {
     const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
     cloudCityTilemap.addTilesetImage("Cloud City", "tiles");
     for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-        const layer = cloudCityTilemap.createLayer(i, "Cloud City", 0, 0);
-        layer.scale = 3;
+      const layer = cloudCityTilemap.createLayer(i, "Cloud City", 0, 0);
+      layer.scale = 3;
     }
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
 
-    const text = this.add.text(0, -10, 'Player 1');
-    text.setColor('#000000');
+    const text = this.add.text(0, -10, "Player 1");
+    text.setColor("#000000");
 
-    const container = this.add.container(0, 0, [ playerSprite, text]);
+    const container = this.add.container(0, 0, [playerSprite, text]);
     this.cameras.main.startFollow(container, true);
-    this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
+    this.cameras.main.setFollowOffset(-playerSprite.width, -playerSprite.height);
 
     const gridEngineConfig = {
-        characters: [
-            {
-                id: "player",
-                sprite: playerSprite,
-                container,
-                walkingAnimationMapping: 6,
-                walkingAnimationEnabled: true,
-                startPosition: new Phaser.Math.Vector2(8, 8),
-            },
-        ],
+      characters: [
+        {
+          id: "player",
+          sprite: playerSprite,
+          container,
+          walkingAnimationMapping: 6,
+          walkingAnimationEnabled: true,
+          startPosition: new Phaser.Math.Vector2(8, 8),
+        },
+      ],
     };
 
     this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
-}
+  }
 
-function update() {
+  function update() {
     const cursors = this.input.keyboard.createCursorKeys();
     if (cursors.left.isDown) {
-        this.gridEngine.moveLeft("player");
+      this.gridEngine.moveLeft("player");
     } else if (cursors.right.isDown) {
-        this.gridEngine.moveRight("player");
+      this.gridEngine.moveRight("player");
     } else if (cursors.up.isDown) {
-        this.gridEngine.moveUp("player");
+      this.gridEngine.moveUp("player");
     } else if (cursors.down.isDown) {
-        this.gridEngine.moveDown("player");
+      this.gridEngine.moveDown("player");
     }
-}
+  }
+
 </script>
 
 ## The Code
 
 ```javascript
 // Your game config
-var game = new Phaser.Game(config);
+const config = getBasicConfig(preload, create, update);
+const game = new Phaser.Game(config);
 
 function preload() {
   this.load.image("tiles", "assets/cloud_tileset.png");
@@ -104,7 +106,7 @@ function create() {
 
   const container = this.add.container(0, 0, [playerSprite, text]);
   this.cameras.main.startFollow(container, true);
-  this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
+  this.cameras.main.setFollowOffset(-playerSprite.width, -playerSprite.height);
 
   const gridEngineConfig = {
     characters: [

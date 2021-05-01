@@ -11,79 +11,108 @@ parent: Examples
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-1.12.2.min.js"></script>
+<script src="js/grid-engine-1.14.0.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
-    const config = getBasicConfig(preload, create, update);
-    var game = new Phaser.Game(config);
+  const config = getBasicConfig(preload, create, update);
+  const game = new Phaser.Game(config);
 
-    function preload () {
-        this.load.image("tiles", "assets/tf_jungle_tileset.png");
-        this.load.tilemapTiledJSON("jungle", "assets/one-way.json");
-        this.load.spritesheet("player", "assets/characters.png", {
-            frameWidth: 52,
-            frameHeight: 72,
-        });
+  function preload() {
+    this.load.image("tiles", "assets/tf_jungle_tileset.png");
+    this.load.tilemapTiledJSON("jungle", "assets/one-way.json");
+    this.load.spritesheet("player", "assets/characters.png", {
+      frameWidth: 52,
+      frameHeight: 72,
+    });
+  }
+
+  function create() {
+    const jungleTilemap = this.make.tilemap({ key: "jungle" });
+    jungleTilemap.addTilesetImage("jungle", "tiles");
+    for (let i = 0; i < jungleTilemap.layers.length; i++) {
+      const layer = jungleTilemap.createLayer(i, "jungle", 0, 0);
+      layer.scale = 3;
     }
+    const playerSprite = this.add.sprite(0, 0, "player");
+    playerSprite.scale = 1.5;
+    this.cameras.main.startFollow(playerSprite, true);
+    this.cameras.main.setFollowOffset(-playerSprite.width, -playerSprite.height);
 
-    function create () {
+    const gridEngineConfig = {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSprite,
+          walkingAnimationMapping: 6,
+          startPosition: new Phaser.Math.Vector2(16, 8),
+        },
+      ],
+    };
 
-        const jungleTilemap = this.make.tilemap({ key: "jungle" });
-        jungleTilemap.addTilesetImage("jungle", "tiles");
-        for (let i = 0; i < jungleTilemap.layers.length; i++) {
-            const layer = jungleTilemap.createLayer(i, "jungle", 0, 0);
-            layer.scale = 3;
-        }
-        const playerSprite = this.add.sprite(0, 0, "player");
-        playerSprite.scale = 1.5;
-        this.cameras.main.startFollow(playerSprite, true);
-        this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
+    this.gridEngine.create(jungleTilemap, gridEngineConfig);
 
-        const gridEngineConfig = {
-            characters: [
-                {
-                    id: "player",
-                    sprite: playerSprite,
-                    walkingAnimationMapping: 6,
-                    startPosition: new Phaser.Math.Vector2(16, 8),
-                },
-            ],
-        };
+    const r1 = this.add.triangle(
+      16 * 48 + 24,
+      9 * 48 + 24,
+      0,
+      0,
+      24,
+      0,
+      12,
+      24,
+      0xffffff
+    );
+    const r2 = this.add.triangle(
+      16 * 48 + 24,
+      10 * 48 + 24,
+      0,
+      0,
+      24,
+      0,
+      12,
+      24,
+      0xffffff
+    );
+    const r3 = this.add.triangle(
+      16 * 48 + 24,
+      11 * 48 + 24,
+      0,
+      0,
+      24,
+      0,
+      12,
+      24,
+      0xffffff
+    );
+    this.tweens.add({
+      targets: [r1, r2, r3],
+      alpha: 0.2,
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.easeInOut",
+    });
+  }
 
-        this.gridEngine.create(jungleTilemap, gridEngineConfig);
-
-        const r1 = this.add.triangle(16 * 48 + 24, 9 * 48 + 24, 0, 0, 24, 0, 12, 24, 0xffffff);
-        const r2 = this.add.triangle(16 * 48 + 24, 10 * 48 + 24, 0, 0, 24, 0, 12, 24, 0xffffff);
-        const r3 = this.add.triangle(16 * 48 + 24, 11 * 48 + 24, 0, 0, 24, 0, 12, 24, 0xffffff);
-        this.tweens.add({
-                targets: [r1,r2,r3],
-                alpha: 0.2,
-                yoyo: true,
-                repeat: -1,
-                ease: 'Sine.easeInOut'
-        });
+  function update() {
+    const cursors = this.input.keyboard.createCursorKeys();
+    if (cursors.left.isDown) {
+      this.gridEngine.moveLeft("player");
+    } else if (cursors.right.isDown) {
+      this.gridEngine.moveRight("player");
+    } else if (cursors.up.isDown) {
+      this.gridEngine.moveUp("player");
+    } else if (cursors.down.isDown) {
+      this.gridEngine.moveDown("player");
     }
-
-    function update () {
-        const cursors = this.input.keyboard.createCursorKeys();
-        if (cursors.left.isDown) {
-            this.gridEngine.moveLeft("player");
-        } else if (cursors.right.isDown) {
-            this.gridEngine.moveRight("player");
-        } else if (cursors.up.isDown) {
-            this.gridEngine.moveUp("player");
-        } else if (cursors.down.isDown) {
-            this.gridEngine.moveDown("player");
-        }
-    }
+  }
 </script>
 
 ## The Code
 
 ```javascript
 // Your game config
-var game = new Phaser.Game(config);
+const game = new Phaser.Game(config);
 
 function preload() {
   this.load.image("tiles", "assets/tf_jungle_tileset.png");
@@ -104,7 +133,7 @@ function create() {
   const playerSprite = this.add.sprite(0, 0, "player");
   playerSprite.scale = 1.5;
   this.cameras.main.startFollow(playerSprite, true);
-  this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
+  this.cameras.main.setFollowOffset(-playerSprite.width, -playerSprite.height);
 
   const gridEngineConfig = {
     characters: [

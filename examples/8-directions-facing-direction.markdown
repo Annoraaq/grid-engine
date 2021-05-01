@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Is Moving
-parent: Examples
+title: Facing Direction (8 directions)
+parent: Examples (8 directions)
 ---
 
-# Is Moving Observable
+# Facing Direction Observable
 
-**Press the arrow keys to move.** This demo demonstrates how to use the `isMoving` observable for characters, allowing you to change behavior depending on whether or not they're in motion! This demo also uses the [Phaser Containers](phaser-container) feature.
+**Press the arrow keys to move.** This demo demonstrates how to use the `facingDirection` observable on a character using 8 directions, allowing you to know when a character is facing a certain direction. This demo also uses the [Phaser Containers](phaser-container) feature.
 
 <div id="game"></div>
 
@@ -17,8 +17,9 @@ parent: Examples
 <script>
   const config = getBasicConfig(preload, create, update);
   const game = new Phaser.Game(config);
+  let facingDirectionText;
 
-  function preload() {
+  function preload () {
     this.load.image("tiles", "assets/tf_jungle_tileset.png");
     this.load.tilemapTiledJSON("jungle", "assets/jungle-small.json");
     this.load.spritesheet("player", "assets/characters.png", {
@@ -27,7 +28,7 @@ parent: Examples
     });
   }
 
-  function create() {
+  function create () {
     const jungleTilemap = this.make.tilemap({ key: "jungle" });
     jungleTilemap.addTilesetImage("jungle", "tiles");
     for (let i = 0; i < jungleTilemap.layers.length; i++) {
@@ -37,12 +38,12 @@ parent: Examples
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
 
-    isMovingText = this.add.text(-20, -10, "");
+    facingDirectionText = this.add.text(-60, -10, '');
 
-    const container = this.add.container(0, 0, [playerSprite, isMovingText]);
+    const container = this.add.container(0, 0, [ playerSprite, facingDirectionText]);
 
     this.cameras.main.startFollow(container, true);
-    this.cameras.main.setFollowOffset(-playerSprite.width, -playerSprite.height);
+    this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
     const gridEngineConfig = {
       characters: [
@@ -51,27 +52,36 @@ parent: Examples
           sprite: playerSprite,
           walkingAnimationMapping: 6,
           startPosition: new Phaser.Math.Vector2(8, 12),
-          container,
+          container
         },
       ],
+      numberOfDirections: 8,
     };
 
     this.gridEngine.create(jungleTilemap, gridEngineConfig);
+    this.gridEngine.turnTowards("player", 'left');
   }
 
-  function update() {
+  function update () {
     const cursors = this.input.keyboard.createCursorKeys();
-    if (cursors.left.isDown) {
-      this.gridEngine.moveLeft("player");
+    if (cursors.left.isDown && cursors.up.isDown) {
+      this.gridEngine.move("player", "up-left");
+    } else if (cursors.left.isDown && cursors.down.isDown) {
+      this.gridEngine.move("player", "down-left");
+    } else if (cursors.right.isDown && cursors.up.isDown) {
+      this.gridEngine.move("player", "up-right");
+    } else if (cursors.right.isDown && cursors.down.isDown) {
+      this.gridEngine.move("player", "down-right");
+    } else if (cursors.left.isDown) {
+      this.gridEngine.move("player", "left");
     } else if (cursors.right.isDown) {
-      this.gridEngine.moveRight("player");
+      this.gridEngine.move("player", "right");
     } else if (cursors.up.isDown) {
-      this.gridEngine.moveUp("player");
+      this.gridEngine.move("player", "up");
     } else if (cursors.down.isDown) {
-      this.gridEngine.moveDown("player");
+      this.gridEngine.move("player", "down");
     }
-
-    isMovingText.text = `isMoving: ${this.gridEngine.isMoving("player")}`;
+    facingDirectionText.text = `facingDirection: ${this.gridEngine.getFacingDirection('player')}`;
   }
 </script>
 
@@ -80,6 +90,7 @@ parent: Examples
 ```javascript
 // Your game config
 const game = new Phaser.Game(config);
+let facingDirectionText;
 
 function preload() {
   this.load.image("tiles", "assets/tf_jungle_tileset.png");
@@ -100,9 +111,12 @@ function create() {
   const playerSprite = this.add.sprite(0, 0, "player");
   playerSprite.scale = 1.5;
 
-  isMovingText = this.add.text(-20, -10, "");
+  facingDirectionText = this.add.text(-60, -10, "");
 
-  const container = this.add.container(0, 0, [playerSprite, isMovingText]);
+  const container = this.add.container(0, 0, [
+    playerSprite,
+    facingDirectionText,
+  ]);
 
   this.cameras.main.startFollow(container, true);
   this.cameras.main.setFollowOffset(-playerSprite.width, -playerSprite.height);
@@ -117,23 +131,34 @@ function create() {
         container,
       },
     ],
+    numberOfDirections: 8,
   };
 
   this.gridEngine.create(jungleTilemap, gridEngineConfig);
+  this.gridEngine.turnTowards("player", "left");
 }
 
 function update() {
   const cursors = this.input.keyboard.createCursorKeys();
-  if (cursors.left.isDown) {
-    this.gridEngine.moveLeft("player");
+  if (cursors.left.isDown && cursors.up.isDown) {
+    this.gridEngine.move("player", "up-left");
+  } else if (cursors.left.isDown && cursors.down.isDown) {
+    this.gridEngine.move("player", "down-left");
+  } else if (cursors.right.isDown && cursors.up.isDown) {
+    this.gridEngine.move("player", "up-right");
+  } else if (cursors.right.isDown && cursors.down.isDown) {
+    this.gridEngine.move("player", "down-right");
+  } else if (cursors.left.isDown) {
+    this.gridEngine.move("player", "left");
   } else if (cursors.right.isDown) {
-    this.gridEngine.moveRight("player");
+    this.gridEngine.move("player", "right");
   } else if (cursors.up.isDown) {
-    this.gridEngine.moveUp("player");
+    this.gridEngine.move("player", "up");
   } else if (cursors.down.isDown) {
-    this.gridEngine.moveDown("player");
+    this.gridEngine.move("player", "down");
   }
-
-  isMovingText.text = `isMoving: ${this.gridEngine.isMoving("player")}`;
+  facingDirectionText.text = `facingDirection: ${this.gridEngine.getFacingDirection(
+    "player"
+  )}`;
 }
 ```

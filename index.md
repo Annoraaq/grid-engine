@@ -25,6 +25,7 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
 - Pathfinding (for both NPCs and the player)
 - Random movement (can also limit to a radius)
 - Following other characters
+- Diagonal movement (8 directions)
 - Isometric maps (Beta)
 
 # Installation

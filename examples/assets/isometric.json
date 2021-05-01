@@ -56,7 +56,7 @@
  "orientation":"isometric",
  "renderorder":"right-down",
  "tiledversion":"1.4.3",
- "tileheight":18,
+ "tileheight":16,
  "tilesets":[
         {
          "columns":1,

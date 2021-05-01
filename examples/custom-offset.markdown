@@ -11,12 +11,12 @@ parent: Examples
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-1.12.2.min.js"></script>
+<script src="js/grid-engine-1.14.0.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
   const config = getBasicConfig(preload, create, update);
-  var game = new Phaser.Game(config);
+  const game = new Phaser.Game(config);
 
   function preload () {
     this.load.image("tiles", "assets/tf_jungle_tileset.png");
@@ -108,9 +108,9 @@ parent: Examples
 
 ```javascript
 // Your game config
-var game = new Phaser.Game(config);
+const game = new Phaser.Game(config);
 
-function preload () {
+function preload() {
   this.load.image("tiles", "assets/tf_jungle_tileset.png");
   this.load.tilemapTiledJSON("jungle", "assets/jungle-chess.json");
   this.load.spritesheet("player", "assets/characters.png", {
@@ -119,7 +119,7 @@ function preload () {
   });
 }
 
-function create () {
+function create() {
   const jungleTilemap = this.make.tilemap({ key: "jungle" });
   jungleTilemap.addTilesetImage("jungle", "tiles");
   for (let i = 0; i < jungleTilemap.layers.length; i++) {
@@ -129,10 +129,10 @@ function create () {
   const playerSprite = this.add.sprite(0, 0, "player");
   playerSprite.scale = 1.5;
 
-  isMovingText = this.add.text(-20, -10, '');
+  isMovingText = this.add.text(-20, -10, "");
 
   this.cameras.main.startFollow(playerSprite, true);
-  this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
+  this.cameras.main.setFollowOffset(-playerSprite.width, -playerSprite.height);
 
   const gridEngineConfig = {
     characters: [
@@ -147,28 +147,40 @@ function create () {
     ],
   };
 
-  const shopText = this.add.text(6* 48, 10*48, 'You are standing on a special tile!', { fontSize: 25, });
+  const shopText = this.add.text(
+    6 * 48,
+    10 * 48,
+    "You are standing on a special tile!",
+    { fontSize: 25 }
+  );
   shopText.setVisible(false);
   shopText.depth = 3000;
 
-  const hint = this.add.text(7* 48, 14*48, 'Step on the colored tile.\nWatch the offset.', { fontSize: 25, });
+  const hint = this.add.text(
+    7 * 48,
+    14 * 48,
+    "Step on the colored tile.\nWatch the offset.",
+    { fontSize: 25 }
+  );
   hint.depth = 3000;
 
   tintTile(jungleTilemap, 13, 11, 0x6eff94);
 
   this.gridEngine.create(jungleTilemap, gridEngineConfig);
 
-  this.gridEngine.positionChanged().subscribe(({charId, exitTile, enterTile}) => {
-    if (hasTrigger(jungleTilemap, enterTile)) {
-      shopText.setVisible(true);
-    }
-    if (hasTrigger(jungleTilemap, exitTile)) {
-      shopText.setVisible(false);
-    }
-  });
+  this.gridEngine
+    .positionChanged()
+    .subscribe(({ charId, exitTile, enterTile }) => {
+      if (hasTrigger(jungleTilemap, enterTile)) {
+        shopText.setVisible(true);
+      }
+      if (hasTrigger(jungleTilemap, exitTile)) {
+        shopText.setVisible(false);
+      }
+    });
 }
 
-function update () {
+function update() {
   const cursors = this.input.keyboard.createCursorKeys();
   if (cursors.left.isDown) {
     this.gridEngine.moveLeft("player");
@@ -193,5 +205,4 @@ function hasTrigger(tilemap, position) {
     return tile?.properties?.trigger;
   });
 }
-
 ```
