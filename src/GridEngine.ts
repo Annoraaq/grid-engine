@@ -197,8 +197,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
         "GridEngine: CharacterConfig property `characterIndex` is deprecated. Use `walkingAnimtionMapping` instead."
       );
     }
-    const isIsometric =
-      this.tilemap.orientation == `${Phaser.Tilemaps.Orientation.ISOMETRIC}`;
 
     const charConfig: CharConfig = {
       sprite: charData.sprite,
@@ -221,7 +219,7 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
       charConfig.walkingAnimationEnabled = true;
     }
 
-    const gridChar = this.createCharacter(isIsometric, charData.id, charConfig);
+    const gridChar = this.createCharacter(charData.id, charConfig);
 
     if (charData.facingDirection) {
       gridChar.turnTowards(charData.facingDirection);
@@ -405,12 +403,8 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     }
   }
 
-  private createCharacter(
-    isIsometric: boolean,
-    id: string,
-    config: CharConfig
-  ): GridCharacter {
-    if (isIsometric) {
+  private createCharacter(id: string, config: CharConfig): GridCharacter {
+    if (this._isIsometric()) {
       return new IsometricGridCharacter(id, config);
     } else {
       return new GridCharacter(id, config);
