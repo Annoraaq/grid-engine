@@ -13,6 +13,7 @@ export declare enum Direction {
     DOWN_LEFT = "down-left"
 }
 export declare function getDirections(numberOfDirections: NumberOfDirections): Direction[];
+export declare function isDiagonal(direction: Direction): boolean;
 export declare function turnCounterClockwise(direction: Direction): Direction;
 export declare function directionVector(direction: Direction): Vector2;
 export declare function oppositeDirection(direction: Direction): Direction;

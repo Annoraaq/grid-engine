@@ -90,5 +90,6 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     private addCharacters;
     private moveChar;
     private _stopMovement;
+    private _isIsometric;
 }
 export {};
