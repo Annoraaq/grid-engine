@@ -103,7 +103,7 @@ export class GridCharacter {
 
   setMovement(movement: Movement): void {
     this.movement = movement;
-    this.movement.setCharacter(this);
+    this.movement?.setCharacter(this);
   }
 
   getMovement(): Movement {
@@ -117,7 +117,18 @@ export class GridCharacter {
   }
 
   setTilePosition(tilePosition: Vector2): void {
-    if (this.isMoving()) return;
+    if (this.isMoving()) {
+      this.movementStopped$.next(this.movementDirection);
+    }
+    this.positionChanged$.next({
+      exitTile: this.tilePos,
+      enterTile: tilePosition,
+    });
+    this.positionChangeFinished$.next({
+      exitTile: this.tilePos,
+      enterTile: tilePosition,
+    });
+    this.movementDirection = Direction.NONE;
     this.nextTilePos = tilePosition;
     this.tilePos = tilePosition;
     this.updateZindex();

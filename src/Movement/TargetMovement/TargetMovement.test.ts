@@ -295,6 +295,22 @@ describe("TargetMovement", () => {
     expect(char.move).not.toHaveBeenCalled();
   });
 
+  it("should not move if distance reached or will be reached", () => {
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(1, 2));
+    const charPos = new Vector2(1, 1);
+    Bfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos, new Vector2(1, 2)],
+      closestToTarget: new Vector2(1, 2),
+    });
+    const char = createMockChar("char", charPos);
+    char.isMoving = () => true;
+    targetMovement.setCharacter(char);
+    targetMovement.update();
+    expect(char.turnTowards).toHaveBeenCalledWith(Direction.DOWN);
+
+    expect(char.move).not.toHaveBeenCalled();
+  });
+
   it("should not move if no path exists", () => {
     targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 2));
     const charPos = new Vector2(3, 1);

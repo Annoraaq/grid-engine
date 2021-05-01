@@ -3,6 +3,7 @@ import * as Phaser from "phaser";
 import { Direction } from "../Direction/Direction";
 import { take } from "rxjs/operators";
 import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
+import { Movement } from "../Movement/Movement";
 
 const mockCharacterAnimation = {
   updateCharacterFrame: jest.fn(),
@@ -259,20 +260,73 @@ describe("GridCharacter", () => {
     );
   });
 
-  it("should set tile position with custom offset", () => {
+  it("should set tile position with custom offset", async () => {
+    const movementStoppedObs = gridCharacter.movementStopped();
+    jest.spyOn(movementStoppedObs, "next");
+    const positionChangeStartedProm = gridCharacter
+      .positionChanged()
+      .pipe(take(1))
+      .toPromise();
+    const positionChangeFinishedProm = gridCharacter
+      .positionChangeFinished()
+      .pipe(take(1))
+      .toPromise();
+
     gridCharacter.setTilePosition(new Vector2(3, 4));
+
+    expect(movementStoppedObs.next).not.toHaveBeenCalled();
+    const posChangeStarted = await positionChangeStartedProm;
+    const posChangeFinished = await positionChangeFinishedProm;
+
+    expect(posChangeStarted).toEqual({
+      exitTile: new Vector2(0, 0),
+      enterTile: new Vector2(3, 4),
+    });
+
+    expect(posChangeFinished).toEqual({
+      exitTile: new Vector2(0, 0),
+      enterTile: new Vector2(3, 4),
+    });
 
     expect(spriteMock.x).toEqual(3 * TILE_WIDTH + PLAYER_X_OFFSET);
     expect(spriteMock.y).toEqual(4 * TILE_HEIGHT + PLAYER_Y_OFFSET);
   });
 
-  it("should not set tile position when moving", () => {
+  it("should stop moving on set tile pos", async () => {
     mockNonBlockingTile();
     gridCharacter.move(Direction.DOWN);
+
+    const movementStoppedProm = gridCharacter
+      .movementStopped()
+      .pipe(take(1))
+      .toPromise();
+    const positionChangeStartedProm = gridCharacter
+      .positionChanged()
+      .pipe(take(1))
+      .toPromise();
+    const positionChangeFinishedProm = gridCharacter
+      .positionChangeFinished()
+      .pipe(take(1))
+      .toPromise();
+
     gridCharacter.setTilePosition(new Vector2(3, 4));
 
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
-    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
+    const dir = await movementStoppedProm;
+    const posChangeStarted = await positionChangeStartedProm;
+    const posChangeFinished = await positionChangeFinishedProm;
+    expect(posChangeStarted).toEqual({
+      exitTile: new Vector2(0, 0),
+      enterTile: new Vector2(3, 4),
+    });
+
+    expect(posChangeFinished).toEqual({
+      exitTile: new Vector2(0, 0),
+      enterTile: new Vector2(3, 4),
+    });
+    expect(dir).toEqual(Direction.DOWN);
+
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+    expect(gridCharacter.getTilePos()).toEqual(new Vector2(3, 4));
   });
 
   it("should stop moving if no movementImpuls", async () => {
@@ -351,6 +405,20 @@ describe("GridCharacter", () => {
     mockBlockingTile();
     gridCharacter.move(Direction.DOWN);
     expect(gridCharacter.isMoving()).toBeFalsy();
+  });
+
+  it("should set movement", () => {
+    const movement: Movement = <any>{
+      setCharacter: jest.fn(),
+    };
+    gridCharacter.setMovement(movement);
+    expect(gridCharacter.getMovement()).toEqual(movement);
+    expect(movement.setCharacter).toHaveBeenCalledWith(gridCharacter);
+  });
+
+  it("should set movement to undefined", () => {
+    gridCharacter.setMovement(undefined);
+    expect(gridCharacter.getMovement()).toEqual(undefined);
   });
 
   describe("isBlockingDirection", () => {

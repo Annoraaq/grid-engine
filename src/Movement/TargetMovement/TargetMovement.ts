@@ -33,7 +33,10 @@ export class TargetMovement implements Movement {
     const { dir, dist } = this.getDirOnShortestPath();
     if (this.noPathExists(dist)) {
       this.character.move(Direction.NONE);
-    } else if (dist <= this.distance) {
+    } else if (
+      dist <= this.distance ||
+      (this.character.isMoving() && dist <= this.distance + 1)
+    ) {
       this.character.turnTowards(dir);
     } else {
       this.character.move(dir);
