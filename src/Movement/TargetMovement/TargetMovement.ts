@@ -13,6 +13,8 @@ const Vector2 = Phaser.Math.Vector2;
 export class TargetMovement implements Movement {
   private character: GridCharacter;
   private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR;
+  private shortestPath: Vector2[];
+  private distOffset: number;
 
   constructor(
     private tilemap: GridTilemap,
@@ -29,11 +31,77 @@ export class TargetMovement implements Movement {
     this.character = character;
   }
 
+  private getTileInDir(dir: Direction): Vector2 {
+    switch (dir) {
+      case Direction.UP:
+        return this.character.getTilePos().clone().add(new Vector2(0, -1));
+      case Direction.UP_RIGHT:
+        return this.character.getTilePos().clone().add(new Vector2(1, -1));
+      case Direction.RIGHT:
+        return this.character.getTilePos().clone().add(new Vector2(1, 0));
+      case Direction.DOWN_RIGHT:
+        return this.character.getTilePos().clone().add(new Vector2(1, 1));
+      case Direction.DOWN:
+        return this.character.getTilePos().clone().add(new Vector2(0, 1));
+      case Direction.DOWN_LEFT:
+        return this.character.getTilePos().clone().add(new Vector2(-1, 1));
+      case Direction.LEFT:
+        return this.character.getTilePos().clone().add(new Vector2(-1, 0));
+      case Direction.UP_LEFT:
+        return this.character.getTilePos().clone().add(new Vector2(-1, -1));
+    }
+  }
+
   update(): void {
-    const { dir, dist } = this.getDirOnShortestPath();
-    if (this.noPathExists(dist)) {
+    if (!this.shortestPath) {
+      ({
+        path: this.shortestPath,
+        distOffset: this.distOffset,
+      } = this.getShortestPath());
+    }
+
+    // no path found
+    if (this.shortestPath.length == 0) {
       this.character.move(Direction.NONE);
-    } else if (
+      return;
+    }
+
+    // shorten path
+    const nextField = this.shortestPath[0];
+    if (
+      this.character.getTilePos().x === nextField.x &&
+      this.character.getTilePos().y === nextField.y
+    ) {
+      this.shortestPath.shift();
+    }
+    let { dir, dist } = this.getDirOnShortestPath();
+
+    const tileInDir = this.getTileInDir(dir);
+    if (dir !== Direction.NONE && this.isBlocking(tileInDir)) {
+      ({
+        path: this.shortestPath,
+        distOffset: this.distOffset,
+      } = this.getShortestPath());
+
+      // no path found
+      if (this.shortestPath.length == 0) {
+        this.character.move(Direction.NONE);
+        return;
+      }
+
+      // shorten path
+      const nextField = this.shortestPath[0];
+      if (
+        this.character.getTilePos().x === nextField.x &&
+        this.character.getTilePos().y === nextField.y
+      ) {
+        this.shortestPath.shift();
+      }
+
+      ({ dir, dist } = this.getDirOnShortestPath());
+    }
+
+    if (
       dist <= this.distance ||
       (this.character.isMoving() && dist <= this.distance + 1)
     ) {
@@ -107,14 +175,12 @@ export class TargetMovement implements Movement {
   }
 
   private getDirOnShortestPath(): { dir: Direction; dist: number } {
-    const { path: shortestPath, distOffset } = this.getShortestPath();
-    if (shortestPath.length == 0) return { dir: Direction.NONE, dist: -1 };
-    if (shortestPath.length == 1) return { dir: Direction.NONE, dist: 0 };
+    if (this.shortestPath.length == 0) return { dir: Direction.NONE, dist: 0 };
 
-    const nextField = shortestPath[1];
+    const nextField = this.shortestPath[0];
     const result = {
       dir: undefined,
-      dist: shortestPath.length - 1 + distOffset,
+      dist: this.shortestPath.length + this.distOffset,
     };
 
     const charPos = this.character.getTilePos();

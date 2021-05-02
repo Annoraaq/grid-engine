@@ -372,4 +372,60 @@ describe("TargetMovement", () => {
     const getNeighbours = targetMovement.getNeighbours(charPos);
     expect(getNeighbours).toEqual([new Vector2(charPos.x - 1, charPos.y)]);
   });
+
+  it("should not recalculate shortest path if not blocking", () => {
+    gridTilemapMock.isBlocking.mockReturnValue(false);
+
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(2, 2));
+    const charPos = new Vector2(1, 1);
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos, new Vector2(2, 1), new Vector2(2, 2)],
+      closestToTarget: new Vector2(2, 2),
+    });
+    let char = createMockChar("char", charPos);
+    targetMovement.setCharacter(char);
+    targetMovement.update();
+
+    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
+    expect(char.move).toHaveBeenCalledWith(Direction.RIGHT);
+
+    char = createMockChar("char", new Vector2(2, 1));
+    targetMovement.setCharacter(char);
+    targetMovement.update();
+
+    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
+    expect(char.move).toHaveBeenCalledWith(Direction.DOWN);
+  });
+
+  it("should recalculate shortest path if blocking", () => {
+    gridTilemapMock.isBlocking.mockReturnValue(false);
+
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 2));
+
+    // move one step that is not blocking
+    const charPos = new Vector2(1, 1);
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos, new Vector2(2, 1), new Vector2(2, 2), new Vector2(3, 2)],
+      closestToTarget: new Vector2(3, 2),
+    });
+    let char = createMockChar("char", charPos);
+    targetMovement.setCharacter(char);
+    targetMovement.update();
+
+    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
+    expect(char.move).toHaveBeenCalledWith(Direction.RIGHT);
+
+    // move next step that is blocking
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [new Vector2(2, 1), new Vector2(2, 2), new Vector2(3, 2)],
+      closestToTarget: new Vector2(3, 2),
+    });
+    gridTilemapMock.isBlocking.mockReturnValue(true);
+    char = createMockChar("char", new Vector2(2, 1));
+    targetMovement.setCharacter(char);
+    targetMovement.update();
+
+    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
+    expect(char.move).toHaveBeenCalledWith(Direction.DOWN);
+  });
 });
