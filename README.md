@@ -98,3 +98,6 @@ function create() {
 <p align="center">
     <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/radius-movement.gif" />
 </p>
+
+# Special Thanks
+splashsky, therebelrobot
