@@ -12,9 +12,14 @@ export declare class TargetMovement implements Movement {
     private closestPointIfBlocked;
     private character;
     private numberOfDirections;
+    private shortestPath;
+    private distOffset;
+    private posOnPath;
     constructor(tilemap: GridTilemap, targetPos: Vector2, distance?: number, closestPointIfBlocked?: boolean);
     setNumberOfDirections(numberOfDirections: NumberOfDirections): void;
     setCharacter(character: GridCharacter): void;
+    private getTileInDir;
+    pathEqual(path1: Vector2[], path2: Vector2[]): boolean;
     update(): void;
     getNeighbours: (pos: Vector2) => Vector2[];
     private isBlocking;

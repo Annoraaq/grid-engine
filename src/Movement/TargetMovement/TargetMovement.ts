@@ -15,6 +15,7 @@ export class TargetMovement implements Movement {
   private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR;
   private shortestPath: Vector2[];
   private distOffset: number;
+  private posOnPath = 0;
 
   constructor(
     private tilemap: GridTilemap,
@@ -29,6 +30,9 @@ export class TargetMovement implements Movement {
 
   setCharacter(character: GridCharacter): void {
     this.character = character;
+    const shortestPath = this.getShortestPath();
+    this.shortestPath = shortestPath.path;
+    this.distOffset = shortestPath.distOffset;
   }
 
   private getTileInDir(dir: Direction): Vector2 {
@@ -53,62 +57,33 @@ export class TargetMovement implements Movement {
   }
 
   update(): void {
-    if (!this.shortestPath) {
-      ({
-        path: this.shortestPath,
-        distOffset: this.distOffset,
-      } = this.getShortestPath());
+    if (this.shortestPath.length <= 0) return;
+
+    let currentTile = this.shortestPath[this.posOnPath];
+    while (
+      this.posOnPath < this.shortestPath.length - 1 &&
+      (this.character.getNextTilePos().x != currentTile.x ||
+        this.character.getNextTilePos().y != currentTile.y)
+    ) {
+      this.posOnPath++;
+      currentTile = this.shortestPath[this.posOnPath];
     }
 
-    // no path found
-    if (this.shortestPath.length == 0) {
-      this.character.move(Direction.NONE);
+    if (
+      this.posOnPath + (this.distance - this.distOffset) >=
+      this.shortestPath.length - 1
+    ) {
+      if (this.posOnPath < this.shortestPath.length - 1) {
+        const nextTile = this.shortestPath[this.posOnPath + 1];
+        const dir = this.getDir(this.character.getNextTilePos(), nextTile);
+        this.character.turnTowards(dir);
+      }
       return;
     }
 
-    // shorten path
-    const nextField = this.shortestPath[0];
-    if (
-      this.character.getTilePos().x === nextField.x &&
-      this.character.getTilePos().y === nextField.y
-    ) {
-      this.shortestPath.shift();
-    }
-    let { dir, dist } = this.getDirOnShortestPath();
-
-    const tileInDir = this.getTileInDir(dir);
-    if (dir !== Direction.NONE && this.isBlocking(tileInDir)) {
-      ({
-        path: this.shortestPath,
-        distOffset: this.distOffset,
-      } = this.getShortestPath());
-
-      // no path found
-      if (this.shortestPath.length == 0) {
-        this.character.move(Direction.NONE);
-        return;
-      }
-
-      // shorten path
-      const nextField = this.shortestPath[0];
-      if (
-        this.character.getTilePos().x === nextField.x &&
-        this.character.getTilePos().y === nextField.y
-      ) {
-        this.shortestPath.shift();
-      }
-
-      ({ dir, dist } = this.getDirOnShortestPath());
-    }
-
-    if (
-      dist <= this.distance ||
-      (this.character.isMoving() && dist <= this.distance + 1)
-    ) {
-      this.character.turnTowards(dir);
-    } else {
-      this.character.move(dir);
-    }
+    const nextTile = this.shortestPath[this.posOnPath + 1];
+    const dir = this.getDir(this.character.getNextTilePos(), nextTile);
+    this.character.move(dir);
   }
 
   getNeighbours = (pos: Vector2): Vector2[] => {
@@ -141,17 +116,13 @@ export class TargetMovement implements Movement {
     return orthogonalNeighbours;
   };
 
-  private noPathExists(distance: number): boolean {
-    return distance == -1;
-  }
-
   private getShortestPath(): { path: Vector2[]; distOffset: number } {
     const shortestPathAlgo: ShortestPathAlgorithm = new Bfs();
     const {
       path: shortestPath,
       closestToTarget,
     } = shortestPathAlgo.getShortestPath(
-      this.character.getTilePos(),
+      this.character.getNextTilePos(),
       this.targetPos,
       this.getNeighbours
     );
@@ -160,10 +131,11 @@ export class TargetMovement implements Movement {
 
     if (noPathFound && this.closestPointIfBlocked) {
       const shortestPathToClosestPoint = shortestPathAlgo.getShortestPath(
-        this.character.getTilePos(),
+        this.character.getNextTilePos(),
         closestToTarget,
         this.getNeighbours
       ).path;
+      // todo use distance utils
       const distOffset = VectorUtils.manhattanDistance(
         closestToTarget,
         this.targetPos
@@ -174,39 +146,55 @@ export class TargetMovement implements Movement {
     return { path: shortestPath, distOffset: 0 };
   }
 
-  private getDirOnShortestPath(): { dir: Direction; dist: number } {
-    if (this.shortestPath.length == 0) return { dir: Direction.NONE, dist: 0 };
-
-    const nextField = this.shortestPath[0];
-    const result = {
-      dir: undefined,
-      dist: this.shortestPath.length + this.distOffset,
-    };
-
-    const charPos = this.character.getTilePos();
-
-    if (nextField.x > charPos.x) {
-      if (nextField.y > charPos.y) {
-        result.dir = Direction.DOWN_RIGHT;
-      } else if (nextField.y < charPos.y) {
-        result.dir = Direction.UP_RIGHT;
-      } else {
-        result.dir = Direction.RIGHT;
-      }
-    } else if (nextField.x < charPos.x) {
-      if (nextField.y > charPos.y) {
-        result.dir = Direction.DOWN_LEFT;
-      } else if (nextField.y < charPos.y) {
-        result.dir = Direction.UP_LEFT;
-      } else {
-        result.dir = Direction.LEFT;
-      }
-    } else if (nextField.y < charPos.y) {
-      result.dir = Direction.UP;
-    } else if (nextField.y > charPos.y) {
-      result.dir = Direction.DOWN;
+  private getDir(from: Vector2, to: Vector2): Direction {
+    if (this.numberOfDirections === NumberOfDirections.EIGHT) {
+      return this.getDir8Directions(from, to);
     }
+    return this.getDir4Directions(from, to);
+  }
 
-    return result;
+  private getDir8Directions(from: Vector2, to: Vector2): Direction {
+    if (to.x > from.x) {
+      if (to.y > from.y) {
+        return Direction.DOWN_RIGHT;
+      } else if (to.y < from.y) {
+        return Direction.UP_RIGHT;
+      } else {
+        return Direction.RIGHT;
+      }
+    } else if (to.x < from.x) {
+      if (to.y > from.y) {
+        return Direction.DOWN_LEFT;
+      } else if (to.y < from.y) {
+        return Direction.UP_LEFT;
+      } else {
+        return Direction.LEFT;
+      }
+    } else if (to.y < from.y) {
+      return Direction.UP;
+    } else if (to.y > from.y) {
+      return Direction.DOWN;
+    }
+    return Direction.NONE;
+  }
+
+  private getDir4Directions(from: Vector2, to: Vector2): Direction {
+    if (VectorUtils.manhattanDistance(from, to) == 0) return Direction.NONE;
+
+    const diff = from.clone().subtract(to);
+
+    if (Math.abs(diff.x) > Math.abs(diff.y)) {
+      if (diff.x > 0) {
+        return Direction.LEFT;
+      } else {
+        return Direction.RIGHT;
+      }
+    } else {
+      if (diff.y > 0) {
+        return Direction.UP;
+      } else {
+        return Direction.DOWN;
+      }
+    }
   }
 }

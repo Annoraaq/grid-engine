@@ -143,6 +143,10 @@ export class GridCharacter {
     return this.tilePos;
   }
 
+  getNextTilePos(): Vector2 {
+    return this.nextTilePos;
+  }
+
   move(direction: Direction): void {
     this.lastMovementImpulse = direction;
     if (direction == Direction.NONE) return;
