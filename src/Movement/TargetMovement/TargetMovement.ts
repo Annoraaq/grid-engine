@@ -1,3 +1,4 @@
+import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { ShortestPathAlgorithm } from "./../../Algorithms/ShortestPath/ShortestPathAlgorithm";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { VectorUtils } from "../../Utils/VectorUtils";
@@ -70,7 +71,7 @@ export class TargetMovement implements Movement {
     }
 
     if (
-      this.posOnPath + (this.distance - this.distOffset) >=
+      this.posOnPath + Math.max(0, this.distance - this.distOffset) >=
       this.shortestPath.length - 1
     ) {
       if (this.posOnPath < this.shortestPath.length - 1) {
@@ -92,7 +93,6 @@ export class TargetMovement implements Movement {
   };
 
   private isBlocking = (pos: Vector2): boolean => {
-    if (VectorUtils.equal(pos, this.targetPos)) return false;
     return this.tilemap.isBlocking(pos);
   };
 
@@ -135,10 +135,10 @@ export class TargetMovement implements Movement {
         closestToTarget,
         this.getNeighbours
       ).path;
-      // todo use distance utils
-      const distOffset = VectorUtils.manhattanDistance(
+      const distOffset = DistanceUtils.distance(
         closestToTarget,
-        this.targetPos
+        this.targetPos,
+        this.numberOfDirections
       );
       return { path: shortestPathToClosestPoint, distOffset };
     }
@@ -179,7 +179,7 @@ export class TargetMovement implements Movement {
   }
 
   private getDir4Directions(from: Vector2, to: Vector2): Direction {
-    if (VectorUtils.manhattanDistance(from, to) == 0) return Direction.NONE;
+    if (VectorUtils.equal(from, to)) return Direction.NONE;
 
     const diff = from.clone().subtract(to);
 

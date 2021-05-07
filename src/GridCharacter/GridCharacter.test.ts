@@ -407,11 +407,16 @@ describe("GridCharacter", () => {
     expect(gridCharacter.isMoving()).toBeFalsy();
   });
 
-  it("should set movement", () => {
+  it("should set movement", async () => {
     const movement: Movement = <any>{
       setCharacter: jest.fn(),
     };
+    const autoMovementSet = gridCharacter
+      .autoMovementSet()
+      .pipe(take(1))
+      .toPromise();
     gridCharacter.setMovement(movement);
+    await autoMovementSet;
     expect(gridCharacter.getMovement()).toEqual(movement);
     expect(movement.setCharacter).toHaveBeenCalledWith(gridCharacter);
   });
