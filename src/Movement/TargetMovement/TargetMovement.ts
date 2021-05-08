@@ -7,6 +7,7 @@ import * as Phaser from "phaser";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
 import { Bfs } from "../../Algorithms/ShortestPath/Bfs/Bfs";
 import { Movement } from "../Movement";
+import { NoPathFoundStrategy } from "../../Algorithms/ShortestPath/NoPathFoundStrategy";
 
 type Vector2 = Phaser.Math.Vector2;
 const Vector2 = Phaser.Math.Vector2;
@@ -22,7 +23,7 @@ export class TargetMovement implements Movement {
     private tilemap: GridTilemap,
     private targetPos: Vector2,
     private distance = 0,
-    private closestPointIfBlocked = false
+    private noPathFoundStrategy: NoPathFoundStrategy = NoPathFoundStrategy.STOP
   ) {}
 
   setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
@@ -34,27 +35,6 @@ export class TargetMovement implements Movement {
     const shortestPath = this.getShortestPath();
     this.shortestPath = shortestPath.path;
     this.distOffset = shortestPath.distOffset;
-  }
-
-  private getTileInDir(dir: Direction): Vector2 {
-    switch (dir) {
-      case Direction.UP:
-        return this.character.getTilePos().clone().add(new Vector2(0, -1));
-      case Direction.UP_RIGHT:
-        return this.character.getTilePos().clone().add(new Vector2(1, -1));
-      case Direction.RIGHT:
-        return this.character.getTilePos().clone().add(new Vector2(1, 0));
-      case Direction.DOWN_RIGHT:
-        return this.character.getTilePos().clone().add(new Vector2(1, 1));
-      case Direction.DOWN:
-        return this.character.getTilePos().clone().add(new Vector2(0, 1));
-      case Direction.DOWN_LEFT:
-        return this.character.getTilePos().clone().add(new Vector2(-1, 1));
-      case Direction.LEFT:
-        return this.character.getTilePos().clone().add(new Vector2(-1, 0));
-      case Direction.UP_LEFT:
-        return this.character.getTilePos().clone().add(new Vector2(-1, -1));
-    }
   }
 
   update(): void {
@@ -129,7 +109,10 @@ export class TargetMovement implements Movement {
 
     const noPathFound = shortestPath.length == 0;
 
-    if (noPathFound && this.closestPointIfBlocked) {
+    if (
+      noPathFound &&
+      this.noPathFoundStrategy === NoPathFoundStrategy.CLOSEST_REACHABLE
+    ) {
       const shortestPathToClosestPoint = shortestPathAlgo.getShortestPath(
         this.character.getNextTilePos(),
         closestToTarget,

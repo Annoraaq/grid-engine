@@ -1,3 +1,4 @@
+import { NoPathFoundStrategy } from "./Algorithms/ShortestPath/NoPathFoundStrategy";
 import { Subject, of } from "rxjs";
 import { take } from "rxjs/operators";
 import * as Phaser from "phaser";
@@ -810,7 +811,7 @@ describe("GridEngine", () => {
       mockGridTileMap,
       targetVec,
       0,
-      false
+      NoPathFoundStrategy.STOP
     );
     expect(mockTargetMovement.setNumberOfDirections).toHaveBeenCalledWith(
       NumberOfDirections.FOUR
@@ -822,7 +823,7 @@ describe("GridEngine", () => {
       mockGridTileMap,
       targetVec,
       0,
-      true
+      NoPathFoundStrategy.CLOSEST_REACHABLE
     );
     expect(mockSetMovement).toHaveBeenCalledWith(mockTargetMovement);
   });

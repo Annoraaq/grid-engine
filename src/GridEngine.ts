@@ -18,6 +18,7 @@ import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
+import { NoPathFoundStrategy } from "./Algorithms/ShortestPath/NoPathFoundStrategy";
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
@@ -145,6 +146,8 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
       targetPos,
       0,
       closestPointIfBlocked
+        ? NoPathFoundStrategy.CLOSEST_REACHABLE
+        : NoPathFoundStrategy.STOP
     );
     targetMovement.setNumberOfDirections(this.numberOfDirections);
     this.gridCharacters.get(charId).setMovement(targetMovement);

@@ -1,3 +1,4 @@
+import { NoPathFoundStrategy } from "./../../Algorithms/ShortestPath/NoPathFoundStrategy";
 import { NumberOfDirections } from "./../../Direction/Direction";
 import { FollowMovement } from "./FollowMovement";
 import * as Phaser from "phaser";
@@ -64,7 +65,7 @@ describe("FollowMovement", () => {
       gridTilemapMock,
       targetCharPos,
       1,
-      false
+      NoPathFoundStrategy.STOP
     );
     expect(mockTargetMovement.setNumberOfDirections).toHaveBeenCalledWith(
       NumberOfDirections.FOUR
@@ -100,7 +101,7 @@ describe("FollowMovement", () => {
       gridTilemapMock,
       enterTile,
       1,
-      false
+      NoPathFoundStrategy.STOP
     );
     expect(mockTargetMovement.setNumberOfDirections).toHaveBeenCalledWith(
       NumberOfDirections.FOUR
@@ -122,7 +123,7 @@ describe("FollowMovement", () => {
       gridTilemapMock,
       enterTile,
       1,
-      false
+      NoPathFoundStrategy.STOP
     );
     expect(mockTargetMovement.setNumberOfDirections).not.toHaveBeenCalledWith(
       NumberOfDirections.FOUR
@@ -138,7 +139,7 @@ describe("FollowMovement", () => {
       gridTilemapMock,
       targetCharPos,
       8,
-      false
+      NoPathFoundStrategy.STOP
     );
     expect(mockTargetMovement.setCharacter).toHaveBeenCalledWith(mockChar);
   });
@@ -151,7 +152,7 @@ describe("FollowMovement", () => {
       gridTilemapMock,
       targetCharPos,
       8,
-      true
+      NoPathFoundStrategy.CLOSEST_REACHABLE
     );
     expect(mockTargetMovement.setCharacter).toHaveBeenCalledWith(mockChar);
   });

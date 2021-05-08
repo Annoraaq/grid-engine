@@ -4,6 +4,7 @@ import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
 import { Movement } from "../Movement";
+import { NoPathFoundStrategy } from "../../Algorithms/ShortestPath/NoPathFoundStrategy";
 
 type Vector2 = Phaser.Math.Vector2;
 const Vector2 = Phaser.Math.Vector2;
@@ -40,11 +41,14 @@ export class FollowMovement implements Movement {
   }
 
   private updateTarget(targetPos: Vector2): void {
+    const noPathFoundStrategy = this.closestPointIfBlocked
+      ? NoPathFoundStrategy.CLOSEST_REACHABLE
+      : NoPathFoundStrategy.STOP;
     this.targetMovement = new TargetMovement(
       this.gridTilemap,
       targetPos,
       this.distance + 1,
-      this.closestPointIfBlocked
+      noPathFoundStrategy
     );
     this.targetMovement.setNumberOfDirections(this.numberOfDirections);
     this.targetMovement.setCharacter(this.character);
