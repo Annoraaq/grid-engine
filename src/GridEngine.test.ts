@@ -794,38 +794,89 @@ describe("GridEngine", () => {
     );
   });
 
-  it("should move to coordinates", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
-    gridEngine.create(tileMapMock, {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
-        },
-      ],
+  describe("moveTo", () => {
+    beforeEach(() => {
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+          },
+        ],
+      });
     });
-    const targetVec = new Vector2(3, 4);
-    gridEngine.moveTo("player", targetVec);
-    expect(TargetMovement).toHaveBeenCalledWith(
-      mockGridTileMap,
-      targetVec,
-      0,
-      NoPathFoundStrategy.STOP
-    );
-    expect(mockTargetMovement.setNumberOfDirections).toHaveBeenCalledWith(
-      NumberOfDirections.FOUR
-    );
-    expect(mockSetMovement).toHaveBeenCalledWith(mockTargetMovement);
 
-    gridEngine.moveTo("player", targetVec, true);
-    expect(TargetMovement).toHaveBeenCalledWith(
-      mockGridTileMap,
-      targetVec,
-      0,
-      NoPathFoundStrategy.CLOSEST_REACHABLE
-    );
-    expect(mockSetMovement).toHaveBeenCalledWith(mockTargetMovement);
+    it("should move to coordinates", () => {
+      const targetVec = new Vector2(3, 4);
+      gridEngine.moveTo("player", targetVec);
+      expect(TargetMovement).toHaveBeenCalledWith(
+        mockGridTileMap,
+        targetVec,
+        0,
+        NoPathFoundStrategy.STOP
+      );
+      expect(mockTargetMovement.setNumberOfDirections).toHaveBeenCalledWith(
+        NumberOfDirections.FOUR
+      );
+      expect(mockSetMovement).toHaveBeenCalledWith(mockTargetMovement);
+    });
+
+    it("should move to coordinates closestPointIfBlocked", () => {
+      const targetVec = new Vector2(3, 4);
+      gridEngine.moveTo("player", targetVec, true);
+      expect(TargetMovement).toHaveBeenCalledWith(
+        mockGridTileMap,
+        targetVec,
+        0,
+        NoPathFoundStrategy.CLOSEST_REACHABLE
+      );
+    });
+
+    it("should move to coordinates STOP", () => {
+      const targetVec = new Vector2(3, 4);
+      gridEngine.moveTo("player", targetVec, NoPathFoundStrategy.STOP);
+      expect(TargetMovement).toHaveBeenCalledWith(
+        mockGridTileMap,
+        targetVec,
+        0,
+        NoPathFoundStrategy.STOP
+      );
+    });
+
+    it("should move to coordinates CLOSEST_REACHABLE", () => {
+      const targetVec = new Vector2(3, 4);
+      gridEngine.moveTo(
+        "player",
+        targetVec,
+        NoPathFoundStrategy.CLOSEST_REACHABLE
+      );
+      expect(TargetMovement).toHaveBeenCalledWith(
+        mockGridTileMap,
+        targetVec,
+        0,
+        NoPathFoundStrategy.CLOSEST_REACHABLE
+      );
+    });
+
+    it("should move to coordinates STOP on unknown strategy", () => {
+      const targetVec = new Vector2(3, 4);
+      gridEngine.moveTo(
+        "player",
+        targetVec,
+        <NoPathFoundStrategy>"unknown strategy"
+      );
+      expect(TargetMovement).toHaveBeenCalledWith(
+        mockGridTileMap,
+        targetVec,
+        0,
+        NoPathFoundStrategy.STOP
+      );
+      expect(console.warn).toHaveBeenCalledWith(
+        "GridEngine: Unknown NoPathFoundStrategy 'unknown strategy'. Falling back to 'STOP'"
+      );
+    });
   });
 
   it("should stop moving", () => {
@@ -1000,7 +1051,7 @@ describe("GridEngine", () => {
       // @ts-ignore
       expect.toBeCharacter("player2"),
       7,
-      true
+      NoPathFoundStrategy.CLOSEST_REACHABLE
     );
     expect(mockFollowMovement.setNumberOfDirections).toHaveBeenCalledWith(
       NumberOfDirections.FOUR
@@ -1030,7 +1081,7 @@ describe("GridEngine", () => {
       // @ts-ignore
       expect.toBeCharacter("player2"),
       0,
-      false
+      NoPathFoundStrategy.STOP
     );
     expect(mockSetMovement).toHaveBeenCalledWith(mockFollowMovement);
   });

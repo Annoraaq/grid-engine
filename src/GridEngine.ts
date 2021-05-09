@@ -137,17 +137,40 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   moveTo(
     charId: string,
     targetPos: Vector2,
-    closestPointIfBlocked = false
+    NoPathFoundStrategy?: NoPathFoundStrategy
+  ): void;
+  moveTo(
+    charId: string,
+    targetPos: Vector2,
+    closestPointIfBlocked?: boolean
+  ): void;
+  moveTo(
+    charId: string,
+    targetPos: Vector2,
+    noPathFoundStrategy?: boolean | NoPathFoundStrategy
   ): void {
+    let _noPathFoundStrategy = NoPathFoundStrategy.STOP;
+    if (typeof noPathFoundStrategy === "boolean") {
+      _noPathFoundStrategy = noPathFoundStrategy
+        ? NoPathFoundStrategy.CLOSEST_REACHABLE
+        : NoPathFoundStrategy.STOP;
+    } else if (
+      Object.values(NoPathFoundStrategy).includes(noPathFoundStrategy)
+    ) {
+      _noPathFoundStrategy = noPathFoundStrategy;
+    } else {
+      console.warn(
+        `GridEngine: Unknown NoPathFoundStrategy '${noPathFoundStrategy}'. Falling back to '${NoPathFoundStrategy.STOP}'`
+      );
+    }
+
     this.initGuard();
     this.unknownCharGuard(charId);
     const targetMovement = new TargetMovement(
       this.gridTilemap,
       targetPos,
       0,
-      closestPointIfBlocked
-        ? NoPathFoundStrategy.CLOSEST_REACHABLE
-        : NoPathFoundStrategy.STOP
+      _noPathFoundStrategy
     );
     targetMovement.setNumberOfDirections(this.numberOfDirections);
     this.gridCharacters.get(charId).setMovement(targetMovement);
@@ -317,6 +340,8 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
       this.gridCharacters.get(charIdToFollow),
       distance,
       closestPointIfBlocked
+        ? NoPathFoundStrategy.CLOSEST_REACHABLE
+        : NoPathFoundStrategy.STOP
     );
     followMovement.setNumberOfDirections(this.numberOfDirections);
     this.gridCharacters.get(charId).setMovement(followMovement);

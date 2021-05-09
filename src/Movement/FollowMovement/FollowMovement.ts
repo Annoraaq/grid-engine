@@ -18,7 +18,7 @@ export class FollowMovement implements Movement {
     private gridTilemap: GridTilemap,
     private charToFollow: GridCharacter,
     private distance = 0,
-    private closestPointIfBlocked = false
+    private noPathFoundStrategy: NoPathFoundStrategy = NoPathFoundStrategy.STOP
   ) {}
 
   setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
@@ -41,14 +41,11 @@ export class FollowMovement implements Movement {
   }
 
   private updateTarget(targetPos: Vector2): void {
-    const noPathFoundStrategy = this.closestPointIfBlocked
-      ? NoPathFoundStrategy.CLOSEST_REACHABLE
-      : NoPathFoundStrategy.STOP;
     this.targetMovement = new TargetMovement(
       this.gridTilemap,
       targetPos,
       this.distance + 1,
-      noPathFoundStrategy
+      this.noPathFoundStrategy
     );
     this.targetMovement.setNumberOfDirections(this.numberOfDirections);
     this.targetMovement.setCharacter(this.character);

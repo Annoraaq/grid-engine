@@ -144,8 +144,13 @@ describe("FollowMovement", () => {
     expect(mockTargetMovement.setCharacter).toHaveBeenCalledWith(mockChar);
   });
 
-  it("should update added character with distance and closestPointIfBlocked", () => {
-    followMovement = new FollowMovement(gridTilemapMock, targetChar, 7, true);
+  it("should update added character with distance and CLOSEST_REACHABLE", () => {
+    followMovement = new FollowMovement(
+      gridTilemapMock,
+      targetChar,
+      7,
+      NoPathFoundStrategy.CLOSEST_REACHABLE
+    );
     followMovement.setCharacter(mockChar);
     followMovement.update();
     expect(TargetMovement).toHaveBeenCalledWith(
