@@ -1,3 +1,4 @@
+import { PathBlockedStrategy } from "./Algorithms/ShortestPath/PathBlockedStrategy";
 import { IsometricGridCharacter } from "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import { TargetMovement } from "./Movement/TargetMovement/TargetMovement";
@@ -137,17 +138,20 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   moveTo(
     charId: string,
     targetPos: Vector2,
-    NoPathFoundStrategy?: NoPathFoundStrategy
+    NoPathFoundStrategy?: NoPathFoundStrategy,
+    pathBlockedStrategy?: PathBlockedStrategy
   ): void;
   moveTo(
     charId: string,
     targetPos: Vector2,
-    closestPointIfBlocked?: boolean
+    closestPointIfBlocked?: boolean,
+    pathBlockedStrategy?: PathBlockedStrategy
   ): void;
   moveTo(
     charId: string,
     targetPos: Vector2,
-    noPathFoundStrategy?: boolean | NoPathFoundStrategy
+    noPathFoundStrategy?: boolean | NoPathFoundStrategy,
+    pathBlockedStrategy?: PathBlockedStrategy
   ): void {
     let _noPathFoundStrategy = NoPathFoundStrategy.STOP;
     if (typeof noPathFoundStrategy === "boolean") {
@@ -173,6 +177,9 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
       _noPathFoundStrategy
     );
     targetMovement.setNumberOfDirections(this.numberOfDirections);
+    if (pathBlockedStrategy) {
+      targetMovement.setPathBlockedStrategy(pathBlockedStrategy);
+    }
     this.gridCharacters.get(charId).setMovement(targetMovement);
   }
 

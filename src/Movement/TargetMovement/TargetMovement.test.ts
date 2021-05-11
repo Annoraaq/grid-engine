@@ -2,6 +2,7 @@ import { Direction, NumberOfDirections } from "../../Direction/Direction";
 import { TargetMovement } from "./TargetMovement";
 import * as Phaser from "phaser";
 import { NoPathFoundStrategy } from "../../Algorithms/ShortestPath/NoPathFoundStrategy";
+import { PathBlockedStrategy } from "../../Algorithms/ShortestPath/PathBlockedStrategy";
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
@@ -421,8 +422,8 @@ describe("TargetMovement", () => {
     ]);
   });
 
-  xit("should not recalculate shortest path if not blocking", () => {
-    gridTilemapMock.isBlocking.mockReturnValue(false);
+  it("should not recalculate shortest path on strategy WAIT", () => {
+    gridTilemapMock.isBlocking.mockReturnValue(true);
 
     targetMovement = new TargetMovement(gridTilemapMock, new Vector2(2, 2));
     const charPos = new Vector2(1, 1);
@@ -430,50 +431,30 @@ describe("TargetMovement", () => {
       path: [charPos, new Vector2(2, 1), new Vector2(2, 2)],
       closestToTarget: new Vector2(2, 2),
     });
-    let char = createMockChar("char", charPos);
+    const char = createMockChar("char", charPos);
     targetMovement.setCharacter(char);
     targetMovement.update();
 
     expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
     expect(char.move).toHaveBeenCalledWith(Direction.RIGHT);
-
-    char = createMockChar("char", new Vector2(2, 1));
-    targetMovement.setCharacter(char);
-    targetMovement.update();
-
-    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
-    expect(char.move).toHaveBeenCalledWith(Direction.DOWN);
   });
 
-  xit("should recalculate shortest path if blocking", () => {
-    gridTilemapMock.isBlocking.mockReturnValue(false);
+  it("should recalculate shortest path on strategy RETRY", () => {
+    gridTilemapMock.isBlocking.mockReturnValue(true);
 
     targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 2));
+    targetMovement.setPathBlockedStrategy(PathBlockedStrategy.RETRY);
 
-    // move one step that is not blocking
-    const charPos = new Vector2(1, 1);
-    mockBfs.getShortestPath = jest.fn().mockReturnValue({
-      path: [charPos, new Vector2(2, 1), new Vector2(2, 2), new Vector2(3, 2)],
-      closestToTarget: new Vector2(3, 2),
-    });
-    let char = createMockChar("char", charPos);
-    targetMovement.setCharacter(char);
-    targetMovement.update();
-
-    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
-    expect(char.move).toHaveBeenCalledWith(Direction.RIGHT);
-
-    // move next step that is blocking
     mockBfs.getShortestPath = jest.fn().mockReturnValue({
       path: [new Vector2(2, 1), new Vector2(2, 2), new Vector2(3, 2)],
       closestToTarget: new Vector2(3, 2),
     });
     gridTilemapMock.isBlocking.mockReturnValue(true);
-    char = createMockChar("char", new Vector2(2, 1));
+    const char = createMockChar("char", new Vector2(2, 1));
     targetMovement.setCharacter(char);
     targetMovement.update();
 
-    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
+    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(2);
     expect(char.move).toHaveBeenCalledWith(Direction.DOWN);
   });
 

@@ -1,3 +1,4 @@
+import { PathBlockedStrategy } from "./../../Algorithms/ShortestPath/PathBlockedStrategy";
 import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { ShortestPathAlgorithm } from "./../../Algorithms/ShortestPath/ShortestPathAlgorithm";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
@@ -18,6 +19,7 @@ export class TargetMovement implements Movement {
   private shortestPath: Vector2[];
   private distOffset: number;
   private posOnPath = 0;
+  private pathBlockedStrategy: PathBlockedStrategy = PathBlockedStrategy.WAIT;
 
   constructor(
     private tilemap: GridTilemap,
@@ -26,6 +28,14 @@ export class TargetMovement implements Movement {
     private noPathFoundStrategy: NoPathFoundStrategy = NoPathFoundStrategy.STOP
   ) {}
 
+  setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void {
+    this.pathBlockedStrategy = pathBlockedStrategy;
+  }
+
+  getPathBlockedStrategy(): PathBlockedStrategy {
+    return this.pathBlockedStrategy;
+  }
+
   setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
     this.numberOfDirections = numberOfDirections;
   }
@@ -33,6 +43,7 @@ export class TargetMovement implements Movement {
   setCharacter(character: GridCharacter): void {
     this.character = character;
     const shortestPath = this.getShortestPath();
+    this.posOnPath = 0;
     this.shortestPath = shortestPath.path;
     this.distOffset = shortestPath.distOffset;
   }
@@ -64,6 +75,16 @@ export class TargetMovement implements Movement {
 
     const nextTile = this.shortestPath[this.posOnPath + 1];
     const dir = this.getDir(this.character.getNextTilePos(), nextTile);
+    if (
+      this.pathBlockedStrategy === PathBlockedStrategy.RETRY &&
+      this.isBlocking(nextTile)
+    ) {
+      const shortestPath = this.getShortestPath();
+      this.posOnPath = 0;
+      this.shortestPath = shortestPath.path;
+      this.distOffset = shortestPath.distOffset;
+    }
+
     this.character.move(dir);
   }
 
