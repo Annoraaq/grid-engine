@@ -45,7 +45,7 @@ export class FollowMovement implements Movement {
       this.gridTilemap,
       targetPos,
       this.distance + 1,
-      this.noPathFoundStrategy
+      { noPathFoundStrategy: this.noPathFoundStrategy }
     );
     this.targetMovement.setNumberOfDirections(this.numberOfDirections);
     this.targetMovement.setCharacter(this.character);
