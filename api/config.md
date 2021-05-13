@@ -102,13 +102,5 @@ The data shape of the configuration object is described here.
 ## Direction
 
 ```js
-"none" |
-  "up" |
-  "right" |
-  "left" |
-  "down" |
-  "up-left" |
-  "up-right" |
-  "down-left" |
-  "down-right";
+"none" | "up" | "right" | "left" | "down" | "up-left" | "up-right" | "down-left" | "down-right"
 ```

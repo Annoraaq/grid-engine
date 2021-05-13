@@ -54,9 +54,9 @@ nav_order: 2
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Stops any automated movement such as random movement (`moveRandomly()`), following (`follow()`) or moving to a specified position (`moveTo()`). **DEPRECATED**: use `stopMovement()` instead. |
 
-| moveTo(charId: string, targetPos: Phaser.Math.Vector2, closestPointIfBlocked: boolean = false): void                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| moveTo(charId: string, targetPos: Phaser.Math.Vector2, config: [MoveToConfig](./methods.html/#movetoconfig)): void                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Initiates movement toward the specified `targetPos`. The movement will happen along one shortest path. If no such path exists, the character will repeatedly check for a path to open up and remain still in the meantime. If `closestPointIfBlocked` is set to `true`, the character will move to the closest point ([manhattan distance](https://en.wikipedia.org/wiki/Taxicab_geometry)) to `targetPos` that is reachable from `charId` in case that there does not exist a path between `charId` and the target. |
+| Initiates movement toward the specified `targetPos`. The movement will happen along one shortest path. Check out [MoveToConfig](./methods.html/#movetoconfig) for pathfinding configurations. |
 
 | addCharacter(charData: [CharacterData](./config.html/#characterdata)): void |
 | :-------------------------------------------------------------------------- |
@@ -109,3 +109,28 @@ nav_order: 2
 | positionChangeFinished(): Observable<{charId: string, exitTile: Phaser.Math.Vector2, enterTile: Phaser.Math.Vector2}>      |
 | :------------------------------------------------------------------------------------------------------------------------- |
 | Returns an Observable that will notify about every change of tile position. It will notify at the **end** of the movement. |
+
+# Pathfinding Configuration
+
+## MoveToConfig
+
+```js
+{
+  noPathFoundStrategy?: NoPathFoundStrategy,
+  pathBlockedStrategy?: PathBlockedStrategy
+}
+```
+
+## NoPathFoundStrategy
+
+```js
+"STOP" | "CLOSEST_REACHABLE"
+```
+This strategy can be used to configure pathfinding. It determines what happens if no path could be found. "STOP" will simply stop the pathfinding if no path could be found. "CLOSEST_REACHABLE" will look for the closest point ([manhattan distance](https://en.wikipedia.org/wiki/Taxicab_geometry)) to the target position that is reachable.
+
+## PathBlockedStrategy
+
+```js
+"WAIT" | "RETRY"
+```
+This strategy can be used to configure pathfinding. It determines what happens if a previously calculated path is suddenly blocked. This can happen if a path existed and while the character was moving along that path, it got suddenly blocked. "WAIT" will make the character wait (possibly forever) until the path will be free again. "RETRY" will make the character look for a new path (repeatedly and possibly forever).
