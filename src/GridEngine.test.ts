@@ -897,23 +897,6 @@ describe("GridEngine", () => {
       );
     });
 
-    it("should use pathBlockedStrategy = STOP", () => {
-      const targetVec = new Vector2(3, 4);
-      gridEngine.moveTo("player", targetVec, {
-        noPathFoundStrategy: NoPathFoundStrategy.STOP,
-        pathBlockedStrategy: PathBlockedStrategy.STOP,
-      });
-      expect(TargetMovement).toHaveBeenCalledWith(
-        mockGridTileMap,
-        targetVec,
-        0,
-        {
-          noPathFoundStrategy: NoPathFoundStrategy.STOP,
-          pathBlockedStrategy: PathBlockedStrategy.STOP,
-        }
-      );
-    });
-
     it("should use pathBlockedStrategy = WAIT", () => {
       const targetVec = new Vector2(3, 4);
       gridEngine.moveTo("player", targetVec, {
