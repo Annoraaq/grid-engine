@@ -1530,6 +1530,7 @@ describe("GridEngine", () => {
   });
 
   describe("Error Handling unknown char id", () => {
+    const UNKNOWN_CHAR_ID = "unknownCharId";
     beforeEach(() => {
       gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
@@ -1543,81 +1544,51 @@ describe("GridEngine", () => {
       });
     });
 
-    it("should throw error if getPosition is invoked", () => {
-      expect(() => gridEngine.getPosition("unknownCharId")).toThrow(
-        "Character unknown"
+    function expectCharUnknownException(fn: () => any) {
+      expect(() => fn()).toThrow("Character unknown");
+    }
+
+    it("should throw error if char id unknown", () => {
+      expectCharUnknownException(() => gridEngine.getPosition(UNKNOWN_CHAR_ID));
+      expectCharUnknownException(() =>
+        gridEngine.setPosition(UNKNOWN_CHAR_ID, new Vector2(1, 2))
       );
-    });
-
-    it("should throw error if setPosition is invoked", () => {
-      expect(() =>
-        gridEngine.setPosition("unknownCharId", new Vector2(1, 2))
-      ).toThrow("Character unknown");
-    });
-
-    it("should throw error if move is invoked", () => {
-      expect(() => gridEngine.move("unknownCharId", Direction.LEFT)).toThrow(
-        "Character unknown"
+      expectCharUnknownException(() =>
+        gridEngine.move(UNKNOWN_CHAR_ID, Direction.LEFT)
       );
-    });
-
-    it("should throw error if moveLeft is invoked", () => {
-      expect(() => gridEngine.moveLeft("unknownCharId")).toThrow(
-        "Character unknown"
+      expectCharUnknownException(() => gridEngine.moveLeft(UNKNOWN_CHAR_ID));
+      expectCharUnknownException(() => gridEngine.moveRight(UNKNOWN_CHAR_ID));
+      expectCharUnknownException(() => gridEngine.moveUp(UNKNOWN_CHAR_ID));
+      expectCharUnknownException(() => gridEngine.moveDown(UNKNOWN_CHAR_ID));
+      expectCharUnknownException(() =>
+        gridEngine.moveRandomly(UNKNOWN_CHAR_ID)
       );
-    });
-
-    it("should throw error if moveRight is invoked", () => {
-      expect(() => gridEngine.moveRight("unknownCharId")).toThrow(
-        "Character unknown"
+      expectCharUnknownException(() =>
+        gridEngine.stopMovement(UNKNOWN_CHAR_ID)
       );
-    });
-
-    it("should throw error if moveUp is invoked", () => {
-      expect(() => gridEngine.moveUp("unknownCharId")).toThrow(
-        "Character unknown"
+      expectCharUnknownException(() =>
+        gridEngine.stopMovingRandomly(UNKNOWN_CHAR_ID)
       );
-    });
-
-    it("should throw error if moveDown is invoked", () => {
-      expect(() => gridEngine.moveDown("unknownCharId")).toThrow(
-        "Character unknown"
+      expectCharUnknownException(() => gridEngine.setSpeed(UNKNOWN_CHAR_ID, 4));
+      expectCharUnknownException(() =>
+        gridEngine.moveTo(UNKNOWN_CHAR_ID, new Vector2(3, 4))
       );
-    });
-
-    it("should throw error if moveRandomly is invoked", () => {
-      expect(() => gridEngine.moveRandomly("unknownCharId")).toThrow(
-        "Character unknown"
+      expectCharUnknownException(() =>
+        gridEngine.removeCharacter(UNKNOWN_CHAR_ID)
       );
-    });
 
-    it("should throw error if stopMovement is invoked", () => {
-      expect(() => gridEngine.stopMovement("unknownCharId")).toThrow(
-        "Character unknown"
+      expectCharUnknownException(() =>
+        gridEngine.stopFollowing(UNKNOWN_CHAR_ID)
       );
-    });
-
-    it("should throw error if stopMovingRandomly is invoked", () => {
-      expect(() => gridEngine.stopMovingRandomly("unknownCharId")).toThrow(
-        "Character unknown"
+      expectCharUnknownException(() =>
+        gridEngine.setWalkingAnimationMapping(UNKNOWN_CHAR_ID, <any>{})
       );
-    });
-
-    it("should throw error if setSpeed is invoked", () => {
-      expect(() => gridEngine.setSpeed("unknownCharId", 4)).toThrow(
-        "Character unknown"
+      expectCharUnknownException(() => gridEngine.isMoving(UNKNOWN_CHAR_ID));
+      expectCharUnknownException(() =>
+        gridEngine.getFacingDirection(UNKNOWN_CHAR_ID)
       );
-    });
-
-    it("should throw error if moveTo is invoked", () => {
-      expect(() =>
-        gridEngine.moveTo("unknownCharId", new Vector2(3, 4))
-      ).toThrow("Character unknown");
-    });
-
-    it("should throw error if removeCharacter is invoked", () => {
-      expect(() => gridEngine.removeCharacter("unknownCharId")).toThrow(
-        "Character unknown"
+      expectCharUnknownException(() =>
+        gridEngine.turnTowards(UNKNOWN_CHAR_ID, Direction.LEFT)
       );
     });
 
@@ -1631,36 +1602,6 @@ describe("GridEngine", () => {
       expect(() => gridEngine.follow("unknownCharId", "unknownCharId")).toThrow(
         "Character unknown"
       );
-    });
-
-    it("should throw error if stopFollowing is invoked", () => {
-      expect(() => gridEngine.stopFollowing("unknownCharId")).toThrow(
-        "Character unknown"
-      );
-    });
-
-    it("should throw error if setWalkingAnimationMapping is invoked", () => {
-      expect(() =>
-        gridEngine.setWalkingAnimationMapping("unknownCharId", <any>{})
-      ).toThrow("Character unknown");
-    });
-
-    it("should throw error if isMoving is invoked", () => {
-      expect(() => gridEngine.isMoving("unknownCharId")).toThrow(
-        "Character unknown"
-      );
-    });
-
-    it("should throw error if getFacingDirectiion is invoked", () => {
-      expect(() => gridEngine.getFacingDirection("unknownCharId")).toThrow(
-        "Character unknown"
-      );
-    });
-
-    it("should throw error if turnTowards is invoked", () => {
-      expect(() =>
-        gridEngine.turnTowards("unknownCharId", Direction.LEFT)
-      ).toThrow("Character unknown");
     });
   });
 
