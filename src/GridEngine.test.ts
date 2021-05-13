@@ -181,10 +181,10 @@ describe("GridEngine", () => {
     mockDirectionChanged.mockReset().mockReturnValue(of());
     mockPositionChanged.mockReset().mockReturnValue(of());
     mockPositionChangeFinished.mockReset().mockReturnValue(of());
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
   });
 
   it("should boot", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.boot();
     expect(sceneMock.sys.events.on).toHaveBeenCalledWith(
       "update",
@@ -194,7 +194,6 @@ describe("GridEngine", () => {
   });
 
   it("should init tilemap", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -212,7 +211,6 @@ describe("GridEngine", () => {
 
   it("should init tilemap with deprecated firstLayerAboveChar", () => {
     console.warn = jest.fn();
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -231,7 +229,6 @@ describe("GridEngine", () => {
 
   it("should init player", () => {
     const containerMock = {};
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -257,7 +254,6 @@ describe("GridEngine", () => {
 
   it("should init isometric player", () => {
     tileMapMock.orientation = `${Phaser.Tilemaps.Orientation.ISOMETRIC}`;
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -282,7 +278,6 @@ describe("GridEngine", () => {
 
   it("should init player with facingDirection", () => {
     const containerMock = {};
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -298,7 +293,6 @@ describe("GridEngine", () => {
 
   it("should still support deprecated characterIndex property", () => {
     console.warn = jest.fn();
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -324,7 +318,6 @@ describe("GridEngine", () => {
   });
 
   it("should prefer walkingAnimationMapping over charIndex", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -348,7 +341,6 @@ describe("GridEngine", () => {
   });
 
   it("should init player without walking animation", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -393,7 +385,6 @@ describe("GridEngine", () => {
         rightFoot: 26,
       },
     };
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -415,7 +406,6 @@ describe("GridEngine", () => {
   });
 
   it("should use config startPosition", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -430,7 +420,6 @@ describe("GridEngine", () => {
   });
 
   it("should use config speed", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -454,7 +443,6 @@ describe("GridEngine", () => {
   it("should use config offset", () => {
     const offsetX = 5;
     const offsetY = 6;
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -480,7 +468,6 @@ describe("GridEngine", () => {
 
   describe("move 4 dirs", () => {
     it("should move player orthogonally", () => {
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -498,7 +485,6 @@ describe("GridEngine", () => {
 
     it("should show warn on vertical move", () => {
       console.warn = jest.fn();
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -536,7 +522,6 @@ describe("GridEngine", () => {
 
   describe("move 8 dirs", () => {
     it("should move player orthogonally", () => {
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -553,7 +538,6 @@ describe("GridEngine", () => {
     });
 
     it("should move player vertically", () => {
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -573,7 +557,6 @@ describe("GridEngine", () => {
   describe("move 4 dirs isometric", () => {
     it("should move player vertically", () => {
       tileMapMock.orientation = `${Phaser.Tilemaps.Orientation.ISOMETRIC}`;
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -591,7 +574,6 @@ describe("GridEngine", () => {
     it("should show warn on orthogonal move", () => {
       console.warn = jest.fn();
       tileMapMock.orientation = `${Phaser.Tilemaps.Orientation.ISOMETRIC}`;
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -628,7 +610,6 @@ describe("GridEngine", () => {
   });
 
   it("should move player left", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -644,7 +625,6 @@ describe("GridEngine", () => {
   });
 
   it("should move player right", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -660,7 +640,6 @@ describe("GridEngine", () => {
   });
 
   it("should move player up", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -676,7 +655,6 @@ describe("GridEngine", () => {
   });
 
   it("should move player down", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -692,7 +670,6 @@ describe("GridEngine", () => {
   });
 
   it("should update", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -708,7 +685,6 @@ describe("GridEngine", () => {
   });
 
   it("should get tile position", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -723,7 +699,6 @@ describe("GridEngine", () => {
   });
 
   it("should set tile position", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -739,7 +714,6 @@ describe("GridEngine", () => {
   });
 
   it("should move randomly", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -757,7 +731,6 @@ describe("GridEngine", () => {
   });
 
   it("should move randomly with 8 directions", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -775,7 +748,6 @@ describe("GridEngine", () => {
 
   describe("moveTo", () => {
     beforeEach(() => {
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -930,7 +902,6 @@ describe("GridEngine", () => {
   });
 
   it("should stop moving", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -945,7 +916,6 @@ describe("GridEngine", () => {
   });
 
   it("should stop moving randomly", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -960,7 +930,6 @@ describe("GridEngine", () => {
   });
 
   it("should set speed", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -974,14 +943,12 @@ describe("GridEngine", () => {
   });
 
   it("should not call update before create", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.update(123, 456);
     expect(mockRandomMovementUpdate).not.toHaveBeenCalled();
     expect(mockTargetMovement.update).not.toHaveBeenCalled();
   });
 
   it("should add chars on the go", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [],
       firstLayerAboveChar: 3,
@@ -995,7 +962,6 @@ describe("GridEngine", () => {
   });
 
   it("should remove chars on the go", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -1011,7 +977,6 @@ describe("GridEngine", () => {
   });
 
   it("should remove all chars", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -1032,7 +997,6 @@ describe("GridEngine", () => {
   });
 
   it("should get all chars", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -1050,7 +1014,6 @@ describe("GridEngine", () => {
   });
 
   it("should check if char is registered", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -1069,7 +1032,6 @@ describe("GridEngine", () => {
   });
 
   it("should follow a char", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -1097,7 +1059,6 @@ describe("GridEngine", () => {
   });
 
   it("should follow a char with default distance", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -1122,7 +1083,6 @@ describe("GridEngine", () => {
   });
 
   it("should stop following", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -1140,7 +1100,6 @@ describe("GridEngine", () => {
   });
 
   it("should set walkingAnimationMapping", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -1177,7 +1136,6 @@ describe("GridEngine", () => {
   });
 
   it("should delegate isMoving", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -1196,7 +1154,6 @@ describe("GridEngine", () => {
   });
 
   it("should delegate getFacingDirection", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -1212,7 +1169,6 @@ describe("GridEngine", () => {
   });
 
   it("should delegate turnTowards", () => {
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -1230,7 +1186,6 @@ describe("GridEngine", () => {
     it("should get chars movementStarted observable", async () => {
       const mockSubject = new Subject<Direction>();
       mockMovementStarted.mockReturnValue(mockSubject);
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1250,7 +1205,6 @@ describe("GridEngine", () => {
     it("should unsubscribe from movementStarted if char removed", async () => {
       const mockSubject = new Subject<Direction>();
       mockMovementStarted.mockReturnValue(mockSubject);
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1275,7 +1229,6 @@ describe("GridEngine", () => {
     it("should get chars movementStopped observable", async () => {
       const mockSubject = new Subject<Direction>();
       mockMovementStopped.mockReturnValue(mockSubject);
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1295,7 +1248,6 @@ describe("GridEngine", () => {
     it("should unsubscribe from movementStopped if char removed", async () => {
       const mockSubject = new Subject<Direction>();
       mockMovementStopped.mockReturnValue(mockSubject);
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1320,7 +1272,6 @@ describe("GridEngine", () => {
     it("should get chars directionChanged observable", async () => {
       const mockSubject = new Subject<Direction>();
       mockDirectionChanged.mockReturnValue(mockSubject);
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1340,7 +1291,6 @@ describe("GridEngine", () => {
     it("should unsubscribe from directionChanged if char removed", async () => {
       const mockSubject = new Subject<Direction>();
       mockDirectionChanged.mockReturnValue(mockSubject);
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1365,7 +1315,6 @@ describe("GridEngine", () => {
     it("should get chars positionChanged observable", async () => {
       const mockSubject = new Subject<PositionChange>();
       mockPositionChanged.mockReturnValue(mockSubject);
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1391,7 +1340,6 @@ describe("GridEngine", () => {
     it("should unsubscribe from positionChanged if char removed", async () => {
       const mockSubject = new Subject<PositionChange>();
       mockPositionChanged.mockReturnValue(mockSubject);
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1419,7 +1367,6 @@ describe("GridEngine", () => {
     it("should get chars positionChangeFinished observable", async () => {
       const mockSubject = new Subject<PositionChange>();
       mockPositionChangeFinished.mockReturnValue(mockSubject);
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1448,7 +1395,6 @@ describe("GridEngine", () => {
     it("should unsubscribe from positionChangeFinished if char removed", async () => {
       const mockSubject = new Subject<PositionChange>();
       mockPositionChangeFinished.mockReturnValue(mockSubject);
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1477,7 +1423,6 @@ describe("GridEngine", () => {
   describe("Error Handling unknown char id", () => {
     const UNKNOWN_CHAR_ID = "unknownCharId";
     beforeEach(() => {
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1551,9 +1496,6 @@ describe("GridEngine", () => {
 
   describe("invokation of methods if not created properly", () => {
     const SOME_CHAR_ID = "someCharId";
-    beforeEach(() => {
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
-    });
 
     function expectUninitializedException(fn: () => any) {
       expect(() => fn()).toThrow("Plugin not initialized");
