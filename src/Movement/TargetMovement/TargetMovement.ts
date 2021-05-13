@@ -1,3 +1,4 @@
+import { NoPathFoundStrategy } from "./../../Algorithms/ShortestPath/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./../../Algorithms/ShortestPath/PathBlockedStrategy";
 import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { ShortestPathAlgorithm } from "./../../Algorithms/ShortestPath/ShortestPathAlgorithm";
@@ -8,10 +9,14 @@ import * as Phaser from "phaser";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
 import { Bfs } from "../../Algorithms/ShortestPath/Bfs/Bfs";
 import { Movement } from "../Movement";
-import { NoPathFoundStrategy } from "../../Algorithms/ShortestPath/NoPathFoundStrategy";
 
 type Vector2 = Phaser.Math.Vector2;
 const Vector2 = Phaser.Math.Vector2;
+
+export interface MoveToConfig {
+  noPathFoundStrategy?: NoPathFoundStrategy;
+  pathBlockedStrategy?: PathBlockedStrategy;
+}
 
 export class TargetMovement implements Movement {
   private character: GridCharacter;
@@ -19,14 +24,20 @@ export class TargetMovement implements Movement {
   private shortestPath: Vector2[];
   private distOffset: number;
   private posOnPath = 0;
-  private pathBlockedStrategy: PathBlockedStrategy = PathBlockedStrategy.WAIT;
+  private noPathFoundStrategy: NoPathFoundStrategy;
+  private pathBlockedStrategy: PathBlockedStrategy;
 
   constructor(
     private tilemap: GridTilemap,
     private targetPos: Vector2,
     private distance = 0,
-    private noPathFoundStrategy: NoPathFoundStrategy = NoPathFoundStrategy.STOP
-  ) {}
+    config?: MoveToConfig
+  ) {
+    this.noPathFoundStrategy =
+      config?.noPathFoundStrategy || NoPathFoundStrategy.STOP;
+    this.pathBlockedStrategy =
+      config?.pathBlockedStrategy || PathBlockedStrategy.WAIT;
+  }
 
   setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void {
     this.pathBlockedStrategy = pathBlockedStrategy;

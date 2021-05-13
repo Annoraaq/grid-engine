@@ -161,12 +161,9 @@ describe("TargetMovement", () => {
   });
 
   it("should move towards closest reachable point if path is blocked", () => {
-    targetMovement = new TargetMovement(
-      gridTilemapMock,
-      new Vector2(3, 1),
-      0,
-      NoPathFoundStrategy.CLOSEST_REACHABLE
-    );
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 1), 0, {
+      noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+    });
     const charPos = new Vector2(1, 1);
     mockBfs.getShortestPath = jest
       .fn()
@@ -198,12 +195,9 @@ describe("TargetMovement", () => {
   it("should not move towards closest reachable point if distance is reached", () => {
     const charPos = new Vector2(1, 1);
     const targetPos = new Vector2(3, 1);
-    targetMovement = new TargetMovement(
-      gridTilemapMock,
-      targetPos,
-      2,
-      NoPathFoundStrategy.CLOSEST_REACHABLE
-    );
+    targetMovement = new TargetMovement(gridTilemapMock, targetPos, 2, {
+      noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+    });
     mockBfs.getShortestPath = jest
       .fn()
       .mockReturnValueOnce({
@@ -320,12 +314,9 @@ describe("TargetMovement", () => {
   });
 
   it("should move if closestToTarget is further than distance", () => {
-    targetMovement = new TargetMovement(
-      gridTilemapMock,
-      new Vector2(1, 5),
-      3,
-      NoPathFoundStrategy.CLOSEST_REACHABLE
-    );
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(1, 5), 3, {
+      noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+    });
     const charPos = new Vector2(1, 1);
     mockBfs.getShortestPath = jest
       .fn()
@@ -344,12 +335,9 @@ describe("TargetMovement", () => {
   });
 
   it("should not move if closestToTarget is closer than distance", () => {
-    targetMovement = new TargetMovement(
-      gridTilemapMock,
-      new Vector2(1, 5),
-      3,
-      NoPathFoundStrategy.CLOSEST_REACHABLE
-    );
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(1, 5), 3, {
+      noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+    });
     const charPos = new Vector2(1, 2);
     mockBfs.getShortestPath = jest
       .fn()
@@ -370,12 +358,9 @@ describe("TargetMovement", () => {
   it("should not move if distOffset is larger than distance", () => {
     const charPos = new Vector2(1, 2);
     const target = new Vector2(1, 5);
-    targetMovement = new TargetMovement(
-      gridTilemapMock,
-      target,
-      1,
-      NoPathFoundStrategy.CLOSEST_REACHABLE
-    );
+    targetMovement = new TargetMovement(gridTilemapMock, target, 1, {
+      noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+    });
     mockBfs.getShortestPath = jest
       .fn()
       .mockReturnValueOnce({
@@ -546,12 +531,9 @@ describe("TargetMovement", () => {
       const charPos = new Vector2(1, 1);
       const targetPos = new Vector2(3, 3);
       const closestToTarget = new Vector2(2, 2);
-      targetMovement = new TargetMovement(
-        gridTilemapMock,
-        targetPos,
-        2,
-        NoPathFoundStrategy.CLOSEST_REACHABLE
-      );
+      targetMovement = new TargetMovement(gridTilemapMock, targetPos, 2, {
+        noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+      });
       targetMovement.setNumberOfDirections(NumberOfDirections.EIGHT);
       mockBfs.getShortestPath = jest
         .fn()

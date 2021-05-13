@@ -1,3 +1,4 @@
+import { PathBlockedStrategy } from "./Algorithms/ShortestPath/PathBlockedStrategy";
 import { NoPathFoundStrategy } from "./Algorithms/ShortestPath/NoPathFoundStrategy";
 import { Subject, of } from "rxjs";
 import { take } from "rxjs/operators";
@@ -815,12 +816,16 @@ describe("GridEngine", () => {
         mockGridTileMap,
         targetVec,
         0,
-        NoPathFoundStrategy.STOP
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+        }
       );
       expect(mockTargetMovement.setNumberOfDirections).toHaveBeenCalledWith(
         NumberOfDirections.FOUR
       );
       expect(mockSetMovement).toHaveBeenCalledWith(mockTargetMovement);
+      expect(console.warn).not.toHaveBeenCalled();
     });
 
     it("should move to coordinates closestPointIfBlocked", () => {
@@ -830,51 +835,136 @@ describe("GridEngine", () => {
         mockGridTileMap,
         targetVec,
         0,
-        NoPathFoundStrategy.CLOSEST_REACHABLE
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+        }
+      );
+      expect(console.warn).toHaveBeenCalledWith(
+        "GridEngine: parameter 'closestPointIfBlocked' is deprecated. " +
+          "Please use noPathFoundStrategy: 'CLOSEST_REACHABLE' instead."
       );
     });
 
     it("should move to coordinates STOP", () => {
       const targetVec = new Vector2(3, 4);
-      gridEngine.moveTo("player", targetVec, NoPathFoundStrategy.STOP);
+      gridEngine.moveTo("player", targetVec, {
+        noPathFoundStrategy: NoPathFoundStrategy.STOP,
+      });
       expect(TargetMovement).toHaveBeenCalledWith(
         mockGridTileMap,
         targetVec,
         0,
-        NoPathFoundStrategy.STOP
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+        }
       );
     });
 
     it("should move to coordinates CLOSEST_REACHABLE", () => {
       const targetVec = new Vector2(3, 4);
-      gridEngine.moveTo(
-        "player",
-        targetVec,
-        NoPathFoundStrategy.CLOSEST_REACHABLE
-      );
+      gridEngine.moveTo("player", targetVec, {
+        noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+      });
       expect(TargetMovement).toHaveBeenCalledWith(
         mockGridTileMap,
         targetVec,
         0,
-        NoPathFoundStrategy.CLOSEST_REACHABLE
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+        }
       );
     });
 
     it("should move to coordinates STOP on unknown strategy", () => {
       const targetVec = new Vector2(3, 4);
-      gridEngine.moveTo(
-        "player",
-        targetVec,
-        <NoPathFoundStrategy>"unknown strategy"
-      );
+      gridEngine.moveTo("player", targetVec, {
+        noPathFoundStrategy: <NoPathFoundStrategy>"unknown strategy",
+      });
       expect(TargetMovement).toHaveBeenCalledWith(
         mockGridTileMap,
         targetVec,
         0,
-        NoPathFoundStrategy.STOP
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+        }
       );
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Unknown NoPathFoundStrategy 'unknown strategy'. Falling back to 'STOP'"
+      );
+    });
+
+    it("should use pathBlockedStrategy = STOP", () => {
+      const targetVec = new Vector2(3, 4);
+      gridEngine.moveTo("player", targetVec, {
+        noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        pathBlockedStrategy: PathBlockedStrategy.STOP,
+      });
+      expect(TargetMovement).toHaveBeenCalledWith(
+        mockGridTileMap,
+        targetVec,
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.STOP,
+        }
+      );
+    });
+
+    it("should use pathBlockedStrategy = WAIT", () => {
+      const targetVec = new Vector2(3, 4);
+      gridEngine.moveTo("player", targetVec, {
+        noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        pathBlockedStrategy: PathBlockedStrategy.WAIT,
+      });
+      expect(TargetMovement).toHaveBeenCalledWith(
+        mockGridTileMap,
+        targetVec,
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+        }
+      );
+    });
+
+    it("should use pathBlockedStrategy = RETRY", () => {
+      const targetVec = new Vector2(3, 4);
+      gridEngine.moveTo("player", targetVec, {
+        noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        pathBlockedStrategy: PathBlockedStrategy.RETRY,
+      });
+      expect(TargetMovement).toHaveBeenCalledWith(
+        mockGridTileMap,
+        targetVec,
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.RETRY,
+        }
+      );
+    });
+
+    it("should use pathBlockedStrategy WAIT and warn on unkown input", () => {
+      const targetVec = new Vector2(3, 4);
+      gridEngine.moveTo("player", targetVec, {
+        noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        pathBlockedStrategy: <PathBlockedStrategy>"unknown strategy",
+      });
+      expect(TargetMovement).toHaveBeenCalledWith(
+        mockGridTileMap,
+        targetVec,
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+        }
+      );
+      expect(console.warn).toHaveBeenCalledWith(
+        "GridEngine: Unknown PathBlockedStrategy 'unknown strategy'. Falling back to 'WAIT'"
       );
     });
   });
