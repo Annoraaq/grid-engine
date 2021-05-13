@@ -200,7 +200,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
       collisionTilePropertyName: "custom_collision_prop",
@@ -241,7 +240,6 @@ describe("GridEngine", () => {
           container: <any>containerMock,
         },
       ],
-      firstLayerAboveChar: 3,
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
@@ -294,7 +292,6 @@ describe("GridEngine", () => {
           facingDirection: Direction.LEFT,
         },
       ],
-      firstLayerAboveChar: 3,
     });
     expect(mockTurnTowards).toHaveBeenCalledWith(Direction.LEFT);
   });
@@ -310,7 +307,6 @@ describe("GridEngine", () => {
           characterIndex: 2,
         },
       ],
-      firstLayerAboveChar: 3,
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
@@ -362,7 +358,6 @@ describe("GridEngine", () => {
           walkingAnimationEnabled: false,
         },
       ],
-      firstLayerAboveChar: 3,
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
@@ -407,7 +402,6 @@ describe("GridEngine", () => {
           walkingAnimationMapping,
         },
       ],
-      firstLayerAboveChar: 3,
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
@@ -431,7 +425,6 @@ describe("GridEngine", () => {
           startPosition: new Vector2(3, 4),
         },
       ],
-      firstLayerAboveChar: 3,
     });
     expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(3, 4));
   });
@@ -511,7 +504,6 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
       });
@@ -550,7 +542,6 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
         numberOfDirections: NumberOfDirections.EIGHT,
@@ -568,7 +559,6 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
         numberOfDirections: NumberOfDirections.EIGHT,
@@ -589,7 +579,6 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
       });
@@ -608,7 +597,6 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
       });
@@ -646,10 +634,8 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
-      firstLayerAboveChar: 3,
     });
 
     gridEngine.moveLeft("player");
@@ -664,7 +650,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -681,7 +666,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -698,7 +682,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -715,7 +698,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -732,7 +714,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -748,7 +729,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -765,7 +745,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -784,7 +763,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
       numberOfDirections: NumberOfDirections.EIGHT,
@@ -803,7 +781,6 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
       });
@@ -959,7 +936,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -975,7 +951,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -991,7 +966,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -1015,7 +989,6 @@ describe("GridEngine", () => {
     gridEngine.addCharacter({
       id: "player",
       sprite: playerSpriteMock,
-      walkingAnimationMapping: 3,
     });
     gridEngine.update(123, 456);
     expect(mockUpdate).toHaveBeenCalledTimes(1);
@@ -1028,7 +1001,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -1045,12 +1017,10 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
         {
           id: "player2",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -1068,12 +1038,10 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
         {
           id: "player2",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -1088,14 +1056,12 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
     gridEngine.addCharacter({
       id: "player2",
       sprite: playerSpriteMock,
-      walkingAnimationMapping: 3,
     });
     expect(gridEngine.hasCharacter("player")).toBe(true);
     expect(gridEngine.hasCharacter("player2")).toBe(true);
@@ -1109,12 +1075,10 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
         {
           id: "player2",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -1139,12 +1103,10 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
         {
           id: "player2",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -1166,12 +1128,10 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
         {
           id: "player2",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -1223,7 +1183,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -1243,7 +1202,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -1260,7 +1218,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         },
       ],
     });
@@ -1279,7 +1236,6 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
       });
@@ -1300,10 +1256,8 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
-        firstLayerAboveChar: 3,
       });
 
       gridEngine.removeCharacter("player");
@@ -1327,7 +1281,6 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
       });
@@ -1348,10 +1301,8 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
-        firstLayerAboveChar: 3,
       });
 
       gridEngine.removeCharacter("player");
@@ -1375,7 +1326,6 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
       });
@@ -1396,7 +1346,6 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
       });
@@ -1422,7 +1371,6 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
       });
@@ -1449,7 +1397,6 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
       });
@@ -1478,7 +1425,6 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
       });
@@ -1508,7 +1454,6 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
       });
@@ -1538,7 +1483,6 @@ describe("GridEngine", () => {
           {
             id: "player",
             sprite: playerSpriteMock,
-            walkingAnimationMapping: 3,
           },
         ],
       });
