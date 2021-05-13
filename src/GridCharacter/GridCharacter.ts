@@ -54,6 +54,7 @@ export class GridCharacter {
   private directionChanged$ = new Subject<Direction>();
   private positionChanged$ = new Subject<PositionChange>();
   private positionChangeFinished$ = new Subject<PositionChange>();
+  private autoMovementSet$ = new Subject<void>();
   private lastMovementImpulse = Direction.NONE;
   private facingDirection: Direction = Direction.DOWN;
   private animation: CharacterAnimation;
@@ -102,6 +103,7 @@ export class GridCharacter {
   }
 
   setMovement(movement: Movement): void {
+    this.autoMovementSet$.next();
     this.movement = movement;
     this.movement?.setCharacter(this);
   }
@@ -141,6 +143,10 @@ export class GridCharacter {
 
   getTilePos(): Vector2 {
     return this.tilePos;
+  }
+
+  getNextTilePos(): Vector2 {
+    return this.nextTilePos;
   }
 
   move(direction: Direction): void {
@@ -216,6 +222,10 @@ export class GridCharacter {
 
   positionChangeFinished(): Subject<PositionChange> {
     return this.positionChangeFinished$;
+  }
+
+  autoMovementSet(): Subject<void> {
+    return this.autoMovementSet$;
   }
 
   protected tilePosToPixelPos(tilePosition: Vector2): Vector2 {

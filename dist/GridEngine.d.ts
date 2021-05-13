@@ -1,3 +1,4 @@
+import { MoveToConfig } from "./Movement/TargetMovement/TargetMovement";
 import { CharacterIndex, FrameRow, PositionChange } from "./GridCharacter/GridCharacter";
 import "phaser";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
@@ -58,6 +59,7 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     move(charId: string, direction: Direction): void;
     moveRandomly(charId: string, delay?: number, radius?: number): void;
     moveTo(charId: string, targetPos: Vector2, closestPointIfBlocked?: boolean): void;
+    moveTo(charId: string, targetPos: Vector2, config?: MoveToConfig): void;
     stopMovingRandomly(charId: string): void;
     stopMovement(charId: string): void;
     setSpeed(charId: string, speed: number): void;
@@ -92,5 +94,6 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     private moveChar;
     private _stopMovement;
     private _isIsometric;
+    private assembleMoveToConfig;
 }
 export {};

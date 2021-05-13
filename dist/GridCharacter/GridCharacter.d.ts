@@ -45,6 +45,7 @@ export declare class GridCharacter {
     private directionChanged$;
     private positionChanged$;
     private positionChangeFinished$;
+    private autoMovementSet$;
     private lastMovementImpulse;
     private facingDirection;
     private animation;
@@ -58,6 +59,7 @@ export declare class GridCharacter {
     setWalkingAnimationMapping(walkingAnimationMapping: WalkingAnimationMapping): void;
     setTilePosition(tilePosition: Vector2): void;
     getTilePos(): Vector2;
+    getNextTilePos(): Vector2;
     move(direction: Direction): void;
     update(delta: number): void;
     getMovementDirection(): Direction;
@@ -71,6 +73,7 @@ export declare class GridCharacter {
     directionChanged(): Subject<Direction>;
     positionChanged(): Subject<PositionChange>;
     positionChangeFinished(): Subject<PositionChange>;
+    autoMovementSet(): Subject<void>;
     protected tilePosToPixelPos(tilePosition: Vector2): Vector2;
     protected getTileDistance(direction: Direction): Vector2;
     protected toMapDirection(direction: Direction): Direction;

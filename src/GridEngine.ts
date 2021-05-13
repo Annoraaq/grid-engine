@@ -1,6 +1,10 @@
+import { PathBlockedStrategy } from "./Algorithms/ShortestPath/PathBlockedStrategy";
 import { IsometricGridCharacter } from "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
-import { TargetMovement } from "./Movement/TargetMovement/TargetMovement";
+import {
+  MoveToConfig,
+  TargetMovement,
+} from "./Movement/TargetMovement/TargetMovement";
 import {
   CharacterIndex,
   CharConfig,
@@ -18,6 +22,7 @@ import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
+import { NoPathFoundStrategy } from "./Algorithms/ShortestPath/NoPathFoundStrategy";
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
@@ -136,15 +141,23 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   moveTo(
     charId: string,
     targetPos: Vector2,
-    closestPointIfBlocked = false
+    closestPointIfBlocked?: boolean
+  ): void;
+  moveTo(charId: string, targetPos: Vector2, config?: MoveToConfig): void;
+  moveTo(
+    charId: string,
+    targetPos: Vector2,
+    config?: boolean | MoveToConfig
   ): void {
+    const moveToConfig = this.assembleMoveToConfig(config);
+
     this.initGuard();
     this.unknownCharGuard(charId);
     const targetMovement = new TargetMovement(
       this.gridTilemap,
       targetPos,
       0,
-      closestPointIfBlocked
+      moveToConfig
     );
     targetMovement.setNumberOfDirections(this.numberOfDirections);
     this.gridCharacters.get(charId).setMovement(targetMovement);
@@ -314,6 +327,8 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
       this.gridCharacters.get(charIdToFollow),
       distance,
       closestPointIfBlocked
+        ? NoPathFoundStrategy.CLOSEST_REACHABLE
+        : NoPathFoundStrategy.STOP
     );
     followMovement.setNumberOfDirections(this.numberOfDirections);
     this.gridCharacters.get(charId).setMovement(followMovement);
@@ -446,5 +461,46 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     return (
       this.tilemap.orientation == `${Phaser.Tilemaps.Orientation.ISOMETRIC}`
     );
+  }
+
+  private assembleMoveToConfig(config: boolean | MoveToConfig): MoveToConfig {
+    const moveToConfig = {
+      noPathFoundStrategy: NoPathFoundStrategy.STOP,
+      pathBlockedStrategy: PathBlockedStrategy.WAIT,
+    };
+    if (typeof config === "boolean") {
+      moveToConfig.noPathFoundStrategy = config
+        ? NoPathFoundStrategy.CLOSEST_REACHABLE
+        : NoPathFoundStrategy.STOP;
+      console.warn(
+        "GridEngine: parameter 'closestPointIfBlocked' is deprecated. " +
+          "Please use noPathFoundStrategy: 'CLOSEST_REACHABLE' instead."
+      );
+      return moveToConfig;
+    }
+    if (config?.noPathFoundStrategy) {
+      if (
+        Object.values(NoPathFoundStrategy).includes(config.noPathFoundStrategy)
+      ) {
+        moveToConfig.noPathFoundStrategy = config.noPathFoundStrategy;
+      } else {
+        console.warn(
+          `GridEngine: Unknown NoPathFoundStrategy '${config.noPathFoundStrategy}'. Falling back to '${NoPathFoundStrategy.STOP}'`
+        );
+      }
+    }
+
+    if (config?.pathBlockedStrategy) {
+      if (
+        Object.values(PathBlockedStrategy).includes(config.pathBlockedStrategy)
+      ) {
+        moveToConfig.pathBlockedStrategy = config.pathBlockedStrategy;
+      } else {
+        console.warn(
+          `GridEngine: Unknown PathBlockedStrategy '${config.pathBlockedStrategy}'. Falling back to '${PathBlockedStrategy.WAIT}'`
+        );
+      }
+    }
+    return moveToConfig;
   }
 }

@@ -4,6 +4,7 @@ import * as Phaser from "phaser";
 import { Direction } from "../../Direction/Direction";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { RandomMovement } from "./RandomMovement";
+import { Subject } from "rxjs";
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
@@ -11,6 +12,8 @@ type Vector2 = Phaser.Math.Vector2;
 describe("RandomMovement", () => {
   let randomMovement: RandomMovement;
   let charMock: GridCharacter;
+  let positionChangedSubject$: Subject<any>;
+  let autoMovementSetSubject$: Subject<any>;
 
   function mockRandom(val: number) {
     const mockMath = Object.create(Math);
@@ -20,12 +23,22 @@ describe("RandomMovement", () => {
 
   beforeEach(() => {
     randomMovement = new RandomMovement();
+    positionChangedSubject$ = new Subject();
+    autoMovementSetSubject$ = new Subject();
     charMock = <any>{
+      positionChangedSubject$,
+      autoMovementSetSubject$,
       getId: () => "char",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getTilePos: () => new Vector2(0, 0),
+      getNextTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
+      positionChanged: function () {
+        return this.positionChangedSubject$;
+      },
+      autoMovementSet: function () {
+        return this.autoMovementSetSubject$;
+      },
     };
   });
 
@@ -63,7 +76,7 @@ describe("RandomMovement", () => {
     mockRandom(0.5);
 
     randomMovement.setCharacter(charMock);
-    charMock.getTilePos = () => new Vector2(2, 2);
+    charMock.getNextTilePos = () => new Vector2(2, 2);
     randomMovement.update(1);
 
     expect(charMock.move).toHaveBeenCalledWith(Direction.NONE);
@@ -74,7 +87,7 @@ describe("RandomMovement", () => {
     mockRandom(0.5);
 
     randomMovement.setCharacter(charMock);
-    charMock.getTilePos = () => new Vector2(2, 2);
+    charMock.getNextTilePos = () => new Vector2(2, 2);
     randomMovement.update(1);
 
     expect(charMock.move).toHaveBeenCalledWith(Direction.DOWN);
@@ -87,20 +100,46 @@ describe("RandomMovement", () => {
     randomMovement.setCharacter(charMock);
 
     // do first step down and set step size 2
-    randomMovement.update(500);
+    randomMovement.update(1);
+    positionChangedSubject$.next();
     expect(charMock.move).toHaveBeenNthCalledWith(1, Direction.DOWN);
 
     // next random direction would be up
     mockRandom(0.1);
 
     // do next step which is still smaller than step size
-    randomMovement.update(500);
+    randomMovement.update(1);
+    positionChangedSubject$.next();
     expect(charMock.move).toHaveBeenNthCalledWith(2, Direction.DOWN);
 
     // do next step which exceeds step size. New random direction (up)
     // should be taken
-    randomMovement.update(500);
+    randomMovement.update(1);
+    positionChangedSubject$.next();
     expect(charMock.move).toHaveBeenNthCalledWith(3, Direction.UP);
+  });
+
+  it("should reset step size", () => {
+    randomMovement = new RandomMovement(0, 2);
+    mockRandom(0.7); // dir: down, stepSize: 2
+    randomMovement.setCharacter(charMock);
+
+    mockRandom(0.1); // dir: up, stepSize: 1
+
+    // set stepsWalked to 2
+    positionChangedSubject$.next();
+    positionChangedSubject$.next();
+
+    // sets step size to 1
+    randomMovement.update(1);
+    expect(charMock.move).toHaveBeenNthCalledWith(1, Direction.UP);
+
+    mockRandom(0.7); // dir: down, stepSize: 2
+
+    // set stepsWalked to 1
+    positionChangedSubject$.next();
+    randomMovement.update(1);
+    expect(charMock.move).toHaveBeenNthCalledWith(2, Direction.DOWN);
   });
 
   it("should not continue moving if direction blocked", () => {
@@ -131,34 +170,29 @@ describe("RandomMovement", () => {
     randomMovement.update(60);
     expect(charMock.move).toHaveBeenNthCalledWith(1, Direction.DOWN);
 
-    charMock.getTilePos = () => new Vector2(2, 2);
+    charMock.getNextTilePos = () => new Vector2(2, 2);
 
     // do next step which is out of radius
     randomMovement.update(1);
     expect(charMock.move).toHaveBeenCalledTimes(1);
   });
 
-  it("should reset step size and steps walked on direction change", () => {
+  it("should unsubscribe from positionChanged on autoMovementSet", () => {
     randomMovement = new RandomMovement(0, 2);
-    mockRandom(0.7);
-
+    mockRandom(0.7); // dir: down, stepSize: 2
     randomMovement.setCharacter(charMock);
+    // start moving down
+    randomMovement.update(1);
+    expect(charMock.move).toHaveBeenNthCalledWith(1, Direction.DOWN);
 
-    // do first step down and init step size with 2
-    randomMovement.update(500);
-    // walk down
-    randomMovement.update(500);
+    mockRandom(0.1); // dir: up, stepSize: 1
 
-    // walk up and reset step size and walked steps
-    mockRandom(0.1);
-    randomMovement.update(500);
+    autoMovementSetSubject$.next();
+    positionChangedSubject$.next();
+    positionChangedSubject$.next();
 
-    // next random direction would be down,
-    // because step size was reset to 1
-    mockRandom(0.7);
-    randomMovement.update(500);
-
-    expect(charMock.move).toHaveBeenNthCalledWith(4, Direction.DOWN);
+    randomMovement.update(1);
+    expect(charMock.move).toHaveBeenNthCalledWith(2, Direction.DOWN);
   });
 
   describe("8 directions", () => {
@@ -181,7 +215,7 @@ describe("RandomMovement", () => {
       mockRandom(0.7);
 
       randomMovement.setCharacter(charMock);
-      charMock.getTilePos = () => new Vector2(4, 4);
+      charMock.getNextTilePos = () => new Vector2(4, 4);
       randomMovement.update(1);
 
       expect(charMock.move).toHaveBeenCalledWith(Direction.NONE);

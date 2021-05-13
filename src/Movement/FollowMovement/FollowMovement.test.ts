@@ -1,7 +1,12 @@
+import { NoPathFoundStrategy } from "./../../Algorithms/ShortestPath/NoPathFoundStrategy";
 import { NumberOfDirections } from "./../../Direction/Direction";
 import { FollowMovement } from "./FollowMovement";
 import * as Phaser from "phaser";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
+import { Subject } from "rxjs";
+
+type Vector2 = Phaser.Math.Vector2;
+const Vector2 = Phaser.Math.Vector2;
 
 const mockTargetMovement = {
   setCharacter: jest.fn(),
@@ -18,13 +23,24 @@ jest.mock("../TargetMovement/TargetMovement", () => ({
 describe("FollowMovement", () => {
   let followMovement: FollowMovement;
   let gridTilemapMock;
+  let mockChar;
+  let targetCharPos: Vector2;
+  let targetChar;
 
   function createMockChar(id: string, pos: Phaser.Math.Vector2) {
     return <any>{
+      positionChangedSubject$: new Subject(),
+      autoMovementSetSubject$: new Subject(),
       getId: () => id,
       getTilePos: jest.fn(() => pos),
       move: jest.fn(),
       isMoving: () => false,
+      positionChanged: function () {
+        return this.positionChangedSubject$;
+      },
+      autoMovementSet: function () {
+        return this.autoMovementSetSubject$;
+      },
     };
   }
 
@@ -36,21 +52,20 @@ describe("FollowMovement", () => {
       isBlocking: jest.fn(),
     };
     mockTargetMovement.setCharacter.mockReset();
+    const charPos = new Vector2(1, 1);
+    targetCharPos = new Vector2(3, 1);
+    mockChar = createMockChar("char", charPos);
+    targetChar = createMockChar("targetChar", targetCharPos);
+    followMovement = new FollowMovement(gridTilemapMock, targetChar);
   });
 
-  it("should update added character", () => {
-    const charPos = new Phaser.Math.Vector2(1, 1);
-    const targetCharPos = new Phaser.Math.Vector2(3, 1);
-    const mockChar = createMockChar("char", charPos);
-    const targetChar = createMockChar("targetChar", targetCharPos);
-    followMovement = new FollowMovement(gridTilemapMock, targetChar);
+  it("should set character", () => {
     followMovement.setCharacter(mockChar);
-    followMovement.update();
     expect(TargetMovement).toHaveBeenCalledWith(
       gridTilemapMock,
       targetCharPos,
       1,
-      false
+      { noPathFoundStrategy: NoPathFoundStrategy.STOP }
     );
     expect(mockTargetMovement.setNumberOfDirections).toHaveBeenCalledWith(
       NumberOfDirections.FOUR
@@ -58,12 +73,13 @@ describe("FollowMovement", () => {
     expect(mockTargetMovement.setCharacter).toHaveBeenCalledWith(mockChar);
   });
 
+  it("should update added character", () => {
+    followMovement.setCharacter(mockChar);
+    followMovement.update();
+    expect(mockTargetMovement.update).toHaveBeenCalled();
+  });
+
   it("should pass number of directions", () => {
-    const charPos = new Phaser.Math.Vector2(1, 1);
-    const targetCharPos = new Phaser.Math.Vector2(3, 1);
-    const mockChar = createMockChar("char", charPos);
-    const targetChar = createMockChar("targetChar", targetCharPos);
-    followMovement = new FollowMovement(gridTilemapMock, targetChar);
     followMovement.setNumberOfDirections(NumberOfDirections.EIGHT);
     followMovement.setCharacter(mockChar);
     followMovement.update();
@@ -72,11 +88,47 @@ describe("FollowMovement", () => {
     );
   });
 
+  it("should update target on position change", () => {
+    followMovement.setCharacter(mockChar);
+
+    const enterTile = new Vector2(7, 7);
+    mockTargetMovement.setNumberOfDirections.mockReset();
+    mockTargetMovement.setCharacter.mockReset();
+
+    targetChar.positionChangedSubject$.next({ enterTile });
+
+    expect(TargetMovement).toHaveBeenCalledWith(gridTilemapMock, enterTile, 1, {
+      noPathFoundStrategy: NoPathFoundStrategy.STOP,
+    });
+    expect(mockTargetMovement.setNumberOfDirections).toHaveBeenCalledWith(
+      NumberOfDirections.FOUR
+    );
+    expect(mockTargetMovement.setCharacter).toHaveBeenCalledWith(mockChar);
+  });
+
+  it("should not update target on position change after autoMovementSet", () => {
+    followMovement.setCharacter(mockChar);
+
+    const enterTile = new Vector2(7, 7);
+    mockTargetMovement.setNumberOfDirections.mockReset();
+    mockTargetMovement.setCharacter.mockReset();
+
+    mockChar.autoMovementSetSubject$.next();
+    targetChar.positionChangedSubject$.next({ enterTile });
+
+    expect(TargetMovement).not.toHaveBeenCalledWith(
+      gridTilemapMock,
+      enterTile,
+      1,
+      { noPathFoundStrategy: NoPathFoundStrategy.STOP }
+    );
+    expect(mockTargetMovement.setNumberOfDirections).not.toHaveBeenCalledWith(
+      NumberOfDirections.FOUR
+    );
+    expect(mockTargetMovement.setCharacter).not.toHaveBeenCalledWith(mockChar);
+  });
+
   it("should update added character with distance", () => {
-    const charPos = new Phaser.Math.Vector2(1, 1);
-    const targetCharPos = new Phaser.Math.Vector2(3, 1);
-    const mockChar = createMockChar("char", charPos);
-    const targetChar = createMockChar("targetChar", targetCharPos);
     followMovement = new FollowMovement(gridTilemapMock, targetChar, 7);
     followMovement.setCharacter(mockChar);
     followMovement.update();
@@ -84,24 +136,25 @@ describe("FollowMovement", () => {
       gridTilemapMock,
       targetCharPos,
       8,
-      false
+      { noPathFoundStrategy: NoPathFoundStrategy.STOP }
     );
     expect(mockTargetMovement.setCharacter).toHaveBeenCalledWith(mockChar);
   });
 
-  it("should update added character with distance and closestPointIfBlocked", () => {
-    const charPos = new Phaser.Math.Vector2(1, 1);
-    const targetCharPos = new Phaser.Math.Vector2(3, 1);
-    const mockChar = createMockChar("char", charPos);
-    const targetChar = createMockChar("targetChar", targetCharPos);
-    followMovement = new FollowMovement(gridTilemapMock, targetChar, 7, true);
+  it("should update added character with distance and CLOSEST_REACHABLE", () => {
+    followMovement = new FollowMovement(
+      gridTilemapMock,
+      targetChar,
+      7,
+      NoPathFoundStrategy.CLOSEST_REACHABLE
+    );
     followMovement.setCharacter(mockChar);
     followMovement.update();
     expect(TargetMovement).toHaveBeenCalledWith(
       gridTilemapMock,
       targetCharPos,
       8,
-      true
+      { noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE }
     );
     expect(mockTargetMovement.setCharacter).toHaveBeenCalledWith(mockChar);
   });
