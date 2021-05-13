@@ -1606,150 +1606,64 @@ describe("GridEngine", () => {
   });
 
   describe("invokation of methods if not created properly", () => {
+    const SOME_CHAR_ID = "someCharId";
     beforeEach(() => {
       gridEngine = new GridEngine(sceneMock, pluginManagerMock);
     });
 
-    it("should throw error if getPosition is invoked", () => {
-      expect(() => gridEngine.getPosition("someCharId")).toThrow(
-        "Plugin not initialized"
+    function expectUninitializedException(fn: () => any) {
+      expect(() => fn()).toThrow("Plugin not initialized");
+    }
+
+    it("should throw error if plugin not created", () => {
+      expectUninitializedException(() => gridEngine.getPosition(SOME_CHAR_ID));
+      expectUninitializedException(() =>
+        gridEngine.setPosition(SOME_CHAR_ID, new Vector2(1, 2))
       );
-    });
-
-    it("should throw error if setPosition is invoked", () => {
-      expect(() =>
-        gridEngine.setPosition("someCharId", new Vector2(1, 2))
-      ).toThrow("Plugin not initialized");
-    });
-
-    it("should throw error if move is invoked", () => {
-      expect(() => gridEngine.move("someCharId", Direction.LEFT)).toThrow(
-        "Plugin not initialized"
+      expectUninitializedException(() =>
+        gridEngine.move(SOME_CHAR_ID, Direction.LEFT)
       );
-    });
-
-    it("should throw error if moveLeft is invoked", () => {
-      expect(() => gridEngine.moveLeft("someCharId")).toThrow(
-        "Plugin not initialized"
+      expectUninitializedException(() => gridEngine.moveLeft(SOME_CHAR_ID));
+      expectUninitializedException(() => gridEngine.moveRight(SOME_CHAR_ID));
+      expectUninitializedException(() => gridEngine.moveUp(SOME_CHAR_ID));
+      expectUninitializedException(() => gridEngine.moveDown(SOME_CHAR_ID));
+      expectUninitializedException(() => gridEngine.moveRandomly(SOME_CHAR_ID));
+      expectUninitializedException(() =>
+        gridEngine.moveTo(SOME_CHAR_ID, new Vector2(2, 3))
       );
-    });
-
-    it("should throw error if moveRight is invoked", () => {
-      expect(() => gridEngine.moveRight("someCharId")).toThrow(
-        "Plugin not initialized"
+      expectUninitializedException(() => gridEngine.stopMovement(SOME_CHAR_ID));
+      expectUninitializedException(() =>
+        gridEngine.stopMovingRandomly(SOME_CHAR_ID)
       );
-    });
-
-    it("should throw error if moveUp is invoked", () => {
-      expect(() => gridEngine.moveUp("someCharId")).toThrow(
-        "Plugin not initialized"
-      );
-    });
-
-    it("should throw error if moveDown is invoked", () => {
-      expect(() => gridEngine.moveDown("someCharId")).toThrow(
-        "Plugin not initialized"
-      );
-    });
-
-    it("should throw error if moveRandomly is invoked", () => {
-      expect(() => gridEngine.moveRandomly("someCharId")).toThrow(
-        "Plugin not initialized"
-      );
-    });
-
-    it("should throw error if moveTo is invoked", () => {
-      expect(() => gridEngine.moveTo("someCharId", new Vector2(2, 3))).toThrow(
-        "Plugin not initialized"
-      );
-    });
-
-    it("should throw error if stopMovement is invoked", () => {
-      expect(() => gridEngine.stopMovement("someCharId")).toThrow(
-        "Plugin not initialized"
-      );
-    });
-
-    it("should throw error if stopMovingRandomly is invoked", () => {
-      expect(() => gridEngine.stopMovingRandomly("someCharId")).toThrow(
-        "Plugin not initialized"
-      );
-    });
-
-    it("should throw error if setSpeed is invoked", () => {
-      expect(() => gridEngine.setSpeed("someCharId", 3)).toThrow(
-        "Plugin not initialized"
-      );
-    });
-
-    it("should throw error if addCharacter is invoked", () => {
-      expect(() =>
+      expectUninitializedException(() => gridEngine.setSpeed(SOME_CHAR_ID, 3));
+      expectUninitializedException(() =>
         gridEngine.addCharacter({
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
         })
-      ).toThrow("Plugin not initialized");
-    });
-
-    it("should throw error if hasCharacter is invoked", () => {
-      expect(() => gridEngine.hasCharacter("someCharId")).toThrow(
-        "Plugin not initialized"
       );
-    });
-
-    it("should throw error if removeCharacter is invoked", () => {
-      expect(() => gridEngine.removeCharacter("someCharId")).toThrow(
-        "Plugin not initialized"
+      expectUninitializedException(() => gridEngine.hasCharacter(SOME_CHAR_ID));
+      expectUninitializedException(() =>
+        gridEngine.removeCharacter(SOME_CHAR_ID)
       );
-    });
-
-    it("should throw error if follow is invoked", () => {
-      expect(() => gridEngine.follow("someCharId", "someOtherCharId")).toThrow(
-        "Plugin not initialized"
+      expectUninitializedException(() => gridEngine.removeAllCharacters());
+      expectUninitializedException(() =>
+        gridEngine.follow(SOME_CHAR_ID, "someOtherCharId")
       );
-    });
-
-    it("should throw error if stopFollowing is invoked", () => {
-      expect(() => gridEngine.stopFollowing("someCharId")).toThrow(
-        "Plugin not initialized"
+      expectUninitializedException(() =>
+        gridEngine.stopFollowing(SOME_CHAR_ID)
       );
-    });
-
-    it("should throw error if setWalkingAnimationMapping is invoked", () => {
-      expect(() =>
-        gridEngine.setWalkingAnimationMapping("someCharId", <any>{})
-      ).toThrow("Plugin not initialized");
-    });
-
-    it("should throw error if isMoving is invoked", () => {
-      expect(() => gridEngine.isMoving("someCharId")).toThrow(
-        "Plugin not initialized"
+      expectUninitializedException(() =>
+        gridEngine.setWalkingAnimationMapping(SOME_CHAR_ID, <any>{})
       );
-    });
-
-    it("should throw error if getFacingDirection is invoked", () => {
-      expect(() => gridEngine.getFacingDirection("someCharId")).toThrow(
-        "Plugin not initialized"
+      expectUninitializedException(() => gridEngine.isMoving(SOME_CHAR_ID));
+      expectUninitializedException(() =>
+        gridEngine.getFacingDirection(SOME_CHAR_ID)
       );
-    });
-
-    it("should throw error if turnTowards is invoked", () => {
-      expect(() =>
-        gridEngine.turnTowards("someCharId", Direction.LEFT)
-      ).toThrow("Plugin not initialized");
-    });
-
-    it("should throw error if removeAllCharacters is invoked", () => {
-      expect(() => gridEngine.removeAllCharacters()).toThrow(
-        "Plugin not initialized"
+      expectUninitializedException(() =>
+        gridEngine.turnTowards(SOME_CHAR_ID, Direction.LEFT)
       );
-    });
-
-    it("should throw error if getAllCharacters is invoked", () => {
-      expect(() => gridEngine.getAllCharacters()).toThrow(
-        "Plugin not initialized"
-      );
+      expectUninitializedException(() => gridEngine.getAllCharacters());
     });
   });
 });
