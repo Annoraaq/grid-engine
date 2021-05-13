@@ -3,6 +3,7 @@ import { getDirections, NumberOfDirections } from "./../../Direction/Direction";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Direction, directionVector } from "../../Direction/Direction";
 import { Movement } from "../Movement";
+import { takeUntil } from "rxjs/operators";
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
@@ -26,25 +27,30 @@ export class RandomMovement implements Movement {
   setCharacter(character: GridCharacter): void {
     this.character = character;
     this.delayLeft = this.delay;
-    this.initialRow = character.getTilePos().y;
-    this.initialCol = character.getTilePos().x;
+    this.initialRow = character.getNextTilePos().y;
+    this.initialCol = character.getNextTilePos().x;
     this.stepSize = this.getRandomInt(this.radius) + 1;
     this.stepsWalked = 0;
     this.currentMovementDirection = Direction.NONE;
+    this.character
+      .positionChanged()
+      .pipe(takeUntil(this.character.autoMovementSet()))
+      .subscribe(() => {
+        this.stepsWalked++;
+      });
   }
 
   update(delta: number): void {
     if (this.shouldContinueWalkingCurrentDirection()) {
-      this.stepsWalked++;
       this.character.move(this.currentMovementDirection);
     } else {
       this.delayLeft -= delta;
       if (this.delayLeft <= 0) {
         this.delayLeft = this.delay;
         const dir = this.getFreeRandomDirection();
+        this.stepsWalked = 0;
         this.character.move(dir);
         this.currentMovementDirection = dir;
-        this.stepsWalked = 1;
         this.stepSize = this.getRandomInt(this.radius) + 1;
       }
     }
@@ -75,7 +81,7 @@ export class RandomMovement implements Movement {
 
   private getDist(dir: Direction): number {
     return DistanceUtils.distance(
-      this.character.getTilePos().add(directionVector(dir)),
+      this.character.getNextTilePos().add(directionVector(dir)),
       new Vector2(this.initialCol, this.initialRow),
       this.numberOfDirections
     );

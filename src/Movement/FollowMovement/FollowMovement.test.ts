@@ -65,7 +65,7 @@ describe("FollowMovement", () => {
       gridTilemapMock,
       targetCharPos,
       1,
-      NoPathFoundStrategy.STOP
+      { noPathFoundStrategy: NoPathFoundStrategy.STOP }
     );
     expect(mockTargetMovement.setNumberOfDirections).toHaveBeenCalledWith(
       NumberOfDirections.FOUR
@@ -97,12 +97,9 @@ describe("FollowMovement", () => {
 
     targetChar.positionChangedSubject$.next({ enterTile });
 
-    expect(TargetMovement).toHaveBeenCalledWith(
-      gridTilemapMock,
-      enterTile,
-      1,
-      NoPathFoundStrategy.STOP
-    );
+    expect(TargetMovement).toHaveBeenCalledWith(gridTilemapMock, enterTile, 1, {
+      noPathFoundStrategy: NoPathFoundStrategy.STOP,
+    });
     expect(mockTargetMovement.setNumberOfDirections).toHaveBeenCalledWith(
       NumberOfDirections.FOUR
     );
@@ -123,7 +120,7 @@ describe("FollowMovement", () => {
       gridTilemapMock,
       enterTile,
       1,
-      NoPathFoundStrategy.STOP
+      { noPathFoundStrategy: NoPathFoundStrategy.STOP }
     );
     expect(mockTargetMovement.setNumberOfDirections).not.toHaveBeenCalledWith(
       NumberOfDirections.FOUR
@@ -139,7 +136,7 @@ describe("FollowMovement", () => {
       gridTilemapMock,
       targetCharPos,
       8,
-      NoPathFoundStrategy.STOP
+      { noPathFoundStrategy: NoPathFoundStrategy.STOP }
     );
     expect(mockTargetMovement.setCharacter).toHaveBeenCalledWith(mockChar);
   });
@@ -157,7 +154,7 @@ describe("FollowMovement", () => {
       gridTilemapMock,
       targetCharPos,
       8,
-      NoPathFoundStrategy.CLOSEST_REACHABLE
+      { noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE }
     );
     expect(mockTargetMovement.setCharacter).toHaveBeenCalledWith(mockChar);
   });
