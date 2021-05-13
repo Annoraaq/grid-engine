@@ -2,3 +2,4 @@ node_modules
 dist
 .github
 **/*.d.ts
+GridEngine.min.js
