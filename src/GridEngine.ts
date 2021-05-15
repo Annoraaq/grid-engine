@@ -66,9 +66,9 @@ export class GridEngine {
   private tilemap: Phaser.Tilemaps.Tilemap;
   private gridTilemap: GridTilemap;
   private isCreated = false;
-  private movementStopped$: Subject<[string, Direction]>;
-  private movementStarted$: Subject<[string, Direction]>;
-  private directionChanged$: Subject<[string, Direction]>;
+  private movementStopped$: Subject<{ charId: string; direction: Direction }>;
+  private movementStarted$: Subject<{ charId: string; direction: Direction }>;
+  private directionChanged$: Subject<{ charId: string; direction: Direction }>;
   private positionChangeStarted$: Subject<{ charId: string } & PositionChange>;
   private positionChangeFinished$: Subject<{ charId: string } & PositionChange>;
   private charRemoved$: Subject<string>;
@@ -100,9 +100,18 @@ export class GridEngine {
     this.isCreated = true;
     this.gridCharacters = new Map();
     this.tilemap = tilemap;
-    this.movementStopped$ = new Subject<[string, Direction]>();
-    this.movementStarted$ = new Subject<[string, Direction]>();
-    this.directionChanged$ = new Subject<[string, Direction]>();
+    this.movementStopped$ = new Subject<{
+      charId: string;
+      direction: Direction;
+    }>();
+    this.movementStarted$ = new Subject<{
+      charId: string;
+      direction: Direction;
+    }>();
+    this.directionChanged$ = new Subject<{
+      charId: string;
+      direction: Direction;
+    }>();
     this.positionChangeStarted$ = new Subject<
       { charId: string } & PositionChange
     >();
@@ -243,21 +252,21 @@ export class GridEngine {
       .movementStopped()
       .pipe(this.takeUntilCharRemoved(gridChar.getId()))
       .subscribe((direction: Direction) => {
-        this.movementStopped$.next([gridChar.getId(), direction]);
+        this.movementStopped$.next({ charId: gridChar.getId(), direction });
       });
 
     gridChar
       .movementStarted()
       .pipe(this.takeUntilCharRemoved(gridChar.getId()))
       .subscribe((direction: Direction) => {
-        this.movementStarted$.next([gridChar.getId(), direction]);
+        this.movementStarted$.next({ charId: gridChar.getId(), direction });
       });
 
     gridChar
       .directionChanged()
       .pipe(this.takeUntilCharRemoved(gridChar.getId()))
       .subscribe((direction: Direction) => {
-        this.directionChanged$.next([gridChar.getId(), direction]);
+        this.directionChanged$.next({ charId: gridChar.getId(), direction });
       });
 
     gridChar
@@ -353,15 +362,15 @@ export class GridEngine {
     this.gridCharacters.get(charId).setTilePosition(pos);
   }
 
-  movementStarted(): Observable<[string, Direction]> {
+  movementStarted(): Observable<{ charId: string; direction: Direction }> {
     return this.movementStarted$;
   }
 
-  movementStopped(): Observable<[string, Direction]> {
+  movementStopped(): Observable<{ charId: string; direction: Direction }> {
     return this.movementStopped$;
   }
 
-  directionChanged(): Observable<[string, Direction]> {
+  directionChanged(): Observable<{ charId: string; direction: Direction }> {
     return this.directionChanged$;
   }
 
