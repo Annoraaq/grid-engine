@@ -3,7 +3,6 @@ import { CharacterIndex, FrameRow, PositionChange } from "./GridCharacter/GridCh
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { Observable } from "rxjs";
 import { Vector2 } from "./Utils/Vector2/Vector2";
-import * as Phaser from "phaser";
 export declare type TileSizePerSecond = number;
 export interface Position {
     x: number;
@@ -38,8 +37,8 @@ export interface CharacterData {
     offsetY?: number;
     facingDirection?: Direction;
 }
-export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
-    scene: Phaser.Scene;
+export declare class GridEngine {
+    private scene;
     private gridCharacters;
     private tilemap;
     private gridTilemap;
@@ -51,8 +50,9 @@ export declare class GridEngine extends Phaser.Plugins.ScenePlugin {
     private positionChangeFinished$;
     private charRemoved$;
     private numberOfDirections;
-    constructor(scene: Phaser.Scene, pluginManager: Phaser.Plugins.PluginManager, _pluginKey?: string);
+    constructor(scene: Phaser.Scene);
     boot(): void;
+    destroy(): void;
     create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void;
     getPosition(charId: string): Position;
     moveLeft(charId: string): void;

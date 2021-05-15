@@ -146,7 +146,6 @@ import { Vector2 } from "./Utils/Vector2/Vector2";
 describe("GridEngine", () => {
   let gridEngine: GridEngine;
   let sceneMock;
-  let pluginManagerMock;
   let tileMapMock;
   let playerSpriteMock;
 
@@ -158,7 +157,6 @@ describe("GridEngine", () => {
     // hacky way of avoiding errors in Plugin Initialization because Phaser
     // is not mockable by jest
     sceneMock = { sys: { events: { once: jest.fn(), on: jest.fn() } } };
-    pluginManagerMock = {};
     tileMapMock = {
       layers: [
         {
@@ -180,7 +178,7 @@ describe("GridEngine", () => {
     mockDirectionChanged.mockReset().mockReturnValue(of());
     mockPositionChanged.mockReset().mockReturnValue(of());
     mockPositionChangeFinished.mockReset().mockReturnValue(of());
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock, "gridEngine");
+    gridEngine = new GridEngine(sceneMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -1328,7 +1326,7 @@ describe("GridEngine", () => {
     const SOME_CHAR_ID = "someCharId";
 
     beforeEach(() => {
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock, "gridEngine");
+      gridEngine = new GridEngine(sceneMock);
     });
 
     function expectUninitializedException(fn: () => any) {

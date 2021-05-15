@@ -1,6 +1,7 @@
 import { Direction } from "../../Direction/Direction";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { IsometricGridCharacter } from "./IsometricGridCharacter";
+import * as Phaser from "phaser";
 
 const mockCharacterAnimation = {
   updateCharacterFrame: jest.fn(),
