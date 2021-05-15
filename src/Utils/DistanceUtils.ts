@@ -1,8 +1,6 @@
 import { VectorUtils } from "./VectorUtils";
 import { NumberOfDirections } from "./../Direction/Direction";
-import * as Phaser from "phaser";
-type Vector2 = Phaser.Math.Vector2;
-const Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "./Vector2/Vector2";
 
 export class DistanceUtils {
   static distance(

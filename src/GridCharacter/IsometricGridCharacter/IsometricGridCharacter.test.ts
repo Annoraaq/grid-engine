@@ -1,5 +1,5 @@
-import * as Phaser from "phaser";
 import { Direction } from "../../Direction/Direction";
+import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { IsometricGridCharacter } from "./IsometricGridCharacter";
 
 const mockCharacterAnimation = {
@@ -22,9 +22,6 @@ jest.mock("../CharacterAnimation/CharacterAnimation", function () {
       }),
   };
 });
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
 
 describe("IsometricGridCharacter", () => {
   let gridCharacter: IsometricGridCharacter;

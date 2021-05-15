@@ -1,9 +1,7 @@
 import { Direction, turnCounterClockwise } from "../../Direction/Direction";
+import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { VectorUtils } from "../../Utils/VectorUtils";
 import { GridCharacter } from "../GridCharacter";
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
 
 export class IsometricGridCharacter extends GridCharacter {
   protected tilePosToPixelPos(tilePosition: Vector2): Vector2 {

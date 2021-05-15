@@ -1,12 +1,9 @@
 import { NoPathFoundStrategy } from "./../../Algorithms/ShortestPath/NoPathFoundStrategy";
 import { NumberOfDirections } from "./../../Direction/Direction";
 import { FollowMovement } from "./FollowMovement";
-import * as Phaser from "phaser";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
 import { Subject } from "rxjs";
-
-type Vector2 = Phaser.Math.Vector2;
-const Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "../../Utils/Vector2/Vector2";
 
 const mockTargetMovement = {
   setCharacter: jest.fn(),
@@ -27,7 +24,7 @@ describe("FollowMovement", () => {
   let targetCharPos: Vector2;
   let targetChar;
 
-  function createMockChar(id: string, pos: Phaser.Math.Vector2) {
+  function createMockChar(id: string, pos: Vector2) {
     return <any>{
       positionChangedSubject$: new Subject(),
       autoMovementSetSubject$: new Subject(),

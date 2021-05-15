@@ -1,8 +1,6 @@
+import { Vector2 } from "../Utils/Vector2/Vector2";
 import { Direction } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
 
 describe("GridTilemapPlugin", () => {
   let gridTilemap: GridTilemap;

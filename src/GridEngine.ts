@@ -12,7 +12,6 @@ import {
   GridCharacter,
   PositionChange,
 } from "./GridCharacter/GridCharacter";
-import "phaser";
 import {
   Direction,
   isDiagonal,
@@ -23,11 +22,15 @@ import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 import { NoPathFoundStrategy } from "./Algorithms/ShortestPath/NoPathFoundStrategy";
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "./Utils/Vector2/Vector2";
+import * as Phaser from "phaser";
 
 export type TileSizePerSecond = number;
+
+export interface Position {
+  x: number;
+  y: number;
+}
 
 export interface GridEngineConfig {
   characters: CharacterData[];
@@ -54,7 +57,7 @@ export interface CharacterData {
   walkingAnimationEnabled?: boolean;
   characterIndex?: number; // deprecated
   speed?: TileSizePerSecond;
-  startPosition?: Vector2;
+  startPosition?: Position;
   container?: Phaser.GameObjects.Container;
   offsetX?: number;
   offsetY?: number;
@@ -78,7 +81,8 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
 
   constructor(
     public scene: Phaser.Scene,
-    pluginManager: Phaser.Plugins.PluginManager
+    pluginManager: Phaser.Plugins.PluginManager,
+    _pluginKey?: string
   ) {
     super(scene, pluginManager);
   }
@@ -104,7 +108,7 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     this.addCharacters(config);
   }
 
-  getPosition(charId: string): Vector2 {
+  getPosition(charId: string): Position {
     this.initGuard();
     this.unknownCharGuard(charId);
     return this.gridCharacters.get(charId).getTilePos();
@@ -140,13 +144,13 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
 
   moveTo(
     charId: string,
-    targetPos: Vector2,
+    targetPos: Position,
     closestPointIfBlocked?: boolean
   ): void;
-  moveTo(charId: string, targetPos: Vector2, config?: MoveToConfig): void;
+  moveTo(charId: string, targetPos: Position, config?: MoveToConfig): void;
   moveTo(
     charId: string,
-    targetPos: Vector2,
+    targetPos: Position,
     config?: boolean | MoveToConfig
   ): void {
     const moveToConfig = this.assembleMoveToConfig(config);
@@ -155,7 +159,7 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     this.unknownCharGuard(charId);
     const targetMovement = new TargetMovement(
       this.gridTilemap,
-      targetPos,
+      new Vector2(targetPos),
       0,
       moveToConfig
     );
@@ -240,7 +244,10 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
 
     this.gridCharacters.set(charData.id, gridChar);
 
-    gridChar.setTilePosition(charData.startPosition || new Vector2(0, 0));
+    const startPos = charData.startPosition
+      ? new Vector2(charData.startPosition)
+      : new Vector2(0, 0);
+    gridChar.setTilePosition(startPos);
 
     this.gridTilemap.addCharacter(gridChar);
 

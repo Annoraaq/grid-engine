@@ -2,9 +2,10 @@ import { PathBlockedStrategy } from "./Algorithms/ShortestPath/PathBlockedStrate
 import { NoPathFoundStrategy } from "./Algorithms/ShortestPath/NoPathFoundStrategy";
 import { Subject, of } from "rxjs";
 import { take } from "rxjs/operators";
-import * as Phaser from "phaser";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { GridCharacter, PositionChange } from "./GridCharacter/GridCharacter";
+import * as Phaser from "phaser";
+
 const mockSetTilePositon = jest.fn();
 const mockMove = jest.fn();
 const mockUpdate = jest.fn();
@@ -41,9 +42,6 @@ const mockGridTilemapConstructor = jest.fn(function (
 ) {
   return mockGridTileMap;
 });
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
 
 expect.extend({
   toBeCharacter(receivedChar: GridCharacter, expectedCharId: string) {
@@ -143,6 +141,7 @@ import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { TargetMovement } from "./Movement/TargetMovement/TargetMovement";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import { IsometricGridCharacter } from "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter";
+import { Vector2 } from "./Utils/Vector2/Vector2";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;
@@ -181,7 +180,7 @@ describe("GridEngine", () => {
     mockDirectionChanged.mockReset().mockReturnValue(of());
     mockPositionChanged.mockReset().mockReturnValue(of());
     mockPositionChangeFinished.mockReset().mockReturnValue(of());
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine = new GridEngine(sceneMock, pluginManagerMock, "gridEngine");
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -1329,7 +1328,7 @@ describe("GridEngine", () => {
     const SOME_CHAR_ID = "someCharId";
 
     beforeEach(() => {
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine = new GridEngine(sceneMock, pluginManagerMock, "gridEngine");
     });
 
     function expectUninitializedException(fn: () => any) {

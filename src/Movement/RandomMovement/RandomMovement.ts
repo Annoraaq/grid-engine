@@ -4,9 +4,7 @@ import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Direction, directionVector } from "../../Direction/Direction";
 import { Movement } from "../Movement";
 import { takeUntil } from "rxjs/operators";
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "../../Utils/Vector2/Vector2";
 
 export class RandomMovement implements Movement {
   private character: GridCharacter;

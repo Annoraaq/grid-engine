@@ -1,9 +1,9 @@
 import { GridCharacter } from "./GridCharacter";
-import * as Phaser from "phaser";
 import { Direction } from "../Direction/Direction";
 import { take } from "rxjs/operators";
 import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
 import { Movement } from "../Movement/Movement";
+import { Vector2 } from "../Utils/Vector2/Vector2";
 
 const mockCharacterAnimation = {
   updateCharacterFrame: jest.fn(),
@@ -25,9 +25,6 @@ jest.mock("./CharacterAnimation/CharacterAnimation", function () {
       }),
   };
 });
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
 
 describe("GridCharacter", () => {
   let gridCharacter: GridCharacter;

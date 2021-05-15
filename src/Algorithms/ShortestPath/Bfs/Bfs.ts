@@ -1,9 +1,6 @@
 import { ShortestPathAlgorithm } from "./../ShortestPathAlgorithm";
-import * as Phaser from "phaser";
 import { VectorUtils } from "../../../Utils/VectorUtils";
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "../../../Utils/Vector2/Vector2";
 
 interface ShortestPathTuple {
   shortestDistance: number;

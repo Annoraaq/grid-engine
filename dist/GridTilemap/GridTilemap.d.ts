@@ -1,8 +1,6 @@
 import { Direction } from "./../Direction/Direction";
-import * as Phaser from "phaser";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
-declare const Vector2: typeof Phaser.Math.Vector2;
-declare type Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "../Utils/Vector2/Vector2";
 export declare class GridTilemap {
     private tilemap;
     private firstLayerAboveChar?;
@@ -31,4 +29,3 @@ export declare class GridTilemap {
     private setLayerDepths;
     private createLayerForEachRow;
 }
-export {};

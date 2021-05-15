@@ -5,9 +5,7 @@ import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
 import { Movement } from "../Movement";
 import { NoPathFoundStrategy } from "../../Algorithms/ShortestPath/NoPathFoundStrategy";
-
-type Vector2 = Phaser.Math.Vector2;
-const Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "../../Utils/Vector2/Vector2";
 
 export class FollowMovement implements Movement {
   private character: GridCharacter;

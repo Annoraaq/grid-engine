@@ -1,8 +1,5 @@
-import * as Phaser from "phaser";
+import { Vector2 } from "./Vector2/Vector2";
 import { VectorUtils } from "./VectorUtils";
-
-type Vector2 = Phaser.Math.Vector2;
-const Vector2 = Phaser.Math.Vector2;
 
 describe("VectorUtils", () => {
   describe("vec2str", () => {

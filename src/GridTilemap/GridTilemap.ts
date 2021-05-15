@@ -1,9 +1,6 @@
 import { Direction } from "./../Direction/Direction";
-import * as Phaser from "phaser";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "../Utils/Vector2/Vector2";
 
 export class GridTilemap {
   private static readonly MAX_PLAYER_LAYERS = 1000;
