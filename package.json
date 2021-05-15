@@ -22,7 +22,7 @@
     "rxjs": "^6.6.3"
   },
   "peerDependencies": {
-    "phaser": "~3.52.0"
+    "phaser": "~3.54.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.17.0",
