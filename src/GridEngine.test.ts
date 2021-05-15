@@ -528,30 +528,6 @@ describe("GridEngine", () => {
     });
   });
 
-  it("should move player left", () => {
-    gridEngine.moveLeft("player");
-
-    expect(mockMove).toHaveBeenCalledWith(Direction.LEFT);
-  });
-
-  it("should move player right", () => {
-    gridEngine.moveRight("player");
-
-    expect(mockMove).toHaveBeenCalledWith(Direction.RIGHT);
-  });
-
-  it("should move player up", () => {
-    gridEngine.moveUp("player");
-
-    expect(mockMove).toHaveBeenCalledWith(Direction.UP);
-  });
-
-  it("should move player down", () => {
-    gridEngine.moveDown("player");
-
-    expect(mockMove).toHaveBeenCalledWith(Direction.DOWN);
-  });
-
   it("should update", () => {
     gridEngine.update(123, 456);
 
@@ -928,7 +904,7 @@ describe("GridEngine", () => {
 
       mockSubject.next(Direction.LEFT);
       const res = await prom;
-      expect(res).toEqual(["player", Direction.LEFT]);
+      expect(res).toEqual({ charId: "player", direction: Direction.LEFT });
     });
 
     it("should unsubscribe from movementStarted if char removed", async () => {
@@ -971,7 +947,7 @@ describe("GridEngine", () => {
 
       mockSubject.next(Direction.LEFT);
       const res = await prom;
-      expect(res).toEqual(["player", Direction.LEFT]);
+      expect(res).toEqual({ charId: "player", direction: Direction.LEFT });
     });
 
     it("should unsubscribe from movementStopped if char removed", async () => {
@@ -1014,7 +990,7 @@ describe("GridEngine", () => {
 
       mockSubject.next(Direction.LEFT);
       const res = await prom;
-      expect(res).toEqual(["player", Direction.LEFT]);
+      expect(res).toEqual({ charId: "player", direction: Direction.LEFT });
     });
 
     it("should unsubscribe from directionChanged if char removed", async () => {
@@ -1164,10 +1140,6 @@ describe("GridEngine", () => {
       expectCharUnknownException(() =>
         gridEngine.move(UNKNOWN_CHAR_ID, Direction.LEFT)
       );
-      expectCharUnknownException(() => gridEngine.moveLeft(UNKNOWN_CHAR_ID));
-      expectCharUnknownException(() => gridEngine.moveRight(UNKNOWN_CHAR_ID));
-      expectCharUnknownException(() => gridEngine.moveUp(UNKNOWN_CHAR_ID));
-      expectCharUnknownException(() => gridEngine.moveDown(UNKNOWN_CHAR_ID));
       expectCharUnknownException(() =>
         gridEngine.moveRandomly(UNKNOWN_CHAR_ID)
       );
@@ -1226,10 +1198,6 @@ describe("GridEngine", () => {
       expectUninitializedException(() =>
         gridEngine.move(SOME_CHAR_ID, Direction.LEFT)
       );
-      expectUninitializedException(() => gridEngine.moveLeft(SOME_CHAR_ID));
-      expectUninitializedException(() => gridEngine.moveRight(SOME_CHAR_ID));
-      expectUninitializedException(() => gridEngine.moveUp(SOME_CHAR_ID));
-      expectUninitializedException(() => gridEngine.moveDown(SOME_CHAR_ID));
       expectUninitializedException(() => gridEngine.moveRandomly(SOME_CHAR_ID));
       expectUninitializedException(() =>
         gridEngine.moveTo(SOME_CHAR_ID, new Vector2(2, 3))

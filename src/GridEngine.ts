@@ -138,22 +138,6 @@ export class GridEngine {
     return this.gridCharacters.get(charId).getTilePos();
   }
 
-  moveLeft(charId: string): void {
-    this.moveChar(charId, Direction.LEFT);
-  }
-
-  moveRight(charId: string): void {
-    this.moveChar(charId, Direction.RIGHT);
-  }
-
-  moveUp(charId: string): void {
-    this.moveChar(charId, Direction.UP);
-  }
-
-  moveDown(charId: string): void {
-    this.moveChar(charId, Direction.DOWN);
-  }
-
   move(charId: string, direction: Direction): void {
     this.moveChar(charId, direction);
   }
