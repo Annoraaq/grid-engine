@@ -33,7 +33,6 @@ export interface Position {
 
 export interface GridEngineConfig {
   characters: CharacterData[];
-  firstLayerAboveChar?: number; // deprecated
   collisionTilePropertyName?: string;
   numberOfDirections?: NumberOfDirections;
 }
@@ -54,7 +53,6 @@ export interface CharacterData {
   sprite: Phaser.GameObjects.Sprite;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
   walkingAnimationEnabled?: boolean;
-  characterIndex?: number; // deprecated
   speed?: TileSizePerSecond;
   startPosition?: Position;
   container?: Phaser.GameObjects.Container;
@@ -71,7 +69,7 @@ export class GridEngine {
   private movementStopped$: Subject<[string, Direction]>;
   private movementStarted$: Subject<[string, Direction]>;
   private directionChanged$: Subject<[string, Direction]>;
-  private positionChanged$: Subject<{ charId: string } & PositionChange>;
+  private positionChangeStarted$: Subject<{ charId: string } & PositionChange>;
   private positionChangeFinished$: Subject<{ charId: string } & PositionChange>;
   private charRemoved$: Subject<string>;
   private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR;
@@ -93,7 +91,7 @@ export class GridEngine {
     this.movementStarted$ = undefined;
     this.movementStopped$ = undefined;
     this.directionChanged$ = undefined;
-    this.positionChanged$ = undefined;
+    this.positionChangeStarted$ = undefined;
     this.positionChangeFinished$ = undefined;
     this.charRemoved$ = undefined;
   }
@@ -105,12 +103,14 @@ export class GridEngine {
     this.movementStopped$ = new Subject<[string, Direction]>();
     this.movementStarted$ = new Subject<[string, Direction]>();
     this.directionChanged$ = new Subject<[string, Direction]>();
-    this.positionChanged$ = new Subject<{ charId: string } & PositionChange>();
+    this.positionChangeStarted$ = new Subject<
+      { charId: string } & PositionChange
+    >();
     this.positionChangeFinished$ = new Subject<
       { charId: string } & PositionChange
     >();
     this.charRemoved$ = new Subject<string>();
-    this.gridTilemap = this.createTilemap(tilemap, config);
+    this.gridTilemap = new GridTilemap(tilemap);
     if (config.collisionTilePropertyName) {
       this.gridTilemap.setCollisionTilePropertyName(
         config.collisionTilePropertyName
@@ -157,17 +157,7 @@ export class GridEngine {
     this.gridCharacters.get(charId).setMovement(randomMovement);
   }
 
-  moveTo(
-    charId: string,
-    targetPos: Position,
-    closestPointIfBlocked?: boolean
-  ): void;
-  moveTo(charId: string, targetPos: Position, config?: MoveToConfig): void;
-  moveTo(
-    charId: string,
-    targetPos: Position,
-    config?: boolean | MoveToConfig
-  ): void {
+  moveTo(charId: string, targetPos: Position, config?: MoveToConfig): void {
     const moveToConfig = this.assembleMoveToConfig(config);
 
     this.initGuard();
@@ -180,14 +170,6 @@ export class GridEngine {
     );
     targetMovement.setNumberOfDirections(this.numberOfDirections);
     this.gridCharacters.get(charId).setMovement(targetMovement);
-  }
-
-  // deprecated
-  stopMovingRandomly(charId: string): void {
-    console.warn(
-      "GridEngine: `stopMovingRandomly` is deprecated. Use `stopMovement()` instead."
-    );
-    this._stopMovement(charId);
   }
 
   stopMovement(charId: string): void {
@@ -224,12 +206,6 @@ export class GridEngine {
   addCharacter(charData: CharacterData): void {
     this.initGuard();
 
-    if (charData.characterIndex != undefined) {
-      console.warn(
-        "GridEngine: CharacterConfig property `characterIndex` is deprecated. Use `walkingAnimtionMapping` instead."
-      );
-    }
-
     const charConfig: CharConfig = {
       sprite: charData.sprite,
       speed: charData.speed || 4,
@@ -244,9 +220,6 @@ export class GridEngine {
       offsetX: charData.offsetX,
       offsetY: charData.offsetY,
     };
-    if (charConfig.walkingAnimationMapping == undefined) {
-      charConfig.walkingAnimationMapping = charData.characterIndex;
-    }
     if (charConfig.walkingAnimationEnabled == undefined) {
       charConfig.walkingAnimationEnabled = true;
     }
@@ -291,7 +264,7 @@ export class GridEngine {
       .positionChanged()
       .pipe(this.takeUntilCharRemoved(gridChar.getId()))
       .subscribe(({ exitTile, enterTile }) => {
-        this.positionChanged$.next({
+        this.positionChangeStarted$.next({
           charId: gridChar.getId(),
           exitTile,
           enterTile,
@@ -356,14 +329,6 @@ export class GridEngine {
     this.gridCharacters.get(charId).setMovement(followMovement);
   }
 
-  // deprecated
-  stopFollowing(charId: string): void {
-    console.warn(
-      "GridEngine: `stopFollowing` is deprecated. Use `stopMovement()` instead."
-    );
-    this._stopMovement(charId);
-  }
-
   isMoving(charId: string): boolean {
     this.initGuard();
     this.unknownCharGuard(charId);
@@ -400,8 +365,8 @@ export class GridEngine {
     return this.directionChanged$;
   }
 
-  positionChanged(): Observable<{ charId: string } & PositionChange> {
-    return this.positionChanged$;
+  positionChangeStarted(): Observable<{ charId: string } & PositionChange> {
+    return this.positionChangeStarted$;
   }
 
   positionChangeFinished(): Observable<{ charId: string } & PositionChange> {
@@ -423,20 +388,6 @@ export class GridEngine {
   private unknownCharGuard(charId: string) {
     if (!this.gridCharacters.has(charId)) {
       throw new Error(`Character unknown: ${charId}`);
-    }
-  }
-
-  private createTilemap(
-    tilemap: Phaser.Tilemaps.Tilemap,
-    config: GridEngineConfig
-  ) {
-    if (config.firstLayerAboveChar != undefined) {
-      console.warn(
-        "GridEngine: Config property `firstLayerAboveChar` is deprecated. Use a property `alwaysTop` on the tilemap layers instead."
-      );
-      return new GridTilemap(tilemap, config.firstLayerAboveChar);
-    } else {
-      return new GridTilemap(tilemap);
     }
   }
 
@@ -485,21 +436,11 @@ export class GridEngine {
     );
   }
 
-  private assembleMoveToConfig(config: boolean | MoveToConfig): MoveToConfig {
+  private assembleMoveToConfig(config: MoveToConfig): MoveToConfig {
     const moveToConfig = {
       noPathFoundStrategy: NoPathFoundStrategy.STOP,
       pathBlockedStrategy: PathBlockedStrategy.WAIT,
     };
-    if (typeof config === "boolean") {
-      moveToConfig.noPathFoundStrategy = config
-        ? NoPathFoundStrategy.CLOSEST_REACHABLE
-        : NoPathFoundStrategy.STOP;
-      console.warn(
-        "GridEngine: parameter 'closestPointIfBlocked' is deprecated. " +
-          "Please use noPathFoundStrategy: 'CLOSEST_REACHABLE' instead."
-      );
-      return moveToConfig;
-    }
     if (config?.noPathFoundStrategy) {
       if (
         Object.values(NoPathFoundStrategy).includes(config.noPathFoundStrategy)
