@@ -23,7 +23,6 @@ import { Observable, Subject } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 import { NoPathFoundStrategy } from "./Algorithms/ShortestPath/NoPathFoundStrategy";
 import { Vector2 } from "./Utils/Vector2/Vector2";
-import * as Phaser from "phaser";
 
 export type TileSizePerSecond = number;
 
@@ -64,37 +63,53 @@ export interface CharacterData {
   facingDirection?: Direction;
 }
 
-export class GridEngine extends Phaser.Plugins.ScenePlugin {
+export class GridEngine {
   private gridCharacters: Map<string, GridCharacter>;
   private tilemap: Phaser.Tilemaps.Tilemap;
   private gridTilemap: GridTilemap;
   private isCreated = false;
-  private movementStopped$ = new Subject<[string, Direction]>();
-  private movementStarted$ = new Subject<[string, Direction]>();
-  private directionChanged$ = new Subject<[string, Direction]>();
-  private positionChanged$ = new Subject<{ charId: string } & PositionChange>();
-  private positionChangeFinished$ = new Subject<
-    { charId: string } & PositionChange
-  >();
-  private charRemoved$ = new Subject<string>();
+  private movementStopped$: Subject<[string, Direction]>;
+  private movementStarted$: Subject<[string, Direction]>;
+  private directionChanged$: Subject<[string, Direction]>;
+  private positionChanged$: Subject<{ charId: string } & PositionChange>;
+  private positionChangeFinished$: Subject<{ charId: string } & PositionChange>;
+  private charRemoved$: Subject<string>;
   private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR;
 
-  constructor(
-    public scene: Phaser.Scene,
-    pluginManager: Phaser.Plugins.PluginManager,
-    _pluginKey?: string
-  ) {
-    super(scene, pluginManager);
+  constructor(private scene: Phaser.Scene) {
+    this.scene.sys.events.once("boot", this.boot, this);
   }
 
   boot(): void {
-    this.systems.events.on("update", this.update, this);
+    this.scene.sys.events.on("update", this.update, this);
+    this.scene.sys.events.on("destroy", this.destroy, this);
+  }
+
+  destroy(): void {
+    this.scene = undefined;
+    this.tilemap = undefined;
+    this.gridCharacters = undefined;
+    this.gridTilemap = undefined;
+    this.movementStarted$ = undefined;
+    this.movementStopped$ = undefined;
+    this.directionChanged$ = undefined;
+    this.positionChanged$ = undefined;
+    this.positionChangeFinished$ = undefined;
+    this.charRemoved$ = undefined;
   }
 
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
     this.isCreated = true;
     this.gridCharacters = new Map();
     this.tilemap = tilemap;
+    this.movementStopped$ = new Subject<[string, Direction]>();
+    this.movementStarted$ = new Subject<[string, Direction]>();
+    this.directionChanged$ = new Subject<[string, Direction]>();
+    this.positionChanged$ = new Subject<{ charId: string } & PositionChange>();
+    this.positionChangeFinished$ = new Subject<
+      { charId: string } & PositionChange
+    >();
+    this.charRemoved$ = new Subject<string>();
     this.gridTilemap = this.createTilemap(tilemap, config);
     if (config.collisionTilePropertyName) {
       this.gridTilemap.setCollisionTilePropertyName(
