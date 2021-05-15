@@ -230,7 +230,6 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       tileSize: new Vector2(32, 32),
       speed: 4,
-      walkingAnimationEnabled: true,
       container: containerMock,
       offsetX: undefined,
       offsetY: undefined,
@@ -254,7 +253,6 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       tileSize: new Vector2(32, 32),
       speed: 4,
-      walkingAnimationEnabled: true,
       container: undefined,
       offsetX: undefined,
       offsetY: undefined,
@@ -284,8 +282,6 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
-          walkingAnimationEnabled: false,
         },
       ],
     });
@@ -294,8 +290,6 @@ describe("GridEngine", () => {
       tileSize: new Vector2(32, 32),
       tilemap: mockGridTileMap,
       speed: 4,
-      walkingAnimationMapping: 3,
-      walkingAnimationEnabled: false,
     });
     expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
   });
@@ -338,7 +332,6 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping,
-      walkingAnimationEnabled: true,
     });
     expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
   });
@@ -374,7 +367,6 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       speed: 2,
       walkingAnimationMapping: 3,
-      walkingAnimationEnabled: true,
     });
   });
 
@@ -398,7 +390,6 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping: 3,
-      walkingAnimationEnabled: true,
       offsetX,
       offsetY,
     });

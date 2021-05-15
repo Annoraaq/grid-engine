@@ -26,7 +26,6 @@ export interface CharConfig {
   tilemap: GridTilemap;
   tileSize: Vector2;
   speed: number;
-  walkingAnimationEnabled: boolean;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
   container?: Phaser.GameObjects.Container;
   offsetX?: number;
@@ -79,7 +78,7 @@ export class GridCharacter {
       walkingAnimationMapping,
       characterIndex
     );
-    this.animation.setIsEnabled(config.walkingAnimationEnabled);
+    this.animation.setIsEnabled(config.walkingAnimationMapping !== undefined);
     this.animation.setStandingFrame(Direction.DOWN);
 
     this.speedPixelsPerSecond = this.createSpeedPixelsPerSecond();

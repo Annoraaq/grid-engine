@@ -52,7 +52,6 @@ export interface CharacterData {
   id: string;
   sprite: Phaser.GameObjects.Sprite;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
-  walkingAnimationEnabled?: boolean;
   speed?: TileSizePerSecond;
   startPosition?: Position;
   container?: Phaser.GameObjects.Container;
@@ -208,14 +207,10 @@ export class GridEngine {
         this.gridTilemap.getTileHeight()
       ),
       walkingAnimationMapping: charData.walkingAnimationMapping,
-      walkingAnimationEnabled: charData.walkingAnimationEnabled,
       container: charData.container,
       offsetX: charData.offsetX,
       offsetY: charData.offsetY,
     };
-    if (charConfig.walkingAnimationEnabled == undefined) {
-      charConfig.walkingAnimationEnabled = true;
-    }
 
     const gridChar = this.createCharacter(charData.id, charConfig);
 

@@ -77,7 +77,6 @@ describe("IsometricGridCharacter", () => {
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 1,
       walkingAnimationMapping: 3,
-      walkingAnimationEnabled: true,
     });
   });
 
@@ -89,7 +88,6 @@ describe("IsometricGridCharacter", () => {
       tilemap: gridTilemapMock,
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 1,
-      walkingAnimationEnabled: true,
       offsetX: customOffsetX,
       offsetY: customOffsetY,
     });

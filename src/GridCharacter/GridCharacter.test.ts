@@ -4,6 +4,7 @@ import { take } from "rxjs/operators";
 import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
+import * as Phaser from "phaser";
 
 const mockCharacterAnimation = {
   updateCharacterFrame: jest.fn(),
@@ -84,7 +85,6 @@ describe("GridCharacter", () => {
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 3,
       walkingAnimationMapping: 3,
-      walkingAnimationEnabled: true,
     });
   });
 
@@ -94,7 +94,6 @@ describe("GridCharacter", () => {
       tilemap: gridTilemapMock,
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 3,
-      walkingAnimationEnabled: true,
     });
     mockNonBlockingTile();
     gridCharacter.move(Direction.DOWN);
@@ -243,7 +242,6 @@ describe("GridCharacter", () => {
       tilemap: gridTilemapMock,
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 3,
-      walkingAnimationEnabled: true,
       offsetX: customOffsetX,
       offsetY: customOffsetY,
     });
@@ -558,7 +556,6 @@ describe("GridCharacter", () => {
         tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
         speed: 3,
         walkingAnimationMapping: 3,
-        walkingAnimationEnabled: true,
         container: containerMock,
       });
     });
