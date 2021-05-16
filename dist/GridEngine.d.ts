@@ -10,7 +10,6 @@ export interface Position {
 }
 export interface GridEngineConfig {
     characters: CharacterData[];
-    firstLayerAboveChar?: number;
     collisionTilePropertyName?: string;
     numberOfDirections?: NumberOfDirections;
 }
@@ -28,8 +27,6 @@ export interface CharacterData {
     id: string;
     sprite: Phaser.GameObjects.Sprite;
     walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
-    walkingAnimationEnabled?: boolean;
-    characterIndex?: number;
     speed?: TileSizePerSecond;
     startPosition?: Position;
     container?: Phaser.GameObjects.Container;
@@ -46,7 +43,7 @@ export declare class GridEngine {
     private movementStopped$;
     private movementStarted$;
     private directionChanged$;
-    private positionChanged$;
+    private positionChangeStarted$;
     private positionChangeFinished$;
     private charRemoved$;
     private numberOfDirections;
@@ -55,15 +52,9 @@ export declare class GridEngine {
     destroy(): void;
     create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void;
     getPosition(charId: string): Position;
-    moveLeft(charId: string): void;
-    moveRight(charId: string): void;
-    moveUp(charId: string): void;
-    moveDown(charId: string): void;
     move(charId: string, direction: Direction): void;
     moveRandomly(charId: string, delay?: number, radius?: number): void;
-    moveTo(charId: string, targetPos: Position, closestPointIfBlocked?: boolean): void;
     moveTo(charId: string, targetPos: Position, config?: MoveToConfig): void;
-    stopMovingRandomly(charId: string): void;
     stopMovement(charId: string): void;
     setSpeed(charId: string, speed: number): void;
     setWalkingAnimationMapping(charId: string, walkingAnimationMapping: WalkingAnimationMapping): void;
@@ -74,15 +65,23 @@ export declare class GridEngine {
     removeAllCharacters(): void;
     getAllCharacters(): string[];
     follow(charId: string, charIdToFollow: string, distance?: number, closestPointIfBlocked?: boolean): void;
-    stopFollowing(charId: string): void;
     isMoving(charId: string): boolean;
     getFacingDirection(charId: string): Direction;
     turnTowards(charId: string, direction: Direction): void;
     setPosition(charId: string, pos: Vector2): void;
-    movementStarted(): Observable<[string, Direction]>;
-    movementStopped(): Observable<[string, Direction]>;
-    directionChanged(): Observable<[string, Direction]>;
-    positionChanged(): Observable<{
+    movementStarted(): Observable<{
+        charId: string;
+        direction: Direction;
+    }>;
+    movementStopped(): Observable<{
+        charId: string;
+        direction: Direction;
+    }>;
+    directionChanged(): Observable<{
+        charId: string;
+        direction: Direction;
+    }>;
+    positionChangeStarted(): Observable<{
         charId: string;
     } & PositionChange>;
     positionChangeFinished(): Observable<{
@@ -91,7 +90,6 @@ export declare class GridEngine {
     private takeUntilCharRemoved;
     private initGuard;
     private unknownCharGuard;
-    private createTilemap;
     private createCharacter;
     private addCharacters;
     private moveChar;

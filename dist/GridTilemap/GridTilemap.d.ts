@@ -9,7 +9,6 @@ export declare class GridTilemap {
     private static readonly ALWAYS_TOP_PROP_NAME;
     private static readonly HEIGHT_SHIFT_PROP_NAME;
     private static readonly ONE_WAY_COLLIDE_PROP_PREFIX;
-    private static readonly LEGACY_COLLIDE_PROP_NAME;
     private characters;
     private collisionTilePropertyName;
     constructor(tilemap: Phaser.Tilemaps.Tilemap, firstLayerAboveChar?: number);

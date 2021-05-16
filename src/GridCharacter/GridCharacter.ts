@@ -4,7 +4,7 @@ import { directionVector, oppositeDirection } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
-import { WalkingAnimationMapping } from "../GridEngine";
+import { Position, WalkingAnimationMapping } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 
@@ -17,8 +17,8 @@ export interface FrameRow {
 export type CharacterIndex = number;
 
 export interface PositionChange {
-  exitTile: Vector2;
-  enterTile: Vector2;
+  exitTile: Position;
+  enterTile: Position;
 }
 
 export interface CharConfig {

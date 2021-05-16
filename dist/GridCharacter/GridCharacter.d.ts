@@ -1,7 +1,7 @@
 import { Direction } from "../Direction/Direction";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
-import { WalkingAnimationMapping } from "../GridEngine";
+import { Position, WalkingAnimationMapping } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 export interface FrameRow {
@@ -11,15 +11,14 @@ export interface FrameRow {
 }
 export declare type CharacterIndex = number;
 export interface PositionChange {
-    exitTile: Vector2;
-    enterTile: Vector2;
+    exitTile: Position;
+    enterTile: Position;
 }
 export interface CharConfig {
     sprite: Phaser.GameObjects.Sprite;
     tilemap: GridTilemap;
     tileSize: Vector2;
     speed: number;
-    walkingAnimationEnabled: boolean;
     walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
     container?: Phaser.GameObjects.Container;
     offsetX?: number;
