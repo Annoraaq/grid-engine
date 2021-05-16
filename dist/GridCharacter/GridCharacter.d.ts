@@ -4,6 +4,7 @@ import { Subject } from "rxjs";
 import { Position, WalkingAnimationMapping } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
+import * as Phaser from "phaser";
 export interface FrameRow {
     leftFoot: number;
     standing: number;
