@@ -11,7 +11,7 @@ parent: Examples
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-1.15.0.min.js"></script>
+<script src="js/grid-engine-2.0.0.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
@@ -45,7 +45,7 @@ parent: Examples
           id: "player",
           sprite: playerSprite,
           walkingAnimationMapping: 6,
-          startPosition: new Phaser.Math.Vector2(16, 8),
+          startPosition: {x: 16, y: 8},
         },
       ],
     };
@@ -97,13 +97,13 @@ parent: Examples
   function update() {
     const cursors = this.input.keyboard.createCursorKeys();
     if (cursors.left.isDown) {
-      this.gridEngine.moveLeft("player");
+      this.gridEngine.move("player", "left");
     } else if (cursors.right.isDown) {
-      this.gridEngine.moveRight("player");
+      this.gridEngine.move("player", "right");
     } else if (cursors.up.isDown) {
-      this.gridEngine.moveUp("player");
+      this.gridEngine.move("player", "up");
     } else if (cursors.down.isDown) {
-      this.gridEngine.moveDown("player");
+      this.gridEngine.move("player", "down");
     }
   }
 </script>
@@ -141,7 +141,7 @@ function create() {
         id: "player",
         sprite: playerSprite,
         walkingAnimationMapping: 6,
-        startPosition: new Phaser.Math.Vector2(16, 8),
+        startPosition: {x: 16, y: 8},
       },
     ],
   };
@@ -193,13 +193,13 @@ function create() {
 function update() {
   const cursors = this.input.keyboard.createCursorKeys();
   if (cursors.left.isDown) {
-    this.gridEngine.moveLeft("player");
+    this.gridEngine.move("player", "left");
   } else if (cursors.right.isDown) {
-    this.gridEngine.moveRight("player");
+    this.gridEngine.move("player", "right");
   } else if (cursors.up.isDown) {
-    this.gridEngine.moveUp("player");
+    this.gridEngine.move("player", "up");
   } else if (cursors.down.isDown) {
-    this.gridEngine.moveDown("player");
+    this.gridEngine.move("player", "down");
   }
 }
 ```

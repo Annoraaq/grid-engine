@@ -11,7 +11,7 @@ parent: Examples
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-1.15.0.min.js"></script>
+<script src="js/grid-engine-2.0.0.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
@@ -31,7 +31,7 @@ parent: Examples
         const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
         cloudCityTilemap.addTilesetImage("cloud_tileset", "tiles");
         for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-            const layer = cloudCityTilemap.createDynamicLayer(i, "cloud_tileset", 0, 0);
+            const layer = cloudCityTilemap.createLayer(i, "cloud_tileset", 0, 0);
             layer.scale = 3;
         }
         const playerSprite = this.add.sprite(0, 0, "player");
@@ -45,7 +45,7 @@ parent: Examples
                     id: "player",
                     sprite: playerSprite,
                     walkingAnimationMapping: 6,
-                    startPosition: new Phaser.Math.Vector2(22, 40),
+                    startPosition: {x: 22, y: 40},
                 },
             ],
         };
@@ -58,7 +58,7 @@ parent: Examples
                     id: `npc${x}#${y}`,
                     sprite: spr,
                     walkingAnimationMapping: getRandomInt(0,6),
-                    startPosition: new Phaser.Math.Vector2(x, y),
+                    startPosition: {x, y},
                     speed: 2
               })
           }
@@ -76,13 +76,13 @@ parent: Examples
     function update () {
         const cursors = this.input.keyboard.createCursorKeys();
         if (cursors.left.isDown) {
-            this.gridEngine.moveLeft("player");
+          this.gridEngine.move("player", "left");
         } else if (cursors.right.isDown) {
-            this.gridEngine.moveRight("player");
+          this.gridEngine.move("player", "right");
         } else if (cursors.up.isDown) {
-            this.gridEngine.moveUp("player");
+          this.gridEngine.move("player", "up");
         } else if (cursors.down.isDown) {
-            this.gridEngine.moveDown("player");
+          this.gridEngine.move("player", "down");
         }
     }
 
@@ -112,7 +112,7 @@ function create() {
   const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
   cloudCityTilemap.addTilesetImage("cloud_tileset", "tiles");
   for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-    const layer = cloudCityTilemap.createDynamicLayer(i, "cloud_tileset", 0, 0);
+    const layer = cloudCityTilemap.createLayer(i, "cloud_tileset", 0, 0);
     layer.scale = 3;
   }
   const playerSprite = this.add.sprite(0, 0, "player");
@@ -126,7 +126,7 @@ function create() {
         id: "player",
         sprite: playerSprite,
         walkingAnimationMapping: 6,
-        startPosition: new Phaser.Math.Vector2(22, 40),
+        startPosition: {x: 22, y: 40},
       },
     ],
   };
@@ -139,7 +139,7 @@ function create() {
         id: `npc${x}#${y}`,
         sprite: spr,
         walkingAnimationMapping: getRandomInt(0, 6),
-        startPosition: new Phaser.Math.Vector2(x, y),
+        startPosition: {x, y},
         speed: 2,
       });
     }
@@ -157,13 +157,13 @@ function create() {
 function update() {
   const cursors = this.input.keyboard.createCursorKeys();
   if (cursors.left.isDown) {
-    this.gridEngine.moveLeft("player");
+    this.gridEngine.move("player", "left");
   } else if (cursors.right.isDown) {
-    this.gridEngine.moveRight("player");
+    this.gridEngine.move("player", "right");
   } else if (cursors.up.isDown) {
-    this.gridEngine.moveUp("player");
+    this.gridEngine.move("player", "up");
   } else if (cursors.down.isDown) {
-    this.gridEngine.moveDown("player");
+    this.gridEngine.move("player", "down");
   }
 }
 

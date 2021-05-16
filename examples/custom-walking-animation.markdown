@@ -11,7 +11,7 @@ parent: Examples
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-1.15.0.min.js"></script>
+<script src="js/grid-engine-2.0.0.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
@@ -31,7 +31,7 @@ parent: Examples
     const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
     cloudCityTilemap.addTilesetImage("Cloud City", "tiles");
     for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-      const layer = cloudCityTilemap.createStaticLayer(i, "Cloud City", 0, 0);
+      const layer = cloudCityTilemap.createLayer(i, "Cloud City", 0, 0);
       layer.scale = 3;
     }
     const playerSprite = this.add.sprite(0, 0, "player");
@@ -50,24 +50,22 @@ parent: Examples
         {
           id: "player",
           sprite: playerSprite,
-          walkingAnimationEnabled: false,
-          startPosition: new Phaser.Math.Vector2(8, 8),
+          startPosition: {x: 8, y: 8},
         },
       ],
-      firstLayerAboveChar: 3,
     };
 
     this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
-    this.gridEngine.movementStarted().subscribe(([_charId, direction]) => {
+    this.gridEngine.movementStarted().subscribe(({direction}) => {
       playerSprite.anims.play(direction);
     });
 
-    this.gridEngine.movementStopped().subscribe(([_charId, direction]) => {
+    this.gridEngine.movementStopped().subscribe(({direction}) => {
       playerSprite.anims.stop();
       playerSprite.setFrame(getStopFrame(direction));
     });
 
-    this.gridEngine.directionChanged().subscribe(([_charId, direction]) => {
+    this.gridEngine.directionChanged().subscribe(({direction}) => {
       playerSprite.setFrame(getStopFrame(direction));
     });
   }
@@ -105,13 +103,13 @@ parent: Examples
   function update () {
     const cursors = this.input.keyboard.createCursorKeys();
     if (cursors.left.isDown) {
-      this.gridEngine.moveLeft("player");
+      this.gridEngine.move("player", "left");
     } else if (cursors.right.isDown) {
-      this.gridEngine.moveRight("player");
+      this.gridEngine.move("player", "right");
     } else if (cursors.up.isDown) {
-      this.gridEngine.moveUp("player");
+      this.gridEngine.move("player", "up");
     } else if (cursors.down.isDown) {
-      this.gridEngine.moveDown("player");
+      this.gridEngine.move("player", "down");
     }
   }
 </script>
@@ -135,7 +133,7 @@ function create() {
   const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
   cloudCityTilemap.addTilesetImage("Cloud City", "tiles");
   for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-    const layer = cloudCityTilemap.createStaticLayer(i, "Cloud City", 0, 0);
+    const layer = cloudCityTilemap.createLayer(i, "Cloud City", 0, 0);
     layer.scale = 3;
   }
   const playerSprite = this.add.sprite(0, 0, "player");
@@ -154,24 +152,22 @@ function create() {
       {
         id: "player",
         sprite: playerSprite,
-        walkingAnimationEnabled: false,
-        startPosition: new Phaser.Math.Vector2(8, 8),
+        startPosition: {x: 8, y: 8},
       },
     ],
-    firstLayerAboveChar: 3,
   };
 
   this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
-  this.gridEngine.movementStarted().subscribe(([_charId, direction]) => {
+  this.gridEngine.movementStarted().subscribe(({direction}) => {
     playerSprite.anims.play(direction);
   });
 
-  this.gridEngine.movementStopped().subscribe(([_charId, direction]) => {
+  this.gridEngine.movementStopped().subscribe(({direction}) => {
     playerSprite.anims.stop();
     playerSprite.setFrame(getStopFrame(direction));
   });
 
-  this.gridEngine.directionChanged().subscribe(([_charId, direction]) => {
+  this.gridEngine.directionChanged().subscribe(({direction}) => {
     playerSprite.setFrame(getStopFrame(direction));
   });
 }
@@ -205,13 +201,13 @@ function getStopFrame(direction) {
 function update() {
   const cursors = this.input.keyboard.createCursorKeys();
   if (cursors.left.isDown) {
-    this.gridEngine.moveLeft("player");
+    this.gridEngine.move("player", "left");
   } else if (cursors.right.isDown) {
-    this.gridEngine.moveRight("player");
+    this.gridEngine.move("player", "right");
   } else if (cursors.up.isDown) {
-    this.gridEngine.moveUp("player");
+    this.gridEngine.move("player", "up");
   } else if (cursors.down.isDown) {
-    this.gridEngine.moveDown("player");
+    this.gridEngine.move("player", "down");
   }
 }
 ```

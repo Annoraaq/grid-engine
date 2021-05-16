@@ -1,4 +1,11 @@
 { "compressionlevel":-1,
+ "editorsettings":
+    {
+     "export":
+        {
+         "target":"."
+        }
+    },
  "height":10,
  "infinite":false,
  "layers":[
@@ -22,7 +29,7 @@
          "opacity":1,
          "properties":[
                 {
-                 "name":"gm_heightShift",
+                 "name":"ge_heightShift",
                  "type":"int",
                  "value":1
                 }],

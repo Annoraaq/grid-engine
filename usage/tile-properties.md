@@ -20,7 +20,7 @@ For the most basic type of collision, read [the Collision guide](collision) to g
 
 | Property   | Type    | Effect                                                                                                                                              |
 | :--------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `gm_collide` | boolean | If set to `true`, characters can not walk over tile from any direction. <br>If set to `false`, characters can walk through tile from any direction. |
+| `ge_collide` | boolean | If set to `true`, characters can not walk over tile from any direction. <br>If set to `false`, characters can walk through tile from any direction. |
 
 ### One-Way
 
@@ -28,7 +28,7 @@ These flags inform **Grid Engine** about how it should handle collisions from ce
 
 | Property           | Type    | Effect                                                               |
 | :----------------- | :------ | :------------------------------------------------------------------- |
-| `gm_collide_up`    | boolean | If set to `true`, characters can not walk over tile from the top.    |
-| `gm_collide_down`  | boolean | If set to `true`, characters can not walk over tile from the bottom. |
-| `gm_collide_left`  | boolean | If set to `true`, characters can not walk over tile from the left.   |
-| `gm_collide_right` | boolean | If set to `true`, characters can not walk over tile from the right.  |
+| `ge_collide_up`    | boolean | If set to `true`, characters can not walk over tile from the top.    |
+| `ge_collide_down`  | boolean | If set to `true`, characters can not walk over tile from the bottom. |
+| `ge_collide_left`  | boolean | If set to `true`, characters can not walk over tile from the left.   |
+| `ge_collide_right` | boolean | If set to `true`, characters can not walk over tile from the right.  |

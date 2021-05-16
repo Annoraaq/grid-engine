@@ -11,7 +11,7 @@ parent: Examples (8 directions)
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-1.15.0.min.js"></script>
+<script src="js/grid-engine-2.0.0.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
@@ -51,7 +51,7 @@ parent: Examples (8 directions)
           id: "player",
           sprite: playerSprite,
           walkingAnimationMapping: 6,
-          startPosition: new Phaser.Math.Vector2(8, 12),
+          startPosition: {x: 8, y: 12},
           container
         },
       ],
@@ -127,7 +127,7 @@ function create() {
         id: "player",
         sprite: playerSprite,
         walkingAnimationMapping: 6,
-        startPosition: new Phaser.Math.Vector2(8, 12),
+        startPosition: {x: 8, y: 12},
         container,
       },
     ],

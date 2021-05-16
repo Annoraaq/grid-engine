@@ -11,7 +11,7 @@ parent: Examples (8 directions)
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-1.15.0.min.js"></script>
+<script src="js/grid-engine-2.0.0.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
@@ -31,7 +31,7 @@ parent: Examples (8 directions)
     const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
     cloudCityTilemap.addTilesetImage("cloud_tileset", "tiles");
     for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-      const layer = cloudCityTilemap.createDynamicLayer(i, "cloud_tileset", 0, 0);
+      const layer = cloudCityTilemap.createLayer(i, "cloud_tileset", 0, 0);
       layer.scale = 3;
     }
     const playerSprite = this.add.sprite(0, 0, "player");
@@ -45,7 +45,7 @@ parent: Examples (8 directions)
           id: "player",
           sprite: playerSprite,
           walkingAnimationMapping: 6,
-          startPosition: new Phaser.Math.Vector2(22, 40),
+          startPosition: {x: 22, y: 40},
         },
       ],
       numberOfDirections: 8,
@@ -59,7 +59,7 @@ parent: Examples (8 directions)
           id: `npc${x}#${y}`,
           sprite: spr,
           walkingAnimationMapping: getRandomInt(0,6),
-          startPosition: new Phaser.Math.Vector2(x, y),
+          startPosition: {x, y},
           speed: 2
         })
       }
@@ -121,7 +121,7 @@ function create() {
   const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
   cloudCityTilemap.addTilesetImage("cloud_tileset", "tiles");
   for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-    const layer = cloudCityTilemap.createDynamicLayer(i, "cloud_tileset", 0, 0);
+    const layer = cloudCityTilemap.createLayer(i, "cloud_tileset", 0, 0);
     layer.scale = 3;
   }
   const playerSprite = this.add.sprite(0, 0, "player");
@@ -135,7 +135,7 @@ function create() {
         id: "player",
         sprite: playerSprite,
         walkingAnimationMapping: 6,
-        startPosition: new Phaser.Math.Vector2(22, 40),
+        startPosition: {x: 22, y: 40},
       },
     ],
     numberOfDirections: 8,
@@ -149,7 +149,7 @@ function create() {
         id: `npc${x}#${y}`,
         sprite: spr,
         walkingAnimationMapping: getRandomInt(0, 6),
-        startPosition: new Phaser.Math.Vector2(x, y),
+        startPosition: {x, y},
         speed: 2,
       });
     }

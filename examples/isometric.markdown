@@ -11,7 +11,7 @@ parent: Examples
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-1.15.0.min.js"></script>
+<script src="js/grid-engine-2.0.0.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
@@ -49,7 +49,7 @@ parent: Examples
         {
           id: "player",
           sprite: playerSprite,
-          startPosition: new Phaser.Math.Vector2(0, 0),
+          startPosition: {x: 0, y: 0},
           offsetY: -9,
           walkingAnimationEnabled: false,
           speed: 2,
@@ -58,16 +58,16 @@ parent: Examples
     };
 
     this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
-    this.gridEngine.movementStarted().subscribe(([_charId, direction]) => {
+    this.gridEngine.movementStarted().subscribe(({direction}) => {
       playerSprite.anims.play(direction);
     });
 
-    this.gridEngine.movementStopped().subscribe(([_charId, direction]) => {
+    this.gridEngine.movementStopped().subscribe(({direction}) => {
       playerSprite.anims.stop();
       playerSprite.setFrame(getStopFrame(direction));
     });
 
-    this.gridEngine.directionChanged().subscribe(([_charId, direction]) => {
+    this.gridEngine.directionChanged().subscribe(({direction}) => {
       playerSprite.setFrame(getStopFrame(direction));
     });
   }
@@ -149,7 +149,7 @@ function create() {
       {
         id: "player",
         sprite: playerSprite,
-        startPosition: new Phaser.Math.Vector2(0, 0),
+        startPosition: {x: 0, y: 0},
         offsetY: -9,
         walkingAnimationEnabled: false,
         speed: 2,
@@ -158,16 +158,16 @@ function create() {
   };
 
   this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
-  this.gridEngine.movementStarted().subscribe(([_charId, direction]) => {
+  this.gridEngine.movementStarted().subscribe(({direction}) => {
     playerSprite.anims.play(direction);
   });
 
-  this.gridEngine.movementStopped().subscribe(([_charId, direction]) => {
+  this.gridEngine.movementStopped().subscribe(({direction}) => {
     playerSprite.anims.stop();
     playerSprite.setFrame(getStopFrame(direction));
   });
 
-  this.gridEngine.directionChanged().subscribe(([_charId, direction]) => {
+  this.gridEngine.directionChanged().subscribe(({direction}) => {
     playerSprite.setFrame(getStopFrame(direction));
   });
 }

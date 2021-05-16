@@ -1,4 +1,11 @@
 { "compressionlevel":-1,
+ "editorsettings":
+    {
+     "export":
+        {
+         "target":"."
+        }
+    },
  "height":20,
  "infinite":false,
  "layers":[
@@ -22,7 +29,7 @@
          "opacity":1,
          "properties":[
                 {
-                 "name":"gm_heightShift",
+                 "name":"ge_heightShift",
                  "type":"int",
                  "value":2
                 }],
@@ -76,7 +83,7 @@
                  "id":177,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -85,7 +92,7 @@
                  "id":178,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":false
                         }]
@@ -94,7 +101,7 @@
                  "id":179,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -103,7 +110,7 @@
                  "id":199,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -112,7 +119,7 @@
                  "id":200,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -121,7 +128,7 @@
                  "id":201,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -130,7 +137,7 @@
                  "id":202,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -139,7 +146,7 @@
                  "id":203,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -148,7 +155,7 @@
                  "id":221,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -157,7 +164,7 @@
                  "id":222,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -166,7 +173,7 @@
                  "id":223,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -175,7 +182,7 @@
                  "id":224,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -184,7 +191,7 @@
                  "id":225,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -193,7 +200,7 @@
                  "id":236,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -202,7 +209,7 @@
                  "id":237,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -211,7 +218,7 @@
                  "id":238,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -220,7 +227,7 @@
                  "id":243,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -229,7 +236,7 @@
                  "id":244,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -238,7 +245,7 @@
                  "id":245,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -247,7 +254,7 @@
                  "id":265,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -256,7 +263,7 @@
                  "id":266,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -265,7 +272,7 @@
                  "id":267,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -274,7 +281,7 @@
                  "id":275,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -283,7 +290,7 @@
                  "id":276,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
@@ -292,7 +299,7 @@
                  "id":277,
                  "properties":[
                         {
-                         "name":"collides",
+                         "name":"ge_collide",
                          "type":"bool",
                          "value":true
                         }]
