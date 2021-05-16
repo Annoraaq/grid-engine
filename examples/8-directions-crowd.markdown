@@ -15,6 +15,7 @@ parent: Examples (8 directions)
 <script src="js/getBasicConfig.js"></script>
 
 <script>
+
   const config = getBasicConfig(preload, create, update);
   const game = new Phaser.Game(config);
 
