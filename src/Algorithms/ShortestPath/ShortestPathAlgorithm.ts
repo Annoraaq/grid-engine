@@ -1,7 +1,4 @@
-import * as Phaser from "phaser";
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "../../Utils/Vector2/Vector2";
 
 export interface ShortestPathAlgorithm {
   getShortestPath(

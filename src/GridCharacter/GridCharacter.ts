@@ -2,14 +2,12 @@ import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
 import { VectorUtils } from "./../Utils/VectorUtils";
 import { directionVector, oppositeDirection } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
-import * as Phaser from "phaser";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
-import { WalkingAnimationMapping } from "../GridEngine";
+import { Position, WalkingAnimationMapping } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "../Utils/Vector2/Vector2";
+import * as Phaser from "phaser";
 
 export interface FrameRow {
   leftFoot: number;
@@ -20,8 +18,8 @@ export interface FrameRow {
 export type CharacterIndex = number;
 
 export interface PositionChange {
-  exitTile: Vector2;
-  enterTile: Vector2;
+  exitTile: Position;
+  enterTile: Position;
 }
 
 export interface CharConfig {
@@ -29,7 +27,6 @@ export interface CharConfig {
   tilemap: GridTilemap;
   tileSize: Vector2;
   speed: number;
-  walkingAnimationEnabled: boolean;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
   container?: Phaser.GameObjects.Container;
   offsetX?: number;
@@ -82,7 +79,7 @@ export class GridCharacter {
       walkingAnimationMapping,
       characterIndex
     );
-    this.animation.setIsEnabled(config.walkingAnimationEnabled);
+    this.animation.setIsEnabled(config.walkingAnimationMapping !== undefined);
     this.animation.setStandingFrame(Direction.DOWN);
 
     this.speedPixelsPerSecond = this.createSpeedPixelsPerSecond();

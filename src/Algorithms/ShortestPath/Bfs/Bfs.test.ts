@@ -1,8 +1,6 @@
-import * as Phaser from "phaser";
+import { Vector2 } from "../../../Utils/Vector2/Vector2";
 import { VectorUtils } from "../../../Utils/VectorUtils";
 import { Bfs } from "./Bfs";
-
-const Vector2 = Phaser.Math.Vector2;
 
 describe("Bfs", () => {
   let bfs: Bfs;
@@ -36,8 +34,8 @@ describe("Bfs", () => {
   });
 
   it("should return one medium shortest path", () => {
-    const startPos = new Phaser.Math.Vector2(3, 3);
-    const targetPos = new Phaser.Math.Vector2(5, -1);
+    const startPos = new Vector2(3, 3);
+    const targetPos = new Vector2(5, -1);
     const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,

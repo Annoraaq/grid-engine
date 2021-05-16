@@ -1,10 +1,8 @@
+import { Vector2 } from "../Utils/Vector2/Vector2";
 import { Direction } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
 
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
-
-describe("GridTilemapPlugin", () => {
+describe("GridTilemap", () => {
   let gridTilemap: GridTilemap;
   let tilemapMock;
   let blankLayerMock;
@@ -78,7 +76,7 @@ describe("GridTilemapPlugin", () => {
         },
         properties: [
           {
-            name: "gm_alwaysTop",
+            name: "ge_alwaysTop",
             value: true,
           },
         ],
@@ -132,7 +130,7 @@ describe("GridTilemapPlugin", () => {
         },
         properties: [
           {
-            name: "gm_heightShift",
+            name: "ge_heightShift",
             value: 1,
           },
         ],
@@ -188,7 +186,7 @@ describe("GridTilemapPlugin", () => {
   it("should detect blocking tiles", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({
-      properties: { gm_collide: true },
+      properties: { ge_collide: true },
     });
     gridTilemap = new GridTilemap(tilemapMock, 3);
     const isBlockingTile = gridTilemap.hasBlockingTile(new Vector2(3, 4));
@@ -217,20 +215,10 @@ describe("GridTilemapPlugin", () => {
     expect(isBlocking).toBe(true);
   });
 
-  it("should detect blocking tiles with legacy collide property", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
-    tilemapMock.getTileAt.mockReturnValue({ properties: { collides: true } });
-    gridTilemap = new GridTilemap(tilemapMock, 3);
-    const isBlockingTile = gridTilemap.hasBlockingTile(new Vector2(3, 4));
-    const isBlocking = gridTilemap.isBlocking(new Vector2(3, 4));
-    expect(isBlockingTile).toBe(true);
-    expect(isBlocking).toBe(true);
-  });
-
   it("should detect one-way blocking tiles left", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({
-      properties: { gm_collide_left: true, gm_collide_right: false },
+      properties: { ge_collide_left: true, ge_collide_right: false },
     });
     gridTilemap = new GridTilemap(tilemapMock, 3);
     const isBlockingLeft = gridTilemap.isBlocking(
@@ -258,7 +246,7 @@ describe("GridTilemapPlugin", () => {
   it("should detect one-way blocking tiles right", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({
-      properties: { gm_collide_right: true },
+      properties: { ge_collide_right: true },
     });
     gridTilemap = new GridTilemap(tilemapMock, 3);
     const isBlockingLeft = gridTilemap.isBlocking(
@@ -286,7 +274,7 @@ describe("GridTilemapPlugin", () => {
   it("should detect one-way blocking tiles up", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({
-      properties: { gm_collide_up: true },
+      properties: { ge_collide_up: true },
     });
     gridTilemap = new GridTilemap(tilemapMock, 3);
     const isBlockingLeft = gridTilemap.isBlocking(
@@ -314,7 +302,7 @@ describe("GridTilemapPlugin", () => {
   it("should detect one-way blocking tiles down", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({
-      properties: { gm_collide_down: true },
+      properties: { ge_collide_down: true },
     });
     gridTilemap = new GridTilemap(tilemapMock, 3);
     const isBlockingLeft = gridTilemap.isBlocking(

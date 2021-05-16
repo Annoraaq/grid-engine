@@ -1,11 +1,8 @@
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
 import { TargetMovement } from "./TargetMovement";
-import * as Phaser from "phaser";
 import { NoPathFoundStrategy } from "../../Algorithms/ShortestPath/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Algorithms/ShortestPath/PathBlockedStrategy";
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "../../Utils/Vector2/Vector2";
 
 const mockBfs = {
   getShortestPath: jest.fn(),

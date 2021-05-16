@@ -12,7 +12,6 @@ import {
   GridCharacter,
   PositionChange,
 } from "./GridCharacter/GridCharacter";
-import "phaser";
 import {
   Direction,
   isDiagonal,
@@ -23,15 +22,17 @@ import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 import { NoPathFoundStrategy } from "./Algorithms/ShortestPath/NoPathFoundStrategy";
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "./Utils/Vector2/Vector2";
 
 export type TileSizePerSecond = number;
 
+export interface Position {
+  x: number;
+  y: number;
+}
+
 export interface GridEngineConfig {
   characters: CharacterData[];
-  firstLayerAboveChar?: number; // deprecated
   collisionTilePropertyName?: string;
   numberOfDirections?: NumberOfDirections;
 }
@@ -51,47 +52,73 @@ export interface CharacterData {
   id: string;
   sprite: Phaser.GameObjects.Sprite;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
-  walkingAnimationEnabled?: boolean;
-  characterIndex?: number; // deprecated
   speed?: TileSizePerSecond;
-  startPosition?: Vector2;
+  startPosition?: Position;
   container?: Phaser.GameObjects.Container;
   offsetX?: number;
   offsetY?: number;
   facingDirection?: Direction;
 }
 
-export class GridEngine extends Phaser.Plugins.ScenePlugin {
+export class GridEngine {
   private gridCharacters: Map<string, GridCharacter>;
   private tilemap: Phaser.Tilemaps.Tilemap;
   private gridTilemap: GridTilemap;
   private isCreated = false;
-  private movementStopped$ = new Subject<[string, Direction]>();
-  private movementStarted$ = new Subject<[string, Direction]>();
-  private directionChanged$ = new Subject<[string, Direction]>();
-  private positionChanged$ = new Subject<{ charId: string } & PositionChange>();
-  private positionChangeFinished$ = new Subject<
-    { charId: string } & PositionChange
-  >();
-  private charRemoved$ = new Subject<string>();
+  private movementStopped$: Subject<{ charId: string; direction: Direction }>;
+  private movementStarted$: Subject<{ charId: string; direction: Direction }>;
+  private directionChanged$: Subject<{ charId: string; direction: Direction }>;
+  private positionChangeStarted$: Subject<{ charId: string } & PositionChange>;
+  private positionChangeFinished$: Subject<{ charId: string } & PositionChange>;
+  private charRemoved$: Subject<string>;
   private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR;
 
-  constructor(
-    public scene: Phaser.Scene,
-    pluginManager: Phaser.Plugins.PluginManager
-  ) {
-    super(scene, pluginManager);
+  constructor(private scene: Phaser.Scene) {
+    this.scene.sys.events.once("boot", this.boot, this);
   }
 
   boot(): void {
-    this.systems.events.on("update", this.update, this);
+    this.scene.sys.events.on("update", this.update, this);
+    this.scene.sys.events.on("destroy", this.destroy, this);
+  }
+
+  destroy(): void {
+    this.scene = undefined;
+    this.tilemap = undefined;
+    this.gridCharacters = undefined;
+    this.gridTilemap = undefined;
+    this.movementStarted$ = undefined;
+    this.movementStopped$ = undefined;
+    this.directionChanged$ = undefined;
+    this.positionChangeStarted$ = undefined;
+    this.positionChangeFinished$ = undefined;
+    this.charRemoved$ = undefined;
   }
 
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
     this.isCreated = true;
     this.gridCharacters = new Map();
     this.tilemap = tilemap;
-    this.gridTilemap = this.createTilemap(tilemap, config);
+    this.movementStopped$ = new Subject<{
+      charId: string;
+      direction: Direction;
+    }>();
+    this.movementStarted$ = new Subject<{
+      charId: string;
+      direction: Direction;
+    }>();
+    this.directionChanged$ = new Subject<{
+      charId: string;
+      direction: Direction;
+    }>();
+    this.positionChangeStarted$ = new Subject<
+      { charId: string } & PositionChange
+    >();
+    this.positionChangeFinished$ = new Subject<
+      { charId: string } & PositionChange
+    >();
+    this.charRemoved$ = new Subject<string>();
+    this.gridTilemap = new GridTilemap(tilemap);
     if (config.collisionTilePropertyName) {
       this.gridTilemap.setCollisionTilePropertyName(
         config.collisionTilePropertyName
@@ -104,26 +131,10 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     this.addCharacters(config);
   }
 
-  getPosition(charId: string): Vector2 {
+  getPosition(charId: string): Position {
     this.initGuard();
     this.unknownCharGuard(charId);
     return this.gridCharacters.get(charId).getTilePos();
-  }
-
-  moveLeft(charId: string): void {
-    this.moveChar(charId, Direction.LEFT);
-  }
-
-  moveRight(charId: string): void {
-    this.moveChar(charId, Direction.RIGHT);
-  }
-
-  moveUp(charId: string): void {
-    this.moveChar(charId, Direction.UP);
-  }
-
-  moveDown(charId: string): void {
-    this.moveChar(charId, Direction.DOWN);
   }
 
   move(charId: string, direction: Direction): void {
@@ -138,37 +149,19 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     this.gridCharacters.get(charId).setMovement(randomMovement);
   }
 
-  moveTo(
-    charId: string,
-    targetPos: Vector2,
-    closestPointIfBlocked?: boolean
-  ): void;
-  moveTo(charId: string, targetPos: Vector2, config?: MoveToConfig): void;
-  moveTo(
-    charId: string,
-    targetPos: Vector2,
-    config?: boolean | MoveToConfig
-  ): void {
+  moveTo(charId: string, targetPos: Position, config?: MoveToConfig): void {
     const moveToConfig = this.assembleMoveToConfig(config);
 
     this.initGuard();
     this.unknownCharGuard(charId);
     const targetMovement = new TargetMovement(
       this.gridTilemap,
-      targetPos,
+      new Vector2(targetPos),
       0,
       moveToConfig
     );
     targetMovement.setNumberOfDirections(this.numberOfDirections);
     this.gridCharacters.get(charId).setMovement(targetMovement);
-  }
-
-  // deprecated
-  stopMovingRandomly(charId: string): void {
-    console.warn(
-      "GridEngine: `stopMovingRandomly` is deprecated. Use `stopMovement()` instead."
-    );
-    this._stopMovement(charId);
   }
 
   stopMovement(charId: string): void {
@@ -205,12 +198,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   addCharacter(charData: CharacterData): void {
     this.initGuard();
 
-    if (charData.characterIndex != undefined) {
-      console.warn(
-        "GridEngine: CharacterConfig property `characterIndex` is deprecated. Use `walkingAnimtionMapping` instead."
-      );
-    }
-
     const charConfig: CharConfig = {
       sprite: charData.sprite,
       speed: charData.speed || 4,
@@ -220,17 +207,10 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
         this.gridTilemap.getTileHeight()
       ),
       walkingAnimationMapping: charData.walkingAnimationMapping,
-      walkingAnimationEnabled: charData.walkingAnimationEnabled,
       container: charData.container,
       offsetX: charData.offsetX,
       offsetY: charData.offsetY,
     };
-    if (charConfig.walkingAnimationMapping == undefined) {
-      charConfig.walkingAnimationMapping = charData.characterIndex;
-    }
-    if (charConfig.walkingAnimationEnabled == undefined) {
-      charConfig.walkingAnimationEnabled = true;
-    }
 
     const gridChar = this.createCharacter(charData.id, charConfig);
 
@@ -240,7 +220,10 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
 
     this.gridCharacters.set(charData.id, gridChar);
 
-    gridChar.setTilePosition(charData.startPosition || new Vector2(0, 0));
+    const startPos = charData.startPosition
+      ? new Vector2(charData.startPosition)
+      : new Vector2(0, 0);
+    gridChar.setTilePosition(startPos);
 
     this.gridTilemap.addCharacter(gridChar);
 
@@ -248,28 +231,28 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
       .movementStopped()
       .pipe(this.takeUntilCharRemoved(gridChar.getId()))
       .subscribe((direction: Direction) => {
-        this.movementStopped$.next([gridChar.getId(), direction]);
+        this.movementStopped$.next({ charId: gridChar.getId(), direction });
       });
 
     gridChar
       .movementStarted()
       .pipe(this.takeUntilCharRemoved(gridChar.getId()))
       .subscribe((direction: Direction) => {
-        this.movementStarted$.next([gridChar.getId(), direction]);
+        this.movementStarted$.next({ charId: gridChar.getId(), direction });
       });
 
     gridChar
       .directionChanged()
       .pipe(this.takeUntilCharRemoved(gridChar.getId()))
       .subscribe((direction: Direction) => {
-        this.directionChanged$.next([gridChar.getId(), direction]);
+        this.directionChanged$.next({ charId: gridChar.getId(), direction });
       });
 
     gridChar
       .positionChanged()
       .pipe(this.takeUntilCharRemoved(gridChar.getId()))
       .subscribe(({ exitTile, enterTile }) => {
-        this.positionChanged$.next({
+        this.positionChangeStarted$.next({
           charId: gridChar.getId(),
           exitTile,
           enterTile,
@@ -334,14 +317,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     this.gridCharacters.get(charId).setMovement(followMovement);
   }
 
-  // deprecated
-  stopFollowing(charId: string): void {
-    console.warn(
-      "GridEngine: `stopFollowing` is deprecated. Use `stopMovement()` instead."
-    );
-    this._stopMovement(charId);
-  }
-
   isMoving(charId: string): boolean {
     this.initGuard();
     this.unknownCharGuard(charId);
@@ -366,20 +341,20 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     this.gridCharacters.get(charId).setTilePosition(pos);
   }
 
-  movementStarted(): Observable<[string, Direction]> {
+  movementStarted(): Observable<{ charId: string; direction: Direction }> {
     return this.movementStarted$;
   }
 
-  movementStopped(): Observable<[string, Direction]> {
+  movementStopped(): Observable<{ charId: string; direction: Direction }> {
     return this.movementStopped$;
   }
 
-  directionChanged(): Observable<[string, Direction]> {
+  directionChanged(): Observable<{ charId: string; direction: Direction }> {
     return this.directionChanged$;
   }
 
-  positionChanged(): Observable<{ charId: string } & PositionChange> {
-    return this.positionChanged$;
+  positionChangeStarted(): Observable<{ charId: string } & PositionChange> {
+    return this.positionChangeStarted$;
   }
 
   positionChangeFinished(): Observable<{ charId: string } & PositionChange> {
@@ -401,20 +376,6 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
   private unknownCharGuard(charId: string) {
     if (!this.gridCharacters.has(charId)) {
       throw new Error(`Character unknown: ${charId}`);
-    }
-  }
-
-  private createTilemap(
-    tilemap: Phaser.Tilemaps.Tilemap,
-    config: GridEngineConfig
-  ) {
-    if (config.firstLayerAboveChar != undefined) {
-      console.warn(
-        "GridEngine: Config property `firstLayerAboveChar` is deprecated. Use a property `alwaysTop` on the tilemap layers instead."
-      );
-      return new GridTilemap(tilemap, config.firstLayerAboveChar);
-    } else {
-      return new GridTilemap(tilemap);
     }
   }
 
@@ -463,21 +424,11 @@ export class GridEngine extends Phaser.Plugins.ScenePlugin {
     );
   }
 
-  private assembleMoveToConfig(config: boolean | MoveToConfig): MoveToConfig {
+  private assembleMoveToConfig(config: MoveToConfig): MoveToConfig {
     const moveToConfig = {
       noPathFoundStrategy: NoPathFoundStrategy.STOP,
       pathBlockedStrategy: PathBlockedStrategy.WAIT,
     };
-    if (typeof config === "boolean") {
-      moveToConfig.noPathFoundStrategy = config
-        ? NoPathFoundStrategy.CLOSEST_REACHABLE
-        : NoPathFoundStrategy.STOP;
-      console.warn(
-        "GridEngine: parameter 'closestPointIfBlocked' is deprecated. " +
-          "Please use noPathFoundStrategy: 'CLOSEST_REACHABLE' instead."
-      );
-      return moveToConfig;
-    }
     if (config?.noPathFoundStrategy) {
       if (
         Object.values(NoPathFoundStrategy).includes(config.noPathFoundStrategy)

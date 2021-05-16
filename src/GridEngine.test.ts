@@ -2,9 +2,10 @@ import { PathBlockedStrategy } from "./Algorithms/ShortestPath/PathBlockedStrate
 import { NoPathFoundStrategy } from "./Algorithms/ShortestPath/NoPathFoundStrategy";
 import { Subject, of } from "rxjs";
 import { take } from "rxjs/operators";
-import * as Phaser from "phaser";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { GridCharacter, PositionChange } from "./GridCharacter/GridCharacter";
+import * as Phaser from "phaser";
+
 const mockSetTilePositon = jest.fn();
 const mockMove = jest.fn();
 const mockUpdate = jest.fn();
@@ -16,7 +17,7 @@ const mockRandomMovementUpdate = jest.fn();
 const mockMovementStarted = jest.fn();
 const mockMovementStopped = jest.fn();
 const mockDirectionChanged = jest.fn();
-const mockPositionChanged = jest.fn();
+const mockPositionChangeStarted = jest.fn();
 const mockPositionChangeFinished = jest.fn();
 const mockIsMoving = jest.fn();
 const mockSetMovement = jest.fn();
@@ -41,9 +42,6 @@ const mockGridTilemapConstructor = jest.fn(function (
 ) {
   return mockGridTileMap;
 });
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
 
 expect.extend({
   toBeCharacter(receivedChar: GridCharacter, expectedCharId: string) {
@@ -83,7 +81,7 @@ function createMockCharConstr() {
       movementStarted: mockMovementStarted,
       movementStopped: mockMovementStopped,
       directionChanged: mockDirectionChanged,
-      positionChanged: mockPositionChanged,
+      positionChanged: mockPositionChangeStarted,
       positionChangeFinished: mockPositionChangeFinished,
       isMoving: mockIsMoving,
       getFacingDirection: mockFacingDirection,
@@ -143,11 +141,11 @@ import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { TargetMovement } from "./Movement/TargetMovement/TargetMovement";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import { IsometricGridCharacter } from "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter";
+import { Vector2 } from "./Utils/Vector2/Vector2";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;
   let sceneMock;
-  let pluginManagerMock;
   let tileMapMock;
   let playerSpriteMock;
 
@@ -159,7 +157,6 @@ describe("GridEngine", () => {
     // hacky way of avoiding errors in Plugin Initialization because Phaser
     // is not mockable by jest
     sceneMock = { sys: { events: { once: jest.fn(), on: jest.fn() } } };
-    pluginManagerMock = {};
     tileMapMock = {
       layers: [
         {
@@ -179,9 +176,9 @@ describe("GridEngine", () => {
     mockMovementStarted.mockReset().mockReturnValue(of());
     mockMovementStopped.mockReset().mockReturnValue(of());
     mockDirectionChanged.mockReset().mockReturnValue(of());
-    mockPositionChanged.mockReset().mockReturnValue(of());
+    mockPositionChangeStarted.mockReset().mockReturnValue(of());
     mockPositionChangeFinished.mockReset().mockReturnValue(of());
-    gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+    gridEngine = new GridEngine(sceneMock);
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -217,24 +214,6 @@ describe("GridEngine", () => {
     );
   });
 
-  it("should init tilemap with deprecated firstLayerAboveChar", () => {
-    console.warn = jest.fn();
-    gridEngine.create(tileMapMock, {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
-        },
-      ],
-      firstLayerAboveChar: 3,
-    });
-    expect(mockGridTilemapConstructor).toHaveBeenCalledWith(tileMapMock, 3);
-    expect(console.warn).toHaveBeenCalledWith(
-      "GridEngine: Config property `firstLayerAboveChar` is deprecated. Use a property `alwaysTop` on the tilemap layers instead."
-    );
-  });
-
   it("should init player", () => {
     const containerMock = {};
     gridEngine.create(tileMapMock, {
@@ -251,7 +230,6 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       tileSize: new Vector2(32, 32),
       speed: 4,
-      walkingAnimationEnabled: true,
       container: containerMock,
       offsetX: undefined,
       offsetY: undefined,
@@ -275,7 +253,6 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       tileSize: new Vector2(32, 32),
       speed: 4,
-      walkingAnimationEnabled: true,
       container: undefined,
       offsetX: undefined,
       offsetY: undefined,
@@ -299,63 +276,12 @@ describe("GridEngine", () => {
     expect(mockTurnTowards).toHaveBeenCalledWith(Direction.LEFT);
   });
 
-  it("should still support deprecated characterIndex property", () => {
-    console.warn = jest.fn();
-    gridEngine.create(tileMapMock, {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-          characterIndex: 2,
-        },
-      ],
-    });
-    expect(GridCharacter).toHaveBeenCalledWith("player", {
-      sprite: playerSpriteMock,
-      tilemap: mockGridTileMap,
-      tileSize: new Vector2(32, 32),
-      speed: 4,
-      walkingAnimationMapping: 2,
-      walkingAnimationEnabled: true,
-    });
-    expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
-
-    expect(console.warn).toHaveBeenCalledWith(
-      "GridEngine: CharacterConfig property `characterIndex` is deprecated. Use `walkingAnimtionMapping` instead."
-    );
-  });
-
-  it("should prefer walkingAnimationMapping over charIndex", () => {
-    gridEngine.create(tileMapMock, {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-          characterIndex: 2,
-          walkingAnimationMapping: 3,
-        },
-      ],
-      firstLayerAboveChar: 3,
-    });
-    expect(GridCharacter).toHaveBeenCalledWith("player", {
-      sprite: playerSpriteMock,
-      tilemap: mockGridTileMap,
-      tileSize: new Vector2(32, 32),
-      speed: 4,
-      walkingAnimationMapping: 3,
-      walkingAnimationEnabled: true,
-    });
-    expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
-  });
-
   it("should init player without walking animation", () => {
     gridEngine.create(tileMapMock, {
       characters: [
         {
           id: "player",
           sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
-          walkingAnimationEnabled: false,
         },
       ],
     });
@@ -364,8 +290,6 @@ describe("GridEngine", () => {
       tileSize: new Vector2(32, 32),
       tilemap: mockGridTileMap,
       speed: 4,
-      walkingAnimationMapping: 3,
-      walkingAnimationEnabled: false,
     });
     expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
   });
@@ -408,7 +332,6 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping,
-      walkingAnimationEnabled: true,
     });
     expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
   });
@@ -444,7 +367,6 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       speed: 2,
       walkingAnimationMapping: 3,
-      walkingAnimationEnabled: true,
     });
   });
 
@@ -468,7 +390,6 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping: 3,
-      walkingAnimationEnabled: true,
       offsetX,
       offsetY,
     });
@@ -598,30 +519,6 @@ describe("GridEngine", () => {
     });
   });
 
-  it("should move player left", () => {
-    gridEngine.moveLeft("player");
-
-    expect(mockMove).toHaveBeenCalledWith(Direction.LEFT);
-  });
-
-  it("should move player right", () => {
-    gridEngine.moveRight("player");
-
-    expect(mockMove).toHaveBeenCalledWith(Direction.RIGHT);
-  });
-
-  it("should move player up", () => {
-    gridEngine.moveUp("player");
-
-    expect(mockMove).toHaveBeenCalledWith(Direction.UP);
-  });
-
-  it("should move player down", () => {
-    gridEngine.moveDown("player");
-
-    expect(mockMove).toHaveBeenCalledWith(Direction.DOWN);
-  });
-
   it("should update", () => {
     gridEngine.update(123, 456);
 
@@ -683,24 +580,6 @@ describe("GridEngine", () => {
       );
       expect(mockSetMovement).toHaveBeenCalledWith(mockTargetMovement);
       expect(console.warn).not.toHaveBeenCalled();
-    });
-
-    it("should move to coordinates closestPointIfBlocked", () => {
-      const targetVec = new Vector2(3, 4);
-      gridEngine.moveTo("player", targetVec, true);
-      expect(TargetMovement).toHaveBeenCalledWith(
-        mockGridTileMap,
-        targetVec,
-        0,
-        {
-          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
-          pathBlockedStrategy: PathBlockedStrategy.WAIT,
-        }
-      );
-      expect(console.warn).toHaveBeenCalledWith(
-        "GridEngine: parameter 'closestPointIfBlocked' is deprecated. " +
-          "Please use noPathFoundStrategy: 'CLOSEST_REACHABLE' instead."
-      );
     });
 
     it("should move to coordinates STOP", () => {
@@ -815,12 +694,6 @@ describe("GridEngine", () => {
     expect(mockSetMovement).toHaveBeenCalledWith(undefined);
   });
 
-  it("should stop moving randomly", () => {
-    mockGetMovement.mockReturnValue({});
-    gridEngine.stopMovingRandomly("player");
-    expect(mockSetMovement).toHaveBeenCalledWith(undefined);
-  });
-
   it("should set speed", () => {
     gridEngine.setSpeed("player", 2);
     expect(mockSetSpeed).toHaveBeenCalledWith(2);
@@ -835,7 +708,6 @@ describe("GridEngine", () => {
   it("should add chars on the go", () => {
     gridEngine.create(tileMapMock, {
       characters: [],
-      firstLayerAboveChar: 3,
     });
     gridEngine.addCharacter({
       id: "player",
@@ -950,23 +822,6 @@ describe("GridEngine", () => {
     expect(mockSetMovement).toHaveBeenCalledWith(mockFollowMovement);
   });
 
-  it("should stop following", () => {
-    gridEngine.create(tileMapMock, {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-        },
-        {
-          id: "player2",
-          sprite: playerSpriteMock,
-        },
-      ],
-    });
-    gridEngine.stopFollowing("player");
-    expect(mockSetMovement).toHaveBeenCalledWith(undefined);
-  });
-
   it("should set walkingAnimationMapping", () => {
     gridEngine.create(tileMapMock, {
       characters: [
@@ -1040,7 +895,7 @@ describe("GridEngine", () => {
 
       mockSubject.next(Direction.LEFT);
       const res = await prom;
-      expect(res).toEqual(["player", Direction.LEFT]);
+      expect(res).toEqual({ charId: "player", direction: Direction.LEFT });
     });
 
     it("should unsubscribe from movementStarted if char removed", async () => {
@@ -1083,7 +938,7 @@ describe("GridEngine", () => {
 
       mockSubject.next(Direction.LEFT);
       const res = await prom;
-      expect(res).toEqual(["player", Direction.LEFT]);
+      expect(res).toEqual({ charId: "player", direction: Direction.LEFT });
     });
 
     it("should unsubscribe from movementStopped if char removed", async () => {
@@ -1126,7 +981,7 @@ describe("GridEngine", () => {
 
       mockSubject.next(Direction.LEFT);
       const res = await prom;
-      expect(res).toEqual(["player", Direction.LEFT]);
+      expect(res).toEqual({ charId: "player", direction: Direction.LEFT });
     });
 
     it("should unsubscribe from directionChanged if char removed", async () => {
@@ -1155,7 +1010,7 @@ describe("GridEngine", () => {
 
     it("should get chars positionChanged observable", async () => {
       const mockSubject = new Subject<PositionChange>();
-      mockPositionChanged.mockReturnValue(mockSubject);
+      mockPositionChangeStarted.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1165,7 +1020,7 @@ describe("GridEngine", () => {
         ],
       });
 
-      const prom = gridEngine.positionChanged().pipe(take(1)).toPromise();
+      const prom = gridEngine.positionChangeStarted().pipe(take(1)).toPromise();
 
       const exitTile = new Vector2(1, 2);
       const enterTile = new Vector2(2, 2);
@@ -1180,7 +1035,7 @@ describe("GridEngine", () => {
 
     it("should unsubscribe from positionChanged if char removed", async () => {
       const mockSubject = new Subject<PositionChange>();
-      mockPositionChanged.mockReturnValue(mockSubject);
+      mockPositionChangeStarted.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1193,7 +1048,7 @@ describe("GridEngine", () => {
       gridEngine.removeCharacter("player");
       const nextMock = jest.fn();
 
-      gridEngine.positionChanged().subscribe({
+      gridEngine.positionChangeStarted().subscribe({
         complete: jest.fn(),
         next: nextMock,
       });
@@ -1276,18 +1131,11 @@ describe("GridEngine", () => {
       expectCharUnknownException(() =>
         gridEngine.move(UNKNOWN_CHAR_ID, Direction.LEFT)
       );
-      expectCharUnknownException(() => gridEngine.moveLeft(UNKNOWN_CHAR_ID));
-      expectCharUnknownException(() => gridEngine.moveRight(UNKNOWN_CHAR_ID));
-      expectCharUnknownException(() => gridEngine.moveUp(UNKNOWN_CHAR_ID));
-      expectCharUnknownException(() => gridEngine.moveDown(UNKNOWN_CHAR_ID));
       expectCharUnknownException(() =>
         gridEngine.moveRandomly(UNKNOWN_CHAR_ID)
       );
       expectCharUnknownException(() =>
         gridEngine.stopMovement(UNKNOWN_CHAR_ID)
-      );
-      expectCharUnknownException(() =>
-        gridEngine.stopMovingRandomly(UNKNOWN_CHAR_ID)
       );
       expectCharUnknownException(() => gridEngine.setSpeed(UNKNOWN_CHAR_ID, 4));
       expectCharUnknownException(() =>
@@ -1297,9 +1145,6 @@ describe("GridEngine", () => {
         gridEngine.removeCharacter(UNKNOWN_CHAR_ID)
       );
 
-      expectCharUnknownException(() =>
-        gridEngine.stopFollowing(UNKNOWN_CHAR_ID)
-      );
       expectCharUnknownException(() =>
         gridEngine.setWalkingAnimationMapping(UNKNOWN_CHAR_ID, <any>{})
       );
@@ -1329,7 +1174,7 @@ describe("GridEngine", () => {
     const SOME_CHAR_ID = "someCharId";
 
     beforeEach(() => {
-      gridEngine = new GridEngine(sceneMock, pluginManagerMock);
+      gridEngine = new GridEngine(sceneMock);
     });
 
     function expectUninitializedException(fn: () => any) {
@@ -1344,18 +1189,11 @@ describe("GridEngine", () => {
       expectUninitializedException(() =>
         gridEngine.move(SOME_CHAR_ID, Direction.LEFT)
       );
-      expectUninitializedException(() => gridEngine.moveLeft(SOME_CHAR_ID));
-      expectUninitializedException(() => gridEngine.moveRight(SOME_CHAR_ID));
-      expectUninitializedException(() => gridEngine.moveUp(SOME_CHAR_ID));
-      expectUninitializedException(() => gridEngine.moveDown(SOME_CHAR_ID));
       expectUninitializedException(() => gridEngine.moveRandomly(SOME_CHAR_ID));
       expectUninitializedException(() =>
         gridEngine.moveTo(SOME_CHAR_ID, new Vector2(2, 3))
       );
       expectUninitializedException(() => gridEngine.stopMovement(SOME_CHAR_ID));
-      expectUninitializedException(() =>
-        gridEngine.stopMovingRandomly(SOME_CHAR_ID)
-      );
       expectUninitializedException(() => gridEngine.setSpeed(SOME_CHAR_ID, 3));
       expectUninitializedException(() =>
         gridEngine.addCharacter({
@@ -1370,9 +1208,6 @@ describe("GridEngine", () => {
       expectUninitializedException(() => gridEngine.removeAllCharacters());
       expectUninitializedException(() =>
         gridEngine.follow(SOME_CHAR_ID, "someOtherCharId")
-      );
-      expectUninitializedException(() =>
-        gridEngine.stopFollowing(SOME_CHAR_ID)
       );
       expectUninitializedException(() =>
         gridEngine.setWalkingAnimationMapping(SOME_CHAR_ID, <any>{})

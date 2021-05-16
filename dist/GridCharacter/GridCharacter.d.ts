@@ -1,11 +1,10 @@
 import { Direction } from "../Direction/Direction";
-import * as Phaser from "phaser";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
-import { WalkingAnimationMapping } from "../GridEngine";
+import { Position, WalkingAnimationMapping } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
-declare const Vector2: typeof Phaser.Math.Vector2;
-declare type Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "../Utils/Vector2/Vector2";
+import * as Phaser from "phaser";
 export interface FrameRow {
     leftFoot: number;
     standing: number;
@@ -13,15 +12,14 @@ export interface FrameRow {
 }
 export declare type CharacterIndex = number;
 export interface PositionChange {
-    exitTile: Vector2;
-    enterTile: Vector2;
+    exitTile: Position;
+    enterTile: Position;
 }
 export interface CharConfig {
     sprite: Phaser.GameObjects.Sprite;
     tilemap: GridTilemap;
     tileSize: Vector2;
     speed: number;
-    walkingAnimationEnabled: boolean;
     walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
     container?: Phaser.GameObjects.Container;
     offsetX?: number;
@@ -99,4 +97,3 @@ export declare class GridCharacter {
     private stopMoving;
     private hasWalkedHalfATile;
 }
-export {};

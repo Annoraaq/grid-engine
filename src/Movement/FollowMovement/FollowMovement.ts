@@ -5,9 +5,8 @@ import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
 import { Movement } from "../Movement";
 import { NoPathFoundStrategy } from "../../Algorithms/ShortestPath/NoPathFoundStrategy";
-
-type Vector2 = Phaser.Math.Vector2;
-const Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "../../Utils/Vector2/Vector2";
+import { Position } from "../../GridEngine";
 
 export class FollowMovement implements Movement {
   private character: GridCharacter;
@@ -40,10 +39,10 @@ export class FollowMovement implements Movement {
     this.targetMovement?.update();
   }
 
-  private updateTarget(targetPos: Vector2): void {
+  private updateTarget(targetPos: Position): void {
     this.targetMovement = new TargetMovement(
       this.gridTilemap,
-      targetPos,
+      new Vector2(targetPos),
       this.distance + 1,
       { noPathFoundStrategy: this.noPathFoundStrategy }
     );

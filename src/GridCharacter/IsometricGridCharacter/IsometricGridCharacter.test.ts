@@ -1,6 +1,7 @@
-import * as Phaser from "phaser";
 import { Direction } from "../../Direction/Direction";
+import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { IsometricGridCharacter } from "./IsometricGridCharacter";
+import * as Phaser from "phaser";
 
 const mockCharacterAnimation = {
   updateCharacterFrame: jest.fn(),
@@ -22,9 +23,6 @@ jest.mock("../CharacterAnimation/CharacterAnimation", function () {
       }),
   };
 });
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
 
 describe("IsometricGridCharacter", () => {
   let gridCharacter: IsometricGridCharacter;
@@ -79,7 +77,6 @@ describe("IsometricGridCharacter", () => {
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 1,
       walkingAnimationMapping: 3,
-      walkingAnimationEnabled: true,
     });
   });
 
@@ -91,7 +88,6 @@ describe("IsometricGridCharacter", () => {
       tilemap: gridTilemapMock,
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 1,
-      walkingAnimationEnabled: true,
       offsetX: customOffsetX,
       offsetY: customOffsetY,
     });

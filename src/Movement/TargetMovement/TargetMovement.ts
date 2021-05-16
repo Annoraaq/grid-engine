@@ -5,13 +5,10 @@ import { ShortestPathAlgorithm } from "./../../Algorithms/ShortestPath/ShortestP
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { VectorUtils } from "../../Utils/VectorUtils";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import * as Phaser from "phaser";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
 import { Bfs } from "../../Algorithms/ShortestPath/Bfs/Bfs";
 import { Movement } from "../Movement";
-
-type Vector2 = Phaser.Math.Vector2;
-const Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "../../Utils/Vector2/Vector2";
 
 export interface MoveToConfig {
   noPathFoundStrategy?: NoPathFoundStrategy;

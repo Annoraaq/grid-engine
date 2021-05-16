@@ -1,10 +1,7 @@
 import { NumberOfDirections } from "./../Direction/Direction";
 import { DistanceUtils } from "./DistanceUtils";
-import * as Phaser from "phaser";
+import { Vector2 } from "./Vector2/Vector2";
 import { VectorUtils } from "./VectorUtils";
-
-type Vector2 = Phaser.Math.Vector2;
-const Vector2 = Phaser.Math.Vector2;
 
 jest.mock("./VectorUtils");
 describe("DistanceUtils", () => {

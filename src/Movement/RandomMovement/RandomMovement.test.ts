@@ -1,13 +1,10 @@
-import { NumberOfDirections } from "./../../Direction/Direction";
 /*eslint no-global-assign: "off"*/
-import * as Phaser from "phaser";
+import { NumberOfDirections } from "./../../Direction/Direction";
 import { Direction } from "../../Direction/Direction";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { RandomMovement } from "./RandomMovement";
 import { Subject } from "rxjs";
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "../../Utils/Vector2/Vector2";
 
 describe("RandomMovement", () => {
   let randomMovement: RandomMovement;

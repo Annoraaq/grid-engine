@@ -2,11 +2,9 @@ import { NoPathFoundStrategy } from "./../../Algorithms/ShortestPath/NoPathFound
 import { PathBlockedStrategy } from "./../../Algorithms/ShortestPath/PathBlockedStrategy";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import * as Phaser from "phaser";
 import { NumberOfDirections } from "../../Direction/Direction";
 import { Movement } from "../Movement";
-declare type Vector2 = Phaser.Math.Vector2;
-declare const Vector2: typeof Phaser.Math.Vector2;
+import { Vector2 } from "../../Utils/Vector2/Vector2";
 export interface MoveToConfig {
     noPathFoundStrategy?: NoPathFoundStrategy;
     pathBlockedStrategy?: PathBlockedStrategy;
@@ -36,4 +34,3 @@ export declare class TargetMovement implements Movement {
     private getDir8Directions;
     private getDir4Directions;
 }
-export {};

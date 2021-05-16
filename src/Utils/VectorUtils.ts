@@ -1,6 +1,4 @@
-import * as Phaser from "phaser";
-type Vector2 = Phaser.Math.Vector2;
-const Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "./Vector2/Vector2";
 
 export class VectorUtils {
   static vec2str(vec: Vector2): string {

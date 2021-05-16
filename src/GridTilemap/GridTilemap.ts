@@ -1,19 +1,15 @@
 import { Direction } from "./../Direction/Direction";
-import * as Phaser from "phaser";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
-
-const Vector2 = Phaser.Math.Vector2;
-type Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "../Utils/Vector2/Vector2";
 
 export class GridTilemap {
   private static readonly MAX_PLAYER_LAYERS = 1000;
   static readonly FIRST_PLAYER_LAYER = 1000;
-  private static readonly ALWAYS_TOP_PROP_NAME = "gm_alwaysTop";
-  private static readonly HEIGHT_SHIFT_PROP_NAME = "gm_heightShift";
-  private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "gm_collide_";
-  private static readonly LEGACY_COLLIDE_PROP_NAME = "collides";
+  private static readonly ALWAYS_TOP_PROP_NAME = "ge_alwaysTop";
+  private static readonly HEIGHT_SHIFT_PROP_NAME = "ge_heightShift";
+  private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "ge_collide_";
   private characters = new Map<string, GridCharacter>();
-  private collisionTilePropertyName = "gm_collide";
+  private collisionTilePropertyName = "ge_collide";
 
   constructor(
     private tilemap: Phaser.Tilemaps.Tilemap,
@@ -51,8 +47,7 @@ export class GridTilemap {
       const tile = this.tilemap.getTileAt(pos.x, pos.y, false, layer.name);
       return (
         tile?.properties &&
-        (tile.properties[GridTilemap.LEGACY_COLLIDE_PROP_NAME] ||
-          tile.properties[this.collisionTilePropertyName] ||
+        (tile.properties[this.collisionTilePropertyName] ||
           tile.properties[collidesPropName])
       );
     });

@@ -1,6 +1,4 @@
-import * as Phaser from "phaser";
-declare const Vector2: typeof Phaser.Math.Vector2;
-declare type Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "../Utils/Vector2/Vector2";
 export declare enum Direction {
     NONE = "none",
     LEFT = "left",
@@ -21,4 +19,3 @@ export declare enum NumberOfDirections {
     FOUR = 4,
     EIGHT = 8
 }
-export {};

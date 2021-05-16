@@ -1,8 +1,6 @@
 import { Direction } from "./../Direction/Direction";
-import * as Phaser from "phaser";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
-declare const Vector2: typeof Phaser.Math.Vector2;
-declare type Vector2 = Phaser.Math.Vector2;
+import { Vector2 } from "../Utils/Vector2/Vector2";
 export declare class GridTilemap {
     private tilemap;
     private firstLayerAboveChar?;
@@ -11,7 +9,6 @@ export declare class GridTilemap {
     private static readonly ALWAYS_TOP_PROP_NAME;
     private static readonly HEIGHT_SHIFT_PROP_NAME;
     private static readonly ONE_WAY_COLLIDE_PROP_PREFIX;
-    private static readonly LEGACY_COLLIDE_PROP_NAME;
     private characters;
     private collisionTilePropertyName;
     constructor(tilemap: Phaser.Tilemaps.Tilemap, firstLayerAboveChar?: number);
@@ -31,4 +28,3 @@ export declare class GridTilemap {
     private setLayerDepths;
     private createLayerForEachRow;
 }
-export {};
