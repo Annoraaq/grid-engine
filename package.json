@@ -1,6 +1,6 @@
 {
   "name": "grid-engine",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Phaser3 plugin for grid based movement on a 2D game board.",
   "author": "Johannes Baum",
   "license": "ISC",
@@ -33,10 +33,10 @@
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-jest": "^24.3.1",
     "jest": "^26.6.3",
+    "phaser": "~3.54.0",
     "prettier": "2.2.1",
     "ts-jest": "^26.4.4",
-    "typescript": "^3.9.5",
-    "phaser": "~3.54.0"
+    "typescript": "^3.9.5"
   },
   "repository": {
     "type": "git",
