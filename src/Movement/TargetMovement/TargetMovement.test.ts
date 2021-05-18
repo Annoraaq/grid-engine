@@ -418,6 +418,10 @@ describe("TargetMovement", () => {
     targetMovement.update();
 
     expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
+    expect(char.move).not.toHaveBeenCalled();
+
+    gridTilemapMock.isBlocking.mockReturnValue(false);
+    targetMovement.update();
     expect(char.move).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
@@ -437,7 +441,33 @@ describe("TargetMovement", () => {
     targetMovement.update();
 
     expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(2);
+    expect(char.move).not.toHaveBeenCalled();
+
+    gridTilemapMock.isBlocking.mockReturnValue(false);
+    targetMovement.update();
+
     expect(char.move).toHaveBeenCalledWith(Direction.DOWN);
+  });
+
+  it("should stop on pathBlockedStrategy STOP", () => {
+    gridTilemapMock.isBlocking.mockReturnValue(true);
+
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 2));
+    targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
+
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [new Vector2(2, 1), new Vector2(2, 2), new Vector2(3, 2)],
+      closestToTarget: new Vector2(3, 2),
+    });
+    gridTilemapMock.isBlocking.mockReturnValue(true);
+    const char = createMockChar("char", new Vector2(2, 1));
+    targetMovement.setCharacter(char);
+    targetMovement.update();
+
+    gridTilemapMock.isBlocking.mockReturnValue(false);
+    targetMovement.update();
+
+    expect(char.move).not.toHaveBeenCalled();
   });
 
   describe("8 directions", () => {
