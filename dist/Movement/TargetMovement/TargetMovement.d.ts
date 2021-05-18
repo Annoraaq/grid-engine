@@ -20,6 +20,7 @@ export declare class TargetMovement implements Movement {
     private posOnPath;
     private noPathFoundStrategy;
     private pathBlockedStrategy;
+    private stopped;
     constructor(tilemap: GridTilemap, targetPos: Vector2, distance?: number, config?: MoveToConfig);
     setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void;
     getPathBlockedStrategy(): PathBlockedStrategy;

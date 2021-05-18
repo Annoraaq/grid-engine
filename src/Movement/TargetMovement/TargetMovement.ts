@@ -23,6 +23,7 @@ export class TargetMovement implements Movement {
   private posOnPath = 0;
   private noPathFoundStrategy: NoPathFoundStrategy;
   private pathBlockedStrategy: PathBlockedStrategy;
+  private stopped = false;
 
   constructor(
     private tilemap: GridTilemap,
@@ -57,6 +58,7 @@ export class TargetMovement implements Movement {
   }
 
   update(): void {
+    if (this.stopped) return;
     if (this.shortestPath.length <= 0) return;
 
     let currentTile = this.shortestPath[this.posOnPath];
@@ -83,17 +85,20 @@ export class TargetMovement implements Movement {
 
     const nextTile = this.shortestPath[this.posOnPath + 1];
     const dir = this.getDir(this.character.getNextTilePos(), nextTile);
-    if (
-      this.pathBlockedStrategy === PathBlockedStrategy.RETRY &&
-      this.isBlocking(nextTile)
-    ) {
-      const shortestPath = this.getShortestPath();
-      this.posOnPath = 0;
-      this.shortestPath = shortestPath.path;
-      this.distOffset = shortestPath.distOffset;
+
+    if (this.isBlocking(nextTile)) {
+      if (this.pathBlockedStrategy === PathBlockedStrategy.RETRY) {
+        const shortestPath = this.getShortestPath();
+        this.posOnPath = 0;
+        this.shortestPath = shortestPath.path;
+        this.distOffset = shortestPath.distOffset;
+      } else if (this.pathBlockedStrategy === PathBlockedStrategy.STOP) {
+        this.stopped = true;
+      }
+    } else {
+        this.character.move(dir);
     }
 
-    this.character.move(dir);
   }
 
   getNeighbours = (pos: Vector2): Vector2[] => {
