@@ -119,6 +119,12 @@ This strategy can be used to configure pathfinding. It determines what happens i
 ## PathBlockedStrategy
 
 ```js
-"WAIT" | "RETRY"
+"WAIT" | "RETRY" | "STOP"
 ```
-This strategy can be used to configure pathfinding. It determines what happens if a previously calculated path is suddenly blocked. This can happen if a path existed and while the character was moving along that path, it got suddenly blocked. "WAIT" will make the character wait (possibly forever) until the path will be free again. "RETRY" will make the character look for a new path (repeatedly and possibly forever).
+This strategy can be used to configure pathfinding. It determines what happens if a previously calculated path is suddenly blocked. This can happen if a path existed and while the character was moving along that path, it got suddenly blocked.
+
+**"WAIT"** will make the character wait (possibly forever) until the path will be free again.
+
+**"RETRY"** will make the character look for a new path (repeatedly and possibly forever).
+
+**"STOP"** will make the character stop the movement
