@@ -13,6 +13,7 @@ import { Vector2 } from "../../Utils/Vector2/Vector2";
 export interface MoveToConfig {
   noPathFoundStrategy?: NoPathFoundStrategy;
   pathBlockedStrategy?: PathBlockedStrategy;
+  noPathFoundRetryBackoffMs?: number;
 }
 
 export class TargetMovement implements Movement {
@@ -23,6 +24,8 @@ export class TargetMovement implements Movement {
   private posOnPath = 0;
   private noPathFoundStrategy: NoPathFoundStrategy;
   private pathBlockedStrategy: PathBlockedStrategy;
+  private noPathFoundRetryBackoffMs: number;
+  private noPathFoundRetryElapsed: number;
   private stopped = false;
 
   constructor(
@@ -35,6 +38,7 @@ export class TargetMovement implements Movement {
       config?.noPathFoundStrategy || NoPathFoundStrategy.STOP;
     this.pathBlockedStrategy =
       config?.pathBlockedStrategy || PathBlockedStrategy.WAIT;
+    this.noPathFoundRetryBackoffMs = config?.noPathFoundRetryBackoffMs || 200;
   }
 
   setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void {
@@ -51,15 +55,29 @@ export class TargetMovement implements Movement {
 
   setCharacter(character: GridCharacter): void {
     this.character = character;
+    this.calcShortestPath();
+  }
+
+  private calcShortestPath(): void {
+    this.noPathFoundRetryElapsed = 0;
     const shortestPath = this.getShortestPath();
     this.posOnPath = 0;
     this.shortestPath = shortestPath.path;
     this.distOffset = shortestPath.distOffset;
   }
 
-  update(): void {
+  update(delta: number): void {
     if (this.stopped) return;
-    if (this.shortestPath.length <= 0) return;
+    if (this.shortestPath.length <= 0) {
+      if (this.noPathFoundStrategy === NoPathFoundStrategy.RETRY) {
+        this.noPathFoundRetryElapsed += delta;
+        if (this.noPathFoundRetryElapsed >= this.noPathFoundRetryBackoffMs) {
+          this.calcShortestPath();
+        }
+      } else {
+        return;
+      }
+    }
 
     let currentTile = this.shortestPath[this.posOnPath];
     while (
@@ -96,9 +114,8 @@ export class TargetMovement implements Movement {
         this.stopped = true;
       }
     } else {
-        this.character.move(dir);
+      this.character.move(dir);
     }
-
   }
 
   getNeighbours = (pos: Vector2): Vector2[] => {

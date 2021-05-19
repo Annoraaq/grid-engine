@@ -14,6 +14,6 @@ export declare class FollowMovement implements Movement {
     constructor(gridTilemap: GridTilemap, charToFollow: GridCharacter, distance?: number, noPathFoundStrategy?: NoPathFoundStrategy);
     setNumberOfDirections(numberOfDirections: NumberOfDirections): void;
     setCharacter(character: GridCharacter): void;
-    update(): void;
+    update(elapsed: number): void;
     private updateTarget;
 }

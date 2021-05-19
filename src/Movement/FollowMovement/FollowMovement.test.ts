@@ -72,14 +72,14 @@ describe("FollowMovement", () => {
 
   it("should update added character", () => {
     followMovement.setCharacter(mockChar);
-    followMovement.update();
-    expect(mockTargetMovement.update).toHaveBeenCalled();
+    followMovement.update(100);
+    expect(mockTargetMovement.update).toHaveBeenCalledWith(100);
   });
 
   it("should pass number of directions", () => {
     followMovement.setNumberOfDirections(NumberOfDirections.EIGHT);
     followMovement.setCharacter(mockChar);
-    followMovement.update();
+    followMovement.update(100);
     expect(mockTargetMovement.setNumberOfDirections).toHaveBeenCalledWith(
       NumberOfDirections.EIGHT
     );
@@ -128,7 +128,7 @@ describe("FollowMovement", () => {
   it("should update added character with distance", () => {
     followMovement = new FollowMovement(gridTilemapMock, targetChar, 7);
     followMovement.setCharacter(mockChar);
-    followMovement.update();
+    followMovement.update(100);
     expect(TargetMovement).toHaveBeenCalledWith(
       gridTilemapMock,
       targetCharPos,
@@ -146,7 +146,7 @@ describe("FollowMovement", () => {
       NoPathFoundStrategy.CLOSEST_REACHABLE
     );
     followMovement.setCharacter(mockChar);
-    followMovement.update();
+    followMovement.update(100);
     expect(TargetMovement).toHaveBeenCalledWith(
       gridTilemapMock,
       targetCharPos,
