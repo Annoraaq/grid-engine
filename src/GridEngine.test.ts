@@ -582,6 +582,25 @@ describe("GridEngine", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
 
+    it("should use backoff and retry", () => {
+      const targetVec = new Vector2(3, 4);
+      gridEngine.moveTo("player", targetVec, {
+        noPathFoundRetryBackoffMs: 500,
+        noPathFoundMaxRetries: 10,
+      });
+      expect(TargetMovement).toHaveBeenCalledWith(
+        mockGridTileMap,
+        targetVec,
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+          noPathFoundRetryBackoffMs: 500,
+          noPathFoundMaxRetries: 10,
+        }
+      );
+    });
+
     it("should move to coordinates STOP", () => {
       const targetVec = new Vector2(3, 4);
       gridEngine.moveTo("player", targetVec, {
