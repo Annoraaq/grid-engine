@@ -386,28 +386,148 @@ describe("TargetMovement", () => {
     expect(mockChar.move).not.toHaveBeenCalled();
   });
 
-  it("should move if path exists on RETRY after backoff", () => {
-    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 2), 0, {
-      noPathFoundStrategy: NoPathFoundStrategy.RETRY,
-    });
-    const charPos = new Vector2(1, 1);
-    mockBfs.getShortestPath = jest
-      .fn()
-      .mockReturnValue({ path: [], closestToDistance: charPos });
-    const mockChar = createMockChar("char", charPos);
-    targetMovement.setCharacter(mockChar);
-    targetMovement.update(100);
-    expect(mockChar.move).not.toHaveBeenCalled();
+  describe("noPathFoundStrategy = RETRY", () => {
+    it("should move if path exists after backoff", () => {
+      targetMovement = new TargetMovement(
+        gridTilemapMock,
+        new Vector2(3, 2),
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.RETRY,
+        }
+      );
+      const charPos = new Vector2(1, 1);
+      mockBfs.getShortestPath = jest
+        .fn()
+        .mockReturnValue({ path: [], closestToDistance: charPos });
+      const mockChar = createMockChar("char", charPos);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(100);
+      expect(mockChar.move).not.toHaveBeenCalled();
 
-    mockBfs.getShortestPath = jest.fn().mockReturnValue({
-      path: [charPos, new Vector2(1, 3)],
-      closestToTarget: new Vector2(1, 3),
-    });
-    targetMovement.update(99);
-    expect(mockChar.move).not.toHaveBeenCalled();
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [charPos, new Vector2(1, 3)],
+        closestToTarget: new Vector2(1, 3),
+      });
+      targetMovement.update(99);
+      expect(mockChar.move).not.toHaveBeenCalled();
 
-    targetMovement.update(1);
-    expect(mockChar.move).toHaveBeenCalledWith(Direction.DOWN);
+      targetMovement.update(1);
+      expect(mockChar.move).toHaveBeenCalledWith(Direction.DOWN);
+    });
+
+    it("should move if path exists after custom backoff", () => {
+      targetMovement = new TargetMovement(
+        gridTilemapMock,
+        new Vector2(3, 2),
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.RETRY,
+          noPathFoundRetryBackoffMs: 150,
+        }
+      );
+      const charPos = new Vector2(1, 1);
+      mockBfs.getShortestPath = jest
+        .fn()
+        .mockReturnValue({ path: [], closestToDistance: charPos });
+      const mockChar = createMockChar("char", charPos);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(100);
+      expect(mockChar.move).not.toHaveBeenCalled();
+
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [charPos, new Vector2(1, 3)],
+        closestToTarget: new Vector2(1, 3),
+      });
+      targetMovement.update(49);
+      expect(mockChar.move).not.toHaveBeenCalled();
+
+      targetMovement.update(1);
+      expect(mockChar.move).toHaveBeenCalledWith(Direction.DOWN);
+    });
+
+    it("should limit retry to maxRetries", () => {
+      targetMovement = new TargetMovement(
+        gridTilemapMock,
+        new Vector2(3, 2),
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.RETRY,
+          noPathFoundRetryBackoffMs: 1,
+          noPathFoundMaxRetries: 2,
+        }
+      );
+      const charPos = new Vector2(1, 1);
+      mockBfs.getShortestPath = jest
+        .fn()
+        .mockReturnValue({ path: [], closestToDistance: charPos });
+      const mockChar = createMockChar("char", charPos);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(1);
+      targetMovement.update(1);
+      targetMovement.update(1);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [charPos, new Vector2(1, 3)],
+        closestToTarget: new Vector2(1, 3),
+      });
+      targetMovement.update(1);
+      expect(mockChar.move).not.toHaveBeenCalled();
+    });
+
+    it("should not limit retry on default", () => {
+      targetMovement = new TargetMovement(
+        gridTilemapMock,
+        new Vector2(3, 2),
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.RETRY,
+          noPathFoundRetryBackoffMs: 1,
+        }
+      );
+      const charPos = new Vector2(1, 1);
+      mockBfs.getShortestPath = jest
+        .fn()
+        .mockReturnValue({ path: [], closestToDistance: charPos });
+      const mockChar = createMockChar("char", charPos);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(1);
+      targetMovement.update(1);
+      targetMovement.update(1);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [charPos, new Vector2(1, 3)],
+        closestToTarget: new Vector2(1, 3),
+      });
+      targetMovement.update(1);
+      expect(mockChar.move).toHaveBeenCalledWith(Direction.DOWN);
+    });
+
+    it("should not limit retry if maxRetries = -1", () => {
+      targetMovement = new TargetMovement(
+        gridTilemapMock,
+        new Vector2(3, 2),
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.RETRY,
+          noPathFoundRetryBackoffMs: 1,
+          noPathFoundMaxRetries: -1,
+        }
+      );
+      const charPos = new Vector2(1, 1);
+      mockBfs.getShortestPath = jest
+        .fn()
+        .mockReturnValue({ path: [], closestToDistance: charPos });
+      const mockChar = createMockChar("char", charPos);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(1);
+      targetMovement.update(1);
+      targetMovement.update(1);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [charPos, new Vector2(1, 3)],
+        closestToTarget: new Vector2(1, 3),
+      });
+      targetMovement.update(1);
+      expect(mockChar.move).toHaveBeenCalledWith(Direction.DOWN);
+    });
   });
 
   it("should delegate getNeighbours to gridTilemap", () => {
