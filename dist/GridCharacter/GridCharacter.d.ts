@@ -30,7 +30,6 @@ export declare class GridCharacter {
     protected tileSize: Vector2;
     protected customOffset: Vector2;
     private movementDirection;
-    private speedPixelsPerSecond;
     private tileSizePixelsWalked;
     private _nextTilePos;
     private _tilePos;

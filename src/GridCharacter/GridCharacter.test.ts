@@ -172,6 +172,20 @@ describe("GridCharacter", () => {
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
   });
 
+  it("should update speed", () => {
+    mockNonBlockingTile();
+
+    gridCharacter.move(Direction.UP);
+    gridCharacter.update(MS_FOR_12_PX / 2);
+
+    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 6);
+
+    gridCharacter.setSpeed(1.5);
+    gridCharacter.update(MS_FOR_12_PX / 2);
+    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 9);
+  });
+
   it("should update vertically", () => {
     mockNonBlockingTile();
 

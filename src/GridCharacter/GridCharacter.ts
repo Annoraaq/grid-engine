@@ -38,7 +38,6 @@ export class GridCharacter {
   protected customOffset: Vector2;
 
   private movementDirection = Direction.NONE;
-  private speedPixelsPerSecond: { [key in Direction]: Vector2 };
   private tileSizePixelsWalked: Vector2 = Vector2.ZERO.clone();
   private _nextTilePos = new Vector2(0, 0);
   private _tilePos = new Vector2(0, 0);
@@ -81,8 +80,6 @@ export class GridCharacter {
     );
     this.animation.setIsEnabled(config.walkingAnimationMapping !== undefined);
     this.animation.setStandingFrame(Direction.DOWN);
-
-    this.speedPixelsPerSecond = this.createSpeedPixelsPerSecond();
 
     this.updateZindex();
   }
@@ -357,8 +354,8 @@ export class GridCharacter {
 
   private getSpeedPerDelta(delta: number): Vector2 {
     const deltaInSeconds = delta / 1000;
-    return this.speedPixelsPerSecond[this.movementDirection]
-      .clone()
+    return this.createSpeedPixelsPerSecond()
+      [this.movementDirection].clone()
       .multiply(new Vector2(deltaInSeconds, deltaInSeconds))
       .multiply(directionVector(this.movementDirection));
   }
