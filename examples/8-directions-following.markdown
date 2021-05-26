@@ -11,7 +11,7 @@ parent: Examples (8 directions)
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-2.0.0.min.js"></script>
+<script src="js/grid-engine-2.2.0.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
@@ -150,26 +150,26 @@ function create() {
         id: "player",
         sprite: playerSprite,
         walkingAnimationMapping: 6,
-        startPosition: {x: 8, y: 8},
+        startPosition: { x: 8, y: 8 },
       },
       {
         id: "npc0",
         sprite: npcSprite,
         walkingAnimationMapping: 0,
-        startPosition: {x: 12, y: 5},
+        startPosition: { x: 12, y: 5 },
         speed: 3,
       },
       {
         id: "npc1",
         sprite: npcSprite1,
         walkingAnimationMapping: 1,
-        startPosition: {x: 14, y: 8},
+        startPosition: { x: 14, y: 8 },
       },
       {
         id: "npc2",
         sprite: npcSprite2,
         walkingAnimationMapping: 3,
-        startPosition: {x: 5, y: 10},
+        startPosition: { x: 5, y: 10 },
         speed: 2,
       },
     ],

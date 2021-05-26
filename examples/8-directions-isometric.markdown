@@ -11,7 +11,7 @@ parent: Examples (8 directions)
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-2.0.0.min.js"></script>
+<script src="js/grid-engine-2.2.0.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
@@ -220,29 +220,29 @@ function create() {
       {
         id: "player",
         sprite: sprites["player"],
-        startPosition: {x: 3, y: 4},
+        startPosition: { x: 3, y: 4 },
         offsetY: -9,
-        speed: 2
+        speed: 2,
       },
       {
         id: "npc0",
         sprite: sprites["npc0"],
         offsetY: -9,
-        startPosition: {x: 5, y: 5},
-        speed: 3
+        startPosition: { x: 5, y: 5 },
+        speed: 3,
       },
       {
         id: "npc1",
         sprite: sprites["npc1"],
         offsetY: -9,
-        startPosition: {x: 10, y: 10},
+        startPosition: { x: 10, y: 10 },
       },
       {
         id: "npc2",
         sprite: sprites["npc2"],
         offsetY: -9,
-        startPosition: {x: 5, y: 10},
-        speed: 2
+        startPosition: { x: 5, y: 10 },
+        speed: 2,
       },
     ],
     numberOfDirections: 8,
@@ -252,16 +252,16 @@ function create() {
   this.gridEngine.moveRandomly("npc0");
   this.gridEngine.moveRandomly("npc1", 500);
   this.gridEngine.moveRandomly("npc2", 1500);
-  this.gridEngine.movementStarted().subscribe(({charId, direction}) => {
+  this.gridEngine.movementStarted().subscribe(({ charId, direction }) => {
     sprites[charId].anims.play(direction);
   });
 
-  this.gridEngine.movementStopped().subscribe(({charId, direction}) => {
+  this.gridEngine.movementStopped().subscribe(({ charId, direction }) => {
     sprites[charId].anims.stop();
     sprites[charId].setFrame(getStopFrame(direction));
   });
 
-  this.gridEngine.directionChanged().subscribe(({charId, direction}) => {
+  this.gridEngine.directionChanged().subscribe(({ charId, direction }) => {
     sprites[charId].setFrame(getStopFrame(direction));
   });
 }

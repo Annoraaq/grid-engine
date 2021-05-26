@@ -11,7 +11,7 @@ parent: Examples
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-2.0.0.min.js"></script>
+<script src="js/grid-engine-2.2.0.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
@@ -152,22 +152,22 @@ function create() {
       {
         id: "player",
         sprite: playerSprite,
-        startPosition: {x: 8, y: 8},
+        startPosition: { x: 8, y: 8 },
       },
     ],
   };
 
   this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
-  this.gridEngine.movementStarted().subscribe(({direction}) => {
+  this.gridEngine.movementStarted().subscribe(({ direction }) => {
     playerSprite.anims.play(direction);
   });
 
-  this.gridEngine.movementStopped().subscribe(({direction}) => {
+  this.gridEngine.movementStopped().subscribe(({ direction }) => {
     playerSprite.anims.stop();
     playerSprite.setFrame(getStopFrame(direction));
   });
 
-  this.gridEngine.directionChanged().subscribe(({direction}) => {
+  this.gridEngine.directionChanged().subscribe(({ direction }) => {
     playerSprite.setFrame(getStopFrame(direction));
   });
 }
