@@ -6,15 +6,15 @@ nav_order: 2
 
 # Methods
 
-| create(tilemap: Phaser.Tilemaps.Tilemap, config: [GridEngineConfig](./config.html/#gridengineconfig)): void                                                                                                            |
+| create(tilemap: Phaser.Tilemaps.Tilemap, config: [GridEngineConfig](./config.html#gridengineconfig)): void                                                                                                             |
 | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Initializes the plugin. This method needs to be called before any other method. One exception is the `update` method. You are allowed to call it even before the `create` method (even though it will have no effect). |
 
-| getPosition(charId: string): [Position](./config.html/#position) |
-| :--------------------------------------------------------------- |
-| Returns the tile position of the character with the given id.    |
+| getPosition(charId: string): [Position](./config.html#position) |
+| :-------------------------------------------------------------- |
+| Returns the tile position of the character with the given id.   |
 
-| setPosition(charId: string, pos: [Position](./config.html/#position)): void                                                                                                                                                                                                         |
+| setPosition(charId: string, pos: [Position](./config.html#position)): void                                                                                                                                                                                                          |
 | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Places the character with the given id to the provided tile position. If that character is moving, the movement is stopped. The `positionChanged` and `positionChangeFinished` observables will fire. If the character was moving, the `movementStopped` observable will also fire. |
 
@@ -22,15 +22,15 @@ nav_order: 2
 | :--------------------------------------------------- |
 | Returns `true` if the character is currently moving. |
 
-| getFacingDirection(charId: string): [Direction](./config.html/#direction)                    |
+| getFacingDirection(charId: string): [Direction](./config.html#direction)                     |
 | :------------------------------------------------------------------------------------------- |
 | Returns the direction the character is currently facing. At time of creation this is `down`. |
 
-| turnTowards(charId: string, direction: [Direction](./config.html/#direction)): void |
-| :---------------------------------------------------------------------------------- |
-| Turns the character towards the given direction without moving it.                  |
+| turnTowards(charId: string, direction: [Direction](./config.html#direction)): void |
+| :--------------------------------------------------------------------------------- |
+| Turns the character towards the given direction without moving it.                 |
 
-| move(charId: string, [Direction](./config.html/#direction)): void                                                                                                                                                                                     |
+| move(charId: string, [Direction](./config.html#direction)): void                                                                                                                                                                                      |
 | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Initiates movement of the character with the given id. If the character is already moving nothing happens. If the movement direction is currently blocked, the character will only turn towards that direction. Movement commands are **not** queued. |
 
@@ -38,21 +38,21 @@ nav_order: 2
 | :-------------------------------------------------- |
 | Sets the speed in tiles per second for a character. |
 
-| setWalkingAnimationMapping(charId: string, walkingAnimationMapping: [WalkingAnimationMapping](./config.html/#walkinganimationmapping)): void |
-| :------------------------------------------------------------------------------------------------------------------------------------------- |
-| Sets the [WalkingAnimationMapping](./config.html/#walkinganimationmapping) for a character.                                                  |
+| setWalkingAnimationMapping(charId: string, walkingAnimationMapping: [WalkingAnimationMapping](./config.html#walkinganimationmapping)): void |
+| :------------------------------------------------------------------------------------------------------------------------------------------ |
+| Sets the [WalkingAnimationMapping](./config.html#walkinganimationmapping) for a character.                                                  |
 
 | moveRandomly(charId: string, delay: number = 0, radius: number = -1): void                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Initiates random movement of the character with the given id. The character will randomly pick one of the non-blocking directions. Optionally a `delay` in milliseconds can be provided. This represents the waiting time after a finished movement, before the next is being initiated. If a `radius` other than `-1` is provided, the character will not move further than that radius from its initial position (the position it has been, when `moveRandomly` was called). The distance is calculated with the [manhattan distance](https://en.wikipedia.org/wiki/Taxicab_geometry). Additionally, if a `radius` other than `-1` was given, the character might move more than one tile into a random direction in one run (as long as the route is neither blocked nor outside of the radius). |
 
-| moveTo(charId: string, targetPos: [Position](./config.html/#position), config: [MoveToConfig](./methods.html/#movetoconfig)): void                                                            |
-| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Initiates movement toward the specified `targetPos`. The movement will happen along one shortest path. Check out [MoveToConfig](./methods.html/#movetoconfig) for pathfinding configurations. |
+| moveTo(charId: string, targetPos: [Position](./config.html#position), config: [MoveToConfig](./methods.html#movetoconfig)): void                                                             |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Initiates movement toward the specified `targetPos`. The movement will happen along one shortest path. Check out [MoveToConfig](./methods.html#movetoconfig) for pathfinding configurations. |
 
-| addCharacter(charData: [CharacterData](./config.html/#characterdata)): void |
-| :-------------------------------------------------------------------------- |
-| Adds a character on the go.                                                 |
+| addCharacter(charData: [CharacterData](./config.html#characterdata)): void |
+| :------------------------------------------------------------------------- |
+| Adds a character on the go.                                                |
 
 | hasCharacter(charId: string): boolean                       |
 | :---------------------------------------------------------- |
@@ -78,25 +78,25 @@ nav_order: 2
 | :--------------------------------------------------------------------------------------------------------------------------------------------- |
 | Stops any automated movement such as random movement (`moveRandomly()`), following (`follow()`) or moving to a specified position (`moveTo()`) |
 
-| movementStarted(): Observable<{charId: string, direction: [Direction](./config.html/#direction)}>       |
+| movementStarted(): Observable<{charId: string, direction: [Direction](./config.html#direction)}>        |
 | :------------------------------------------------------------------------------------------------------ |
 | Returns an Observable that on each start of a movement will provide the character ID and the direction. |
 
-| movementStopped(): Observable<{charId: string, direction: [Direction](./config.html/#direction)}>                           |
+| movementStopped(): Observable<{charId: string, direction: [Direction](./config.html#direction)}>                            |
 | :-------------------------------------------------------------------------------------------------------------------------- |
 | Returns an Observable that on each stopped movement of a character will provide it's ID and the direction of that movement. |
 
-| directionChanged(): Observable<{charId: string, direction: [Direction](./config.html/#direction)}>                                                                                                                   |
+| directionChanged(): Observable<{charId: string, direction: [Direction](./config.html#direction)}>                                                                                                                    |
 | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Returns an Observable that will notify about every change of direction that is not part of a movement. This is the case if the character tries to walk towards a blocked tile. The character will turn but not move. |
 
-| positionChangeStarted(): Observable<{charId: string, exitTile: [Position](./config.html/#position), enterTile: [Position](./config.html/#position)}> |
-| :--------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Returns an Observable that will notify about every change of tile position. It will notify at the **beginning** of the movement.                     |
+| positionChangeStarted(): Observable<{charId: string, exitTile: [Position](./config.html#position), enterTile: [Position](./config.html#position)}> |
+| :------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Returns an Observable that will notify about every change of tile position. It will notify at the **beginning** of the movement.                   |
 
-| positionChangeFinished(): Observable<{charId: string, exitTile: [Position](./config.html/#position), enterTile: [Position](./config.html/#position)}> |
-| :---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Returns an Observable that will notify about every change of tile position. It will notify at the **end** of the movement.                            |
+| positionChangeFinished(): Observable<{charId: string, exitTile: [Position](./config.html#position), enterTile: [Position](./config.html#position)}> |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Returns an Observable that will notify about every change of tile position. It will notify at the **end** of the movement.                          |
 
 # Pathfinding Configuration
 
