@@ -8,6 +8,8 @@ import { Vector2 } from "../../Utils/Vector2/Vector2";
 export interface MoveToConfig {
     noPathFoundStrategy?: NoPathFoundStrategy;
     pathBlockedStrategy?: PathBlockedStrategy;
+    noPathFoundRetryBackoffMs?: number;
+    noPathFoundMaxRetries?: number;
 }
 export declare class TargetMovement implements Movement {
     private tilemap;
@@ -20,14 +22,30 @@ export declare class TargetMovement implements Movement {
     private posOnPath;
     private noPathFoundStrategy;
     private pathBlockedStrategy;
+    private noPathFoundRetryBackoffMs;
+    private noPathFoundMaxRetries;
+    private noPathFoundRetries;
+    private noPathFoundRetryElapsed;
     private stopped;
     constructor(tilemap: GridTilemap, targetPos: Vector2, distance?: number, config?: MoveToConfig);
     setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void;
     getPathBlockedStrategy(): PathBlockedStrategy;
     setNumberOfDirections(numberOfDirections: NumberOfDirections): void;
     setCharacter(character: GridCharacter): void;
-    update(): void;
+    update(delta: number): void;
     getNeighbours: (pos: Vector2) => Vector2[];
+    private moveCharOnPath;
+    private nextTileOnPath;
+    private applyPathBlockedStrategy;
+    private stop;
+    private turnTowardsTarget;
+    private existsDistToTarget;
+    private hasArrived;
+    private retryCalculatePath;
+    private shouldRetryCalculatePath;
+    private updatePosOnPath;
+    private noPathFound;
+    private calcShortestPath;
     private isBlocking;
     private _getNeighbours;
     private getShortestPath;

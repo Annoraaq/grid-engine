@@ -426,6 +426,7 @@ export class GridEngine {
 
   private assembleMoveToConfig(config: MoveToConfig): MoveToConfig {
     const moveToConfig = {
+      ...config,
       noPathFoundStrategy: NoPathFoundStrategy.STOP,
       pathBlockedStrategy: PathBlockedStrategy.WAIT,
     };

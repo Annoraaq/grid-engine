@@ -35,8 +35,8 @@ export class FollowMovement implements Movement {
       });
   }
 
-  update(): void {
-    this.targetMovement?.update();
+  update(delta: number): void {
+    this.targetMovement?.update(delta);
   }
 
   private updateTarget(targetPos: Position): void {

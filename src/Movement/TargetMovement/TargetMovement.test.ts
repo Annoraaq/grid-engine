@@ -1,6 +1,6 @@
+import { NoPathFoundStrategy } from "./../../Algorithms/ShortestPath/NoPathFoundStrategy";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
 import { TargetMovement } from "./TargetMovement";
-import { NoPathFoundStrategy } from "../../Algorithms/ShortestPath/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Algorithms/ShortestPath/PathBlockedStrategy";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 
@@ -49,7 +49,7 @@ describe("TargetMovement", () => {
     });
     const mockChar = createMockChar("char1", charPos);
     targetMovement.setCharacter(mockChar);
-    targetMovement.update();
+    targetMovement.update(100);
     expect(mockBfs.getShortestPath).toHaveBeenCalledWith(
       charPos,
       new Vector2(3, 1),
@@ -67,7 +67,7 @@ describe("TargetMovement", () => {
     });
     const char = createMockChar("char", charPos);
     targetMovement.setCharacter(char);
-    targetMovement.update();
+    targetMovement.update(100);
 
     expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
     expect(char.move).toHaveBeenCalledWith(Direction.RIGHT);
@@ -82,7 +82,7 @@ describe("TargetMovement", () => {
     });
     const char = createMockChar("char", charPos);
     targetMovement.setCharacter(char);
-    targetMovement.update();
+    targetMovement.update(100);
 
     expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
     expect(char.move).toHaveBeenCalledWith(Direction.RIGHT);
@@ -97,7 +97,7 @@ describe("TargetMovement", () => {
     });
     const mockChar = createMockChar("char", charPos);
     targetMovement.setCharacter(mockChar);
-    targetMovement.update();
+    targetMovement.update(100);
     expect(mockChar.move).not.toHaveBeenCalled();
   });
 
@@ -110,7 +110,7 @@ describe("TargetMovement", () => {
     });
     const char = createMockChar("char", charPos);
     targetMovement.setCharacter(char);
-    targetMovement.update();
+    targetMovement.update(100);
 
     expect(char.move).toHaveBeenCalledWith(Direction.RIGHT);
   });
@@ -124,7 +124,7 @@ describe("TargetMovement", () => {
     });
     const char = createMockChar("char", charPos);
     targetMovement.setCharacter(char);
-    targetMovement.update();
+    targetMovement.update(100);
 
     expect(char.move).toHaveBeenCalledWith(Direction.LEFT);
   });
@@ -138,7 +138,7 @@ describe("TargetMovement", () => {
     });
     const char = createMockChar("char", charPos);
     targetMovement.setCharacter(char);
-    targetMovement.update();
+    targetMovement.update(100);
 
     expect(char.move).toHaveBeenCalledWith(Direction.DOWN);
   });
@@ -152,7 +152,7 @@ describe("TargetMovement", () => {
     });
     const char = createMockChar("char", charPos);
     targetMovement.setCharacter(char);
-    targetMovement.update();
+    targetMovement.update(100);
 
     expect(char.move).toHaveBeenCalledWith(Direction.UP);
   });
@@ -174,7 +174,7 @@ describe("TargetMovement", () => {
       });
     const mockChar = createMockChar("char", charPos);
     targetMovement.setCharacter(mockChar);
-    targetMovement.update();
+    targetMovement.update(100);
 
     expect(mockBfs.getShortestPath).toHaveBeenCalledWith(
       charPos,
@@ -207,7 +207,7 @@ describe("TargetMovement", () => {
       });
     const mockChar = createMockChar("char", charPos);
     targetMovement.setCharacter(mockChar);
-    targetMovement.update();
+    targetMovement.update(100);
     expect(mockChar.move).not.toHaveBeenCalled();
   });
 
@@ -220,10 +220,10 @@ describe("TargetMovement", () => {
     });
     const char = createMockChar("char", charPos);
     targetMovement.setCharacter(char);
-    targetMovement.update();
+    targetMovement.update(100);
     expect(char.turnTowards).toHaveBeenCalledWith(Direction.DOWN);
     expect(char.move).not.toHaveBeenCalled();
-    targetMovement.update();
+    targetMovement.update(100);
     char.turnTowards.mockReset();
     expect(char.turnTowards).not.toHaveBeenCalled();
   });
@@ -240,7 +240,7 @@ describe("TargetMovement", () => {
       const char = createMockChar("char", charPos);
 
       targetMovement.setCharacter(char);
-      targetMovement.update();
+      targetMovement.update(100);
 
       expect(char.turnTowards).toHaveBeenCalledWith(Direction.LEFT);
     });
@@ -256,7 +256,7 @@ describe("TargetMovement", () => {
       const char = createMockChar("char", charPos);
 
       targetMovement.setCharacter(char);
-      targetMovement.update();
+      targetMovement.update(100);
 
       expect(char.turnTowards).toHaveBeenCalledWith(Direction.RIGHT);
     });
@@ -272,7 +272,7 @@ describe("TargetMovement", () => {
       const char = createMockChar("char", charPos);
 
       targetMovement.setCharacter(char);
-      targetMovement.update();
+      targetMovement.update(100);
 
       expect(char.turnTowards).toHaveBeenCalledWith(Direction.UP);
     });
@@ -288,7 +288,7 @@ describe("TargetMovement", () => {
       const char = createMockChar("char", charPos);
 
       targetMovement.setCharacter(char);
-      targetMovement.update();
+      targetMovement.update(100);
 
       expect(char.turnTowards).toHaveBeenCalledWith(Direction.DOWN);
     });
@@ -304,7 +304,7 @@ describe("TargetMovement", () => {
       const char = createMockChar("char", charPos);
 
       targetMovement.setCharacter(char);
-      targetMovement.update();
+      targetMovement.update(100);
 
       expect(char.turnTowards).toHaveBeenCalledWith(Direction.DOWN);
     });
@@ -327,7 +327,7 @@ describe("TargetMovement", () => {
       });
     const char = createMockChar("char", charPos);
     targetMovement.setCharacter(char);
-    targetMovement.update();
+    targetMovement.update(100);
     expect(char.move).toHaveBeenCalledWith(Direction.DOWN);
   });
 
@@ -348,7 +348,7 @@ describe("TargetMovement", () => {
       });
     const char = createMockChar("char", charPos);
     targetMovement.setCharacter(char);
-    targetMovement.update();
+    targetMovement.update(100);
     expect(char.move).not.toHaveBeenCalled();
   });
 
@@ -370,7 +370,7 @@ describe("TargetMovement", () => {
       });
     const char = createMockChar("char", charPos);
     targetMovement.setCharacter(char);
-    targetMovement.update();
+    targetMovement.update(100);
     expect(char.move).not.toHaveBeenCalled();
   });
 
@@ -382,8 +382,152 @@ describe("TargetMovement", () => {
       .mockReturnValue({ path: [], closestToDistance: charPos });
     const mockChar = createMockChar("char", charPos);
     targetMovement.setCharacter(mockChar);
-    targetMovement.update();
+    targetMovement.update(100);
     expect(mockChar.move).not.toHaveBeenCalled();
+  });
+
+  describe("noPathFoundStrategy = RETRY", () => {
+    it("should move if path exists after backoff", () => {
+      targetMovement = new TargetMovement(
+        gridTilemapMock,
+        new Vector2(3, 2),
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.RETRY,
+        }
+      );
+      const charPos = new Vector2(1, 1);
+      mockBfs.getShortestPath = jest
+        .fn()
+        .mockReturnValue({ path: [], closestToDistance: charPos });
+      const mockChar = createMockChar("char", charPos);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(100);
+      expect(mockChar.move).not.toHaveBeenCalled();
+
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [charPos, new Vector2(1, 3)],
+        closestToTarget: new Vector2(1, 3),
+      });
+      targetMovement.update(99);
+      expect(mockChar.move).not.toHaveBeenCalled();
+
+      targetMovement.update(1);
+      expect(mockChar.move).toHaveBeenCalledWith(Direction.DOWN);
+    });
+
+    it("should move if path exists after custom backoff", () => {
+      targetMovement = new TargetMovement(
+        gridTilemapMock,
+        new Vector2(3, 2),
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.RETRY,
+          noPathFoundRetryBackoffMs: 150,
+        }
+      );
+      const charPos = new Vector2(1, 1);
+      mockBfs.getShortestPath = jest
+        .fn()
+        .mockReturnValue({ path: [], closestToDistance: charPos });
+      const mockChar = createMockChar("char", charPos);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(100);
+      expect(mockChar.move).not.toHaveBeenCalled();
+
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [charPos, new Vector2(1, 3)],
+        closestToTarget: new Vector2(1, 3),
+      });
+      targetMovement.update(49);
+      expect(mockChar.move).not.toHaveBeenCalled();
+
+      targetMovement.update(1);
+      expect(mockChar.move).toHaveBeenCalledWith(Direction.DOWN);
+    });
+
+    it("should limit retry to maxRetries", () => {
+      targetMovement = new TargetMovement(
+        gridTilemapMock,
+        new Vector2(3, 2),
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.RETRY,
+          noPathFoundRetryBackoffMs: 1,
+          noPathFoundMaxRetries: 2,
+        }
+      );
+      const charPos = new Vector2(1, 1);
+      mockBfs.getShortestPath = jest
+        .fn()
+        .mockReturnValue({ path: [], closestToDistance: charPos });
+      const mockChar = createMockChar("char", charPos);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(1);
+      targetMovement.update(1);
+      targetMovement.update(1);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [charPos, new Vector2(1, 3)],
+        closestToTarget: new Vector2(1, 3),
+      });
+      targetMovement.update(1);
+      expect(mockChar.move).not.toHaveBeenCalled();
+    });
+
+    it("should not limit retry on default", () => {
+      targetMovement = new TargetMovement(
+        gridTilemapMock,
+        new Vector2(3, 2),
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.RETRY,
+          noPathFoundRetryBackoffMs: 1,
+        }
+      );
+      const charPos = new Vector2(1, 1);
+      mockBfs.getShortestPath = jest
+        .fn()
+        .mockReturnValue({ path: [], closestToDistance: charPos });
+      const mockChar = createMockChar("char", charPos);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(1);
+      targetMovement.update(1);
+      targetMovement.update(1);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [charPos, new Vector2(1, 3)],
+        closestToTarget: new Vector2(1, 3),
+      });
+      targetMovement.update(1);
+      expect(mockChar.move).toHaveBeenCalledWith(Direction.DOWN);
+    });
+
+    it("should not limit retry if maxRetries = -1", () => {
+      targetMovement = new TargetMovement(
+        gridTilemapMock,
+        new Vector2(3, 2),
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.RETRY,
+          noPathFoundRetryBackoffMs: 1,
+          noPathFoundMaxRetries: -1,
+        }
+      );
+      const charPos = new Vector2(1, 1);
+      mockBfs.getShortestPath = jest
+        .fn()
+        .mockReturnValue({ path: [], closestToDistance: charPos });
+      const mockChar = createMockChar("char", charPos);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(1);
+      targetMovement.update(1);
+      targetMovement.update(1);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [charPos, new Vector2(1, 3)],
+        closestToTarget: new Vector2(1, 3),
+      });
+      targetMovement.update(1);
+      expect(mockChar.move).toHaveBeenCalledWith(Direction.DOWN);
+    });
   });
 
   it("should delegate getNeighbours to gridTilemap", () => {
@@ -415,13 +559,13 @@ describe("TargetMovement", () => {
     });
     const char = createMockChar("char", charPos);
     targetMovement.setCharacter(char);
-    targetMovement.update();
+    targetMovement.update(100);
 
     expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
     expect(char.move).not.toHaveBeenCalled();
 
     gridTilemapMock.isBlocking.mockReturnValue(false);
-    targetMovement.update();
+    targetMovement.update(100);
     expect(char.move).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
@@ -438,13 +582,13 @@ describe("TargetMovement", () => {
     gridTilemapMock.isBlocking.mockReturnValue(true);
     const char = createMockChar("char", new Vector2(2, 1));
     targetMovement.setCharacter(char);
-    targetMovement.update();
+    targetMovement.update(100);
 
     expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(2);
     expect(char.move).not.toHaveBeenCalled();
 
     gridTilemapMock.isBlocking.mockReturnValue(false);
-    targetMovement.update();
+    targetMovement.update(100);
 
     expect(char.move).toHaveBeenCalledWith(Direction.DOWN);
   });
@@ -462,10 +606,10 @@ describe("TargetMovement", () => {
     gridTilemapMock.isBlocking.mockReturnValue(true);
     const char = createMockChar("char", new Vector2(2, 1));
     targetMovement.setCharacter(char);
-    targetMovement.update();
+    targetMovement.update(100);
 
     gridTilemapMock.isBlocking.mockReturnValue(false);
-    targetMovement.update();
+    targetMovement.update(100);
 
     expect(char.move).not.toHaveBeenCalled();
   });
@@ -504,7 +648,7 @@ describe("TargetMovement", () => {
       });
       const char = createMockChar("char", charPos);
       targetMovement.setCharacter(char);
-      targetMovement.update();
+      targetMovement.update(100);
 
       expect(char.move).toHaveBeenCalledWith(Direction.UP_LEFT);
     });
@@ -519,7 +663,7 @@ describe("TargetMovement", () => {
       });
       const char = createMockChar("char", charPos);
       targetMovement.setCharacter(char);
-      targetMovement.update();
+      targetMovement.update(100);
 
       expect(char.move).toHaveBeenCalledWith(Direction.UP_RIGHT);
     });
@@ -534,7 +678,7 @@ describe("TargetMovement", () => {
       });
       const char = createMockChar("char", charPos);
       targetMovement.setCharacter(char);
-      targetMovement.update();
+      targetMovement.update(100);
 
       expect(char.move).toHaveBeenCalledWith(Direction.DOWN_LEFT);
     });
@@ -549,7 +693,7 @@ describe("TargetMovement", () => {
       });
       const char = createMockChar("char", charPos);
       targetMovement.setCharacter(char);
-      targetMovement.update();
+      targetMovement.update(100);
 
       expect(char.move).toHaveBeenCalledWith(Direction.DOWN_RIGHT);
     });
@@ -574,7 +718,7 @@ describe("TargetMovement", () => {
         });
       const mockChar = createMockChar("char", charPos);
       targetMovement.setCharacter(mockChar);
-      targetMovement.update();
+      targetMovement.update(100);
       expect(mockChar.move).not.toHaveBeenCalled();
     });
   });

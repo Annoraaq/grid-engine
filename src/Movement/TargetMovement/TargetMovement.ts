@@ -13,6 +13,8 @@ import { Vector2 } from "../../Utils/Vector2/Vector2";
 export interface MoveToConfig {
   noPathFoundStrategy?: NoPathFoundStrategy;
   pathBlockedStrategy?: PathBlockedStrategy;
+  noPathFoundRetryBackoffMs?: number;
+  noPathFoundMaxRetries?: number;
 }
 
 export class TargetMovement implements Movement {
@@ -23,6 +25,10 @@ export class TargetMovement implements Movement {
   private posOnPath = 0;
   private noPathFoundStrategy: NoPathFoundStrategy;
   private pathBlockedStrategy: PathBlockedStrategy;
+  private noPathFoundRetryBackoffMs: number;
+  private noPathFoundMaxRetries: number;
+  private noPathFoundRetries = 0;
+  private noPathFoundRetryElapsed: number;
   private stopped = false;
 
   constructor(
@@ -35,6 +41,8 @@ export class TargetMovement implements Movement {
       config?.noPathFoundStrategy || NoPathFoundStrategy.STOP;
     this.pathBlockedStrategy =
       config?.pathBlockedStrategy || PathBlockedStrategy.WAIT;
+    this.noPathFoundRetryBackoffMs = config?.noPathFoundRetryBackoffMs || 200;
+    this.noPathFoundMaxRetries = config?.noPathFoundMaxRetries || -1;
   }
 
   setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void {
@@ -51,16 +59,97 @@ export class TargetMovement implements Movement {
 
   setCharacter(character: GridCharacter): void {
     this.character = character;
-    const shortestPath = this.getShortestPath();
-    this.posOnPath = 0;
-    this.shortestPath = shortestPath.path;
-    this.distOffset = shortestPath.distOffset;
+    this.noPathFoundRetryElapsed = 0;
+    this.calcShortestPath();
   }
 
-  update(): void {
+  update(delta: number): void {
     if (this.stopped) return;
-    if (this.shortestPath.length <= 0) return;
+    if (this.noPathFound() && !this.shouldRetryCalculatePath()) return;
 
+    if (this.noPathFound() && this.shouldRetryCalculatePath()) {
+      this.retryCalculatePath(delta);
+    }
+
+    this.updatePosOnPath();
+
+    if (this.hasArrived() && this.existsDistToTarget()) {
+      this.turnTowardsTarget();
+    }
+
+    if (this.hasArrived()) return;
+
+    if (this.isBlocking(this.nextTileOnPath())) {
+      this.applyPathBlockedStrategy();
+    } else {
+      this.moveCharOnPath();
+    }
+  }
+
+  getNeighbours = (pos: Vector2): Vector2[] => {
+    const neighbours = this._getNeighbours(pos);
+    return neighbours.filter((pos) => !this.isBlocking(pos));
+  };
+
+  private moveCharOnPath(): void {
+    const dir = this.getDir(
+      this.character.getNextTilePos(),
+      this.nextTileOnPath()
+    );
+    this.character.move(dir);
+  }
+
+  private nextTileOnPath(): Vector2 {
+    return this.shortestPath[this.posOnPath + 1];
+  }
+
+  private applyPathBlockedStrategy(): void {
+    if (this.pathBlockedStrategy === PathBlockedStrategy.RETRY) {
+      this.calcShortestPath();
+    } else if (this.pathBlockedStrategy === PathBlockedStrategy.STOP) {
+      this.stop();
+    }
+  }
+
+  private stop(): void {
+    this.stopped = true;
+  }
+
+  private turnTowardsTarget(): void {
+    const nextTile = this.shortestPath[this.posOnPath + 1];
+    const dir = this.getDir(this.character.getNextTilePos(), nextTile);
+    this.character.turnTowards(dir);
+  }
+
+  private existsDistToTarget(): boolean {
+    return this.posOnPath < this.shortestPath.length - 1;
+  }
+
+  private hasArrived(): boolean {
+    return (
+      this.posOnPath + Math.max(0, this.distance - this.distOffset) >=
+      this.shortestPath.length - 1
+    );
+  }
+
+  private retryCalculatePath(delta: number) {
+    this.noPathFoundRetryElapsed += delta;
+    if (this.noPathFoundRetryElapsed >= this.noPathFoundRetryBackoffMs) {
+      this.noPathFoundRetryElapsed = 0;
+      this.calcShortestPath();
+      this.noPathFoundRetries++;
+    }
+  }
+
+  private shouldRetryCalculatePath(): boolean {
+    return (
+      this.noPathFoundStrategy === NoPathFoundStrategy.RETRY &&
+      (this.noPathFoundMaxRetries === -1 ||
+        this.noPathFoundRetries < this.noPathFoundMaxRetries)
+    );
+  }
+
+  private updatePosOnPath(): void {
     let currentTile = this.shortestPath[this.posOnPath];
     while (
       this.posOnPath < this.shortestPath.length - 1 &&
@@ -70,41 +159,18 @@ export class TargetMovement implements Movement {
       this.posOnPath++;
       currentTile = this.shortestPath[this.posOnPath];
     }
-
-    if (
-      this.posOnPath + Math.max(0, this.distance - this.distOffset) >=
-      this.shortestPath.length - 1
-    ) {
-      if (this.posOnPath < this.shortestPath.length - 1) {
-        const nextTile = this.shortestPath[this.posOnPath + 1];
-        const dir = this.getDir(this.character.getNextTilePos(), nextTile);
-        this.character.turnTowards(dir);
-      }
-      return;
-    }
-
-    const nextTile = this.shortestPath[this.posOnPath + 1];
-    const dir = this.getDir(this.character.getNextTilePos(), nextTile);
-
-    if (this.isBlocking(nextTile)) {
-      if (this.pathBlockedStrategy === PathBlockedStrategy.RETRY) {
-        const shortestPath = this.getShortestPath();
-        this.posOnPath = 0;
-        this.shortestPath = shortestPath.path;
-        this.distOffset = shortestPath.distOffset;
-      } else if (this.pathBlockedStrategy === PathBlockedStrategy.STOP) {
-        this.stopped = true;
-      }
-    } else {
-        this.character.move(dir);
-    }
-
   }
 
-  getNeighbours = (pos: Vector2): Vector2[] => {
-    const neighbours = this._getNeighbours(pos);
-    return neighbours.filter((pos) => !this.isBlocking(pos));
-  };
+  private noPathFound(): boolean {
+    return this.shortestPath.length === 0;
+  }
+
+  private calcShortestPath(): void {
+    const shortestPath = this.getShortestPath();
+    this.posOnPath = 0;
+    this.shortestPath = shortestPath.path;
+    this.distOffset = shortestPath.distOffset;
+  }
 
   private isBlocking = (pos: Vector2): boolean => {
     return this.tilemap.isBlocking(pos);
