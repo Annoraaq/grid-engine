@@ -2,7 +2,6 @@ import { MoveToConfig } from "./Movement/TargetMovement/TargetMovement";
 import { CharacterIndex, FrameRow, PositionChange } from "./GridCharacter/GridCharacter";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { Observable } from "rxjs";
-import { Vector2 } from "./Utils/Vector2/Vector2";
 export declare type TileSizePerSecond = number;
 export interface Position {
     x: number;
@@ -68,7 +67,7 @@ export declare class GridEngine {
     isMoving(charId: string): boolean;
     getFacingDirection(charId: string): Direction;
     turnTowards(charId: string, direction: Direction): void;
-    setPosition(charId: string, pos: Vector2): void;
+    setPosition(charId: string, pos: Position): void;
     movementStarted(): Observable<{
         charId: string;
         direction: Direction;

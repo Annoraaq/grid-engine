@@ -532,7 +532,7 @@ describe("GridEngine", () => {
   });
 
   it("should set tile position", () => {
-    gridEngine.setPosition("player", new Vector2(3, 4));
+    gridEngine.setPosition("player", { x: 3, y: 4 });
 
     expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(3, 4));
   });
