@@ -335,10 +335,10 @@ export class GridEngine {
     return this.gridCharacters.get(charId).turnTowards(direction);
   }
 
-  setPosition(charId: string, pos: Vector2): void {
+  setPosition(charId: string, pos: Position): void {
     this.initGuard();
     this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).setTilePosition(pos);
+    this.gridCharacters.get(charId).setTilePosition(new Vector2(pos));
   }
 
   movementStarted(): Observable<{ charId: string; direction: Direction }> {
