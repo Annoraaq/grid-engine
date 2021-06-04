@@ -572,8 +572,56 @@ describe("TargetMovement", () => {
   it("should recalculate shortest path on strategy RETRY", () => {
     gridTilemapMock.isBlocking.mockReturnValue(true);
 
-    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 2));
-    targetMovement.setPathBlockedStrategy(PathBlockedStrategy.RETRY);
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 2), 0, {
+      pathBlockedStrategy: PathBlockedStrategy.RETRY,
+    });
+
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [new Vector2(2, 1), new Vector2(2, 2), new Vector2(3, 2)],
+      closestToTarget: new Vector2(3, 2),
+    });
+    gridTilemapMock.isBlocking.mockReturnValue(true);
+    const char = createMockChar("char", new Vector2(2, 1));
+    targetMovement.setCharacter(char);
+    targetMovement.update(200);
+
+    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(2);
+    expect(char.move).not.toHaveBeenCalled();
+
+    gridTilemapMock.isBlocking.mockReturnValue(false);
+    targetMovement.update(200);
+
+    expect(char.move).toHaveBeenCalledWith(Direction.DOWN);
+  });
+
+  it("should recalculate shortest path on strategy RETRY after default backoff", () => {
+    const defaultBackoff = 200;
+    gridTilemapMock.isBlocking.mockReturnValue(true);
+
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 2), 0, {
+      pathBlockedStrategy: PathBlockedStrategy.RETRY,
+    });
+
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [new Vector2(2, 1), new Vector2(2, 2), new Vector2(3, 2)],
+      closestToTarget: new Vector2(3, 2),
+    });
+    gridTilemapMock.isBlocking.mockReturnValue(true);
+    const char = createMockChar("char", new Vector2(2, 1));
+    targetMovement.setCharacter(char);
+    targetMovement.update(defaultBackoff - 1);
+    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
+    targetMovement.update(1);
+    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(2);
+  });
+
+  it("should recalculate shortest path on strategy RETRY after custom backoff", () => {
+    gridTilemapMock.isBlocking.mockReturnValue(true);
+
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 2), 0, {
+      pathBlockedStrategy: PathBlockedStrategy.RETRY,
+      pathBlockedRetryBackoffMs: 150,
+    });
 
     mockBfs.getShortestPath = jest.fn().mockReturnValue({
       path: [new Vector2(2, 1), new Vector2(2, 2), new Vector2(3, 2)],
@@ -583,14 +631,34 @@ describe("TargetMovement", () => {
     const char = createMockChar("char", new Vector2(2, 1));
     targetMovement.setCharacter(char);
     targetMovement.update(100);
-
+    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
+    targetMovement.update(49);
+    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
+    targetMovement.update(1);
     expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(2);
+  });
+
+  it("should recalculate shortest path on strategy RETRY with maxRetries", () => {
+    gridTilemapMock.isBlocking.mockReturnValue(true);
+
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 2), 0, {
+      pathBlockedStrategy: PathBlockedStrategy.RETRY,
+      pathBlockedMaxRetries: 2,
+    });
+
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [new Vector2(2, 1), new Vector2(2, 2), new Vector2(3, 2)],
+      closestToTarget: new Vector2(3, 2),
+    });
+    gridTilemapMock.isBlocking.mockReturnValue(true);
+    const char = createMockChar("char", new Vector2(2, 1));
+    targetMovement.setCharacter(char); // call shortestPath initially
+    targetMovement.update(200); // retry 1
+    targetMovement.update(200); // retry 2
+    targetMovement.update(200); // retry 3 should not happen
+
+    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(3);
     expect(char.move).not.toHaveBeenCalled();
-
-    gridTilemapMock.isBlocking.mockReturnValue(false);
-    targetMovement.update(100);
-
-    expect(char.move).toHaveBeenCalledWith(Direction.DOWN);
   });
 
   it("should stop on pathBlockedStrategy STOP", () => {

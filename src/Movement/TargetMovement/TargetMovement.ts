@@ -15,6 +15,8 @@ export interface MoveToConfig {
   pathBlockedStrategy?: PathBlockedStrategy;
   noPathFoundRetryBackoffMs?: number;
   noPathFoundMaxRetries?: number;
+  pathBlockedMaxRetries?: number;
+  pathBlockedRetryBackoffMs?: number;
 }
 
 export class TargetMovement implements Movement {
@@ -23,8 +25,12 @@ export class TargetMovement implements Movement {
   private shortestPath: Vector2[];
   private distOffset: number;
   private posOnPath = 0;
-  private noPathFoundStrategy: NoPathFoundStrategy;
   private pathBlockedStrategy: PathBlockedStrategy;
+  private pathBlockedMaxRetries: number;
+  private pathBlockedRetries = 0;
+  private pathBlockedRetryBackoffMs: number;
+  private pathBlockedRetryElapsed: number;
+  private noPathFoundStrategy: NoPathFoundStrategy;
   private noPathFoundRetryBackoffMs: number;
   private noPathFoundMaxRetries: number;
   private noPathFoundRetries = 0;
@@ -43,6 +49,8 @@ export class TargetMovement implements Movement {
       config?.pathBlockedStrategy || PathBlockedStrategy.WAIT;
     this.noPathFoundRetryBackoffMs = config?.noPathFoundRetryBackoffMs || 200;
     this.noPathFoundMaxRetries = config?.noPathFoundMaxRetries || -1;
+    this.pathBlockedMaxRetries = config?.pathBlockedMaxRetries || -1;
+    this.pathBlockedRetryBackoffMs = config?.pathBlockedRetryBackoffMs || 200;
   }
 
   setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void {
@@ -60,6 +68,7 @@ export class TargetMovement implements Movement {
   setCharacter(character: GridCharacter): void {
     this.character = character;
     this.noPathFoundRetryElapsed = 0;
+    this.pathBlockedRetryElapsed = 0;
     this.calcShortestPath();
   }
 
@@ -68,7 +77,7 @@ export class TargetMovement implements Movement {
     if (this.noPathFound() && !this.shouldRetryCalculatePath()) return;
 
     if (this.noPathFound() && this.shouldRetryCalculatePath()) {
-      this.retryCalculatePath(delta);
+      this.retryNoPathFound(delta);
     }
 
     this.updatePosOnPath();
@@ -80,7 +89,7 @@ export class TargetMovement implements Movement {
     if (this.hasArrived()) return;
 
     if (this.isBlocking(this.nextTileOnPath())) {
-      this.applyPathBlockedStrategy();
+      this.applyPathBlockedStrategy(delta);
     } else {
       this.moveCharOnPath();
     }
@@ -103,9 +112,16 @@ export class TargetMovement implements Movement {
     return this.shortestPath[this.posOnPath + 1];
   }
 
-  private applyPathBlockedStrategy(): void {
+  private applyPathBlockedStrategy(delta: number): void {
     if (this.pathBlockedStrategy === PathBlockedStrategy.RETRY) {
-      this.calcShortestPath();
+      if (
+        this.pathBlockedMaxRetries !== -1 &&
+        this.pathBlockedRetries >= this.pathBlockedMaxRetries
+      ) {
+        this.stop();
+      } else {
+        this.retryPathBlocked(delta);
+      }
     } else if (this.pathBlockedStrategy === PathBlockedStrategy.STOP) {
       this.stop();
     }
@@ -132,12 +148,21 @@ export class TargetMovement implements Movement {
     );
   }
 
-  private retryCalculatePath(delta: number) {
+  private retryNoPathFound(delta: number) {
     this.noPathFoundRetryElapsed += delta;
     if (this.noPathFoundRetryElapsed >= this.noPathFoundRetryBackoffMs) {
       this.noPathFoundRetryElapsed = 0;
       this.calcShortestPath();
       this.noPathFoundRetries++;
+    }
+  }
+
+  private retryPathBlocked(delta: number) {
+    this.pathBlockedRetryElapsed += delta;
+    if (this.pathBlockedRetryElapsed >= this.pathBlockedRetryBackoffMs) {
+      this.pathBlockedRetryElapsed = 0;
+      this.calcShortestPath();
+      this.pathBlockedRetries++;
     }
   }
 
