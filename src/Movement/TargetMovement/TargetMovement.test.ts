@@ -98,6 +98,7 @@ describe("TargetMovement", () => {
     const mockChar = createMockChar("char", charPos);
     targetMovement.setCharacter(mockChar);
     targetMovement.update(100);
+    expect(gridTilemapMock.isBlocking).not.toHaveBeenCalledWith(undefined);
     expect(mockChar.move).not.toHaveBeenCalled();
   });
 
