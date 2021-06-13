@@ -9,6 +9,8 @@ import { Bfs } from "../../Algorithms/ShortestPath/Bfs/Bfs";
 import { Movement } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Retryable } from "./Retryable/Retryable";
+import { DistanceUtils8 } from "../../Utils/DistanceUtils8/DistanceUtils8";
+import { DistanceUtils4 } from "../../Utils/DistanceUtils4/DistanceUtils4";
 
 export interface MoveToConfig {
   noPathFoundStrategy?: NoPathFoundStrategy;
@@ -21,7 +23,6 @@ export interface MoveToConfig {
 
 export class TargetMovement implements Movement {
   private character: GridCharacter;
-  private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR;
   private shortestPath: Vector2[];
   private distOffset: number;
   private posOnPath = 0;
@@ -30,6 +31,7 @@ export class TargetMovement implements Movement {
   private stopped = false;
   private noPathFoundRetryable: Retryable;
   private pathBlockedRetryable: Retryable;
+  private distanceUtils: DistanceUtils = new DistanceUtils4();
 
   constructor(
     private tilemap: GridTilemap,
@@ -62,7 +64,11 @@ export class TargetMovement implements Movement {
   }
 
   setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
-    this.numberOfDirections = numberOfDirections;
+    if (numberOfDirections === NumberOfDirections.EIGHT) {
+      this.distanceUtils = new DistanceUtils8();
+    } else {
+      this.distanceUtils = new DistanceUtils4();
+    }
   }
 
   setCharacter(character: GridCharacter): void {
@@ -99,7 +105,7 @@ export class TargetMovement implements Movement {
   }
 
   getNeighbours = (pos: Vector2): Vector2[] => {
-    const neighbours = this._getNeighbours(pos);
+    const neighbours = this.distanceUtils.neighbours(pos);
     return neighbours.filter((pos) => !this.isBlocking(pos));
   };
 
@@ -163,26 +169,6 @@ export class TargetMovement implements Movement {
     return !pos || this.tilemap.isBlocking(pos);
   };
 
-  private _getNeighbours = (pos: Vector2): Vector2[] => {
-    const orthogonalNeighbours = [
-      new Vector2(pos.x, pos.y + 1),
-      new Vector2(pos.x + 1, pos.y),
-      new Vector2(pos.x - 1, pos.y),
-      new Vector2(pos.x, pos.y - 1),
-    ];
-    const diagonalNeighbours = [
-      new Vector2(pos.x + 1, pos.y + 1),
-      new Vector2(pos.x + 1, pos.y - 1),
-      new Vector2(pos.x - 1, pos.y + 1),
-      new Vector2(pos.x - 1, pos.y - 1),
-    ];
-
-    if (this.numberOfDirections === NumberOfDirections.EIGHT) {
-      return [...orthogonalNeighbours, ...diagonalNeighbours];
-    }
-    return orthogonalNeighbours;
-  };
-
   private getShortestPath(): { path: Vector2[]; distOffset: number } {
     const shortestPathAlgo: ShortestPathAlgorithm = new Bfs();
     const {
@@ -205,10 +191,9 @@ export class TargetMovement implements Movement {
         closestToTarget,
         this.getNeighbours
       ).path;
-      const distOffset = DistanceUtils.distance(
+      const distOffset = this.distanceUtils.distance(
         closestToTarget,
-        this.targetPos,
-        this.numberOfDirections
+        this.targetPos
       );
       return { path: shortestPathToClosestPoint, distOffset };
     }
@@ -217,9 +202,6 @@ export class TargetMovement implements Movement {
   }
 
   private getDir(from: Vector2, to: Vector2): Direction {
-    if (this.numberOfDirections === NumberOfDirections.EIGHT) {
-      return DistanceUtils.direction8(from, to);
-    }
-    return DistanceUtils.direction4(from, to);
+    return this.distanceUtils.direction(from, to);
   }
 }

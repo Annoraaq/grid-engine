@@ -5,6 +5,8 @@ import { Direction, directionVector } from "../../Direction/Direction";
 import { Movement } from "../Movement";
 import { takeUntil } from "rxjs/operators";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
+import { DistanceUtils8 } from "../../Utils/DistanceUtils8/DistanceUtils8";
+import { DistanceUtils4 } from "../../Utils/DistanceUtils4/DistanceUtils4";
 
 export class RandomMovement implements Movement {
   private character: GridCharacter;
@@ -15,11 +17,17 @@ export class RandomMovement implements Movement {
   private stepsWalked: number;
   private currentMovementDirection: Direction;
   private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR;
+  private distanceUtils: DistanceUtils = new DistanceUtils4();
 
   constructor(private delay = 0, private radius = -1) {}
 
   setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
     this.numberOfDirections = numberOfDirections;
+    if (numberOfDirections === NumberOfDirections.EIGHT) {
+      this.distanceUtils = new DistanceUtils8();
+    } else {
+      this.distanceUtils = new DistanceUtils4();
+    }
   }
 
   setCharacter(character: GridCharacter): void {
@@ -78,10 +86,9 @@ export class RandomMovement implements Movement {
   }
 
   private getDist(dir: Direction): number {
-    return DistanceUtils.distance(
+    return this.distanceUtils.distance(
       this.character.getNextTilePos().add(directionVector(dir)),
-      new Vector2(this.initialCol, this.initialRow),
-      this.numberOfDirections
+      new Vector2(this.initialCol, this.initialRow)
     );
   }
 
