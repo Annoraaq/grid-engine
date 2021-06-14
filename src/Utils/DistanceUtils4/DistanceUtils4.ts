@@ -28,12 +28,12 @@ export class DistanceUtils4 implements DistanceUtils {
     }
   }
 
-  neighbours = (pos: Vector2): Vector2[] => {
+  neighbours(pos: Vector2): Vector2[] {
     return [
       new Vector2(pos.x, pos.y + 1),
       new Vector2(pos.x + 1, pos.y),
       new Vector2(pos.x - 1, pos.y),
       new Vector2(pos.x, pos.y - 1),
     ];
-  };
+  }
 }

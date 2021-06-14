@@ -8,7 +8,7 @@ export class DistanceUtils8 implements DistanceUtils {
     return VectorUtils.chebyshevDistance(pos1, pos2);
   }
 
-  neighbours = (pos: Vector2): Vector2[] => {
+  neighbours(pos: Vector2): Vector2[] {
     const orthogonalNeighbours = [
       new Vector2(pos.x, pos.y + 1),
       new Vector2(pos.x + 1, pos.y),
@@ -23,7 +23,7 @@ export class DistanceUtils8 implements DistanceUtils {
     ];
 
     return [...orthogonalNeighbours, ...diagonalNeighbours];
-  };
+  }
 
   direction(from: Vector2, to: Vector2): Direction {
     if (to.x > from.x) {
