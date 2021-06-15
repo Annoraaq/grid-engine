@@ -570,6 +570,53 @@ describe("TargetMovement", () => {
     expect(char.move).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
+  it("should timeout on strategy WAIT", () => {
+    gridTilemapMock.isBlocking.mockReturnValue(true);
+
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(2, 2), 0, {
+      pathBlockedWaitTimeoutMs: 2000,
+    });
+    const charPos = new Vector2(1, 1);
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos, new Vector2(2, 1), new Vector2(2, 2)],
+      closestToTarget: new Vector2(2, 2),
+    });
+    const char = createMockChar("char", charPos);
+    targetMovement.setCharacter(char);
+    targetMovement.update(2200);
+    gridTilemapMock.isBlocking.mockReturnValue(false);
+    targetMovement.update(100);
+
+    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
+    expect(char.move).not.toHaveBeenCalled();
+  });
+
+  it("should reset timeout on strategy WAIT", () => {
+    gridTilemapMock.isBlocking.mockReturnValue(true);
+
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(2, 2), 0, {
+      pathBlockedWaitTimeoutMs: 2000,
+    });
+    const charPos = new Vector2(1, 1);
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos, new Vector2(2, 1), new Vector2(2, 2)],
+      closestToTarget: new Vector2(2, 2),
+    });
+    const char = createMockChar("char", charPos);
+    targetMovement.setCharacter(char);
+    targetMovement.update(500);
+    gridTilemapMock.isBlocking.mockReturnValue(false);
+    targetMovement.update(100);
+    gridTilemapMock.isBlocking.mockReturnValue(true);
+    targetMovement.update(1600); // would stop char if timeout NOT reset
+    gridTilemapMock.isBlocking.mockReturnValue(false);
+    char.move.mockReset();
+    // should not have been stopped and therefore move
+    targetMovement.update(100);
+
+    expect(char.move).toHaveBeenCalled();
+  });
+
   it("should recalculate shortest path on strategy RETRY", () => {
     gridTilemapMock.isBlocking.mockReturnValue(true);
 

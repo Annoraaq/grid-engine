@@ -19,6 +19,7 @@ export interface MoveToConfig {
   noPathFoundMaxRetries?: number;
   pathBlockedMaxRetries?: number;
   pathBlockedRetryBackoffMs?: number;
+  pathBlockedWaitTimeoutMs?: number;
 }
 
 export class TargetMovement implements Movement {
@@ -31,6 +32,8 @@ export class TargetMovement implements Movement {
   private stopped = false;
   private noPathFoundRetryable: Retryable;
   private pathBlockedRetryable: Retryable;
+  private pathBlockedWaitTimeoutMs: number;
+  private pathBlockedWaitElapsed: number;
   private distanceUtils: DistanceUtils = new DistanceUtils4();
 
   constructor(
@@ -53,6 +56,7 @@ export class TargetMovement implements Movement {
       config?.pathBlockedMaxRetries || -1,
       () => this.stop()
     );
+    this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
   }
 
   setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void {
@@ -75,6 +79,7 @@ export class TargetMovement implements Movement {
     this.character = character;
     this.noPathFoundRetryable.reset();
     this.pathBlockedRetryable.reset();
+    this.pathBlockedWaitElapsed = 0;
     this.calcShortestPath();
   }
 
@@ -91,7 +96,16 @@ export class TargetMovement implements Movement {
         this.pathBlockedRetryable.retry(delta, () => this.calcShortestPath());
       } else if (this.pathBlockedStrategy === PathBlockedStrategy.STOP) {
         this.stop();
+      } else if (this.pathBlockedStrategy === PathBlockedStrategy.WAIT) {
+        if (this.pathBlockedWaitTimeoutMs > -1) {
+          this.pathBlockedWaitElapsed += delta;
+          if (this.pathBlockedWaitElapsed >= this.pathBlockedWaitTimeoutMs) {
+            this.stop();
+          }
+        }
       }
+    } else {
+      this.pathBlockedWaitElapsed = 0;
     }
 
     this.updatePosOnPath();
