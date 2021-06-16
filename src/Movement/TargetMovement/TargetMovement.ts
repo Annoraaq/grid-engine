@@ -92,18 +92,7 @@ export class TargetMovement implements Movement {
       }
     }
     if (this.isBlocking(this.nextTileOnPath())) {
-      if (this.pathBlockedStrategy === PathBlockedStrategy.RETRY) {
-        this.pathBlockedRetryable.retry(delta, () => this.calcShortestPath());
-      } else if (this.pathBlockedStrategy === PathBlockedStrategy.STOP) {
-        this.stop();
-      } else if (this.pathBlockedStrategy === PathBlockedStrategy.WAIT) {
-        if (this.pathBlockedWaitTimeoutMs > -1) {
-          this.pathBlockedWaitElapsed += delta;
-          if (this.pathBlockedWaitElapsed >= this.pathBlockedWaitTimeoutMs) {
-            this.stop();
-          }
-        }
-      }
+      this.applyPathBlockedStrategy(delta);
     } else {
       this.pathBlockedWaitElapsed = 0;
     }
@@ -122,6 +111,21 @@ export class TargetMovement implements Movement {
     const neighbours = this.distanceUtils.neighbours(pos);
     return neighbours.filter((pos) => !this.isBlocking(pos));
   };
+
+  private applyPathBlockedStrategy(delta: number): void {
+    if (this.pathBlockedStrategy === PathBlockedStrategy.RETRY) {
+      this.pathBlockedRetryable.retry(delta, () => this.calcShortestPath());
+    } else if (this.pathBlockedStrategy === PathBlockedStrategy.STOP) {
+      this.stop();
+    } else if (this.pathBlockedStrategy === PathBlockedStrategy.WAIT) {
+      if (this.pathBlockedWaitTimeoutMs > -1) {
+        this.pathBlockedWaitElapsed += delta;
+        if (this.pathBlockedWaitElapsed >= this.pathBlockedWaitTimeoutMs) {
+          this.stop();
+        }
+      }
+    }
+  }
 
   private moveCharOnPath(): void {
     const dir = this.getDir(
