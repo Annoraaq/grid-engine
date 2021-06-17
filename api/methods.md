@@ -107,7 +107,10 @@ nav_order: 2
   noPathFoundStrategy?: NoPathFoundStrategy,
   pathBlockedStrategy?: PathBlockedStrategy,
   noPathFoundRetryBackoffMs?: number,
-  noPathFoundMaxRetries?: number
+  noPathFoundMaxRetries?: number,
+  pathBlockedMaxRetries?: number,
+  pathBlockedRetryBackoffMs?: number,
+  pathBlockedWaitTimeoutMs?: number
 }
 ```
 
@@ -127,8 +130,8 @@ This strategy can be used to configure pathfinding. It determines what happens i
 
 This strategy can be used to configure pathfinding. It determines what happens if a previously calculated path is suddenly blocked. This can happen if a path existed and while the character was moving along that path, it got suddenly blocked.
 
-**"WAIT"** will make the character wait (possibly forever) until the path will be free again.
+**"WAIT"** will make the character wait (forever or until given `pathBlockedWaitTimeoutMs`) until the path will be free again.
 
-**"RETRY"** will make the character look for a new path (repeatedly and possibly forever).
+**"RETRY"** will make the character look for a new path. You can provide a custom backoff time in milliseconds: `pathBlockedRetryBackoffMs`. You can also specify a maximum number of retries using `pathBlockedMaxRetries`.
 
 **"STOP"** will make the character stop the movement
