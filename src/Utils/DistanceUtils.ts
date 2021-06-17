@@ -1,16 +1,10 @@
-import { VectorUtils } from "./VectorUtils";
-import { NumberOfDirections } from "./../Direction/Direction";
+import { Direction } from "../Direction/Direction";
 import { Vector2 } from "./Vector2/Vector2";
 
-export class DistanceUtils {
-  static distance(
-    pos1: Vector2,
-    pos2: Vector2,
-    numberOfDirections: NumberOfDirections
-  ): number {
-    if (numberOfDirections === NumberOfDirections.EIGHT) {
-      return VectorUtils.chebyshevDistance(pos1, pos2);
-    }
-    return VectorUtils.manhattanDistance(pos1, pos2);
-  }
+export interface DistanceUtils {
+  distance(pos1: Vector2, pos2: Vector2): number;
+
+  direction(from: Vector2, to: Vector2): Direction;
+
+  neighbours(pos: Vector2): Vector2[];
 }
