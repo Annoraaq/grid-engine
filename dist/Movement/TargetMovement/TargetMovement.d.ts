@@ -10,23 +10,26 @@ export interface MoveToConfig {
     pathBlockedStrategy?: PathBlockedStrategy;
     noPathFoundRetryBackoffMs?: number;
     noPathFoundMaxRetries?: number;
+    pathBlockedMaxRetries?: number;
+    pathBlockedRetryBackoffMs?: number;
+    pathBlockedWaitTimeoutMs?: number;
 }
 export declare class TargetMovement implements Movement {
     private tilemap;
     private targetPos;
     private distance;
     private character;
-    private numberOfDirections;
     private shortestPath;
     private distOffset;
     private posOnPath;
-    private noPathFoundStrategy;
     private pathBlockedStrategy;
-    private noPathFoundRetryBackoffMs;
-    private noPathFoundMaxRetries;
-    private noPathFoundRetries;
-    private noPathFoundRetryElapsed;
+    private noPathFoundStrategy;
     private stopped;
+    private noPathFoundRetryable;
+    private pathBlockedRetryable;
+    private pathBlockedWaitTimeoutMs;
+    private pathBlockedWaitElapsed;
+    private distanceUtils;
     constructor(tilemap: GridTilemap, targetPos: Vector2, distance?: number, config?: MoveToConfig);
     setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void;
     getPathBlockedStrategy(): PathBlockedStrategy;
@@ -34,22 +37,17 @@ export declare class TargetMovement implements Movement {
     setCharacter(character: GridCharacter): void;
     update(delta: number): void;
     getNeighbours: (pos: Vector2) => Vector2[];
+    private applyPathBlockedStrategy;
     private moveCharOnPath;
     private nextTileOnPath;
-    private applyPathBlockedStrategy;
     private stop;
     private turnTowardsTarget;
     private existsDistToTarget;
     private hasArrived;
-    private retryCalculatePath;
-    private shouldRetryCalculatePath;
     private updatePosOnPath;
     private noPathFound;
     private calcShortestPath;
     private isBlocking;
-    private _getNeighbours;
     private getShortestPath;
     private getDir;
-    private getDir8Directions;
-    private getDir4Directions;
 }
