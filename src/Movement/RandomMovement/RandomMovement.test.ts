@@ -98,7 +98,7 @@ describe("RandomMovement", () => {
 
     // do first step down and set step size 2
     randomMovement.update(1);
-    positionChangedSubject$.next();
+    positionChangedSubject$.next(undefined);
     expect(charMock.move).toHaveBeenNthCalledWith(1, Direction.DOWN);
 
     // next random direction would be up
@@ -106,13 +106,13 @@ describe("RandomMovement", () => {
 
     // do next step which is still smaller than step size
     randomMovement.update(1);
-    positionChangedSubject$.next();
+    positionChangedSubject$.next(undefined);
     expect(charMock.move).toHaveBeenNthCalledWith(2, Direction.DOWN);
 
     // do next step which exceeds step size. New random direction (up)
     // should be taken
     randomMovement.update(1);
-    positionChangedSubject$.next();
+    positionChangedSubject$.next(undefined);
     expect(charMock.move).toHaveBeenNthCalledWith(3, Direction.UP);
   });
 
@@ -124,8 +124,8 @@ describe("RandomMovement", () => {
     mockRandom(0.1); // dir: up, stepSize: 1
 
     // set stepsWalked to 2
-    positionChangedSubject$.next();
-    positionChangedSubject$.next();
+    positionChangedSubject$.next(undefined);
+    positionChangedSubject$.next(undefined);
 
     // sets step size to 1
     randomMovement.update(1);
@@ -134,7 +134,7 @@ describe("RandomMovement", () => {
     mockRandom(0.7); // dir: down, stepSize: 2
 
     // set stepsWalked to 1
-    positionChangedSubject$.next();
+    positionChangedSubject$.next(undefined);
     randomMovement.update(1);
     expect(charMock.move).toHaveBeenNthCalledWith(2, Direction.DOWN);
   });
@@ -184,9 +184,9 @@ describe("RandomMovement", () => {
 
     mockRandom(0.1); // dir: up, stepSize: 1
 
-    autoMovementSetSubject$.next();
-    positionChangedSubject$.next();
-    positionChangedSubject$.next();
+    autoMovementSetSubject$.next(undefined);
+    positionChangedSubject$.next(undefined);
+    positionChangedSubject$.next(undefined);
 
     randomMovement.update(1);
     expect(charMock.move).toHaveBeenNthCalledWith(2, Direction.DOWN);

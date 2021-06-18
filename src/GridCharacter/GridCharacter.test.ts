@@ -138,7 +138,7 @@ describe("GridCharacter", () => {
     expect(gridCharacter.isBlockingTile(new Vector2(5, 5))).toBe(true);
   });
 
-  it("should start movement", async (done) => {
+  it("should start movement", async () => {
     mockNonBlockingTile();
     expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, 0));
     const movementStartedProm = gridCharacter
@@ -146,11 +146,10 @@ describe("GridCharacter", () => {
       .pipe(take(1))
       .toPromise();
 
-    gridCharacter.positionChanged().subscribe(({ exitTile, enterTile }) => {
-      expect(exitTile).toEqual(new Vector2(0, 0));
-      expect(enterTile).toEqual(new Vector2(0, -1));
-      done();
-    });
+    const posChangedProm = gridCharacter
+      .positionChanged()
+      .pipe(take(1))
+      .toPromise();
 
     gridCharacter.move(Direction.UP);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
@@ -162,6 +161,9 @@ describe("GridCharacter", () => {
     gridCharacter.move(Direction.DOWN);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, 0));
+    const { exitTile, enterTile } = await posChangedProm;
+    expect(exitTile).toEqual(new Vector2(0, 0));
+    expect(enterTile).toEqual(new Vector2(0, -1));
   });
 
   it("should not update if not moving", () => {
