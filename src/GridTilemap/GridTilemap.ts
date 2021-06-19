@@ -1,6 +1,8 @@
 import { Direction } from "./../Direction/Direction";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
 import { Vector2 } from "../Utils/Vector2/Vector2";
+import { Subscription } from "rxjs";
+import { Position } from "../GridEngine";
 
 export class GridTilemap {
   private static readonly MAX_PLAYER_LAYERS = 1000;
@@ -10,6 +12,9 @@ export class GridTilemap {
   private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "ge_collide_";
   private characters = new Map<string, GridCharacter>();
   private collisionTilePropertyName = "ge_collide";
+  private tilePosToCharacters: Map<string, Set<GridCharacter>> = new Map();
+  private charactersSubscription: Map<string, Subscription> = new Map();
+  private charactersSubscription2: Map<string, Subscription> = new Map();
 
   constructor(
     private tilemap: Phaser.Tilemaps.Tilemap,
@@ -20,9 +25,67 @@ export class GridTilemap {
 
   addCharacter(character: GridCharacter): void {
     this.characters.set(character.getId(), character);
+    if (
+      !this.tilePosToCharacters.has(this.posToString(character.getTilePos()))
+    ) {
+      this.tilePosToCharacters.set(
+        this.posToString(character.getTilePos()),
+        new Set()
+      );
+    }
+    this.tilePosToCharacters
+      .get(this.posToString(character.getTilePos()))
+      .add(character);
+    if (
+      !this.tilePosToCharacters.has(
+        this.posToString(character.getNextTilePos())
+      )
+    ) {
+      this.tilePosToCharacters.set(
+        this.posToString(character.getNextTilePos()),
+        new Set()
+      );
+    }
+    this.tilePosToCharacters
+      .get(this.posToString(character.getNextTilePos()))
+      .add(character);
+    const sub = character.positionChanged().subscribe((positionChange) => {
+      if (
+        !this.tilePosToCharacters.has(
+          this.posToString(positionChange.enterTile)
+        )
+      ) {
+        this.tilePosToCharacters.set(
+          this.posToString(positionChange.enterTile),
+          new Set()
+        );
+      }
+      this.tilePosToCharacters
+        .get(this.posToString(positionChange.enterTile))
+        .add(character);
+    });
+    const sub2 = character
+      .positionChangeFinished()
+      .subscribe((positionChange) => {
+        this.tilePosToCharacters
+          .get(this.posToString(positionChange.exitTile))
+          .delete(character);
+      });
+
+    this.charactersSubscription.set(character.getId(), sub);
+    this.charactersSubscription2.set(character.getId(), sub2);
   }
 
   removeCharacter(charId: string): void {
+    this.charactersSubscription.get(charId).unsubscribe();
+    this.charactersSubscription2.get(charId).unsubscribe();
+    const char = this.characters.get(charId);
+    this.tilePosToCharacters
+      .get(this.posToString(char.getTilePos()))
+      .delete(char);
+    this.tilePosToCharacters
+      .get(this.posToString(char.getNextTilePos()))
+      .delete(char);
     this.characters.delete(charId);
   }
 
@@ -60,8 +123,10 @@ export class GridTilemap {
   }
 
   hasBlockingChar(pos: Vector2): boolean {
-    return [...this.characters.values()].some((char) =>
-      char.isBlockingTile(pos)
+    const posStr = this.posToString(pos);
+    return (
+      this.tilePosToCharacters.has(posStr) &&
+      this.tilePosToCharacters.get(posStr).size > 0
     );
   }
 
@@ -77,6 +142,10 @@ export class GridTilemap {
   getTileHeight(): number {
     const tilemapScale = this.tilemap.layers[0].tilemapLayer.scale;
     return this.tilemap.tileHeight * tilemapScale;
+  }
+
+  private posToString(pos: Position): string {
+    return `${pos.x}#${pos.y}`;
   }
 
   private getLayerProp(layer: Phaser.Tilemaps.LayerData, name: string): any {
