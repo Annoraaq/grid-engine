@@ -11,6 +11,7 @@ export declare class GridTilemap {
     private static readonly ONE_WAY_COLLIDE_PROP_PREFIX;
     private characters;
     private collisionTilePropertyName;
+    private charBlockCache;
     constructor(tilemap: Phaser.Tilemaps.Tilemap, firstLayerAboveChar?: number);
     addCharacter(character: GridCharacter): void;
     removeCharacter(charId: string): void;
