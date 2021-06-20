@@ -1,6 +1,7 @@
 import { Direction } from "./../Direction/Direction";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
 import { Vector2 } from "../Utils/Vector2/Vector2";
+import { CharBlockCache } from "./CharBlockCache/CharBlockCache";
 
 export class GridTilemap {
   private static readonly MAX_PLAYER_LAYERS = 1000;
@@ -10,6 +11,7 @@ export class GridTilemap {
   private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "ge_collide_";
   private characters = new Map<string, GridCharacter>();
   private collisionTilePropertyName = "ge_collide";
+  private charBlockCache: CharBlockCache = new CharBlockCache();
 
   constructor(
     private tilemap: Phaser.Tilemaps.Tilemap,
@@ -20,9 +22,11 @@ export class GridTilemap {
 
   addCharacter(character: GridCharacter): void {
     this.characters.set(character.getId(), character);
+    this.charBlockCache.addCharacter(character);
   }
 
   removeCharacter(charId: string): void {
+    this.charBlockCache.removeCharacter(this.characters.get(charId));
     this.characters.delete(charId);
   }
 
@@ -60,9 +64,7 @@ export class GridTilemap {
   }
 
   hasBlockingChar(pos: Vector2): boolean {
-    return [...this.characters.values()].some((char) =>
-      char.isBlockingTile(pos)
-    );
+    return this.charBlockCache.isCharBlockingAt(pos);
   }
 
   setCollisionTilePropertyName(name: string): void {

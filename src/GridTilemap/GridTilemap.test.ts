@@ -1,6 +1,22 @@
+import { GridCharacter } from "./../GridCharacter/GridCharacter";
+import { of } from "rxjs";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { Direction } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
+
+const mockCharBlockCache = {
+  addCharacter: jest.fn(),
+  removeCharacter: jest.fn(),
+  isCharBlockingAt: jest.fn(),
+};
+
+jest.mock("./CharBlockCache/CharBlockCache", function () {
+  return {
+    CharBlockCache: jest.fn().mockImplementation(function () {
+      return mockCharBlockCache;
+    }),
+  };
+});
 
 describe("GridTilemap", () => {
   let gridTilemap: GridTilemap;
@@ -41,6 +57,10 @@ describe("GridTilemap", () => {
       createBlankLayer: jest.fn().mockReturnValue(blankLayerMock),
     };
     gridTilemap = new GridTilemap(tilemapMock);
+    mockCharBlockCache.addCharacter.mockReset();
+    mockCharBlockCache.removeCharacter.mockReset();
+    mockCharBlockCache.isCharBlockingAt.mockReset();
+    mockCharBlockCache.isCharBlockingAt = jest.fn(() => false);
   });
 
   it("should set layer depths on construction", () => {
@@ -162,9 +182,9 @@ describe("GridTilemap", () => {
 
   it("should add a character", () => {
     gridTilemap = new GridTilemap(tilemapMock, 3);
-    const charMock1 = <any>{ getId: () => "player" };
-    const charMock2 = <any>{ getId: () => "player2" };
-    const charMockSameId = <any>{ getId: () => "player2" };
+    const charMock1 = createCharMock("player");
+    const charMock2 = createCharMock("player2");
+    const charMockSameId = createCharMock("player2");
     gridTilemap.addCharacter(charMock1);
     gridTilemap.addCharacter(charMock2);
     gridTilemap.addCharacter(charMockSameId);
@@ -174,13 +194,18 @@ describe("GridTilemap", () => {
 
   it("should remove a character", () => {
     gridTilemap = new GridTilemap(tilemapMock, 3);
-    const charMock1 = <any>{ getId: () => "player" };
-    const charMock2 = <any>{ getId: () => "player2" };
+    const charMock1 = <any>{
+      ...createCharMock("player"),
+    };
+    const charMock2 = <any>{
+      ...createCharMock("player2"),
+    };
     gridTilemap.addCharacter(charMock1);
     gridTilemap.addCharacter(charMock2);
     gridTilemap.removeCharacter("player");
 
     expect(gridTilemap.getCharacters()).toEqual([charMock2]);
+    expect(mockCharBlockCache.removeCharacter).toHaveBeenCalledWith(charMock1);
   });
 
   it("should detect blocking tiles", () => {
@@ -364,24 +389,14 @@ describe("GridTilemap", () => {
     expect(hasNoTile).toBe(false);
   });
 
-  it("should detect a blocking char", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
+  it("should detect blocking char", () => {
     gridTilemap = new GridTilemap(tilemapMock, 3);
+    mockCharBlockCache.isCharBlockingAt = jest.fn(() => true);
 
-    const char1Mock = <any>{
-      getId: () => "player1",
-      isBlockingTile: () => true,
-    };
-    const char2Mock = <any>{
-      getId: () => "player2",
-      isBlockingTile: () => false,
-    };
-    gridTilemap.addCharacter(char1Mock);
-    gridTilemap.addCharacter(char2Mock);
-    const hasBlockingChar = gridTilemap.hasBlockingChar(new Vector2(3, 4));
-    const isBlocking = gridTilemap.isBlocking(new Vector2(3, 4));
-    expect(hasBlockingChar).toBe(true);
-    expect(isBlocking).toBe(true);
+    expect(gridTilemap.hasBlockingChar(new Vector2(3, 3))).toBe(true);
+    expect(mockCharBlockCache.isCharBlockingAt).toHaveBeenCalledWith(
+      new Vector2(3, 3)
+    );
   });
 
   it("should detect an unblocked tile", () => {
@@ -389,12 +404,12 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(tilemapMock, 3);
 
     const char1Mock = <any>{
-      getId: () => "player1",
-      isBlockingTile: () => false,
+      ...createCharMock("player1"),
+      getTilePos: () => ({ x: 3, y: 3 }),
     };
     const char2Mock = <any>{
-      getId: () => "player2",
-      isBlockingTile: () => false,
+      ...createCharMock("player2"),
+      getTilePos: () => ({ x: 3, y: 3 }),
     };
     gridTilemap.addCharacter(char1Mock);
     gridTilemap.addCharacter(char2Mock);
@@ -409,4 +424,15 @@ describe("GridTilemap", () => {
   it("should get scaled tile height", () => {
     expect(gridTilemap.getTileHeight()).toEqual(48);
   });
+
+  function createCharMock(id = "player"): GridCharacter {
+    return <any>{
+      getId: () => id,
+      isBlockingTile: () => false,
+      getTilePos: () => ({ x: 1, y: 1 }),
+      getNextTilePos: () => ({ x: 1, y: 1 }),
+      positionChanged: () => of([]),
+      positionChangeFinished: () => of([]),
+    };
+  }
 });
