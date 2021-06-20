@@ -2,6 +2,7 @@ import { MoveToConfig } from "./Movement/TargetMovement/TargetMovement";
 import { CharacterIndex, FrameRow, PositionChange } from "./GridCharacter/GridCharacter";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { Observable } from "rxjs";
+export { Direction };
 export declare type TileSizePerSecond = number;
 export interface Position {
     x: number;

@@ -1,4 +1,4 @@
-import { GridEngine } from "./GridEngine";
+import { GridEngine, Direction } from "./GridEngine";
 
-export { GridEngine };
+export { GridEngine, Direction };
 export default GridEngine;
