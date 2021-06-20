@@ -1,9 +1,22 @@
 import { GridCharacter } from "./../GridCharacter/GridCharacter";
-import { of, Subject } from "rxjs";
-import { PositionChange } from "../GridCharacter/GridCharacter";
+import { of } from "rxjs";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { Direction } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
+
+const mockCharBlockCache = {
+  addCharacter: jest.fn(),
+  removeCharacter: jest.fn(),
+  isCharBlockingAt: jest.fn(),
+};
+
+jest.mock("./CharBlockCache/CharBlockCache", function () {
+  return {
+    CharBlockCache: jest.fn().mockImplementation(function () {
+      return mockCharBlockCache;
+    }),
+  };
+});
 
 describe("GridTilemap", () => {
   let gridTilemap: GridTilemap;
@@ -44,6 +57,10 @@ describe("GridTilemap", () => {
       createBlankLayer: jest.fn().mockReturnValue(blankLayerMock),
     };
     gridTilemap = new GridTilemap(tilemapMock);
+    mockCharBlockCache.addCharacter.mockReset();
+    mockCharBlockCache.removeCharacter.mockReset();
+    mockCharBlockCache.isCharBlockingAt.mockReset();
+    mockCharBlockCache.isCharBlockingAt = jest.fn(() => false);
   });
 
   it("should set layer depths on construction", () => {
@@ -177,35 +194,18 @@ describe("GridTilemap", () => {
 
   it("should remove a character", () => {
     gridTilemap = new GridTilemap(tilemapMock, 3);
-    const positionChangedSub = { unsubscribe: jest.fn() };
-    const positionChanged = {
-      subscribe: () => positionChangedSub,
-    };
-    const positionChangeFinishedSub = { unsubscribe: jest.fn() };
-    const positionChangeFinished = {
-      subscribe: () => positionChangeFinishedSub,
-    };
     const charMock1 = <any>{
       ...createCharMock("player"),
-      getTilePos: () => ({ x: 0, y: 1 }),
-      getNextTilePos: () => ({ x: 1, y: 1 }),
-      positionChanged: () => positionChanged,
-      positionChangeFinished: () => positionChangeFinished,
     };
     const charMock2 = <any>{
       ...createCharMock("player2"),
-      getTilePos: () => ({ x: 2, y: 2 }),
-      getNextTilePos: () => ({ x: 2, y: 2 }),
     };
     gridTilemap.addCharacter(charMock1);
     gridTilemap.addCharacter(charMock2);
     gridTilemap.removeCharacter("player");
 
     expect(gridTilemap.getCharacters()).toEqual([charMock2]);
-    expect(positionChangedSub.unsubscribe).toHaveBeenCalled();
-    expect(positionChangeFinishedSub.unsubscribe).toHaveBeenCalled();
-    expect(gridTilemap.hasBlockingChar(new Vector2(0, 1))).toBe(false);
-    expect(gridTilemap.hasBlockingChar(new Vector2(1, 1))).toBe(false);
+    expect(mockCharBlockCache.removeCharacter).toHaveBeenCalledWith(charMock1);
   });
 
   it("should detect blocking tiles", () => {
@@ -389,129 +389,14 @@ describe("GridTilemap", () => {
     expect(hasNoTile).toBe(false);
   });
 
-  it("should detect blocking char after adding", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
+  it("should detect blocking char", () => {
     gridTilemap = new GridTilemap(tilemapMock, 3);
-
-    const char1Mock = <any>{
-      ...createCharMock("player1"),
-      getTilePos: () => ({ x: 3, y: 3 }),
-    };
-
-    gridTilemap.addCharacter(char1Mock);
-    expect(gridTilemap.hasBlockingChar(new Vector2(3, 3))).toBe(true);
-  });
-
-  it("should block new and old pos on movement", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
-    gridTilemap = new GridTilemap(tilemapMock, 3);
-    const positionChanged = new Subject<PositionChange>();
-
-    const char1Mock = <any>{
-      ...createCharMock("player1"),
-      getTilePos: () => ({ x: 3, y: 3 }),
-      positionChanged: () => positionChanged,
-    };
-    gridTilemap.addCharacter(char1Mock);
-    positionChanged.next({
-      enterTile: new Vector2(3, 4),
-      exitTile: new Vector2(3, 3),
-    });
-
-    const hasBlockingCharOnOldPos = gridTilemap.hasBlockingChar(
-      new Vector2(3, 3)
-    );
-    const hasBlockingChar = gridTilemap.hasBlockingChar(new Vector2(3, 4));
-    const isBlocking = gridTilemap.isBlocking(new Vector2(3, 4));
-    expect(hasBlockingCharOnOldPos).toBe(true);
-    expect(hasBlockingChar).toBe(true);
-    expect(isBlocking).toBe(true);
-  });
-
-  it("should consider serveral chars for blocking after pos change", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
-    gridTilemap = new GridTilemap(tilemapMock, 3);
-    const positionChanged = new Subject<PositionChange>();
-    const positionChangeFinished = new Subject<PositionChange>();
-
-    const char1Mock = <any>{
-      ...createCharMock("player1"),
-      getTilePos: () => ({ x: 3, y: 3 }),
-    };
-    const char2Mock = <any>{
-      ...createCharMock("player2"),
-      getTilePos: () => ({ x: 3, y: 2 }),
-      positionChanged: () => positionChanged,
-      positionChangeFinished: () => positionChangeFinished,
-    };
-
-    gridTilemap.addCharacter(char1Mock);
-    gridTilemap.addCharacter(char2Mock);
-    positionChanged.next({
-      enterTile: new Vector2(3, 3),
-      exitTile: new Vector2(3, 2),
-    });
-    positionChangeFinished.next({
-      enterTile: new Vector2(3, 3),
-      exitTile: new Vector2(3, 2),
-    });
-    positionChanged.next({
-      enterTile: new Vector2(3, 4),
-      exitTile: new Vector2(3, 3),
-    });
-    positionChangeFinished.next({
-      enterTile: new Vector2(3, 4),
-      exitTile: new Vector2(3, 3),
-    });
+    mockCharBlockCache.isCharBlockingAt = jest.fn(() => true);
 
     expect(gridTilemap.hasBlockingChar(new Vector2(3, 3))).toBe(true);
-  });
-
-  it("should unblock old pos", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
-    gridTilemap = new GridTilemap(tilemapMock, 3);
-    const positionChangeFinished = new Subject<PositionChange>();
-
-    const char1Mock = <any>{
-      ...createCharMock("player1"),
-      getTilePos: () => ({ x: 3, y: 3 }),
-      positionChangeFinished: () => positionChangeFinished,
-    };
-    gridTilemap.addCharacter(char1Mock);
-
-    positionChangeFinished.next({
-      enterTile: new Vector2(3, 4),
-      exitTile: new Vector2(3, 3),
-    });
-
-    const hasBlockingCharOnOldPos = gridTilemap.hasBlockingChar(
+    expect(mockCharBlockCache.isCharBlockingAt).toHaveBeenCalledWith(
       new Vector2(3, 3)
     );
-    expect(hasBlockingCharOnOldPos).toBe(false);
-  });
-
-  it("should consider several chars for blocking", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
-    gridTilemap = new GridTilemap(tilemapMock, 3);
-
-    const char1Mock = <any>{
-      ...createCharMock("player1"),
-      getTilePos: () => ({ x: 3, y: 3 }),
-    };
-    const char2Mock = <any>{
-      ...createCharMock("player2"),
-      getTilePos: () => ({ x: 3, y: 3 }),
-    };
-
-    gridTilemap.addCharacter(char1Mock);
-    gridTilemap.addCharacter(char2Mock);
-
-    gridTilemap.removeCharacter("player2");
-
-    const hasBlockingCharOnOldPos = gridTilemap.hasBlockingChar(
-      new Vector2(3, 3)
-    );
-    expect(hasBlockingCharOnOldPos).toBe(true);
   });
 
   it("should detect an unblocked tile", () => {
