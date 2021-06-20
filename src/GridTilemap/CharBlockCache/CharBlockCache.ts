@@ -17,54 +17,10 @@ export class CharBlockCache {
   }
 
   addCharacter(character: GridCharacter): void {
-    if (
-      !this.tilePosToCharacters.has(this.posToString(character.getTilePos()))
-    ) {
-      this.tilePosToCharacters.set(
-        this.posToString(character.getTilePos()),
-        new Set()
-      );
-    }
-    this.tilePosToCharacters
-      .get(this.posToString(character.getTilePos()))
-      .add(character);
-    if (
-      !this.tilePosToCharacters.has(
-        this.posToString(character.getNextTilePos())
-      )
-    ) {
-      this.tilePosToCharacters.set(
-        this.posToString(character.getNextTilePos()),
-        new Set()
-      );
-    }
-    this.tilePosToCharacters
-      .get(this.posToString(character.getNextTilePos()))
-      .add(character);
-    const sub = character.positionChanged().subscribe((positionChange) => {
-      if (
-        !this.tilePosToCharacters.has(
-          this.posToString(positionChange.enterTile)
-        )
-      ) {
-        this.tilePosToCharacters.set(
-          this.posToString(positionChange.enterTile),
-          new Set()
-        );
-      }
-      this.tilePosToCharacters
-        .get(this.posToString(positionChange.enterTile))
-        .add(character);
-    });
-    const sub2 = character
-      .positionChangeFinished()
-      .subscribe((positionChange) => {
-        this.tilePosToCharacters
-          .get(this.posToString(positionChange.exitTile))
-          .delete(character);
-      });
-    this.positionChangedSubs.set(character.getId(), sub);
-    this.positionChangeFinishedSubs.set(character.getId(), sub2);
+    this.add(this.posToString(character.getTilePos()), character);
+    this.add(this.posToString(character.getNextTilePos()), character);
+    this.addPositionChangeSub(character);
+    this.addPositionChangeFinishedSub(character);
   }
 
   removeCharacter(character: GridCharacter): void {
@@ -77,6 +33,36 @@ export class CharBlockCache {
     this.tilePosToCharacters
       .get(this.posToString(character.getNextTilePos()))
       .delete(character);
+  }
+
+  private add(pos: string, character: GridCharacter): void {
+    if (!this.tilePosToCharacters.has(pos)) {
+      this.tilePosToCharacters.set(pos, new Set());
+    }
+    this.tilePosToCharacters.get(pos).add(character);
+  }
+
+  private addPositionChangeSub(character: GridCharacter) {
+    const positionChangedSub = character
+      .positionChanged()
+      .subscribe((positionChange) => {
+        this.add(this.posToString(positionChange.enterTile), character);
+      });
+    this.positionChangedSubs.set(character.getId(), positionChangedSub);
+  }
+
+  private addPositionChangeFinishedSub(character: GridCharacter) {
+    const positionChangeFinishedSub = character
+      .positionChangeFinished()
+      .subscribe((positionChange) => {
+        this.tilePosToCharacters
+          .get(this.posToString(positionChange.exitTile))
+          .delete(character);
+      });
+    this.positionChangeFinishedSubs.set(
+      character.getId(),
+      positionChangeFinishedSub
+    );
   }
 
   private posToString(pos: Position): string {
