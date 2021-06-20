@@ -24,6 +24,8 @@ import { takeUntil, filter } from "rxjs/operators";
 import { NoPathFoundStrategy } from "./Algorithms/ShortestPath/NoPathFoundStrategy";
 import { Vector2 } from "./Utils/Vector2/Vector2";
 
+export { Direction };
+
 export type TileSizePerSecond = number;
 
 export interface Position {
