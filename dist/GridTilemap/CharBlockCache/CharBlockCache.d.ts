@@ -7,5 +7,8 @@ export declare class CharBlockCache {
     isCharBlockingAt(pos: Vector2): boolean;
     addCharacter(character: GridCharacter): void;
     removeCharacter(character: GridCharacter): void;
+    private add;
+    private addPositionChangeSub;
+    private addPositionChangeFinishedSub;
     private posToString;
 }
