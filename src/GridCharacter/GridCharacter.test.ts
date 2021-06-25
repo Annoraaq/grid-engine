@@ -355,13 +355,14 @@ describe("GridCharacter", () => {
     expect(dir).toEqual(Direction.DOWN);
   });
 
-  it("should observe position update in movementStopped", (done) => {
+  it("should observe position and movement update in movementStopped", (done) => {
     mockNonBlockingTile();
     gridCharacter
       .movementStopped()
       .pipe(take(1))
       .subscribe(() => {
         expect(gridCharacter.getTilePos()).toEqual({ x: 0, y: 1 });
+        expect(gridCharacter.isMoving()).toEqual(false);
         done();
       });
     gridCharacter.move(Direction.DOWN);
@@ -378,6 +379,7 @@ describe("GridCharacter", () => {
     gridCharacter
       .positionChangeFinished()
       .subscribe(({ exitTile, enterTile }) => {
+        expect(gridCharacter.isMoving()).toEqual(false);
         expect(exitTile).toEqual(new Vector2(0, 0));
         expect(enterTile).toEqual(new Vector2(0, 1));
         done();
