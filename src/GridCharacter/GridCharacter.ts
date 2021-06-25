@@ -398,13 +398,13 @@ export class GridCharacter {
   }
 
   private stopMoving(): void {
-    this.movementStopped$.next(this.movementDirection);
     this.positionChangeFinished$.next({
       exitTile: this.tilePos,
       enterTile: this.nextTilePos,
     });
-    this.movementDirection = Direction.NONE;
     this.tilePos = this.nextTilePos;
+    this.movementStopped$.next(this.movementDirection);
+    this.movementDirection = Direction.NONE;
   }
 
   private hasWalkedHalfATile(): boolean {
