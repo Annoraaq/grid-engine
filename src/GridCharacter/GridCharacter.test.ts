@@ -349,9 +349,11 @@ describe("GridCharacter", () => {
       .movementStopped()
       .pipe(take(1))
       .toPromise();
+    expect(gridCharacter.getTilePos()).toEqual({ x: 0, y: 0 });
     gridCharacter.update(500);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
     const dir = await movementStoppedProm;
+    expect(gridCharacter.getTilePos()).toEqual({ x: 0, y: 1 });
     expect(dir).toEqual(Direction.DOWN);
   });
 
