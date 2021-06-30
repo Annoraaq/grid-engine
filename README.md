@@ -40,7 +40,7 @@ npm i --save grid-engine
 ### Web
 
 ```html
-<!-- Download the .zip and copy GridEngine.min.js from root directory -->
+<!-- Download the .zip and copy GridEngine.min.js from dist directory -->
 <script src="GridEngine.min.js"></script>
 ```
 
@@ -100,4 +100,5 @@ function create() {
 </p>
 
 # Special Thanks
+
 splashsky, therebelrobot
