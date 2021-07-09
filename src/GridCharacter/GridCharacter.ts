@@ -171,16 +171,20 @@ export class GridCharacter {
 
   isBlockingTile(tilePos: Vector2): boolean {
     return this.nextTilePos.equals(tilePos) || this.tilePos.equals(tilePos);
+    // return this.nextTilePos.equals(tilePos);
   }
 
   isBlockingDirection(direction: Direction): boolean {
     if (direction == Direction.NONE) return false;
-    return (
-      this.tilemap.hasBlockingTile(
-        this.tilePosInDirection(direction),
-        oppositeDirection(this.toMapDirection(direction))
-      ) || this.tilemap.hasBlockingChar(this.tilePosInDirection(direction))
+    const tilePosInDir = this.tilePosInDirection(direction);
+    const hasBlockingTile = this.tilemap.hasBlockingTile(
+      tilePosInDir,
+      oppositeDirection(this.toMapDirection(direction))
     );
+    const hasBlockingChar =
+      this.tilemap.hasBlockingChar(tilePosInDir) &&
+      !this.tilePos.equals(tilePosInDir);
+    return hasBlockingTile || hasBlockingChar;
   }
 
   isMoving(): boolean {
@@ -328,26 +332,67 @@ export class GridCharacter {
   }
 
   private updateCharacterPosition(delta: number): void {
-    const pixelsToWalkThisUpdate = this.getSpeedPerDelta(delta);
+    const maxMovementForDelta = this.getSpeedPerDelta(delta);
+    const distToTileBorder = this.getTileDistance(this.movementDirection)
+      .clone()
+      .subtract(this.tileSizePixelsWalked)
+      .multiply(directionVector(this.movementDirection));
 
-    if (!this.willCrossTileBorderThisUpdate(pixelsToWalkThisUpdate)) {
-      this.moveCharacterSprite(pixelsToWalkThisUpdate);
-    } else if (this.shouldContinueMoving()) {
-      this.moveCharacterSprite(pixelsToWalkThisUpdate);
-      this.positionChangeFinished$.next({
-        exitTile: this.tilePos,
-        enterTile: this.nextTilePos,
-      });
-      this.updateTilePos();
+    if (
+      maxMovementForDelta
+        .abs()
+        .subtract(distToTileBorder.abs())
+        .equals(new Vector2(0, 0))
+    ) {
+      // case 2
+      // move and stop if not continue moving
+      this.moveCharacterSprite(maxMovementForDelta);
+
+      if (this.shouldContinueMoving()) {
+        this.positionChangeFinished$.next({
+          exitTile: this.tilePos,
+          enterTile: this.nextTilePos,
+        });
+        this.updateTilePos();
+      } else {
+        this.stopMoving();
+      }
+    } else if (
+      Vector2.min(distToTileBorder.abs(), maxMovementForDelta.abs()).equals(
+        maxMovementForDelta.abs()
+      )
+    ) {
+      // case 1
+      // only move
+      this.moveCharacterSprite(maxMovementForDelta);
     } else {
-      this.moveCharacterSpriteRestOfTile();
-      this.stopMoving();
+      // case 3
+      // move to tile border, and continue in other dir recursively
+      this.moveCharacterSprite(distToTileBorder);
+
+      if (this.shouldContinueMoving()) {
+        this.positionChangeFinished$.next({
+          exitTile: this.tilePos,
+          enterTile: this.nextTilePos,
+        });
+        this.startMoving(this.lastMovementImpulse);
+
+        const alpha = maxMovementForDelta.subtract(distToTileBorder);
+        const propVec = alpha.divide(maxMovementForDelta);
+        if (isNaN(propVec.x)) propVec.x = 0;
+        if (isNaN(propVec.y)) propVec.y = 0;
+        const prop = Math.max(Math.abs(propVec.x), Math.abs(propVec.y));
+
+        this.updateCharacterPosition(delta * prop);
+      } else {
+        this.stopMoving();
+      }
     }
   }
 
   private shouldContinueMoving(): boolean {
     return (
-      this.movementDirection == this.lastMovementImpulse &&
+      this.lastMovementImpulse !== Direction.NONE &&
       !this.isBlockingDirection(this.lastMovementImpulse)
     );
   }
@@ -358,26 +403,6 @@ export class GridCharacter {
       [this.movementDirection].clone()
       .multiply(new Vector2(deltaInSeconds, deltaInSeconds))
       .multiply(directionVector(this.movementDirection));
-  }
-
-  private willCrossTileBorderThisUpdate(
-    pixelsToWalkThisUpdate: Vector2
-  ): boolean {
-    return (
-      this.tileSizePixelsWalked.x + Math.abs(pixelsToWalkThisUpdate.x) >=
-        this.getTileDistance(this.movementDirection).x ||
-      this.tileSizePixelsWalked.y + Math.abs(pixelsToWalkThisUpdate.y) >=
-        this.getTileDistance(this.movementDirection).y
-    );
-  }
-
-  private moveCharacterSpriteRestOfTile(): void {
-    this.moveCharacterSprite(
-      this.getTileDistance(this.movementDirection)
-        .clone()
-        .subtract(this.tileSizePixelsWalked)
-        .multiply(directionVector(this.movementDirection))
-    );
   }
 
   private moveCharacterSprite(speed: Vector2): void {
