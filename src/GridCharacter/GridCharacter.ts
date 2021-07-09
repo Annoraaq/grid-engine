@@ -230,8 +230,7 @@ export class GridCharacter {
     return tilePosition.clone().multiply(this.tileSize);
   }
 
-  protected getTileDistance(direction: Direction): Vector2 {
-    if (direction === Direction.NONE) return Vector2.ZERO.clone();
+  protected getTileDistance(_direction: Direction): Vector2 {
     return this.tileSize.clone();
   }
 
@@ -380,7 +379,6 @@ export class GridCharacter {
         const alpha = maxMovementForDelta.subtract(distToTileBorder);
         const propVec = alpha.divide(maxMovementForDelta);
         if (isNaN(propVec.x)) propVec.x = 0;
-        if (isNaN(propVec.y)) propVec.y = 0;
         const prop = Math.max(Math.abs(propVec.x), Math.abs(propVec.y));
 
         this.updateCharacterPosition(delta * prop);

@@ -88,6 +88,17 @@ describe("GridCharacter", () => {
     });
   });
 
+  it("should get init data", () => {
+    gridCharacter = new GridCharacter("player", {
+      sprite: spriteMock,
+      tilemap: gridTilemapMock,
+      tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
+      speed: 3,
+    });
+    expect(gridCharacter.getId()).toEqual("player");
+    expect(gridCharacter.getSpeed()).toEqual(3);
+  });
+
   it("should set the correct default charIndex", () => {
     gridCharacter = new GridCharacter("player", {
       sprite: spriteMock,
@@ -155,12 +166,14 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, 0));
+    expect(gridCharacter.getNextTilePos()).toEqual(new Vector2(0, -1));
     const dir = await movementStartedProm;
     expect(dir).toEqual(Direction.UP);
 
     gridCharacter.move(Direction.DOWN);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, 0));
+    expect(gridCharacter.getNextTilePos()).toEqual(new Vector2(0, -1));
     const { exitTile, enterTile } = await posChangedProm;
     expect(exitTile).toEqual(new Vector2(0, 0));
     expect(enterTile).toEqual(new Vector2(0, -1));
@@ -172,6 +185,12 @@ describe("GridCharacter", () => {
     gridCharacter.update(300);
     expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
+  });
+
+  it("should not move if no direction", () => {
+    mockNonBlockingTile();
+    gridCharacter.move(Direction.NONE);
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
   });
 
   it("should update speed", () => {
@@ -395,7 +414,7 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN);
   });
 
-  it("should continue moving", (done) => {
+  it("should continue moving vertically", (done) => {
     mockNonBlockingTile();
 
     gridCharacter
@@ -413,6 +432,50 @@ describe("GridCharacter", () => {
     expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS + 24);
     expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, 1));
+  });
+
+  it("should continue moving to different dir", (done) => {
+    mockNonBlockingTile();
+
+    gridCharacter
+      .positionChangeFinished()
+      .subscribe(({ exitTile, enterTile }) => {
+        expect(exitTile).toEqual(new Vector2(0, 0));
+        expect(enterTile).toEqual(new Vector2(1, 0));
+        done();
+      });
+
+    gridCharacter.move(Direction.RIGHT);
+    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.move(Direction.DOWN);
+    gridCharacter.update(MS_FOR_12_PX);
+    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 16);
+    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS + 8);
+    expect(gridCharacter.getTilePos()).toEqual(new Vector2(1, 0));
+  });
+
+  it("should continue moving on tile border edge case vertically", () => {
+    mockNonBlockingTile();
+
+    gridCharacter.move(Direction.DOWN);
+    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.move(Direction.RIGHT);
+    gridCharacter.update(83.33333333333333333333333333333333333333);
+    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 0);
+    expect(Math.round(spriteMock.y)).toEqual(INITIAL_SPRITE_Y_POS + 16);
+    expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, 1));
+  });
+
+  it("should stop moving on tile border edge case", () => {
+    mockNonBlockingTile();
+
+    gridCharacter.move(Direction.DOWN);
+    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.update(83.33333333333333333333333333333333333333);
+    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 0);
+    expect(Math.round(spriteMock.y)).toEqual(INITIAL_SPRITE_Y_POS + 16);
+    expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, 1));
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
   });
 
   it("should stop moving if blocking", () => {
@@ -437,6 +500,7 @@ describe("GridCharacter", () => {
   it("should set movement", async () => {
     const movement: Movement = <any>{
       setCharacter: jest.fn(),
+      update: jest.fn(),
     };
     const autoMovementSet = gridCharacter
       .autoMovementSet()
@@ -444,6 +508,8 @@ describe("GridCharacter", () => {
       .toPromise();
     gridCharacter.setMovement(movement);
     await autoMovementSet;
+    gridCharacter.update(100);
+    expect(movement.update).toHaveBeenCalledWith(100);
     expect(gridCharacter.getMovement()).toEqual(movement);
     expect(movement.setCharacter).toHaveBeenCalledWith(gridCharacter);
   });
