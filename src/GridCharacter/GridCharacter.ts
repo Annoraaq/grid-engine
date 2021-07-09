@@ -305,7 +305,9 @@ export class GridCharacter {
   }
 
   private startMoving(direction: Direction): void {
-    this.movementStarted$.next(direction);
+    if (direction != this.movementDirection) {
+      this.movementStarted$.next(direction);
+    }
     this.movementDirection = direction;
     this.facingDirection = direction;
     this.updateTilePos();

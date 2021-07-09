@@ -414,24 +414,43 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN);
   });
 
-  it("should continue moving vertically", (done) => {
+  it("should continue moving to different dir", async () => {
     mockNonBlockingTile();
 
-    gridCharacter
+    const prom = gridCharacter
       .positionChangeFinished()
-      .subscribe(({ exitTile, enterTile }) => {
-        expect(exitTile).toEqual(new Vector2(0, 0));
-        expect(enterTile).toEqual(new Vector2(0, 1));
-        done();
+      .pipe(take(1))
+      .toPromise();
+
+    gridCharacter.move(Direction.RIGHT);
+    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.move(Direction.DOWN);
+    gridCharacter.update(MS_FOR_12_PX);
+
+    const { exitTile, enterTile } = await prom;
+    expect(exitTile).toEqual(new Vector2(0, 0));
+    expect(enterTile).toEqual(new Vector2(1, 0));
+    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 16);
+    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS + 8);
+    expect(gridCharacter.getTilePos()).toEqual(new Vector2(1, 0));
+  });
+
+  it("should not trigger movementStarted on continuing", (done) => {
+    mockNonBlockingTile();
+
+    gridCharacter.move(Direction.RIGHT);
+    gridCharacter.update(MS_FOR_12_PX);
+
+    gridCharacter
+      .movementStarted()
+      .pipe(take(1))
+      .subscribe(() => {
+        done(new Error("Should not call movementStarted"));
       });
 
-    gridCharacter.move(Direction.DOWN);
+    gridCharacter.move(Direction.RIGHT);
     gridCharacter.update(MS_FOR_12_PX);
-    gridCharacter.move(Direction.DOWN);
-    gridCharacter.update(MS_FOR_12_PX);
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
-    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS + 24);
-    expect(gridCharacter.getTilePos()).toEqual(new Vector2(0, 1));
+    done();
   });
 
   it("should continue moving to different dir", (done) => {
