@@ -50,6 +50,10 @@ export class Vector2 {
     return new Vector2(Math.abs(this.x), Math.abs(this.y));
   }
 
+  length(): number {
+    return Math.sqrt(this.x * this.x + this.y * this.y);
+  }
+
   static min(vector1: Vector2, vector2: Vector2): Vector2 {
     if (vector1.x + vector1.y - vector2.x - vector2.y > 0) {
       return vector2;

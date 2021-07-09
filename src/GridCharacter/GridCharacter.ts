@@ -171,7 +171,6 @@ export class GridCharacter {
 
   isBlockingTile(tilePos: Vector2): boolean {
     return this.nextTilePos.equals(tilePos) || this.tilePos.equals(tilePos);
-    // return this.nextTilePos.equals(tilePos);
   }
 
   isBlockingDirection(direction: Direction): boolean {
@@ -314,9 +313,7 @@ export class GridCharacter {
 
   private updateTilePos() {
     this.tilePos = this.nextTilePos;
-    const newTilePos = this.nextTilePos.add(
-      directionVector(this.toMapDirection(this.movementDirection))
-    );
+    const newTilePos = this.tilePosInDirection(this.movementDirection);
     this.nextTilePos = newTilePos;
     this.positionChanged$.next({
       exitTile: this.tilePos,
@@ -330,45 +327,26 @@ export class GridCharacter {
     );
   }
 
-  private updateCharacterPosition(delta: number): void {
-    const maxMovementForDelta = this.getSpeedPerDelta(delta);
-    const distToTileBorder = this.getTileDistance(this.movementDirection)
+  private getDistToNextTile(): Vector2 {
+    return this.getTileDistance(this.movementDirection)
       .clone()
       .subtract(this.tileSizePixelsWalked)
       .multiply(directionVector(this.movementDirection));
+  }
 
-    if (
-      maxMovementForDelta
-        .abs()
-        .subtract(distToTileBorder.abs())
-        .equals(new Vector2(0, 0))
-    ) {
-      // case 2
-      // move and stop if not continue moving
-      this.moveCharacterSprite(maxMovementForDelta);
+  private updateCharacterPosition(delta: number): void {
+    const maxMovementForDelta = this.getSpeedPerDelta(delta);
+    const distToNextTile = this.getDistToNextTile();
+    const willCrossTileBorderThisUpdate =
+      distToNextTile.length() <= maxMovementForDelta.length();
 
-      if (this.shouldContinueMoving()) {
-        this.positionChangeFinished$.next({
-          exitTile: this.tilePos,
-          enterTile: this.nextTilePos,
-        });
-        this.updateTilePos();
-      } else {
-        this.stopMoving();
-      }
-    } else if (
-      Vector2.min(distToTileBorder.abs(), maxMovementForDelta.abs()).equals(
-        maxMovementForDelta.abs()
-      )
-    ) {
-      // case 1
-      // only move
-      this.moveCharacterSprite(maxMovementForDelta);
-    } else {
-      // case 3
-      // move to tile border, and continue in other dir recursively
-      this.moveCharacterSprite(distToTileBorder);
+    const distToWalk = willCrossTileBorderThisUpdate
+      ? distToNextTile
+      : maxMovementForDelta;
 
+    this.moveCharacterSprite(distToWalk);
+
+    if (willCrossTileBorderThisUpdate) {
       if (this.shouldContinueMoving()) {
         this.positionChangeFinished$.next({
           exitTile: this.tilePos,
@@ -376,16 +354,25 @@ export class GridCharacter {
         });
         this.startMoving(this.lastMovementImpulse);
 
-        const alpha = maxMovementForDelta.subtract(distToTileBorder);
-        const propVec = alpha.divide(maxMovementForDelta);
-        if (isNaN(propVec.x)) propVec.x = 0;
-        const prop = Math.max(Math.abs(propVec.x), Math.abs(propVec.y));
-
-        this.updateCharacterPosition(delta * prop);
+        this.updateCharacterPosition(
+          delta * this.getProportionWalked(maxMovementForDelta, distToNextTile)
+        );
       } else {
         this.stopMoving();
       }
     }
+  }
+
+  private getProportionWalked(
+    maxMovementForDelta: Vector2,
+    distToNextTile: Vector2
+  ): number {
+    const toWalkOnNextTileThisUpdate = maxMovementForDelta.subtract(
+      distToNextTile
+    );
+    const propVec = toWalkOnNextTileThisUpdate.divide(maxMovementForDelta);
+    if (isNaN(propVec.x)) propVec.x = 0;
+    return Math.max(Math.abs(propVec.x), Math.abs(propVec.y));
   }
 
   private shouldContinueMoving(): boolean {
