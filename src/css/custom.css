@@ -1,0 +1,132 @@
+/* stylelint-disable docusaurus/copyright-header */
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+ @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;0,800;1,400;1,700;1,800&display=swap');
+
+/* You can override the default Infima variables here. */
+:root {
+    --ifm-color-primary: #0EA5E9; /*#25c2a0;*/
+    --ifm-color-primary-dark: #0284C7; /*rgb(33, 175, 144);*/
+    --ifm-color-primary-darker: #0369A1; /*rgb(31, 165, 136);*/
+    --ifm-color-primary-darkest: #075985; /*rgb(26, 136, 112);*/
+    --ifm-color-primary-light: #38BDF8; /*rgb(70, 203, 174);*/
+    --ifm-color-primary-lighter: #7DD3FC; /*rgb(102, 212, 189);*/
+    --ifm-color-primary-lightest: #BAE6FD; /*rgb(146, 224, 208);*/
+    --ifm-code-font-size: 90%; /*95%;*/
+    --ifm-font-family-base: 'Open Sans';
+    --ifm-global-shadow-md: 0px;
+    --ifm-navbar-shadow: none;
+
+    --ifm-color-info: #06B6D4;
+    --ifm-color-primary: #0EA5E9;
+}
+
+.navbar {
+    border-bottom: 1px solid var(--ifm-toc-border-color);   
+}
+
+.docusaurus-highlight-code-line {
+  background-color: rgba(0, 0, 0, 0.1);
+  display: block;
+  margin: 0 calc(-1 * var(--ifm-pre-padding));
+  padding: 0 var(--ifm-pre-padding);
+}
+
+html[data-theme='dark'] .docusaurus-highlight-code-line {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme='dark'] {
+    --ifm-background-color: #1e2125;
+    --ifm-background-surface-color: #121212;
+    --ifm-navbar-background-color: #1e2125;
+}
+
+@media screen and (max-width: 996px) {
+    :root {
+        --ifm-font-size-base: 18px;
+    }
+    article header h1 {
+        font-size: 1.5rem !important;
+    }
+    .hero .hero__title {
+        font-size: 2.5rem;
+    }
+}
+
+@media screen and (min-width: 997px) {
+    :root {
+        --ifm-font-size-base: 17px;
+    }
+    article header h1 {
+        font-size: 2rem !important;
+    }
+}
+
+article {
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Announcement Bar */
+div[class^='announcementBarContent'] {
+    background-color: var(--ifm-background-surface-color);
+    color: var(--ifm-font-color-base);
+}
+  
+div[class^='announcementBarContent'] a {
+    color: var(--ifm-link-color);
+    text-decoration: inherit;
+}
+
+div[class^='announcementBarContent'] a:hover {
+    color: var(--ifm-link-color);
+    text-decoration: underline;
+}
+
+.navbar .navbar__items {
+    flex: auto;
+}
+
+/* Header Dropdown Menu */
+.dropdown__link {
+    font-size: inherit;
+}
+
+/* Adjust footer link colors */
+#__docusaurus > footer > div > div.text--center > div > a {
+    color: unset;
+}
+
+#__docusaurus > footer > div > div.text--center > div > a:hover {
+    color: var(--ifm-link-color);
+    text-decoration: underline;
+}
+
+@media screen and (min-width: 997px) {
+    /* Show inline table of contents on mobile only */
+    div[class^='tableOfContentsInline'] {
+        display: none;
+    }
+}
+
+.navbar__brand {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.separator {
+    height: 1px;
+    border-bottom: 1px solid var(--ifm-toc-border-color);
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}
+
+.badge--bm {
+    margin-bottom: 1rem;
+}
