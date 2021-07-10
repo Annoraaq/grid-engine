@@ -34,11 +34,23 @@ export class Vector2 {
     return new Vector2(this.x * vector.x, this.y * vector.y);
   }
 
+  divide(vector: Vector2): Vector2 {
+    return new Vector2(this.x / vector.x, this.y / vector.y);
+  }
+
   subtract(vector: Vector2): Vector2 {
     return new Vector2(this.x - vector.x, this.y - vector.y);
   }
 
   equals(vector: Vector2): boolean {
     return this.x === vector.x && this.y === vector.y;
+  }
+
+  abs(): Vector2 {
+    return new Vector2(Math.abs(this.x), Math.abs(this.y));
+  }
+
+  length(): number {
+    return Math.sqrt(this.x * this.x + this.y * this.y);
   }
 }
