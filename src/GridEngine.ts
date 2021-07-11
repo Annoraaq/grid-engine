@@ -1,3 +1,5 @@
+import { GlobalConfig } from "./GlobalConfig/GlobalConfig";
+import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { IsometricGridCharacter } from "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import {
@@ -37,6 +39,7 @@ export interface GridEngineConfig {
   characters: CharacterData[];
   collisionTilePropertyName?: string;
   numberOfDirections?: NumberOfDirections;
+  characterCollisionStrategy?: CollisionStrategy;
 }
 
 export interface WalkingAnimationMapping {
@@ -100,6 +103,8 @@ export class GridEngine {
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
     this.isCreated = true;
     this.gridCharacters = new Map();
+
+    GlobalConfig.set(config);
     this.tilemap = tilemap;
     this.movementStopped$ = new Subject<{
       charId: string;

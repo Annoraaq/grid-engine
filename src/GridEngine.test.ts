@@ -1,3 +1,4 @@
+import { GlobalConfig } from "./GlobalConfig/GlobalConfig";
 import { Subject, of } from "rxjs";
 import { take } from "rxjs/operators";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
@@ -334,6 +335,22 @@ describe("GridEngine", () => {
       walkingAnimationMapping,
     });
     expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
+  });
+
+  it("should init GlobalConfig", () => {
+    GlobalConfig.set = jest.fn();
+    const config = {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+          startPosition: new Vector2(3, 4),
+        },
+      ],
+    };
+    gridEngine.create(tileMapMock, config);
+    expect(GlobalConfig.set).toHaveBeenCalledWith(config);
   });
 
   it("should use config startPosition", () => {
