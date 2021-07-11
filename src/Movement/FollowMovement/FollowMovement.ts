@@ -4,9 +4,9 @@ import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
 import { Movement } from "../Movement";
-import { NoPathFoundStrategy } from "../../Algorithms/ShortestPath/NoPathFoundStrategy";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Position } from "../../GridEngine";
+import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 
 export class FollowMovement implements Movement {
   private character: GridCharacter;

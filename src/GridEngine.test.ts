@@ -1,5 +1,3 @@
-import { PathBlockedStrategy } from "./Algorithms/ShortestPath/PathBlockedStrategy";
-import { NoPathFoundStrategy } from "./Algorithms/ShortestPath/NoPathFoundStrategy";
 import { Subject, of } from "rxjs";
 import { take } from "rxjs/operators";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
@@ -142,6 +140,8 @@ import { TargetMovement } from "./Movement/TargetMovement/TargetMovement";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import { IsometricGridCharacter } from "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter";
 import { Vector2 } from "./Utils/Vector2/Vector2";
+import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
+import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;

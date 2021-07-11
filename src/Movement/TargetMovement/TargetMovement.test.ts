@@ -1,14 +1,14 @@
-import { NoPathFoundStrategy } from "./../../Algorithms/ShortestPath/NoPathFoundStrategy";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
 import { TargetMovement } from "./TargetMovement";
-import { PathBlockedStrategy } from "../../Algorithms/ShortestPath/PathBlockedStrategy";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
+import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
+import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
 
 const mockBfs = {
   getShortestPath: jest.fn(),
 };
 
-jest.mock("../../Algorithms/ShortestPath/Bfs/Bfs", function () {
+jest.mock("../../Pathfinding/Bfs/Bfs", function () {
   return {
     Bfs: jest.fn(function () {
       return mockBfs;

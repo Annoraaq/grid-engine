@@ -1,4 +1,3 @@
-import { PathBlockedStrategy } from "./Algorithms/ShortestPath/PathBlockedStrategy";
 import { IsometricGridCharacter } from "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import {
@@ -21,8 +20,9 @@ import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
-import { NoPathFoundStrategy } from "./Algorithms/ShortestPath/NoPathFoundStrategy";
 import { Vector2 } from "./Utils/Vector2/Vector2";
+import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
+import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 
 export { Direction };
 

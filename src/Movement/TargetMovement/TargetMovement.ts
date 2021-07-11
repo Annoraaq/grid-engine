@@ -1,16 +1,16 @@
-import { NoPathFoundStrategy } from "./../../Algorithms/ShortestPath/NoPathFoundStrategy";
-import { PathBlockedStrategy } from "./../../Algorithms/ShortestPath/PathBlockedStrategy";
 import { DistanceUtils } from "./../../Utils/DistanceUtils";
-import { ShortestPathAlgorithm } from "./../../Algorithms/ShortestPath/ShortestPathAlgorithm";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
-import { Bfs } from "../../Algorithms/ShortestPath/Bfs/Bfs";
+import { Bfs } from "../../Pathfinding/Bfs/Bfs";
 import { Movement } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Retryable } from "./Retryable/Retryable";
 import { DistanceUtils8 } from "../../Utils/DistanceUtils8/DistanceUtils8";
 import { DistanceUtils4 } from "../../Utils/DistanceUtils4/DistanceUtils4";
+import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
+import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
+import { ShortestPathAlgorithm } from "../../Pathfinding/ShortestPathAlgorithm";
 
 export interface MoveToConfig {
   noPathFoundStrategy?: NoPathFoundStrategy;

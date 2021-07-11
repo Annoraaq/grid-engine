@@ -1,5 +1,5 @@
-import { Vector2 } from "../../../Utils/Vector2/Vector2";
-import { VectorUtils } from "../../../Utils/VectorUtils";
+import { Vector2 } from "../../Utils/Vector2/Vector2";
+import { VectorUtils } from "../../Utils/VectorUtils";
 import { Bfs } from "./Bfs";
 
 describe("Bfs", () => {

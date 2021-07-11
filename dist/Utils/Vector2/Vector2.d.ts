@@ -12,6 +12,9 @@ export declare class Vector2 {
     clone(): Vector2;
     add(vector: Vector2): Vector2;
     multiply(vector: Vector2): Vector2;
+    divide(vector: Vector2): Vector2;
     subtract(vector: Vector2): Vector2;
     equals(vector: Vector2): boolean;
+    abs(): Vector2;
+    length(): number;
 }

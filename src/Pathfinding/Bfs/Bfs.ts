@@ -1,6 +1,6 @@
 import { ShortestPathAlgorithm } from "./../ShortestPathAlgorithm";
-import { VectorUtils } from "../../../Utils/VectorUtils";
-import { Vector2 } from "../../../Utils/Vector2/Vector2";
+import { VectorUtils } from "../../Utils/VectorUtils";
+import { Vector2 } from "../../Utils/Vector2/Vector2";
 
 interface ShortestPathTuple {
   shortestDistance: number;

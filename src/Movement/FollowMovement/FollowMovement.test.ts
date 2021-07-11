@@ -1,9 +1,9 @@
-import { NoPathFoundStrategy } from "./../../Algorithms/ShortestPath/NoPathFoundStrategy";
 import { NumberOfDirections } from "./../../Direction/Direction";
 import { FollowMovement } from "./FollowMovement";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
 import { Subject } from "rxjs";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
+import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 
 const mockTargetMovement = {
   setCharacter: jest.fn(),
