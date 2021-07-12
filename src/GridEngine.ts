@@ -25,6 +25,7 @@ import { takeUntil, filter } from "rxjs/operators";
 import { Vector2 } from "./Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
+import { Concrete } from "./Utils/TypeUtils";
 
 export { Direction };
 
@@ -100,11 +101,24 @@ export class GridEngine {
     this.charRemoved$ = undefined;
   }
 
+  private setConfigDefaults(
+    config: GridEngineConfig
+  ): Concrete<GridEngineConfig> {
+    return {
+      collisionTilePropertyName: "ge_collide",
+      numberOfDirections: NumberOfDirections.FOUR,
+      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
+      ...config,
+    };
+  }
+
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
     this.isCreated = true;
     this.gridCharacters = new Map();
 
-    GlobalConfig.set(config);
+    const concreteConfig = this.setConfigDefaults(config);
+
+    GlobalConfig.set(concreteConfig);
     this.tilemap = tilemap;
     this.movementStopped$ = new Subject<{
       charId: string;

@@ -1,3 +1,4 @@
+import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { GlobalConfig } from "./GlobalConfig/GlobalConfig";
 import { Subject, of } from "rxjs";
 import { take } from "rxjs/operators";
@@ -337,7 +338,7 @@ describe("GridEngine", () => {
     expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
   });
 
-  it("should init GlobalConfig", () => {
+  it("should init GlobalConfig with default values", () => {
     GlobalConfig.set = jest.fn();
     const config = {
       characters: [
@@ -350,7 +351,33 @@ describe("GridEngine", () => {
       ],
     };
     gridEngine.create(tileMapMock, config);
-    expect(GlobalConfig.set).toHaveBeenCalledWith(config);
+    expect(GlobalConfig.set).toHaveBeenCalledWith({
+      ...config,
+      collisionTilePropertyName: "ge_collide",
+      numberOfDirections: NumberOfDirections.FOUR,
+      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
+    });
+  });
+
+  it("should override GlobalConfig default values", () => {
+    GlobalConfig.set = jest.fn();
+    const config = {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+          startPosition: new Vector2(3, 4),
+        },
+      ],
+      collisionTilePropertyName: "custom_name",
+      numberOfDirections: NumberOfDirections.EIGHT,
+      characterCollisionStrategy: CollisionStrategy.BLOCK_ONE_TILE_AHEAD,
+    };
+    gridEngine.create(tileMapMock, config);
+    expect(GlobalConfig.set).toHaveBeenCalledWith({
+      ...config,
+    });
   });
 
   it("should use config startPosition", () => {
