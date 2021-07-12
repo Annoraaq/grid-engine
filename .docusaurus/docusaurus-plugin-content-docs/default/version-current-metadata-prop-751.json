@@ -1,0 +1,62 @@
+{
+  "pluginId": "default",
+  "version": "current",
+  "label": "Next",
+  "banner": "none",
+  "isLast": true,
+  "docsSidebars": {
+    "tutorialSidebar": [
+      {
+        "type": "link",
+        "label": "Intro",
+        "href": "/"
+      },
+      {
+        "type": "link",
+        "label": "Methods",
+        "href": "/methods"
+      },
+      {
+        "type": "category",
+        "label": "API",
+        "items": [
+          {
+            "type": "link",
+            "label": "GridEngineConfig",
+            "href": "/api/gridengineconfig"
+          },
+          {
+            "type": "link",
+            "label": "CharacterData",
+            "href": "/api/characterdata"
+          },
+          {
+            "type": "link",
+            "label": "WalkingAnimationMapping",
+            "href": "/api/walkinganimationmapping"
+          },
+          {
+            "type": "link",
+            "label": "Position",
+            "href": "/api/position"
+          },
+          {
+            "type": "link",
+            "label": "Direction",
+            "href": "/api/direction"
+          }
+        ],
+        "collapsed": true
+      }
+    ]
+  },
+  "permalinkToSidebar": {
+    "/api/characterdata": "tutorialSidebar",
+    "/api/direction": "tutorialSidebar",
+    "/api/gridengineconfig": "tutorialSidebar",
+    "/api/position": "tutorialSidebar",
+    "/api/walkinganimationmapping": "tutorialSidebar",
+    "/": "tutorialSidebar",
+    "/methods": "tutorialSidebar"
+  }
+}

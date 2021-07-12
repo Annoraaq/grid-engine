@@ -1,0 +1,23 @@
+{
+  "unversionedId": "api/direction",
+  "id": "api/direction",
+  "isDocsHomePage": false,
+  "title": "Direction",
+  "description": "Direction is an enum that more easily allows us to pass a desired direction in our code.",
+  "source": "@site/docs/api/direction.md",
+  "sourceDirName": "api",
+  "slug": "/api/direction",
+  "permalink": "/api/direction",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/api/direction.md",
+  "version": "current",
+  "sidebarPosition": 5,
+  "frontMatter": {
+    "sidebar_title": "Direction",
+    "sidebar_position": 5
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Position",
+    "permalink": "/api/position"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "unversionedId": "manage-versions",
+  "id": "manage-versions",
+  "isDocsHomePage": false,
+  "title": "Manage Versions",
+  "description": "Docusaurus can manage multiple versions of your documentation.",
+  "source": "@site/docs/manage-versions.md",
+  "slug": "/manage-versions",
+  "permalink": "/docs/manage-versions",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/manage-versions.md",
+  "version": "current",
+  "sidebar": "tutorial",
+  "previous": {
+    "title": "Congratulations!",
+    "permalink": "/docs/congratulations"
+  },
+  "next": {
+    "title": "Translate your site",
+    "permalink": "/docs/translate-your-site"
+  }
+}

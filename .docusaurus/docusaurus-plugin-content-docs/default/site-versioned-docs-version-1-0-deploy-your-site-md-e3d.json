@@ -1,0 +1,21 @@
+{
+  "unversionedId": "deploy-your-site",
+  "id": "version-1.0/deploy-your-site",
+  "isDocsHomePage": false,
+  "title": "Deploy your site",
+  "description": "Docusaurus is a static-site-generator (also called Jamstack), and builds your site as a set of static HTML, JavaScript and CSS files.",
+  "source": "@site/versioned_docs/version-1.0/deploy-your-site.md",
+  "slug": "/deploy-your-site",
+  "permalink": "/docs/deploy-your-site",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/versioned_docs/version-1.0/deploy-your-site.md",
+  "version": "1.0",
+  "sidebar": "version-1.0/docs",
+  "previous": {
+    "title": "Thank you!",
+    "permalink": "/docs/thank-you"
+  },
+  "next": {
+    "title": "Translate your site",
+    "permalink": "/docs/translate-your-site"
+  }
+}

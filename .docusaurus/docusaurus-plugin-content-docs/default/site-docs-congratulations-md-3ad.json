@@ -1,0 +1,25 @@
+{
+  "unversionedId": "congratulations",
+  "id": "congratulations",
+  "isDocsHomePage": false,
+  "title": "Congratulations!",
+  "description": "Congratulations on making it this far!",
+  "source": "@site/docs/congratulations.md",
+  "sourceDirName": ".",
+  "slug": "/congratulations",
+  "permalink": "/docs/congratulations",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/congratulations.md",
+  "version": "current",
+  "frontMatter": {
+    "title": "Congratulations!"
+  },
+  "sidebar": "mySiteSidebar",
+  "previous": {
+    "title": "Getting Started",
+    "permalink": "/docs/"
+  },
+  "next": {
+    "title": "Create a Blog Post",
+    "permalink": "/docs/create-a-blog-post"
+  }
+}

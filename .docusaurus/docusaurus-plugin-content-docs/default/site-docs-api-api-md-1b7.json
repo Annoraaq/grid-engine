@@ -1,0 +1,23 @@
+{
+  "unversionedId": "api/api",
+  "id": "api/api",
+  "isDocsHomePage": false,
+  "title": "Stuff!",
+  "description": "",
+  "source": "@site/docs/api/api.md",
+  "sourceDirName": "api",
+  "slug": "/api/api",
+  "permalink": "/docs/api/api",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/api/api.md",
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Intro",
+    "permalink": "/docs/intro"
+  },
+  "next": {
+    "title": "Create a Page",
+    "permalink": "/docs/tutorial-basics/create-a-page"
+  }
+}

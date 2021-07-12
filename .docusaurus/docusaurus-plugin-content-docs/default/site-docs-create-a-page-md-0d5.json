@@ -1,0 +1,25 @@
+{
+  "unversionedId": "create-a-page",
+  "id": "create-a-page",
+  "isDocsHomePage": false,
+  "title": "Create a Page",
+  "description": "Add Markdown or React files to src/pages to create standalone pages:",
+  "source": "@site/docs/create-a-page.md",
+  "sourceDirName": ".",
+  "slug": "/create-a-page",
+  "permalink": "/docs/create-a-page",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/create-a-page.md",
+  "version": "current",
+  "frontMatter": {
+    "title": "Create a Page"
+  },
+  "sidebar": "mySiteSidebar",
+  "previous": {
+    "title": "Create a Document",
+    "permalink": "/docs/create-a-document"
+  },
+  "next": {
+    "title": "Deploy your site",
+    "permalink": "/docs/deploy-your-site"
+  }
+}

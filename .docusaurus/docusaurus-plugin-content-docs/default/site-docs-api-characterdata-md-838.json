@@ -1,0 +1,27 @@
+{
+  "unversionedId": "api/characterdata",
+  "id": "api/characterdata",
+  "isDocsHomePage": false,
+  "title": "CharacterData",
+  "description": "An Object that contains various properties for characters. These Objects get registered into Grid Engine via GridEngineConfig.",
+  "source": "@site/docs/api/characterdata.md",
+  "sourceDirName": "api",
+  "slug": "/api/characterdata",
+  "permalink": "/api/characterdata",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/api/characterdata.md",
+  "version": "current",
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_title": "CharacterData",
+    "sidebar_position": 2
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "GridEngineConfig",
+    "permalink": "/api/gridengineconfig"
+  },
+  "next": {
+    "title": "WalkingAnimationMapping",
+    "permalink": "/api/walkinganimationmapping"
+  }
+}

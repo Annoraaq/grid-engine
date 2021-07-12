@@ -1,0 +1,21 @@
+{
+  "unversionedId": "translate-your-site",
+  "id": "version-1.0/translate-your-site",
+  "isDocsHomePage": false,
+  "title": "Translate your site",
+  "description": "In this page we would cover translate .md files. We are going to translate the Getting Started page in the Docusaurus Tutorial section to French - \"fr\".",
+  "source": "@site/versioned_docs/version-1.0/translate-your-site.md",
+  "slug": "/translate-your-site",
+  "permalink": "/docs/translate-your-site",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/versioned_docs/version-1.0/translate-your-site.md",
+  "version": "1.0",
+  "sidebar": "version-1.0/docs",
+  "previous": {
+    "title": "Deploy your site",
+    "permalink": "/docs/deploy-your-site"
+  },
+  "next": {
+    "title": "Manage Versions",
+    "permalink": "/docs/manage-versions"
+  }
+}

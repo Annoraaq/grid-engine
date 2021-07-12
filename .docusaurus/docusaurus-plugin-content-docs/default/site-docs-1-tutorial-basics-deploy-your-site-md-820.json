@@ -1,0 +1,26 @@
+{
+  "unversionedId": "tutorial-basics/deploy-your-site",
+  "id": "tutorial-basics/deploy-your-site",
+  "isDocsHomePage": false,
+  "title": "Deploy your site",
+  "description": "Docusaurus is a static-site-generator (also called Jamstack), and builds your site as static HTML, JavaScript and CSS files.",
+  "source": "@site/docs/1-tutorial-basics/deploy-your-site.md",
+  "sourceDirName": "1-tutorial-basics",
+  "slug": "/tutorial-basics/deploy-your-site",
+  "permalink": "/docs/tutorial-basics/deploy-your-site",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/1-tutorial-basics/deploy-your-site.md",
+  "version": "current",
+  "sidebarPosition": 6,
+  "frontMatter": {
+    "sidebar_position": 6
+  },
+  "sidebar": "mySiteSidebar",
+  "previous": {
+    "title": "Create a Blog Post",
+    "permalink": "/docs/tutorial-basics/create-a-blog-post"
+  },
+  "next": {
+    "title": "Congratulations!",
+    "permalink": "/docs/tutorial-basics/congratulations"
+  }
+}

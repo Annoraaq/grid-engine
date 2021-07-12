@@ -1,0 +1,22 @@
+{
+  "unversionedId": "tutorial-extras/translate-your-site",
+  "id": "version-1.0/tutorial-extras/translate-your-site",
+  "isDocsHomePage": false,
+  "title": "Translate your site",
+  "description": "Let's translate docs/getting-started.md to French.",
+  "source": "@site/versioned_docs/version-1.0/tutorial-extras/translate-your-site.md",
+  "sourceDirName": "tutorial-extras",
+  "slug": "/tutorial-extras/translate-your-site",
+  "permalink": "/docs/1.0/tutorial-extras/translate-your-site",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/versioned_docs/version-1.0/tutorial-extras/translate-your-site.md",
+  "version": "1.0",
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_position": 2
+  },
+  "sidebar": "version-1.0/tutorialSidebar",
+  "previous": {
+    "title": "Manage Docs Versions",
+    "permalink": "/docs/1.0/tutorial-extras/manage-docs-versions"
+  }
+}

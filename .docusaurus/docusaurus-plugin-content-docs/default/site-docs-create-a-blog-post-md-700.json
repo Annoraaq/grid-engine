@@ -1,0 +1,25 @@
+{
+  "unversionedId": "create-a-blog-post",
+  "id": "create-a-blog-post",
+  "isDocsHomePage": false,
+  "title": "Create a Blog Post",
+  "description": "Docusaurus creates a page for each blog post, but also a blog index page, a tag system, an RSS feed...",
+  "source": "@site/docs/create-a-blog-post.md",
+  "sourceDirName": ".",
+  "slug": "/create-a-blog-post",
+  "permalink": "/docs/create-a-blog-post",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/create-a-blog-post.md",
+  "version": "current",
+  "frontMatter": {
+    "title": "Create a Blog Post"
+  },
+  "sidebar": "mySiteSidebar",
+  "previous": {
+    "title": "Congratulations!",
+    "permalink": "/docs/congratulations"
+  },
+  "next": {
+    "title": "Create a Document",
+    "permalink": "/docs/create-a-document"
+  }
+}

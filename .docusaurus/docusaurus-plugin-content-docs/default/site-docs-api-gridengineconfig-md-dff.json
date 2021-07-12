@@ -1,0 +1,27 @@
+{
+  "unversionedId": "api/gridengineconfig",
+  "id": "api/gridengineconfig",
+  "isDocsHomePage": false,
+  "title": "GridEngineConfig",
+  "description": "Grid Engine accepts an Object for configuration. This is usually through the GridEngineConfig interface. Here you'll find properties of GridEngineConfig and a description as well.",
+  "source": "@site/docs/api/gridengineconfig.md",
+  "sourceDirName": "api",
+  "slug": "/api/gridengineconfig",
+  "permalink": "/api/gridengineconfig",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/api/gridengineconfig.md",
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_title": "GridEngineConfig",
+    "sidebar_position": 1
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Methods",
+    "permalink": "/methods"
+  },
+  "next": {
+    "title": "CharacterData",
+    "permalink": "/api/characterdata"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "path": "/",
+      "versions": [
+        {
+          "name": "current",
+          "label": "Next",
+          "isLast": true,
+          "path": "/",
+          "mainDocId": "intro",
+          "docs": [
+            {
+              "id": "api/characterdata",
+              "path": "/api/characterdata",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "api/direction",
+              "path": "/api/direction",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "api/gridengineconfig",
+              "path": "/api/gridengineconfig",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "api/position",
+              "path": "/api/position",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "api/walkinganimationmapping",
+              "path": "/api/walkinganimationmapping",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "intro",
+              "path": "/",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "methods",
+              "path": "/methods",
+              "sidebar": "tutorialSidebar"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

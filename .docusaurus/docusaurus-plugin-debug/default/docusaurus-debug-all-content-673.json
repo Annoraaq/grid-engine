@@ -1,0 +1,273 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "loadedVersions": [
+        {
+          "versionName": "current",
+          "versionLabel": "Next",
+          "versionPath": "/",
+          "versionEditUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs",
+          "versionEditUrlLocalized": "https://github.com/facebook/docusaurus/edit/master/website/i18n/en/docusaurus-plugin-content-docs/current",
+          "versionBanner": "none",
+          "isLast": true,
+          "routePriority": -1,
+          "sidebarFilePath": "C:\\Users\\skyle\\Projects\\ge-docs\\sidebars.js",
+          "contentPath": "C:\\Users\\skyle\\Projects\\ge-docs\\docs",
+          "contentPathLocalized": "C:\\Users\\skyle\\Projects\\ge-docs\\i18n\\en\\docusaurus-plugin-content-docs\\current",
+          "mainDocId": "intro",
+          "sidebars": {
+            "tutorialSidebar": [
+              {
+                "type": "doc",
+                "id": "intro",
+                "label": "Intro"
+              },
+              {
+                "type": "doc",
+                "id": "methods",
+                "label": "Methods"
+              },
+              {
+                "type": "category",
+                "label": "API",
+                "items": [
+                  {
+                    "type": "doc",
+                    "id": "api/gridengineconfig"
+                  },
+                  {
+                    "type": "doc",
+                    "id": "api/characterdata"
+                  },
+                  {
+                    "type": "doc",
+                    "id": "api/walkinganimationmapping"
+                  },
+                  {
+                    "type": "doc",
+                    "id": "api/position"
+                  },
+                  {
+                    "type": "doc",
+                    "id": "api/direction"
+                  }
+                ],
+                "collapsed": true
+              }
+            ]
+          },
+          "permalinkToSidebar": {
+            "/api/characterdata": "tutorialSidebar",
+            "/api/direction": "tutorialSidebar",
+            "/api/gridengineconfig": "tutorialSidebar",
+            "/api/position": "tutorialSidebar",
+            "/api/walkinganimationmapping": "tutorialSidebar",
+            "/": "tutorialSidebar",
+            "/methods": "tutorialSidebar"
+          },
+          "docs": [
+            {
+              "unversionedId": "api/characterdata",
+              "id": "api/characterdata",
+              "isDocsHomePage": false,
+              "title": "CharacterData",
+              "description": "An Object that contains various properties for characters. These Objects get registered into Grid Engine via GridEngineConfig.",
+              "source": "@site/docs/api/characterdata.md",
+              "sourceDirName": "api",
+              "slug": "/api/characterdata",
+              "permalink": "/api/characterdata",
+              "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/api/characterdata.md",
+              "version": "current",
+              "sidebarPosition": 2,
+              "frontMatter": {
+                "sidebar_title": "CharacterData",
+                "sidebar_position": 2
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "GridEngineConfig",
+                "permalink": "/api/gridengineconfig"
+              },
+              "next": {
+                "title": "WalkingAnimationMapping",
+                "permalink": "/api/walkinganimationmapping"
+              }
+            },
+            {
+              "unversionedId": "api/direction",
+              "id": "api/direction",
+              "isDocsHomePage": false,
+              "title": "Direction",
+              "description": "Direction is an enum that more easily allows us to pass a desired direction in our code.",
+              "source": "@site/docs/api/direction.md",
+              "sourceDirName": "api",
+              "slug": "/api/direction",
+              "permalink": "/api/direction",
+              "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/api/direction.md",
+              "version": "current",
+              "sidebarPosition": 5,
+              "frontMatter": {
+                "sidebar_title": "Direction",
+                "sidebar_position": 5
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Position",
+                "permalink": "/api/position"
+              }
+            },
+            {
+              "unversionedId": "api/gridengineconfig",
+              "id": "api/gridengineconfig",
+              "isDocsHomePage": false,
+              "title": "GridEngineConfig",
+              "description": "Grid Engine accepts an Object for configuration. This is usually through the GridEngineConfig interface. Here you'll find properties of GridEngineConfig and a description as well.",
+              "source": "@site/docs/api/gridengineconfig.md",
+              "sourceDirName": "api",
+              "slug": "/api/gridengineconfig",
+              "permalink": "/api/gridengineconfig",
+              "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/api/gridengineconfig.md",
+              "version": "current",
+              "sidebarPosition": 1,
+              "frontMatter": {
+                "sidebar_title": "GridEngineConfig",
+                "sidebar_position": 1
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Methods",
+                "permalink": "/methods"
+              },
+              "next": {
+                "title": "CharacterData",
+                "permalink": "/api/characterdata"
+              }
+            },
+            {
+              "unversionedId": "api/position",
+              "id": "api/position",
+              "isDocsHomePage": false,
+              "title": "Position",
+              "description": "This type exists purely to avoid using the Phaser.Math.Vector2 Object everywhere. It simply contains an x and a y property, each of which are number.",
+              "source": "@site/docs/api/position.md",
+              "sourceDirName": "api",
+              "slug": "/api/position",
+              "permalink": "/api/position",
+              "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/api/position.md",
+              "version": "current",
+              "sidebarPosition": 4,
+              "frontMatter": {
+                "sidebar_title": "Position",
+                "sidebar_position": 4
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "WalkingAnimationMapping",
+                "permalink": "/api/walkinganimationmapping"
+              },
+              "next": {
+                "title": "Direction",
+                "permalink": "/api/direction"
+              }
+            },
+            {
+              "unversionedId": "api/walkinganimationmapping",
+              "id": "api/walkinganimationmapping",
+              "isDocsHomePage": false,
+              "title": "WalkingAnimationMapping",
+              "description": "This Object defines custom mapping for spritesheets that don't match up with the example spritesheet.",
+              "source": "@site/docs/api/walkinganimationmapping.md",
+              "sourceDirName": "api",
+              "slug": "/api/walkinganimationmapping",
+              "permalink": "/api/walkinganimationmapping",
+              "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/api/walkinganimationmapping.md",
+              "version": "current",
+              "sidebarPosition": 3,
+              "frontMatter": {
+                "sidebar_title": "WalkingAnimationMapping",
+                "sidebar_position": 3
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "CharacterData",
+                "permalink": "/api/characterdata"
+              },
+              "next": {
+                "title": "Position",
+                "permalink": "/api/position"
+              }
+            },
+            {
+              "unversionedId": "intro",
+              "id": "intro",
+              "isDocsHomePage": false,
+              "title": "👋 Intro",
+              "description": "Welcome to the Grid Engine plugin! This Phaser 3 plugin adds grid-based movement to your tilemap game. Your characters will be able to only move in whole tile sizes, locked to the x-y grid!",
+              "source": "@site/docs/intro.md",
+              "sourceDirName": ".",
+              "slug": "/",
+              "permalink": "/",
+              "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/intro.md",
+              "version": "current",
+              "sidebarPosition": 1,
+              "frontMatter": {
+                "sidebar_label": "Intro",
+                "sidebar_position": 1,
+                "slug": "/"
+              },
+              "sidebar": "tutorialSidebar",
+              "next": {
+                "title": "Methods",
+                "permalink": "/methods"
+              }
+            },
+            {
+              "unversionedId": "methods",
+              "id": "methods",
+              "isDocsHomePage": false,
+              "title": "Methods",
+              "description": "This is a compendium of the methods within the plugin, as well as a description of their function.",
+              "source": "@site/docs/methods.md",
+              "sourceDirName": ".",
+              "slug": "/methods",
+              "permalink": "/methods",
+              "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/methods.md",
+              "version": "current",
+              "sidebarPosition": 2,
+              "frontMatter": {
+                "sidebar_label": "Methods",
+                "sidebar_position": 2
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Intro",
+                "permalink": "/"
+              },
+              "next": {
+                "title": "GridEngineConfig",
+                "permalink": "/api/gridengineconfig"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "docusaurus-plugin-content-blog": {
+    "default": {
+      "blogPosts": [],
+      "blogListPaginated": [],
+      "blogTags": {},
+      "blogTagsListPath": null
+    }
+  },
+  "docusaurus-plugin-content-pages": {
+    "default": []
+  },
+  "docusaurus-plugin-debug": {
+    "default": null
+  },
+  "docusaurus-theme-classic": {
+    "default": null
+  }
+}

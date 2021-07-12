@@ -1,0 +1,21 @@
+{
+  "unversionedId": "create-a-post",
+  "id": "create-a-post",
+  "isDocsHomePage": false,
+  "title": "Create a Post",
+  "description": "This page will help you on how to create blog posts in Docusaurus.",
+  "source": "@site/docs/create-a-post.md",
+  "slug": "/create-a-post",
+  "permalink": "/docs/create-a-post",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/create-a-post.md",
+  "version": "current",
+  "sidebar": "docs",
+  "previous": {
+    "title": "Create a Page",
+    "permalink": "/docs/create-a-page"
+  },
+  "next": {
+    "title": "Markdown Features",
+    "permalink": "/docs/markdown-features"
+  }
+}

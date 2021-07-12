@@ -1,0 +1,56 @@
+{
+  "/__docusaurus/debug-3d6": {
+    "component": "component---theme-debug-config-23-a-2ff"
+  },
+  "/__docusaurus/debug/config-914": {
+    "component": "component---theme-debug-config-23-a-2ff"
+  },
+  "/__docusaurus/debug/content-c28": {
+    "component": "component---theme-debug-contentba-8-ce7",
+    "allContent": "allContent---docusaurus-debug-content-246-9aa"
+  },
+  "/__docusaurus/debug/globalData-3cf": {
+    "component": "component---theme-debug-global-dataede-0fa"
+  },
+  "/__docusaurus/debug/metadata-31b": {
+    "component": "component---theme-debug-site-metadata-68-e-3d4"
+  },
+  "/__docusaurus/debug/registry-0da": {
+    "component": "component---theme-debug-registry-679-501"
+  },
+  "/__docusaurus/debug/routes-244": {
+    "component": "component---theme-debug-routes-946-699"
+  },
+  "/-6d6": {
+    "component": "component---theme-doc-page-1-be-9be",
+    "versionMetadata": "versionMetadata---935-fcf"
+  },
+  "/-546": {
+    "component": "component---theme-doc-item-178-a40",
+    "content": "content---0-e-3-279"
+  },
+  "/api/characterdata-888": {
+    "component": "component---theme-doc-item-178-a40",
+    "content": "content---api-characterdata-838-abe"
+  },
+  "/api/direction-236": {
+    "component": "component---theme-doc-item-178-a40",
+    "content": "content---api-direction-07-c-8da"
+  },
+  "/api/gridengineconfig-3ef": {
+    "component": "component---theme-doc-item-178-a40",
+    "content": "content---api-gridengineconfigdff-026"
+  },
+  "/api/position-a7b": {
+    "component": "component---theme-doc-item-178-a40",
+    "content": "content---api-position-25-f-eea"
+  },
+  "/api/walkinganimationmapping-d84": {
+    "component": "component---theme-doc-item-178-a40",
+    "content": "content---api-walkinganimationmapping-9-d-6-caf"
+  },
+  "/methods-602": {
+    "component": "component---theme-doc-item-178-a40",
+    "content": "content---methodsfa-1-52a"
+  }
+}

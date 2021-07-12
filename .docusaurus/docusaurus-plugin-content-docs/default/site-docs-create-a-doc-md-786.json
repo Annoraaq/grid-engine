@@ -1,0 +1,21 @@
+{
+  "unversionedId": "create-a-doc",
+  "id": "create-a-doc",
+  "isDocsHomePage": false,
+  "title": "Create a Document",
+  "description": "Documents are the main feature of Docusaurus.",
+  "source": "@site/docs/create-a-doc.md",
+  "slug": "/create-a-doc",
+  "permalink": "/docs/create-a-doc",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/create-a-doc.md",
+  "version": "current",
+  "sidebar": "docs",
+  "previous": {
+    "title": "Create a Page",
+    "permalink": "/docs/create-a-page"
+  },
+  "next": {
+    "title": "Create a Blog Post",
+    "permalink": "/docs/create-a-blog-post"
+  }
+}

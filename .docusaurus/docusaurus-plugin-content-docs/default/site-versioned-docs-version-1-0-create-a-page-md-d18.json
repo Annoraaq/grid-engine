@@ -1,0 +1,21 @@
+{
+  "unversionedId": "create-a-page",
+  "id": "version-1.0/create-a-page",
+  "isDocsHomePage": false,
+  "title": "Create a Page",
+  "description": "Any React or Markdown file created under src/pages directory is converted into a website page:",
+  "source": "@site/versioned_docs/version-1.0/create-a-page.md",
+  "slug": "/create-a-page",
+  "permalink": "/docs/create-a-page",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/versioned_docs/version-1.0/create-a-page.md",
+  "version": "1.0",
+  "sidebar": "version-1.0/docs",
+  "previous": {
+    "title": "Getting Started",
+    "permalink": "/docs/"
+  },
+  "next": {
+    "title": "Create a Document",
+    "permalink": "/docs/create-a-document"
+  }
+}

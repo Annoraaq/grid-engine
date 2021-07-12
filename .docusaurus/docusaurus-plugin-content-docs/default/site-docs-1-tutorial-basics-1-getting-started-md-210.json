@@ -1,0 +1,22 @@
+{
+  "unversionedId": "Tutorial - Basics/getting-started",
+  "id": "Tutorial - Basics/getting-started",
+  "isDocsHomePage": false,
+  "title": "Getting Started",
+  "description": "Get started by creating a new site",
+  "source": "@site/docs/1-Tutorial - Basics/1-getting-started.md",
+  "sourceDirName": "1-Tutorial - Basics",
+  "slug": "/",
+  "permalink": "/docs/",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/1-Tutorial - Basics/1-getting-started.md",
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "slug": "/"
+  },
+  "sidebar": "mySiteSidebar",
+  "next": {
+    "title": "Create a Page",
+    "permalink": "/docs/Tutorial - Basics/create-a-page"
+  }
+}

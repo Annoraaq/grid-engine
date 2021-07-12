@@ -1,0 +1,21 @@
+{
+  "unversionedId": "thank-you",
+  "id": "thank-you",
+  "isDocsHomePage": false,
+  "title": "Thank you!",
+  "description": "Congratulations on making it this far!",
+  "source": "@site/docs/thank-you.md",
+  "slug": "/thank-you",
+  "permalink": "/docs/thank-you",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/thank-you.md",
+  "version": "current",
+  "sidebar": "tutorial",
+  "previous": {
+    "title": "Deploy your site",
+    "permalink": "/docs/deploy-your-site"
+  },
+  "next": {
+    "title": "Manage Versions",
+    "permalink": "/docs/manage-versions"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "unversionedId": "markdown-features",
+  "id": "markdown-features",
+  "isDocsHomePage": false,
+  "title": "Markdown Features",
+  "description": "Docusaurus supports Markdown and a few additional features.",
+  "source": "@site/docs/markdown-features.mdx",
+  "sourceDirName": ".",
+  "slug": "/markdown-features",
+  "permalink": "/docs/markdown-features",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/markdown-features.mdx",
+  "version": "current",
+  "frontMatter": {
+    "title": "Markdown Features"
+  },
+  "sidebar": "mySiteSidebar",
+  "previous": {
+    "title": "Manage Docs Versions",
+    "permalink": "/docs/manage-docs-versions"
+  },
+  "next": {
+    "title": "Translate your site",
+    "permalink": "/docs/translate-your-site"
+  }
+}

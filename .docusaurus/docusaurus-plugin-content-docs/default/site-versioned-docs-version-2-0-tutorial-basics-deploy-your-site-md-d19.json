@@ -1,0 +1,26 @@
+{
+  "unversionedId": "tutorial-basics/deploy-your-site",
+  "id": "version-2.0/tutorial-basics/deploy-your-site",
+  "isDocsHomePage": false,
+  "title": "Deploy your site",
+  "description": "Docusaurus is a static-site-generator (also called Jamstack).",
+  "source": "@site/versioned_docs/version-2.0/tutorial-basics/deploy-your-site.md",
+  "sourceDirName": "tutorial-basics",
+  "slug": "/tutorial-basics/deploy-your-site",
+  "permalink": "/docs/tutorial-basics/deploy-your-site",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/versioned_docs/version-2.0/tutorial-basics/deploy-your-site.md",
+  "version": "2.0",
+  "sidebarPosition": 6,
+  "frontMatter": {
+    "sidebar_position": 6
+  },
+  "sidebar": "version-2.0/tutorialSidebar",
+  "previous": {
+    "title": "Markdown Features",
+    "permalink": "/docs/tutorial-basics/markdown-features"
+  },
+  "next": {
+    "title": "Congratulations!",
+    "permalink": "/docs/tutorial-basics/congratulations"
+  }
+}

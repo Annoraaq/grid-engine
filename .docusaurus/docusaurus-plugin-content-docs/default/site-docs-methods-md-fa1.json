@@ -1,0 +1,27 @@
+{
+  "unversionedId": "methods",
+  "id": "methods",
+  "isDocsHomePage": false,
+  "title": "Methods",
+  "description": "This is a compendium of the methods within the plugin, as well as a description of their function.",
+  "source": "@site/docs/methods.md",
+  "sourceDirName": ".",
+  "slug": "/methods",
+  "permalink": "/methods",
+  "editUrl": "https://github.com/facebook/docusaurus/edit/master/website/docs/methods.md",
+  "version": "current",
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_label": "Methods",
+    "sidebar_position": 2
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Intro",
+    "permalink": "/"
+  },
+  "next": {
+    "title": "GridEngineConfig",
+    "permalink": "/api/gridengineconfig"
+  }
+}
