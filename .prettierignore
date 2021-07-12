@@ -5,4 +5,5 @@ _site
 vendor
 node_modules
 **/*.d.ts
-.vscode
+examples/assets
+**/*.min.js
