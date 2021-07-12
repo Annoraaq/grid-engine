@@ -140,11 +140,6 @@ export class GridEngine {
     >();
     this.charRemoved$ = new Subject<string>();
     this.gridTilemap = new GridTilemap(tilemap);
-    if (config.collisionTilePropertyName) {
-      this.gridTilemap.setCollisionTilePropertyName(
-        config.collisionTilePropertyName
-      );
-    }
 
     this.numberOfDirections =
       config.numberOfDirections || this.numberOfDirections;

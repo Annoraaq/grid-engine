@@ -32,7 +32,6 @@ const mockFollowMovement = {
 const mockGridTileMap = {
   addCharacter: jest.fn(),
   removeCharacter: jest.fn(),
-  setCollisionTilePropertyName: jest.fn(),
   getTileWidth: () => 32,
   getTileHeight: () => 32,
 };
@@ -208,12 +207,8 @@ describe("GridEngine", () => {
           sprite: playerSpriteMock,
         },
       ],
-      collisionTilePropertyName: "custom_collision_prop",
     });
     expect(mockGridTilemapConstructor).toHaveBeenCalledWith(tileMapMock);
-    expect(mockGridTileMap.setCollisionTilePropertyName).toHaveBeenCalledWith(
-      "custom_collision_prop"
-    );
   });
 
   it("should init player", () => {

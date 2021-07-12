@@ -3,7 +3,7 @@ import { GridEngineConfig } from "./../../dist/GridEngine.d";
 export class GlobalConfig {
   private static config: Concrete<GridEngineConfig>;
 
-  static get(): GridEngineConfig {
+  static get(): Concrete<GridEngineConfig> {
     return GlobalConfig.config;
   }
 

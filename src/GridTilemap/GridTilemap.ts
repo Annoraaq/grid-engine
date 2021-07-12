@@ -1,3 +1,4 @@
+import { GlobalConfig } from "./../GlobalConfig/GlobalConfig";
 import { Direction } from "./../Direction/Direction";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
 import { Vector2 } from "../Utils/Vector2/Vector2";
@@ -10,7 +11,6 @@ export class GridTilemap {
   private static readonly HEIGHT_SHIFT_PROP_NAME = "ge_heightShift";
   private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "ge_collide_";
   private characters = new Map<string, GridCharacter>();
-  private collisionTilePropertyName = "ge_collide";
   private charBlockCache: CharBlockCache = new CharBlockCache();
 
   constructor(
@@ -51,7 +51,7 @@ export class GridTilemap {
       const tile = this.tilemap.getTileAt(pos.x, pos.y, false, layer.name);
       return (
         tile?.properties &&
-        (tile.properties[this.collisionTilePropertyName] ||
+        (tile.properties[GlobalConfig.get().collisionTilePropertyName] ||
           tile.properties[collidesPropName])
       );
     });
@@ -65,10 +65,6 @@ export class GridTilemap {
 
   hasBlockingChar(pos: Vector2): boolean {
     return this.charBlockCache.isCharBlockingAt(pos);
-  }
-
-  setCollisionTilePropertyName(name: string): void {
-    this.collisionTilePropertyName = name;
   }
 
   getTileWidth(): number {

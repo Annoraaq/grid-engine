@@ -1,7 +1,9 @@
+import { CollisionStrategy } from "./../Collisions/CollisionStrategy";
+import { GlobalConfig } from "./../GlobalConfig/GlobalConfig";
 import { GridCharacter } from "./../GridCharacter/GridCharacter";
 import { of } from "rxjs";
 import { Vector2 } from "../Utils/Vector2/Vector2";
-import { Direction } from "./../Direction/Direction";
+import { Direction, NumberOfDirections } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
 
 const mockCharBlockCache = {
@@ -61,6 +63,12 @@ describe("GridTilemap", () => {
     mockCharBlockCache.removeCharacter.mockReset();
     mockCharBlockCache.isCharBlockingAt.mockReset();
     mockCharBlockCache.isCharBlockingAt = jest.fn(() => false);
+    GlobalConfig.get = jest.fn(() => ({
+      characters: [],
+      numberOfDirections: NumberOfDirections.FOUR,
+      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
+      collisionTilePropertyName: "ge_collide",
+    }));
   });
 
   it("should set layer depths on construction", () => {
@@ -232,8 +240,13 @@ describe("GridTilemap", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { custom_collides_prop: true },
     });
+    GlobalConfig.get = jest.fn(() => ({
+      characters: [],
+      numberOfDirections: NumberOfDirections.FOUR,
+      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
+      collisionTilePropertyName: "custom_collides_prop",
+    }));
     gridTilemap = new GridTilemap(tilemapMock, 3);
-    gridTilemap.setCollisionTilePropertyName("custom_collides_prop");
     const isBlockingTile = gridTilemap.hasBlockingTile(new Vector2(3, 4));
     const isBlocking = gridTilemap.isBlocking(new Vector2(3, 4));
     expect(isBlockingTile).toBe(true);
