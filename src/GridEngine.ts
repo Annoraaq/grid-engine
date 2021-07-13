@@ -77,7 +77,6 @@ export class GridEngine {
   private positionChangeStarted$: Subject<{ charId: string } & PositionChange>;
   private positionChangeFinished$: Subject<{ charId: string } & PositionChange>;
   private charRemoved$: Subject<string>;
-  private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR;
 
   constructor(private scene: Phaser.Scene) {
     this.scene.sys.events.once("boot", this.boot, this);
@@ -141,10 +140,7 @@ export class GridEngine {
     this.charRemoved$ = new Subject<string>();
     this.gridTilemap = new GridTilemap(tilemap);
 
-    this.numberOfDirections =
-      config.numberOfDirections || this.numberOfDirections;
-
-    this.addCharacters(config);
+    this.addCharacters();
   }
 
   getPosition(charId: string): Position {
@@ -161,7 +157,7 @@ export class GridEngine {
     this.initGuard();
     this.unknownCharGuard(charId);
     const randomMovement = new RandomMovement(delay, radius);
-    randomMovement.setNumberOfDirections(this.numberOfDirections);
+    randomMovement.setNumberOfDirections(GlobalConfig.get().numberOfDirections);
     this.gridCharacters.get(charId).setMovement(randomMovement);
   }
 
@@ -176,7 +172,7 @@ export class GridEngine {
       0,
       moveToConfig
     );
-    targetMovement.setNumberOfDirections(this.numberOfDirections);
+    targetMovement.setNumberOfDirections(GlobalConfig.get().numberOfDirections);
     this.gridCharacters.get(charId).setMovement(targetMovement);
   }
 
@@ -329,7 +325,7 @@ export class GridEngine {
         ? NoPathFoundStrategy.CLOSEST_REACHABLE
         : NoPathFoundStrategy.STOP
     );
-    followMovement.setNumberOfDirections(this.numberOfDirections);
+    followMovement.setNumberOfDirections(GlobalConfig.get().numberOfDirections);
     this.gridCharacters.get(charId).setMovement(followMovement);
   }
 
@@ -403,15 +399,17 @@ export class GridEngine {
     }
   }
 
-  private addCharacters(config: GridEngineConfig) {
-    config.characters.forEach((charData) => this.addCharacter(charData));
+  private addCharacters() {
+    GlobalConfig.get().characters.forEach((charData) =>
+      this.addCharacter(charData)
+    );
   }
 
   private moveChar(charId: string, direction: Direction): void {
     this.initGuard();
     this.unknownCharGuard(charId);
 
-    if (this.numberOfDirections === NumberOfDirections.FOUR) {
+    if (GlobalConfig.get().numberOfDirections === NumberOfDirections.FOUR) {
       if (!this._isIsometric() && isDiagonal(direction)) {
         console.warn(
           `GridEngine: Character '${charId}' can't be moved '${direction}' in 4 direction mode.`
