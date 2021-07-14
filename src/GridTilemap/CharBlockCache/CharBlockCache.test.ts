@@ -1,3 +1,6 @@
+import { CollisionStrategy } from "./../../Collisions/CollisionStrategy";
+import { NumberOfDirections } from "./../../Direction/Direction";
+import { GlobalConfig } from "./../../GlobalConfig/GlobalConfig";
 import { of, Subject } from "rxjs";
 import {
   GridCharacter,
@@ -5,6 +8,8 @@ import {
 } from "../../GridCharacter/GridCharacter";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache";
+import { GridEngineConfig } from "../../GridEngine";
+import { Concrete } from "../../Utils/TypeUtils";
 describe("CharBlockCache", () => {
   let charBlockCache: CharBlockCache;
 
@@ -22,26 +27,91 @@ describe("CharBlockCache", () => {
     expect(charBlockCache.isCharBlockingAt(new Vector2(3, 3))).toBe(true);
   });
 
-  it("should block new and old pos on movement", () => {
-    const positionChanged = new Subject<PositionChange>();
-
-    const char1Mock = <any>{
-      ...createCharMock("player1"),
-      getTilePos: () => ({ x: 3, y: 3 }),
-      positionChanged: () => positionChanged,
-    };
-    charBlockCache.addCharacter(char1Mock);
-    positionChanged.next({
-      enterTile: new Vector2(3, 4),
-      exitTile: new Vector2(3, 3),
+  describe("blocking strategy BLOCK_TWO_TILES", () => {
+    beforeEach(() => {
+      GlobalConfig.get = jest.fn(() => ({
+        ...createMockConf(),
+        characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
+      }));
     });
 
-    const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
-      new Vector2(3, 3)
-    );
-    const hasBlockingChar = charBlockCache.isCharBlockingAt(new Vector2(3, 4));
-    expect(hasBlockingCharOnOldPos).toBe(true);
-    expect(hasBlockingChar).toBe(true);
+    it("should block new and old pos on movement", () => {
+      const positionChanged = new Subject<PositionChange>();
+
+      const char1Mock = <any>{
+        ...createCharMock("player1"),
+        getTilePos: () => ({ x: 3, y: 3 }),
+        positionChanged: () => positionChanged,
+      };
+      charBlockCache.addCharacter(char1Mock);
+      positionChanged.next({
+        enterTile: new Vector2(3, 4),
+        exitTile: new Vector2(3, 3),
+      });
+
+      const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
+        new Vector2(3, 3)
+      );
+      const hasBlockingChar = charBlockCache.isCharBlockingAt(
+        new Vector2(3, 4)
+      );
+      expect(hasBlockingCharOnOldPos).toBe(true);
+      expect(hasBlockingChar).toBe(true);
+    });
+
+    it("should unblock old pos", () => {
+      const positionChangeFinished = new Subject<PositionChange>();
+
+      const char1Mock = <any>{
+        ...createCharMock("player1"),
+        getTilePos: () => ({ x: 3, y: 3 }),
+        positionChangeFinished: () => positionChangeFinished,
+      };
+      charBlockCache.addCharacter(char1Mock);
+
+      positionChangeFinished.next({
+        enterTile: new Vector2(3, 4),
+        exitTile: new Vector2(3, 3),
+      });
+
+      const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
+        new Vector2(3, 3)
+      );
+      expect(hasBlockingCharOnOldPos).toBe(false);
+    });
+  });
+
+  describe("blocking strategy BLOCK_ONE_TILE_AHEAD", () => {
+    beforeEach(() => {
+      GlobalConfig.get = jest.fn(() => ({
+        ...createMockConf(),
+        characterCollisionStrategy: CollisionStrategy.BLOCK_ONE_TILE_AHEAD,
+      }));
+    });
+
+    it("should block pos on movement and release old one", () => {
+      const positionChanged = new Subject<PositionChange>();
+
+      const char1Mock = <any>{
+        ...createCharMock("player1"),
+        getTilePos: () => ({ x: 3, y: 3 }),
+        positionChanged: () => positionChanged,
+      };
+      charBlockCache.addCharacter(char1Mock);
+      positionChanged.next({
+        enterTile: new Vector2(3, 4),
+        exitTile: new Vector2(3, 3),
+      });
+
+      const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
+        new Vector2(3, 3)
+      );
+      const hasBlockingChar = charBlockCache.isCharBlockingAt(
+        new Vector2(3, 4)
+      );
+      expect(hasBlockingCharOnOldPos).toBe(false);
+      expect(hasBlockingChar).toBe(true);
+    });
   });
 
   it("should consider serveral chars for blocking after pos change", () => {
@@ -79,27 +149,6 @@ describe("CharBlockCache", () => {
     });
 
     expect(charBlockCache.isCharBlockingAt(new Vector2(3, 3))).toBe(true);
-  });
-
-  it("should unblock old pos", () => {
-    const positionChangeFinished = new Subject<PositionChange>();
-
-    const char1Mock = <any>{
-      ...createCharMock("player1"),
-      getTilePos: () => ({ x: 3, y: 3 }),
-      positionChangeFinished: () => positionChangeFinished,
-    };
-    charBlockCache.addCharacter(char1Mock);
-
-    positionChangeFinished.next({
-      enterTile: new Vector2(3, 4),
-      exitTile: new Vector2(3, 3),
-    });
-
-    const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
-      new Vector2(3, 3)
-    );
-    expect(hasBlockingCharOnOldPos).toBe(false);
   });
 
   it("should consider several chars for blocking", () => {
@@ -162,6 +211,15 @@ describe("CharBlockCache", () => {
       getNextTilePos: () => ({ x: 1, y: 1 }),
       positionChanged: () => of([]),
       positionChangeFinished: () => of([]),
+    };
+  }
+
+  function createMockConf(): Concrete<GridEngineConfig> {
+    return {
+      characters: [],
+      collisionTilePropertyName: "ge_collide",
+      numberOfDirections: NumberOfDirections.FOUR,
+      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
     };
   }
 });

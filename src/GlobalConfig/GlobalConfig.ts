@@ -1,5 +1,5 @@
+import { GridEngineConfig } from "../GridEngine";
 import { Concrete } from "../Utils/TypeUtils";
-import { GridEngineConfig } from "./../../dist/GridEngine.d";
 export class GlobalConfig {
   private static config: Concrete<GridEngineConfig>;
 

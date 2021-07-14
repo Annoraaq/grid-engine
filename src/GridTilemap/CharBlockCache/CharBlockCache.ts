@@ -1,7 +1,9 @@
+import { GlobalConfig } from "./../../GlobalConfig/GlobalConfig";
 import { Subscription } from "rxjs";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Position } from "../../GridEngine";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
+import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
 
 export class CharBlockCache {
   private tilePosToCharacters: Map<string, Set<GridCharacter>> = new Map();
@@ -46,6 +48,14 @@ export class CharBlockCache {
     const positionChangedSub = character
       .positionChanged()
       .subscribe((positionChange) => {
+        if (
+          GlobalConfig.get().characterCollisionStrategy ===
+          CollisionStrategy.BLOCK_ONE_TILE_AHEAD
+        ) {
+          this.tilePosToCharacters
+            .get(this.posToString(positionChange.exitTile))
+            .delete(character);
+        }
         this.add(this.posToString(positionChange.enterTile), character);
       });
     this.positionChangedSubs.set(character.getId(), positionChangedSub);

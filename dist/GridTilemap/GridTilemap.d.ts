@@ -10,7 +10,6 @@ export declare class GridTilemap {
     private static readonly HEIGHT_SHIFT_PROP_NAME;
     private static readonly ONE_WAY_COLLIDE_PROP_PREFIX;
     private characters;
-    private collisionTilePropertyName;
     private charBlockCache;
     constructor(tilemap: Phaser.Tilemaps.Tilemap, firstLayerAboveChar?: number);
     addCharacter(character: GridCharacter): void;
@@ -20,7 +19,6 @@ export declare class GridTilemap {
     hasBlockingTile(pos: Vector2, direction?: Direction): boolean;
     hasNoTile(pos: Vector2): boolean;
     hasBlockingChar(pos: Vector2): boolean;
-    setCollisionTilePropertyName(name: string): void;
     getTileWidth(): number;
     getTileHeight(): number;
     private getLayerProp;
