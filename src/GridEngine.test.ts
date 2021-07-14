@@ -334,7 +334,7 @@ describe("GridEngine", () => {
   });
 
   it("should init GlobalConfig with default values", () => {
-    GlobalConfig.set = jest.fn();
+    const setSpy = jest.spyOn(GlobalConfig, "set");
     const config = {
       characters: [
         {
@@ -346,7 +346,7 @@ describe("GridEngine", () => {
       ],
     };
     gridEngine.create(tileMapMock, config);
-    expect(GlobalConfig.set).toHaveBeenCalledWith({
+    expect(setSpy).toHaveBeenCalledWith({
       ...config,
       collisionTilePropertyName: "ge_collide",
       numberOfDirections: NumberOfDirections.FOUR,
@@ -355,7 +355,7 @@ describe("GridEngine", () => {
   });
 
   it("should override GlobalConfig default values", () => {
-    GlobalConfig.set = jest.fn();
+    const setSpy = jest.spyOn(GlobalConfig, "set");
     const config = {
       characters: [
         {
@@ -370,7 +370,7 @@ describe("GridEngine", () => {
       characterCollisionStrategy: CollisionStrategy.BLOCK_ONE_TILE_AHEAD,
     };
     gridEngine.create(tileMapMock, config);
-    expect(GlobalConfig.set).toHaveBeenCalledWith({
+    expect(setSpy).toHaveBeenCalledWith({
       ...config,
     });
   });
