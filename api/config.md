@@ -22,6 +22,10 @@ The data shape of the configuration object is described here.
 | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | The possible number of directions for moving a character. Default is 4 (up, down, left, right). If set to 8 it additionaly enables diagonal movement (up-left, up-right, down-left, down-right). |
 
+| characterCollisionStrategy: [CollisionStrategy](#collisionstrategy) <span class="label label-green">OPTIONAL</span><span class="label label-blue">DEFAULT: "BLOCK_TWO_TILES"</span>
+|:-------------|
+| The character collision strategy. See [CollisionStrategy](#collisionstrategy). |
+
 ## CharacterData
 
 | id: string                                                                                                                                     |
@@ -101,3 +105,13 @@ The data shape of the configuration object is described here.
   y: number
 }
 ```
+
+## CollisionStrategy
+
+```js
+"BLOCK_TWO_TILES" | "BLOCK_ONE_TILE_AHEAD",
+```
+
+**"BLOCK_TWO_TILES"**: When character is standing, it will block only one tile. If it is moving, it will block the tile it is leaving and the tile it is entering
+
+**"BLOCK_ONE_TILE_AHEAD"**: When character is standing, it will block only one tile. If it is moving, it will only block the tile it is entering.
