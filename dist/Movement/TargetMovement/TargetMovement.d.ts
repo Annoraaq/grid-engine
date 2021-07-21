@@ -1,10 +1,10 @@
-import { NoPathFoundStrategy } from "./../../Algorithms/ShortestPath/NoPathFoundStrategy";
-import { PathBlockedStrategy } from "./../../Algorithms/ShortestPath/PathBlockedStrategy";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { NumberOfDirections } from "../../Direction/Direction";
 import { Movement } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
+import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
+import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
 export interface MoveToConfig {
     noPathFoundStrategy?: NoPathFoundStrategy;
     pathBlockedStrategy?: PathBlockedStrategy;

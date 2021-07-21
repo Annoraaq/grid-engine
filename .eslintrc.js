@@ -15,5 +15,9 @@ module.exports = {
     ],
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/ban-ts-comment": "off",
+    "no-empty-function": "off",
+    "@typescript-eslint/no-empty-function": ["error", {
+      "allow": ["private-constructors"]
+    }]
   },
 };

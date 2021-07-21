@@ -1,3 +1,3 @@
-export declare type Brand<K, T> = K & {
-    __brand: T;
+export declare type Concrete<Type> = {
+    [Property in keyof Type]-?: Type[Property];
 };

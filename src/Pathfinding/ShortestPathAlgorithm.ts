@@ -1,4 +1,4 @@
-import { Vector2 } from "../../Utils/Vector2/Vector2";
+import { Vector2 } from "../Utils/Vector2/Vector2";
 
 export interface ShortestPathAlgorithm {
   getShortestPath(

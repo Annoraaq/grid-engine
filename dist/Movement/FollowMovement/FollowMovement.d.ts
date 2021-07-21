@@ -2,7 +2,7 @@ import { NumberOfDirections } from "./../../Direction/Direction";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Movement } from "../Movement";
-import { NoPathFoundStrategy } from "../../Algorithms/ShortestPath/NoPathFoundStrategy";
+import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 export declare class FollowMovement implements Movement {
     private gridTilemap;
     private charToFollow;

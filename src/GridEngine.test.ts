@@ -1,5 +1,5 @@
-import { PathBlockedStrategy } from "./Algorithms/ShortestPath/PathBlockedStrategy";
-import { NoPathFoundStrategy } from "./Algorithms/ShortestPath/NoPathFoundStrategy";
+import { CollisionStrategy } from "./Collisions/CollisionStrategy";
+import { GlobalConfig } from "./GlobalConfig/GlobalConfig";
 import { Subject, of } from "rxjs";
 import { take } from "rxjs/operators";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
@@ -32,7 +32,6 @@ const mockFollowMovement = {
 const mockGridTileMap = {
   addCharacter: jest.fn(),
   removeCharacter: jest.fn(),
-  setCollisionTilePropertyName: jest.fn(),
   getTileWidth: () => 32,
   getTileHeight: () => 32,
 };
@@ -142,6 +141,8 @@ import { TargetMovement } from "./Movement/TargetMovement/TargetMovement";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import { IsometricGridCharacter } from "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter";
 import { Vector2 } from "./Utils/Vector2/Vector2";
+import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
+import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;
@@ -206,12 +207,8 @@ describe("GridEngine", () => {
           sprite: playerSpriteMock,
         },
       ],
-      collisionTilePropertyName: "custom_collision_prop",
     });
     expect(mockGridTilemapConstructor).toHaveBeenCalledWith(tileMapMock);
-    expect(mockGridTileMap.setCollisionTilePropertyName).toHaveBeenCalledWith(
-      "custom_collision_prop"
-    );
   });
 
   it("should init player", () => {
@@ -334,6 +331,48 @@ describe("GridEngine", () => {
       walkingAnimationMapping,
     });
     expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
+  });
+
+  it("should init GlobalConfig with default values", () => {
+    const setSpy = jest.spyOn(GlobalConfig, "set");
+    const config = {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+          startPosition: new Vector2(3, 4),
+        },
+      ],
+    };
+    gridEngine.create(tileMapMock, config);
+    expect(setSpy).toHaveBeenCalledWith({
+      ...config,
+      collisionTilePropertyName: "ge_collide",
+      numberOfDirections: NumberOfDirections.FOUR,
+      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
+    });
+  });
+
+  it("should override GlobalConfig default values", () => {
+    const setSpy = jest.spyOn(GlobalConfig, "set");
+    const config = {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+          startPosition: new Vector2(3, 4),
+        },
+      ],
+      collisionTilePropertyName: "custom_name",
+      numberOfDirections: NumberOfDirections.EIGHT,
+      characterCollisionStrategy: CollisionStrategy.BLOCK_ONE_TILE_AHEAD,
+    };
+    gridEngine.create(tileMapMock, config);
+    expect(setSpy).toHaveBeenCalledWith({
+      ...config,
+    });
   });
 
   it("should use config startPosition", () => {

@@ -1,3 +1,4 @@
+import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { MoveToConfig } from "./Movement/TargetMovement/TargetMovement";
 import { CharacterIndex, FrameRow, PositionChange } from "./GridCharacter/GridCharacter";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
@@ -12,6 +13,7 @@ export interface GridEngineConfig {
     characters: CharacterData[];
     collisionTilePropertyName?: string;
     numberOfDirections?: NumberOfDirections;
+    characterCollisionStrategy?: CollisionStrategy;
 }
 export interface WalkingAnimationMapping {
     [Direction.UP]: FrameRow;
@@ -46,10 +48,10 @@ export declare class GridEngine {
     private positionChangeStarted$;
     private positionChangeFinished$;
     private charRemoved$;
-    private numberOfDirections;
     constructor(scene: Phaser.Scene);
     boot(): void;
     destroy(): void;
+    private setConfigDefaults;
     create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void;
     getPosition(charId: string): Position;
     move(charId: string, direction: Direction): void;
