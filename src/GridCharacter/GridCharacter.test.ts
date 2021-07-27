@@ -130,6 +130,24 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getTilePos()).toEqual(expectedPos);
   });
 
+
+  it("should set and get sprite", () => {
+    const sprite = <any>{
+      setOrigin: jest.fn(),
+      setDepth: jest.fn(),
+    };
+    gridCharacter.setSprite(sprite);
+    expect(sprite.setOrigin).toHaveBeenCalledWith(0,0);
+
+    expect(gridCharacter.getSprite()).toBe(sprite);
+    expect(gridCharacter.getSprite().x).toEqual(80);
+    expect(gridCharacter.getSprite().y).toEqual(92);
+    expect(CharacterAnimation).toHaveBeenCalledWith(sprite, undefined, 3);
+    expect(mockCharacterAnimation.setIsEnabled).toHaveBeenCalledWith(true);
+    expect(mockCharacterAnimation.setStandingFrame).toHaveBeenCalledWith(Direction.DOWN);
+    expect(sprite.setDepth).toHaveBeenCalledWith(1000);
+  });
+
   it("should block one tile if not moving", () => {
     const newTilePos = new Vector2(5, 6);
     gridCharacter.setTilePosition(newTilePos);
