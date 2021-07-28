@@ -100,17 +100,6 @@ export class GridEngine {
     this.charRemoved$ = undefined;
   }
 
-  private setConfigDefaults(
-    config: GridEngineConfig
-  ): Concrete<GridEngineConfig> {
-    return {
-      collisionTilePropertyName: "ge_collide",
-      numberOfDirections: NumberOfDirections.FOUR,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      ...config,
-    };
-  }
-
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
     this.isCreated = true;
     this.gridCharacters = new Map();
@@ -353,6 +342,18 @@ export class GridEngine {
     this.gridCharacters.get(charId).setTilePosition(new Vector2(pos));
   }
 
+  getSprite(charId: string): Phaser.GameObjects.Sprite {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    return this.gridCharacters.get(charId).getSprite();
+  }
+
+  setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    this.gridCharacters.get(charId).setSprite(sprite);
+  }
+
   movementStarted(): Observable<{ charId: string; direction: Direction }> {
     return this.movementStarted$;
   }
@@ -371,6 +372,17 @@ export class GridEngine {
 
   positionChangeFinished(): Observable<{ charId: string } & PositionChange> {
     return this.positionChangeFinished$;
+  }
+
+  private setConfigDefaults(
+    config: GridEngineConfig
+  ): Concrete<GridEngineConfig> {
+    return {
+      collisionTilePropertyName: "ge_collide",
+      numberOfDirections: NumberOfDirections.FOUR,
+      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
+      ...config,
+    };
   }
 
   private takeUntilCharRemoved(charId: string) {

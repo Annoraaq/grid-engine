@@ -22,6 +22,8 @@ const mockPositionChangeFinished = jest.fn();
 const mockIsMoving = jest.fn();
 const mockSetMovement = jest.fn();
 const mockGetMovement = jest.fn();
+const mockSetSprite = jest.fn();
+const mockGetSprite = jest.fn();
 const mockFacingDirection = jest.fn();
 const mockTurnTowards = jest.fn();
 const mockFollowMovement = {
@@ -87,6 +89,8 @@ function createMockCharConstr() {
       turnTowards: mockTurnTowards,
       setMovement: mockSetMovement,
       getMovement: mockGetMovement,
+      getSprite: mockGetSprite,
+      setSprite: mockSetSprite,
     };
   };
 }
@@ -574,6 +578,18 @@ describe("GridEngine", () => {
     gridEngine.setPosition("player", { x: 3, y: 4 });
 
     expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(3, 4));
+  });
+
+  it("should get sprite", () => {
+    mockGetSprite.mockReturnValue('sprite');
+
+    expect(gridEngine.getSprite('player')).toEqual('sprite');
+  });
+
+  it("should set sprite", () => {
+    gridEngine.setSprite("player", <any>'someSprite');
+
+    expect(mockSetSprite).toHaveBeenCalledWith('someSprite');
   });
 
   it("should move randomly", () => {
@@ -1213,6 +1229,12 @@ describe("GridEngine", () => {
       expectCharUnknownException(() =>
         gridEngine.turnTowards(UNKNOWN_CHAR_ID, Direction.LEFT)
       );
+      expectCharUnknownException(() =>
+        gridEngine.setSprite(UNKNOWN_CHAR_ID, playerSpriteMock)
+      );
+      expectCharUnknownException(() =>
+        gridEngine.getSprite(UNKNOWN_CHAR_ID)
+      );
     });
 
     it("should throw error if follow is invoked", () => {
@@ -1278,6 +1300,8 @@ describe("GridEngine", () => {
         gridEngine.turnTowards(SOME_CHAR_ID, Direction.LEFT)
       );
       expectUninitializedException(() => gridEngine.getAllCharacters());
+      expectUninitializedException(() => gridEngine.setSprite(SOME_CHAR_ID, playerSpriteMock));
+      expectUninitializedException(() => gridEngine.getSprite(SOME_CHAR_ID));
     });
   });
 });

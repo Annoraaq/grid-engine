@@ -55,33 +55,24 @@ export class GridCharacter {
   private facingDirection: Direction = Direction.DOWN;
   private animation: CharacterAnimation;
   private movement: Movement;
+  private characterIndex = -1;
+  private walkingAnimationMapping: WalkingAnimationMapping;
 
   constructor(private id: string, config: CharConfig) {
-    let characterIndex = 0;
-    let walkingAnimationMapping: WalkingAnimationMapping;
     if (typeof config.walkingAnimationMapping == "number") {
-      characterIndex = config.walkingAnimationMapping;
+      this.characterIndex = config.walkingAnimationMapping;
     } else {
-      walkingAnimationMapping = config.walkingAnimationMapping;
+      this.walkingAnimationMapping = config.walkingAnimationMapping;
     }
 
-    this.sprite = config.sprite;
-    this.sprite.setOrigin(0, 0);
     this.container = config.container;
     this.tilemap = config.tilemap;
     this.speed = config.speed;
     this.customOffset = new Vector2(config.offsetX || 0, config.offsetY || 0);
     this.tileSize = config.tileSize.clone();
 
-    this.animation = new CharacterAnimation(
-      this.sprite,
-      walkingAnimationMapping,
-      characterIndex
-    );
-    this.animation.setIsEnabled(config.walkingAnimationMapping !== undefined);
-    this.animation.setStandingFrame(Direction.DOWN);
-
-    this.updateZindex();
+    this.sprite = config.sprite;
+    this._setSprite(this.sprite);
   }
 
   getId(): string {
@@ -94,6 +85,14 @@ export class GridCharacter {
 
   setSpeed(speed: number): void {
     this.speed = speed;
+  }
+
+  getSprite(): Phaser.GameObjects.Sprite {
+    return this.sprite;
+  }
+
+  setSprite(sprite: Phaser.GameObjects.Sprite): void {
+    this._setSprite(sprite);
   }
 
   setMovement(movement: Movement): void {
@@ -236,6 +235,24 @@ export class GridCharacter {
   protected toMapDirection(direction: Direction): Direction {
     return direction;
   }
+
+  private _setSprite(sprite: Phaser.GameObjects.Sprite): void {
+    sprite.setOrigin(0, 0);
+    sprite.x = this.sprite.x;
+    sprite.y = this.sprite.y;
+    this.sprite = sprite;
+    this.animation = new CharacterAnimation(
+      this.sprite,
+      this.walkingAnimationMapping,
+      this.characterIndex
+    );
+
+    this.animation.setIsEnabled(this.walkingAnimationMapping !== undefined || this.characterIndex !== -1);
+    this.animation.setStandingFrame(Direction.DOWN);
+
+    this.updateZindex();
+  }
+
 
   private getOffset(): Vector2 {
     const offsetX =

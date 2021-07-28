@@ -99,19 +99,6 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getSpeed()).toEqual(3);
   });
 
-  it("should set the correct default charIndex", () => {
-    gridCharacter = new GridCharacter("player", {
-      sprite: spriteMock,
-      tilemap: gridTilemapMock,
-      tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
-      speed: 3,
-    });
-    mockNonBlockingTile();
-    gridCharacter.move(Direction.DOWN);
-    gridCharacter.update(100);
-    expect(CharacterAnimation).toHaveBeenCalledWith(spriteMock, undefined, 0);
-  });
-
   it("should set the correct depth on construction", () => {
     expect(spriteMock.setDepth).toHaveBeenCalledWith(1000);
   });
@@ -128,6 +115,24 @@ describe("GridCharacter", () => {
 
     expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 + expectedPos.y);
     expect(gridCharacter.getTilePos()).toEqual(expectedPos);
+  });
+
+
+  it("should set and get sprite", () => {
+    const sprite = <any>{
+      setOrigin: jest.fn(),
+      setDepth: jest.fn(),
+    };
+    gridCharacter.setSprite(sprite);
+    expect(sprite.setOrigin).toHaveBeenCalledWith(0,0);
+
+    expect(gridCharacter.getSprite()).toBe(sprite);
+    expect(gridCharacter.getSprite().x).toEqual(80);
+    expect(gridCharacter.getSprite().y).toEqual(92);
+    expect(CharacterAnimation).toHaveBeenCalledWith(sprite, undefined, 3);
+    expect(mockCharacterAnimation.setIsEnabled).toHaveBeenCalledWith(true);
+    expect(mockCharacterAnimation.setStandingFrame).toHaveBeenCalledWith(Direction.DOWN);
+    expect(sprite.setDepth).toHaveBeenCalledWith(1000);
   });
 
   it("should block one tile if not moving", () => {
