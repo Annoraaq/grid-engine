@@ -51,7 +51,6 @@ export declare class GridEngine {
     constructor(scene: Phaser.Scene);
     boot(): void;
     destroy(): void;
-    private setConfigDefaults;
     create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void;
     getPosition(charId: string): Position;
     move(charId: string, direction: Direction): void;
@@ -71,6 +70,8 @@ export declare class GridEngine {
     getFacingDirection(charId: string): Direction;
     turnTowards(charId: string, direction: Direction): void;
     setPosition(charId: string, pos: Position): void;
+    getSprite(charId: string): Phaser.GameObjects.Sprite;
+    setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void;
     movementStarted(): Observable<{
         charId: string;
         direction: Direction;
@@ -89,6 +90,7 @@ export declare class GridEngine {
     positionChangeFinished(): Observable<{
         charId: string;
     } & PositionChange>;
+    private setConfigDefaults;
     private takeUntilCharRemoved;
     private initGuard;
     private unknownCharGuard;

@@ -47,10 +47,14 @@ export declare class GridCharacter {
     private facingDirection;
     private animation;
     private movement;
+    private characterIndex;
+    private walkingAnimationMapping;
     constructor(id: string, config: CharConfig);
     getId(): string;
     getSpeed(): number;
     setSpeed(speed: number): void;
+    getSprite(): Phaser.GameObjects.Sprite;
+    setSprite(sprite: Phaser.GameObjects.Sprite): void;
     setMovement(movement: Movement): void;
     getMovement(): Movement;
     setWalkingAnimationMapping(walkingAnimationMapping: WalkingAnimationMapping): void;
@@ -74,6 +78,7 @@ export declare class GridCharacter {
     protected tilePosToPixelPos(tilePosition: Vector2): Vector2;
     protected getTileDistance(_direction: Direction): Vector2;
     protected toMapDirection(direction: Direction): Direction;
+    private _setSprite;
     private getOffset;
     private createSpeedPixelsPerSecond;
     private get nextTilePos();
