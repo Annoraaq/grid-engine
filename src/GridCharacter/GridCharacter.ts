@@ -55,7 +55,7 @@ export class GridCharacter {
   private facingDirection: Direction = Direction.DOWN;
   private animation: CharacterAnimation;
   private movement: Movement;
-  private characterIndex = 0;
+  private characterIndex = -1;
   private walkingAnimationMapping: WalkingAnimationMapping;
 
   constructor(private id: string, config: CharConfig) {
@@ -247,7 +247,7 @@ export class GridCharacter {
       this.characterIndex
     );
 
-    this.animation.setIsEnabled(this.walkingAnimationMapping !== undefined || this.characterIndex !== undefined);
+    this.animation.setIsEnabled(this.walkingAnimationMapping !== undefined || this.characterIndex !== -1);
     this.animation.setStandingFrame(Direction.DOWN);
 
     this.updateZindex();

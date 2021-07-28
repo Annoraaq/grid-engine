@@ -99,19 +99,6 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getSpeed()).toEqual(3);
   });
 
-  it("should set the correct default charIndex", () => {
-    gridCharacter = new GridCharacter("player", {
-      sprite: spriteMock,
-      tilemap: gridTilemapMock,
-      tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
-      speed: 3,
-    });
-    mockNonBlockingTile();
-    gridCharacter.move(Direction.DOWN);
-    gridCharacter.update(100);
-    expect(CharacterAnimation).toHaveBeenCalledWith(spriteMock, undefined, 0);
-  });
-
   it("should set the correct depth on construction", () => {
     expect(spriteMock.setDepth).toHaveBeenCalledWith(1000);
   });
