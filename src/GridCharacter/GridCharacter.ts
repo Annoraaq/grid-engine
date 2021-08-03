@@ -200,6 +200,10 @@ export class GridCharacter {
     return this.facingDirection;
   }
 
+  getFacingPosition(): Vector2 {
+    return this._tilePos.add(directionVector(this.facingDirection));
+  }
+
   movementStarted(): Subject<Direction> {
     return this.movementStarted$;
   }

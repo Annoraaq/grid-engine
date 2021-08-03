@@ -605,6 +605,52 @@ describe("GridCharacter", () => {
     });
   });
 
+  describe("getFacingPosition", () => {
+    beforeEach(() => {
+      gridCharacter.setTilePosition(new Vector2({x: 2, y: 3}));
+    });
+
+    it("should return left neighbor pos", () => {
+      gridCharacter.turnTowards(Direction.LEFT);
+      expect(gridCharacter.getFacingPosition()).toEqual(new Vector2({x: 1, y: 3}));
+    });
+
+    it("should return right neighbor pos", () => {
+      gridCharacter.turnTowards(Direction.RIGHT);
+      expect(gridCharacter.getFacingPosition()).toEqual(new Vector2({x: 3, y: 3}));
+    });
+
+    it("should return down neighbor pos", () => {
+      gridCharacter.turnTowards(Direction.DOWN);
+      expect(gridCharacter.getFacingPosition()).toEqual(new Vector2({x: 2, y: 4}));
+    });
+
+    it("should return up neighbor pos", () => {
+      gridCharacter.turnTowards(Direction.UP);
+      expect(gridCharacter.getFacingPosition()).toEqual(new Vector2({x: 2, y: 2}));
+    });
+
+    it("should return up-left neighbor pos", () => {
+      gridCharacter.turnTowards(Direction.UP_LEFT);
+      expect(gridCharacter.getFacingPosition()).toEqual(new Vector2({x: 1, y: 2}));
+    });
+
+    it("should return up-right neighbor pos", () => {
+      gridCharacter.turnTowards(Direction.UP_RIGHT);
+      expect(gridCharacter.getFacingPosition()).toEqual(new Vector2({x: 3, y: 2}));
+    });
+
+    it("should return down-right neighbor pos", () => {
+      gridCharacter.turnTowards(Direction.DOWN_RIGHT);
+      expect(gridCharacter.getFacingPosition()).toEqual(new Vector2({x: 3, y: 4}));
+    });
+
+    it("should return down-left neighbor pos", () => {
+      gridCharacter.turnTowards(Direction.DOWN_LEFT);
+      expect(gridCharacter.getFacingPosition()).toEqual(new Vector2({x: 1, y: 4}));
+    });
+  });
+
   describe("turnTowards", () => {
     beforeEach(() => {
       mockCharacterAnimation.setStandingFrame.mockReset();
