@@ -330,6 +330,12 @@ export class GridEngine {
     return this.gridCharacters.get(charId).getFacingDirection();
   }
 
+  getFacingPosition(charId: string): Position {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    return this.gridCharacters.get(charId).getFacingPosition();
+  }
+
   turnTowards(charId: string, direction: Direction): void {
     this.initGuard();
     this.unknownCharGuard(charId);
