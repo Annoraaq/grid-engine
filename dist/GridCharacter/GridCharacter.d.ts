@@ -69,6 +69,7 @@ export declare class GridCharacter {
     isMoving(): boolean;
     turnTowards(direction: Direction): void;
     getFacingDirection(): Direction;
+    getFacingPosition(): Vector2;
     movementStarted(): Subject<Direction>;
     movementStopped(): Subject<Direction>;
     directionChanged(): Subject<Direction>;

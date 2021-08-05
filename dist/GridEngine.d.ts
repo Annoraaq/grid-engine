@@ -68,6 +68,7 @@ export declare class GridEngine {
     follow(charId: string, charIdToFollow: string, distance?: number, closestPointIfBlocked?: boolean): void;
     isMoving(charId: string): boolean;
     getFacingDirection(charId: string): Direction;
+    getFacingPosition(charId: string): Position;
     turnTowards(charId: string, direction: Direction): void;
     setPosition(charId: string, pos: Position): void;
     getSprite(charId: string): Phaser.GameObjects.Sprite;
