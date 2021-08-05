@@ -19,7 +19,7 @@
   ],
   "types": "dist/GridEngine.d.ts",
   "dependencies": {
-    "rxjs": "^7.1.0"
+    "rxjs": "^7.3.0"
   },
   "peerDependencies": {
     "phaser": "~3.55.2"
