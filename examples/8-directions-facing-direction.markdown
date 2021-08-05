@@ -11,13 +11,14 @@ parent: Examples (8 directions)
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-2.2.0.min.js"></script>
+<script src="js/grid-engine-2.7.0.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
   const config = getBasicConfig(preload, create, update);
   const game = new Phaser.Game(config);
   let facingDirectionText;
+  let facingPositionText;
 
   function preload () {
     this.load.image("tiles", "assets/tf_jungle_tileset.png");
@@ -38,9 +39,10 @@ parent: Examples (8 directions)
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
 
-    facingDirectionText = this.add.text(-60, -10, '');
+    facingDirectionText = this.add.text(-60, -30, '');
+    facingPositionText = this.add.text(-60, -10, '');
 
-    const container = this.add.container(0, 0, [ playerSprite, facingDirectionText]);
+    const container = this.add.container(0, 0, [ playerSprite, facingDirectionText, facingPositionText]);
 
     this.cameras.main.startFollow(container, true);
     this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
@@ -82,83 +84,81 @@ parent: Examples (8 directions)
       this.gridEngine.move("player", "down");
     }
     facingDirectionText.text = `facingDirection: ${this.gridEngine.getFacingDirection('player')}`;
+    facingPositionText.text = `facingPosition: (${this.gridEngine.getFacingPosition('player').x}, ${this.gridEngine.getFacingPosition('player').y})`;
   }
 </script>
 
 ## The Code
 
 ```javascript
-// Your game config
-const game = new Phaser.Game(config);
-let facingDirectionText;
+  const game = new Phaser.Game(config);
+  let facingDirectionText;
+  let facingPositionText;
 
-function preload() {
-  this.load.image("tiles", "assets/tf_jungle_tileset.png");
-  this.load.tilemapTiledJSON("jungle", "assets/jungle-small.json");
-  this.load.spritesheet("player", "assets/characters.png", {
-    frameWidth: 52,
-    frameHeight: 72,
-  });
-}
-
-function create() {
-  const jungleTilemap = this.make.tilemap({ key: "jungle" });
-  jungleTilemap.addTilesetImage("jungle", "tiles");
-  for (let i = 0; i < jungleTilemap.layers.length; i++) {
-    const layer = jungleTilemap.createLayer(i, "jungle", 0, 0);
-    layer.scale = 3;
+  function preload () {
+    this.load.image("tiles", "assets/tf_jungle_tileset.png");
+    this.load.tilemapTiledJSON("jungle", "assets/jungle-small.json");
+    this.load.spritesheet("player", "assets/characters.png", {
+      frameWidth: 52,
+      frameHeight: 72,
+    });
   }
-  const playerSprite = this.add.sprite(0, 0, "player");
-  playerSprite.scale = 1.5;
 
-  facingDirectionText = this.add.text(-60, -10, "");
+  function create () {
+    const jungleTilemap = this.make.tilemap({ key: "jungle" });
+    jungleTilemap.addTilesetImage("jungle", "tiles");
+    for (let i = 0; i < jungleTilemap.layers.length; i++) {
+      const layer = jungleTilemap.createLayer(i, "jungle", 0, 0);
+      layer.scale = 3;
+    }
+    const playerSprite = this.add.sprite(0, 0, "player");
+    playerSprite.scale = 1.5;
 
-  const container = this.add.container(0, 0, [
-    playerSprite,
-    facingDirectionText,
-  ]);
+    facingDirectionText = this.add.text(-60, -30, '');
+    facingPositionText = this.add.text(-60, -10, '');
 
-  this.cameras.main.startFollow(container, true);
-  this.cameras.main.setFollowOffset(-playerSprite.width, -playerSprite.height);
+    const container = this.add.container(0, 0, [ playerSprite, facingDirectionText, facingPositionText]);
 
-  const gridEngineConfig = {
-    characters: [
-      {
-        id: "player",
-        sprite: playerSprite,
-        walkingAnimationMapping: 6,
-        startPosition: { x: 8, y: 12 },
-        container,
-      },
-    ],
-    numberOfDirections: 8,
-  };
+    this.cameras.main.startFollow(container, true);
+    this.cameras.main.setFollowOffset(- (playerSprite.width), -(playerSprite.height));
 
-  this.gridEngine.create(jungleTilemap, gridEngineConfig);
-  this.gridEngine.turnTowards("player", "left");
-}
+    const gridEngineConfig = {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSprite,
+          walkingAnimationMapping: 6,
+          startPosition: {x: 8, y: 12},
+          container
+        },
+      ],
+      numberOfDirections: 8,
+    };
 
-function update() {
-  const cursors = this.input.keyboard.createCursorKeys();
-  if (cursors.left.isDown && cursors.up.isDown) {
-    this.gridEngine.move("player", "up-left");
-  } else if (cursors.left.isDown && cursors.down.isDown) {
-    this.gridEngine.move("player", "down-left");
-  } else if (cursors.right.isDown && cursors.up.isDown) {
-    this.gridEngine.move("player", "up-right");
-  } else if (cursors.right.isDown && cursors.down.isDown) {
-    this.gridEngine.move("player", "down-right");
-  } else if (cursors.left.isDown) {
-    this.gridEngine.move("player", "left");
-  } else if (cursors.right.isDown) {
-    this.gridEngine.move("player", "right");
-  } else if (cursors.up.isDown) {
-    this.gridEngine.move("player", "up");
-  } else if (cursors.down.isDown) {
-    this.gridEngine.move("player", "down");
+    this.gridEngine.create(jungleTilemap, gridEngineConfig);
+    this.gridEngine.turnTowards("player", 'left');
   }
-  facingDirectionText.text = `facingDirection: ${this.gridEngine.getFacingDirection(
-    "player"
-  )}`;
-}
+
+  function update () {
+    const cursors = this.input.keyboard.createCursorKeys();
+    if (cursors.left.isDown && cursors.up.isDown) {
+      this.gridEngine.move("player", "up-left");
+    } else if (cursors.left.isDown && cursors.down.isDown) {
+      this.gridEngine.move("player", "down-left");
+    } else if (cursors.right.isDown && cursors.up.isDown) {
+      this.gridEngine.move("player", "up-right");
+    } else if (cursors.right.isDown && cursors.down.isDown) {
+      this.gridEngine.move("player", "down-right");
+    } else if (cursors.left.isDown) {
+      this.gridEngine.move("player", "left");
+    } else if (cursors.right.isDown) {
+      this.gridEngine.move("player", "right");
+    } else if (cursors.up.isDown) {
+      this.gridEngine.move("player", "up");
+    } else if (cursors.down.isDown) {
+      this.gridEngine.move("player", "down");
+    }
+    facingDirectionText.text = `facingDirection: ${this.gridEngine.getFacingDirection('player')}`;
+    facingPositionText.text = `facingPosition: (${this.gridEngine.getFacingPosition('player').x}, ${this.gridEngine.getFacingPosition('player').y})`;
+  }
 ```
