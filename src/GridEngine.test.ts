@@ -6,26 +6,27 @@ import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { GridCharacter, PositionChange } from "./GridCharacter/GridCharacter";
 import * as Phaser from "phaser";
 
-const mockSetTilePositon = jest.fn();
-const mockMove = jest.fn();
-const mockUpdate = jest.fn();
-const mockGetTilePos = jest.fn();
-const mockAddCharacter = jest.fn();
-const mockSetSpeed = jest.fn();
-const mockSetWalkingAnimationMapping = jest.fn();
-const mockRandomMovementUpdate = jest.fn();
-const mockMovementStarted = jest.fn();
-const mockMovementStopped = jest.fn();
-const mockDirectionChanged = jest.fn();
-const mockPositionChangeStarted = jest.fn();
-const mockPositionChangeFinished = jest.fn();
-const mockIsMoving = jest.fn();
-const mockSetMovement = jest.fn();
-const mockGetMovement = jest.fn();
-const mockSetSprite = jest.fn();
-const mockGetSprite = jest.fn();
-const mockFacingDirection = jest.fn();
-const mockTurnTowards = jest.fn();
+const mockGridCharacter = {
+  setTilePosition: jest.fn(),
+  move: jest.fn(),
+  update: jest.fn(),
+  getTilePos: jest.fn(),
+  setSpeed: jest.fn(),
+  setWalkingAnimationMapping: jest.fn(),
+  movementStarted: jest.fn(),
+  movementStopped: jest.fn(),
+  directionChanged: jest.fn(),
+  positionChanged: jest.fn(),
+  positionChangeFinished: jest.fn(),
+  isMoving: jest.fn(),
+  getFacingDirection: jest.fn(),
+  getFacingPosition: jest.fn(),
+  turnTowards: jest.fn(),
+  setMovement: jest.fn(),
+  getMovement: jest.fn(),
+  getSprite: jest.fn(),
+  setSprite: jest.fn(),
+}
 const mockFollowMovement = {
   setCharacter: jest.fn(),
   update: jest.fn(),
@@ -72,25 +73,8 @@ jest.mock("./GridTilemap/GridTilemap", function () {
 function createMockCharConstr() {
   return (id: string) => {
     return {
-      setTilePosition: mockSetTilePositon,
-      move: mockMove,
-      update: mockUpdate,
+      ...mockGridCharacter,
       getId: () => id,
-      getTilePos: mockGetTilePos,
-      setSpeed: mockSetSpeed,
-      setWalkingAnimationMapping: mockSetWalkingAnimationMapping,
-      movementStarted: mockMovementStarted,
-      movementStopped: mockMovementStopped,
-      directionChanged: mockDirectionChanged,
-      positionChanged: mockPositionChangeStarted,
-      positionChangeFinished: mockPositionChangeFinished,
-      isMoving: mockIsMoving,
-      getFacingDirection: mockFacingDirection,
-      turnTowards: mockTurnTowards,
-      setMovement: mockSetMovement,
-      getMovement: mockGetMovement,
-      getSprite: mockGetSprite,
-      setSprite: mockSetSprite,
     };
   };
 }
@@ -111,8 +95,8 @@ jest.mock(
 );
 
 const mockRandomMovement = {
-  addCharacter: mockAddCharacter,
-  update: mockRandomMovementUpdate,
+  addCharacter: jest.fn(),
+  update: jest.fn(),
   setNumberOfDirections: jest.fn(),
 };
 
@@ -174,15 +158,15 @@ describe("GridEngine", () => {
     };
     playerSpriteMock = {};
     mockTargetMovement.update.mockReset();
-    mockRandomMovementUpdate.mockReset();
-    mockUpdate.mockReset();
+    mockRandomMovement.update.mockReset();
+    mockGridCharacter.update.mockReset();
     mockFollowMovement.setCharacter.mockReset();
     mockFollowMovement.update.mockReset();
-    mockMovementStarted.mockReset().mockReturnValue(of());
-    mockMovementStopped.mockReset().mockReturnValue(of());
-    mockDirectionChanged.mockReset().mockReturnValue(of());
-    mockPositionChangeStarted.mockReset().mockReturnValue(of());
-    mockPositionChangeFinished.mockReset().mockReturnValue(of());
+    mockGridCharacter.movementStarted.mockReset().mockReturnValue(of());
+    mockGridCharacter.movementStopped.mockReset().mockReturnValue(of());
+    mockGridCharacter.directionChanged.mockReset().mockReturnValue(of());
+    mockGridCharacter.positionChanged.mockReset().mockReturnValue(of());
+    mockGridCharacter.positionChangeFinished.mockReset().mockReturnValue(of());
     gridEngine = new GridEngine(sceneMock);
     gridEngine.create(tileMapMock, {
       characters: [
@@ -235,8 +219,8 @@ describe("GridEngine", () => {
       offsetX: undefined,
       offsetY: undefined,
     });
-    expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
-    expect(mockTurnTowards).not.toHaveBeenCalled();
+    expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith(new Vector2(0, 0));
+    expect(mockGridCharacter.turnTowards).not.toHaveBeenCalled();
   });
 
   it("should init isometric player", () => {
@@ -258,8 +242,8 @@ describe("GridEngine", () => {
       offsetX: undefined,
       offsetY: undefined,
     });
-    expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
-    expect(mockTurnTowards).not.toHaveBeenCalled();
+    expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith(new Vector2(0, 0));
+    expect(mockGridCharacter.turnTowards).not.toHaveBeenCalled();
   });
 
   it("should init player with facingDirection", () => {
@@ -274,7 +258,7 @@ describe("GridEngine", () => {
         },
       ],
     });
-    expect(mockTurnTowards).toHaveBeenCalledWith(Direction.LEFT);
+    expect(mockGridCharacter.turnTowards).toHaveBeenCalledWith(Direction.LEFT);
   });
 
   it("should init player without walking animation", () => {
@@ -292,7 +276,7 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       speed: 4,
     });
-    expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
+    expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith(new Vector2(0, 0));
   });
 
   it("should init player with animation mapping", () => {
@@ -334,7 +318,7 @@ describe("GridEngine", () => {
       speed: 4,
       walkingAnimationMapping,
     });
-    expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(0, 0));
+    expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith(new Vector2(0, 0));
   });
 
   it("should init GlobalConfig with default values", () => {
@@ -390,7 +374,7 @@ describe("GridEngine", () => {
         },
       ],
     });
-    expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(3, 4));
+    expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith(new Vector2(3, 4));
   });
 
   it("should use config speed", () => {
@@ -442,7 +426,7 @@ describe("GridEngine", () => {
     it("should move player orthogonally", () => {
       gridEngine.move("player", Direction.LEFT);
 
-      expect(mockMove).toHaveBeenCalledWith(Direction.LEFT);
+      expect(mockGridCharacter.move).toHaveBeenCalledWith(Direction.LEFT);
     });
 
     it("should show warn on vertical move", () => {
@@ -451,25 +435,25 @@ describe("GridEngine", () => {
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Character 'player' can't be moved 'down-left' in 4 direction mode."
       );
-      expect(mockMove).not.toHaveBeenCalled();
+      expect(mockGridCharacter.move).not.toHaveBeenCalled();
 
       gridEngine.move("player", Direction.DOWN_RIGHT);
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Character 'player' can't be moved 'down-right' in 4 direction mode."
       );
-      expect(mockMove).not.toHaveBeenCalled();
+      expect(mockGridCharacter.move).not.toHaveBeenCalled();
 
       gridEngine.move("player", Direction.UP_RIGHT);
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Character 'player' can't be moved 'up-right' in 4 direction mode."
       );
-      expect(mockMove).not.toHaveBeenCalled();
+      expect(mockGridCharacter.move).not.toHaveBeenCalled();
 
       gridEngine.move("player", Direction.UP_LEFT);
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Character 'player' can't be moved 'up-left' in 4 direction mode."
       );
-      expect(mockMove).not.toHaveBeenCalled();
+      expect(mockGridCharacter.move).not.toHaveBeenCalled();
     });
   });
 
@@ -487,7 +471,7 @@ describe("GridEngine", () => {
 
       gridEngine.move("player", Direction.LEFT);
 
-      expect(mockMove).toHaveBeenCalledWith(Direction.LEFT);
+      expect(mockGridCharacter.move).toHaveBeenCalledWith(Direction.LEFT);
     });
 
     it("should move player vertically", () => {
@@ -503,7 +487,7 @@ describe("GridEngine", () => {
 
       gridEngine.move("player", Direction.UP_LEFT);
 
-      expect(mockMove).toHaveBeenCalledWith(Direction.UP_LEFT);
+      expect(mockGridCharacter.move).toHaveBeenCalledWith(Direction.UP_LEFT);
     });
   });
 
@@ -521,7 +505,7 @@ describe("GridEngine", () => {
 
       gridEngine.move("player", Direction.UP_LEFT);
 
-      expect(mockMove).toHaveBeenCalledWith(Direction.UP_LEFT);
+      expect(mockGridCharacter.move).toHaveBeenCalledWith(Direction.UP_LEFT);
     });
 
     it("should show warn on orthogonal move", () => {
@@ -540,36 +524,36 @@ describe("GridEngine", () => {
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Character 'player' can't be moved 'down' in 4 direction isometric mode."
       );
-      expect(mockMove).not.toHaveBeenCalled();
+      expect(mockGridCharacter.move).not.toHaveBeenCalled();
 
       gridEngine.move("player", Direction.LEFT);
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Character 'player' can't be moved 'left' in 4 direction isometric mode."
       );
-      expect(mockMove).not.toHaveBeenCalled();
+      expect(mockGridCharacter.move).not.toHaveBeenCalled();
 
       gridEngine.move("player", Direction.RIGHT);
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Character 'player' can't be moved 'right' in 4 direction isometric mode."
       );
-      expect(mockMove).not.toHaveBeenCalled();
+      expect(mockGridCharacter.move).not.toHaveBeenCalled();
 
       gridEngine.move("player", Direction.UP);
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Character 'player' can't be moved 'up' in 4 direction isometric mode."
       );
-      expect(mockMove).not.toHaveBeenCalled();
+      expect(mockGridCharacter.move).not.toHaveBeenCalled();
     });
   });
 
   it("should update", () => {
     gridEngine.update(123, 456);
 
-    expect(mockUpdate).toHaveBeenCalledWith(456);
+    expect(mockGridCharacter.update).toHaveBeenCalledWith(456);
   });
 
   it("should get tile position", () => {
-    mockGetTilePos.mockReturnValue(new Vector2(3, 4));
+    mockGridCharacter.getTilePos.mockReturnValue(new Vector2(3, 4));
 
     expect(gridEngine.getPosition("player")).toEqual(new Vector2(3, 4));
   });
@@ -577,11 +561,11 @@ describe("GridEngine", () => {
   it("should set tile position", () => {
     gridEngine.setPosition("player", { x: 3, y: 4 });
 
-    expect(mockSetTilePositon).toHaveBeenCalledWith(new Vector2(3, 4));
+    expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith(new Vector2(3, 4));
   });
 
   it("should get sprite", () => {
-    mockGetSprite.mockReturnValue('sprite');
+    mockGridCharacter.getSprite.mockReturnValue('sprite');
 
     expect(gridEngine.getSprite('player')).toEqual('sprite');
   });
@@ -589,7 +573,15 @@ describe("GridEngine", () => {
   it("should set sprite", () => {
     gridEngine.setSprite("player", <any>'someSprite');
 
-    expect(mockSetSprite).toHaveBeenCalledWith('someSprite');
+    expect(mockGridCharacter.setSprite).toHaveBeenCalledWith('someSprite');
+  });
+
+  it("should get facing position", () => {
+    mockGridCharacter.getFacingPosition.mockReturnValue('facingPos')
+    const res = gridEngine.getFacingPosition("player");
+
+    expect(mockGridCharacter.getFacingPosition).toHaveBeenCalled();
+    expect(res).toEqual('facingPos');
   });
 
   it("should move randomly", () => {
@@ -598,7 +590,7 @@ describe("GridEngine", () => {
     expect(mockRandomMovement.setNumberOfDirections).toHaveBeenCalledWith(
       NumberOfDirections.FOUR
     );
-    expect(mockSetMovement).toHaveBeenCalledWith(mockRandomMovement);
+    expect(mockGridCharacter.setMovement).toHaveBeenCalledWith(mockRandomMovement);
   });
 
   it("should move randomly with 8 directions", () => {
@@ -633,7 +625,7 @@ describe("GridEngine", () => {
       expect(mockTargetMovement.setNumberOfDirections).toHaveBeenCalledWith(
         NumberOfDirections.FOUR
       );
-      expect(mockSetMovement).toHaveBeenCalledWith(mockTargetMovement);
+      expect(mockGridCharacter.setMovement).toHaveBeenCalledWith(mockTargetMovement);
       expect(console.warn).not.toHaveBeenCalled();
     });
 
@@ -763,19 +755,19 @@ describe("GridEngine", () => {
   });
 
   it("should stop moving", () => {
-    mockGetMovement.mockReturnValue({});
+    mockGridCharacter.getMovement.mockReturnValue({});
     gridEngine.stopMovement("player");
-    expect(mockSetMovement).toHaveBeenCalledWith(undefined);
+    expect(mockGridCharacter.setMovement).toHaveBeenCalledWith(undefined);
   });
 
   it("should set speed", () => {
     gridEngine.setSpeed("player", 2);
-    expect(mockSetSpeed).toHaveBeenCalledWith(2);
+    expect(mockGridCharacter.setSpeed).toHaveBeenCalledWith(2);
   });
 
   it("should not call update before create", () => {
     gridEngine.update(123, 456);
-    expect(mockRandomMovementUpdate).not.toHaveBeenCalled();
+    expect(mockRandomMovement.update).not.toHaveBeenCalled();
     expect(mockTargetMovement.update).not.toHaveBeenCalled();
   });
 
@@ -788,14 +780,14 @@ describe("GridEngine", () => {
       sprite: playerSpriteMock,
     });
     gridEngine.update(123, 456);
-    expect(mockUpdate).toHaveBeenCalledTimes(1);
+    expect(mockGridCharacter.update).toHaveBeenCalledTimes(1);
   });
 
   it("should remove chars on the go", () => {
     gridEngine.removeCharacter("player");
     gridEngine.update(123, 456);
     expect(mockGridTileMap.removeCharacter).toHaveBeenCalledWith("player");
-    expect(mockUpdate).not.toHaveBeenCalled();
+    expect(mockGridCharacter.update).not.toHaveBeenCalled();
   });
 
   it("should remove all chars", () => {
@@ -815,7 +807,7 @@ describe("GridEngine", () => {
     gridEngine.update(123, 456);
     expect(mockGridTileMap.removeCharacter).toHaveBeenCalledWith("player");
     expect(mockGridTileMap.removeCharacter).toHaveBeenCalledWith("player2");
-    expect(mockUpdate).not.toHaveBeenCalled();
+    expect(mockGridCharacter.update).not.toHaveBeenCalled();
   });
 
   it("should get all chars", () => {
@@ -869,7 +861,7 @@ describe("GridEngine", () => {
     expect(mockFollowMovement.setNumberOfDirections).toHaveBeenCalledWith(
       NumberOfDirections.FOUR
     );
-    expect(mockSetMovement).toHaveBeenCalledWith(mockFollowMovement);
+    expect(mockGridCharacter.setMovement).toHaveBeenCalledWith(mockFollowMovement);
   });
 
   it("should follow a char with default distance", () => {
@@ -893,7 +885,7 @@ describe("GridEngine", () => {
       0,
       NoPathFoundStrategy.STOP
     );
-    expect(mockSetMovement).toHaveBeenCalledWith(mockFollowMovement);
+    expect(mockGridCharacter.setMovement).toHaveBeenCalledWith(mockFollowMovement);
   });
 
   it("should set walkingAnimationMapping", () => {
@@ -929,33 +921,33 @@ describe("GridEngine", () => {
       },
     };
     gridEngine.setWalkingAnimationMapping("player", mockMapping);
-    expect(mockSetWalkingAnimationMapping).toHaveBeenCalledWith(mockMapping);
+    expect(mockGridCharacter.setWalkingAnimationMapping).toHaveBeenCalledWith(mockMapping);
   });
 
   it("should delegate isMoving", () => {
-    mockIsMoving.mockReturnValue(true);
+    mockGridCharacter.isMoving.mockReturnValue(true);
     let isMoving = gridEngine.isMoving("player");
     expect(isMoving).toEqual(true);
-    mockIsMoving.mockReturnValue(false);
+    mockGridCharacter.isMoving.mockReturnValue(false);
     isMoving = gridEngine.isMoving("player");
     expect(isMoving).toEqual(false);
   });
 
   it("should delegate getFacingDirection", () => {
-    mockFacingDirection.mockReturnValue(Direction.LEFT);
+    mockGridCharacter.getFacingDirection.mockReturnValue(Direction.LEFT);
     const facingDirection = gridEngine.getFacingDirection("player");
     expect(facingDirection).toEqual(Direction.LEFT);
   });
 
   it("should delegate turnTowards", () => {
     gridEngine.turnTowards("player", Direction.RIGHT);
-    expect(mockTurnTowards).toHaveBeenCalledWith(Direction.RIGHT);
+    expect(mockGridCharacter.turnTowards).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
   describe("Observables", () => {
     it("should get chars movementStarted observable", async () => {
       const mockSubject = new Subject<Direction>();
-      mockMovementStarted.mockReturnValue(mockSubject);
+      mockGridCharacter.movementStarted.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -974,7 +966,7 @@ describe("GridEngine", () => {
 
     it("should unsubscribe from movementStarted if char removed", async () => {
       const mockSubject = new Subject<Direction>();
-      mockMovementStarted.mockReturnValue(mockSubject);
+      mockGridCharacter.movementStarted.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -998,7 +990,7 @@ describe("GridEngine", () => {
 
     it("should get chars movementStopped observable", async () => {
       const mockSubject = new Subject<Direction>();
-      mockMovementStopped.mockReturnValue(mockSubject);
+      mockGridCharacter.movementStopped.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1017,7 +1009,7 @@ describe("GridEngine", () => {
 
     it("should unsubscribe from movementStopped if char removed", async () => {
       const mockSubject = new Subject<Direction>();
-      mockMovementStopped.mockReturnValue(mockSubject);
+      mockGridCharacter.movementStopped.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1041,7 +1033,7 @@ describe("GridEngine", () => {
 
     it("should get chars directionChanged observable", async () => {
       const mockSubject = new Subject<Direction>();
-      mockDirectionChanged.mockReturnValue(mockSubject);
+      mockGridCharacter.directionChanged.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1060,7 +1052,7 @@ describe("GridEngine", () => {
 
     it("should unsubscribe from directionChanged if char removed", async () => {
       const mockSubject = new Subject<Direction>();
-      mockDirectionChanged.mockReturnValue(mockSubject);
+      mockGridCharacter.directionChanged.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1084,7 +1076,7 @@ describe("GridEngine", () => {
 
     it("should get chars positionChanged observable", async () => {
       const mockSubject = new Subject<PositionChange>();
-      mockPositionChangeStarted.mockReturnValue(mockSubject);
+      mockGridCharacter.positionChanged.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1109,7 +1101,7 @@ describe("GridEngine", () => {
 
     it("should unsubscribe from positionChanged if char removed", async () => {
       const mockSubject = new Subject<PositionChange>();
-      mockPositionChangeStarted.mockReturnValue(mockSubject);
+      mockGridCharacter.positionChanged.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1136,7 +1128,7 @@ describe("GridEngine", () => {
 
     it("should get chars positionChangeFinished observable", async () => {
       const mockSubject = new Subject<PositionChange>();
-      mockPositionChangeFinished.mockReturnValue(mockSubject);
+      mockGridCharacter.positionChangeFinished.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1164,7 +1156,7 @@ describe("GridEngine", () => {
 
     it("should unsubscribe from positionChangeFinished if char removed", async () => {
       const mockSubject = new Subject<PositionChange>();
-      mockPositionChangeFinished.mockReturnValue(mockSubject);
+      mockGridCharacter.positionChangeFinished.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1235,6 +1227,9 @@ describe("GridEngine", () => {
       expectCharUnknownException(() =>
         gridEngine.getSprite(UNKNOWN_CHAR_ID)
       );
+      expectCharUnknownException(() =>
+        gridEngine.getFacingPosition(UNKNOWN_CHAR_ID)
+      );
     });
 
     it("should throw error if follow is invoked", () => {
@@ -1302,6 +1297,7 @@ describe("GridEngine", () => {
       expectUninitializedException(() => gridEngine.getAllCharacters());
       expectUninitializedException(() => gridEngine.setSprite(SOME_CHAR_ID, playerSpriteMock));
       expectUninitializedException(() => gridEngine.getSprite(SOME_CHAR_ID));
+      expectUninitializedException(() => gridEngine.getFacingPosition(SOME_CHAR_ID));
     });
   });
 });

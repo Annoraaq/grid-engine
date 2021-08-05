@@ -19,25 +19,25 @@
   ],
   "types": "dist/GridEngine.d.ts",
   "dependencies": {
-    "rxjs": "^7.1.0"
+    "rxjs": "^7.3.0"
   },
   "peerDependencies": {
     "phaser": "~3.55.2"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.23",
-    "@typescript-eslint/eslint-plugin": "^4.27.0",
-    "@typescript-eslint/parser": "^4.27.0",
+    "@types/jest": "^26.0.24",
+    "@typescript-eslint/eslint-plugin": "^4.29.0",
+    "@typescript-eslint/parser": "^4.29.0",
     "canvas": "^2.8.0",
-    "esbuild": "^0.12.9",
-    "eslint": "^7.28.0",
+    "esbuild": "^0.12.18",
+    "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-jest": "^24.4.0",
     "jest": "^27.0.6",
     "phaser": "~3.55.2",
-    "prettier": "2.3.1",
-    "ts-jest": "^27.0.3",
-    "typescript": "^4.3.4"
+    "prettier": "2.3.2",
+    "ts-jest": "^27.0.4",
+    "typescript": "^4.3.5"
   },
   "repository": {
     "type": "git",
