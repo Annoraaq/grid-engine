@@ -26,6 +26,10 @@ nav_order: 2
 | :------------------------------------------------------------------------------------------- |
 | Returns the direction the character is currently facing. At time of creation this is `down`. |
 
+| getFacingPosition(charId: string): [Position](./config.html#position)                     |
+| :------------------------------------------------------------------------------------------- |
+| Returns the position the character is currently facing. |
+
 | turnTowards(charId: string, direction: [Direction](./config.html#direction)): void |
 | :--------------------------------------------------------------------------------- |
 | Turns the character towards the given direction without moving it.                 |
