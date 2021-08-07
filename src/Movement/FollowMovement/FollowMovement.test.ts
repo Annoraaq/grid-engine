@@ -26,14 +26,14 @@ describe("FollowMovement", () => {
 
   function createMockChar(id: string, pos: Vector2) {
     return <any>{
-      positionChangedSubject$: new Subject(),
+      positionChangeStartedSubject$: new Subject(),
       autoMovementSetSubject$: new Subject(),
       getId: () => id,
       getTilePos: jest.fn(() => pos),
       move: jest.fn(),
       isMoving: () => false,
-      positionChanged: function () {
-        return this.positionChangedSubject$;
+      positionChangeStarted: function () {
+        return this.positionChangeStartedSubject$;
       },
       autoMovementSet: function () {
         return this.autoMovementSetSubject$;
@@ -92,7 +92,7 @@ describe("FollowMovement", () => {
     mockTargetMovement.setNumberOfDirections.mockReset();
     mockTargetMovement.setCharacter.mockReset();
 
-    targetChar.positionChangedSubject$.next({ enterTile });
+    targetChar.positionChangeStartedSubject$.next({ enterTile });
 
     expect(TargetMovement).toHaveBeenCalledWith(gridTilemapMock, enterTile, 1, {
       noPathFoundStrategy: NoPathFoundStrategy.STOP,
@@ -111,7 +111,7 @@ describe("FollowMovement", () => {
     mockTargetMovement.setCharacter.mockReset();
 
     mockChar.autoMovementSetSubject$.next();
-    targetChar.positionChangedSubject$.next({ enterTile });
+    targetChar.positionChangeStartedSubject$.next({ enterTile });
 
     expect(TargetMovement).not.toHaveBeenCalledWith(
       gridTilemapMock,

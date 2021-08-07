@@ -28,7 +28,7 @@ export class FollowMovement implements Movement {
     this.character = character;
     this.updateTarget(this.charToFollow.getTilePos());
     this.charToFollow
-      .positionChanged()
+      .positionChangeStarted()
       .pipe(takeUntil(this.character.autoMovementSet()))
       .subscribe(({ enterTile }) => {
         this.updateTarget(enterTile);

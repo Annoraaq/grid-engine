@@ -36,15 +36,15 @@ describe("CharBlockCache", () => {
     });
 
     it("should block new and old pos on movement", () => {
-      const positionChanged = new Subject<PositionChange>();
+      const positionChangeStarted = new Subject<PositionChange>();
 
       const char1Mock = <any>{
         ...createCharMock("player1"),
         getTilePos: () => ({ x: 3, y: 3 }),
-        positionChanged: () => positionChanged,
+        positionChangeStarted: () => positionChangeStarted,
       };
       charBlockCache.addCharacter(char1Mock);
-      positionChanged.next({
+      positionChangeStarted.next({
         enterTile: new Vector2(3, 4),
         exitTile: new Vector2(3, 3),
       });
@@ -90,15 +90,15 @@ describe("CharBlockCache", () => {
     });
 
     it("should block pos on movement and release old one", () => {
-      const positionChanged = new Subject<PositionChange>();
+      const positionChangeStarted = new Subject<PositionChange>();
 
       const char1Mock = <any>{
         ...createCharMock("player1"),
         getTilePos: () => ({ x: 3, y: 3 }),
-        positionChanged: () => positionChanged,
+        positionChangeStarted: () => positionChangeStarted,
       };
       charBlockCache.addCharacter(char1Mock);
-      positionChanged.next({
+      positionChangeStarted.next({
         enterTile: new Vector2(3, 4),
         exitTile: new Vector2(3, 3),
       });
@@ -115,7 +115,7 @@ describe("CharBlockCache", () => {
   });
 
   it("should consider serveral chars for blocking after pos change", () => {
-    const positionChanged = new Subject<PositionChange>();
+    const positionChangeStarted = new Subject<PositionChange>();
     const positionChangeFinished = new Subject<PositionChange>();
 
     const char1Mock = <any>{
@@ -125,13 +125,13 @@ describe("CharBlockCache", () => {
     const char2Mock = <any>{
       ...createCharMock("player2"),
       getTilePos: () => ({ x: 3, y: 2 }),
-      positionChanged: () => positionChanged,
+      positionChangeStarted: () => positionChangeStarted,
       positionChangeFinished: () => positionChangeFinished,
     };
 
     charBlockCache.addCharacter(char1Mock);
     charBlockCache.addCharacter(char2Mock);
-    positionChanged.next({
+    positionChangeStarted.next({
       enterTile: new Vector2(3, 3),
       exitTile: new Vector2(3, 2),
     });
@@ -139,7 +139,7 @@ describe("CharBlockCache", () => {
       enterTile: new Vector2(3, 3),
       exitTile: new Vector2(3, 2),
     });
-    positionChanged.next({
+    positionChangeStarted.next({
       enterTile: new Vector2(3, 4),
       exitTile: new Vector2(3, 3),
     });
@@ -173,9 +173,9 @@ describe("CharBlockCache", () => {
   });
 
   it("should remove a character", () => {
-    const positionChangedSub = { unsubscribe: jest.fn() };
-    const positionChanged = {
-      subscribe: () => positionChangedSub,
+    const positionChangeStartedSub = { unsubscribe: jest.fn() };
+    const positionChangeStarted = {
+      subscribe: () => positionChangeStartedSub,
     };
     const positionChangeFinishedSub = { unsubscribe: jest.fn() };
     const positionChangeFinished = {
@@ -185,7 +185,7 @@ describe("CharBlockCache", () => {
       ...createCharMock("player"),
       getTilePos: () => ({ x: 0, y: 1 }),
       getNextTilePos: () => ({ x: 1, y: 1 }),
-      positionChanged: () => positionChanged,
+      positionChangeStarted: () => positionChangeStarted,
       positionChangeFinished: () => positionChangeFinished,
     };
     const charMock2 = <any>{
@@ -197,7 +197,7 @@ describe("CharBlockCache", () => {
     charBlockCache.addCharacter(charMock2);
     charBlockCache.removeCharacter(charMock1);
 
-    expect(positionChangedSub.unsubscribe).toHaveBeenCalled();
+    expect(positionChangeStartedSub.unsubscribe).toHaveBeenCalled();
     expect(positionChangeFinishedSub.unsubscribe).toHaveBeenCalled();
     expect(charBlockCache.isCharBlockingAt(new Vector2(0, 1))).toBe(false);
     expect(charBlockCache.isCharBlockingAt(new Vector2(1, 1))).toBe(false);
@@ -209,7 +209,7 @@ describe("CharBlockCache", () => {
       isBlockingTile: () => false,
       getTilePos: () => ({ x: 1, y: 1 }),
       getNextTilePos: () => ({ x: 1, y: 1 }),
-      positionChanged: () => of([]),
+      positionChangeStarted: () => of([]),
       positionChangeFinished: () => of([]),
     };
   }

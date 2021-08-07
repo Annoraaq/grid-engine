@@ -163,7 +163,7 @@ describe("GridCharacter", () => {
       .toPromise();
 
     const posChangedProm = gridCharacter
-      .positionChanged()
+      .positionChangeStarted()
       .pipe(take(1))
       .toPromise();
 
@@ -299,7 +299,7 @@ describe("GridCharacter", () => {
     const movementStoppedObs = gridCharacter.movementStopped();
     jest.spyOn(movementStoppedObs, "next");
     const positionChangeStartedProm = gridCharacter
-      .positionChanged()
+      .positionChangeStarted()
       .pipe(take(1))
       .toPromise();
     const positionChangeFinishedProm = gridCharacter
@@ -336,7 +336,7 @@ describe("GridCharacter", () => {
       .pipe(take(1))
       .toPromise();
     const positionChangeStartedProm = gridCharacter
-      .positionChanged()
+      .positionChangeStarted()
       .pipe(take(1))
       .toPromise();
     const positionChangeFinishedProm = gridCharacter

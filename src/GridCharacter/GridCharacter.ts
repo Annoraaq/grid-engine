@@ -48,7 +48,7 @@ export class GridCharacter {
   private movementStarted$ = new Subject<Direction>();
   private movementStopped$ = new Subject<Direction>();
   private directionChanged$ = new Subject<Direction>();
-  private positionChanged$ = new Subject<PositionChange>();
+  private positionChangeStarted$ = new Subject<PositionChange>();
   private positionChangeFinished$ = new Subject<PositionChange>();
   private autoMovementSet$ = new Subject<void>();
   private lastMovementImpulse = Direction.NONE;
@@ -115,7 +115,7 @@ export class GridCharacter {
     if (this.isMoving()) {
       this.movementStopped$.next(this.movementDirection);
     }
-    this.positionChanged$.next({
+    this.positionChangeStarted$.next({
       exitTile: this.tilePos,
       enterTile: tilePosition,
     });
@@ -216,8 +216,8 @@ export class GridCharacter {
     return this.directionChanged$;
   }
 
-  positionChanged(): Subject<PositionChange> {
-    return this.positionChanged$;
+  positionChangeStarted(): Subject<PositionChange> {
+    return this.positionChangeStarted$;
   }
 
   positionChangeFinished(): Subject<PositionChange> {
@@ -338,7 +338,7 @@ export class GridCharacter {
     this.tilePos = this.nextTilePos;
     const newTilePos = this.tilePosInDirection(this.movementDirection);
     this.nextTilePos = newTilePos;
-    this.positionChanged$.next({
+    this.positionChangeStarted$.next({
       exitTile: this.tilePos,
       enterTile: newTilePos,
     });

@@ -250,7 +250,7 @@ export class GridEngine {
       });
 
     gridChar
-      .positionChanged()
+      .positionChangeStarted()
       .pipe(this.takeUntilCharRemoved(gridChar.getId()))
       .subscribe(({ exitTile, enterTile }) => {
         this.positionChangeStarted$.next({

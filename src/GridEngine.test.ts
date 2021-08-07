@@ -16,7 +16,7 @@ const mockGridCharacter = {
   movementStarted: jest.fn(),
   movementStopped: jest.fn(),
   directionChanged: jest.fn(),
-  positionChanged: jest.fn(),
+  positionChangeStarted: jest.fn(),
   positionChangeFinished: jest.fn(),
   isMoving: jest.fn(),
   getFacingDirection: jest.fn(),
@@ -165,7 +165,7 @@ describe("GridEngine", () => {
     mockGridCharacter.movementStarted.mockReset().mockReturnValue(of());
     mockGridCharacter.movementStopped.mockReset().mockReturnValue(of());
     mockGridCharacter.directionChanged.mockReset().mockReturnValue(of());
-    mockGridCharacter.positionChanged.mockReset().mockReturnValue(of());
+    mockGridCharacter.positionChangeStarted.mockReset().mockReturnValue(of());
     mockGridCharacter.positionChangeFinished.mockReset().mockReturnValue(of());
     gridEngine = new GridEngine(sceneMock);
     gridEngine.create(tileMapMock, {
@@ -1074,9 +1074,9 @@ describe("GridEngine", () => {
       expect(nextMock).not.toHaveBeenCalled();
     });
 
-    it("should get chars positionChanged observable", async () => {
+    it("should get chars positionChangeStarted observable", async () => {
       const mockSubject = new Subject<PositionChange>();
-      mockGridCharacter.positionChanged.mockReturnValue(mockSubject);
+      mockGridCharacter.positionChangeStarted.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1099,9 +1099,9 @@ describe("GridEngine", () => {
       expect(res).toEqual({ charId: "player", exitTile, enterTile });
     });
 
-    it("should unsubscribe from positionChanged if char removed", async () => {
+    it("should unsubscribe from positionChangeStarted if char removed", async () => {
       const mockSubject = new Subject<PositionChange>();
-      mockGridCharacter.positionChanged.mockReturnValue(mockSubject);
+      mockGridCharacter.positionChangeStarted.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
         characters: [
           {
