@@ -105,6 +105,7 @@ const mockTargetMovement = {
   update: jest.fn(),
   removeCharacter: jest.fn(),
   setNumberOfDirections: jest.fn(),
+  finishedObs: jest.fn().mockReturnValue(of()),
 };
 
 jest.mock("./Movement/RandomMovement/RandomMovement", () => ({
@@ -125,7 +126,7 @@ jest.mock("./GridTilemap/GridTilemap");
 
 import { GridEngine } from "./GridEngine";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
-import { TargetMovement } from "./Movement/TargetMovement/TargetMovement";
+import { Finished, TargetMovement } from "./Movement/TargetMovement/TargetMovement";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import { IsometricGridCharacter } from "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter";
 import { Vector2 } from "./Utils/Vector2/Vector2";
@@ -627,6 +628,44 @@ describe("GridEngine", () => {
       );
       expect(mockGridCharacter.setMovement).toHaveBeenCalledWith(mockTargetMovement);
       expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    it("should return observable", (done) => {
+      const finishedSubject = new Subject<Finished>();
+      mockTargetMovement.finishedObs.mockReturnValue(finishedSubject);
+      const targetVec = new Vector2(3, 4);
+      gridEngine.moveTo("player", targetVec).subscribe((finished) => {
+        expect(finished.charId).toEqual('player');
+        expect(finished.position).toEqual({x: 1, y: 2});
+        expect(finished.successful).toEqual(false);
+        expect(finished.errorReason).toEqual('errorReason');
+        done();
+      });
+      finishedSubject.next(<Finished>{
+        position: {x: 1, y: 2},
+        successful: false,
+        errorReason: 'errorReason'
+      });
+    });
+
+    it("should return observable only once", (done) => {
+      const finishedSubject = new Subject<Finished>();
+      mockTargetMovement.finishedObs.mockReturnValue(finishedSubject);
+      const targetVec = new Vector2(3, 4);
+      const callMock = jest.fn();
+      gridEngine.moveTo("player", targetVec).subscribe(callMock).add(done);
+      finishedSubject.next(<Finished>{
+        position: {x: 1, y: 2},
+        successful: false,
+        errorReason: 'errorReason'
+      });
+      finishedSubject.next(<Finished>{
+        position: {x: 1, y: 2},
+        successful: false,
+        errorReason: 'errorReason'
+      });
+
+      expect(callMock).toHaveBeenCalledTimes(1);
     });
 
     it("should use backoff and retry", () => {

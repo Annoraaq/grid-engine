@@ -11,6 +11,8 @@ import { DistanceUtils4 } from "../../Utils/DistanceUtils4/DistanceUtils4";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
 import { ShortestPathAlgorithm } from "../../Pathfinding/ShortestPathAlgorithm";
+import { Position } from "../../GridEngine";
+import { Subject, take } from "rxjs";
 
 export interface MoveToConfig {
   noPathFoundStrategy?: NoPathFoundStrategy;
@@ -20,6 +22,12 @@ export interface MoveToConfig {
   pathBlockedMaxRetries?: number;
   pathBlockedRetryBackoffMs?: number;
   pathBlockedWaitTimeoutMs?: number;
+}
+
+export interface Finished {
+  position: Position,
+  successful: boolean,
+  errorReason: string,
 }
 
 export class TargetMovement implements Movement {
@@ -35,6 +43,7 @@ export class TargetMovement implements Movement {
   private pathBlockedWaitTimeoutMs: number;
   private pathBlockedWaitElapsed: number;
   private distanceUtils: DistanceUtils = new DistanceUtils4();
+  private finished$: Subject<Finished>;
 
   constructor(
     private tilemap: GridTilemap,
@@ -57,6 +66,7 @@ export class TargetMovement implements Movement {
       () => this.stop()
     );
     this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
+    this.finished$ = new Subject<Finished>();
   }
 
   setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void {
@@ -81,6 +91,15 @@ export class TargetMovement implements Movement {
     this.pathBlockedRetryable.reset();
     this.pathBlockedWaitElapsed = 0;
     this.calcShortestPath();
+    this.character.autoMovementSet().pipe(take(1)).subscribe(() => {
+      this.finished$.next({
+        position: this.character.getTilePos(),
+        successful: false,
+        errorReason:
+          "Movement of character has been replaced before destination was reached.",
+      });
+      this.finished$.complete();
+    })
   }
 
   update(delta: number): void {
@@ -99,6 +118,12 @@ export class TargetMovement implements Movement {
 
     this.updatePosOnPath();
     if (this.hasArrived()) {
+      this.finished$.next({
+        position: this.character.getTilePos(),
+        successful: true,
+        errorReason: undefined
+      })
+      this.stop();
       if (this.existsDistToTarget()) {
         this.turnTowardsTarget();
       }
@@ -111,6 +136,10 @@ export class TargetMovement implements Movement {
     const neighbours = this.distanceUtils.neighbours(pos);
     return neighbours.filter((pos) => !this.isBlocking(pos));
   };
+
+  finishedObs(): Subject<Finished> {
+    return this.finished$;
+  }
 
   private applyPathBlockedStrategy(delta: number): void {
     if (this.pathBlockedStrategy === PathBlockedStrategy.RETRY) {
@@ -154,7 +183,7 @@ export class TargetMovement implements Movement {
   }
 
   private hasArrived(): boolean {
-    return (
+    return !this.noPathFound() && (
       this.posOnPath + Math.max(0, this.distance - this.distOffset) >=
       this.shortestPath.length - 1
     );

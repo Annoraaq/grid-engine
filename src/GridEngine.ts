@@ -3,6 +3,7 @@ import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { IsometricGridCharacter } from "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import {
+  Finished,
   MoveToConfig,
   TargetMovement,
 } from "./Movement/TargetMovement/TargetMovement";
@@ -21,7 +22,7 @@ import {
 import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
-import { takeUntil, filter } from "rxjs/operators";
+import { takeUntil, filter, map, take } from "rxjs/operators";
 import { Vector2 } from "./Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
@@ -150,7 +151,7 @@ export class GridEngine {
     this.gridCharacters.get(charId).setMovement(randomMovement);
   }
 
-  moveTo(charId: string, targetPos: Position, config?: MoveToConfig): void {
+  moveTo(charId: string, targetPos: Position, config?: MoveToConfig): Observable<{charId: string} & Finished> {
     const moveToConfig = this.assembleMoveToConfig(config);
 
     this.initGuard();
@@ -163,10 +164,21 @@ export class GridEngine {
     );
     targetMovement.setNumberOfDirections(GlobalConfig.get().numberOfDirections);
     this.gridCharacters.get(charId).setMovement(targetMovement);
+    return targetMovement.finishedObs().pipe(
+      take(1),
+      map((finished) => ({
+        charId,
+        position: finished.position,
+        successful: finished.successful,
+        errorReason: finished.errorReason
+      }))
+    );
   }
 
   stopMovement(charId: string): void {
-    this._stopMovement(charId);
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    this.gridCharacters.get(charId).setMovement(undefined);
   }
 
   setSpeed(charId: string, speed: number): void {
@@ -442,12 +454,6 @@ export class GridEngine {
     }
 
     this.gridCharacters.get(charId).move(direction);
-  }
-
-  private _stopMovement(charId: string) {
-    this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).setMovement(undefined);
   }
 
   private _isIsometric(): boolean {

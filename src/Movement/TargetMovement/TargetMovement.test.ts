@@ -3,6 +3,7 @@ import { TargetMovement } from "./TargetMovement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
+import { of } from "rxjs";
 
 const mockBfs = {
   getShortestPath: jest.fn(),
@@ -28,6 +29,7 @@ describe("TargetMovement", () => {
       move: jest.fn(),
       isMoving: () => false,
       turnTowards: jest.fn(),
+      autoMovementSet: jest.fn().mockReturnValue(of()),
     };
   }
   beforeEach(() => {
@@ -728,6 +730,71 @@ describe("TargetMovement", () => {
     targetMovement.update(100);
 
     expect(char.move).not.toHaveBeenCalled();
+  });
+
+  describe('finished observable', () => {
+    let mockChar;
+
+    beforeEach(() => {
+      const targetPos = new Vector2(3, 3);
+      targetMovement = new TargetMovement(gridTilemapMock, targetPos);
+      mockBfs.getShortestPath = jest.fn().mockReturnValueOnce({
+        path: [],
+        targetPos,
+      });
+      mockChar = createMockChar('char', new Vector2(1,1));
+    })
+
+    it("should call fire when char gets new movement", () => {
+      mockChar.autoMovementSet.mockReturnValue(of(1));
+      const mockCall = jest.fn();
+      targetMovement.finishedObs().subscribe(mockCall);
+      targetMovement.setCharacter(mockChar);
+      expect(mockCall).toHaveBeenCalledWith({
+        position: mockChar.getTilePos(),
+        successful: false,
+        errorReason: "Movement of character has been replaced before destination was reached."
+      })
+    });
+
+    it("should complete when char gets new movement", () => {
+      mockChar.autoMovementSet.mockReturnValue(of(1));
+      const mockCall = jest.fn();
+      targetMovement.finishedObs().subscribe({complete: mockCall});
+      targetMovement.setCharacter(mockChar);
+      expect(mockCall).toHaveBeenCalled();
+    });
+
+    it("should fire when char arrives", () => {
+      const charPos = new Vector2(1, 1);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [charPos],
+        closestToTarget: charPos,
+      });
+      const mockCall = jest.fn();
+      targetMovement.finishedObs().subscribe(mockCall);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(100);
+      expect(mockCall).toHaveBeenCalledWith({
+        position: mockChar.getTilePos(),
+        successful: true,
+        errorReason: undefined
+      });
+    });
+
+    it("should fire once when char arrives", () => {
+      const charPos = new Vector2(1, 1);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [charPos],
+        closestToTarget: charPos,
+      });
+      const mockCall = jest.fn();
+      targetMovement.finishedObs().subscribe(mockCall);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(100);
+      targetMovement.update(100);
+      expect(mockCall).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("8 directions", () => {
