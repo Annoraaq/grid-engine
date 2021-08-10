@@ -151,6 +151,12 @@ export class TargetMovement implements Movement {
         this.pathBlockedWaitElapsed += delta;
         if (this.pathBlockedWaitElapsed >= this.pathBlockedWaitTimeoutMs) {
           this.stop();
+          this.finished$.next({
+            position: this.character.getTilePos(),
+            successful: false,
+            errorReason: `PathBlockedStrategy WAIT: Wait timeout of 2000ms exceeded.`
+          });
+          this.finished$.complete();
         }
       }
     }

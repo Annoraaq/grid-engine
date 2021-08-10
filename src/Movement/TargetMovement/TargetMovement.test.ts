@@ -4,6 +4,7 @@ import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
 import { of } from "rxjs";
+import { Vector } from "matter";
 
 const mockBfs = {
   getShortestPath: jest.fn(),
@@ -578,6 +579,14 @@ describe("TargetMovement", () => {
     targetMovement = new TargetMovement(gridTilemapMock, new Vector2(2, 2), 0, {
       pathBlockedWaitTimeoutMs: 2000,
     });
+    const finishedObsCallbackMock = jest.fn();
+    const finishedObsCompleteMock = jest.fn();
+    targetMovement
+      .finishedObs()
+      .subscribe({
+        next: finishedObsCallbackMock,
+        complete: finishedObsCompleteMock,
+      });
     const charPos = new Vector2(1, 1);
     mockBfs.getShortestPath = jest.fn().mockReturnValue({
       path: [charPos, new Vector2(2, 1), new Vector2(2, 2)],
@@ -591,6 +600,12 @@ describe("TargetMovement", () => {
 
     expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
     expect(char.move).not.toHaveBeenCalled();
+    expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+      position: new Vector2(0, 1),
+      successful: false,
+      errorReason: 'PathBlockedStrategy WAIT: Wait timeout of 2000ms exceeded.'
+    });
+    expect(finishedObsCompleteMock).toHaveBeenCalled();
   });
 
   it("should reset timeout on strategy WAIT", () => {
