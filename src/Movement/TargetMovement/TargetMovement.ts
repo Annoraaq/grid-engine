@@ -25,9 +25,9 @@ export interface MoveToConfig {
 }
 
 export interface Finished {
-  position: Position,
-  successful: boolean,
-  errorReason: string,
+  position: Position;
+  successful: boolean;
+  errorReason: string;
 }
 
 export class TargetMovement implements Movement {
@@ -58,12 +58,30 @@ export class TargetMovement implements Movement {
     this.noPathFoundRetryable = new Retryable(
       config?.noPathFoundRetryBackoffMs || 200,
       config?.noPathFoundMaxRetries || -1,
-      () => this.stop()
+      () => {
+        this.stop();
+        this.finished$.next({
+          position: this.character.getTilePos(),
+          successful: false,
+          errorReason:
+            "NoPathFoundStrategy RETRY: Maximum retries of 2 exceeded.",
+        });
+        this.finished$.complete();
+      }
     );
     this.pathBlockedRetryable = new Retryable(
       config?.pathBlockedRetryBackoffMs || 200,
       config?.pathBlockedMaxRetries || -1,
-      () => this.stop()
+      () => {
+        this.stop();
+        this.finished$.next({
+          position: this.character.getTilePos(),
+          successful: false,
+          errorReason:
+            "PathBlockedStrategy RETRY: Maximum retries of 2 exceeded.",
+        });
+        this.finished$.complete();
+      }
     );
     this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
     this.finished$ = new Subject<Finished>();
@@ -91,15 +109,18 @@ export class TargetMovement implements Movement {
     this.pathBlockedRetryable.reset();
     this.pathBlockedWaitElapsed = 0;
     this.calcShortestPath();
-    this.character.autoMovementSet().pipe(take(1)).subscribe(() => {
-      this.finished$.next({
-        position: this.character.getTilePos(),
-        successful: false,
-        errorReason:
-          "Movement of character has been replaced before destination was reached.",
+    this.character
+      .autoMovementSet()
+      .pipe(take(1))
+      .subscribe(() => {
+        this.finished$.next({
+          position: this.character.getTilePos(),
+          successful: false,
+          errorReason:
+            "Movement of character has been replaced before destination was reached.",
+        });
+        this.finished$.complete();
       });
-      this.finished$.complete();
-    })
   }
 
   update(delta: number): void {
@@ -121,8 +142,8 @@ export class TargetMovement implements Movement {
       this.finished$.next({
         position: this.character.getTilePos(),
         successful: true,
-        errorReason: undefined
-      })
+        errorReason: undefined,
+      });
       this.stop();
       if (this.existsDistToTarget()) {
         this.turnTowardsTarget();
@@ -146,6 +167,12 @@ export class TargetMovement implements Movement {
       this.pathBlockedRetryable.retry(delta, () => this.calcShortestPath());
     } else if (this.pathBlockedStrategy === PathBlockedStrategy.STOP) {
       this.stop();
+      this.finished$.next({
+        position: this.character.getTilePos(),
+        successful: false,
+        errorReason: `PathBlockedStrategy STOP: No path found.`,
+      });
+      this.finished$.complete();
     } else if (this.pathBlockedStrategy === PathBlockedStrategy.WAIT) {
       if (this.pathBlockedWaitTimeoutMs > -1) {
         this.pathBlockedWaitElapsed += delta;
@@ -154,7 +181,7 @@ export class TargetMovement implements Movement {
           this.finished$.next({
             position: this.character.getTilePos(),
             successful: false,
-            errorReason: `PathBlockedStrategy WAIT: Wait timeout of 2000ms exceeded.`
+            errorReason: `PathBlockedStrategy WAIT: Wait timeout of ${this.pathBlockedWaitTimeoutMs}ms exceeded.`,
           });
           this.finished$.complete();
         }
@@ -189,9 +216,10 @@ export class TargetMovement implements Movement {
   }
 
   private hasArrived(): boolean {
-    return !this.noPathFound() && (
+    return (
+      !this.noPathFound() &&
       this.posOnPath + Math.max(0, this.distance - this.distOffset) >=
-      this.shortestPath.length - 1
+        this.shortestPath.length - 1
     );
   }
 
@@ -224,14 +252,12 @@ export class TargetMovement implements Movement {
 
   private getShortestPath(): { path: Vector2[]; distOffset: number } {
     const shortestPathAlgo: ShortestPathAlgorithm = new Bfs();
-    const {
-      path: shortestPath,
-      closestToTarget,
-    } = shortestPathAlgo.getShortestPath(
-      this.character.getNextTilePos(),
-      this.targetPos,
-      this.getNeighbours
-    );
+    const { path: shortestPath, closestToTarget } =
+      shortestPathAlgo.getShortestPath(
+        this.character.getNextTilePos(),
+        this.targetPos,
+        this.getNeighbours
+      );
 
     const noPathFound = shortestPath.length == 0;
 
