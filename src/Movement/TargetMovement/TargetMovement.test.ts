@@ -1,5 +1,5 @@
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
-import { TargetMovement } from "./TargetMovement";
+import { ErrorCode, TargetMovement } from "./TargetMovement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
@@ -487,6 +487,7 @@ describe("TargetMovement", () => {
       expect(finishedObsCallbackMock).toHaveBeenCalledWith({
         position: new Vector2(0, 1),
         successful: false,
+        errorCode: ErrorCode.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED,
         errorReason:
           "NoPathFoundStrategy RETRY: Maximum retries of 2 exceeded.",
       });
@@ -616,6 +617,7 @@ describe("TargetMovement", () => {
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
       position: new Vector2(0, 1),
       successful: false,
+      errorCode: ErrorCode.PATH_BLOCKED_WAIT_TIMEOUT,
       errorReason: "PathBlockedStrategy WAIT: Wait timeout of 2000ms exceeded.",
     });
     expect(finishedObsCompleteMock).toHaveBeenCalled();
@@ -747,6 +749,7 @@ describe("TargetMovement", () => {
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
       position: new Vector2(1, 1),
       successful: false,
+      errorCode: ErrorCode.PATH_BLOCKED_MAX_RETRIES_EXCEEDED,
       errorReason: "PathBlockedStrategy RETRY: Maximum retries of 2 exceeded.",
     });
     expect(finishedObsCompleteMock).toHaveBeenCalled();
@@ -780,6 +783,7 @@ describe("TargetMovement", () => {
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
       position: new Vector2(1, 1),
       successful: false,
+      errorCode: ErrorCode.NO_PATH_FOUND,
       errorReason: `PathBlockedStrategy STOP: No path found.`,
     });
     expect(finishedObsCompleteMock).toHaveBeenCalled();
@@ -806,6 +810,7 @@ describe("TargetMovement", () => {
       expect(mockCall).toHaveBeenCalledWith({
         position: mockChar.getTilePos(),
         successful: false,
+        errorCode: ErrorCode.MOVEMENT_TERMINATED,
         errorReason:
           "Movement of character has been replaced before destination was reached.",
       });
@@ -832,6 +837,7 @@ describe("TargetMovement", () => {
       expect(mockCall).toHaveBeenCalledWith({
         position: mockChar.getTilePos(),
         successful: true,
+        errorCode: undefined,
         errorReason: undefined,
       });
     });

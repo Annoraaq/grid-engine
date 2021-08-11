@@ -24,10 +24,19 @@ export interface MoveToConfig {
   pathBlockedWaitTimeoutMs?: number;
 }
 
+export enum ErrorCode {
+  NO_PATH_FOUND_MAX_RETRIES_EXCEEDED = "NO_PATH_FOUND_MAX_RETRIES_EXCEEDED",
+  PATH_BLOCKED_MAX_RETRIES_EXCEEDED = "PATH_BLOCKED_MAX_RETRIES_EXCEEDED",
+  NO_PATH_FOUND = "NO_PATH_FOUND",
+  PATH_BLOCKED_WAIT_TIMEOUT = "PATH_BLOCKED_WAIT_TIMEOUT",
+  MOVEMENT_TERMINATED = "MOVEMENT_TERMINATED",
+}
+
 export interface Finished {
   position: Position;
   successful: boolean;
-  errorReason: string;
+  errorCode?: ErrorCode;
+  errorReason?: string;
 }
 
 export class TargetMovement implements Movement {
@@ -59,28 +68,14 @@ export class TargetMovement implements Movement {
       config?.noPathFoundRetryBackoffMs || 200,
       config?.noPathFoundMaxRetries || -1,
       () => {
-        this.stop();
-        this.finished$.next({
-          position: this.character.getTilePos(),
-          successful: false,
-          errorReason:
-            "NoPathFoundStrategy RETRY: Maximum retries of 2 exceeded.",
-        });
-        this.finished$.complete();
+        this.stop(ErrorCode.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED);
       }
     );
     this.pathBlockedRetryable = new Retryable(
       config?.pathBlockedRetryBackoffMs || 200,
       config?.pathBlockedMaxRetries || -1,
       () => {
-        this.stop();
-        this.finished$.next({
-          position: this.character.getTilePos(),
-          successful: false,
-          errorReason:
-            "PathBlockedStrategy RETRY: Maximum retries of 2 exceeded.",
-        });
-        this.finished$.complete();
+        this.stop(ErrorCode.PATH_BLOCKED_MAX_RETRIES_EXCEEDED);
       }
     );
     this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
@@ -113,13 +108,7 @@ export class TargetMovement implements Movement {
       .autoMovementSet()
       .pipe(take(1))
       .subscribe(() => {
-        this.finished$.next({
-          position: this.character.getTilePos(),
-          successful: false,
-          errorReason:
-            "Movement of character has been replaced before destination was reached.",
-        });
-        this.finished$.complete();
+        this.stop(ErrorCode.MOVEMENT_TERMINATED);
       });
   }
 
@@ -139,11 +128,6 @@ export class TargetMovement implements Movement {
 
     this.updatePosOnPath();
     if (this.hasArrived()) {
-      this.finished$.next({
-        position: this.character.getTilePos(),
-        successful: true,
-        errorReason: undefined,
-      });
       this.stop();
       if (this.existsDistToTarget()) {
         this.turnTowardsTarget();
@@ -162,28 +146,33 @@ export class TargetMovement implements Movement {
     return this.finished$;
   }
 
+  private codeToReason(errorCode?: ErrorCode): string | undefined {
+    switch (errorCode) {
+      case ErrorCode.MOVEMENT_TERMINATED:
+        return "Movement of character has been replaced before destination was reached.";
+      case ErrorCode.NO_PATH_FOUND:
+        return "PathBlockedStrategy STOP: No path found.";
+      case ErrorCode.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED:
+        return `NoPathFoundStrategy RETRY: Maximum retries of ${this.noPathFoundRetryable.getMaxRetries()} exceeded.`;
+      case ErrorCode.PATH_BLOCKED_MAX_RETRIES_EXCEEDED:
+        return `PathBlockedStrategy RETRY: Maximum retries of ${this.pathBlockedRetryable.getMaxRetries()} exceeded.`;
+      case ErrorCode.PATH_BLOCKED_WAIT_TIMEOUT:
+        return `PathBlockedStrategy WAIT: Wait timeout of ${this.pathBlockedWaitTimeoutMs}ms exceeded.`;
+      default:
+        return undefined;
+    }
+  }
+
   private applyPathBlockedStrategy(delta: number): void {
     if (this.pathBlockedStrategy === PathBlockedStrategy.RETRY) {
       this.pathBlockedRetryable.retry(delta, () => this.calcShortestPath());
     } else if (this.pathBlockedStrategy === PathBlockedStrategy.STOP) {
-      this.stop();
-      this.finished$.next({
-        position: this.character.getTilePos(),
-        successful: false,
-        errorReason: `PathBlockedStrategy STOP: No path found.`,
-      });
-      this.finished$.complete();
+      this.stop(ErrorCode.NO_PATH_FOUND);
     } else if (this.pathBlockedStrategy === PathBlockedStrategy.WAIT) {
       if (this.pathBlockedWaitTimeoutMs > -1) {
         this.pathBlockedWaitElapsed += delta;
         if (this.pathBlockedWaitElapsed >= this.pathBlockedWaitTimeoutMs) {
-          this.stop();
-          this.finished$.next({
-            position: this.character.getTilePos(),
-            successful: false,
-            errorReason: `PathBlockedStrategy WAIT: Wait timeout of ${this.pathBlockedWaitTimeoutMs}ms exceeded.`,
-          });
-          this.finished$.complete();
+          this.stop(ErrorCode.PATH_BLOCKED_WAIT_TIMEOUT);
         }
       }
     }
@@ -201,7 +190,14 @@ export class TargetMovement implements Movement {
     return this.shortestPath[this.posOnPath + 1];
   }
 
-  private stop(): void {
+  private stop(errorCode?: ErrorCode): void {
+    this.finished$.next({
+      position: this.character.getTilePos(),
+      successful: errorCode === undefined,
+      errorCode,
+      errorReason: this.codeToReason(errorCode),
+    });
+    this.finished$.complete();
     this.stopped = true;
   }
 
