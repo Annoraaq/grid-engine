@@ -24,7 +24,8 @@ export interface MoveToConfig {
   pathBlockedWaitTimeoutMs?: number;
 }
 
-export enum ErrorCode {
+export enum Result {
+  SUCCESS = "SUCCESS",
   NO_PATH_FOUND_MAX_RETRIES_EXCEEDED = "NO_PATH_FOUND_MAX_RETRIES_EXCEEDED",
   PATH_BLOCKED_MAX_RETRIES_EXCEEDED = "PATH_BLOCKED_MAX_RETRIES_EXCEEDED",
   NO_PATH_FOUND = "NO_PATH_FOUND",
@@ -34,9 +35,8 @@ export enum ErrorCode {
 
 export interface Finished {
   position: Position;
-  successful: boolean;
-  errorCode?: ErrorCode;
-  errorReason?: string;
+  result?: Result;
+  description?: string;
 }
 
 export class TargetMovement implements Movement {
@@ -68,14 +68,14 @@ export class TargetMovement implements Movement {
       config?.noPathFoundRetryBackoffMs || 200,
       config?.noPathFoundMaxRetries || -1,
       () => {
-        this.stop(ErrorCode.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED);
+        this.stop(Result.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED);
       }
     );
     this.pathBlockedRetryable = new Retryable(
       config?.pathBlockedRetryBackoffMs || 200,
       config?.pathBlockedMaxRetries || -1,
       () => {
-        this.stop(ErrorCode.PATH_BLOCKED_MAX_RETRIES_EXCEEDED);
+        this.stop(Result.PATH_BLOCKED_MAX_RETRIES_EXCEEDED);
       }
     );
     this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
@@ -108,7 +108,7 @@ export class TargetMovement implements Movement {
       .autoMovementSet()
       .pipe(take(1))
       .subscribe(() => {
-        this.stop(ErrorCode.MOVEMENT_TERMINATED);
+        this.stop(Result.MOVEMENT_TERMINATED);
       });
   }
 
@@ -146,17 +146,17 @@ export class TargetMovement implements Movement {
     return this.finished$;
   }
 
-  private codeToReason(errorCode?: ErrorCode): string | undefined {
-    switch (errorCode) {
-      case ErrorCode.MOVEMENT_TERMINATED:
+  private resultToReason(result?: Result): string | undefined {
+    switch (result) {
+      case Result.MOVEMENT_TERMINATED:
         return "Movement of character has been replaced before destination was reached.";
-      case ErrorCode.NO_PATH_FOUND:
+      case Result.NO_PATH_FOUND:
         return "PathBlockedStrategy STOP: No path found.";
-      case ErrorCode.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED:
+      case Result.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED:
         return `NoPathFoundStrategy RETRY: Maximum retries of ${this.noPathFoundRetryable.getMaxRetries()} exceeded.`;
-      case ErrorCode.PATH_BLOCKED_MAX_RETRIES_EXCEEDED:
+      case Result.PATH_BLOCKED_MAX_RETRIES_EXCEEDED:
         return `PathBlockedStrategy RETRY: Maximum retries of ${this.pathBlockedRetryable.getMaxRetries()} exceeded.`;
-      case ErrorCode.PATH_BLOCKED_WAIT_TIMEOUT:
+      case Result.PATH_BLOCKED_WAIT_TIMEOUT:
         return `PathBlockedStrategy WAIT: Wait timeout of ${this.pathBlockedWaitTimeoutMs}ms exceeded.`;
       default:
         return undefined;
@@ -167,12 +167,12 @@ export class TargetMovement implements Movement {
     if (this.pathBlockedStrategy === PathBlockedStrategy.RETRY) {
       this.pathBlockedRetryable.retry(delta, () => this.calcShortestPath());
     } else if (this.pathBlockedStrategy === PathBlockedStrategy.STOP) {
-      this.stop(ErrorCode.NO_PATH_FOUND);
+      this.stop(Result.NO_PATH_FOUND);
     } else if (this.pathBlockedStrategy === PathBlockedStrategy.WAIT) {
       if (this.pathBlockedWaitTimeoutMs > -1) {
         this.pathBlockedWaitElapsed += delta;
         if (this.pathBlockedWaitElapsed >= this.pathBlockedWaitTimeoutMs) {
-          this.stop(ErrorCode.PATH_BLOCKED_WAIT_TIMEOUT);
+          this.stop(Result.PATH_BLOCKED_WAIT_TIMEOUT);
         }
       }
     }
@@ -190,12 +190,11 @@ export class TargetMovement implements Movement {
     return this.shortestPath[this.posOnPath + 1];
   }
 
-  private stop(errorCode?: ErrorCode): void {
+  private stop(result?: Result): void {
     this.finished$.next({
       position: this.character.getTilePos(),
-      successful: errorCode === undefined,
-      errorCode,
-      errorReason: this.codeToReason(errorCode),
+      result,
+      description: this.resultToReason(result),
     });
     this.finished$.complete();
     this.stopped = true;

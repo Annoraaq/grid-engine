@@ -151,7 +151,11 @@ export class GridEngine {
     this.gridCharacters.get(charId).setMovement(randomMovement);
   }
 
-  moveTo(charId: string, targetPos: Position, config?: MoveToConfig): Observable<{charId: string} & Finished> {
+  moveTo(
+    charId: string,
+    targetPos: Position,
+    config?: MoveToConfig
+  ): Observable<{ charId: string } & Finished> {
     const moveToConfig = this.assembleMoveToConfig(config);
 
     this.initGuard();
@@ -169,8 +173,8 @@ export class GridEngine {
       map((finished) => ({
         charId,
         position: finished.position,
-        successful: finished.successful,
-        errorReason: finished.errorReason
+        result: finished.result,
+        description: finished.description,
       }))
     );
   }
