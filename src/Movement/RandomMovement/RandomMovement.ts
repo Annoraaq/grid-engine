@@ -39,7 +39,7 @@ export class RandomMovement implements Movement {
     this.stepsWalked = 0;
     this.currentMovementDirection = Direction.NONE;
     this.character
-      .positionChanged()
+      .positionChangeStarted()
       .pipe(takeUntil(this.character.autoMovementSet()))
       .subscribe(() => {
         this.stepsWalked++;

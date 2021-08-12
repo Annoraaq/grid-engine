@@ -1,8 +1,9 @@
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
-import { TargetMovement } from "./TargetMovement";
+import { MoveToResult, TargetMovement } from "./TargetMovement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
+import { of } from "rxjs";
 
 const mockBfs = {
   getShortestPath: jest.fn(),
@@ -28,6 +29,7 @@ describe("TargetMovement", () => {
       move: jest.fn(),
       isMoving: () => false,
       turnTowards: jest.fn(),
+      autoMovementSet: jest.fn().mockReturnValue(of()),
     };
   }
   beforeEach(() => {
@@ -458,6 +460,13 @@ describe("TargetMovement", () => {
           noPathFoundMaxRetries: 2,
         }
       );
+      const finishedObsCallbackMock = jest.fn();
+      const finishedObsCompleteMock = jest.fn();
+      targetMovement.finishedObs().subscribe({
+        next: finishedObsCallbackMock,
+        complete: finishedObsCompleteMock,
+      });
+
       const charPos = new Vector2(1, 1);
       mockBfs.getShortestPath = jest
         .fn()
@@ -473,6 +482,14 @@ describe("TargetMovement", () => {
       });
       targetMovement.update(1);
       expect(mockChar.move).not.toHaveBeenCalled();
+
+      expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+        position: new Vector2(0, 1),
+        result: MoveToResult.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED,
+        description:
+          "NoPathFoundStrategy RETRY: Maximum retries of 2 exceeded.",
+      });
+      expect(finishedObsCompleteMock).toHaveBeenCalled();
     });
 
     it("should not limit retry on default", () => {
@@ -531,6 +548,47 @@ describe("TargetMovement", () => {
     });
   });
 
+  describe("noPathFoundStrategy = STOP", () => {
+    it("should stop if no path found", () => {
+      targetMovement = new TargetMovement(
+        gridTilemapMock,
+        new Vector2(3, 2),
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        }
+      );
+      const finishedObsCallbackMock = jest.fn();
+      const finishedObsCompleteMock = jest.fn();
+      targetMovement.finishedObs().subscribe({
+        next: finishedObsCallbackMock,
+        complete: finishedObsCompleteMock,
+      });
+      const charPos = new Vector2(1, 1);
+      mockBfs.getShortestPath = jest
+        .fn()
+        .mockReturnValue({ path: [], closestToDistance: charPos });
+      const mockChar = createMockChar("char", charPos);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(100);
+      expect(mockChar.move).not.toHaveBeenCalled();
+
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [charPos, new Vector2(1, 3)],
+        closestToTarget: new Vector2(1, 3),
+      });
+      targetMovement.update(200);
+
+      expect(mockChar.move).not.toHaveBeenCalled();
+      expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+        position: new Vector2(0, 1),
+        result: MoveToResult.NO_PATH_FOUND,
+        description: "NoPathFoundStrategy STOP: No path found.",
+      });
+      expect(finishedObsCompleteMock).toHaveBeenCalled();
+    });
+  });
+
   it("should delegate getNeighbours to gridTilemap", () => {
     const charPos = new Vector2(3, 1);
     const targetPos = new Vector2(1, 1);
@@ -576,6 +634,12 @@ describe("TargetMovement", () => {
     targetMovement = new TargetMovement(gridTilemapMock, new Vector2(2, 2), 0, {
       pathBlockedWaitTimeoutMs: 2000,
     });
+    const finishedObsCallbackMock = jest.fn();
+    const finishedObsCompleteMock = jest.fn();
+    targetMovement.finishedObs().subscribe({
+      next: finishedObsCallbackMock,
+      complete: finishedObsCompleteMock,
+    });
     const charPos = new Vector2(1, 1);
     mockBfs.getShortestPath = jest.fn().mockReturnValue({
       path: [charPos, new Vector2(2, 1), new Vector2(2, 2)],
@@ -589,6 +653,12 @@ describe("TargetMovement", () => {
 
     expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
     expect(char.move).not.toHaveBeenCalled();
+    expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+      position: new Vector2(0, 1),
+      result: MoveToResult.PATH_BLOCKED_WAIT_TIMEOUT,
+      description: "PathBlockedStrategy WAIT: Wait timeout of 2000ms exceeded.",
+    });
+    expect(finishedObsCompleteMock).toHaveBeenCalled();
   });
 
   it("should reset timeout on strategy WAIT", () => {
@@ -694,6 +764,13 @@ describe("TargetMovement", () => {
       pathBlockedMaxRetries: 2,
     });
 
+    const finishedObsCallbackMock = jest.fn();
+    const finishedObsCompleteMock = jest.fn();
+    targetMovement.finishedObs().subscribe({
+      next: finishedObsCallbackMock,
+      complete: finishedObsCompleteMock,
+    });
+
     mockBfs.getShortestPath = jest.fn().mockReturnValue({
       path: [new Vector2(2, 1), new Vector2(2, 2), new Vector2(3, 2)],
       closestToTarget: new Vector2(3, 2),
@@ -707,6 +784,12 @@ describe("TargetMovement", () => {
 
     expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(3);
     expect(char.move).not.toHaveBeenCalled();
+    expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+      position: new Vector2(1, 1),
+      result: MoveToResult.PATH_BLOCKED_MAX_RETRIES_EXCEEDED,
+      description: "PathBlockedStrategy RETRY: Maximum retries of 2 exceeded.",
+    });
+    expect(finishedObsCompleteMock).toHaveBeenCalled();
   });
 
   it("should stop on pathBlockedStrategy STOP", () => {
@@ -715,6 +798,12 @@ describe("TargetMovement", () => {
     targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 2));
     targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
 
+    const finishedObsCallbackMock = jest.fn();
+    const finishedObsCompleteMock = jest.fn();
+    targetMovement.finishedObs().subscribe({
+      next: finishedObsCallbackMock,
+      complete: finishedObsCompleteMock,
+    });
     mockBfs.getShortestPath = jest.fn().mockReturnValue({
       path: [new Vector2(2, 1), new Vector2(2, 2), new Vector2(3, 2)],
       closestToTarget: new Vector2(3, 2),
@@ -728,6 +817,98 @@ describe("TargetMovement", () => {
     targetMovement.update(100);
 
     expect(char.move).not.toHaveBeenCalled();
+    expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+      position: new Vector2(1, 1),
+      result: MoveToResult.PATH_BLOCKED,
+      description: `PathBlockedStrategy STOP: Path blocked.`,
+    });
+    expect(finishedObsCompleteMock).toHaveBeenCalled();
+  });
+
+  it("should not block itself", () => {
+    gridTilemapMock.isBlocking.mockReturnValue(false);
+
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 2));
+    targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
+
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [new Vector2(2, 1), new Vector2(2, 2), new Vector2(3, 2)],
+      closestToTarget: new Vector2(3, 2),
+    });
+    const char = createMockChar("char", new Vector2(2, 1));
+    char.getNextTilePos.mockReturnValue(new Vector2(2, 2));
+    targetMovement.setCharacter(char);
+    targetMovement.update(1);
+    expect(gridTilemapMock.isBlocking).not.toHaveBeenCalledWith(
+      new Vector2(2, 2)
+    );
+    expect(gridTilemapMock.isBlocking).toHaveBeenCalledWith(new Vector2(3, 2));
+  });
+
+  describe("finished observable", () => {
+    let mockChar;
+
+    beforeEach(() => {
+      const targetPos = new Vector2(3, 3);
+      targetMovement = new TargetMovement(gridTilemapMock, targetPos);
+      mockBfs.getShortestPath = jest.fn().mockReturnValueOnce({
+        path: [],
+        targetPos,
+      });
+      mockChar = createMockChar("char", new Vector2(1, 1));
+    });
+
+    it("should call fire when char gets new movement", () => {
+      mockChar.autoMovementSet.mockReturnValue(of(1));
+      const mockCall = jest.fn();
+      targetMovement.finishedObs().subscribe(mockCall);
+      targetMovement.setCharacter(mockChar);
+      expect(mockCall).toHaveBeenCalledWith({
+        position: mockChar.getTilePos(),
+        result: MoveToResult.MOVEMENT_TERMINATED,
+        description:
+          "Movement of character has been replaced before destination was reached.",
+      });
+    });
+
+    it("should complete when char gets new movement", () => {
+      mockChar.autoMovementSet.mockReturnValue(of(1));
+      const mockCall = jest.fn();
+      targetMovement.finishedObs().subscribe({ complete: mockCall });
+      targetMovement.setCharacter(mockChar);
+      expect(mockCall).toHaveBeenCalled();
+    });
+
+    it("should fire when char arrives", () => {
+      const charPos = new Vector2(1, 1);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [charPos],
+        closestToTarget: charPos,
+      });
+      const mockCall = jest.fn();
+      targetMovement.finishedObs().subscribe(mockCall);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(100);
+      expect(mockCall).toHaveBeenCalledWith({
+        position: mockChar.getTilePos(),
+        result: MoveToResult.SUCCESS,
+        description: "Successfully arrived.",
+      });
+    });
+
+    it("should fire once when char arrives", () => {
+      const charPos = new Vector2(1, 1);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [charPos],
+        closestToTarget: charPos,
+      });
+      const mockCall = jest.fn();
+      targetMovement.finishedObs().subscribe(mockCall);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(100);
+      targetMovement.update(100);
+      expect(mockCall).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("8 directions", () => {

@@ -9,7 +9,7 @@ import { Vector2 } from "../../Utils/Vector2/Vector2";
 describe("RandomMovement", () => {
   let randomMovement: RandomMovement;
   let charMock: GridCharacter;
-  let positionChangedSubject$: Subject<any>;
+  let positionChangeStartedSubject$: Subject<any>;
   let autoMovementSetSubject$: Subject<any>;
 
   function mockRandom(val: number) {
@@ -20,18 +20,18 @@ describe("RandomMovement", () => {
 
   beforeEach(() => {
     randomMovement = new RandomMovement();
-    positionChangedSubject$ = new Subject();
+    positionChangeStartedSubject$ = new Subject();
     autoMovementSetSubject$ = new Subject();
     charMock = <any>{
-      positionChangedSubject$,
+      positionChangeStartedSubject$: positionChangeStartedSubject$,
       autoMovementSetSubject$,
       getId: () => "char",
       isBlockingDirection: () => false,
       move: jest.fn(),
       getNextTilePos: () => new Vector2(0, 0),
       isMoving: () => false,
-      positionChanged: function () {
-        return this.positionChangedSubject$;
+      positionChangeStarted: function () {
+        return this.positionChangeStartedSubject$;
       },
       autoMovementSet: function () {
         return this.autoMovementSetSubject$;
@@ -98,7 +98,7 @@ describe("RandomMovement", () => {
 
     // do first step down and set step size 2
     randomMovement.update(1);
-    positionChangedSubject$.next(undefined);
+    positionChangeStartedSubject$.next(undefined);
     expect(charMock.move).toHaveBeenNthCalledWith(1, Direction.DOWN);
 
     // next random direction would be up
@@ -106,13 +106,13 @@ describe("RandomMovement", () => {
 
     // do next step which is still smaller than step size
     randomMovement.update(1);
-    positionChangedSubject$.next(undefined);
+    positionChangeStartedSubject$.next(undefined);
     expect(charMock.move).toHaveBeenNthCalledWith(2, Direction.DOWN);
 
     // do next step which exceeds step size. New random direction (up)
     // should be taken
     randomMovement.update(1);
-    positionChangedSubject$.next(undefined);
+    positionChangeStartedSubject$.next(undefined);
     expect(charMock.move).toHaveBeenNthCalledWith(3, Direction.UP);
   });
 
@@ -124,8 +124,8 @@ describe("RandomMovement", () => {
     mockRandom(0.1); // dir: up, stepSize: 1
 
     // set stepsWalked to 2
-    positionChangedSubject$.next(undefined);
-    positionChangedSubject$.next(undefined);
+    positionChangeStartedSubject$.next(undefined);
+    positionChangeStartedSubject$.next(undefined);
 
     // sets step size to 1
     randomMovement.update(1);
@@ -134,7 +134,7 @@ describe("RandomMovement", () => {
     mockRandom(0.7); // dir: down, stepSize: 2
 
     // set stepsWalked to 1
-    positionChangedSubject$.next(undefined);
+    positionChangeStartedSubject$.next(undefined);
     randomMovement.update(1);
     expect(charMock.move).toHaveBeenNthCalledWith(2, Direction.DOWN);
   });
@@ -174,7 +174,7 @@ describe("RandomMovement", () => {
     expect(charMock.move).toHaveBeenCalledTimes(1);
   });
 
-  it("should unsubscribe from positionChanged on autoMovementSet", () => {
+  it("should unsubscribe from positionChangeStarted on autoMovementSet", () => {
     randomMovement = new RandomMovement(0, 2);
     mockRandom(0.7); // dir: down, stepSize: 2
     randomMovement.setCharacter(charMock);
@@ -185,8 +185,8 @@ describe("RandomMovement", () => {
     mockRandom(0.1); // dir: up, stepSize: 1
 
     autoMovementSetSubject$.next(undefined);
-    positionChangedSubject$.next(undefined);
-    positionChangedSubject$.next(undefined);
+    positionChangeStartedSubject$.next(undefined);
+    positionChangeStartedSubject$.next(undefined);
 
     randomMovement.update(1);
     expect(charMock.move).toHaveBeenNthCalledWith(2, Direction.DOWN);

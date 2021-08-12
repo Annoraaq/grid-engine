@@ -444,7 +444,7 @@ describe("GridTilemap", () => {
       isBlockingTile: () => false,
       getTilePos: () => ({ x: 1, y: 1 }),
       getNextTilePos: () => ({ x: 1, y: 1 }),
-      positionChanged: () => of([]),
+      positionChangeStarted: () => of([]),
       positionChangeFinished: () => of([]),
     };
   }

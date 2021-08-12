@@ -20,12 +20,16 @@ export class Retryable {
     }
   }
 
-  private shouldRetry(): boolean {
-    return this.maxRetries === -1 || this.retries < this.maxRetries;
-  }
-
   reset(): void {
     this.retries = 0;
     this.elapsed = 0;
+  }
+
+  getMaxRetries(): number {
+    return this.maxRetries;
+  }
+
+  private shouldRetry(): boolean {
+    return this.maxRetries === -1 || this.retries < this.maxRetries;
   }
 }
