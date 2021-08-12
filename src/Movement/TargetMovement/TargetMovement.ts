@@ -24,7 +24,7 @@ export interface MoveToConfig {
   pathBlockedWaitTimeoutMs?: number;
 }
 
-export enum Result {
+export enum MoveToResult {
   SUCCESS = "SUCCESS",
   NO_PATH_FOUND_MAX_RETRIES_EXCEEDED = "NO_PATH_FOUND_MAX_RETRIES_EXCEEDED",
   PATH_BLOCKED_MAX_RETRIES_EXCEEDED = "PATH_BLOCKED_MAX_RETRIES_EXCEEDED",
@@ -36,7 +36,7 @@ export enum Result {
 
 export interface Finished {
   position: Position;
-  result?: Result;
+  result?: MoveToResult;
   description?: string;
 }
 
@@ -69,14 +69,14 @@ export class TargetMovement implements Movement {
       config?.noPathFoundRetryBackoffMs || 200,
       config?.noPathFoundMaxRetries || -1,
       () => {
-        this.stop(Result.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED);
+        this.stop(MoveToResult.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED);
       }
     );
     this.pathBlockedRetryable = new Retryable(
       config?.pathBlockedRetryBackoffMs || 200,
       config?.pathBlockedMaxRetries || -1,
       () => {
-        this.stop(Result.PATH_BLOCKED_MAX_RETRIES_EXCEEDED);
+        this.stop(MoveToResult.PATH_BLOCKED_MAX_RETRIES_EXCEEDED);
       }
     );
     this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
@@ -109,7 +109,7 @@ export class TargetMovement implements Movement {
       .autoMovementSet()
       .pipe(take(1))
       .subscribe(() => {
-        this.stop(Result.MOVEMENT_TERMINATED);
+        this.stop(MoveToResult.MOVEMENT_TERMINATED);
       });
   }
 
@@ -120,7 +120,7 @@ export class TargetMovement implements Movement {
       if (this.noPathFoundStrategy === NoPathFoundStrategy.RETRY) {
         this.noPathFoundRetryable.retry(delta, () => this.calcShortestPath());
       } else if (this.noPathFoundStrategy === NoPathFoundStrategy.STOP) {
-        this.stop(Result.NO_PATH_FOUND);
+        this.stop(MoveToResult.NO_PATH_FOUND);
       }
     }
 
@@ -132,7 +132,7 @@ export class TargetMovement implements Movement {
     }
 
     if (this.hasArrived()) {
-      this.stop(Result.SUCCESS);
+      this.stop(MoveToResult.SUCCESS);
       if (this.existsDistToTarget()) {
         this.turnTowardsTarget();
       }
@@ -150,21 +150,21 @@ export class TargetMovement implements Movement {
     return this.finished$;
   }
 
-  private resultToReason(result?: Result): string | undefined {
+  private resultToReason(result?: MoveToResult): string | undefined {
     switch (result) {
-      case Result.SUCCESS:
-        return `Successfully arrived.`;
-      case Result.MOVEMENT_TERMINATED:
+      case MoveToResult.SUCCESS:
+        return "Successfully arrived.";
+      case MoveToResult.MOVEMENT_TERMINATED:
         return "Movement of character has been replaced before destination was reached.";
-      case Result.PATH_BLOCKED:
+      case MoveToResult.PATH_BLOCKED:
         return "PathBlockedStrategy STOP: Path blocked.";
-      case Result.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED:
+      case MoveToResult.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED:
         return `NoPathFoundStrategy RETRY: Maximum retries of ${this.noPathFoundRetryable.getMaxRetries()} exceeded.`;
-      case Result.NO_PATH_FOUND:
+      case MoveToResult.NO_PATH_FOUND:
         return "NoPathFoundStrategy STOP: No path found.";
-      case Result.PATH_BLOCKED_MAX_RETRIES_EXCEEDED:
+      case MoveToResult.PATH_BLOCKED_MAX_RETRIES_EXCEEDED:
         return `PathBlockedStrategy RETRY: Maximum retries of ${this.pathBlockedRetryable.getMaxRetries()} exceeded.`;
-      case Result.PATH_BLOCKED_WAIT_TIMEOUT:
+      case MoveToResult.PATH_BLOCKED_WAIT_TIMEOUT:
         return `PathBlockedStrategy WAIT: Wait timeout of ${this.pathBlockedWaitTimeoutMs}ms exceeded.`;
       default:
         return undefined;
@@ -175,12 +175,12 @@ export class TargetMovement implements Movement {
     if (this.pathBlockedStrategy === PathBlockedStrategy.RETRY) {
       this.pathBlockedRetryable.retry(delta, () => this.calcShortestPath());
     } else if (this.pathBlockedStrategy === PathBlockedStrategy.STOP) {
-      this.stop(Result.PATH_BLOCKED);
+      this.stop(MoveToResult.PATH_BLOCKED);
     } else if (this.pathBlockedStrategy === PathBlockedStrategy.WAIT) {
       if (this.pathBlockedWaitTimeoutMs > -1) {
         this.pathBlockedWaitElapsed += delta;
         if (this.pathBlockedWaitElapsed >= this.pathBlockedWaitTimeoutMs) {
-          this.stop(Result.PATH_BLOCKED_WAIT_TIMEOUT);
+          this.stop(MoveToResult.PATH_BLOCKED_WAIT_TIMEOUT);
         }
       }
     }
@@ -198,7 +198,7 @@ export class TargetMovement implements Movement {
     return this.shortestPath[this.posOnPath + 1];
   }
 
-  private stop(result?: Result): void {
+  private stop(result?: MoveToResult): void {
     this.finished$.next({
       position: this.character.getTilePos(),
       result,
