@@ -26,9 +26,9 @@ nav_order: 2
 | :------------------------------------------------------------------------------------------- |
 | Returns the direction the character is currently facing. At time of creation this is `down`. |
 
-| getFacingPosition(charId: string): [Position](./config.html#position)                     |
-| :------------------------------------------------------------------------------------------- |
-| Returns the position the character is currently facing. |
+| getFacingPosition(charId: string): [Position](./config.html#position) |
+| :-------------------------------------------------------------------- |
+| Returns the position the character is currently facing.               |
 
 | turnTowards(charId: string, direction: [Direction](./config.html#direction)): void |
 | :--------------------------------------------------------------------------------- |
@@ -46,21 +46,21 @@ nav_order: 2
 | :------------------------------------------------------------------------------------------------------------------------------------------ |
 | Sets the [WalkingAnimationMapping](./config.html#walkinganimationmapping) for a character.                                                  |
 
-| setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void       |
-| :-------------------------------------------------- |
-| Sets the sprite for a character. |
+| setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void |
+| :----------------------------------------------------------------- |
+| Sets the sprite for a character.                                   |
 
-| getSprite(charId: string): Phaser.GameObjects.Sprite       |
-| :-------------------------------------------------- |
-| Gets the sprite of a character. |
+| getSprite(charId: string): Phaser.GameObjects.Sprite |
+| :--------------------------------------------------- |
+| Gets the sprite of a character.                      |
 
 | moveRandomly(charId: string, delay: number = 0, radius: number = -1): void                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Initiates random movement of the character with the given id. The character will randomly pick one of the non-blocking directions. Optionally a `delay` in milliseconds can be provided. This represents the waiting time after a finished movement, before the next is being initiated. If a `radius` other than `-1` is provided, the character will not move further than that radius from its initial position (the position it has been, when `moveRandomly` was called). The distance is calculated with the [manhattan distance](https://en.wikipedia.org/wiki/Taxicab_geometry). Additionally, if a `radius` other than `-1` was given, the character might move more than one tile into a random direction in one run (as long as the route is neither blocked nor outside of the radius). |
 
-| moveTo(charId: string, targetPos: [Position](./config.html#position), config: [MoveToConfig](./methods.html#movetoconfig)): void                                                             |
-| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Initiates movement toward the specified `targetPos`. The movement will happen along one shortest path. Check out [MoveToConfig](./methods.html#movetoconfig) for pathfinding configurations. |
+| moveTo(charId: string, targetPos: [Position](./config.html#position), config: [MoveToConfig](./methods.html#movetoconfig)): Observable<{charId: string, position: [Position](./config.html#position), result: [MoveToResult](./methods.html#movetoresult), description: string}>                                                                                                     |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Initiates movement toward the specified `targetPos`. The movement will happen along one shortest path. Check out [MoveToConfig](./methods.html#movetoconfig) for pathfinding configurations. It will return an observable that will fire whenever the moveTo movement is finished or aborted. It will provide a [result code](./methods.html#movetoresult) as well as a description. |
 
 | addCharacter(charData: [CharacterData](./config.html#characterdata)): void |
 | :------------------------------------------------------------------------- |
@@ -147,3 +147,29 @@ This strategy can be used to configure pathfinding. It determines what happens i
 **"RETRY"** will make the character look for a new path. You can provide a custom backoff time in milliseconds: `pathBlockedRetryBackoffMs`. You can also specify a maximum number of retries using `pathBlockedMaxRetries`.
 
 **"STOP"** will make the character stop the movement
+
+## MoveToResult
+
+```js
+"SUCCESS" |
+  "NO_PATH_FOUND_MAX_RETRIES_EXCEEDED" |
+  "NO_PATH_FOUND" |
+  "PATH_BLOCKED_MAX_RETRIES_EXCEEDED" |
+  "PATH_BLOCKED" |
+  "PATH_BLOCKED_WAIT_TIMEOUT" |
+  "MOVEMENT_TERMINATED";
+```
+
+**"SUCCESS":** Successfully arrived.
+
+**"NO_PATH_FOUND_MAX_RETRIES_EXCEEDED":** NoPathFoundStrategy RETRY: Maximum retries of `MoveToConfig.noPathFoundMaxRetries` exceeded.
+
+**"NO_PATH_FOUND":** NoPathFoundStrategy STOP: No path found.
+
+**"PATH_BLOCKED_MAX_RETRIES_EXCEEDED":** PathBlockedStrategy RETRY: Maximum retries of `MoveToConfig.pathBlockedMaxRetries` exceeded.
+
+**"PATH_BLOCKED":** PathBlockedStrategy STOP: Path blocked.
+
+**"PATH_BLOCKED_WAIT_TIMEOUT":** PathBlockedStrategy WAIT: Wait timeout of `MoteToConfig.pathBlockedWaitTimeoutMs`ms exceeded.
+
+**"MOVEMENT_TERMINATED":** Movement of character has been replaced before destination was reached.

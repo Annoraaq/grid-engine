@@ -11,7 +11,7 @@ parent: Examples
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-2.7.0.min.js"></script>
+<script src="js/grid-engine-2.8.0.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
@@ -107,13 +107,13 @@ function create() {
   const playerSprite = this.add.sprite(0, 0, "player");
   playerSprite.scale = 1.5;
 
-  facingDirectionText = this.add.text(-60, -30, '');
-  facingPositionText = this.add.text(-60, -10, '');
+  facingDirectionText = this.add.text(-60, -30, "");
+  facingPositionText = this.add.text(-60, -10, "");
 
   const container = this.add.container(0, 0, [
     playerSprite,
     facingDirectionText,
-    facingPositionText
+    facingPositionText,
   ]);
 
   this.cameras.main.startFollow(container, true);
@@ -150,6 +150,8 @@ function update() {
   facingDirectionText.text = `facingDirection: ${this.gridEngine.getFacingDirection(
     "player"
   )}`;
-  facingPositionText.text = `facingPosition: (${this.gridEngine.getFacingPosition('player').x}, ${this.gridEngine.getFacingPosition('player').y})`;
+  facingPositionText.text = `facingPosition: (${
+    this.gridEngine.getFacingPosition("player").x
+  }, ${this.gridEngine.getFacingPosition("player").y})`;
 }
 ```
