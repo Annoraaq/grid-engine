@@ -661,7 +661,7 @@ describe("GridEngine", () => {
       });
       finishedSubject.next(<Finished>{
         position: { x: 1, y: 2 },
-        result: "NO_PATH_FOUND",
+        result: "PATH_BLOCKED",
         description: "errorReason",
       });
     });
@@ -674,12 +674,12 @@ describe("GridEngine", () => {
       gridEngine.moveTo("player", targetVec).subscribe(callMock).add(done);
       finishedSubject.next(<Finished>{
         position: { x: 1, y: 2 },
-        result: "NO_PATH_FOUND",
+        result: "PATH_BLOCKED",
         description: "errorReason",
       });
       finishedSubject.next(<Finished>{
         position: { x: 1, y: 2 },
-        result: "NO_PATH_FOUND",
+        result: "PATH_BLOCKED",
         description: "errorReason",
       });
 

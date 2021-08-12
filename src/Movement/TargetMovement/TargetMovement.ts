@@ -28,7 +28,7 @@ export enum Result {
   SUCCESS = "SUCCESS",
   NO_PATH_FOUND_MAX_RETRIES_EXCEEDED = "NO_PATH_FOUND_MAX_RETRIES_EXCEEDED",
   PATH_BLOCKED_MAX_RETRIES_EXCEEDED = "PATH_BLOCKED_MAX_RETRIES_EXCEEDED",
-  NO_PATH_FOUND = "NO_PATH_FOUND",
+  PATH_BLOCKED = "PATH_BLOCKED",
   PATH_BLOCKED_WAIT_TIMEOUT = "PATH_BLOCKED_WAIT_TIMEOUT",
   MOVEMENT_TERMINATED = "MOVEMENT_TERMINATED",
 }
@@ -120,15 +120,16 @@ export class TargetMovement implements Movement {
         this.noPathFoundRetryable.retry(delta, () => this.calcShortestPath());
       }
     }
+
+    this.updatePosOnPath();
     if (this.isBlocking(this.nextTileOnPath())) {
       this.applyPathBlockedStrategy(delta);
     } else {
       this.pathBlockedWaitElapsed = 0;
     }
 
-    this.updatePosOnPath();
     if (this.hasArrived()) {
-      this.stop();
+      this.stop(Result.SUCCESS);
       if (this.existsDistToTarget()) {
         this.turnTowardsTarget();
       }
@@ -148,10 +149,12 @@ export class TargetMovement implements Movement {
 
   private resultToReason(result?: Result): string | undefined {
     switch (result) {
+      case Result.SUCCESS:
+        return `Successfully arrived.`;
       case Result.MOVEMENT_TERMINATED:
         return "Movement of character has been replaced before destination was reached.";
-      case Result.NO_PATH_FOUND:
-        return "PathBlockedStrategy STOP: No path found.";
+      case Result.PATH_BLOCKED:
+        return "PathBlockedStrategy STOP: Path blocked.";
       case Result.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED:
         return `NoPathFoundStrategy RETRY: Maximum retries of ${this.noPathFoundRetryable.getMaxRetries()} exceeded.`;
       case Result.PATH_BLOCKED_MAX_RETRIES_EXCEEDED:
@@ -167,7 +170,7 @@ export class TargetMovement implements Movement {
     if (this.pathBlockedStrategy === PathBlockedStrategy.RETRY) {
       this.pathBlockedRetryable.retry(delta, () => this.calcShortestPath());
     } else if (this.pathBlockedStrategy === PathBlockedStrategy.STOP) {
-      this.stop(Result.NO_PATH_FOUND);
+      this.stop(Result.PATH_BLOCKED);
     } else if (this.pathBlockedStrategy === PathBlockedStrategy.WAIT) {
       if (this.pathBlockedWaitTimeoutMs > -1) {
         this.pathBlockedWaitElapsed += delta;

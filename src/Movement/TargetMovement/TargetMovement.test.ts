@@ -778,10 +778,30 @@ describe("TargetMovement", () => {
     expect(char.move).not.toHaveBeenCalled();
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
       position: new Vector2(1, 1),
-      result: Result.NO_PATH_FOUND,
-      description: `PathBlockedStrategy STOP: No path found.`,
+      result: Result.PATH_BLOCKED,
+      description: `PathBlockedStrategy STOP: Path blocked.`,
     });
     expect(finishedObsCompleteMock).toHaveBeenCalled();
+  });
+
+  it("should not block itself", () => {
+    gridTilemapMock.isBlocking.mockReturnValue(false);
+
+    targetMovement = new TargetMovement(gridTilemapMock, new Vector2(3, 2));
+    targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
+
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [new Vector2(2, 1), new Vector2(2, 2), new Vector2(3, 2)],
+      closestToTarget: new Vector2(3, 2),
+    });
+    const char = createMockChar("char", new Vector2(2, 1));
+    char.getNextTilePos.mockReturnValue(new Vector2(2, 2));
+    targetMovement.setCharacter(char);
+    targetMovement.update(1);
+    expect(gridTilemapMock.isBlocking).not.toHaveBeenCalledWith(
+      new Vector2(2, 2)
+    );
+    expect(gridTilemapMock.isBlocking).toHaveBeenCalledWith(new Vector2(3, 2));
   });
 
   describe("finished observable", () => {
@@ -830,8 +850,8 @@ describe("TargetMovement", () => {
       targetMovement.update(100);
       expect(mockCall).toHaveBeenCalledWith({
         position: mockChar.getTilePos(),
-        result: undefined,
-        description: undefined,
+        result: Result.SUCCESS,
+        description: "Successfully arrived.",
       });
     });
 
