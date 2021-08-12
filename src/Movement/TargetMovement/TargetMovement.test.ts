@@ -1,5 +1,5 @@
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
-import { Result, TargetMovement } from "./TargetMovement";
+import { MoveToResult, TargetMovement } from "./TargetMovement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
@@ -485,7 +485,7 @@ describe("TargetMovement", () => {
 
       expect(finishedObsCallbackMock).toHaveBeenCalledWith({
         position: new Vector2(0, 1),
-        result: Result.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED,
+        result: MoveToResult.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED,
         description:
           "NoPathFoundStrategy RETRY: Maximum retries of 2 exceeded.",
       });
@@ -582,7 +582,7 @@ describe("TargetMovement", () => {
       expect(mockChar.move).not.toHaveBeenCalled();
       expect(finishedObsCallbackMock).toHaveBeenCalledWith({
         position: new Vector2(0, 1),
-        result: Result.NO_PATH_FOUND,
+        result: MoveToResult.NO_PATH_FOUND,
         description: "NoPathFoundStrategy STOP: No path found.",
       });
       expect(finishedObsCompleteMock).toHaveBeenCalled();
@@ -655,7 +655,7 @@ describe("TargetMovement", () => {
     expect(char.move).not.toHaveBeenCalled();
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
       position: new Vector2(0, 1),
-      result: Result.PATH_BLOCKED_WAIT_TIMEOUT,
+      result: MoveToResult.PATH_BLOCKED_WAIT_TIMEOUT,
       description: "PathBlockedStrategy WAIT: Wait timeout of 2000ms exceeded.",
     });
     expect(finishedObsCompleteMock).toHaveBeenCalled();
@@ -786,7 +786,7 @@ describe("TargetMovement", () => {
     expect(char.move).not.toHaveBeenCalled();
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
       position: new Vector2(1, 1),
-      result: Result.PATH_BLOCKED_MAX_RETRIES_EXCEEDED,
+      result: MoveToResult.PATH_BLOCKED_MAX_RETRIES_EXCEEDED,
       description: "PathBlockedStrategy RETRY: Maximum retries of 2 exceeded.",
     });
     expect(finishedObsCompleteMock).toHaveBeenCalled();
@@ -819,7 +819,7 @@ describe("TargetMovement", () => {
     expect(char.move).not.toHaveBeenCalled();
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
       position: new Vector2(1, 1),
-      result: Result.PATH_BLOCKED,
+      result: MoveToResult.PATH_BLOCKED,
       description: `PathBlockedStrategy STOP: Path blocked.`,
     });
     expect(finishedObsCompleteMock).toHaveBeenCalled();
@@ -865,7 +865,7 @@ describe("TargetMovement", () => {
       targetMovement.setCharacter(mockChar);
       expect(mockCall).toHaveBeenCalledWith({
         position: mockChar.getTilePos(),
-        result: Result.MOVEMENT_TERMINATED,
+        result: MoveToResult.MOVEMENT_TERMINATED,
         description:
           "Movement of character has been replaced before destination was reached.",
       });
@@ -891,7 +891,7 @@ describe("TargetMovement", () => {
       targetMovement.update(100);
       expect(mockCall).toHaveBeenCalledWith({
         position: mockChar.getTilePos(),
-        result: Result.SUCCESS,
+        result: MoveToResult.SUCCESS,
         description: "Successfully arrived.",
       });
     });
