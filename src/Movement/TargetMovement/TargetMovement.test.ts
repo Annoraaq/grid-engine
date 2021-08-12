@@ -548,6 +548,47 @@ describe("TargetMovement", () => {
     });
   });
 
+  describe("noPathFoundStrategy = STOP", () => {
+    it("should stop if no path found", () => {
+      targetMovement = new TargetMovement(
+        gridTilemapMock,
+        new Vector2(3, 2),
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        }
+      );
+      const finishedObsCallbackMock = jest.fn();
+      const finishedObsCompleteMock = jest.fn();
+      targetMovement.finishedObs().subscribe({
+        next: finishedObsCallbackMock,
+        complete: finishedObsCompleteMock,
+      });
+      const charPos = new Vector2(1, 1);
+      mockBfs.getShortestPath = jest
+        .fn()
+        .mockReturnValue({ path: [], closestToDistance: charPos });
+      const mockChar = createMockChar("char", charPos);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(100);
+      expect(mockChar.move).not.toHaveBeenCalled();
+
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [charPos, new Vector2(1, 3)],
+        closestToTarget: new Vector2(1, 3),
+      });
+      targetMovement.update(200);
+
+      expect(mockChar.move).not.toHaveBeenCalled();
+      expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+        position: new Vector2(0, 1),
+        result: Result.NO_PATH_FOUND,
+        description: "NoPathFoundStrategy STOP: No path found.",
+      });
+      expect(finishedObsCompleteMock).toHaveBeenCalled();
+    });
+  });
+
   it("should delegate getNeighbours to gridTilemap", () => {
     const charPos = new Vector2(3, 1);
     const targetPos = new Vector2(1, 1);

@@ -29,6 +29,7 @@ export enum Result {
   NO_PATH_FOUND_MAX_RETRIES_EXCEEDED = "NO_PATH_FOUND_MAX_RETRIES_EXCEEDED",
   PATH_BLOCKED_MAX_RETRIES_EXCEEDED = "PATH_BLOCKED_MAX_RETRIES_EXCEEDED",
   PATH_BLOCKED = "PATH_BLOCKED",
+  NO_PATH_FOUND = "NO_PATH_FOUND",
   PATH_BLOCKED_WAIT_TIMEOUT = "PATH_BLOCKED_WAIT_TIMEOUT",
   MOVEMENT_TERMINATED = "MOVEMENT_TERMINATED",
 }
@@ -118,6 +119,8 @@ export class TargetMovement implements Movement {
     if (this.noPathFound()) {
       if (this.noPathFoundStrategy === NoPathFoundStrategy.RETRY) {
         this.noPathFoundRetryable.retry(delta, () => this.calcShortestPath());
+      } else if (this.noPathFoundStrategy === NoPathFoundStrategy.STOP) {
+        this.stop(Result.NO_PATH_FOUND);
       }
     }
 
@@ -157,6 +160,8 @@ export class TargetMovement implements Movement {
         return "PathBlockedStrategy STOP: Path blocked.";
       case Result.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED:
         return `NoPathFoundStrategy RETRY: Maximum retries of ${this.noPathFoundRetryable.getMaxRetries()} exceeded.`;
+      case Result.NO_PATH_FOUND:
+        return "NoPathFoundStrategy STOP: No path found.";
       case Result.PATH_BLOCKED_MAX_RETRIES_EXCEEDED:
         return `PathBlockedStrategy RETRY: Maximum retries of ${this.pathBlockedRetryable.getMaxRetries()} exceeded.`;
       case Result.PATH_BLOCKED_WAIT_TIMEOUT:
