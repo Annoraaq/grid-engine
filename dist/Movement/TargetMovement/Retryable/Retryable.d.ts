@@ -6,6 +6,7 @@ export declare class Retryable {
     private elapsed;
     constructor(backoffMs: number, maxRetries: number, onFinished: () => any);
     retry(elapsed: number, fn: () => any): void;
-    private shouldRetry;
     reset(): void;
+    getMaxRetries(): number;
+    private shouldRetry;
 }

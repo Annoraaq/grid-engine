@@ -40,7 +40,7 @@ export declare class GridCharacter {
     private movementStarted$;
     private movementStopped$;
     private directionChanged$;
-    private positionChanged$;
+    private positionChangeStarted$;
     private positionChangeFinished$;
     private autoMovementSet$;
     private lastMovementImpulse;
@@ -73,7 +73,7 @@ export declare class GridCharacter {
     movementStarted(): Subject<Direction>;
     movementStopped(): Subject<Direction>;
     directionChanged(): Subject<Direction>;
-    positionChanged(): Subject<PositionChange>;
+    positionChangeStarted(): Subject<PositionChange>;
     positionChangeFinished(): Subject<PositionChange>;
     autoMovementSet(): Subject<void>;
     protected tilePosToPixelPos(tilePosition: Vector2): Vector2;

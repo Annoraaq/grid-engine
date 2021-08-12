@@ -1,5 +1,5 @@
 import { CollisionStrategy } from "./Collisions/CollisionStrategy";
-import { MoveToConfig } from "./Movement/TargetMovement/TargetMovement";
+import { Finished, MoveToConfig } from "./Movement/TargetMovement/TargetMovement";
 import { CharacterIndex, FrameRow, PositionChange } from "./GridCharacter/GridCharacter";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { Observable } from "rxjs";
@@ -55,7 +55,9 @@ export declare class GridEngine {
     getPosition(charId: string): Position;
     move(charId: string, direction: Direction): void;
     moveRandomly(charId: string, delay?: number, radius?: number): void;
-    moveTo(charId: string, targetPos: Position, config?: MoveToConfig): void;
+    moveTo(charId: string, targetPos: Position, config?: MoveToConfig): Observable<{
+        charId: string;
+    } & Finished>;
     stopMovement(charId: string): void;
     setSpeed(charId: string, speed: number): void;
     setWalkingAnimationMapping(charId: string, walkingAnimationMapping: WalkingAnimationMapping): void;
@@ -98,7 +100,6 @@ export declare class GridEngine {
     private createCharacter;
     private addCharacters;
     private moveChar;
-    private _stopMovement;
     private _isIsometric;
     private assembleMoveToConfig;
 }
