@@ -43,6 +43,21 @@ jobs:
           # Deprecated. Use node-version instead. Will not be supported after October 1, 2019
           version: # optional
 
-      # Runs a single command using the runners shell
       - name: npm install
         run: npm i
+      
+      - name: build
+        run: npm run build
+
+      - uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
+        with:
+          # Determines the way the action fills missing author name and email. Three options are available:
+          # - github_actor -> UserName <UserName@users.noreply.github.com>
+          # - user_info -> Your Display Name <your-actual@email.com>
+          # - github_actions -> github-actions <email associated with the github logo>
+          # Default: github_actor
+          default_author: github_actions
+
+          # The message for the commit
+          # Default: 'Commit from GitHub Actions (name of the workflow)'
+          message: 'build'
