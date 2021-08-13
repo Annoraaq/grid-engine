@@ -80,6 +80,7 @@ export class GridEngine {
   private charRemoved$: Subject<string>;
 
   constructor(private scene: Phaser.Scene) {
+    console.log("test");
     this.scene.sys.events.once("boot", this.boot, this);
   }
 
