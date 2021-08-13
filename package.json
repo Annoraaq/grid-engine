@@ -10,9 +10,9 @@
     "dev": "prettier --write src/ && eslint src/",
     "build-web": "esbuild src/main-iife.ts --bundle --minify --external:phaser --target=es2016 --global-name=GridEngine --outfile=dist/GridEngine.min.js",
     "build-esm": "esbuild src/main-esm.ts --bundle --minify --format=esm --external:phaser --target=es2016 --outfile=dist/GridEngine.esm.min.js",
-    "build-declarations": "tsc --emitDeclarationOnly --outDir dist",
     "build": "npm run build-web && npm run build-esm && tsc --emitDeclarationOnly --outDir dist",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "serve": "esbuild src/main-iife.ts --servedir=serve --outfile=serve/js/GridEngine.js --bundle --target=es2016 --external:phaser --global-name=GridEngine"
   },
   "files": [
     "dist"
