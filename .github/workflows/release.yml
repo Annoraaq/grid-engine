@@ -49,7 +49,7 @@ jobs:
           message: 'build'
         
       - name: bump minor
-        run: npm version $INPUT_VERSIONTYPE
+        run: echo $INPUT_VERSIONTYPE
         
       - name: Push changes
         uses: ad-m/github-push-action@master
