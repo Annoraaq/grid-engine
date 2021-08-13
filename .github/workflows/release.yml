@@ -1,0 +1,63 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Release
+
+# Controls when the workflow will run
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.4.0
+        with:
+          # Set always-auth in npmrc
+          always-auth: # optional, default is false
+          # Version Spec of the version to use.  Examples: 12.x, 10.15.1, >=10.15.0
+          node-version: # optional
+          # Target architecture for Node to use. Examples: x86, x64. Will use system architecture by default.
+          architecture: # optional
+          # Set this option if you want the action to check for the latest available version that satisfies the version spec
+          check-latest: # optional
+          # Optional registry to set up for auth. Will set the registry in a project level .npmrc and .yarnrc file, and set up auth to read in from env.NODE_AUTH_TOKEN
+          registry-url: # optional
+          # Optional scope for authenticating against scoped registries
+          scope: # optional
+          # Used to pull node distributions from node-versions.  Since there's a default, this is typically not supplied by the user.
+          token: # optional, default is ${{ github.token }}
+          # Used to specify a package manager for caching in the default directory. Supported values: npm, yarn, pnpm
+          cache: # optional
+          # Used to specify the path to a dependency file: package-lock.json, yarn.lock, etc. Supports wildcards or a list of file names for caching multiple dependencies.
+          cache-dependency-path: # optional
+          # Deprecated. Use node-version instead. Will not be supported after October 1, 2019
+          version: # optional
+
+      - name: npm install
+        run: npm i
+      
+      - name: build
+        run: npm run build
+
+      - uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
+        with:
+          # Determines the way the action fills missing author name and email. Three options are available:
+          # - github_actor -> UserName <UserName@users.noreply.github.com>
+          # - user_info -> Your Display Name <your-actual@email.com>
+          # - github_actions -> github-actions <email associated with the github logo>
+          # Default: github_actor
+          default_author: github_actions
+
+          # The message for the commit
+          # Default: 'Commit from GitHub Actions (name of the workflow)'
+          message: 'build'
