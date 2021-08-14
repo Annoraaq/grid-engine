@@ -222,6 +222,7 @@ describe("GridEngine", () => {
       container: containerMock,
       offsetX: undefined,
       offsetY: undefined,
+      collides: true,
     });
     expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith(
       new Vector2(0, 0)
@@ -247,6 +248,7 @@ describe("GridEngine", () => {
       container: undefined,
       offsetX: undefined,
       offsetY: undefined,
+      collides: true,
     });
     expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith(
       new Vector2(0, 0)
@@ -283,6 +285,7 @@ describe("GridEngine", () => {
       tileSize: new Vector2(32, 32),
       tilemap: mockGridTileMap,
       speed: 4,
+      collides: true,
     });
     expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith(
       new Vector2(0, 0)
@@ -327,6 +330,7 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping,
+      collides: true,
     });
     expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith(
       new Vector2(0, 0)
@@ -408,6 +412,7 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       speed: 2,
       walkingAnimationMapping: 3,
+      collides: true,
     });
   });
 
@@ -433,6 +438,29 @@ describe("GridEngine", () => {
       walkingAnimationMapping: 3,
       offsetX,
       offsetY,
+      collides: true,
+    });
+  });
+
+  it("should use config collides", () => {
+    gridEngine.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+          speed: 2,
+          collides: false,
+        },
+      ],
+    });
+    expect(GridCharacter).toHaveBeenCalledWith("player", {
+      sprite: playerSpriteMock,
+      tileSize: new Vector2(32, 32),
+      tilemap: mockGridTileMap,
+      speed: 2,
+      walkingAnimationMapping: 3,
+      collides: false,
     });
   });
 

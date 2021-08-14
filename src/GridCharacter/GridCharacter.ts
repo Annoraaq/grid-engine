@@ -27,6 +27,7 @@ export interface CharConfig {
   tilemap: GridTilemap;
   tileSize: Vector2;
   speed: number;
+  collides: boolean;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
   container?: Phaser.GameObjects.Container;
   offsetX?: number;
@@ -57,6 +58,7 @@ export class GridCharacter {
   private movement: Movement;
   private characterIndex = -1;
   private walkingAnimationMapping: WalkingAnimationMapping;
+  private collides: boolean;
 
   constructor(private id: string, config: CharConfig) {
     if (typeof config.walkingAnimationMapping == "number") {
@@ -68,6 +70,7 @@ export class GridCharacter {
     this.container = config.container;
     this.tilemap = config.tilemap;
     this.speed = config.speed;
+    this.collides = config.collides;
     this.customOffset = new Vector2(config.offsetX || 0, config.offsetY || 0);
     this.tileSize = config.tileSize.clone();
 
@@ -168,12 +171,9 @@ export class GridCharacter {
     return this.movementDirection;
   }
 
-  isBlockingTile(tilePos: Vector2): boolean {
-    return this.nextTilePos.equals(tilePos) || this.tilePos.equals(tilePos);
-  }
-
   isBlockingDirection(direction: Direction): boolean {
     if (direction == Direction.NONE) return false;
+    if (!this.collides) return false;
     const tilePosInDir = this.tilePosInDirection(direction);
     const hasBlockingTile = this.tilemap.hasBlockingTile(
       tilePosInDir,
@@ -228,6 +228,10 @@ export class GridCharacter {
     return this.autoMovementSet$;
   }
 
+  isColliding(): boolean {
+    return this.collides;
+  }
+
   protected tilePosToPixelPos(tilePosition: Vector2): Vector2 {
     return tilePosition.clone().multiply(this.tileSize);
   }
@@ -251,12 +255,13 @@ export class GridCharacter {
       this.characterIndex
     );
 
-    this.animation.setIsEnabled(this.walkingAnimationMapping !== undefined || this.characterIndex !== -1);
+    this.animation.setIsEnabled(
+      this.walkingAnimationMapping !== undefined || this.characterIndex !== -1
+    );
     this.animation.setStandingFrame(Direction.DOWN);
 
     this.updateZindex();
   }
-
 
   private getOffset(): Vector2 {
     const offsetX =
@@ -390,9 +395,8 @@ export class GridCharacter {
     maxMovementForDelta: Vector2,
     distToNextTile: Vector2
   ): number {
-    const toWalkOnNextTileThisUpdate = maxMovementForDelta.subtract(
-      distToNextTile
-    );
+    const toWalkOnNextTileThisUpdate =
+      maxMovementForDelta.subtract(distToNextTile);
     const propVec = toWalkOnNextTileThisUpdate.divide(maxMovementForDelta);
     if (isNaN(propVec.x)) propVec.x = 0;
     return Math.max(Math.abs(propVec.x), Math.abs(propVec.y));

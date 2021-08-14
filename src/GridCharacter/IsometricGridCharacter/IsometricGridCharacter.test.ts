@@ -77,6 +77,7 @@ describe("IsometricGridCharacter", () => {
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 1,
       walkingAnimationMapping: 3,
+      collides: true,
     });
   });
 
@@ -90,6 +91,7 @@ describe("IsometricGridCharacter", () => {
       speed: 1,
       offsetX: customOffsetX,
       offsetY: customOffsetY,
+      collides: true,
     });
     gridCharacter.setTilePosition(new Vector2(3, 4));
 

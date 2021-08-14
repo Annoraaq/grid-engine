@@ -14,7 +14,10 @@ export class CharBlockCache {
     const posStr = this.posToString(pos);
     return (
       this.tilePosToCharacters.has(posStr) &&
-      this.tilePosToCharacters.get(posStr).size > 0
+      this.tilePosToCharacters.get(posStr).size > 0 &&
+      [...this.tilePosToCharacters.get(posStr)].some((char: GridCharacter) =>
+        char.isColliding()
+      )
     );
   }
 
@@ -58,7 +61,10 @@ export class CharBlockCache {
         }
         this.add(this.posToString(positionChange.enterTile), character);
       });
-    this.positionChangeStartedSubs.set(character.getId(), positionChangeStartedSub);
+    this.positionChangeStartedSubs.set(
+      character.getId(),
+      positionChangeStartedSub
+    );
   }
 
   private addPositionChangeFinishedSub(character: GridCharacter) {

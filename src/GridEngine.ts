@@ -65,6 +65,7 @@ export interface CharacterData {
   offsetX?: number;
   offsetY?: number;
   facingDirection?: Direction;
+  collides?: boolean;
 }
 
 export class GridEngine {
@@ -227,6 +228,7 @@ export class GridEngine {
       container: charData.container,
       offsetX: charData.offsetX,
       offsetY: charData.offsetY,
+      collides: charData.collides === undefined ? true : charData.collides,
     };
 
     const gridChar = this.createCharacter(charData.id, charConfig);
