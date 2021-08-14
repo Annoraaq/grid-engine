@@ -27,6 +27,7 @@ export interface CharConfig {
   tilemap: GridTilemap;
   tileSize: Vector2;
   speed: number;
+  collides: boolean;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
   container?: Phaser.GameObjects.Container;
   offsetX?: number;
@@ -251,12 +252,13 @@ export class GridCharacter {
       this.characterIndex
     );
 
-    this.animation.setIsEnabled(this.walkingAnimationMapping !== undefined || this.characterIndex !== -1);
+    this.animation.setIsEnabled(
+      this.walkingAnimationMapping !== undefined || this.characterIndex !== -1
+    );
     this.animation.setStandingFrame(Direction.DOWN);
 
     this.updateZindex();
   }
-
 
   private getOffset(): Vector2 {
     const offsetX =
@@ -390,9 +392,8 @@ export class GridCharacter {
     maxMovementForDelta: Vector2,
     distToNextTile: Vector2
   ): number {
-    const toWalkOnNextTileThisUpdate = maxMovementForDelta.subtract(
-      distToNextTile
-    );
+    const toWalkOnNextTileThisUpdate =
+      maxMovementForDelta.subtract(distToNextTile);
     const propVec = toWalkOnNextTileThisUpdate.divide(maxMovementForDelta);
     if (isNaN(propVec.x)) propVec.x = 0;
     return Math.max(Math.abs(propVec.x), Math.abs(propVec.y));
