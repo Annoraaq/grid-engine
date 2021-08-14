@@ -19,6 +19,7 @@ export class CharBlockCache {
   }
 
   addCharacter(character: GridCharacter): void {
+    if (!character.isColliding()) return;
     this.add(this.posToString(character.getTilePos()), character);
     this.add(this.posToString(character.getNextTilePos()), character);
     this.addPositionChangeSub(character);
@@ -26,6 +27,7 @@ export class CharBlockCache {
   }
 
   removeCharacter(character: GridCharacter): void {
+    if (!character.isColliding()) return;
     const charId = character.getId();
     this.positionChangeStartedSubs.get(charId).unsubscribe();
     this.positionChangeFinishedSubs.get(charId).unsubscribe();
@@ -58,7 +60,10 @@ export class CharBlockCache {
         }
         this.add(this.posToString(positionChange.enterTile), character);
       });
-    this.positionChangeStartedSubs.set(character.getId(), positionChangeStartedSub);
+    this.positionChangeStartedSubs.set(
+      character.getId(),
+      positionChangeStartedSub
+    );
   }
 
   private addPositionChangeFinishedSub(character: GridCharacter) {

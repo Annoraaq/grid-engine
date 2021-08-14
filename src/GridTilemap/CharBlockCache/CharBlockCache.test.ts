@@ -27,6 +27,17 @@ describe("CharBlockCache", () => {
     expect(charBlockCache.isCharBlockingAt(new Vector2(3, 3))).toBe(true);
   });
 
+  it("should not detect non-colliding char after adding", () => {
+    const char1Mock = <any>{
+      ...createCharMock("player1"),
+      getTilePos: () => ({ x: 3, y: 3 }),
+      isColliding: () => false,
+    };
+
+    charBlockCache.addCharacter(char1Mock);
+    expect(charBlockCache.isCharBlockingAt(new Vector2(3, 3))).toBe(false);
+  });
+
   describe("blocking strategy BLOCK_TWO_TILES", () => {
     beforeEach(() => {
       GlobalConfig.get = jest.fn(() => ({
@@ -211,6 +222,7 @@ describe("CharBlockCache", () => {
       getNextTilePos: () => ({ x: 1, y: 1 }),
       positionChangeStarted: () => of([]),
       positionChangeFinished: () => of([]),
+      isColliding: () => true,
     };
   }
 
