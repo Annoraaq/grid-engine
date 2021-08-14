@@ -591,6 +591,23 @@ describe("GridCharacter", () => {
       expect(result).toBe(true);
     });
 
+    it("should not detect blocking direction if char does not collide", () => {
+      gridCharacter = new GridCharacter("player", {
+        sprite: spriteMock,
+        tilemap: gridTilemapMock,
+        tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
+        speed: 3,
+        collides: false,
+        walkingAnimationMapping: 3,
+      });
+      const direction = Direction.RIGHT;
+      gridTilemapMock.hasBlockingTile.mockReturnValue(true);
+      gridTilemapMock.hasBlockingChar.mockReturnValue(false);
+
+      const result = gridCharacter.isBlockingDirection(direction);
+      expect(result).toBe(false);
+    });
+
     it("should detect blocking direction if char blocks", () => {
       const direction = Direction.RIGHT;
       gridTilemapMock.hasBlockingTile.mockReturnValue(false);

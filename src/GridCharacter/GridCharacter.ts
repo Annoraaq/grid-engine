@@ -173,6 +173,7 @@ export class GridCharacter {
 
   isBlockingDirection(direction: Direction): boolean {
     if (direction == Direction.NONE) return false;
+    if (!this.collides) return false;
     const tilePosInDir = this.tilePosInDirection(direction);
     const hasBlockingTile = this.tilemap.hasBlockingTile(
       tilePosInDir,
