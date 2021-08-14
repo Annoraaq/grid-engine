@@ -171,10 +171,6 @@ export class GridCharacter {
     return this.movementDirection;
   }
 
-  isBlockingTile(tilePos: Vector2): boolean {
-    return this.nextTilePos.equals(tilePos) || this.tilePos.equals(tilePos);
-  }
-
   isBlockingDirection(direction: Direction): boolean {
     if (direction == Direction.NONE) return false;
     const tilePosInDir = this.tilePosInDirection(direction);
