@@ -35,6 +35,7 @@ export interface CharacterData {
     offsetX?: number;
     offsetY?: number;
     facingDirection?: Direction;
+    collides?: boolean;
 }
 export declare class GridEngine {
     private scene;

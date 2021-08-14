@@ -20,6 +20,7 @@ export interface CharConfig {
     tilemap: GridTilemap;
     tileSize: Vector2;
     speed: number;
+    collides: boolean;
     walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
     container?: Phaser.GameObjects.Container;
     offsetX?: number;
@@ -49,6 +50,7 @@ export declare class GridCharacter {
     private movement;
     private characterIndex;
     private walkingAnimationMapping;
+    private collides;
     constructor(id: string, config: CharConfig);
     getId(): string;
     getSpeed(): number;
@@ -64,7 +66,6 @@ export declare class GridCharacter {
     move(direction: Direction): void;
     update(delta: number): void;
     getMovementDirection(): Direction;
-    isBlockingTile(tilePos: Vector2): boolean;
     isBlockingDirection(direction: Direction): boolean;
     isMoving(): boolean;
     turnTowards(direction: Direction): void;
@@ -76,6 +77,7 @@ export declare class GridCharacter {
     positionChangeStarted(): Subject<PositionChange>;
     positionChangeFinished(): Subject<PositionChange>;
     autoMovementSet(): Subject<void>;
+    isColliding(): boolean;
     protected tilePosToPixelPos(tilePosition: Vector2): Vector2;
     protected getTileDistance(_direction: Direction): Vector2;
     protected toMapDirection(direction: Direction): Direction;
