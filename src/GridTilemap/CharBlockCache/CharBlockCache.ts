@@ -14,12 +14,14 @@ export class CharBlockCache {
     const posStr = this.posToString(pos);
     return (
       this.tilePosToCharacters.has(posStr) &&
-      this.tilePosToCharacters.get(posStr).size > 0
+      this.tilePosToCharacters.get(posStr).size > 0 &&
+      [...this.tilePosToCharacters.get(posStr)].some((char: GridCharacter) =>
+        char.isColliding()
+      )
     );
   }
 
   addCharacter(character: GridCharacter): void {
-    if (!character.isColliding()) return;
     this.add(this.posToString(character.getTilePos()), character);
     this.add(this.posToString(character.getNextTilePos()), character);
     this.addPositionChangeSub(character);
@@ -27,7 +29,6 @@ export class CharBlockCache {
   }
 
   removeCharacter(character: GridCharacter): void {
-    if (!character.isColliding()) return;
     const charId = character.getId();
     this.positionChangeStartedSubs.get(charId).unsubscribe();
     this.positionChangeFinishedSubs.get(charId).unsubscribe();
