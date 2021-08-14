@@ -58,6 +58,7 @@ export class GridCharacter {
   private movement: Movement;
   private characterIndex = -1;
   private walkingAnimationMapping: WalkingAnimationMapping;
+  private collides: boolean;
 
   constructor(private id: string, config: CharConfig) {
     if (typeof config.walkingAnimationMapping == "number") {
@@ -69,6 +70,7 @@ export class GridCharacter {
     this.container = config.container;
     this.tilemap = config.tilemap;
     this.speed = config.speed;
+    this.collides = config.collides;
     this.customOffset = new Vector2(config.offsetX || 0, config.offsetY || 0);
     this.tileSize = config.tileSize.clone();
 
@@ -227,6 +229,10 @@ export class GridCharacter {
 
   autoMovementSet(): Subject<void> {
     return this.autoMovementSet$;
+  }
+
+  isColliding(): boolean {
+    return this.collides;
   }
 
   protected tilePosToPixelPos(tilePosition: Vector2): Vector2 {

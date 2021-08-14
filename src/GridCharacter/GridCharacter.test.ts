@@ -101,6 +101,26 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getSpeed()).toEqual(3);
   });
 
+  it("should get collision data", () => {
+    gridCharacter = new GridCharacter("player", {
+      sprite: spriteMock,
+      tilemap: gridTilemapMock,
+      tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
+      speed: 3,
+      collides: true,
+    });
+    expect(gridCharacter.isColliding()).toEqual(true);
+
+    gridCharacter = new GridCharacter("player", {
+      sprite: spriteMock,
+      tilemap: gridTilemapMock,
+      tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
+      speed: 3,
+      collides: false,
+    });
+    expect(gridCharacter.isColliding()).toEqual(false);
+  });
+
   it("should set the correct depth on construction", () => {
     expect(spriteMock.setDepth).toHaveBeenCalledWith(1000);
   });
