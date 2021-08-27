@@ -8,6 +8,7 @@ import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
 export class CharBlockCache {
   private tilePosToCharacters: Map<string, Set<GridCharacter>> = new Map();
   private positionChangeStartedSubs: Map<string, Subscription> = new Map();
+  private tilePosSetSubs: Map<string, Subscription> = new Map();
   private positionChangeFinishedSubs: Map<string, Subscription> = new Map();
 
   isCharBlockingAt(pos: Vector2): boolean {
@@ -26,12 +27,14 @@ export class CharBlockCache {
     this.add(this.posToString(character.getNextTilePos()), character);
     this.addPositionChangeSub(character);
     this.addPositionChangeFinishedSub(character);
+    this.addTilePosSetSub(character);
   }
 
   removeCharacter(character: GridCharacter): void {
     const charId = character.getId();
     this.positionChangeStartedSubs.get(charId).unsubscribe();
     this.positionChangeFinishedSubs.get(charId).unsubscribe();
+    this.tilePosSetSubs.get(charId).unsubscribe();
     this.tilePosToCharacters
       .get(this.posToString(character.getTilePos()))
       .delete(character);
@@ -45,6 +48,15 @@ export class CharBlockCache {
       this.tilePosToCharacters.set(pos, new Set());
     }
     this.tilePosToCharacters.get(pos).add(character);
+  }
+
+  private addTilePosSetSub(character: GridCharacter) {
+    const tilePosSetSub = character.tilePositionSet().subscribe((_position) => {
+      this.tilePosToCharacters
+        .get(this.posToString(character.getNextTilePos()))
+        .delete(character);
+    });
+    this.tilePosSetSubs.set(character.getId(), tilePosSetSub);
   }
 
   private addPositionChangeSub(character: GridCharacter) {
