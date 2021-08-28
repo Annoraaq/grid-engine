@@ -39,6 +39,7 @@ describe("GridCharacter", () => {
   const MS_FOR_12_PX = 250;
   const INITIAL_SPRITE_X_POS = 5 * TILE_WIDTH + PLAYER_X_OFFSET;
   const INITIAL_SPRITE_Y_POS = 6 * TILE_HEIGHT + PLAYER_Y_OFFSET;
+  const DEPTH_OF_CHAR_LAYER = 10;
 
   function mockNonBlockingTile() {
     gridTilemapMock.hasBlockingTile.mockReturnValue(false);
@@ -60,6 +61,7 @@ describe("GridCharacter", () => {
       hasBlockingTile: jest.fn(),
       hasNoTile: jest.fn(),
       hasBlockingChar: jest.fn().mockReturnValue(false),
+      getDepthOfCharLayer: jest.fn().mockReturnValue(DEPTH_OF_CHAR_LAYER),
     };
     spriteMock = <any>{
       width: 16,
@@ -96,9 +98,11 @@ describe("GridCharacter", () => {
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 3,
       collides: true,
+      charLayer: "someLayer",
     });
     expect(gridCharacter.getId()).toEqual("player");
     expect(gridCharacter.getSpeed()).toEqual(3);
+    expect(gridCharacter.getCharLayer()).toEqual("someLayer");
   });
 
   it("should get collision data", () => {
@@ -122,7 +126,7 @@ describe("GridCharacter", () => {
   });
 
   it("should set the correct depth on construction", () => {
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(1000);
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(DEPTH_OF_CHAR_LAYER);
   });
 
   it("should be facing down on construction by default", () => {
@@ -135,7 +139,9 @@ describe("GridCharacter", () => {
     gridCharacter.setTilePosition(newTilePos);
     newTilePos.x = 20;
 
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 + expectedPos.y);
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+      DEPTH_OF_CHAR_LAYER + expectedPos.y
+    );
     expect(gridCharacter.getTilePos()).toEqual(expectedPos);
   });
 
@@ -155,7 +161,7 @@ describe("GridCharacter", () => {
     expect(mockCharacterAnimation.setStandingFrame).toHaveBeenCalledWith(
       Direction.DOWN
     );
-    expect(sprite.setDepth).toHaveBeenCalledWith(1000);
+    expect(sprite.setDepth).toHaveBeenCalledWith(DEPTH_OF_CHAR_LAYER);
   });
 
   it("should start movement", async () => {
@@ -226,7 +232,7 @@ describe("GridCharacter", () => {
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 12);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 - 1);
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(DEPTH_OF_CHAR_LAYER - 1);
   });
 
   it("should update horizontally", () => {
@@ -239,7 +245,7 @@ describe("GridCharacter", () => {
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.RIGHT);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(1000);
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(DEPTH_OF_CHAR_LAYER);
   });
 
   it("should update diagonally", () => {
@@ -252,7 +258,7 @@ describe("GridCharacter", () => {
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS + 12);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN_LEFT);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN_LEFT);
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(1000 + 1);
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(DEPTH_OF_CHAR_LAYER + 1);
   });
 
   it("should set walkingAnimationMapping", () => {
@@ -564,11 +570,13 @@ describe("GridCharacter", () => {
       gridTilemapMock.hasBlockingTile.mockReturnValue(false);
       gridTilemapMock.hasBlockingChar.mockReturnValue(false);
 
+      gridCharacter.setCharLayer("someLayer");
       gridCharacter.move(Direction.RIGHT);
       gridCharacter.update(10);
 
       const result = gridCharacter.isBlockingDirection(direction);
       expect(gridTilemapMock.hasBlockingTile).toHaveBeenCalledWith(
+        "someLayer",
         {
           x: 2,
           y: 0,
@@ -776,7 +784,9 @@ describe("GridCharacter", () => {
       gridCharacter.update(MS_FOR_12_PX);
 
       expect(spriteMock.setDepth).not.toHaveBeenCalled();
-      expect(containerMock.setDepth).toHaveBeenCalledWith(1000 - 1);
+      expect(containerMock.setDepth).toHaveBeenCalledWith(
+        DEPTH_OF_CHAR_LAYER - 1
+      );
       expect(containerMock.x).toEqual(5 * TILE_WIDTH);
       expect(containerMock.y).toEqual(6 * TILE_HEIGHT - pixelsMovedThisUpdate);
       expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);

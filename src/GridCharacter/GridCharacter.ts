@@ -32,6 +32,7 @@ export interface CharConfig {
   container?: Phaser.GameObjects.Container;
   offsetX?: number;
   offsetY?: number;
+  charLayer?: string;
 }
 
 export class GridCharacter {
@@ -59,6 +60,7 @@ export class GridCharacter {
   private characterIndex = -1;
   private walkingAnimationMapping: WalkingAnimationMapping;
   private collides: boolean;
+  private charLayer?: string;
 
   constructor(private id: string, config: CharConfig) {
     if (typeof config.walkingAnimationMapping == "number") {
@@ -73,6 +75,8 @@ export class GridCharacter {
     this.collides = config.collides;
     this.customOffset = new Vector2(config.offsetX || 0, config.offsetY || 0);
     this.tileSize = config.tileSize.clone();
+
+    this.charLayer = config.charLayer;
 
     this.sprite = config.sprite;
     this._setSprite(this.sprite);
@@ -176,6 +180,7 @@ export class GridCharacter {
     if (!this.collides) return false;
     const tilePosInDir = this.tilePosInDirection(direction);
     const hasBlockingTile = this.tilemap.hasBlockingTile(
+      this.charLayer,
       tilePosInDir,
       oppositeDirection(this.toMapDirection(direction))
     );
@@ -230,6 +235,15 @@ export class GridCharacter {
 
   isColliding(): boolean {
     return this.collides;
+  }
+
+  setCharLayer(charLayer: string): void {
+    this.charLayer = charLayer;
+    this.updateZindex();
+  }
+
+  getCharLayer(): string | undefined {
+    return this.charLayer;
   }
 
   protected tilePosToPixelPos(tilePosition: Vector2): Vector2 {
@@ -311,7 +325,8 @@ export class GridCharacter {
   private updateZindex() {
     const gameObject = this.container || this.sprite;
     gameObject.setDepth(
-      GridTilemap.FIRST_PLAYER_LAYER + this.mapDepth(this.nextTilePos)
+      this.tilemap.getDepthOfCharLayer(this.charLayer) +
+        this.mapDepth(this.nextTilePos)
     );
   }
 

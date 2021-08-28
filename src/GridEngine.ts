@@ -66,6 +66,7 @@ export interface CharacterData {
   offsetY?: number;
   facingDirection?: Direction;
   collides?: boolean;
+  charLayer?: string;
 }
 
 export class GridEngine {
@@ -100,6 +101,23 @@ export class GridEngine {
     this.positionChangeStarted$ = undefined;
     this.positionChangeFinished$ = undefined;
     this.charRemoved$ = undefined;
+  }
+
+  setCharLayer(charId: string, layer: string): void {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    this.gridCharacters.get(charId).setCharLayer(layer);
+  }
+
+  getCharLayer(charId: string): string {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    return this.gridCharacters.get(charId).getCharLayer();
+  }
+
+  getTransition(tile: Position, fromLayer: string): string | undefined {
+    this.initGuard();
+    return this.gridTilemap.getTransition(new Vector2(tile), fromLayer);
   }
 
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
@@ -229,6 +247,7 @@ export class GridEngine {
       offsetX: charData.offsetX,
       offsetY: charData.offsetY,
       collides: charData.collides === undefined ? true : charData.collides,
+      charLayer: charData.charLayer,
     };
 
     const gridChar = this.createCharacter(charData.id, charConfig);

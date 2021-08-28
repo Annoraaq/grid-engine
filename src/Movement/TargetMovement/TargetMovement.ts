@@ -250,7 +250,7 @@ export class TargetMovement implements Movement {
   }
 
   private isBlocking = (pos?: Vector2): boolean => {
-    return !pos || this.tilemap.isBlocking(pos);
+    return !pos || this.tilemap.isBlocking(this.character?.getCharLayer(), pos);
   };
 
   private getShortestPath(): { path: Vector2[]; distOffset: number } {

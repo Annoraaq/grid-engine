@@ -30,6 +30,7 @@ describe("TargetMovement", () => {
       isMoving: () => false,
       turnTowards: jest.fn(),
       autoMovementSet: jest.fn().mockReturnValue(of()),
+      getCharLayer: jest.fn(),
     };
   }
   beforeEach(() => {
@@ -836,13 +837,18 @@ describe("TargetMovement", () => {
       closestToTarget: new Vector2(3, 2),
     });
     const char = createMockChar("char", new Vector2(2, 1));
+    char.getCharLayer.mockReturnValue("someLayer");
     char.getNextTilePos.mockReturnValue(new Vector2(2, 2));
     targetMovement.setCharacter(char);
     targetMovement.update(1);
     expect(gridTilemapMock.isBlocking).not.toHaveBeenCalledWith(
+      "someLayer",
       new Vector2(2, 2)
     );
-    expect(gridTilemapMock.isBlocking).toHaveBeenCalledWith(new Vector2(3, 2));
+    expect(gridTilemapMock.isBlocking).toHaveBeenCalledWith(
+      "someLayer",
+      new Vector2(3, 2)
+    );
   });
 
   describe("finished observable", () => {

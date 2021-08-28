@@ -6,17 +6,19 @@ import { CharBlockCache } from "./CharBlockCache/CharBlockCache";
 
 export class GridTilemap {
   private static readonly MAX_PLAYER_LAYERS = 1000;
-  static readonly FIRST_PLAYER_LAYER = 1000;
   private static readonly ALWAYS_TOP_PROP_NAME = "ge_alwaysTop";
+  private static readonly CHAR_LAYER_PROP_NAME = "ge_charLayer";
   private static readonly HEIGHT_SHIFT_PROP_NAME = "ge_heightShift";
+  private static readonly TRANSITION_FROM_PROP_NAME = "ge_layerTransitionFrom";
+  private static readonly TRANSITION_TO_PROP_NAME = "ge_layerTransitionTo";
+  private static readonly TRANSITION_PROP_NAME = "ge_layerTransition";
   private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "ge_collide_";
   private characters = new Map<string, GridCharacter>();
   private charBlockCache: CharBlockCache = new CharBlockCache();
+  private visLayerDepths = new Map<string, number>();
+  private transitions: Map<string, Map<string, string>> = new Map();
 
-  constructor(
-    private tilemap: Phaser.Tilemaps.Tilemap,
-    private firstLayerAboveChar?: number
-  ) {
+  constructor(private tilemap: Phaser.Tilemaps.Tilemap) {
     this.setLayerDepths();
   }
 
@@ -34,27 +36,35 @@ export class GridTilemap {
     return [...this.characters.values()];
   }
 
-  isBlocking(pos: Vector2, direction?: Direction): boolean {
+  isBlocking(
+    visualLayer: string,
+    pos: Vector2,
+    direction?: Direction
+  ): boolean {
     return (
       this.hasNoTile(pos) ||
-      this.hasBlockingTile(pos, direction) ||
+      this.hasBlockingTile(visualLayer, pos, direction) ||
       this.hasBlockingChar(pos)
     );
   }
 
-  hasBlockingTile(pos: Vector2, direction?: Direction): boolean {
+  hasBlockingTile(
+    charLayer: string,
+    pos: Vector2,
+    direction?: Direction
+  ): boolean {
     if (this.hasNoTile(pos)) return true;
+    return this.getCollisionRelevantLayers(charLayer).some((layer) =>
+      this.isLayerBlockingAt(layer, pos, direction)
+    );
+  }
 
-    const collidesPropName =
-      GridTilemap.ONE_WAY_COLLIDE_PROP_PREFIX + direction;
-    return this.tilemap.layers.some((layer) => {
-      const tile = this.tilemap.getTileAt(pos.x, pos.y, false, layer.name);
-      return (
-        tile?.properties &&
-        (tile.properties[GlobalConfig.get().collisionTilePropertyName] ||
-          tile.properties[collidesPropName])
-      );
-    });
+  getTransition(pos: Vector2, fromLayer: string): string | undefined {
+    const transitions = this.transitions.get(pos.toString());
+
+    if (transitions) {
+      return transitions.get(fromLayer);
+    }
   }
 
   hasNoTile(pos: Vector2): boolean {
@@ -77,6 +87,68 @@ export class GridTilemap {
     return this.tilemap.tileHeight * tilemapScale;
   }
 
+  getDepthOfCharLayer(layerName: string): number {
+    return this.visLayerDepths.get(layerName) || 0;
+  }
+
+  private isLayerBlockingAt(
+    layer: Phaser.Tilemaps.LayerData,
+    pos: Vector2,
+    direction?: Direction
+  ): boolean {
+    const collidesPropName =
+      GridTilemap.ONE_WAY_COLLIDE_PROP_PREFIX + direction;
+
+    const tile = this.tilemap.getTileAt(pos.x, pos.y, false, layer.name);
+    return Boolean(
+      tile?.properties &&
+        (tile.properties[GlobalConfig.get().collisionTilePropertyName] ||
+          tile.properties[collidesPropName])
+    );
+  }
+
+  private getCharLayerIndexes(): number[] {
+    return this.tilemap.layers
+      .map((layer, index) => ({ layer, index }))
+      .filter(({ layer }) => this.isCharLayer(layer))
+      .map(({ index }) => index);
+  }
+
+  private findPrevAndCharLayer(charLayer: string): {
+    prevIndex: number;
+    charLayerIndex: number;
+  } {
+    const indexes = this.getCharLayerIndexes();
+
+    const charLayerIndex = indexes.findIndex((index) => {
+      return (
+        this.getLayerProp(
+          this.tilemap.layers[index],
+          GridTilemap.CHAR_LAYER_PROP_NAME
+        ) == charLayer
+      );
+    });
+
+    if (charLayerIndex == 0) {
+      return { prevIndex: 0, charLayerIndex: indexes[charLayerIndex] };
+    }
+
+    return {
+      prevIndex: indexes[charLayerIndex - 1],
+      charLayerIndex: indexes[charLayerIndex],
+    };
+  }
+
+  private getCollisionRelevantLayers(
+    charLayer: string
+  ): Phaser.Tilemaps.LayerData[] {
+    if (!charLayer) return this.tilemap.layers;
+
+    const { prevIndex, charLayerIndex } = this.findPrevAndCharLayer(charLayer);
+
+    return this.tilemap.layers.slice(prevIndex, charLayerIndex + 1);
+  }
+
   private getLayerProp(layer: Phaser.Tilemaps.LayerData, name: string): any {
     const layerProps = layer.properties as [{ name: any; value: any }];
     const prop = layerProps.find((el) => el.name == name);
@@ -90,40 +162,83 @@ export class GridTilemap {
     return this.getLayerProp(layer, name) != undefined;
   }
 
-  private isLayerAlwaysOnTop(
-    layerData: Phaser.Tilemaps.LayerData,
-    layerIndex: number
-  ): boolean {
-    return (
-      layerIndex >= this.firstLayerAboveChar ||
-      this.hasLayerProp(layerData, GridTilemap.ALWAYS_TOP_PROP_NAME)
-    );
+  private isLayerAlwaysOnTop(layerData: Phaser.Tilemaps.LayerData): boolean {
+    return this.hasLayerProp(layerData, GridTilemap.ALWAYS_TOP_PROP_NAME);
+  }
+
+  private isCharLayer(layerData: Phaser.Tilemaps.LayerData): boolean {
+    return this.hasLayerProp(layerData, GridTilemap.CHAR_LAYER_PROP_NAME);
   }
 
   private setLayerDepths() {
     const layersToDelete: Phaser.Tilemaps.TilemapLayer[] = [];
+    let offset = 0;
+    const onTopLayers = [];
     this.tilemap.layers.forEach((layerData, layerIndex) => {
-      if (this.isLayerAlwaysOnTop(layerData, layerIndex)) {
-        layerData.tilemapLayer.setDepth(
-          GridTilemap.FIRST_PLAYER_LAYER +
-            GridTilemap.MAX_PLAYER_LAYERS +
-            layerIndex
-        );
-      } else if (
-        this.hasLayerProp(layerData, GridTilemap.HEIGHT_SHIFT_PROP_NAME)
-      ) {
-        this.createLayerForEachRow(layerData, layerIndex);
+      if (this.hasLayerProp(layerData, "ge_layerTransitionFrom")) {
+        layerData.visible = false;
+        this.processTransitions(layerData);
+        return;
+      }
+
+      if (this.isLayerAlwaysOnTop(layerData)) {
+        onTopLayers.push(layerData);
+      }
+      if (this.hasLayerProp(layerData, GridTilemap.HEIGHT_SHIFT_PROP_NAME)) {
+        this.createLayerForEachRow(layerData, layerIndex, offset);
         layersToDelete.push(layerData.tilemapLayer);
+        offset += layerData.height;
       } else {
-        layerData.tilemapLayer.setDepth(layerIndex);
+        layerData.tilemapLayer.setDepth(layerIndex + offset);
+      }
+
+      if (this.isCharLayer(layerData)) {
+        this.visLayerDepths.set(
+          this.getLayerProp(layerData, GridTilemap.CHAR_LAYER_PROP_NAME),
+          layerIndex + offset
+        );
+        offset += GridTilemap.MAX_PLAYER_LAYERS;
       }
     });
+
     layersToDelete.forEach((layer) => layer.destroy());
+    if (this.visLayerDepths.size == 0) {
+      onTopLayers.forEach((layer, layerIndex) => {
+        layer.tilemapLayer.setDepth(
+          GridTilemap.MAX_PLAYER_LAYERS +
+            layerIndex +
+            offset +
+            this.tilemap.layers.length -
+            onTopLayers.length
+        );
+      });
+    }
+  }
+
+  private processTransitions(layer: Phaser.Tilemaps.LayerData): void {
+    for (let x = 0; x < layer.width; x++) {
+      for (let y = 0; y < layer.height; y++) {
+        const posStr = new Vector2({ x, y }).toString();
+        const tile = this.tilemap.getTileAt(x, y, false, layer.name);
+        if (tile?.properties[GridTilemap.TRANSITION_PROP_NAME]) {
+          if (!this.transitions.has(posStr)) {
+            this.transitions.set(posStr, new Map());
+          }
+          this.transitions
+            .get(posStr)
+            .set(
+              this.getLayerProp(layer, GridTilemap.TRANSITION_FROM_PROP_NAME),
+              this.getLayerProp(layer, GridTilemap.TRANSITION_TO_PROP_NAME)
+            );
+        }
+      }
+    }
   }
 
   private createLayerForEachRow(
     layer: Phaser.Tilemaps.LayerData,
-    layerIndex: number
+    layerIndex: number,
+    offset: number
   ) {
     const heightShift = this.getLayerProp(
       layer,
@@ -142,11 +257,7 @@ export class GridTilemap {
 
       const makeHigherThanPlayerWhenOnSameLevel = 0.5;
       newLayer.setDepth(
-        GridTilemap.FIRST_PLAYER_LAYER +
-          row +
-          heightShift -
-          1 +
-          makeHigherThanPlayerWhenOnSameLevel
+        offset + row + heightShift - 1 + makeHigherThanPlayerWhenOnSameLevel
       );
     }
   }

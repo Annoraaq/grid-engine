@@ -26,6 +26,9 @@ const mockGridCharacter = {
   getMovement: jest.fn(),
   getSprite: jest.fn(),
   setSprite: jest.fn(),
+  setCharLayer: jest.fn(),
+  getCharLayer: jest.fn(),
+  getTransition: jest.fn(),
 };
 const mockFollowMovement = {
   setCharacter: jest.fn(),
@@ -37,6 +40,7 @@ const mockGridTileMap = {
   removeCharacter: jest.fn(),
   getTileWidth: () => 32,
   getTileHeight: () => 32,
+  getTransition: jest.fn(),
 };
 const mockGridTilemapConstructor = jest.fn(function (
   _tilemap,
@@ -462,6 +466,26 @@ describe("GridEngine", () => {
       walkingAnimationMapping: 3,
       collides: false,
     });
+  });
+
+  it("should use config char layer", () => {
+    gridEngine.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+          startPosition: new Vector2(3, 4),
+          charLayer: "someCharLayer",
+        },
+      ],
+    });
+    expect(GridCharacter).toHaveBeenCalledWith(
+      "player",
+      expect.objectContaining({
+        charLayer: "someCharLayer",
+      })
+    );
   });
 
   describe("move 4 dirs", () => {
@@ -1035,6 +1059,23 @@ describe("GridEngine", () => {
     expect(mockGridCharacter.turnTowards).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
+  it("should delegate setCharLayer", () => {
+    gridEngine.setCharLayer("player", "someLayer");
+    expect(mockGridCharacter.setCharLayer).toHaveBeenCalledWith("someLayer");
+  });
+
+  it("should delegate getCharLayer", () => {
+    mockGridCharacter.getCharLayer.mockReturnValue("someLayer");
+    expect(gridEngine.getCharLayer("player")).toEqual("someLayer");
+  });
+
+  it("should delegate getTransition", () => {
+    mockGridTileMap.getTransition.mockReturnValue("someLayer");
+    expect(gridEngine.getTransition({ x: 3, y: 4 }, "fromLayer")).toEqual(
+      "someLayer"
+    );
+  });
+
   describe("Observables", () => {
     it("should get chars movementStarted observable", async () => {
       const mockSubject = new Subject<Direction>();
@@ -1319,6 +1360,12 @@ describe("GridEngine", () => {
       expectCharUnknownException(() =>
         gridEngine.getFacingPosition(UNKNOWN_CHAR_ID)
       );
+      expectCharUnknownException(() =>
+        gridEngine.setCharLayer(UNKNOWN_CHAR_ID, "someLayer")
+      );
+      expectCharUnknownException(() =>
+        gridEngine.getCharLayer(UNKNOWN_CHAR_ID)
+      );
     });
 
     it("should throw error if follow is invoked", () => {
@@ -1390,6 +1437,13 @@ describe("GridEngine", () => {
       expectUninitializedException(() => gridEngine.getSprite(SOME_CHAR_ID));
       expectUninitializedException(() =>
         gridEngine.getFacingPosition(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngine.setCharLayer(SOME_CHAR_ID, "someLayer")
+      );
+      expectUninitializedException(() => gridEngine.getCharLayer(SOME_CHAR_ID));
+      expectUninitializedException(() =>
+        gridEngine.getTransition(new Vector2({ x: 2, y: 2 }), "someLayer")
       );
     });
   });
