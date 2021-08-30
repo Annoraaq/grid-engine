@@ -615,7 +615,7 @@ describe("GridTilemap", () => {
   });
 
   describe("transitions", () => {
-    it("should detect transitions", () => {
+    it("should detect transitions from tilemap", () => {
       tilemapMock.layers = [
         {
           name: "layer1",
@@ -679,6 +679,48 @@ describe("GridTilemap", () => {
       expect(
         gridTilemap.getTransition(new Vector2({ x: 7, y: 5 }), "charLayer2")
       ).toBe(undefined);
+    });
+
+    it("should set transitions", () => {
+      gridTilemap = new GridTilemap(tilemapMock);
+      gridTilemap.setTransition(
+        new Vector2({ x: 4, y: 5 }),
+        "charLayer2",
+        "charLayer1"
+      );
+      gridTilemap.setTransition(
+        new Vector2({ x: 3, y: 5 }),
+        "charLayer2",
+        "charLayer1"
+      );
+      expect(
+        gridTilemap.getTransition(new Vector2({ x: 4, y: 5 }), "charLayer2")
+      ).toBe("charLayer1");
+      expect(
+        gridTilemap.getTransition(new Vector2({ x: 3, y: 5 }), "charLayer2")
+      ).toBe("charLayer1");
+      expect(
+        gridTilemap.getTransition(new Vector2({ x: 7, y: 5 }), "charLayer2")
+      ).toBe(undefined);
+    });
+
+    it("should get all transitions", () => {
+      const pos1 = new Vector2({ x: 4, y: 5 });
+      const pos2 = new Vector2({ x: 3, y: 5 });
+      gridTilemap = new GridTilemap(tilemapMock);
+      gridTilemap.setTransition(pos1, "charLayer2", "charLayer1");
+      gridTilemap.setTransition(pos2, "charLayer2", "charLayer1");
+
+      const expectedTransitions = new Map();
+      expectedTransitions.set(
+        pos1.toString(),
+        new Map([["charLayer2", "charLayer1"]])
+      );
+      expectedTransitions.set(
+        pos2.toString(),
+        new Map([["charLayer2", "charLayer1"]])
+      );
+      expect(gridTilemap.getTransitions()).toEqual(expectedTransitions);
     });
   });
 

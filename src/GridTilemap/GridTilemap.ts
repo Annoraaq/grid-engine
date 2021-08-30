@@ -67,6 +67,19 @@ export class GridTilemap {
     }
   }
 
+  setTransition(pos: Vector2, fromLayer: string, toLayer: string): void {
+    if (!this.transitions.has(pos.toString())) {
+      this.transitions.set(pos.toString(), new Map());
+    }
+    this.transitions.get(pos.toString()).set(fromLayer, toLayer);
+  }
+
+  getTransitions(): Map<string, Map<string, string>> {
+    return new Map(
+      [...this.transitions].map(([pos, map]) => [pos, new Map(map)])
+    );
+  }
+
   hasNoTile(pos: Vector2): boolean {
     return !this.tilemap.layers.some((layer) =>
       this.tilemap.hasTileAt(pos.x, pos.y, layer.name)
