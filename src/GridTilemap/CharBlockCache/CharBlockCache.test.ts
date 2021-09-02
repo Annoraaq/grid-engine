@@ -58,6 +58,8 @@ describe("CharBlockCache", () => {
       positionChangeStarted.next({
         enterTile: new Vector2(3, 4),
         exitTile: new Vector2(3, 3),
+        enterLayer: "someLayer",
+        exitLayer: "someLayer",
       });
 
       const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
@@ -83,6 +85,8 @@ describe("CharBlockCache", () => {
       positionChangeFinished.next({
         enterTile: new Vector2(3, 4),
         exitTile: new Vector2(3, 3),
+        enterLayer: "someLayer",
+        exitLayer: "someLayer",
       });
 
       const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
@@ -112,6 +116,8 @@ describe("CharBlockCache", () => {
       positionChangeStarted.next({
         enterTile: new Vector2(3, 4),
         exitTile: new Vector2(3, 3),
+        enterLayer: "someLayer",
+        exitLayer: "someLayer",
       });
 
       const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
@@ -145,18 +151,26 @@ describe("CharBlockCache", () => {
     positionChangeStarted.next({
       enterTile: new Vector2(3, 3),
       exitTile: new Vector2(3, 2),
+      enterLayer: "someLayer",
+      exitLayer: "someLayer",
     });
     positionChangeFinished.next({
       enterTile: new Vector2(3, 3),
       exitTile: new Vector2(3, 2),
+      enterLayer: "someLayer",
+      exitLayer: "someLayer",
     });
     positionChangeStarted.next({
       enterTile: new Vector2(3, 4),
       exitTile: new Vector2(3, 3),
+      enterLayer: "someLayer",
+      exitLayer: "someLayer",
     });
     positionChangeFinished.next({
       enterTile: new Vector2(3, 4),
       exitTile: new Vector2(3, 3),
+      enterLayer: "someLayer",
+      exitLayer: "someLayer",
     });
 
     expect(charBlockCache.isCharBlockingAt(new Vector2(3, 3))).toBe(true);

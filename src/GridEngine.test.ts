@@ -1222,13 +1222,23 @@ describe("GridEngine", () => {
 
       const exitTile = new Vector2(1, 2);
       const enterTile = new Vector2(2, 2);
+      const exitLayer = "firstLayer";
+      const enterLayer = "secondLayer";
 
       mockSubject.next({
         exitTile,
         enterTile,
+        exitLayer,
+        enterLayer,
       });
       const res = await prom;
-      expect(res).toEqual({ charId: "player", exitTile, enterTile });
+      expect(res).toEqual({
+        charId: "player",
+        exitTile,
+        enterTile,
+        enterLayer,
+        exitLayer,
+      });
     });
 
     it("should unsubscribe from positionChangeStarted if char removed", async () => {
@@ -1253,8 +1263,10 @@ describe("GridEngine", () => {
 
       const exitTile = new Vector2(1, 2);
       const enterTile = new Vector2(2, 2);
+      const exitLayer = "firstLayer";
+      const enterLayer = "secondLayer";
 
-      mockSubject.next({ exitTile, enterTile });
+      mockSubject.next({ exitTile, enterTile, enterLayer, exitLayer });
       expect(nextMock).not.toHaveBeenCalled();
     });
 
@@ -1277,13 +1289,23 @@ describe("GridEngine", () => {
 
       const exitTile = new Vector2(1, 2);
       const enterTile = new Vector2(2, 2);
+      const exitLayer = "firstLayer";
+      const enterLayer = "secondLayer";
 
       mockSubject.next({
         exitTile,
         enterTile,
+        enterLayer,
+        exitLayer,
       });
       const res = await prom;
-      expect(res).toEqual({ charId: "player", exitTile, enterTile });
+      expect(res).toEqual({
+        charId: "player",
+        exitTile,
+        enterTile,
+        enterLayer,
+        exitLayer,
+      });
     });
 
     it("should unsubscribe from positionChangeFinished if char removed", async () => {
@@ -1308,8 +1330,10 @@ describe("GridEngine", () => {
 
       const exitTile = new Vector2(1, 2);
       const enterTile = new Vector2(2, 2);
+      const exitLayer = "firstLayer";
+      const enterLayer = "secondLayer";
 
-      mockSubject.next({ exitTile, enterTile });
+      mockSubject.next({ exitTile, enterTile, enterLayer, exitLayer });
       expect(nextMock).not.toHaveBeenCalled();
     });
   });

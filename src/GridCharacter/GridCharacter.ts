@@ -20,6 +20,8 @@ export type CharacterIndex = number;
 export interface PositionChange {
   exitTile: Position;
   enterTile: Position;
+  exitLayer: string;
+  enterLayer: string;
 }
 
 export interface CharConfig {
@@ -125,10 +127,14 @@ export class GridCharacter {
     this.positionChangeStarted$.next({
       exitTile: this.tilePos,
       enterTile: tilePosition,
+      exitLayer: this.charLayer,
+      enterLayer: this.charLayer,
     });
     this.positionChangeFinished$.next({
       exitTile: this.tilePos,
       enterTile: tilePosition,
+      exitLayer: this.charLayer,
+      enterLayer: this.charLayer,
     });
     this.movementDirection = Direction.NONE;
     this.nextTilePos = tilePosition;
@@ -361,6 +367,8 @@ export class GridCharacter {
     this.positionChangeStarted$.next({
       exitTile: this.tilePos,
       enterTile: newTilePos,
+      exitLayer: this.charLayer,
+      enterLayer: this.charLayer,
     });
   }
 
@@ -394,6 +402,8 @@ export class GridCharacter {
         this.positionChangeFinished$.next({
           exitTile: this.tilePos,
           enterTile: this.nextTilePos,
+          exitLayer: this.charLayer,
+          enterLayer: this.charLayer,
         });
         this.startMoving(this.lastMovementImpulse);
 
@@ -459,6 +469,8 @@ export class GridCharacter {
     this.positionChangeFinished$.next({
       exitTile,
       enterTile,
+      exitLayer: this.charLayer,
+      enterLayer: this.charLayer,
     });
   }
 

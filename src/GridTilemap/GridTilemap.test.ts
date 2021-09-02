@@ -670,43 +670,35 @@ describe("GridTilemap", () => {
       });
 
       gridTilemap = new GridTilemap(tilemapMock);
-      expect(
-        gridTilemap.getTransition(new Vector2({ x: 4, y: 5 }), "charLayer2")
-      ).toBe("charLayer1");
-      expect(
-        gridTilemap.getTransition(new Vector2({ x: 3, y: 5 }), "charLayer2")
-      ).toBe("charLayer1");
-      expect(
-        gridTilemap.getTransition(new Vector2({ x: 7, y: 5 }), "charLayer2")
-      ).toBe(undefined);
+      expect(gridTilemap.getTransition(new Vector2(4, 5), "charLayer2")).toBe(
+        "charLayer1"
+      );
+      expect(gridTilemap.getTransition(new Vector2(3, 5), "charLayer2")).toBe(
+        "charLayer1"
+      );
+      expect(gridTilemap.getTransition(new Vector2(7, 5), "charLayer2")).toBe(
+        undefined
+      );
     });
 
     it("should set transitions", () => {
       gridTilemap = new GridTilemap(tilemapMock);
-      gridTilemap.setTransition(
-        new Vector2({ x: 4, y: 5 }),
-        "charLayer2",
+      gridTilemap.setTransition(new Vector2(4, 5), "charLayer2", "charLayer1");
+      gridTilemap.setTransition(new Vector2(3, 5), "charLayer2", "charLayer1");
+      expect(gridTilemap.getTransition(new Vector2(4, 5), "charLayer2")).toBe(
         "charLayer1"
       );
-      gridTilemap.setTransition(
-        new Vector2({ x: 3, y: 5 }),
-        "charLayer2",
+      expect(gridTilemap.getTransition(new Vector2(3, 5), "charLayer2")).toBe(
         "charLayer1"
       );
-      expect(
-        gridTilemap.getTransition(new Vector2({ x: 4, y: 5 }), "charLayer2")
-      ).toBe("charLayer1");
-      expect(
-        gridTilemap.getTransition(new Vector2({ x: 3, y: 5 }), "charLayer2")
-      ).toBe("charLayer1");
-      expect(
-        gridTilemap.getTransition(new Vector2({ x: 7, y: 5 }), "charLayer2")
-      ).toBe(undefined);
+      expect(gridTilemap.getTransition(new Vector2(7, 5), "charLayer2")).toBe(
+        undefined
+      );
     });
 
     it("should get all transitions", () => {
-      const pos1 = new Vector2({ x: 4, y: 5 });
-      const pos2 = new Vector2({ x: 3, y: 5 });
+      const pos1 = new Vector2(4, 5);
+      const pos2 = new Vector2(3, 5);
       gridTilemap = new GridTilemap(tilemapMock);
       gridTilemap.setTransition(pos1, "charLayer2", "charLayer1");
       gridTilemap.setTransition(pos2, "charLayer2", "charLayer1");

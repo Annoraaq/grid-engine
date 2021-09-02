@@ -289,22 +289,20 @@ export class GridEngine {
     gridChar
       .positionChangeStarted()
       .pipe(this.takeUntilCharRemoved(gridChar.getId()))
-      .subscribe(({ exitTile, enterTile }) => {
+      .subscribe((positionChange: PositionChange) => {
         this.positionChangeStarted$.next({
           charId: gridChar.getId(),
-          exitTile,
-          enterTile,
+          ...positionChange,
         });
       });
 
     gridChar
       .positionChangeFinished()
       .pipe(this.takeUntilCharRemoved(gridChar.getId()))
-      .subscribe(({ exitTile, enterTile }) => {
+      .subscribe((positionChange: PositionChange) => {
         this.positionChangeFinished$.next({
           charId: gridChar.getId(),
-          exitTile,
-          enterTile,
+          ...positionChange,
         });
       });
   }

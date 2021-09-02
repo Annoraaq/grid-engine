@@ -231,7 +231,7 @@ export class GridTilemap {
   private processTransitions(layer: Phaser.Tilemaps.LayerData): void {
     for (let x = 0; x < layer.width; x++) {
       for (let y = 0; y < layer.height; y++) {
-        const posStr = new Vector2({ x, y }).toString();
+        const posStr = new Vector2(x, y).toString();
         const tile = this.tilemap.getTileAt(x, y, false, layer.name);
         if (tile?.properties[GridTilemap.TRANSITION_PROP_NAME]) {
           if (!this.transitions.has(posStr)) {
