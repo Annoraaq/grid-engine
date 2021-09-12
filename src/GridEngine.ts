@@ -181,7 +181,11 @@ export class GridEngine {
     this.unknownCharGuard(charId);
     const targetMovement = new TargetMovement(
       this.gridTilemap,
-      new Vector2(targetPos),
+      {
+        position: new Vector2(targetPos),
+        layer:
+          config?.targetLayer || this.gridCharacters.get(charId).getCharLayer(),
+      },
       0,
       moveToConfig
     );

@@ -1,3 +1,4 @@
+import { LayerPosition } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { NumberOfDirections } from "./../../Direction/Direction";
 import { FollowMovement } from "./FollowMovement";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
@@ -21,7 +22,7 @@ describe("FollowMovement", () => {
   let followMovement: FollowMovement;
   let gridTilemapMock;
   let mockChar;
-  let targetCharPos: Vector2;
+  let targetCharPos: LayerPosition;
   let targetChar;
 
   function createMockChar(id: string, pos: Vector2) {
@@ -38,6 +39,7 @@ describe("FollowMovement", () => {
       autoMovementSet: function () {
         return this.autoMovementSetSubject$;
       },
+      getCharLayer: () => "layer1",
     };
   }
 
@@ -49,10 +51,10 @@ describe("FollowMovement", () => {
       isBlocking: jest.fn(),
     };
     mockTargetMovement.setCharacter.mockReset();
-    const charPos = new Vector2(1, 1);
-    targetCharPos = new Vector2(3, 1);
-    mockChar = createMockChar("char", charPos);
-    targetChar = createMockChar("targetChar", targetCharPos);
+    const charPos = { position: new Vector2(1, 1), layer: "layer1" };
+    targetCharPos = { position: new Vector2(3, 1), layer: "layer1" };
+    mockChar = createMockChar("char", charPos.position);
+    targetChar = createMockChar("targetChar", targetCharPos.position);
     followMovement = new FollowMovement(gridTilemapMock, targetChar);
   });
 
@@ -88,11 +90,13 @@ describe("FollowMovement", () => {
   it("should update target on position change", () => {
     followMovement.setCharacter(mockChar);
 
-    const enterTile = new Vector2(7, 7);
+    const enterTile = { position: new Vector2(7, 7), layer: "layer1" };
     mockTargetMovement.setNumberOfDirections.mockReset();
     mockTargetMovement.setCharacter.mockReset();
 
-    targetChar.positionChangeStartedSubject$.next({ enterTile });
+    targetChar.positionChangeStartedSubject$.next({
+      enterTile: enterTile.position,
+    });
 
     expect(TargetMovement).toHaveBeenCalledWith(gridTilemapMock, enterTile, 1, {
       noPathFoundStrategy: NoPathFoundStrategy.STOP,

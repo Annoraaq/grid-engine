@@ -24,6 +24,9 @@ export class GridTilemap {
 
   addCharacter(character: GridCharacter): void {
     this.characters.set(character.getId(), character);
+    if (character.getCharLayer() === undefined) {
+      character.setCharLayer(this.getLowestCharLayer());
+    }
     this.charBlockCache.addCharacter(character);
   }
 
@@ -162,6 +165,16 @@ export class GridTilemap {
     return this.tilemap.layers.slice(prevIndex, charLayerIndex + 1);
   }
 
+  private getLowestCharLayer(): string | undefined {
+    const charLayer = this.tilemap.layers.find((layer) => {
+      return this.hasLayerProp(layer, GridTilemap.CHAR_LAYER_PROP_NAME);
+    });
+
+    if (charLayer) {
+      return this.getLayerProp(charLayer, GridTilemap.CHAR_LAYER_PROP_NAME);
+    }
+  }
+
   private getLayerProp(layer: Phaser.Tilemaps.LayerData, name: string): any {
     const layerProps = layer.properties as [{ name: any; value: any }];
     const prop = layerProps.find((el) => el.name == name);
@@ -188,7 +201,7 @@ export class GridTilemap {
     let offset = 0;
     const onTopLayers = [];
     this.tilemap.layers.forEach((layerData, layerIndex) => {
-      if (this.hasLayerProp(layerData, "ge_layerTransitionFrom")) {
+      if (this.hasLayerProp(layerData, GridTilemap.TRANSITION_FROM_PROP_NAME)) {
         layerData.visible = false;
         this.processTransitions(layerData);
         return;

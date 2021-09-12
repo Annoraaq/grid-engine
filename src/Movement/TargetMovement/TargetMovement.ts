@@ -1,3 +1,4 @@
+import { LayerPosition } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
@@ -22,6 +23,7 @@ export interface MoveToConfig {
   pathBlockedMaxRetries?: number;
   pathBlockedRetryBackoffMs?: number;
   pathBlockedWaitTimeoutMs?: number;
+  targetLayer?: string;
 }
 
 export enum MoveToResult {
@@ -42,7 +44,7 @@ export interface Finished {
 
 export class TargetMovement implements Movement {
   private character: GridCharacter;
-  private shortestPath: Vector2[];
+  private shortestPath: LayerPosition[];
   private distOffset: number;
   private posOnPath = 0;
   private pathBlockedStrategy: PathBlockedStrategy;
@@ -57,7 +59,7 @@ export class TargetMovement implements Movement {
 
   constructor(
     private tilemap: GridTilemap,
-    private targetPos: Vector2,
+    private targetPos: LayerPosition,
     private distance = 0,
     config?: MoveToConfig
   ) {
@@ -125,7 +127,12 @@ export class TargetMovement implements Movement {
     }
 
     this.updatePosOnPath();
-    if (this.isBlocking(this.nextTileOnPath())) {
+    if (
+      this.isBlocking(
+        this.nextTileOnPath()?.position,
+        this.character?.getCharLayer()
+      )
+    ) {
       this.applyPathBlockedStrategy(delta);
     } else {
       this.pathBlockedWaitElapsed = 0;
@@ -136,14 +143,32 @@ export class TargetMovement implements Movement {
       if (this.existsDistToTarget()) {
         this.turnTowardsTarget();
       }
-    } else if (!this.isBlocking(this.nextTileOnPath())) {
+    } else if (
+      !this.isBlocking(
+        this.nextTileOnPath()?.position,
+        this.character?.getCharLayer()
+      )
+    ) {
       this.moveCharOnPath();
     }
   }
 
-  getNeighbours = (pos: Vector2): Vector2[] => {
-    const neighbours = this.distanceUtils.neighbours(pos);
-    return neighbours.filter((pos) => !this.isBlocking(pos));
+  getNeighbours = (pos: LayerPosition): LayerPosition[] => {
+    const neighbours = this.distanceUtils.neighbours(pos.position);
+    const unblockedNeighbours = neighbours.filter(
+      (neighbour) => !this.isBlocking(neighbour, pos.layer)
+    );
+
+    return unblockedNeighbours.map((unblockedNeighbour) => {
+      const transition = this.tilemap.getTransition(
+        unblockedNeighbour,
+        pos.layer
+      );
+      return {
+        position: unblockedNeighbour,
+        layer: transition || pos.layer,
+      };
+    });
   };
 
   finishedObs(): Subject<Finished> {
@@ -166,8 +191,6 @@ export class TargetMovement implements Movement {
         return `PathBlockedStrategy RETRY: Maximum retries of ${this.pathBlockedRetryable.getMaxRetries()} exceeded.`;
       case MoveToResult.PATH_BLOCKED_WAIT_TIMEOUT:
         return `PathBlockedStrategy WAIT: Wait timeout of ${this.pathBlockedWaitTimeoutMs}ms exceeded.`;
-      default:
-        return undefined;
     }
   }
 
@@ -189,12 +212,12 @@ export class TargetMovement implements Movement {
   private moveCharOnPath(): void {
     const dir = this.getDir(
       this.character.getNextTilePos(),
-      this.nextTileOnPath()
+      this.nextTileOnPath().position
     );
     this.character.move(dir);
   }
 
-  private nextTileOnPath(): Vector2 | undefined {
+  private nextTileOnPath(): LayerPosition | undefined {
     return this.shortestPath[this.posOnPath + 1];
   }
 
@@ -210,7 +233,7 @@ export class TargetMovement implements Movement {
 
   private turnTowardsTarget(): void {
     const nextTile = this.shortestPath[this.posOnPath + 1];
-    const dir = this.getDir(this.character.getNextTilePos(), nextTile);
+    const dir = this.getDir(this.character.getNextTilePos(), nextTile.position);
     this.character.turnTowards(dir);
   }
 
@@ -230,8 +253,8 @@ export class TargetMovement implements Movement {
     let currentTile = this.shortestPath[this.posOnPath];
     while (
       this.posOnPath < this.shortestPath.length - 1 &&
-      (this.character.getNextTilePos().x != currentTile.x ||
-        this.character.getNextTilePos().y != currentTile.y)
+      (this.character.getNextTilePos().x != currentTile.position.x ||
+        this.character.getNextTilePos().y != currentTile.position.y)
     ) {
       this.posOnPath++;
       currentTile = this.shortestPath[this.posOnPath];
@@ -249,18 +272,24 @@ export class TargetMovement implements Movement {
     this.distOffset = shortestPath.distOffset;
   }
 
-  private isBlocking = (pos?: Vector2): boolean => {
-    return !pos || this.tilemap.isBlocking(this.character?.getCharLayer(), pos);
+  private isBlocking = (pos?: Vector2, charLayer?: string): boolean => {
+    return !pos || this.tilemap.isBlocking(charLayer, pos);
   };
 
-  private getShortestPath(): { path: Vector2[]; distOffset: number } {
+  private getShortestPath(): { path: LayerPosition[]; distOffset: number } {
     const shortestPathAlgo: ShortestPathAlgorithm = new Bfs();
     const { path: shortestPath, closestToTarget } =
       shortestPathAlgo.getShortestPath(
-        this.character.getNextTilePos(),
+        {
+          position: this.character.getNextTilePos(),
+          layer: this.character.getCharLayer(),
+        },
         this.targetPos,
         this.getNeighbours
       );
+
+    // console.log(this.character.getCharLayer());
+    // console.log(this.targetPos);
 
     const noPathFound = shortestPath.length == 0;
 
@@ -269,13 +298,16 @@ export class TargetMovement implements Movement {
       this.noPathFoundStrategy === NoPathFoundStrategy.CLOSEST_REACHABLE
     ) {
       const shortestPathToClosestPoint = shortestPathAlgo.getShortestPath(
-        this.character.getNextTilePos(),
+        {
+          position: this.character.getNextTilePos(),
+          layer: this.character.getCharLayer(),
+        },
         closestToTarget,
         this.getNeighbours
       ).path;
       const distOffset = this.distanceUtils.distance(
-        closestToTarget,
-        this.targetPos
+        closestToTarget.position,
+        this.targetPos.position
       );
       return { path: shortestPathToClosestPoint, distOffset };
     }

@@ -261,6 +261,47 @@ describe("GridTilemap", () => {
     expect(gridTilemap.getCharacters()).toEqual([charMock1, charMockSameId]);
   });
 
+  it("should set the lowest char layer", () => {
+    tilemapMock.layers = [
+      {
+        name: "layer1",
+        tilemapLayer: {
+          setDepth: jest.fn(),
+          destroy: jest.fn(),
+          scale: 3,
+          tileset: "Cloud City",
+        },
+        properties: [
+          {
+            name: "ge_charLayer",
+            value: "layer1",
+          },
+        ],
+      },
+      {
+        name: "layer2",
+        tilemapLayer: {
+          setDepth: jest.fn(),
+          destroy: jest.fn(),
+          scale: 3,
+          tileset: "Cloud City",
+        },
+        properties: [
+          {
+            name: "ge_charLayer",
+            value: "layer2",
+          },
+        ],
+      },
+    ];
+    gridTilemap = new GridTilemap(tilemapMock);
+    const charMock1 = createCharMock("player");
+    charMock1.getCharLayer = () => undefined;
+    gridTilemap.addCharacter(charMock1);
+
+    expect(charMock1.setCharLayer).toBeCalledWith("layer1");
+  });
+
   it("should remove a character", () => {
     gridTilemap = new GridTilemap(tilemapMock);
     const charMock1 = <any>{
@@ -724,6 +765,8 @@ describe("GridTilemap", () => {
       getNextTilePos: () => ({ x: 1, y: 1 }),
       positionChangeStarted: () => of([]),
       positionChangeFinished: () => of([]),
+      getCharLayer: () => "layer1",
+      setCharLayer: jest.fn(),
     };
   }
 });

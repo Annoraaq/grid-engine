@@ -681,11 +681,11 @@ describe("GridEngine", () => {
 
   describe("moveTo", () => {
     it("should move to coordinates", () => {
-      const targetVec = new Vector2(3, 4);
-      gridEngine.moveTo("player", targetVec);
+      const targetVec = { position: new Vector2(3, 4), layer: "layer1" };
+      gridEngine.moveTo("player", targetVec.position);
       expect(TargetMovement).toHaveBeenCalledWith(
         mockGridTileMap,
-        targetVec,
+        { position: targetVec.position, layer: undefined },
         0,
         {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
@@ -699,6 +699,23 @@ describe("GridEngine", () => {
         mockTargetMovement
       );
       expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    it("should move to layer", () => {
+      const targetVec = { position: new Vector2(3, 4), layer: "layer1" };
+      gridEngine.moveTo("player", targetVec.position, {
+        targetLayer: "layer1",
+      });
+      expect(TargetMovement).toHaveBeenCalledWith(
+        mockGridTileMap,
+        targetVec,
+        0,
+        {
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+          targetLayer: "layer1",
+        }
+      );
     });
 
     it("should return observable", (done) => {
@@ -746,7 +763,7 @@ describe("GridEngine", () => {
       });
       expect(TargetMovement).toHaveBeenCalledWith(
         mockGridTileMap,
-        targetVec,
+        expect.objectContaining({ position: targetVec }),
         0,
         {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
@@ -764,7 +781,7 @@ describe("GridEngine", () => {
       });
       expect(TargetMovement).toHaveBeenCalledWith(
         mockGridTileMap,
-        targetVec,
+        expect.objectContaining({ position: targetVec }),
         0,
         {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
@@ -780,7 +797,7 @@ describe("GridEngine", () => {
       });
       expect(TargetMovement).toHaveBeenCalledWith(
         mockGridTileMap,
-        targetVec,
+        expect.objectContaining({ position: targetVec }),
         0,
         {
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
@@ -796,7 +813,7 @@ describe("GridEngine", () => {
       });
       expect(TargetMovement).toHaveBeenCalledWith(
         mockGridTileMap,
-        targetVec,
+        expect.objectContaining({ position: targetVec }),
         0,
         {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
@@ -816,7 +833,7 @@ describe("GridEngine", () => {
       });
       expect(TargetMovement).toHaveBeenCalledWith(
         mockGridTileMap,
-        targetVec,
+        expect.objectContaining({ position: targetVec }),
         0,
         {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
@@ -833,7 +850,7 @@ describe("GridEngine", () => {
       });
       expect(TargetMovement).toHaveBeenCalledWith(
         mockGridTileMap,
-        targetVec,
+        expect.objectContaining({ position: targetVec }),
         0,
         {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
@@ -850,7 +867,7 @@ describe("GridEngine", () => {
       });
       expect(TargetMovement).toHaveBeenCalledWith(
         mockGridTileMap,
-        targetVec,
+        expect.objectContaining({ position: targetVec }),
         0,
         {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
