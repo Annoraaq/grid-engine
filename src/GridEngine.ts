@@ -120,6 +120,15 @@ export class GridEngine {
     return this.gridTilemap.getTransition(new Vector2(tile), fromLayer);
   }
 
+  setTransition(tile: Position, fromLayer: string, toLayer: string): void {
+    this.initGuard();
+    return this.gridTilemap.setTransition(
+      new Vector2(tile),
+      fromLayer,
+      toLayer
+    );
+  }
+
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
     this.isCreated = true;
     this.gridCharacters = new Map();

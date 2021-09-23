@@ -41,6 +41,7 @@ const mockGridTileMap = {
   getTileWidth: () => 32,
   getTileHeight: () => 32,
   getTransition: jest.fn(),
+  setTransition: jest.fn(),
 };
 const mockGridTilemapConstructor = jest.fn(function (
   _tilemap,
@@ -1093,6 +1094,15 @@ describe("GridEngine", () => {
     );
   });
 
+  it("should delegate setTransition", () => {
+    gridEngine.setTransition({ x: 3, y: 4 }, "fromLayer", "toLayer");
+    expect(mockGridTileMap.setTransition).toHaveBeenCalledWith(
+      { x: 3, y: 4 },
+      "fromLayer",
+      "toLayer"
+    );
+  });
+
   describe("Observables", () => {
     it("should get chars movementStarted observable", async () => {
       const mockSubject = new Subject<Direction>();
@@ -1485,6 +1495,13 @@ describe("GridEngine", () => {
       expectUninitializedException(() => gridEngine.getCharLayer(SOME_CHAR_ID));
       expectUninitializedException(() =>
         gridEngine.getTransition(new Vector2({ x: 2, y: 2 }), "someLayer")
+      );
+      expectUninitializedException(() =>
+        gridEngine.setTransition(
+          new Vector2({ x: 2, y: 2 }),
+          "fromLayer",
+          "toLayer"
+        )
       );
     });
   });
