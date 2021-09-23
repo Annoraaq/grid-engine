@@ -201,12 +201,6 @@ export class GridTilemap {
     let offset = 0;
     const onTopLayers = [];
     this.tilemap.layers.forEach((layerData, layerIndex) => {
-      if (this.hasLayerProp(layerData, GridTilemap.TRANSITION_FROM_PROP_NAME)) {
-        layerData.visible = false;
-        this.processTransitions(layerData);
-        return;
-      }
-
       if (this.isLayerAlwaysOnTop(layerData)) {
         onTopLayers.push(layerData);
       }
@@ -238,26 +232,6 @@ export class GridTilemap {
             onTopLayers.length
         );
       });
-    }
-  }
-
-  private processTransitions(layer: Phaser.Tilemaps.LayerData): void {
-    for (let x = 0; x < layer.width; x++) {
-      for (let y = 0; y < layer.height; y++) {
-        const posStr = new Vector2(x, y).toString();
-        const tile = this.tilemap.getTileAt(x, y, false, layer.name);
-        if (tile?.properties[GridTilemap.TRANSITION_PROP_NAME]) {
-          if (!this.transitions.has(posStr)) {
-            this.transitions.set(posStr, new Map());
-          }
-          this.transitions
-            .get(posStr)
-            .set(
-              this.getLayerProp(layer, GridTilemap.TRANSITION_FROM_PROP_NAME),
-              this.getLayerProp(layer, GridTilemap.TRANSITION_TO_PROP_NAME)
-            );
-        }
-      }
     }
   }
 
