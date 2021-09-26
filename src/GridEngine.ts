@@ -115,15 +115,15 @@ export class GridEngine {
     return this.gridCharacters.get(charId).getCharLayer();
   }
 
-  getTransition(tile: Position, fromLayer: string): string | undefined {
+  getTransition(position: Position, fromLayer: string): string | undefined {
     this.initGuard();
-    return this.gridTilemap.getTransition(new Vector2(tile), fromLayer);
+    return this.gridTilemap.getTransition(new Vector2(position), fromLayer);
   }
 
-  setTransition(tile: Position, fromLayer: string, toLayer: string): void {
+  setTransition(position: Position, fromLayer: string, toLayer: string): void {
     this.initGuard();
     return this.gridTilemap.setTransition(
-      new Vector2(tile),
+      new Vector2(position),
       fromLayer,
       toLayer
     );
