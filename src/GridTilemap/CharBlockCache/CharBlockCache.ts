@@ -10,8 +10,8 @@ export class CharBlockCache {
   private positionChangeStartedSubs: Map<string, Subscription> = new Map();
   private positionChangeFinishedSubs: Map<string, Subscription> = new Map();
 
-  isCharBlockingAt(pos: Vector2): boolean {
-    const posStr = this.posToString(pos);
+  isCharBlockingAt(pos: Vector2, layer: string): boolean {
+    const posStr = this.posToString(pos, layer);
     return (
       this.tilePosToCharacters.has(posStr) &&
       this.tilePosToCharacters.get(posStr).size > 0 &&
@@ -22,8 +22,20 @@ export class CharBlockCache {
   }
 
   addCharacter(character: GridCharacter): void {
-    this.add(this.posToString(character.getTilePos()), character);
-    this.add(this.posToString(character.getNextTilePos()), character);
+    this.add(
+      this.posToString(
+        character.getTilePos().position,
+        character.getTilePos().layer
+      ),
+      character
+    );
+    this.add(
+      this.posToString(
+        character.getNextTilePos().position,
+        character.getNextTilePos().layer
+      ),
+      character
+    );
     this.addPositionChangeSub(character);
     this.addPositionChangeFinishedSub(character);
   }
@@ -33,10 +45,20 @@ export class CharBlockCache {
     this.positionChangeStartedSubs.get(charId).unsubscribe();
     this.positionChangeFinishedSubs.get(charId).unsubscribe();
     this.tilePosToCharacters
-      .get(this.posToString(character.getTilePos()))
+      .get(
+        this.posToString(
+          character.getTilePos().position,
+          character.getTilePos().layer
+        )
+      )
       .delete(character);
     this.tilePosToCharacters
-      .get(this.posToString(character.getNextTilePos()))
+      .get(
+        this.posToString(
+          character.getNextTilePos().position,
+          character.getNextTilePos().layer
+        )
+      )
       .delete(character);
   }
 
@@ -56,10 +78,18 @@ export class CharBlockCache {
           CollisionStrategy.BLOCK_ONE_TILE_AHEAD
         ) {
           this.tilePosToCharacters
-            .get(this.posToString(positionChange.exitTile))
+            .get(
+              this.posToString(
+                positionChange.exitTile,
+                positionChange.exitLayer
+              )
+            )
             .delete(character);
         }
-        this.add(this.posToString(positionChange.enterTile), character);
+        this.add(
+          this.posToString(positionChange.enterTile, positionChange.enterLayer),
+          character
+        );
       });
     this.positionChangeStartedSubs.set(
       character.getId(),
@@ -72,7 +102,9 @@ export class CharBlockCache {
       .positionChangeFinished()
       .subscribe((positionChange) => {
         this.tilePosToCharacters
-          .get(this.posToString(positionChange.exitTile))
+          .get(
+            this.posToString(positionChange.exitTile, positionChange.exitLayer)
+          )
           .delete(character);
       });
     this.positionChangeFinishedSubs.set(
@@ -81,7 +113,7 @@ export class CharBlockCache {
     );
   }
 
-  private posToString(pos: Position): string {
-    return `${pos.x}#${pos.y}`;
+  private posToString(pos: Position, layer: string): string {
+    return `${pos.x}#${pos.y}#${layer}`;
   }
 }

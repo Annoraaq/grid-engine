@@ -25,7 +25,7 @@ describe("FollowMovement", () => {
   let targetCharPos: LayerPosition;
   let targetChar;
 
-  function createMockChar(id: string, pos: Vector2) {
+  function createMockChar(id: string, pos: LayerPosition) {
     return <any>{
       positionChangeStartedSubject$: new Subject(),
       autoMovementSetSubject$: new Subject(),
@@ -39,7 +39,6 @@ describe("FollowMovement", () => {
       autoMovementSet: function () {
         return this.autoMovementSetSubject$;
       },
-      getCharLayer: () => "layer1",
     };
   }
 
@@ -53,8 +52,8 @@ describe("FollowMovement", () => {
     mockTargetMovement.setCharacter.mockReset();
     const charPos = { position: new Vector2(1, 1), layer: "layer1" };
     targetCharPos = { position: new Vector2(3, 1), layer: "layer1" };
-    mockChar = createMockChar("char", charPos.position);
-    targetChar = createMockChar("targetChar", targetCharPos.position);
+    mockChar = createMockChar("char", charPos);
+    targetChar = createMockChar("targetChar", targetCharPos);
     followMovement = new FollowMovement(gridTilemapMock, targetChar);
   });
 
@@ -96,6 +95,7 @@ describe("FollowMovement", () => {
 
     targetChar.positionChangeStartedSubject$.next({
       enterTile: enterTile.position,
+      enterLayer: enterTile.layer,
     });
 
     expect(TargetMovement).toHaveBeenCalledWith(gridTilemapMock, enterTile, 1, {

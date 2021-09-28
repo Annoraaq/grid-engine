@@ -1,3 +1,4 @@
+import { LayerPosition } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { Direction, turnCounterClockwise } from "../../Direction/Direction";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { VectorUtils } from "../../Utils/VectorUtils";
@@ -29,7 +30,7 @@ export class IsometricGridCharacter extends GridCharacter {
     return turnCounterClockwise(direction);
   }
 
-  protected mapDepth(nextTilePos: Vector2): number {
-    return nextTilePos.x + nextTilePos.y;
+  protected mapDepth(nextTilePos: LayerPosition): number {
+    return nextTilePos.position.x + nextTilePos.position.y;
   }
 }

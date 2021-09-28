@@ -27,14 +27,14 @@ export class FollowMovement implements Movement {
   setCharacter(character: GridCharacter): void {
     this.character = character;
     this.updateTarget(
-      this.charToFollow.getTilePos(),
-      this.charToFollow.getCharLayer()
+      this.charToFollow.getTilePos().position,
+      this.charToFollow.getTilePos().layer
     );
     this.charToFollow
       .positionChangeStarted()
       .pipe(takeUntil(this.character.autoMovementSet()))
-      .subscribe(({ enterTile }) => {
-        this.updateTarget(enterTile, this.charToFollow.getCharLayer());
+      .subscribe(({ enterTile, enterLayer }) => {
+        this.updateTarget(enterTile, enterLayer);
       });
   }
 

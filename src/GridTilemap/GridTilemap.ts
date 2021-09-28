@@ -24,8 +24,11 @@ export class GridTilemap {
 
   addCharacter(character: GridCharacter): void {
     this.characters.set(character.getId(), character);
-    if (character.getCharLayer() === undefined) {
-      character.setCharLayer(this.getLowestCharLayer());
+    if (character.getNextTilePos().layer === undefined) {
+      character.setTilePosition({
+        ...character.getNextTilePos(),
+        layer: this.getLowestCharLayer(),
+      });
     }
     this.charBlockCache.addCharacter(character);
   }
@@ -39,15 +42,11 @@ export class GridTilemap {
     return [...this.characters.values()];
   }
 
-  isBlocking(
-    visualLayer: string,
-    pos: Vector2,
-    direction?: Direction
-  ): boolean {
+  isBlocking(charLayer: string, pos: Vector2, direction?: Direction): boolean {
     return (
       this.hasNoTile(pos) ||
-      this.hasBlockingTile(visualLayer, pos, direction) ||
-      this.hasBlockingChar(pos)
+      this.hasBlockingTile(charLayer, pos, direction) ||
+      this.hasBlockingChar(pos, charLayer)
     );
   }
 
@@ -89,8 +88,8 @@ export class GridTilemap {
     );
   }
 
-  hasBlockingChar(pos: Vector2): boolean {
-    return this.charBlockCache.isCharBlockingAt(pos);
+  hasBlockingChar(pos: Vector2, layer: string): boolean {
+    return this.charBlockCache.isCharBlockingAt(pos, layer);
   }
 
   getTileWidth(): number {
@@ -146,7 +145,7 @@ export class GridTilemap {
     });
 
     if (charLayerIndex == 0) {
-      return { prevIndex: 0, charLayerIndex: indexes[charLayerIndex] };
+      return { prevIndex: -1, charLayerIndex: indexes[charLayerIndex] };
     }
 
     return {
@@ -162,7 +161,7 @@ export class GridTilemap {
 
     const { prevIndex, charLayerIndex } = this.findPrevAndCharLayer(charLayer);
 
-    return this.tilemap.layers.slice(prevIndex, charLayerIndex + 1);
+    return this.tilemap.layers.slice(prevIndex + 1, charLayerIndex + 1);
   }
 
   private getLowestCharLayer(): string | undefined {

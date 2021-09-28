@@ -40,6 +40,7 @@ export interface Finished {
   position: Position;
   result?: MoveToResult;
   description?: string;
+  layer: string;
 }
 
 export class TargetMovement implements Movement {
@@ -130,7 +131,7 @@ export class TargetMovement implements Movement {
     if (
       this.isBlocking(
         this.nextTileOnPath()?.position,
-        this.character?.getCharLayer()
+        this.character?.getNextTilePos().layer
       )
     ) {
       this.applyPathBlockedStrategy(delta);
@@ -146,7 +147,7 @@ export class TargetMovement implements Movement {
     } else if (
       !this.isBlocking(
         this.nextTileOnPath()?.position,
-        this.character?.getCharLayer()
+        this.character?.getNextTilePos().layer
       )
     ) {
       this.moveCharOnPath();
@@ -211,7 +212,7 @@ export class TargetMovement implements Movement {
 
   private moveCharOnPath(): void {
     const dir = this.getDir(
-      this.character.getNextTilePos(),
+      this.character.getNextTilePos().position,
       this.nextTileOnPath().position
     );
     this.character.move(dir);
@@ -223,9 +224,10 @@ export class TargetMovement implements Movement {
 
   private stop(result?: MoveToResult): void {
     this.finished$.next({
-      position: this.character.getTilePos(),
+      position: this.character.getTilePos().position,
       result,
       description: this.resultToReason(result),
+      layer: this.character.getTilePos().layer,
     });
     this.finished$.complete();
     this.stopped = true;
@@ -233,7 +235,10 @@ export class TargetMovement implements Movement {
 
   private turnTowardsTarget(): void {
     const nextTile = this.shortestPath[this.posOnPath + 1];
-    const dir = this.getDir(this.character.getNextTilePos(), nextTile.position);
+    const dir = this.getDir(
+      this.character.getNextTilePos().position,
+      nextTile.position
+    );
     this.character.turnTowards(dir);
   }
 
@@ -253,8 +258,8 @@ export class TargetMovement implements Movement {
     let currentTile = this.shortestPath[this.posOnPath];
     while (
       this.posOnPath < this.shortestPath.length - 1 &&
-      (this.character.getNextTilePos().x != currentTile.position.x ||
-        this.character.getNextTilePos().y != currentTile.position.y)
+      (this.character.getNextTilePos().position.x != currentTile.position.x ||
+        this.character.getNextTilePos().position.y != currentTile.position.y)
     ) {
       this.posOnPath++;
       currentTile = this.shortestPath[this.posOnPath];
@@ -280,16 +285,10 @@ export class TargetMovement implements Movement {
     const shortestPathAlgo: ShortestPathAlgorithm = new Bfs();
     const { path: shortestPath, closestToTarget } =
       shortestPathAlgo.getShortestPath(
-        {
-          position: this.character.getNextTilePos(),
-          layer: this.character.getCharLayer(),
-        },
+        this.character.getNextTilePos(),
         this.targetPos,
         this.getNeighbours
       );
-
-    // console.log(this.character.getCharLayer());
-    // console.log(this.targetPos);
 
     const noPathFound = shortestPath.length == 0;
 
@@ -298,10 +297,7 @@ export class TargetMovement implements Movement {
       this.noPathFoundStrategy === NoPathFoundStrategy.CLOSEST_REACHABLE
     ) {
       const shortestPathToClosestPoint = shortestPathAlgo.getShortestPath(
-        {
-          position: this.character.getNextTilePos(),
-          layer: this.character.getCharLayer(),
-        },
+        this.character.getNextTilePos(),
         closestToTarget,
         this.getNeighbours
       ).path;

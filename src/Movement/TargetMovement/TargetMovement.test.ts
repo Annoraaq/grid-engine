@@ -25,13 +25,15 @@ describe("TargetMovement", () => {
   function createMockChar(id: string, pos: Vector2) {
     return <any>{
       getId: () => id,
-      getNextTilePos: jest.fn(() => pos),
-      getTilePos: jest.fn(() => new Vector2(pos.x - 1, pos.y)),
+      getNextTilePos: jest.fn(() => ({ position: pos, layer: "layer1" })),
+      getTilePos: jest.fn(() => ({
+        position: new Vector2(pos.x - 1, pos.y),
+        layer: "layer1",
+      })),
       move: jest.fn(),
       isMoving: () => false,
       turnTowards: jest.fn(),
       autoMovementSet: jest.fn().mockReturnValue(of()),
-      getCharLayer: jest.fn().mockReturnValue("layer1"),
     };
   }
   function layerPos(vec: Vector2): LayerPosition {
@@ -552,6 +554,7 @@ describe("TargetMovement", () => {
         result: MoveToResult.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED,
         description:
           "NoPathFoundStrategy RETRY: Maximum retries of 2 exceeded.",
+        layer: "layer1",
       });
       expect(finishedObsCompleteMock).toHaveBeenCalled();
     });
@@ -648,6 +651,7 @@ describe("TargetMovement", () => {
         position: new Vector2(0, 1),
         result: MoveToResult.NO_PATH_FOUND,
         description: "NoPathFoundStrategy STOP: No path found.",
+        layer: "layer1",
       });
       expect(finishedObsCompleteMock).toHaveBeenCalled();
     });
@@ -742,6 +746,7 @@ describe("TargetMovement", () => {
       position: new Vector2(0, 1),
       result: MoveToResult.PATH_BLOCKED_WAIT_TIMEOUT,
       description: "PathBlockedStrategy WAIT: Wait timeout of 2000ms exceeded.",
+      layer: "layer1",
     });
     expect(finishedObsCompleteMock).toHaveBeenCalled();
   });
@@ -914,6 +919,7 @@ describe("TargetMovement", () => {
       position: new Vector2(1, 1),
       result: MoveToResult.PATH_BLOCKED_MAX_RETRIES_EXCEEDED,
       description: "PathBlockedStrategy RETRY: Maximum retries of 2 exceeded.",
+      layer: "layer1",
     });
     expect(finishedObsCompleteMock).toHaveBeenCalled();
   });
@@ -954,6 +960,7 @@ describe("TargetMovement", () => {
       position: new Vector2(1, 1),
       result: MoveToResult.PATH_BLOCKED,
       description: `PathBlockedStrategy STOP: Path blocked.`,
+      layer: "layer1",
     });
     expect(finishedObsCompleteMock).toHaveBeenCalled();
   });
@@ -976,16 +983,18 @@ describe("TargetMovement", () => {
       closestToTarget: new Vector2(3, 2),
     });
     const char = createMockChar("char", new Vector2(2, 1));
-    char.getCharLayer.mockReturnValue("someLayer");
-    char.getNextTilePos.mockReturnValue(new Vector2(2, 2));
+    char.getNextTilePos.mockReturnValue({
+      position: new Vector2(2, 2),
+      layer: "layer1",
+    });
     targetMovement.setCharacter(char);
     targetMovement.update(1);
     expect(gridTilemapMock.isBlocking).not.toHaveBeenCalledWith(
-      "someLayer",
+      "layer1",
       new Vector2(2, 2)
     );
     expect(gridTilemapMock.isBlocking).toHaveBeenCalledWith(
-      "someLayer",
+      "layer1",
       new Vector2(3, 2)
     );
   });
@@ -1009,10 +1018,11 @@ describe("TargetMovement", () => {
       targetMovement.finishedObs().subscribe(mockCall);
       targetMovement.setCharacter(mockChar);
       expect(mockCall).toHaveBeenCalledWith({
-        position: mockChar.getTilePos(),
+        position: mockChar.getTilePos().position,
         result: MoveToResult.MOVEMENT_TERMINATED,
         description:
           "Movement of character has been replaced before destination was reached.",
+        layer: "layer1",
       });
     });
 
@@ -1035,9 +1045,10 @@ describe("TargetMovement", () => {
       targetMovement.setCharacter(mockChar);
       targetMovement.update(100);
       expect(mockCall).toHaveBeenCalledWith({
-        position: mockChar.getTilePos(),
+        position: mockChar.getTilePos().position,
         result: MoveToResult.SUCCESS,
         description: "Successfully arrived.",
+        layer: "layer1",
       });
     });
 

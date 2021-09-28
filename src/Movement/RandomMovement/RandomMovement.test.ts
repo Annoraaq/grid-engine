@@ -28,7 +28,7 @@ describe("RandomMovement", () => {
       getId: () => "char",
       isBlockingDirection: () => false,
       move: jest.fn(),
-      getNextTilePos: () => new Vector2(0, 0),
+      getNextTilePos: () => ({ position: new Vector2(0, 0), layer: "layer1" }),
       isMoving: () => false,
       positionChangeStarted: function () {
         return this.positionChangeStartedSubject$;
@@ -73,7 +73,10 @@ describe("RandomMovement", () => {
     mockRandom(0.5);
 
     randomMovement.setCharacter(charMock);
-    charMock.getNextTilePos = () => new Vector2(2, 2);
+    charMock.getNextTilePos = () => ({
+      position: new Vector2(2, 2),
+      layer: "layer1",
+    });
     randomMovement.update(1);
 
     expect(charMock.move).toHaveBeenCalledWith(Direction.NONE);
@@ -84,7 +87,10 @@ describe("RandomMovement", () => {
     mockRandom(0.5);
 
     randomMovement.setCharacter(charMock);
-    charMock.getNextTilePos = () => new Vector2(2, 2);
+    charMock.getNextTilePos = () => ({
+      position: new Vector2(2, 2),
+      layer: "layer1",
+    });
     randomMovement.update(1);
 
     expect(charMock.move).toHaveBeenCalledWith(Direction.DOWN);
@@ -167,7 +173,10 @@ describe("RandomMovement", () => {
     randomMovement.update(60);
     expect(charMock.move).toHaveBeenNthCalledWith(1, Direction.DOWN);
 
-    charMock.getNextTilePos = () => new Vector2(2, 2);
+    charMock.getNextTilePos = () => ({
+      position: new Vector2(2, 2),
+      layer: "layer1",
+    });
 
     // do next step which is out of radius
     randomMovement.update(1);
@@ -212,7 +221,10 @@ describe("RandomMovement", () => {
       mockRandom(0.7);
 
       randomMovement.setCharacter(charMock);
-      charMock.getNextTilePos = () => new Vector2(4, 4);
+      charMock.getNextTilePos = () => ({
+        position: new Vector2(4, 4),
+        layer: "layer1",
+      });
       randomMovement.update(1);
 
       expect(charMock.move).toHaveBeenCalledWith(Direction.NONE);

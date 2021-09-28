@@ -296,10 +296,16 @@ describe("GridTilemap", () => {
     ];
     gridTilemap = new GridTilemap(tilemapMock);
     const charMock1 = createCharMock("player");
-    charMock1.getCharLayer = () => undefined;
+    charMock1.getNextTilePos = () => ({
+      position: new Vector2(1, 2),
+      layer: undefined,
+    });
     gridTilemap.addCharacter(charMock1);
 
-    expect(charMock1.setCharLayer).toBeCalledWith("layer1");
+    expect(charMock1.setTilePosition).toBeCalledWith({
+      position: new Vector2(1, 2),
+      layer: "layer1",
+    });
   });
 
   it("should remove a character", () => {
@@ -623,9 +629,10 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(tilemapMock);
     mockCharBlockCache.isCharBlockingAt = jest.fn(() => true);
 
-    expect(gridTilemap.hasBlockingChar(new Vector2(3, 3))).toBe(true);
+    expect(gridTilemap.hasBlockingChar(new Vector2(3, 3), "layer1")).toBe(true);
     expect(mockCharBlockCache.isCharBlockingAt).toHaveBeenCalledWith(
-      new Vector2(3, 3)
+      new Vector2(3, 3),
+      "layer1"
     );
   });
 
@@ -643,7 +650,10 @@ describe("GridTilemap", () => {
     };
     gridTilemap.addCharacter(char1Mock);
     gridTilemap.addCharacter(char2Mock);
-    const hasBlockingChar = gridTilemap.hasBlockingChar(new Vector2(4, 4));
+    const hasBlockingChar = gridTilemap.hasBlockingChar(
+      new Vector2(4, 4),
+      "layer1"
+    );
     expect(hasBlockingChar).toBe(false);
   });
 
@@ -699,8 +709,7 @@ describe("GridTilemap", () => {
       getNextTilePos: () => ({ x: 1, y: 1 }),
       positionChangeStarted: () => of([]),
       positionChangeFinished: () => of([]),
-      getCharLayer: () => "layer1",
-      setCharLayer: jest.fn(),
+      setTilePosition: jest.fn(),
     };
   }
 });

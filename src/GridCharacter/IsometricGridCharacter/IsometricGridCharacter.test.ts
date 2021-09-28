@@ -54,6 +54,7 @@ describe("IsometricGridCharacter", () => {
       hasNoTile: jest.fn(),
       hasBlockingChar: jest.fn().mockReturnValue(false),
       getDepthOfCharLayer: jest.fn().mockReturnValue(DEPTH_OF_CHAR_LAYER),
+      getTransition: jest.fn(),
     };
     spriteMock = <any>{
       width: 16,
@@ -95,7 +96,10 @@ describe("IsometricGridCharacter", () => {
       offsetY: customOffsetY,
       collides: true,
     });
-    gridCharacter.setTilePosition(new Vector2(3, 4));
+    gridCharacter.setTilePosition({
+      position: new Vector2(3, 4),
+      layer: "someLayer",
+    });
 
     expect(spriteMock.x).toEqual(
       ((3 - 4) * TILE_WIDTH) / 2 + PLAYER_X_OFFSET + customOffsetX
@@ -169,24 +173,30 @@ describe("IsometricGridCharacter", () => {
     gridTilemapMock.hasBlockingTile.mockReturnValue(false);
     gridTilemapMock.hasBlockingChar.mockReturnValue(false);
 
-    gridCharacter.setTilePosition(new Vector2(3, 3));
+    gridCharacter.setTilePosition({
+      position: new Vector2(3, 3),
+      layer: "someLayer",
+    });
 
     gridCharacter.move(Direction.UP_RIGHT);
     gridCharacter.update(10);
 
     const result = gridCharacter.isBlockingDirection(Direction.UP_RIGHT);
     expect(gridTilemapMock.hasBlockingTile).toHaveBeenCalledWith(
-      undefined,
+      "someLayer",
       {
         x: 3,
         y: 1,
       },
       oppositeMapDirection
     );
-    expect(gridTilemapMock.hasBlockingChar).toHaveBeenCalledWith({
-      x: 3,
-      y: 1,
-    });
+    expect(gridTilemapMock.hasBlockingChar).toHaveBeenCalledWith(
+      {
+        x: 3,
+        y: 1,
+      },
+      "someLayer"
+    );
     expect(result).toBe(false);
   });
 
