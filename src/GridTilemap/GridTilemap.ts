@@ -9,9 +9,6 @@ export class GridTilemap {
   private static readonly ALWAYS_TOP_PROP_NAME = "ge_alwaysTop";
   private static readonly CHAR_LAYER_PROP_NAME = "ge_charLayer";
   private static readonly HEIGHT_SHIFT_PROP_NAME = "ge_heightShift";
-  private static readonly TRANSITION_FROM_PROP_NAME = "ge_layerTransitionFrom";
-  private static readonly TRANSITION_TO_PROP_NAME = "ge_layerTransitionTo";
-  private static readonly TRANSITION_PROP_NAME = "ge_layerTransition";
   private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "ge_collide_";
   private characters = new Map<string, GridCharacter>();
   private charBlockCache: CharBlockCache = new CharBlockCache();
