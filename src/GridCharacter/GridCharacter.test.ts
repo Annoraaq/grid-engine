@@ -697,15 +697,6 @@ describe("GridCharacter", () => {
       expect(result).toBe(true);
     });
 
-    it("should ignore chars current position", () => {
-      const direction = Direction.RIGHT;
-      gridTilemapMock.hasBlockingTile.mockReturnValue(true);
-      gridTilemapMock.hasBlockingChar.mockReturnValue(true);
-
-      const result = gridCharacter.isBlockingDirection(direction);
-      expect(result).toBe(true);
-    });
-
     it("should not detect blocking direction if char does not collide", () => {
       gridCharacter = new GridCharacter("player", {
         sprite: spriteMock,
