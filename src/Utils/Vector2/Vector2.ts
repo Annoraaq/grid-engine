@@ -53,4 +53,8 @@ export class Vector2 {
   length(): number {
     return Math.sqrt(this.x * this.x + this.y * this.y);
   }
+
+  toString(): string {
+    return `${this.x}#${this.y}`;
+  }
 }
