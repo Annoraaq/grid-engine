@@ -1,3 +1,4 @@
+import { LayerPosition } from "./../Pathfinding/ShortestPathAlgorithm";
 import { Direction } from "../Direction/Direction";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
@@ -14,6 +15,8 @@ export declare type CharacterIndex = number;
 export interface PositionChange {
     exitTile: Position;
     enterTile: Position;
+    exitLayer: string;
+    enterLayer: string;
 }
 export interface CharConfig {
     sprite: Phaser.GameObjects.Sprite;
@@ -25,6 +28,7 @@ export interface CharConfig {
     container?: Phaser.GameObjects.Container;
     offsetX?: number;
     offsetY?: number;
+    charLayer?: string;
 }
 export declare class GridCharacter {
     private id;
@@ -61,9 +65,9 @@ export declare class GridCharacter {
     setMovement(movement: Movement): void;
     getMovement(): Movement;
     setWalkingAnimationMapping(walkingAnimationMapping: WalkingAnimationMapping): void;
-    setTilePosition(tilePosition: Vector2): void;
-    getTilePos(): Vector2;
-    getNextTilePos(): Vector2;
+    setTilePosition(tilePosition: LayerPosition): void;
+    getTilePos(): LayerPosition;
+    getNextTilePos(): LayerPosition;
     move(direction: Direction): void;
     update(delta: number): void;
     getMovementDirection(): Direction;
@@ -75,7 +79,7 @@ export declare class GridCharacter {
     movementStarted(): Subject<Direction>;
     movementStopped(): Subject<Direction>;
     directionChanged(): Subject<Direction>;
-    tilePositionSet(): Subject<Position>;
+    tilePositionSet(): Subject<LayerPosition>;
     positionChangeStarted(): Subject<PositionChange>;
     positionChangeFinished(): Subject<PositionChange>;
     autoMovementSet(): Subject<void>;
@@ -91,7 +95,7 @@ export declare class GridCharacter {
     private get tilePos();
     private set tilePos(value);
     private updateZindex;
-    protected mapDepth(nextTilePos: Vector2): number;
+    protected mapDepth(nextTilePos: LayerPosition): number;
     private setPosition;
     private getPosition;
     private startMoving;

@@ -1,7 +1,11 @@
 import { Vector2 } from "../Utils/Vector2/Vector2";
+export interface LayerPosition {
+    position: Vector2;
+    layer: string;
+}
 export interface ShortestPathAlgorithm {
-    getShortestPath(startPos: Vector2, targetPos: Vector2, getNeighbours: (pos: Vector2) => Vector2[]): {
-        path: Vector2[];
-        closestToTarget: Vector2;
+    getShortestPath(startPos: LayerPosition, targetPos: LayerPosition, getNeighbours: (pos: LayerPosition) => LayerPosition[]): {
+        path: LayerPosition[];
+        closestToTarget: LayerPosition;
     };
 }

@@ -1,10 +1,12 @@
-import { ShortestPathAlgorithm } from "./../ShortestPathAlgorithm";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
+import { LayerPosition, ShortestPathAlgorithm } from "./../ShortestPathAlgorithm";
 export declare class Bfs implements ShortestPathAlgorithm {
-    getShortestPath(startPos: Vector2, targetPos: Vector2, getNeighbours: (pos: Vector2) => Vector2[]): {
-        path: Vector2[];
-        closestToTarget: Vector2;
+    getShortestPath(startPos: LayerPosition, targetPos: LayerPosition, getNeighbours: (pos: LayerPosition) => LayerPosition[]): {
+        path: LayerPosition[];
+        closestToTarget: LayerPosition;
     };
+    private distance;
+    private pos2Str;
+    private equal;
     private shortestPathBfs;
     private returnPath;
 }
