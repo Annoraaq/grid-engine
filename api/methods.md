@@ -58,9 +58,9 @@ nav_order: 2
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Initiates random movement of the character with the given id. The character will randomly pick one of the non-blocking directions. Optionally a `delay` in milliseconds can be provided. This represents the waiting time after a finished movement, before the next is being initiated. If a `radius` other than `-1` is provided, the character will not move further than that radius from its initial position (the position it has been, when `moveRandomly` was called). The distance is calculated with the [manhattan distance](https://en.wikipedia.org/wiki/Taxicab_geometry). Additionally, if a `radius` other than `-1` was given, the character might move more than one tile into a random direction in one run (as long as the route is neither blocked nor outside of the radius). |
 
-| moveTo(charId: string, targetPos: [Position](./config.html#position), config: [MoveToConfig](./methods.html#movetoconfig)): Observable<{charId: string, position: [Position](./config.html#position), result: [MoveToResult](./methods.html#movetoresult), description: string}>                                                                                                     |
-| :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Initiates movement toward the specified `targetPos`. The movement will happen along one shortest path. Check out [MoveToConfig](./methods.html#movetoconfig) for pathfinding configurations. It will return an observable that will fire whenever the moveTo movement is finished or aborted. It will provide a [result code](./methods.html#movetoresult) as well as a description. |
+| moveTo(charId: string, targetPos: [Position](./config.html#position), config: [MoveToConfig](./methods.html#movetoconfig)): Observable<{charId: string, position: [Position](./config.html#position), result: [MoveToResult](./methods.html#movetoresult), description: string, layer: string}>                                                                                                            |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Initiates movement toward the specified `targetPos`. The movement will happen along one shortest path. Check out [MoveToConfig](./methods.html#movetoconfig) for pathfinding configurations. It will return an observable that will fire whenever the moveTo movement is finished or aborted. It will provide a [result code](./methods.html#movetoresult) as well as a description and a character layer. |
 
 | addCharacter(charData: [CharacterData](./config.html#characterdata)): void |
 | :------------------------------------------------------------------------- |
@@ -89,6 +89,18 @@ nav_order: 2
 | stopMovement(charId: string)                                                                                                                   |
 | :--------------------------------------------------------------------------------------------------------------------------------------------- |
 | Stops any automated movement such as random movement (`moveRandomly()`), following (`follow()`) or moving to a specified position (`moveTo()`) |
+
+| getCharLayer(charId: string): string \| undefined <span class="label label-purple">BETA</span>                                                        |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Returns the character layer of the given character. You can read more about character layers and transitions [here](./features/character-layers.html) |
+
+| getTransition(position: Position, fromLayer: string): string \| undefined <span class="label label-purple">BETA</span>                                                                                                                                                         |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Returns the character layer that the transition on position `position` from character layer `fromLayer` leads to. If there is no such transition it will return `undefined`. You can read more about character layers and transitions [here](./features/character-layers.html) |
+
+| setTransition(tile: Position, fromLayer: string, toLayer: string) <span class="label label-purple">BETA</span>                                                                                                                   |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sets the character layer `toLayer` that the transition on position `position` from character layer `fromLayer` should lead to. You can read more about character layers and transitions [here](./features/character-layers.html) |
 
 | movementStarted(): Observable<{charId: string, direction: [Direction](./config.html#direction)}>        |
 | :------------------------------------------------------------------------------------------------------ |
@@ -122,9 +134,12 @@ nav_order: 2
   noPathFoundMaxRetries?: number,
   pathBlockedMaxRetries?: number,
   pathBlockedRetryBackoffMs?: number,
-  pathBlockedWaitTimeoutMs?: number
+  pathBlockedWaitTimeoutMs?: number,
+  targetLayer?: string
 }
 ```
+
+`targetLayer` will set the char layer of the movement target. If there is no `targetLayer` provided, the current char layer of the moving character is used.
 
 ## NoPathFoundStrategy
 
