@@ -8,7 +8,7 @@ import {
 } from "../../GridCharacter/GridCharacter";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache";
-import { GridEngineConfig } from "../../GridEngine";
+import { GridEngineConfig, Position } from "../../GridEngine";
 import { Concrete } from "../../Utils/TypeUtils";
 describe("CharBlockCache", () => {
   let charBlockCache: CharBlockCache;
@@ -103,6 +103,46 @@ describe("CharBlockCache", () => {
         "someLayer"
       );
       expect(hasBlockingCharOnOldPos).toBe(false);
+    });
+
+    it("should unblock nextPos on pos change while moving", () => {
+      const positionChangeStarted = new Subject<PositionChange>();
+      const tilePosSet = new Subject<Position>();
+
+      const char1Mock = <any>{
+        ...createCharMock("player1"),
+        getTilePos: () => ({ position: { x: 3, y: 3 }, layer: "someLayer" }),
+        getNextTilePos: () => ({
+          position: { x: 3, y: 3 },
+          layer: "someLayer",
+        }),
+        positionChangeStarted: () => positionChangeStarted,
+        tilePositionSet: () => tilePosSet,
+      };
+      charBlockCache.addCharacter(char1Mock);
+
+      char1Mock.getNextTilePos = () => ({
+        position: { x: 3, y: 4 },
+        layer: "someLayer",
+      });
+
+      positionChangeStarted.next({
+        enterTile: new Vector2(3, 4),
+        enterLayer: "someLayer",
+        exitTile: new Vector2(3, 3),
+        exitLayer: "someLayer",
+      });
+
+      tilePosSet.next({
+        x: 6,
+        y: 6,
+      });
+
+      const hasBlockingCharOnNextPos = charBlockCache.isCharBlockingAt(
+        new Vector2(3, 4),
+        "someLayer"
+      );
+      expect(hasBlockingCharOnNextPos).toBe(false);
     });
   });
 
@@ -221,12 +261,17 @@ describe("CharBlockCache", () => {
     const positionChangeFinished = {
       subscribe: () => positionChangeFinishedSub,
     };
+    const tilePosChangedSub = { unsubscribe: jest.fn() };
+    const tilePosSet = {
+      subscribe: () => tilePosChangedSub,
+    };
     const charMock1 = <any>{
       ...createCharMock("player"),
       getTilePos: () => ({ position: { x: 0, y: 1 }, layer: "someLayer" }),
       getNextTilePos: () => ({ position: { x: 1, y: 1 }, layer: "someLayer" }),
       positionChangeStarted: () => positionChangeStarted,
       positionChangeFinished: () => positionChangeFinished,
+      tilePositionSet: () => tilePosSet,
     };
     const charMock2 = <any>{
       ...createCharMock("player2"),
@@ -239,6 +284,7 @@ describe("CharBlockCache", () => {
 
     expect(positionChangeStartedSub.unsubscribe).toHaveBeenCalled();
     expect(positionChangeFinishedSub.unsubscribe).toHaveBeenCalled();
+    expect(tilePosChangedSub.unsubscribe).toHaveBeenCalled();
     expect(
       charBlockCache.isCharBlockingAt(new Vector2(0, 1), "someLayer")
     ).toBe(false);
@@ -285,6 +331,7 @@ describe("CharBlockCache", () => {
       positionChangeStarted: () => of([]),
       positionChangeFinished: () => of([]),
       isColliding: () => true,
+      tilePositionSet: () => of([]),
     };
   }
 

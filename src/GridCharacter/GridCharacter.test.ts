@@ -364,6 +364,31 @@ describe("GridCharacter", () => {
     expect(spriteMock.y).toEqual(4 * TILE_HEIGHT + PLAYER_Y_OFFSET);
   });
 
+  it("should stop ongoing movement when stopping on positionChangeFinish", async () => {
+    mockNonBlockingTile();
+    const posChangeFinishedCb = jest.fn();
+    const posChangeStartedCb = jest.fn();
+
+    gridCharacter.positionChangeFinished().subscribe((posChanged) => {
+      posChangeFinishedCb(posChanged);
+      if (posChanged.enterTile.x == 0 && posChanged.enterTile.y == 1) {
+        gridCharacter.setTilePosition({
+          position: new Vector2(3, 4),
+          layer: "someLayer",
+        });
+      }
+    });
+    gridCharacter.positionChangeStarted().subscribe((posChanged) => {
+      posChangeStartedCb(posChanged);
+    });
+    gridCharacter.move(Direction.DOWN);
+    gridCharacter.update(400);
+    gridCharacter.update(400);
+
+    expect(posChangeStartedCb).toHaveBeenCalledTimes(2);
+    expect(posChangeFinishedCb).toHaveBeenCalledTimes(2);
+  });
+
   it("should stop moving on set tile pos", async () => {
     mockNonBlockingTile();
     gridCharacter.move(Direction.DOWN);
@@ -380,6 +405,10 @@ describe("GridCharacter", () => {
       .positionChangeFinished()
       .pipe(take(1))
       .toPromise();
+    const tilePosSetProm = gridCharacter
+      .tilePositionSet()
+      .pipe(take(1))
+      .toPromise();
 
     gridCharacter.setTilePosition({
       position: new Vector2(3, 4),
@@ -389,6 +418,7 @@ describe("GridCharacter", () => {
     const dir = await movementStoppedProm;
     const posChangeStarted = await positionChangeStartedProm;
     const posChangeFinished = await positionChangeFinishedProm;
+    const tilePosSet = await tilePosSetProm;
     expect(posChangeStarted).toEqual({
       exitTile: new Vector2(0, 0),
       enterTile: new Vector2(3, 4),
@@ -403,8 +433,12 @@ describe("GridCharacter", () => {
       exitLayer: undefined,
     });
     expect(dir).toEqual(Direction.DOWN);
+    expect(tilePosSet).toEqual({
+      position: { x: 3, y: 4 },
+      layer: "someLayer",
+    });
 
-    expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+    expect(gridCharacter.isMoving()).toEqual(false);
     expect(gridCharacter.getTilePos()).toEqual({
       position: new Vector2(3, 4),
       layer: "someLayer",

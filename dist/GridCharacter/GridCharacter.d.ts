@@ -43,6 +43,7 @@ export declare class GridCharacter {
     private directionChanged$;
     private positionChangeStarted$;
     private positionChangeFinished$;
+    private tilePositionSet$;
     private autoMovementSet$;
     private lastMovementImpulse;
     private facingDirection;
@@ -74,6 +75,7 @@ export declare class GridCharacter {
     movementStarted(): Subject<Direction>;
     movementStopped(): Subject<Direction>;
     directionChanged(): Subject<Direction>;
+    tilePositionSet(): Subject<Position>;
     positionChangeStarted(): Subject<PositionChange>;
     positionChangeFinished(): Subject<PositionChange>;
     autoMovementSet(): Subject<void>;
