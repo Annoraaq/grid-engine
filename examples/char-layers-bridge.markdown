@@ -47,6 +47,7 @@ parent: Examples
           sprite: playerSprite,
           walkingAnimationMapping: 6,
           startPosition: {x: 5, y: 4},
+          charLayer: "ground",
         },
       ],
     };
@@ -108,6 +109,7 @@ function create() {
         sprite: playerSprite,
         walkingAnimationMapping: 6,
         startPosition: { x: 5, y: 4 },
+        charLayer: "ground",
       },
     ],
   };

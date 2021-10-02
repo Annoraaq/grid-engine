@@ -68,6 +68,10 @@ The data shape of the configuration object is described here.
 | :-------------------------------------------------------------------------------------------------------------------- |
 | Set to false, if character should not collide (neither with the tilemap, nor with other characters)                   |
 
+| charLayer: string <span class="label label-green">OPTIONAL</span> <span class="label label-purple">BETA</span>                                                                                                                     |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sets the [character layer](../features/character-layers) of the character. If omitted the lowest character layer of the tilemap is taken. If there are no character layers in the tilemap, it will get the char later `undefined`. |
+
 ## WalkingAnimationMapping
 
 ```js
