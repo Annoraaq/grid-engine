@@ -55,20 +55,12 @@ export class CharacterAnimation {
     walkingAnimationMapping: WalkingAnimationMapping
   ): void {
     this.walkingAnimationMapping = walkingAnimationMapping;
-    if (this.walkingAnimationMapping === undefined) {
-      this._isEnabled = false;
-    } else {
-      this._isEnabled = true;
-    }
+    this._isEnabled = this.walkingAnimationMapping !== undefined;
   }
 
   setCharacterIndex(characterIndex: number): void {
     this.characterIndex = characterIndex;
-    if (this.characterIndex === -1) {
-      this._isEnabled = false;
-    } else {
-      this._isEnabled = true;
-    }
+    this._isEnabled = this.characterIndex !== -1;
   }
 
   getWalkingAnimationMapping(): WalkingAnimationMapping | undefined {
