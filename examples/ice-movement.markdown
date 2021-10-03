@@ -4,7 +4,7 @@ title: Ice Movement
 parent: Examples
 ---
 
-# Character Layers - Bridge
+# Ice Movement
 
 **Press the arrow keys to move.** This is an example of how to implement ice movement with GridEngine. Move on the ice to see the effect.
 
