@@ -21,6 +21,7 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
 - Following other characters
 - Diagonal movement (8 directions)
 - Isometric maps (Beta)
+- Multiple Character Layers (Beta)
 
 📖 Our most current documentation [is here](https://annoraaq.github.io/grid-engine/)!
 ➡️ You can try/download a list of examples [at this link here](https://annoraaq.github.io/grid-engine/examples/).
