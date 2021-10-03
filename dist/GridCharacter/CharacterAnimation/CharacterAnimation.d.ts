@@ -9,12 +9,15 @@ export declare class CharacterAnimation {
     private lastFootLeft;
     private directionToFrameRow;
     private _isEnabled;
-    constructor(sprite: Phaser.GameObjects.Sprite, walkingAnimationMapping: WalkingAnimationMapping, characterIndex: number);
+    constructor(sprite: Phaser.GameObjects.Sprite, walkingAnimationMapping: WalkingAnimationMapping | undefined, characterIndex: number);
     setIsEnabled(isEnabled: boolean): void;
     isEnabled(): boolean;
     updateCharacterFrame(movementDirection: Direction, hasWalkedHalfATile: boolean): void;
     setStandingFrame(direction: Direction): void;
     setWalkingAnimationMapping(walkingAnimationMapping: WalkingAnimationMapping): void;
+    setCharacterIndex(characterIndex: number): void;
+    getWalkingAnimationMapping(): WalkingAnimationMapping | undefined;
+    getCharacterIndex(): number;
     private setStandingFrameDuringWalk;
     private setWalkingFrame;
     private _setStandingFrame;

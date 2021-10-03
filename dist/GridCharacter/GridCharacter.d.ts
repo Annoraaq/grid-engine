@@ -64,7 +64,7 @@ export declare class GridCharacter {
     setSprite(sprite: Phaser.GameObjects.Sprite): void;
     setMovement(movement: Movement): void;
     getMovement(): Movement;
-    setWalkingAnimationMapping(walkingAnimationMapping: WalkingAnimationMapping): void;
+    setWalkingAnimationMapping(walkingAnimationMapping: WalkingAnimationMapping | number): void;
     setTilePosition(tilePosition: LayerPosition): void;
     getTilePos(): LayerPosition;
     getNextTilePos(): LayerPosition;
