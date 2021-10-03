@@ -122,9 +122,13 @@ export class GridCharacter {
   }
 
   setWalkingAnimationMapping(
-    walkingAnimationMapping: WalkingAnimationMapping
+    walkingAnimationMapping: WalkingAnimationMapping | number
   ): void {
-    this.animation.setWalkingAnimationMapping(walkingAnimationMapping);
+    if (typeof walkingAnimationMapping == "number") {
+      this.animation.setCharacterIndex(walkingAnimationMapping);
+    } else {
+      this.animation.setWalkingAnimationMapping(walkingAnimationMapping);
+    }
   }
 
   setTilePosition(tilePosition: LayerPosition): void {
