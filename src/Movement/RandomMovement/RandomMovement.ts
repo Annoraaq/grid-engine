@@ -33,8 +33,8 @@ export class RandomMovement implements Movement {
   setCharacter(character: GridCharacter): void {
     this.character = character;
     this.delayLeft = this.delay;
-    this.initialRow = character.getNextTilePos().y;
-    this.initialCol = character.getNextTilePos().x;
+    this.initialRow = character.getNextTilePos().position.y;
+    this.initialCol = character.getNextTilePos().position.x;
     this.stepSize = this.getRandomInt(this.radius) + 1;
     this.stepsWalked = 0;
     this.currentMovementDirection = Direction.NONE;
@@ -87,7 +87,7 @@ export class RandomMovement implements Movement {
 
   private getDist(dir: Direction): number {
     return this.distanceUtils.distance(
-      this.character.getNextTilePos().add(directionVector(dir)),
+      this.character.getNextTilePos().position.add(directionVector(dir)),
       new Vector2(this.initialCol, this.initialRow)
     );
   }

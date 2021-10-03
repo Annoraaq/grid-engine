@@ -1,24 +1,26 @@
-import { ShortestPathAlgorithm } from "./../ShortestPathAlgorithm";
+import {
+  LayerPosition,
+  ShortestPathAlgorithm,
+} from "./../ShortestPathAlgorithm";
 import { VectorUtils } from "../../Utils/VectorUtils";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
 
 interface ShortestPathTuple {
   shortestDistance: number;
-  previous: Map<string, Vector2>;
-  closestToTarget: Vector2;
+  previous: Map<string, LayerPosition>;
+  closestToTarget: LayerPosition;
 }
 
 interface QueueEntry {
-  node: Vector2;
+  node: LayerPosition;
   dist: number;
 }
 
 export class Bfs implements ShortestPathAlgorithm {
   getShortestPath(
-    startPos: Vector2,
-    targetPos: Vector2,
-    getNeighbours: (pos: Vector2) => Vector2[]
-  ): { path: Vector2[]; closestToTarget: Vector2 } {
+    startPos: LayerPosition,
+    targetPos: LayerPosition,
+    getNeighbours: (pos: LayerPosition) => LayerPosition[]
+  ): { path: LayerPosition[]; closestToTarget: LayerPosition } {
     const shortestPath = this.shortestPathBfs(
       startPos,
       targetPos,
@@ -30,38 +32,49 @@ export class Bfs implements ShortestPathAlgorithm {
     };
   }
 
+  private distance(fromNode: LayerPosition, toNode: LayerPosition): number {
+    return VectorUtils.manhattanDistance(fromNode.position, toNode.position);
+  }
+
+  private pos2Str(layerPos: LayerPosition): string {
+    return `${layerPos.position.toString()}#${layerPos.layer}`;
+  }
+
+  private equal(layerPos1: LayerPosition, layerPos2: LayerPosition): boolean {
+    if (!VectorUtils.equal(layerPos1.position, layerPos2.position))
+      return false;
+    return layerPos1.layer === layerPos2.layer;
+  }
+
   private shortestPathBfs(
-    startNode: Vector2,
-    stopNode: Vector2,
-    getNeighbours: (pos: Vector2) => Vector2[]
+    startNode: LayerPosition,
+    stopNode: LayerPosition,
+    getNeighbours: (pos: LayerPosition) => LayerPosition[]
   ): ShortestPathTuple {
-    const previous = new Map<string, Vector2>();
+    const previous = new Map<string, LayerPosition>();
     const visited = new Set<string>();
     const queue: QueueEntry[] = [];
-    let closestToTarget: Vector2 = startNode;
-    let smallestDistToTarget: number = VectorUtils.manhattanDistance(
-      startNode,
-      stopNode
-    );
+    let closestToTarget: LayerPosition = startNode;
+    let smallestDistToTarget: number = this.distance(startNode, stopNode);
     queue.push({ node: startNode, dist: 0 });
-    visited.add(VectorUtils.vec2str(startNode));
+    visited.add(this.pos2Str(startNode));
 
     while (queue.length > 0) {
       const { node, dist } = queue.shift();
-      const distToTarget = VectorUtils.manhattanDistance(node, stopNode);
+      const distToTarget = this.distance(node, stopNode);
       if (distToTarget < smallestDistToTarget) {
         smallestDistToTarget = distToTarget;
         closestToTarget = node;
       }
-      if (VectorUtils.equal(node, stopNode)) {
+      if (this.equal(node, stopNode)) {
         return { shortestDistance: dist, previous, closestToTarget };
       }
 
       for (const neighbour of getNeighbours(node)) {
-        if (!visited.has(VectorUtils.vec2str(neighbour))) {
-          previous.set(VectorUtils.vec2str(neighbour), node);
+        if (!visited.has(this.pos2Str(neighbour))) {
+          previous.set(this.pos2Str(neighbour), node);
           queue.push({ node: neighbour, dist: dist + 1 });
-          visited.add(VectorUtils.vec2str(neighbour));
+          visited.add(this.pos2Str(neighbour));
         }
       }
     }
@@ -69,15 +82,15 @@ export class Bfs implements ShortestPathAlgorithm {
   }
 
   private returnPath(
-    previous: Map<string, Vector2>,
-    startNode: Vector2,
-    stopNode: Vector2
-  ): Vector2[] {
-    const ret: Vector2[] = [];
-    let currentNode: Vector2 = stopNode;
+    previous: Map<string, LayerPosition>,
+    startNode: LayerPosition,
+    stopNode: LayerPosition
+  ): LayerPosition[] {
+    const ret: LayerPosition[] = [];
+    let currentNode: LayerPosition = stopNode;
     ret.push(currentNode);
-    while (!VectorUtils.equal(currentNode, startNode)) {
-      currentNode = previous.get(VectorUtils.vec2str(currentNode));
+    while (!this.equal(currentNode, startNode)) {
+      currentNode = previous.get(this.pos2Str(currentNode));
       if (!currentNode) return [];
       ret.push(currentNode);
     }

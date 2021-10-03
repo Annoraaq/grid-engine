@@ -66,6 +66,7 @@ export interface CharacterData {
   offsetY?: number;
   facingDirection?: Direction;
   collides?: boolean;
+  charLayer?: string;
 }
 
 export class GridEngine {
@@ -100,6 +101,26 @@ export class GridEngine {
     this.positionChangeStarted$ = undefined;
     this.positionChangeFinished$ = undefined;
     this.charRemoved$ = undefined;
+  }
+
+  getCharLayer(charId: string): string {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    return this.gridCharacters.get(charId).getTilePos().layer;
+  }
+
+  getTransition(position: Position, fromLayer: string): string | undefined {
+    this.initGuard();
+    return this.gridTilemap.getTransition(new Vector2(position), fromLayer);
+  }
+
+  setTransition(position: Position, fromLayer: string, toLayer: string): void {
+    this.initGuard();
+    return this.gridTilemap.setTransition(
+      new Vector2(position),
+      fromLayer,
+      toLayer
+    );
   }
 
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
@@ -137,7 +158,7 @@ export class GridEngine {
   getPosition(charId: string): Position {
     this.initGuard();
     this.unknownCharGuard(charId);
-    return this.gridCharacters.get(charId).getTilePos();
+    return this.gridCharacters.get(charId).getTilePos().position;
   }
 
   move(charId: string, direction: Direction): void {
@@ -163,7 +184,12 @@ export class GridEngine {
     this.unknownCharGuard(charId);
     const targetMovement = new TargetMovement(
       this.gridTilemap,
-      new Vector2(targetPos),
+      {
+        position: new Vector2(targetPos),
+        layer:
+          config?.targetLayer ||
+          this.gridCharacters.get(charId).getNextTilePos().layer,
+      },
       0,
       moveToConfig
     );
@@ -176,6 +202,7 @@ export class GridEngine {
         position: finished.position,
         result: finished.result,
         description: finished.description,
+        layer: finished.layer,
       }))
     );
   }
@@ -229,6 +256,7 @@ export class GridEngine {
       offsetX: charData.offsetX,
       offsetY: charData.offsetY,
       collides: charData.collides === undefined ? true : charData.collides,
+      charLayer: charData.charLayer,
     };
 
     const gridChar = this.createCharacter(charData.id, charConfig);
@@ -242,7 +270,10 @@ export class GridEngine {
     const startPos = charData.startPosition
       ? new Vector2(charData.startPosition)
       : new Vector2(0, 0);
-    gridChar.setTilePosition(startPos);
+    gridChar.setTilePosition({
+      position: startPos,
+      layer: gridChar.getTilePos().layer,
+    });
 
     this.gridTilemap.addCharacter(gridChar);
 
@@ -270,22 +301,20 @@ export class GridEngine {
     gridChar
       .positionChangeStarted()
       .pipe(this.takeUntilCharRemoved(gridChar.getId()))
-      .subscribe(({ exitTile, enterTile }) => {
+      .subscribe((positionChange: PositionChange) => {
         this.positionChangeStarted$.next({
           charId: gridChar.getId(),
-          exitTile,
-          enterTile,
+          ...positionChange,
         });
       });
 
     gridChar
       .positionChangeFinished()
       .pipe(this.takeUntilCharRemoved(gridChar.getId()))
-      .subscribe(({ exitTile, enterTile }) => {
+      .subscribe((positionChange: PositionChange) => {
         this.positionChangeFinished$.next({
           charId: gridChar.getId(),
-          exitTile,
-          enterTile,
+          ...positionChange,
         });
       });
   }
@@ -360,10 +389,18 @@ export class GridEngine {
     return this.gridCharacters.get(charId).turnTowards(direction);
   }
 
-  setPosition(charId: string, pos: Position): void {
+  setPosition(charId: string, pos: Position, layer?: string): void {
     this.initGuard();
     this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).setTilePosition(new Vector2(pos));
+    if (!layer) {
+      this.gridCharacters.get(charId).setTilePosition({
+        position: new Vector2(pos),
+        layer: this.gridCharacters.get(charId).getTilePos().layer,
+      });
+    }
+    this.gridCharacters
+      .get(charId)
+      .setTilePosition({ position: new Vector2(pos), layer });
   }
 
   getSprite(charId: string): Phaser.GameObjects.Sprite {

@@ -26,12 +26,15 @@ export class FollowMovement implements Movement {
 
   setCharacter(character: GridCharacter): void {
     this.character = character;
-    this.updateTarget(this.charToFollow.getTilePos());
+    this.updateTarget(
+      this.charToFollow.getTilePos().position,
+      this.charToFollow.getTilePos().layer
+    );
     this.charToFollow
       .positionChangeStarted()
       .pipe(takeUntil(this.character.autoMovementSet()))
-      .subscribe(({ enterTile }) => {
-        this.updateTarget(enterTile);
+      .subscribe(({ enterTile, enterLayer }) => {
+        this.updateTarget(enterTile, enterLayer);
       });
   }
 
@@ -39,10 +42,13 @@ export class FollowMovement implements Movement {
     this.targetMovement?.update(delta);
   }
 
-  private updateTarget(targetPos: Position): void {
+  private updateTarget(targetPos: Position, targetLayer: string): void {
     this.targetMovement = new TargetMovement(
       this.gridTilemap,
-      new Vector2(targetPos),
+      {
+        position: new Vector2(targetPos),
+        layer: targetLayer,
+      },
       this.distance + 1,
       { noPathFoundStrategy: this.noPathFoundStrategy }
     );

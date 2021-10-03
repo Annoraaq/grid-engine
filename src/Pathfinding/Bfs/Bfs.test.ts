@@ -1,15 +1,28 @@
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { VectorUtils } from "../../Utils/VectorUtils";
+import { LayerPosition } from "../ShortestPathAlgorithm";
 import { Bfs } from "./Bfs";
 
 describe("Bfs", () => {
   let bfs: Bfs;
 
-  const getNeighbours = (pos) => [
-    new Vector2(pos.x, pos.y + 1),
-    new Vector2(pos.x + 1, pos.y),
-    new Vector2(pos.x - 1, pos.y),
-    new Vector2(pos.x, pos.y - 1),
+  const getNeighbours = (pos: LayerPosition) => [
+    {
+      position: new Vector2(pos.position.x, pos.position.y + 1),
+      layer: pos.layer,
+    },
+    {
+      position: new Vector2(pos.position.x + 1, pos.position.y),
+      layer: pos.layer,
+    },
+    {
+      position: new Vector2(pos.position.x - 1, pos.position.y),
+      layer: pos.layer,
+    },
+    {
+      position: new Vector2(pos.position.x, pos.position.y - 1),
+      layer: pos.layer,
+    },
   ];
 
   beforeEach(() => {
@@ -17,8 +30,8 @@ describe("Bfs", () => {
   });
 
   it("should return one simple shortest path", () => {
-    const startPos = new Vector2(3, 3);
-    const targetPos = new Vector2(4, 4);
+    const startPos = { position: new Vector2(3, 3), layer: "layer1" };
+    const targetPos = { position: new Vector2(4, 4), layer: "layer1" };
 
     const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
@@ -26,48 +39,48 @@ describe("Bfs", () => {
       getNeighbours
     );
     expect(path).toEqual([
-      new Vector2(3, 3),
-      new Vector2(3, 4),
-      new Vector2(4, 4),
+      { position: new Vector2(3, 3), layer: "layer1" },
+      { position: new Vector2(3, 4), layer: "layer1" },
+      { position: new Vector2(4, 4), layer: "layer1" },
     ]);
     expect(closestToTarget).toEqual(targetPos);
   });
 
   it("should return one medium shortest path", () => {
-    const startPos = new Vector2(3, 3);
-    const targetPos = new Vector2(5, -1);
+    const startPos = { position: new Vector2(3, 3), layer: "layer1" };
+    const targetPos = { position: new Vector2(5, -1), layer: "layer1" };
     const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
       getNeighbours
     );
     expect(path).toEqual([
-      new Vector2(3, 3),
-      new Vector2(4, 3),
-      new Vector2(5, 3),
-      new Vector2(5, 2),
-      new Vector2(5, 1),
-      new Vector2(5, 0),
-      new Vector2(5, -1),
+      { position: new Vector2(3, 3), layer: "layer1" },
+      { position: new Vector2(4, 3), layer: "layer1" },
+      { position: new Vector2(5, 3), layer: "layer1" },
+      { position: new Vector2(5, 2), layer: "layer1" },
+      { position: new Vector2(5, 1), layer: "layer1" },
+      { position: new Vector2(5, 0), layer: "layer1" },
+      { position: new Vector2(5, -1), layer: "layer1" },
     ]);
     expect(closestToTarget).toEqual(targetPos);
   });
 
   it("should return path of 1", () => {
-    const startPos = new Vector2(3, 3);
-    const targetPos = new Vector2(3, 3);
+    const startPos = { position: new Vector2(3, 3), layer: "layer1" };
+    const targetPos = { position: new Vector2(3, 3), layer: "layer1" };
     const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
       getNeighbours
     );
-    expect(path).toEqual([new Vector2(3, 3)]);
+    expect(path).toEqual([{ position: new Vector2(3, 3), layer: "layer1" }]);
     expect(closestToTarget).toEqual(targetPos);
   });
 
   it("should not find a path if every direction is blocked", () => {
-    const startPos = new Vector2(3, 3);
-    const targetPos = new Vector2(5, 10);
+    const startPos = { position: new Vector2(3, 3), layer: "layer1" };
+    const targetPos = { position: new Vector2(5, 10), layer: "layer1" };
     const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
@@ -89,8 +102,8 @@ describe("Bfs", () => {
     // #t..#
     // #####
 
-    const startPos = new Vector2(1, 1);
-    const targetPos = new Vector2(1, 3);
+    const startPos = { position: new Vector2(1, 1), layer: "layer1" };
+    const targetPos = { position: new Vector2(1, 3), layer: "layer1" };
     const unblockedTiles = [
       VectorUtils.vec2str(new Vector2(1, 1)),
       VectorUtils.vec2str(new Vector2(2, 1)),
@@ -106,18 +119,18 @@ describe("Bfs", () => {
       targetPos,
       (pos) =>
         getNeighbours(pos).filter((n) =>
-          unblockedTiles.includes(VectorUtils.vec2str(n))
+          unblockedTiles.includes(VectorUtils.vec2str(n.position))
         )
     );
 
     expect(path).toEqual([
-      new Vector2(1, 1),
-      new Vector2(2, 1),
-      new Vector2(3, 1),
-      new Vector2(3, 2),
-      new Vector2(3, 3),
-      new Vector2(2, 3),
-      new Vector2(1, 3),
+      { position: new Vector2(1, 1), layer: "layer1" },
+      { position: new Vector2(2, 1), layer: "layer1" },
+      { position: new Vector2(3, 1), layer: "layer1" },
+      { position: new Vector2(3, 2), layer: "layer1" },
+      { position: new Vector2(3, 3), layer: "layer1" },
+      { position: new Vector2(2, 3), layer: "layer1" },
+      { position: new Vector2(1, 3), layer: "layer1" },
     ]);
     expect(closestToTarget).toEqual(targetPos);
   });
@@ -134,8 +147,8 @@ describe("Bfs", () => {
     // #..t#
     // #####
 
-    const startPos = new Vector2(1, 1);
-    const targetPos = new Vector2(3, 3);
+    const startPos = { position: new Vector2(1, 1), layer: "layer1" };
+    const targetPos = { position: new Vector2(3, 3), layer: "layer1" };
     const unblockedTiles = [
       VectorUtils.vec2str(new Vector2(1, 1)),
       VectorUtils.vec2str(new Vector2(2, 1)),
@@ -150,11 +163,14 @@ describe("Bfs", () => {
       targetPos,
       (pos) =>
         getNeighbours(pos).filter((n) =>
-          unblockedTiles.includes(VectorUtils.vec2str(n))
+          unblockedTiles.includes(VectorUtils.vec2str(n.position))
         )
     );
 
     expect(path).toEqual([]);
-    expect(closestToTarget).toEqual(new Vector2(3, 1));
+    expect(closestToTarget).toEqual({
+      position: new Vector2(3, 1),
+      layer: "layer1",
+    });
   });
 });

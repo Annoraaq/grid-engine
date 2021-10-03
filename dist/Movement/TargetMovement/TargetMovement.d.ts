@@ -1,8 +1,8 @@
+import { LayerPosition } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { NumberOfDirections } from "../../Direction/Direction";
 import { Movement } from "../Movement";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
 import { Position } from "../../GridEngine";
@@ -15,6 +15,7 @@ export interface MoveToConfig {
     pathBlockedMaxRetries?: number;
     pathBlockedRetryBackoffMs?: number;
     pathBlockedWaitTimeoutMs?: number;
+    targetLayer?: string;
 }
 export declare enum MoveToResult {
     SUCCESS = "SUCCESS",
@@ -29,6 +30,7 @@ export interface Finished {
     position: Position;
     result?: MoveToResult;
     description?: string;
+    layer: string;
 }
 export declare class TargetMovement implements Movement {
     private tilemap;
@@ -47,13 +49,13 @@ export declare class TargetMovement implements Movement {
     private pathBlockedWaitElapsed;
     private distanceUtils;
     private finished$;
-    constructor(tilemap: GridTilemap, targetPos: Vector2, distance?: number, config?: MoveToConfig);
+    constructor(tilemap: GridTilemap, targetPos: LayerPosition, distance?: number, config?: MoveToConfig);
     setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void;
     getPathBlockedStrategy(): PathBlockedStrategy;
     setNumberOfDirections(numberOfDirections: NumberOfDirections): void;
     setCharacter(character: GridCharacter): void;
     update(delta: number): void;
-    getNeighbours: (pos: Vector2) => Vector2[];
+    getNeighbours: (pos: LayerPosition) => LayerPosition[];
     finishedObs(): Subject<Finished>;
     private resultToReason;
     private applyPathBlockedStrategy;

@@ -17,4 +17,5 @@ export declare class Vector2 {
     equals(vector: Vector2): boolean;
     abs(): Vector2;
     length(): number;
+    toString(): string;
 }

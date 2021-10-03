@@ -82,4 +82,9 @@ describe("Vector2", () => {
     const v = new Vector2({ x: 4, y: -3 });
     expect(v.length()).toEqual(5);
   });
+
+  it("should convert to string", () => {
+    const v = new Vector2({ x: 4, y: -3 });
+    expect(v.toString()).toEqual("4#-3");
+  });
 });

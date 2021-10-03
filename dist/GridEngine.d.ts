@@ -36,6 +36,7 @@ export interface CharacterData {
     offsetY?: number;
     facingDirection?: Direction;
     collides?: boolean;
+    charLayer?: string;
 }
 export declare class GridEngine {
     private scene;
@@ -52,6 +53,9 @@ export declare class GridEngine {
     constructor(scene: Phaser.Scene);
     boot(): void;
     destroy(): void;
+    getCharLayer(charId: string): string;
+    getTransition(position: Position, fromLayer: string): string | undefined;
+    setTransition(position: Position, fromLayer: string, toLayer: string): void;
     create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void;
     getPosition(charId: string): Position;
     move(charId: string, direction: Direction): void;
@@ -73,7 +77,7 @@ export declare class GridEngine {
     getFacingDirection(charId: string): Direction;
     getFacingPosition(charId: string): Position;
     turnTowards(charId: string, direction: Direction): void;
-    setPosition(charId: string, pos: Position): void;
+    setPosition(charId: string, pos: Position, layer?: string): void;
     getSprite(charId: string): Phaser.GameObjects.Sprite;
     setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void;
     movementStarted(): Observable<{
