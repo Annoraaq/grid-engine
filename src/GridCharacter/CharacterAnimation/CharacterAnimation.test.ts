@@ -260,6 +260,10 @@ describe("CharacterAnimation", () => {
         characterAnimation.setWalkingAnimationMapping(
           customWalkingAnimationMapping
         );
+        expect(characterAnimation.isEnabled()).toBe(true);
+        expect(characterAnimation.getWalkingAnimationMapping()).toEqual(
+          customWalkingAnimationMapping
+        );
         characterAnimation.updateCharacterFrame(Direction.UP, false);
         expect(spriteMock.setFrame).toHaveBeenCalledWith(
           customWalkingAnimationMapping.up.leftFoot
@@ -268,6 +272,30 @@ describe("CharacterAnimation", () => {
         expect(spriteMock.setFrame).toHaveBeenCalledWith(
           customWalkingAnimationMapping.up.standing
         );
+      });
+
+      it("should remove customWalkingAnimation", () => {
+        characterAnimation = new CharacterAnimation(spriteMock, undefined, 3);
+        expect(characterAnimation.isEnabled()).toBe(true);
+        characterAnimation.setWalkingAnimationMapping(undefined);
+        expect(characterAnimation.isEnabled()).toBe(false);
+        characterAnimation.setWalkingAnimationMapping(
+          customWalkingAnimationMapping
+        );
+        expect(characterAnimation.isEnabled()).toBe(true);
+      });
+    });
+
+    describe("characterIndex", () => {
+      it("should set characterIndex", () => {
+        characterAnimation = new CharacterAnimation(spriteMock, undefined, 1);
+        expect(characterAnimation.getCharacterIndex()).toEqual(1);
+        expect(characterAnimation.isEnabled()).toEqual(true);
+        characterAnimation.setCharacterIndex(-1);
+        expect(characterAnimation.isEnabled()).toEqual(false);
+        characterAnimation.setCharacterIndex(3);
+        expect(characterAnimation.getCharacterIndex()).toEqual(3);
+        expect(characterAnimation.isEnabled()).toEqual(true);
       });
     });
 

@@ -20,7 +20,7 @@ export class CharacterAnimation {
 
   constructor(
     private sprite: Phaser.GameObjects.Sprite,
-    private walkingAnimationMapping: WalkingAnimationMapping,
+    private walkingAnimationMapping: WalkingAnimationMapping | undefined,
     private characterIndex: number
   ) {}
 
@@ -55,6 +55,20 @@ export class CharacterAnimation {
     walkingAnimationMapping: WalkingAnimationMapping
   ): void {
     this.walkingAnimationMapping = walkingAnimationMapping;
+    this._isEnabled = this.walkingAnimationMapping !== undefined;
+  }
+
+  setCharacterIndex(characterIndex: number): void {
+    this.characterIndex = characterIndex;
+    this._isEnabled = this.characterIndex !== -1;
+  }
+
+  getWalkingAnimationMapping(): WalkingAnimationMapping | undefined {
+    return this.walkingAnimationMapping;
+  }
+
+  getCharacterIndex(): number {
+    return this.characterIndex;
   }
 
   private setStandingFrameDuringWalk(direction: Direction): void {

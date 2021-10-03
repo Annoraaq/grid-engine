@@ -11,6 +11,7 @@ const mockCharacterAnimation = {
   setStandingFrame: jest.fn(),
   setIsEnabled: jest.fn(),
   setWalkingAnimationMapping: jest.fn(),
+  setCharacterIndex: jest.fn(),
 };
 
 jest.mock("./CharacterAnimation/CharacterAnimation", function () {
@@ -284,6 +285,12 @@ describe("GridCharacter", () => {
     expect(
       mockCharacterAnimation.setWalkingAnimationMapping
     ).toHaveBeenCalledWith(walkingAnimationMappingMock);
+  });
+
+  it("should set characterIndex", () => {
+    gridCharacter.setWalkingAnimationMapping(3);
+
+    expect(mockCharacterAnimation.setCharacterIndex).toHaveBeenCalledWith(3);
   });
 
   it("should update only till tile border", () => {
