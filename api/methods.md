@@ -42,9 +42,9 @@ nav_order: 2
 | :-------------------------------------------------- |
 | Sets the speed in tiles per second for a character. |
 
-| setWalkingAnimationMapping(charId: string, walkingAnimationMapping: [WalkingAnimationMapping](./config.html#walkinganimationmapping)): void |
-| :------------------------------------------------------------------------------------------------------------------------------------------ |
-| Sets the [WalkingAnimationMapping](./config.html#walkinganimationmapping) for a character.                                                  |
+| setWalkingAnimationMapping(charId: string, walkingAnimationMapping: [WalkingAnimationMapping](./config.html#walkinganimationmapping) \| number \| undefined): void                                                                                                                                           |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sets the [WalkingAnimationMapping](./config.html#walkinganimationmapping) for a character. Alternatively you can provide a number which is the character index (see also [Character Config](./config.html#characterdata)). If you provide `undefined`, it will disable walking animations for the character. |
 
 | setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void |
 | :----------------------------------------------------------------- |
