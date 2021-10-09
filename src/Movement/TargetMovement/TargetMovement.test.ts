@@ -34,6 +34,7 @@ describe("TargetMovement", () => {
       isMoving: () => false,
       turnTowards: jest.fn(),
       autoMovementSet: jest.fn().mockReturnValue(of()),
+      getCollides: jest.fn().mockReturnValue(true),
     };
   }
   function layerPos(vec: Vector2): LayerPosition {
@@ -657,11 +658,54 @@ describe("TargetMovement", () => {
     });
   });
 
-  it("should delegate getNeighbours to gridTilemap", () => {
+  it("should ignore blocked tiles with non-colliding char", () => {
     const charPos = layerPos(new Vector2(3, 1));
     const targetPos = layerPos(new Vector2(1, 1));
     targetMovement = new TargetMovement(gridTilemapMock, targetPos);
+    const mockChar = createMockChar("char1", charPos.position);
+    mockChar.getCollides.mockReturnValue(false);
+
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [],
+      closestToTarget: undefined,
+    });
+
+    targetMovement.setCharacter(mockChar);
     gridTilemapMock.isBlocking.mockReturnValue(true);
+    const getNeighbours = targetMovement.getNeighbours(charPos);
+
+    expect(getNeighbours).toEqual([
+      {
+        position: new Vector2(charPos.position.x, charPos.position.y + 1),
+        layer: "layer1",
+      },
+      {
+        position: new Vector2(charPos.position.x + 1, charPos.position.y),
+        layer: "layer1",
+      },
+      {
+        position: new Vector2(charPos.position.x - 1, charPos.position.y),
+        layer: "layer1",
+      },
+      {
+        position: new Vector2(charPos.position.x, charPos.position.y - 1),
+        layer: "layer1",
+      },
+    ]);
+  });
+
+  it("should delegate getNeighbours to gridTilemap", () => {
+    const charPos = layerPos(new Vector2(3, 1));
+    const targetPos = layerPos(new Vector2(1, 1));
+    const mockChar = createMockChar("char1", charPos.position);
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [],
+      closestToTarget: undefined,
+    });
+    gridTilemapMock.isBlocking.mockReturnValue(true);
+
+    targetMovement = new TargetMovement(gridTilemapMock, targetPos);
+    targetMovement.setCharacter(mockChar);
     let getNeighbours = targetMovement.getNeighbours(charPos);
     expect(getNeighbours).toEqual([]);
 
@@ -1071,7 +1115,14 @@ describe("TargetMovement", () => {
     it("should get 8 neighbours", () => {
       const charPos = layerPos(new Vector2(3, 1));
       const targetPos = layerPos(new Vector2(1, 1));
+      const mockChar = createMockChar("char1", charPos.position);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [],
+        closestToTarget: undefined,
+      });
+      gridTilemapMock.isBlocking.mockReturnValue(true);
       targetMovement = new TargetMovement(gridTilemapMock, targetPos);
+      targetMovement.setCharacter(mockChar);
       targetMovement.setNumberOfDirections(NumberOfDirections.EIGHT);
       gridTilemapMock.isBlocking.mockReturnValue(true);
       let getNeighbours = targetMovement.getNeighbours(charPos);

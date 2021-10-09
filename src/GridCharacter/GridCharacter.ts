@@ -121,6 +121,10 @@ export class GridCharacter {
     return this.movement;
   }
 
+  getCollides(): boolean {
+    return this.collides;
+  }
+
   setWalkingAnimationMapping(
     walkingAnimationMapping: WalkingAnimationMapping | number
   ): void {
