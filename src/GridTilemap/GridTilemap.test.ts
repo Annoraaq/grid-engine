@@ -12,6 +12,60 @@ const mockCharBlockCache = {
   isCharBlockingAt: jest.fn(),
 };
 
+const mockCharLayers = [
+  {
+    name: "layer1",
+    tilemapLayer: {
+      setDepth: jest.fn(),
+      scale: 3,
+      tileset: "Cloud City",
+    },
+    properties: [
+      {
+        name: "ge_alwaysTop",
+        value: true,
+      },
+    ],
+  },
+  {
+    name: "layer2",
+    tilemapLayer: {
+      setDepth: jest.fn(),
+      scale: 3,
+      tileset: "Cloud City",
+    },
+    properties: [
+      {
+        name: "ge_charLayer",
+        value: "charLayer1",
+      },
+    ],
+  },
+  {
+    name: "layer3",
+    tilemapLayer: {
+      setDepth: jest.fn(),
+      scale: 3,
+      tileset: "Cloud City",
+    },
+    properties: [],
+  },
+  {
+    name: "layer4",
+    tilemapLayer: {
+      setDepth: jest.fn(),
+      scale: 3,
+      tileset: "Cloud City",
+    },
+    properties: [
+      {
+        name: "ge_charLayer",
+        value: "charLayer2",
+      },
+    ],
+  },
+];
+
 jest.mock("./CharBlockCache/CharBlockCache", function () {
   return {
     CharBlockCache: jest.fn().mockImplementation(function () {
@@ -122,59 +176,7 @@ describe("GridTilemap", () => {
   });
 
   it("should consider charLayers", () => {
-    tilemapMock.layers = [
-      {
-        name: "layer1",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-          scale: 3,
-          tileset: "Cloud City",
-        },
-        properties: [
-          {
-            name: "ge_alwaysTop",
-            value: true,
-          },
-        ],
-      },
-      {
-        name: "layer2",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-          scale: 3,
-          tileset: "Cloud City",
-        },
-        properties: [
-          {
-            name: "ge_charLayer",
-            value: "charLayer1",
-          },
-        ],
-      },
-      {
-        name: "layer3",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-          scale: 3,
-          tileset: "Cloud City",
-        },
-        properties: [],
-      },
-      {
-        name: "layer4",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-          scale: 3,
-          tileset: "Cloud City",
-        },
-        properties: [
-          {
-            name: "ge_charLayer",
-            value: "charLayer2",
-          },
-        ],
-      },
-    ];
+    tilemapMock.layers = mockCharLayers;
     gridTilemap = new GridTilemap(tilemapMock);
 
     expect(
@@ -609,20 +611,38 @@ describe("GridTilemap", () => {
     expect(tilemapMock.getTileAt).not.toHaveBeenCalled();
   });
 
-  it("should detect if no tile present", () => {
+  it("should block if no tile present", () => {
+    tilemapMock.layers = mockCharLayers;
     tilemapMock.hasTileAt.mockReturnValue(false);
     gridTilemap = new GridTilemap(tilemapMock);
-    const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4));
+    const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
     const isBlocking = gridTilemap.isBlocking(undefined, new Vector2(3, 4));
     expect(hasNoTile).toBe(true);
     expect(isBlocking).toBe(true);
   });
 
-  it("should detect if tile present", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
+  it("should block if no tile present on char layer", () => {
+    tilemapMock.layers = mockCharLayers;
+    tilemapMock.hasTileAt.mockImplementation((_x, _y, layerName) => {
+      return layerName !== "layer1" && layerName !== "layer2";
+    });
     gridTilemap = new GridTilemap(tilemapMock);
-    const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4));
+    const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
+    const isBlocking = gridTilemap.isBlocking("charLayer1", new Vector2(3, 4));
+    expect(hasNoTile).toBe(true);
+    expect(isBlocking).toBe(true);
+  });
+
+  it("should not block if tile present on char layer", () => {
+    tilemapMock.layers = mockCharLayers;
+    tilemapMock.hasTileAt.mockImplementation((_x, _y, layerName) => {
+      return layerName === "layer2";
+    });
+    gridTilemap = new GridTilemap(tilemapMock);
+    const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
+    const isBlocking = gridTilemap.isBlocking("charLayer1", new Vector2(3, 4));
     expect(hasNoTile).toBe(false);
+    expect(isBlocking).toBe(false);
   });
 
   it("should detect blocking char", () => {
