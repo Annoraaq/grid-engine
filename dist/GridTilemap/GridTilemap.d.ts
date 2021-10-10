@@ -21,7 +21,7 @@ export declare class GridTilemap {
     getTransition(pos: Vector2, fromLayer: string): string | undefined;
     setTransition(pos: Vector2, fromLayer: string, toLayer: string): void;
     getTransitions(): Map<string, Map<string, string>>;
-    hasNoTile(pos: Vector2): boolean;
+    hasNoTile(pos: Vector2, charLayer: string): boolean;
     hasBlockingChar(pos: Vector2, layer: string): boolean;
     getTileWidth(): number;
     getTileHeight(): number;
