@@ -212,10 +212,12 @@ The `ge_alwaysTop` layer property is not needed anymore with character layers. I
     <img src="../img/char-layers-alwaysOnTop.png" alt="Char layers alwaysOnTop" />
 </p>
 
+### What about shadows for the birds?
+
+If they include a character shadow that is part of the character sprite and are rendered on the `sky` character layer like in example 1, we can observe that this shadow is rendered on top of other characters. One solution for this is shown in [this example](../examples/char-layers-flying-chars-shadows).
+
 ## Unsolved Issues
 
 There are unsolved issues when using character sprites that stretch over the size of multiple tiles. These issues impact the display depth (z-index) of character sprites. There can be ugly overlapping issues. The reason for this is that the whole sprite is rendered at the depth of the character layer. But some scenarios demand parts of the sprites to be rendered at different depths.
 
 One example is our bridge example. We create a second character and let it follow our player. Then as soon as the player entered the bridge and gets transferred to the `bridge` character layer we stop. The following character will be one tile behind us but his head is rendered below our character. This is to be expected, because both characters are on different char layers. However, it is not the intended behaviour.
-
-A second example are flying characters. If they include a character shadow that is part of the character sprite and are rendered on the `sky` character layer like in example 1, we can observe that this shadow is rendered on top of other characters.
