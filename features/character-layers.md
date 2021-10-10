@@ -71,6 +71,16 @@ To achieve that we will create a new tilemap layer for the sky:
 
 It is important that the `sky` layer is above the `ground` layer. Otherwise the birds would be rendered below the ground layer.
 
+Next we need to fill the whole `sky` layer with _invisible_ non-colliding tiles. By that I mean tiles that do not contain any pixels and are non-colliding. Why did I do that and not just leave those blank? The reason for this is the collision. If there is no tile at all on any collision-relevant tile layer for the current character layer, then GridEngine will handle the position as _colliding_. So _no tile_ is handled like a colliding tile.
+
+<p align="center">
+    <img src="../img/char-layers-flying-invisible-tile.png" alt="Invisible tile" />
+</p>
+
+<p align="center">
+    <img src="../img/char-layers-flying-fill.png" alt="Bucket fill tool of Tiled editor" />
+</p>
+
 We need to give the tilemap layer the property `ge_charLayer` with the value `sky`:
 
 <p align="center">
