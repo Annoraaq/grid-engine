@@ -132,6 +132,20 @@ Now let's finally take a look at the `bridge` layer:
 
 This layer is supposed to show up on top of all characters on the ground level. It will also be important for the collisions of all characters on bridge level.
 
+Take care of tiles marked with the red "!" on the screenshot. These are **invisible** tiles. I placed non-colliding tiles there that don't have any pixels. Why did I do that and not just leave those blank? The reason for this is the collision. If there is no tile at all on any collision-relevant tile layer for the current character layer, then GridEngine will handle the position as _colliding_. So _no tile_ is handled like a colliding tile.
+
+But why aren't we taking a non-colliding non-invisible tile like the stairs tile to make it less confusing?
+
+<p align="center">
+    <img src="../img/char-layers-stairs-tile.png" alt="Bridge example stairs tile" />
+</p>
+
+Well, the reason is that when leaving the bridge, this tile will overlap the upper part of our character, because she will already be on the `ground` char layer, which is below the bridge char layer. You can see the result here:
+
+<p align="center">
+    <img src="../img/char-layers-stairs-overlap.png" alt="Bridge example stairs overlap" />
+</p>
+
 So now we need to make sure that characters on ground level do not collide with the bridge layer (and it's characters) and vice versa.
 
 Therefore we set the `ge_charLayer` property of the `buildings` layer to `ground` and that of the `bridge` layer to `bridge` as shown in the last example.
