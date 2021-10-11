@@ -108,6 +108,8 @@ describe("GridTilemap", () => {
       ],
       tileWidth: 16,
       tileHeight: 16,
+      width: 20,
+      height: 30,
       getTileAt: jest.fn(),
       hasTileAt: jest.fn(),
       createBlankLayer: jest.fn().mockReturnValue(blankLayerMock),
@@ -683,6 +685,38 @@ describe("GridTilemap", () => {
 
   it("should get scaled tile height", () => {
     expect(gridTilemap.getTileHeight()).toEqual(48);
+  });
+
+  it("should get width", () => {
+    expect(gridTilemap.getWidth()).toEqual(tilemapMock.width);
+  });
+
+  it("should get height", () => {
+    expect(gridTilemap.getHeight()).toEqual(tilemapMock.height);
+  });
+
+  it("should get positions in range", () => {
+    const inRange = { x: 10, y: 10 };
+    const xTooSmall = { x: -1, y: 10 };
+    const xZero = { x: 0, y: 10 };
+    const xMaxSize = { x: tilemapMock.width - 1, y: 10 };
+    const xTooLarge = { x: tilemapMock.width, y: 10 };
+    const yTooSmall = { x: 10, y: -1 };
+    const yZero = { x: 10, y: 0 };
+    const yMaxSize = { x: 10, y: tilemapMock.height - 1 };
+    const yTooLarge = { x: 10, y: tilemapMock.height };
+
+    expect(gridTilemap.isInRange(new Vector2(inRange))).toEqual(true);
+
+    expect(gridTilemap.isInRange(new Vector2(xTooSmall))).toEqual(false);
+    expect(gridTilemap.isInRange(new Vector2(xZero))).toEqual(true);
+    expect(gridTilemap.isInRange(new Vector2(xMaxSize))).toEqual(true);
+    expect(gridTilemap.isInRange(new Vector2(xTooLarge))).toEqual(false);
+
+    expect(gridTilemap.isInRange(new Vector2(yTooSmall))).toEqual(false);
+    expect(gridTilemap.isInRange(new Vector2(yZero))).toEqual(true);
+    expect(gridTilemap.isInRange(new Vector2(yMaxSize))).toEqual(true);
+    expect(gridTilemap.isInRange(new Vector2(yTooLarge))).toEqual(false);
   });
 
   describe("transitions", () => {

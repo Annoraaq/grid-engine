@@ -103,6 +103,23 @@ export class GridTilemap {
     return this.visLayerDepths.get(layerName) || 0;
   }
 
+  getWidth(): number {
+    return this.tilemap.width;
+  }
+
+  getHeight(): number {
+    return this.tilemap.height;
+  }
+
+  isInRange(pos: Vector2): boolean {
+    return (
+      pos.x >= 0 &&
+      pos.x < this.tilemap.width &&
+      pos.y >= 0 &&
+      pos.y < this.tilemap.height
+    );
+  }
+
   private isLayerBlockingAt(
     layer: Phaser.Tilemaps.LayerData,
     pos: Vector2,
