@@ -5,6 +5,7 @@ import { of } from "rxjs";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { Direction, NumberOfDirections } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
+import { Rect } from "../Utils/Rect/Rect";
 
 const mockCharBlockCache = {
   addCharacter: jest.fn(),
@@ -66,10 +67,22 @@ const mockCharLayers = [
   },
 ];
 
+const mockRect = {
+  isInRange: jest.fn(),
+};
+
 jest.mock("./CharBlockCache/CharBlockCache", function () {
   return {
     CharBlockCache: jest.fn().mockImplementation(function () {
       return mockCharBlockCache;
+    }),
+  };
+});
+
+jest.mock("../Utils/Rect/Rect", function () {
+  return {
+    Rect: jest.fn().mockImplementation(function () {
+      return mockRect;
     }),
   };
 });
@@ -108,6 +121,8 @@ describe("GridTilemap", () => {
       ],
       tileWidth: 16,
       tileHeight: 16,
+      width: 20,
+      height: 30,
       getTileAt: jest.fn(),
       hasTileAt: jest.fn(),
       createBlankLayer: jest.fn().mockReturnValue(blankLayerMock),
@@ -683,6 +698,22 @@ describe("GridTilemap", () => {
 
   it("should get scaled tile height", () => {
     expect(gridTilemap.getTileHeight()).toEqual(48);
+  });
+
+  it("should get positions in range", () => {
+    const pos = new Vector2({ x: 10, y: 20 });
+    mockRect.isInRange.mockReturnValue(false);
+    const res = gridTilemap.isInRange(pos);
+
+    expect(Rect).toHaveBeenCalledWith(
+      0,
+      0,
+      tilemapMock.width,
+      tilemapMock.height
+    );
+
+    expect(mockRect.isInRange).toHaveBeenCalledWith(pos);
+    expect(res).toEqual(false);
   });
 
   describe("transitions", () => {

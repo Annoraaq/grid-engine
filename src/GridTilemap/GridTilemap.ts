@@ -3,6 +3,7 @@ import { Direction } from "./../Direction/Direction";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache/CharBlockCache";
+import { Rect } from "../Utils/Rect/Rect";
 
 export class GridTilemap {
   private static readonly MAX_PLAYER_LAYERS = 1000;
@@ -101,6 +102,11 @@ export class GridTilemap {
 
   getDepthOfCharLayer(layerName: string): number {
     return this.visLayerDepths.get(layerName) || 0;
+  }
+
+  isInRange(pos: Vector2): boolean {
+    const rect = new Rect(0, 0, this.tilemap.width, this.tilemap.height);
+    return rect.isInRange(pos);
   }
 
   private isLayerBlockingAt(

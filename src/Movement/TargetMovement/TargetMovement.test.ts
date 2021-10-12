@@ -50,6 +50,7 @@ describe("TargetMovement", () => {
       hasBlockingChar: jest.fn().mockReturnValue(false),
       isBlocking: jest.fn(),
       getTransition: jest.fn(),
+      isInRange: jest.fn().mockReturnValue(true),
     };
     mockBfs.getShortestPath = jest.fn();
   });
@@ -658,40 +659,74 @@ describe("TargetMovement", () => {
     });
   });
 
-  it("should ignore blocked tiles with non-colliding char", () => {
-    const charPos = layerPos(new Vector2(3, 1));
-    const targetPos = layerPos(new Vector2(1, 1));
-    targetMovement = new TargetMovement(gridTilemapMock, targetPos);
-    const mockChar = createMockChar("char1", charPos.position);
-    mockChar.getCollides.mockReturnValue(false);
-
-    mockBfs.getShortestPath = jest.fn().mockReturnValue({
-      path: [],
-      closestToTarget: undefined,
+  describe("non-colliding char", () => {
+    beforeEach(() => {
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [],
+        closestToTarget: undefined,
+      });
     });
 
-    targetMovement.setCharacter(mockChar);
-    gridTilemapMock.isBlocking.mockReturnValue(true);
-    const getNeighbours = targetMovement.getNeighbours(charPos);
+    it("should ignore blocked tiles with non-colliding char", () => {
+      const charPos = layerPos(new Vector2(3, 1));
+      const targetPos = layerPos(new Vector2(1, 1));
+      targetMovement = new TargetMovement(gridTilemapMock, targetPos);
+      const mockChar = createMockChar("char1", charPos.position);
+      mockChar.getCollides.mockReturnValue(false);
 
-    expect(getNeighbours).toEqual([
-      {
-        position: new Vector2(charPos.position.x, charPos.position.y + 1),
-        layer: "layer1",
-      },
-      {
-        position: new Vector2(charPos.position.x + 1, charPos.position.y),
-        layer: "layer1",
-      },
-      {
-        position: new Vector2(charPos.position.x - 1, charPos.position.y),
-        layer: "layer1",
-      },
-      {
-        position: new Vector2(charPos.position.x, charPos.position.y - 1),
-        layer: "layer1",
-      },
-    ]);
+      targetMovement.setCharacter(mockChar);
+      gridTilemapMock.isBlocking.mockReturnValue(true);
+      const getNeighbours = targetMovement.getNeighbours(charPos);
+
+      expect(getNeighbours).toEqual([
+        {
+          position: new Vector2(charPos.position.x, charPos.position.y + 1),
+          layer: "layer1",
+        },
+        {
+          position: new Vector2(charPos.position.x + 1, charPos.position.y),
+          layer: "layer1",
+        },
+        {
+          position: new Vector2(charPos.position.x - 1, charPos.position.y),
+          layer: "layer1",
+        },
+        {
+          position: new Vector2(charPos.position.x, charPos.position.y - 1),
+          layer: "layer1",
+        },
+      ]);
+    });
+
+    it("should not list tiles out of range", () => {
+      gridTilemapMock.isInRange.mockReturnValue(false);
+      const charPos = layerPos(new Vector2(3, 1));
+      const targetPos = layerPos(new Vector2(1, 1));
+      targetMovement = new TargetMovement(gridTilemapMock, targetPos);
+      const mockChar = createMockChar("char1", charPos.position);
+      mockChar.getCollides.mockReturnValue(false);
+
+      targetMovement.setCharacter(mockChar);
+      const getNeighbours = targetMovement.getNeighbours(charPos);
+
+      expect(getNeighbours).toEqual([]);
+    });
+
+    it("should not move if no path exists", () => {
+      targetMovement = new TargetMovement(
+        gridTilemapMock,
+        layerPos(new Vector2(3, 2))
+      );
+      const charPos = layerPos(new Vector2(3, 1));
+      mockBfs.getShortestPath = jest
+        .fn()
+        .mockReturnValue({ path: [], closestToDistance: charPos });
+      const mockChar = createMockChar("char", charPos.position);
+      mockChar.getCollides.mockReturnValue(false);
+      targetMovement.setCharacter(mockChar);
+      targetMovement.update(100);
+      expect(mockChar.move).not.toHaveBeenCalled();
+    });
   });
 
   it("should delegate getNeighbours to gridTilemap", () => {
