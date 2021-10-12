@@ -700,14 +700,6 @@ describe("GridTilemap", () => {
     expect(gridTilemap.getTileHeight()).toEqual(48);
   });
 
-  it("should get width", () => {
-    expect(gridTilemap.getWidth()).toEqual(tilemapMock.width);
-  });
-
-  it("should get height", () => {
-    expect(gridTilemap.getHeight()).toEqual(tilemapMock.height);
-  });
-
   it("should get positions in range", () => {
     const pos = new Vector2({ x: 10, y: 20 });
     mockRect.isInRange.mockReturnValue(false);

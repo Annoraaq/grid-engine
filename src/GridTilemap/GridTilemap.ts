@@ -104,14 +104,6 @@ export class GridTilemap {
     return this.visLayerDepths.get(layerName) || 0;
   }
 
-  getWidth(): number {
-    return this.tilemap.width;
-  }
-
-  getHeight(): number {
-    return this.tilemap.height;
-  }
-
   isInRange(pos: Vector2): boolean {
     const rect = new Rect(0, 0, this.tilemap.width, this.tilemap.height);
     return rect.isInRange(pos);
