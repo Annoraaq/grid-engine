@@ -3,6 +3,7 @@ import { Direction } from "./../Direction/Direction";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache/CharBlockCache";
+import { Rect } from "../Utils/Rect/Rect";
 
 export class GridTilemap {
   private static readonly MAX_PLAYER_LAYERS = 1000;
@@ -112,12 +113,8 @@ export class GridTilemap {
   }
 
   isInRange(pos: Vector2): boolean {
-    return (
-      pos.x >= 0 &&
-      pos.x < this.tilemap.width &&
-      pos.y >= 0 &&
-      pos.y < this.tilemap.height
-    );
+    const rect = new Rect(0, 0, this.tilemap.width, this.tilemap.height);
+    return rect.isInRange(pos);
   }
 
   private isLayerBlockingAt(

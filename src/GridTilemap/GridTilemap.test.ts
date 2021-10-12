@@ -5,6 +5,7 @@ import { of } from "rxjs";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { Direction, NumberOfDirections } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
+import { Rect } from "../Utils/Rect/Rect";
 
 const mockCharBlockCache = {
   addCharacter: jest.fn(),
@@ -66,10 +67,22 @@ const mockCharLayers = [
   },
 ];
 
+const mockRect = {
+  isInRange: jest.fn(),
+};
+
 jest.mock("./CharBlockCache/CharBlockCache", function () {
   return {
     CharBlockCache: jest.fn().mockImplementation(function () {
       return mockCharBlockCache;
+    }),
+  };
+});
+
+jest.mock("../Utils/Rect/Rect", function () {
+  return {
+    Rect: jest.fn().mockImplementation(function () {
+      return mockRect;
     }),
   };
 });
@@ -696,27 +709,19 @@ describe("GridTilemap", () => {
   });
 
   it("should get positions in range", () => {
-    const inRange = { x: 10, y: 10 };
-    const xTooSmall = { x: -1, y: 10 };
-    const xZero = { x: 0, y: 10 };
-    const xMaxSize = { x: tilemapMock.width - 1, y: 10 };
-    const xTooLarge = { x: tilemapMock.width, y: 10 };
-    const yTooSmall = { x: 10, y: -1 };
-    const yZero = { x: 10, y: 0 };
-    const yMaxSize = { x: 10, y: tilemapMock.height - 1 };
-    const yTooLarge = { x: 10, y: tilemapMock.height };
+    const pos = new Vector2({ x: 10, y: 20 });
+    mockRect.isInRange.mockReturnValue(false);
+    const res = gridTilemap.isInRange(pos);
 
-    expect(gridTilemap.isInRange(new Vector2(inRange))).toEqual(true);
+    expect(Rect).toHaveBeenCalledWith(
+      0,
+      0,
+      tilemapMock.width,
+      tilemapMock.height
+    );
 
-    expect(gridTilemap.isInRange(new Vector2(xTooSmall))).toEqual(false);
-    expect(gridTilemap.isInRange(new Vector2(xZero))).toEqual(true);
-    expect(gridTilemap.isInRange(new Vector2(xMaxSize))).toEqual(true);
-    expect(gridTilemap.isInRange(new Vector2(xTooLarge))).toEqual(false);
-
-    expect(gridTilemap.isInRange(new Vector2(yTooSmall))).toEqual(false);
-    expect(gridTilemap.isInRange(new Vector2(yZero))).toEqual(true);
-    expect(gridTilemap.isInRange(new Vector2(yMaxSize))).toEqual(true);
-    expect(gridTilemap.isInRange(new Vector2(yTooLarge))).toEqual(false);
+    expect(mockRect.isInRange).toHaveBeenCalledWith(pos);
+    expect(res).toEqual(false);
   });
 
   describe("transitions", () => {
