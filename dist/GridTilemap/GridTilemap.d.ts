@@ -26,6 +26,7 @@ export declare class GridTilemap {
     getTileWidth(): number;
     getTileHeight(): number;
     getDepthOfCharLayer(layerName: string): number;
+    isInRange(pos: Vector2): boolean;
     private isLayerBlockingAt;
     private getCharLayerIndexes;
     private findPrevAndCharLayer;
