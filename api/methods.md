@@ -114,13 +114,13 @@ nav_order: 2
 | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Returns an Observable that will notify about every change of direction that is not part of a movement. This is the case if the character tries to walk towards a blocked tile. The character will turn but not move. |
 
-| positionChangeStarted(): Observable<{charId: string, exitTile: [Position](./config.html#position), enterTile: [Position](./config.html#position)}> |
-| :------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Returns an Observable that will notify about every change of tile position. It will notify at the **beginning** of the movement.                   |
+| positionChangeStarted(): Observable<{charId: string, exitTile: [Position](./config.html#position), enterTile: [Position](./config.html#position), enterLayer: string, exitLayer: string}> |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Returns an Observable that will notify about every change of tile position. It will notify at the **beginning** of the movement.                                                          |
 
-| positionChangeFinished(): Observable<{charId: string, exitTile: [Position](./config.html#position), enterTile: [Position](./config.html#position)}> |
-| :-------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Returns an Observable that will notify about every change of tile position. It will notify at the **end** of the movement.                          |
+| positionChangeFinished(): Observable<{charId: string, exitTile: [Position](./config.html#position), enterTile: [Position](./config.html#position), enterLayer: string, exitLayer: string}> |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Returns an Observable that will notify about every change of tile position. It will notify at the **end** of the movement.                                                                 |
 
 # Pathfinding Configuration
 
