@@ -44,13 +44,11 @@ describe("GridCharacter", () => {
   const DEPTH_OF_CHAR_LAYER = 10;
 
   function mockNonBlockingTile() {
-    gridTilemapMock.hasBlockingTile.mockReturnValue(false);
-    gridTilemapMock.hasNoTile.mockReturnValue(false);
+    gridTilemapMock.isBlocking.mockReturnValue(false);
   }
 
   function mockBlockingTile() {
-    gridTilemapMock.hasBlockingTile.mockReturnValue(true);
-    gridTilemapMock.hasNoTile.mockReturnValue(false);
+    gridTilemapMock.isBlocking.mockReturnValue(true);
   }
 
   afterEach(() => {
@@ -60,9 +58,7 @@ describe("GridCharacter", () => {
 
   beforeEach(() => {
     gridTilemapMock = {
-      hasBlockingTile: jest.fn(),
-      hasNoTile: jest.fn(),
-      hasBlockingChar: jest.fn().mockReturnValue(false),
+      isBlocking: jest.fn(),
       getDepthOfCharLayer: jest.fn().mockReturnValue(DEPTH_OF_CHAR_LAYER),
       getTransition: jest.fn(),
     };
@@ -722,8 +718,7 @@ describe("GridCharacter", () => {
   describe("isBlockingDirection", () => {
     it("direction NONE never blocks", () => {
       const direction = Direction.NONE;
-      gridTilemapMock.hasBlockingTile.mockReturnValue(true);
-      gridTilemapMock.hasBlockingChar.mockReturnValue(true);
+      gridTilemapMock.isBlocking.mockReturnValue(true);
 
       const result = gridCharacter.isBlockingDirection(direction);
       expect(result).toBe(false);
@@ -732,8 +727,7 @@ describe("GridCharacter", () => {
     it("should detect non-blocking direction", () => {
       const direction = Direction.RIGHT;
       const oppositeDirection = Direction.LEFT;
-      gridTilemapMock.hasBlockingTile.mockReturnValue(false);
-      gridTilemapMock.hasBlockingChar.mockReturnValue(false);
+      gridTilemapMock.isBlocking.mockReturnValue(false);
 
       gridCharacter.move(Direction.RIGHT);
       gridCharacter.update(10);
@@ -745,7 +739,7 @@ describe("GridCharacter", () => {
         { x: 1, y: 0 },
         undefined
       );
-      expect(gridTilemapMock.hasBlockingTile).toHaveBeenCalledWith(
+      expect(gridTilemapMock.isBlocking).toHaveBeenCalledWith(
         "layerInDir",
         {
           x: 2,
@@ -753,23 +747,7 @@ describe("GridCharacter", () => {
         },
         oppositeDirection
       );
-      expect(gridTilemapMock.hasBlockingChar).toHaveBeenCalledWith(
-        {
-          x: 2,
-          y: 0,
-        },
-        "layerInDir"
-      );
       expect(result).toBe(false);
-    });
-
-    it("should detect blocking direction if map blocks", () => {
-      const direction = Direction.RIGHT;
-      gridTilemapMock.hasBlockingTile.mockReturnValue(true);
-      gridTilemapMock.hasBlockingChar.mockReturnValue(false);
-
-      const result = gridCharacter.isBlockingDirection(direction);
-      expect(result).toBe(true);
     });
 
     it("should not detect blocking direction if char does not collide", () => {
@@ -782,26 +760,15 @@ describe("GridCharacter", () => {
         walkingAnimationMapping: 3,
       });
       const direction = Direction.RIGHT;
-      gridTilemapMock.hasBlockingTile.mockReturnValue(true);
-      gridTilemapMock.hasBlockingChar.mockReturnValue(false);
+      gridTilemapMock.isBlocking.mockReturnValue(true);
 
       const result = gridCharacter.isBlockingDirection(direction);
       expect(result).toBe(false);
     });
 
-    it("should detect blocking direction if char blocks", () => {
+    it("should detect blocking direction if tilemap blocks", () => {
       const direction = Direction.RIGHT;
-      gridTilemapMock.hasBlockingTile.mockReturnValue(false);
-      gridTilemapMock.hasBlockingChar.mockReturnValue(true);
-
-      const result = gridCharacter.isBlockingDirection(direction);
-      expect(result).toBe(true);
-    });
-
-    it("should detect blocking direction if char and tile block", () => {
-      const direction = Direction.RIGHT;
-      gridTilemapMock.hasBlockingTile.mockReturnValue(true);
-      gridTilemapMock.hasBlockingChar.mockReturnValue(true);
+      gridTilemapMock.isBlocking.mockReturnValue(true);
 
       const result = gridCharacter.isBlockingDirection(direction);
       expect(result).toBe(true);

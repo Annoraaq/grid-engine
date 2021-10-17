@@ -39,8 +39,7 @@ describe("IsometricGridCharacter", () => {
   const DEPTH_OF_CHAR_LAYER = 10;
 
   function mockNonBlockingTile() {
-    gridTilemapMock.hasBlockingTile.mockReturnValue(false);
-    gridTilemapMock.hasNoTile.mockReturnValue(false);
+    gridTilemapMock.isBlocking.mockReturnValue(false);
   }
 
   afterEach(() => {
@@ -50,9 +49,7 @@ describe("IsometricGridCharacter", () => {
 
   beforeEach(() => {
     gridTilemapMock = {
-      hasBlockingTile: jest.fn(),
-      hasNoTile: jest.fn(),
-      hasBlockingChar: jest.fn().mockReturnValue(false),
+      isBlocking: jest.fn().mockReturnValue(false),
       getDepthOfCharLayer: jest.fn().mockReturnValue(DEPTH_OF_CHAR_LAYER),
       getTransition: jest.fn(),
     };
@@ -177,8 +174,7 @@ describe("IsometricGridCharacter", () => {
 
   it("should detect non-blocking direction", () => {
     const oppositeMapDirection = Direction.DOWN;
-    gridTilemapMock.hasBlockingTile.mockReturnValue(false);
-    gridTilemapMock.hasBlockingChar.mockReturnValue(false);
+    gridTilemapMock.isBlocking.mockReturnValue(false);
 
     gridCharacter.setTilePosition({
       position: new Vector2(3, 3),
@@ -189,20 +185,13 @@ describe("IsometricGridCharacter", () => {
     gridCharacter.update(10);
 
     const result = gridCharacter.isBlockingDirection(Direction.UP_RIGHT);
-    expect(gridTilemapMock.hasBlockingTile).toHaveBeenCalledWith(
+    expect(gridTilemapMock.isBlocking).toHaveBeenCalledWith(
       "someLayer",
       {
         x: 3,
         y: 1,
       },
       oppositeMapDirection
-    );
-    expect(gridTilemapMock.hasBlockingChar).toHaveBeenCalledWith(
-      {
-        x: 3,
-        y: 1,
-      },
-      "someLayer"
     );
     expect(result).toBe(false);
   });

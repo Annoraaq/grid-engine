@@ -227,16 +227,11 @@ export class GridCharacter {
     const layerInDirection =
       this.tilemap.getTransition(tilePosInDir, this.nextTilePos.layer) ||
       this.nextTilePos.layer;
-    const hasBlockingTile = this.tilemap.hasBlockingTile(
+    return this.tilemap.isBlocking(
       layerInDirection,
       tilePosInDir,
       oppositeDirection(this.toMapDirection(direction))
     );
-    const hasBlockingChar = this.tilemap.hasBlockingChar(
-      tilePosInDir,
-      layerInDirection
-    );
-    return hasBlockingTile || hasBlockingChar;
   }
 
   isMoving(): boolean {
