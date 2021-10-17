@@ -27,6 +27,7 @@ export interface PositionChange {
 
 export interface CharConfig {
   sprite: Phaser.GameObjects.Sprite;
+  // sprite2: Phaser.GameObjects.Sprite;
   tilemap: GridTilemap;
   tileSize: Vector2;
   speed: number;
@@ -53,6 +54,7 @@ export class GridCharacter {
     layer: undefined,
   };
   private sprite: Phaser.GameObjects.Sprite;
+  private sprite2: Phaser.GameObjects.Sprite;
   private container?: Phaser.GameObjects.Container;
   private tilemap: GridTilemap;
   private speed: number;
@@ -88,7 +90,10 @@ export class GridCharacter {
     this._tilePos.layer = config.charLayer;
 
     this.sprite = config.sprite;
+    // this.sprite2 = config.sprite2;
     this._setSprite(this.sprite);
+
+    // this.sprite2.setOrigin(0, 0);
   }
 
   getId(): string {
@@ -194,6 +199,19 @@ export class GridCharacter {
       this.updateZindex();
     }
     this.lastMovementImpulse = Direction.NONE;
+    // mirror sprite
+    // this.sprite2.x = this.sprite.x;
+    // this.sprite2.y = this.sprite.y;
+    // this.sprite2.tint = this.sprite.tint;
+    // this.sprite2.alpha = this.sprite.alpha;
+    // this.sprite2.scale = this.sprite.scale;
+    // this.sprite2.setFrame(this.sprite.frame.name);
+    // this.sprite2.active = this.sprite.active;
+    // this.sprite2.alphaBottomLeft = this.sprite.alphaBottomLeft;
+    // this.sprite2.alphaBottomRight = this.sprite.alphaBottomRight;
+    // this.sprite2.alphaTopLeft = this.sprite.alphaTopLeft;
+    // this.sprite2.alphaTopRight = this.sprite.alphaTopRight;
+    // this.sprite2.angle = this.sprite.angle;
   }
 
   getMovementDirection(): Direction {
@@ -357,10 +375,61 @@ export class GridCharacter {
 
   private updateZindex() {
     const gameObject = this.container || this.sprite;
-    gameObject.setDepth(
-      this.tilemap.getDepthOfCharLayer(this.nextTilePos.layer) +
-        this.mapDepth(this.nextTilePos)
-    );
+
+    // get layer of top pos
+    const trans =
+      this.tilemap.getTransition(
+        new Vector2({
+          ...this.nextTilePos.position,
+          y: this.nextTilePos.position.y - 1,
+        }),
+        this.nextTilePos.layer
+      ) ||
+      this.tilemap.getTransition(
+        new Vector2({
+          ...this.nextTilePos.position,
+        }),
+        this.nextTilePos.layer
+      );
+
+    const levelingUp =
+      this.tilemap.getDepthOfCharLayer(this.tilePos.layer) <
+      this.tilemap.getDepthOfCharLayer(this.nextTilePos.layer);
+    const levelingDown =
+      this.tilemap.getDepthOfCharLayer(this.tilePos.layer) >
+      this.tilemap.getDepthOfCharLayer(this.nextTilePos.layer);
+    const overlapUp =
+      this.tilemap.getDepthOfCharLayer(this.nextTilePos.layer) <
+      this.tilemap.getDepthOfCharLayer(trans);
+
+    if (trans || overlapUp || levelingUp) {
+      // this.sprite2.setDepth(
+      //   this.tilemap.getDepthOfCharLayer(trans || this.nextTilePos.layer) +
+      //     this.shiftPad(this.sprite2.y, 7)
+      // );
+      // this.sprite2.visible = true;
+    } else {
+      // this.sprite2.visible = false;
+    }
+
+    if (levelingDown) {
+      gameObject.setDepth(
+        this.tilemap.getDepthOfCharLayer(this.nextTilePos.layer) +
+          this.shiftPad(gameObject.y, 7)
+      );
+    } else {
+      gameObject.setDepth(
+        this.tilemap.getDepthOfCharLayer(this.tilePos.layer) +
+          this.shiftPad(gameObject.y, 7)
+      );
+    }
+  }
+
+  private shiftPad(num: number, places: number): number {
+    const floor = Math.floor(num);
+    const str = `${floor}`.padStart(places, "0");
+    const strPlaces = str.length;
+    return floor / Math.pow(10, strPlaces);
   }
 
   protected mapDepth(nextTilePos: LayerPosition): number {
@@ -371,6 +440,8 @@ export class GridCharacter {
     const gameObject = this.container || this.sprite;
     gameObject.x = position.x;
     gameObject.y = position.y;
+    // this.sprite.x = position.x;
+    // this.sprite.y = position.y;
   }
 
   private getPosition(): Vector2 {

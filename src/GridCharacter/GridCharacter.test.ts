@@ -128,7 +128,9 @@ describe("GridCharacter", () => {
   });
 
   it("should set the correct depth on construction", () => {
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(DEPTH_OF_CHAR_LAYER);
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+      DEPTH_OF_CHAR_LAYER + parseFloat("0.00000" + spriteMock.y)
+    );
   });
 
   it("should be facing down on construction by default", () => {
@@ -142,7 +144,10 @@ describe("GridCharacter", () => {
     newTilePos.x = 20;
 
     expect(spriteMock.setDepth).toHaveBeenCalledWith(
-      DEPTH_OF_CHAR_LAYER + expectedPos.position.y
+      DEPTH_OF_CHAR_LAYER +
+        parseFloat(
+          "0.00000" + (expectedPos.position.y * TILE_HEIGHT + PLAYER_Y_OFFSET)
+        )
     );
     expect(gridCharacter.getTilePos()).toEqual(expectedPos);
   });
@@ -163,7 +168,9 @@ describe("GridCharacter", () => {
     expect(mockCharacterAnimation.setStandingFrame).toHaveBeenCalledWith(
       Direction.DOWN
     );
-    expect(sprite.setDepth).toHaveBeenCalledWith(DEPTH_OF_CHAR_LAYER);
+    expect(sprite.setDepth).toHaveBeenCalledWith(
+      DEPTH_OF_CHAR_LAYER + parseFloat("0.0000092")
+    );
   });
 
   it("should start movement", async () => {
@@ -239,6 +246,71 @@ describe("GridCharacter", () => {
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 9);
   });
 
+  it("should update depth with nextTilePos when staying on char layer", () => {
+    mockNonBlockingTile();
+    gridTilemapMock.getDepthOfCharLayer.mockImplementation((layer) => {
+      if (layer === "charLayer2") {
+        return DEPTH_OF_CHAR_LAYER + 1;
+      }
+      return DEPTH_OF_CHAR_LAYER;
+    });
+
+    gridCharacter.move(Direction.UP);
+    gridCharacter.update(MS_FOR_12_PX);
+
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+      DEPTH_OF_CHAR_LAYER + parseFloat("0.00000" + (INITIAL_SPRITE_Y_POS - 12))
+    );
+  });
+
+  it("should update depth with nextTilePos when lowering char layer", () => {
+    mockNonBlockingTile();
+    const nextTilePos = new Vector2(0, -1);
+    gridTilemapMock.getTransition.mockImplementation((pos) => {
+      if (pos.x == nextTilePos.x && pos.y == nextTilePos.y) {
+        return "charLayer2";
+      }
+    });
+    gridTilemapMock.getDepthOfCharLayer.mockImplementation((layer) => {
+      if (layer === "charLayer2") {
+        return DEPTH_OF_CHAR_LAYER - 1;
+      }
+      return DEPTH_OF_CHAR_LAYER;
+    });
+
+    gridCharacter.move(Direction.UP);
+    gridCharacter.update(MS_FOR_12_PX);
+
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+      DEPTH_OF_CHAR_LAYER -
+        1 +
+        parseFloat("0.00000" + (INITIAL_SPRITE_Y_POS - 12))
+    );
+  });
+
+  it("should update depth with tilePos when entering higher char layer", () => {
+    mockNonBlockingTile();
+    const nextTilePos = new Vector2(0, -1);
+    gridTilemapMock.getTransition.mockImplementation((pos) => {
+      if (pos.x == nextTilePos.x && pos.y == nextTilePos.y) {
+        return "charLayer2";
+      }
+    });
+    gridTilemapMock.getDepthOfCharLayer.mockImplementation((layer) => {
+      if (layer === "charLayer2") {
+        return DEPTH_OF_CHAR_LAYER + 1;
+      }
+      return DEPTH_OF_CHAR_LAYER;
+    });
+
+    gridCharacter.move(Direction.UP);
+    gridCharacter.update(MS_FOR_12_PX);
+
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+      DEPTH_OF_CHAR_LAYER + parseFloat("0.00000" + (INITIAL_SPRITE_Y_POS - 12))
+    );
+  });
+
   it("should update vertically", () => {
     mockNonBlockingTile();
 
@@ -249,7 +321,9 @@ describe("GridCharacter", () => {
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 12);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(DEPTH_OF_CHAR_LAYER - 1);
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+      DEPTH_OF_CHAR_LAYER + parseFloat("0.00000" + (INITIAL_SPRITE_Y_POS - 12))
+    );
   });
 
   it("should update horizontally", () => {
@@ -262,7 +336,9 @@ describe("GridCharacter", () => {
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.RIGHT);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(DEPTH_OF_CHAR_LAYER);
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+      DEPTH_OF_CHAR_LAYER + parseFloat("0.00000" + INITIAL_SPRITE_Y_POS)
+    );
   });
 
   it("should update diagonally", () => {
@@ -275,7 +351,9 @@ describe("GridCharacter", () => {
     expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS + 12);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN_LEFT);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN_LEFT);
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(DEPTH_OF_CHAR_LAYER + 1);
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+      DEPTH_OF_CHAR_LAYER + parseFloat("0.0000" + (INITIAL_SPRITE_Y_POS + 12))
+    );
   });
 
   it("should set walkingAnimationMapping", () => {
@@ -877,7 +955,8 @@ describe("GridCharacter", () => {
 
       expect(spriteMock.setDepth).not.toHaveBeenCalled();
       expect(containerMock.setDepth).toHaveBeenCalledWith(
-        DEPTH_OF_CHAR_LAYER - 1
+        DEPTH_OF_CHAR_LAYER +
+          parseFloat("0.00000" + (6 * TILE_HEIGHT - pixelsMovedThisUpdate))
       );
       expect(containerMock.x).toEqual(5 * TILE_WIDTH);
       expect(containerMock.y).toEqual(6 * TILE_HEIGHT - pixelsMovedThisUpdate);

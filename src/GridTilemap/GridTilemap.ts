@@ -6,7 +6,7 @@ import { CharBlockCache } from "./CharBlockCache/CharBlockCache";
 import { Rect } from "../Utils/Rect/Rect";
 
 export class GridTilemap {
-  private static readonly MAX_PLAYER_LAYERS = 1000;
+  private static readonly MAX_PLAYER_LAYERS = 1;
   private static readonly ALWAYS_TOP_PROP_NAME = "ge_alwaysTop";
   private static readonly CHAR_LAYER_PROP_NAME = "ge_charLayer";
   private static readonly HEIGHT_SHIFT_PROP_NAME = "ge_heightShift";

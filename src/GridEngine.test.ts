@@ -161,7 +161,10 @@ describe("GridEngine", () => {
   beforeEach(() => {
     // hacky way of avoiding errors in Plugin Initialization because Phaser
     // is not mockable by jest
-    sceneMock = { sys: { events: { once: jest.fn(), on: jest.fn() } } };
+    sceneMock = {
+      sys: { events: { once: jest.fn(), on: jest.fn() } },
+      add: { sprite: jest.fn().mockReturnValue({ setCrop: jest.fn() }) },
+    };
     tileMapMock = {
       layers: [
         {

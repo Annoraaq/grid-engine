@@ -111,6 +111,14 @@ describe("IsometricGridCharacter", () => {
 
   it("should move diagonally", () => {
     const tileAmountToWalk = 0.75;
+    const expectedYPos =
+      INITIAL_SPRITE_Y_POS - (TILE_HEIGHT / 2) * tileAmountToWalk;
+    const expectedXPos =
+      INITIAL_SPRITE_X_POS + (TILE_WIDTH / 2) * tileAmountToWalk;
+
+    // expected y pos 67 left padded with 0s
+    const expectedNewYPosDepthOffset = 0.0000067;
+
     mockNonBlockingTile();
 
     expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
@@ -119,19 +127,23 @@ describe("IsometricGridCharacter", () => {
     gridCharacter.move(Direction.UP_RIGHT);
     gridCharacter.update(1000 * tileAmountToWalk);
 
-    expect(spriteMock.x).toEqual(
-      INITIAL_SPRITE_X_POS + (TILE_WIDTH / 2) * tileAmountToWalk
-    );
-    expect(spriteMock.y).toEqual(
-      INITIAL_SPRITE_Y_POS - (TILE_HEIGHT / 2) * tileAmountToWalk
-    );
+    expect(spriteMock.x).toEqual(expectedXPos);
+    expect(spriteMock.y).toEqual(expectedYPos);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP_RIGHT);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP_RIGHT);
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(DEPTH_OF_CHAR_LAYER - 1);
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+      DEPTH_OF_CHAR_LAYER + expectedNewYPosDepthOffset
+    );
   });
 
   it("should move vertically", () => {
     const tileAmountToWalk = 0.75;
+    const expectedYPos = INITIAL_SPRITE_Y_POS - TILE_HEIGHT * tileAmountToWalk;
+    const expectedXPos = INITIAL_SPRITE_X_POS;
+
+    // expected y pos 58 left padded with 0s
+    const expectedNewYPosDepthOffset = 0.0000058;
+
     mockNonBlockingTile();
 
     expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
@@ -140,17 +152,22 @@ describe("IsometricGridCharacter", () => {
     gridCharacter.move(Direction.UP);
     gridCharacter.update(1000 * tileAmountToWalk);
 
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
-    expect(spriteMock.y).toEqual(
-      INITIAL_SPRITE_Y_POS - TILE_HEIGHT * tileAmountToWalk
-    );
+    expect(spriteMock.x).toEqual(expectedXPos);
+    expect(spriteMock.y).toEqual(expectedYPos);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(DEPTH_OF_CHAR_LAYER - 2);
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+      DEPTH_OF_CHAR_LAYER + expectedNewYPosDepthOffset
+    );
   });
 
   it("should move horizontally", () => {
     const tileAmountToWalk = 0.75;
+    const expectedYPos = INITIAL_SPRITE_Y_POS;
+    const expectedXPos = INITIAL_SPRITE_X_POS - TILE_WIDTH * tileAmountToWalk;
+
+    // // expected y pos 76 left padded with 0s
+    const expectedNewYPosDepthOffset = 0.0000076;
     mockNonBlockingTile();
 
     expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
@@ -159,13 +176,13 @@ describe("IsometricGridCharacter", () => {
     gridCharacter.move(Direction.LEFT);
     gridCharacter.update(1000 * tileAmountToWalk);
 
-    expect(spriteMock.x).toEqual(
-      INITIAL_SPRITE_X_POS - TILE_WIDTH * tileAmountToWalk
-    );
-    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
+    expect(spriteMock.x).toEqual(expectedXPos);
+    expect(spriteMock.y).toEqual(expectedYPos);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.LEFT);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(DEPTH_OF_CHAR_LAYER);
+    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+      DEPTH_OF_CHAR_LAYER + expectedNewYPosDepthOffset
+    );
   });
 
   it("should detect non-blocking direction", () => {

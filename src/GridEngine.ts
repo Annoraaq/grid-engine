@@ -243,8 +243,21 @@ export class GridEngine {
   addCharacter(charData: CharacterData): void {
     this.initGuard();
 
+    // const sprite2 = this.scene.add.sprite(0, 0, charData.sprite.texture);
+    // sprite2.scale = charData.sprite.scale;
+    // const scaledTileHeight =
+    //   this.tilemap.tileHeight *
+    //   (this.tilemap.layers[0].tilemapLayer.scale / sprite2.scale);
+    // sprite2.setCrop(
+    //   0,
+    //   0,
+    //   sprite2.width * sprite2.scale,
+    //   charData.sprite.height - scaledTileHeight
+    // );
+
     const charConfig: CharConfig = {
       sprite: charData.sprite,
+      // sprite2,
       speed: charData.speed || 4,
       tilemap: this.gridTilemap,
       tileSize: new Vector2(

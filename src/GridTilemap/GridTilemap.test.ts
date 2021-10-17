@@ -7,6 +7,8 @@ import { Direction, NumberOfDirections } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
 import { Rect } from "../Utils/Rect/Rect";
 
+const MAX_CHAR_LAYERS = 1;
+
 const mockCharBlockCache = {
   addCharacter: jest.fn(),
   removeCharacter: jest.fn(),
@@ -185,7 +187,7 @@ describe("GridTilemap", () => {
 
     expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
     expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(
-      1002
+      MAX_CHAR_LAYERS + 2
     );
     expect(tilemapMock.layers[2].tilemapLayer.setDepth).toHaveBeenCalledWith(2);
   });
@@ -199,13 +201,15 @@ describe("GridTilemap", () => {
     ).toHaveBeenLastCalledWith(0);
     expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(1);
     expect(tilemapMock.layers[2].tilemapLayer.setDepth).toHaveBeenCalledWith(
-      1002
+      MAX_CHAR_LAYERS + 2
     );
     expect(tilemapMock.layers[3].tilemapLayer.setDepth).toHaveBeenCalledWith(
-      1003
+      MAX_CHAR_LAYERS + 3
     );
     expect(gridTilemap.getDepthOfCharLayer("charLayer1")).toEqual(1);
-    expect(gridTilemap.getDepthOfCharLayer("charLayer2")).toEqual(1003);
+    expect(gridTilemap.getDepthOfCharLayer("charLayer2")).toEqual(
+      MAX_CHAR_LAYERS + 3
+    );
   });
 
   it("should consider 'heightShift' layer", () => {
