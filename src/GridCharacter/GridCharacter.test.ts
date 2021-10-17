@@ -61,6 +61,8 @@ describe("GridCharacter", () => {
       isBlocking: jest.fn(),
       getDepthOfCharLayer: jest.fn().mockReturnValue(DEPTH_OF_CHAR_LAYER),
       getTransition: jest.fn(),
+      getTileWidth: jest.fn().mockReturnValue(TILE_WIDTH),
+      getTileHeight: jest.fn().mockReturnValue(TILE_HEIGHT),
     };
     gridSpriteMock = <any>{
       getRawSprite: jest.fn(),
@@ -73,7 +75,6 @@ describe("GridCharacter", () => {
     gridCharacter = new GridCharacter("player", {
       sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
-      tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 3,
       collides: true,
       walkingAnimationMapping: 3,
@@ -84,7 +85,6 @@ describe("GridCharacter", () => {
     gridCharacter = new GridCharacter("player", {
       sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
-      tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 3,
       collides: true,
       charLayer: "someLayer",
@@ -98,7 +98,6 @@ describe("GridCharacter", () => {
     gridCharacter = new GridCharacter("player", {
       sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
-      tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 3,
       collides: true,
     });
@@ -107,7 +106,6 @@ describe("GridCharacter", () => {
     gridCharacter = new GridCharacter("player", {
       sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
-      tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 3,
       collides: false,
     });
@@ -377,7 +375,6 @@ describe("GridCharacter", () => {
     gridCharacter = new GridCharacter("player", {
       sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
-      tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 3,
       offsetX: customOffsetX,
       offsetY: customOffsetY,
@@ -754,7 +751,6 @@ describe("GridCharacter", () => {
       gridCharacter = new GridCharacter("player", {
         sprite: gridSpriteMock,
         tilemap: gridTilemapMock,
-        tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
         speed: 3,
         collides: false,
         walkingAnimationMapping: 3,
@@ -894,7 +890,6 @@ describe("GridCharacter", () => {
       gridCharacter = new GridCharacter("player", {
         sprite: gridSpriteMock,
         tilemap: gridTilemapMock,
-        tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
         speed: 3,
         walkingAnimationMapping: 3,
         container: containerMock,

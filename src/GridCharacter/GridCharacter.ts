@@ -30,7 +30,6 @@ export interface CharConfig {
   sprite: GridSprite;
   // sprite2: Phaser.GameObjects.Sprite;
   tilemap: GridTilemap;
-  tileSize: Vector2;
   speed: number;
   collides: boolean;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
@@ -86,8 +85,10 @@ export class GridCharacter {
     this.speed = config.speed;
     this.collides = config.collides;
     this.customOffset = new Vector2(config.offsetX || 0, config.offsetY || 0);
-    this.tileSize = config.tileSize.clone();
-
+    this.tileSize = new Vector2(
+      this.tilemap.getTileWidth(),
+      this.tilemap.getTileHeight()
+    );
     this._tilePos.layer = config.charLayer;
 
     this.sprite = config.sprite;

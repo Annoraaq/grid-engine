@@ -261,10 +261,6 @@ export class GridEngine {
       // sprite2,
       speed: charData.speed || 4,
       tilemap: this.gridTilemap,
-      tileSize: new Vector2(
-        this.gridTilemap.getTileWidth(),
-        this.gridTilemap.getTileHeight()
-      ),
       walkingAnimationMapping: charData.walkingAnimationMapping,
       container: charData.container,
       offsetX: charData.offsetX,

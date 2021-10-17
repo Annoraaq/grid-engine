@@ -244,7 +244,6 @@ describe("GridEngine", () => {
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: mockGridSprite,
       tilemap: mockGridTileMap,
-      tileSize: new Vector2(32, 32),
       speed: 4,
       container: containerMock,
       offsetX: undefined,
@@ -271,7 +270,6 @@ describe("GridEngine", () => {
     expect(IsometricGridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
       tilemap: mockGridTileMap,
-      tileSize: new Vector2(32, 32),
       speed: 4,
       container: undefined,
       offsetX: undefined,
@@ -311,7 +309,6 @@ describe("GridEngine", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileSize: new Vector2(32, 32),
       tilemap: mockGridTileMap,
       speed: 4,
       collides: true,
@@ -356,7 +353,6 @@ describe("GridEngine", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileSize: new Vector2(32, 32),
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping,
@@ -440,7 +436,6 @@ describe("GridEngine", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileSize: new Vector2(32, 32),
       tilemap: mockGridTileMap,
       speed: 2,
       walkingAnimationMapping: 3,
@@ -464,7 +459,6 @@ describe("GridEngine", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileSize: new Vector2(32, 32),
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping: 3,
@@ -488,7 +482,6 @@ describe("GridEngine", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      tileSize: new Vector2(32, 32),
       tilemap: mockGridTileMap,
       speed: 2,
       walkingAnimationMapping: 3,

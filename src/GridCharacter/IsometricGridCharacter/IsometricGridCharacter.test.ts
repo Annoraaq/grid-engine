@@ -52,6 +52,8 @@ describe("IsometricGridCharacter", () => {
       isBlocking: jest.fn().mockReturnValue(false),
       getDepthOfCharLayer: jest.fn().mockReturnValue(DEPTH_OF_CHAR_LAYER),
       getTransition: jest.fn(),
+      getTileWidth: jest.fn().mockReturnValue(TILE_WIDTH),
+      getTileHeight: jest.fn().mockReturnValue(TILE_HEIGHT),
     };
     gridSpriteMock = <any>{
       getRawSprite: jest.fn(),
@@ -64,7 +66,6 @@ describe("IsometricGridCharacter", () => {
     gridCharacter = new IsometricGridCharacter("player", {
       sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
-      tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 1,
       walkingAnimationMapping: 3,
       collides: true,
@@ -77,7 +78,6 @@ describe("IsometricGridCharacter", () => {
     gridCharacter = new IsometricGridCharacter("player", {
       sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
-      tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 1,
       offsetX: customOffsetX,
       offsetY: customOffsetY,
