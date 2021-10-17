@@ -1,6 +1,9 @@
 import { GridSprite } from "./GridSprite";
 
 describe("GridSprite", () => {
+  const spriteWidth = 100;
+  const spriteHeight = 200;
+  const spriteScale = 3;
   let phaserSprite;
   let gridSprite: GridSprite;
   let xSetter;
@@ -10,7 +13,6 @@ describe("GridSprite", () => {
   let widthGetter;
   let heightGetter;
   let scaleGetter;
-  let scaleSetter;
   beforeEach(() => {
     phaserSprite = <any>{
       setOrigin: jest.fn(),
@@ -21,10 +23,9 @@ describe("GridSprite", () => {
     xGetter = jest.fn(() => 42);
     ySetter = jest.fn();
     yGetter = jest.fn(() => 43);
-    widthGetter = jest.fn(() => 100);
-    heightGetter = jest.fn(() => 200);
-    scaleSetter = jest.fn();
-    scaleGetter = jest.fn(() => 3);
+    widthGetter = jest.fn(() => spriteWidth);
+    heightGetter = jest.fn(() => spriteHeight);
+    scaleGetter = jest.fn(() => spriteScale);
 
     Object.defineProperty(phaserSprite, "x", {
       get: xGetter,
@@ -42,7 +43,6 @@ describe("GridSprite", () => {
     });
     Object.defineProperty(phaserSprite, "scale", {
       get: scaleGetter,
-      set: scaleSetter,
     });
     gridSprite = new GridSprite(phaserSprite);
   });
@@ -65,21 +65,23 @@ describe("GridSprite", () => {
   });
 
   it("should delegate width", () => {
-    expect(gridSprite.width).toEqual(100);
+    expect(gridSprite.width).toEqual(spriteWidth);
   });
 
   it("should delegate height", () => {
-    expect(gridSprite.height).toEqual(200);
-  });
-
-  it("should delegate scale", () => {
-    gridSprite.scale = 4;
-    expect(scaleSetter).toHaveBeenCalledWith(4);
-    expect(gridSprite.scale).toEqual(3);
+    expect(gridSprite.height).toEqual(spriteHeight);
   });
 
   it("should delegate setDepth", () => {
     gridSprite.setDepth(42);
     expect(phaserSprite.setDepth).toHaveBeenCalledWith(42);
+  });
+
+  it("should get scaledWidth", () => {
+    expect(gridSprite.getScaledWidth()).toEqual(spriteWidth * spriteScale);
+  });
+
+  it("should get scaledHeight", () => {
+    expect(gridSprite.getScaledHeight()).toEqual(spriteHeight * spriteScale);
   });
 });

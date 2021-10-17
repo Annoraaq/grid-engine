@@ -109,12 +109,12 @@ export class GridCharacter {
     this.speed = speed;
   }
 
-  getSprite(): Phaser.GameObjects.Sprite {
-    return this.sprite.getRawSprite();
+  getSprite(): GridSprite {
+    return this.sprite;
   }
 
-  setSprite(sprite: Phaser.GameObjects.Sprite): void {
-    this._setSprite(new GridSprite(sprite));
+  setSprite(sprite: GridSprite): void {
+    this._setSprite(sprite);
   }
 
   setMovement(movement: Movement): void {
@@ -322,9 +322,8 @@ export class GridCharacter {
 
   private getOffset(): Vector2 {
     const offsetX =
-      this.tileSize.x / 2 -
-      Math.floor((this.sprite.width * this.sprite.scale) / 2);
-    const offsetY = -(this.sprite.height * this.sprite.scale) + this.tileSize.y;
+      this.tileSize.x / 2 - Math.floor(this.sprite.getScaledWidth() / 2);
+    const offsetY = -this.sprite.getScaledHeight() + this.tileSize.y;
     return new Vector2(offsetX, offsetY);
   }
 

@@ -27,6 +27,7 @@ import { Vector2 } from "./Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { Concrete } from "./Utils/TypeUtils";
+import { GridSprite } from "./GridSprite/GridSprite";
 
 export { Direction };
 
@@ -419,13 +420,13 @@ export class GridEngine {
   getSprite(charId: string): Phaser.GameObjects.Sprite {
     this.initGuard();
     this.unknownCharGuard(charId);
-    return this.gridCharacters.get(charId).getSprite();
+    return this.gridCharacters.get(charId).getSprite().getRawSprite();
   }
 
   setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void {
     this.initGuard();
     this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).setSprite(sprite);
+    this.gridCharacters.get(charId).setSprite(new GridSprite(sprite));
   }
 
   movementStarted(): Observable<{ charId: string; direction: Direction }> {

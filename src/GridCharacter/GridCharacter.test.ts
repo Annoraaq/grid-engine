@@ -154,16 +154,15 @@ describe("GridCharacter", () => {
 
   it("should set and get sprite", () => {
     const sprite = <any>{
-      setOrigin: jest.fn(),
       setDepth: jest.fn(),
+      getRawSprite: jest.fn().mockReturnValue("rawSprite"),
     };
     gridCharacter.setSprite(sprite);
-    expect(sprite.setOrigin).toHaveBeenCalledWith(0, 0);
 
     expect(gridCharacter.getSprite()).toBe(sprite);
     expect(gridCharacter.getSprite().x).toEqual(80);
     expect(gridCharacter.getSprite().y).toEqual(92);
-    expect(CharacterAnimation).toHaveBeenCalledWith(sprite, undefined, 3);
+    expect(CharacterAnimation).toHaveBeenCalledWith("rawSprite", undefined, 3);
     expect(mockCharacterAnimation.setIsEnabled).toHaveBeenCalledWith(true);
     expect(mockCharacterAnimation.setStandingFrame).toHaveBeenCalledWith(
       Direction.DOWN

@@ -57,6 +57,12 @@ const mockGridTilemapConstructor = jest.fn(function (
   return mockGridTileMap;
 });
 
+const mockGridSprite = {};
+
+const mockSpriteConstructor = jest.fn(function (_rawSprite) {
+  return mockGridSprite;
+});
+
 expect.extend({
   toBeCharacter(receivedChar: GridCharacter, expectedCharId: string) {
     const pass = receivedChar.getId() == expectedCharId;
@@ -79,6 +85,12 @@ expect.extend({
 jest.mock("./GridTilemap/GridTilemap", function () {
   return {
     GridTilemap: mockGridTilemapConstructor,
+  };
+});
+
+jest.mock("./GridSprite/GridSprite", function () {
+  return {
+    GridSprite: mockSpriteConstructor,
   };
 });
 
@@ -662,7 +674,10 @@ describe("GridEngine", () => {
   });
 
   it("should get sprite", () => {
-    mockGridCharacter.getSprite.mockReturnValue("sprite");
+    const mockSprite = {
+      getRawSprite: jest.fn().mockReturnValue("sprite"),
+    };
+    mockGridCharacter.getSprite.mockReturnValue(mockSprite);
 
     expect(gridEngine.getSprite("player")).toEqual("sprite");
   });
@@ -670,7 +685,8 @@ describe("GridEngine", () => {
   it("should set sprite", () => {
     gridEngine.setSprite("player", <any>"someSprite");
 
-    expect(mockGridCharacter.setSprite).toHaveBeenCalledWith("someSprite");
+    expect(mockSpriteConstructor).toHaveBeenCalledWith("someSprite");
+    expect(mockGridCharacter.setSprite).toHaveBeenCalledWith(mockGridSprite);
   });
 
   it("should get facing position", () => {
