@@ -54,6 +54,9 @@ describe("IsometricGridCharacter", () => {
       getTransition: jest.fn(),
       getTileWidth: jest.fn().mockReturnValue(TILE_WIDTH),
       getTileHeight: jest.fn().mockReturnValue(TILE_HEIGHT),
+      getTileSize: jest
+        .fn()
+        .mockReturnValue(new Vector2(TILE_WIDTH, TILE_HEIGHT)),
     };
     gridSpriteMock = <any>{
       getRawSprite: jest.fn(),

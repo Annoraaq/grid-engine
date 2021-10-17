@@ -109,6 +109,10 @@ export class GridTilemap {
     return rect.isInRange(pos);
   }
 
+  getTileSize(): Vector2 {
+    return new Vector2(this.getTileWidth(), this.getTileHeight());
+  }
+
   private isLayerBlockingAt(
     layer: Phaser.Tilemaps.LayerData,
     pos: Vector2,

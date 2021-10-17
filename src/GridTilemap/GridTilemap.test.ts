@@ -720,6 +720,15 @@ describe("GridTilemap", () => {
     expect(res).toEqual(false);
   });
 
+  it("should get tileSize", () => {
+    const scaleFactor = 3;
+    const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
+    const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
+    expect(gridTilemap.getTileSize()).toEqual(
+      new Vector2(scaledTileWidth, scaledTileHeight)
+    );
+  });
+
   describe("transitions", () => {
     it("should set transitions", () => {
       gridTilemap = new GridTilemap(tilemapMock);

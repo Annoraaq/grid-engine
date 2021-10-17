@@ -20,7 +20,7 @@ export class IsometricGridCharacter extends GridCharacter {
       case Direction.DOWN_RIGHT:
       case Direction.UP_LEFT:
       case Direction.UP_RIGHT:
-        return VectorUtils.scalarMult(this.tileSize, 0.5);
+        return VectorUtils.scalarMult(this.tilemap.getTileSize(), 0.5);
       default:
         return super.getTileDistance(direction);
     }

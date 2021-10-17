@@ -40,8 +40,8 @@ export interface CharConfig {
 }
 
 export class GridCharacter {
-  protected tileSize: Vector2;
   protected customOffset: Vector2;
+  protected tilemap: GridTilemap;
 
   private movementDirection = Direction.NONE;
   private tileSizePixelsWalked: Vector2 = Vector2.ZERO.clone();
@@ -56,7 +56,6 @@ export class GridCharacter {
   private sprite: GridSprite;
   private sprite2: Phaser.GameObjects.Sprite;
   private container?: Phaser.GameObjects.Container;
-  private tilemap: GridTilemap;
   private speed: number;
   private movementStarted$ = new Subject<Direction>();
   private movementStopped$ = new Subject<Direction>();
@@ -85,10 +84,6 @@ export class GridCharacter {
     this.speed = config.speed;
     this.collides = config.collides;
     this.customOffset = new Vector2(config.offsetX || 0, config.offsetY || 0);
-    this.tileSize = new Vector2(
-      this.tilemap.getTileWidth(),
-      this.tilemap.getTileHeight()
-    );
     this._tilePos.layer = config.charLayer;
 
     this.sprite = config.sprite;
@@ -287,11 +282,11 @@ export class GridCharacter {
   }
 
   protected tilePosToPixelPos(tilePosition: Vector2): Vector2 {
-    return tilePosition.clone().multiply(this.tileSize);
+    return tilePosition.clone().multiply(this.tilemap.getTileSize());
   }
 
   protected getTileDistance(_direction: Direction): Vector2 {
-    return this.tileSize.clone();
+    return this.tilemap.getTileSize();
   }
 
   protected toMapDirection(direction: Direction): Direction {
@@ -318,17 +313,19 @@ export class GridCharacter {
 
   private getOffset(): Vector2 {
     const offsetX =
-      this.tileSize.x / 2 - Math.floor(this.sprite.getScaledWidth() / 2);
-    const offsetY = -this.sprite.getScaledHeight() + this.tileSize.y;
+      this.tilemap.getTileWidth() / 2 -
+      Math.floor(this.sprite.getScaledWidth() / 2);
+    const offsetY =
+      -this.sprite.getScaledHeight() + this.tilemap.getTileHeight();
     return new Vector2(offsetX, offsetY);
   }
 
   private createSpeedPixelsPerSecond(): { [key in Direction]: Vector2 } {
     const speedPixelsPerSecond = {
-      [Direction.LEFT]: new Vector2(this.tileSize.x, 0),
-      [Direction.RIGHT]: new Vector2(this.tileSize.x, 0),
-      [Direction.UP]: new Vector2(0, this.tileSize.y),
-      [Direction.DOWN]: new Vector2(0, this.tileSize.y),
+      [Direction.LEFT]: new Vector2(this.tilemap.getTileWidth(), 0),
+      [Direction.RIGHT]: new Vector2(this.tilemap.getTileWidth(), 0),
+      [Direction.UP]: new Vector2(0, this.tilemap.getTileHeight()),
+      [Direction.DOWN]: new Vector2(0, this.tilemap.getTileHeight()),
       [Direction.UP_LEFT]: this.getTileDistance(Direction.UP_LEFT),
       [Direction.UP_RIGHT]: this.getTileDistance(Direction.UP_RIGHT),
       [Direction.DOWN_LEFT]: this.getTileDistance(Direction.DOWN_LEFT),
