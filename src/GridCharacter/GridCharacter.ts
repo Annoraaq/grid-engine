@@ -9,6 +9,7 @@ import { Position, WalkingAnimationMapping } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
+import { GridSprite } from "../GridSprite/GridSprite";
 
 export interface FrameRow {
   leftFoot: number;
@@ -53,7 +54,7 @@ export class GridCharacter {
     position: new Vector2(0, 0),
     layer: undefined,
   };
-  private sprite: Phaser.GameObjects.Sprite;
+  private sprite: GridSprite;
   private sprite2: Phaser.GameObjects.Sprite;
   private container?: Phaser.GameObjects.Container;
   private tilemap: GridTilemap;
@@ -89,7 +90,7 @@ export class GridCharacter {
 
     this._tilePos.layer = config.charLayer;
 
-    this.sprite = config.sprite;
+    this.sprite = new GridSprite(config.sprite);
     // this.sprite2 = config.sprite2;
     this._setSprite(this.sprite);
 
@@ -109,11 +110,11 @@ export class GridCharacter {
   }
 
   getSprite(): Phaser.GameObjects.Sprite {
-    return this.sprite;
+    return this.sprite.getRawSprite();
   }
 
   setSprite(sprite: Phaser.GameObjects.Sprite): void {
-    this._setSprite(sprite);
+    this._setSprite(new GridSprite(sprite));
   }
 
   setMovement(movement: Movement): void {
@@ -301,13 +302,12 @@ export class GridCharacter {
     return direction;
   }
 
-  private _setSprite(sprite: Phaser.GameObjects.Sprite): void {
-    sprite.setOrigin(0, 0);
+  private _setSprite(sprite: GridSprite): void {
     sprite.x = this.sprite.x;
     sprite.y = this.sprite.y;
     this.sprite = sprite;
     this.animation = new CharacterAnimation(
-      this.sprite,
+      this.sprite.getRawSprite(),
       this.walkingAnimationMapping,
       this.characterIndex
     );
