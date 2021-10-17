@@ -5,6 +5,7 @@ import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
+import { GridSprite } from "../GridSprite/GridSprite";
 
 const mockCharacterAnimation = {
   updateCharacterFrame: jest.fn(),
@@ -30,7 +31,7 @@ jest.mock("./CharacterAnimation/CharacterAnimation", function () {
 
 describe("GridCharacter", () => {
   let gridCharacter: GridCharacter;
-  let spriteMock: Phaser.GameObjects.Sprite;
+  let gridSpriteMock: GridSprite;
   let gridTilemapMock;
 
   const TILE_WIDTH = 16;
@@ -65,26 +66,16 @@ describe("GridCharacter", () => {
       getDepthOfCharLayer: jest.fn().mockReturnValue(DEPTH_OF_CHAR_LAYER),
       getTransition: jest.fn(),
     };
-    spriteMock = <any>{
-      width: 16,
-      scale: 1,
-      height: 20,
-      setFrame: jest.fn(),
+    gridSpriteMock = <any>{
+      getRawSprite: jest.fn(),
+      getScaledWidth: jest.fn().mockReturnValue(16),
+      getScaledHeight: jest.fn().mockReturnValue(20),
       setDepth: jest.fn(),
-      frame: { name: "anything" },
-      setOrigin: jest.fn(),
       x: 5 * TILE_WIDTH + PLAYER_X_OFFSET,
       y: 6 * TILE_HEIGHT + PLAYER_Y_OFFSET,
-      texture: {
-        source: [
-          {
-            width: 144,
-          },
-        ],
-      },
     };
     gridCharacter = new GridCharacter("player", {
-      sprite: spriteMock,
+      sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 3,
@@ -95,7 +86,7 @@ describe("GridCharacter", () => {
 
   it("should get init data", () => {
     gridCharacter = new GridCharacter("player", {
-      sprite: spriteMock,
+      sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 3,
@@ -109,7 +100,7 @@ describe("GridCharacter", () => {
 
   it("should get collision data", () => {
     gridCharacter = new GridCharacter("player", {
-      sprite: spriteMock,
+      sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 3,
@@ -118,7 +109,7 @@ describe("GridCharacter", () => {
     expect(gridCharacter.isColliding()).toEqual(true);
 
     gridCharacter = new GridCharacter("player", {
-      sprite: spriteMock,
+      sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 3,
@@ -128,8 +119,8 @@ describe("GridCharacter", () => {
   });
 
   it("should set the correct depth on construction", () => {
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(
-      DEPTH_OF_CHAR_LAYER + parseFloat("0.00000" + spriteMock.y)
+    expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
+      DEPTH_OF_CHAR_LAYER + parseFloat("0.00000" + gridSpriteMock.y)
     );
   });
 
@@ -143,7 +134,7 @@ describe("GridCharacter", () => {
     gridCharacter.setTilePosition({ position: newTilePos, layer: "someLayer" });
     newTilePos.x = 20;
 
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+    expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
       DEPTH_OF_CHAR_LAYER +
         parseFloat(
           "0.00000" + (expectedPos.position.y * TILE_HEIGHT + PLAYER_Y_OFFSET)
@@ -221,8 +212,8 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
 
     gridCharacter.update(300);
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
-    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
+    expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+    expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
   });
 
   it("should not move if no direction", () => {
@@ -237,12 +228,12 @@ describe("GridCharacter", () => {
     gridCharacter.move(Direction.UP);
     gridCharacter.update(MS_FOR_12_PX / 2);
 
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
-    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 6);
+    expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+    expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 6);
 
     gridCharacter.setSpeed(1.5);
     gridCharacter.update(MS_FOR_12_PX / 2);
-    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 9);
+    expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 9);
   });
 
   it("should update depth with nextTilePos when staying on char layer", () => {
@@ -257,7 +248,7 @@ describe("GridCharacter", () => {
     gridCharacter.move(Direction.UP);
     gridCharacter.update(MS_FOR_12_PX);
 
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+    expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
       DEPTH_OF_CHAR_LAYER + parseFloat("0.00000" + (INITIAL_SPRITE_Y_POS - 12))
     );
   });
@@ -280,7 +271,7 @@ describe("GridCharacter", () => {
     gridCharacter.move(Direction.UP);
     gridCharacter.update(MS_FOR_12_PX);
 
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+    expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
       DEPTH_OF_CHAR_LAYER -
         1 +
         parseFloat("0.00000" + (INITIAL_SPRITE_Y_POS - 12))
@@ -305,7 +296,7 @@ describe("GridCharacter", () => {
     gridCharacter.move(Direction.UP);
     gridCharacter.update(MS_FOR_12_PX);
 
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+    expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
       DEPTH_OF_CHAR_LAYER + parseFloat("0.00000" + (INITIAL_SPRITE_Y_POS - 12))
     );
   });
@@ -316,11 +307,11 @@ describe("GridCharacter", () => {
     gridCharacter.move(Direction.UP);
     gridCharacter.update(MS_FOR_12_PX);
 
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
-    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 12);
+    expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+    expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 12);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+    expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
       DEPTH_OF_CHAR_LAYER + parseFloat("0.00000" + (INITIAL_SPRITE_Y_POS - 12))
     );
   });
@@ -331,11 +322,11 @@ describe("GridCharacter", () => {
     gridCharacter.move(Direction.RIGHT);
     gridCharacter.update(MS_FOR_12_PX);
 
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 12);
-    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
+    expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 12);
+    expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.RIGHT);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+    expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
       DEPTH_OF_CHAR_LAYER + parseFloat("0.00000" + INITIAL_SPRITE_Y_POS)
     );
   });
@@ -346,11 +337,11 @@ describe("GridCharacter", () => {
     gridCharacter.move(Direction.DOWN_LEFT);
     gridCharacter.update(MS_FOR_12_PX);
 
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS - 12);
-    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS + 12);
+    expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS - 12);
+    expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS + 12);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN_LEFT);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN_LEFT);
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+    expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
       DEPTH_OF_CHAR_LAYER + parseFloat("0.0000" + (INITIAL_SPRITE_Y_POS + 12))
     );
   });
@@ -378,8 +369,8 @@ describe("GridCharacter", () => {
     gridCharacter.update(MS_FOR_12_PX);
     gridCharacter.update(MS_FOR_12_PX);
 
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
-    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 16);
+    expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+    expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - 16);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
   });
@@ -388,7 +379,7 @@ describe("GridCharacter", () => {
     const customOffsetX = 10;
     const customOffsetY = 15;
     gridCharacter = new GridCharacter("player", {
-      sprite: spriteMock,
+      sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 3,
@@ -401,10 +392,10 @@ describe("GridCharacter", () => {
       layer: "someLayer",
     });
 
-    expect(spriteMock.x).toEqual(
+    expect(gridSpriteMock.x).toEqual(
       3 * TILE_WIDTH + PLAYER_X_OFFSET + customOffsetX
     );
-    expect(spriteMock.y).toEqual(
+    expect(gridSpriteMock.y).toEqual(
       4 * TILE_HEIGHT + PLAYER_Y_OFFSET + customOffsetY
     );
   });
@@ -444,8 +435,8 @@ describe("GridCharacter", () => {
       enterLayer: "someLayer",
     });
 
-    expect(spriteMock.x).toEqual(3 * TILE_WIDTH + PLAYER_X_OFFSET);
-    expect(spriteMock.y).toEqual(4 * TILE_HEIGHT + PLAYER_Y_OFFSET);
+    expect(gridSpriteMock.x).toEqual(3 * TILE_WIDTH + PLAYER_X_OFFSET);
+    expect(gridSpriteMock.y).toEqual(4 * TILE_HEIGHT + PLAYER_Y_OFFSET);
   });
 
   it("should stop ongoing movement when stopping on positionChangeFinish", async () => {
@@ -606,8 +597,8 @@ describe("GridCharacter", () => {
     const { exitTile, enterTile } = await prom;
     expect(exitTile).toEqual(new Vector2(0, 0));
     expect(enterTile).toEqual(new Vector2(1, 0));
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 16);
-    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS + 8);
+    expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 16);
+    expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS + 8);
     expect(gridCharacter.getTilePos()).toEqual({
       position: new Vector2(1, 0),
       layer: undefined,
@@ -647,8 +638,8 @@ describe("GridCharacter", () => {
     gridCharacter.update(MS_FOR_12_PX);
     gridCharacter.move(Direction.DOWN);
     gridCharacter.update(MS_FOR_12_PX);
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 16);
-    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS + 8);
+    expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 16);
+    expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS + 8);
     expect(gridCharacter.getTilePos()).toEqual({
       position: new Vector2(1, 0),
       layer: undefined,
@@ -662,8 +653,8 @@ describe("GridCharacter", () => {
     gridCharacter.update(MS_FOR_12_PX);
     gridCharacter.move(Direction.RIGHT);
     gridCharacter.update(83.33333333333333333333333333333333333333);
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 0);
-    expect(Math.round(spriteMock.y)).toEqual(INITIAL_SPRITE_Y_POS + 16);
+    expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 0);
+    expect(Math.round(gridSpriteMock.y)).toEqual(INITIAL_SPRITE_Y_POS + 16);
     expect(gridCharacter.getTilePos()).toEqual({
       position: new Vector2(0, 1),
       layer: undefined,
@@ -678,8 +669,8 @@ describe("GridCharacter", () => {
     gridCharacter.update(MS_FOR_12_PX);
     gridCharacter.update(83.33333333333333333333333333333333333333);
 
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 0);
-    expect(Math.round(spriteMock.y)).toEqual(INITIAL_SPRITE_Y_POS + 16);
+    expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 0);
+    expect(Math.round(gridSpriteMock.y)).toEqual(INITIAL_SPRITE_Y_POS + 16);
     expect(gridCharacter.getTilePos()).toEqual({
       position: new Vector2(0, 1),
       layer: "transitionLayer",
@@ -783,7 +774,7 @@ describe("GridCharacter", () => {
 
     it("should not detect blocking direction if char does not collide", () => {
       gridCharacter = new GridCharacter("player", {
-        sprite: spriteMock,
+        sprite: gridSpriteMock,
         tilemap: gridTilemapMock,
         tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
         speed: 3,
@@ -934,7 +925,7 @@ describe("GridCharacter", () => {
         setDepth: jest.fn(),
       };
       gridCharacter = new GridCharacter("player", {
-        sprite: spriteMock,
+        sprite: gridSpriteMock,
         tilemap: gridTilemapMock,
         tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
         speed: 3,
@@ -947,12 +938,12 @@ describe("GridCharacter", () => {
     it("should update", () => {
       mockNonBlockingTile();
       const pixelsMovedThisUpdate = 12;
-      (<any>spriteMock.setDepth).mockReset();
+      (<any>gridSpriteMock.setDepth).mockReset();
 
       gridCharacter.move(Direction.UP);
       gridCharacter.update(MS_FOR_12_PX);
 
-      expect(spriteMock.setDepth).not.toHaveBeenCalled();
+      expect(gridSpriteMock.setDepth).not.toHaveBeenCalled();
       expect(containerMock.setDepth).toHaveBeenCalledWith(
         DEPTH_OF_CHAR_LAYER +
           parseFloat("0.00000" + (6 * TILE_HEIGHT - pixelsMovedThisUpdate))
@@ -970,8 +961,8 @@ describe("GridCharacter", () => {
 
       expect(containerMock.x).toEqual(3 * TILE_WIDTH + PLAYER_X_OFFSET);
       expect(containerMock.y).toEqual(4 * TILE_HEIGHT + PLAYER_Y_OFFSET);
-      expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
-      expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
+      expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+      expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
     });
   });
 });

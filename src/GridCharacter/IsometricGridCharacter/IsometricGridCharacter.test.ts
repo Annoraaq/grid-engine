@@ -1,7 +1,7 @@
 import { Direction } from "../../Direction/Direction";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { IsometricGridCharacter } from "./IsometricGridCharacter";
-import * as Phaser from "phaser";
+import { GridSprite } from "../../GridSprite/GridSprite";
 
 const mockCharacterAnimation = {
   updateCharacterFrame: jest.fn(),
@@ -26,7 +26,7 @@ jest.mock("../CharacterAnimation/CharacterAnimation", function () {
 
 describe("IsometricGridCharacter", () => {
   let gridCharacter: IsometricGridCharacter;
-  let spriteMock: Phaser.GameObjects.Sprite;
+  let gridSpriteMock: GridSprite;
   let gridTilemapMock;
 
   const TILE_WIDTH = 32;
@@ -56,26 +56,16 @@ describe("IsometricGridCharacter", () => {
       getDepthOfCharLayer: jest.fn().mockReturnValue(DEPTH_OF_CHAR_LAYER),
       getTransition: jest.fn(),
     };
-    spriteMock = <any>{
-      width: 16,
-      scale: 1,
-      height: 20,
-      setFrame: jest.fn(),
+    gridSpriteMock = <any>{
+      getRawSprite: jest.fn(),
+      getScaledWidth: jest.fn().mockReturnValue(16),
+      getScaledHeight: jest.fn().mockReturnValue(20),
       setDepth: jest.fn(),
-      frame: { name: "anything" },
-      setOrigin: jest.fn(),
       x: (5 * TILE_WIDTH) / 2 + PLAYER_X_OFFSET,
       y: (6 * TILE_HEIGHT) / 2 + PLAYER_Y_OFFSET,
-      texture: {
-        source: [
-          {
-            width: 144,
-          },
-        ],
-      },
     };
     gridCharacter = new IsometricGridCharacter("player", {
-      sprite: spriteMock,
+      sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 1,
@@ -88,7 +78,7 @@ describe("IsometricGridCharacter", () => {
     const customOffsetX = 10;
     const customOffsetY = 15;
     gridCharacter = new IsometricGridCharacter("player", {
-      sprite: spriteMock,
+      sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
       tileSize: new Vector2(TILE_WIDTH, TILE_HEIGHT),
       speed: 1,
@@ -101,10 +91,10 @@ describe("IsometricGridCharacter", () => {
       layer: "someLayer",
     });
 
-    expect(spriteMock.x).toEqual(
+    expect(gridSpriteMock.x).toEqual(
       ((3 - 4) * TILE_WIDTH) / 2 + PLAYER_X_OFFSET + customOffsetX
     );
-    expect(spriteMock.y).toEqual(
+    expect(gridSpriteMock.y).toEqual(
       ((3 + 4) * TILE_HEIGHT) / 2 + PLAYER_Y_OFFSET + customOffsetY
     );
   });
@@ -121,17 +111,17 @@ describe("IsometricGridCharacter", () => {
 
     mockNonBlockingTile();
 
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
-    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
+    expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+    expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
 
     gridCharacter.move(Direction.UP_RIGHT);
     gridCharacter.update(1000 * tileAmountToWalk);
 
-    expect(spriteMock.x).toEqual(expectedXPos);
-    expect(spriteMock.y).toEqual(expectedYPos);
+    expect(gridSpriteMock.x).toEqual(expectedXPos);
+    expect(gridSpriteMock.y).toEqual(expectedYPos);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP_RIGHT);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP_RIGHT);
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+    expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
       DEPTH_OF_CHAR_LAYER + expectedNewYPosDepthOffset
     );
   });
@@ -146,17 +136,17 @@ describe("IsometricGridCharacter", () => {
 
     mockNonBlockingTile();
 
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
-    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
+    expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+    expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
 
     gridCharacter.move(Direction.UP);
     gridCharacter.update(1000 * tileAmountToWalk);
 
-    expect(spriteMock.x).toEqual(expectedXPos);
-    expect(spriteMock.y).toEqual(expectedYPos);
+    expect(gridSpriteMock.x).toEqual(expectedXPos);
+    expect(gridSpriteMock.y).toEqual(expectedYPos);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+    expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
       DEPTH_OF_CHAR_LAYER + expectedNewYPosDepthOffset
     );
   });
@@ -170,17 +160,17 @@ describe("IsometricGridCharacter", () => {
     const expectedNewYPosDepthOffset = 0.0000076;
     mockNonBlockingTile();
 
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
-    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
+    expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
+    expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
 
     gridCharacter.move(Direction.LEFT);
     gridCharacter.update(1000 * tileAmountToWalk);
 
-    expect(spriteMock.x).toEqual(expectedXPos);
-    expect(spriteMock.y).toEqual(expectedYPos);
+    expect(gridSpriteMock.x).toEqual(expectedXPos);
+    expect(gridSpriteMock.y).toEqual(expectedYPos);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.LEFT);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
-    expect(spriteMock.setDepth).toHaveBeenCalledWith(
+    expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
       DEPTH_OF_CHAR_LAYER + expectedNewYPosDepthOffset
     );
   });
@@ -225,8 +215,8 @@ describe("IsometricGridCharacter", () => {
     gridCharacter.update(750);
     gridCharacter.update(750);
 
-    expect(spriteMock.x).toEqual(INITIAL_SPRITE_X_POS + TILE_WIDTH / 2);
-    expect(spriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - TILE_HEIGHT / 2);
+    expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS + TILE_WIDTH / 2);
+    expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS - TILE_HEIGHT / 2);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP_RIGHT);
   });

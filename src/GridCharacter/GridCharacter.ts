@@ -27,7 +27,7 @@ export interface PositionChange {
 }
 
 export interface CharConfig {
-  sprite: Phaser.GameObjects.Sprite;
+  sprite: GridSprite;
   // sprite2: Phaser.GameObjects.Sprite;
   tilemap: GridTilemap;
   tileSize: Vector2;
@@ -90,7 +90,7 @@ export class GridCharacter {
 
     this._tilePos.layer = config.charLayer;
 
-    this.sprite = new GridSprite(config.sprite);
+    this.sprite = config.sprite;
     // this.sprite2 = config.sprite2;
     this._setSprite(this.sprite);
 

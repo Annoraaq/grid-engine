@@ -257,7 +257,7 @@ export class GridEngine {
     // );
 
     const charConfig: CharConfig = {
-      sprite: charData.sprite,
+      sprite: new GridSprite(charData.sprite),
       // sprite2,
       speed: charData.speed || 4,
       tilemap: this.gridTilemap,

@@ -242,7 +242,7 @@ describe("GridEngine", () => {
       ],
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
-      sprite: playerSpriteMock,
+      sprite: mockGridSprite,
       tilemap: mockGridTileMap,
       tileSize: new Vector2(32, 32),
       speed: 4,
