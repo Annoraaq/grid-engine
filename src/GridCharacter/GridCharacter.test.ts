@@ -703,11 +703,11 @@ describe("GridCharacter", () => {
       .pipe(take(1))
       .toPromise();
     gridCharacter.setMovement(movement);
-    await autoMovementSet;
+    const res = await autoMovementSet;
     gridCharacter.update(100);
     expect(movement.update).toHaveBeenCalledWith(100);
     expect(gridCharacter.getMovement()).toEqual(movement);
-    expect(movement.setCharacter).toHaveBeenCalledWith(gridCharacter);
+    expect(res).toBe(movement);
   });
 
   it("should set movement to undefined", () => {

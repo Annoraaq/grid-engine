@@ -169,7 +169,11 @@ export class GridEngine {
   moveRandomly(charId: string, delay = 0, radius = -1): void {
     this.initGuard();
     this.unknownCharGuard(charId);
-    const randomMovement = new RandomMovement(delay, radius);
+    const randomMovement = new RandomMovement(
+      this.gridCharacters.get(charId),
+      delay,
+      radius
+    );
     randomMovement.setNumberOfDirections(GlobalConfig.get().numberOfDirections);
     this.gridCharacters.get(charId).setMovement(randomMovement);
   }
@@ -184,6 +188,7 @@ export class GridEngine {
     this.initGuard();
     this.unknownCharGuard(charId);
     const targetMovement = new TargetMovement(
+      this.gridCharacters.get(charId),
       this.gridTilemap,
       {
         position: new Vector2(targetPos),
@@ -191,10 +196,10 @@ export class GridEngine {
           config?.targetLayer ||
           this.gridCharacters.get(charId).getNextTilePos().layer,
       },
+      GlobalConfig.get().numberOfDirections,
       0,
       moveToConfig
     );
-    targetMovement.setNumberOfDirections(GlobalConfig.get().numberOfDirections);
     this.gridCharacters.get(charId).setMovement(targetMovement);
     return targetMovement.finishedObs().pipe(
       take(1),
@@ -364,14 +369,15 @@ export class GridEngine {
     this.unknownCharGuard(charId);
     this.unknownCharGuard(charIdToFollow);
     const followMovement = new FollowMovement(
+      this.gridCharacters.get(charId),
       this.gridTilemap,
       this.gridCharacters.get(charIdToFollow),
+      GlobalConfig.get().numberOfDirections,
       distance,
       closestPointIfBlocked
         ? NoPathFoundStrategy.CLOSEST_REACHABLE
         : NoPathFoundStrategy.STOP
     );
-    followMovement.setNumberOfDirections(GlobalConfig.get().numberOfDirections);
     this.gridCharacters.get(charId).setMovement(followMovement);
   }
 

@@ -9,7 +9,6 @@ import { DistanceUtils8 } from "../../Utils/DistanceUtils8/DistanceUtils8";
 import { DistanceUtils4 } from "../../Utils/DistanceUtils4/DistanceUtils4";
 
 export class RandomMovement implements Movement {
-  private character: GridCharacter;
   private delayLeft: number;
   private initialRow: number;
   private initialCol: number;
@@ -19,19 +18,11 @@ export class RandomMovement implements Movement {
   private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR;
   private distanceUtils: DistanceUtils = new DistanceUtils4();
 
-  constructor(private delay = 0, private radius = -1) {}
-
-  setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
-    this.numberOfDirections = numberOfDirections;
-    if (numberOfDirections === NumberOfDirections.EIGHT) {
-      this.distanceUtils = new DistanceUtils8();
-    } else {
-      this.distanceUtils = new DistanceUtils4();
-    }
-  }
-
-  setCharacter(character: GridCharacter): void {
-    this.character = character;
+  constructor(
+    private character: GridCharacter,
+    private delay = 0,
+    private radius = -1
+  ) {
     this.delayLeft = this.delay;
     this.initialRow = character.getNextTilePos().position.y;
     this.initialCol = character.getNextTilePos().position.x;
@@ -44,6 +35,15 @@ export class RandomMovement implements Movement {
       .subscribe(() => {
         this.stepsWalked++;
       });
+  }
+
+  setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
+    this.numberOfDirections = numberOfDirections;
+    if (numberOfDirections === NumberOfDirections.EIGHT) {
+      this.distanceUtils = new DistanceUtils8();
+    } else {
+      this.distanceUtils = new DistanceUtils4();
+    }
   }
 
   update(delta: number): void {

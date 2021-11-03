@@ -63,7 +63,7 @@ export class GridCharacter {
   private positionChangeStarted$ = new Subject<PositionChange>();
   private positionChangeFinished$ = new Subject<PositionChange>();
   private tilePositionSet$ = new Subject<LayerPosition>();
-  private autoMovementSet$ = new Subject<void>();
+  private autoMovementSet$ = new Subject<Movement>();
   private lastMovementImpulse = Direction.NONE;
   private facingDirection: Direction = Direction.DOWN;
   private animation: CharacterAnimation;
@@ -114,9 +114,8 @@ export class GridCharacter {
   }
 
   setMovement(movement: Movement): void {
-    this.autoMovementSet$.next();
+    this.autoMovementSet$.next(movement);
     this.movement = movement;
-    this.movement?.setCharacter(this);
   }
 
   getMovement(): Movement {
@@ -273,7 +272,7 @@ export class GridCharacter {
     return this.positionChangeFinished$;
   }
 
-  autoMovementSet(): Subject<void> {
+  autoMovementSet(): Subject<Movement> {
     return this.autoMovementSet$;
   }
 

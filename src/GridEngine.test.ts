@@ -40,7 +40,6 @@ const mockGridCharacter = {
 const mockFollowMovement = {
   setCharacter: jest.fn(),
   update: jest.fn(),
-  setNumberOfDirections: jest.fn(),
 };
 const mockGridTileMap = {
   addCharacter: jest.fn(),
@@ -128,7 +127,6 @@ const mockTargetMovement = {
   setCharacter: jest.fn(),
   update: jest.fn(),
   removeCharacter: jest.fn(),
-  setNumberOfDirections: jest.fn(),
   finishedObs: jest.fn().mockReturnValue(of()),
 };
 
@@ -692,7 +690,12 @@ describe("GridEngine", () => {
 
   it("should move randomly", () => {
     gridEngine.moveRandomly("player", 123, 3);
-    expect(RandomMovement).toHaveBeenCalledWith(123, 3);
+    expect(RandomMovement).toHaveBeenCalledWith(
+      // @ts-ignore
+      expect.toBeCharacter("player"),
+      123,
+      3
+    );
     expect(mockRandomMovement.setNumberOfDirections).toHaveBeenCalledWith(
       NumberOfDirections.FOUR
     );
@@ -722,16 +725,16 @@ describe("GridEngine", () => {
       const targetVec = { position: new Vector2(3, 4), layer: "layer1" };
       gridEngine.moveTo("player", targetVec.position);
       expect(TargetMovement).toHaveBeenCalledWith(
+        // @ts-ignore
+        expect.toBeCharacter("player"),
         mockGridTileMap,
         { position: targetVec.position, layer: "someLayer" },
+        NumberOfDirections.FOUR,
         0,
         {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
         }
-      );
-      expect(mockTargetMovement.setNumberOfDirections).toHaveBeenCalledWith(
-        NumberOfDirections.FOUR
       );
       expect(mockGridCharacter.setMovement).toHaveBeenCalledWith(
         mockTargetMovement
@@ -745,8 +748,11 @@ describe("GridEngine", () => {
         targetLayer: "layer1",
       });
       expect(TargetMovement).toHaveBeenCalledWith(
+        // @ts-ignore
+        expect.toBeCharacter("player"),
         mockGridTileMap,
         targetVec,
+        NumberOfDirections.FOUR,
         0,
         {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
@@ -800,9 +806,11 @@ describe("GridEngine", () => {
         noPathFoundMaxRetries: 10,
       });
       expect(TargetMovement).toHaveBeenCalledWith(
-        mockGridTileMap,
-        expect.objectContaining({ position: targetVec }),
-        0,
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
         {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
@@ -818,9 +826,11 @@ describe("GridEngine", () => {
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
       });
       expect(TargetMovement).toHaveBeenCalledWith(
-        mockGridTileMap,
-        expect.objectContaining({ position: targetVec }),
-        0,
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
         {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
@@ -834,9 +844,11 @@ describe("GridEngine", () => {
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
       });
       expect(TargetMovement).toHaveBeenCalledWith(
-        mockGridTileMap,
-        expect.objectContaining({ position: targetVec }),
-        0,
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
         {
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
@@ -850,9 +862,11 @@ describe("GridEngine", () => {
         noPathFoundStrategy: <NoPathFoundStrategy>"unknown strategy",
       });
       expect(TargetMovement).toHaveBeenCalledWith(
-        mockGridTileMap,
-        expect.objectContaining({ position: targetVec }),
-        0,
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
         {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
@@ -870,9 +884,11 @@ describe("GridEngine", () => {
         pathBlockedStrategy: PathBlockedStrategy.WAIT,
       });
       expect(TargetMovement).toHaveBeenCalledWith(
-        mockGridTileMap,
-        expect.objectContaining({ position: targetVec }),
-        0,
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
         {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
@@ -887,9 +903,11 @@ describe("GridEngine", () => {
         pathBlockedStrategy: PathBlockedStrategy.RETRY,
       });
       expect(TargetMovement).toHaveBeenCalledWith(
-        mockGridTileMap,
-        expect.objectContaining({ position: targetVec }),
-        0,
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
         {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.RETRY,
@@ -904,9 +922,11 @@ describe("GridEngine", () => {
         pathBlockedStrategy: <PathBlockedStrategy>"unknown strategy",
       });
       expect(TargetMovement).toHaveBeenCalledWith(
-        mockGridTileMap,
-        expect.objectContaining({ position: targetVec }),
-        0,
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
         {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
@@ -1016,14 +1036,14 @@ describe("GridEngine", () => {
     });
     gridEngine.follow("player", "player2", 7, true);
     expect(FollowMovement).toHaveBeenCalledWith(
+      // @ts-ignore
+      expect.toBeCharacter("player"),
       mockGridTileMap,
       // @ts-ignore
       expect.toBeCharacter("player2"),
+      NumberOfDirections.FOUR,
       7,
       NoPathFoundStrategy.CLOSEST_REACHABLE
-    );
-    expect(mockFollowMovement.setNumberOfDirections).toHaveBeenCalledWith(
-      NumberOfDirections.FOUR
     );
     expect(mockGridCharacter.setMovement).toHaveBeenCalledWith(
       mockFollowMovement
@@ -1045,9 +1065,10 @@ describe("GridEngine", () => {
     });
     gridEngine.follow("player", "player2");
     expect(FollowMovement).toHaveBeenCalledWith(
-      mockGridTileMap,
-      // @ts-ignore
-      expect.toBeCharacter("player2"),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
       0,
       NoPathFoundStrategy.STOP
     );

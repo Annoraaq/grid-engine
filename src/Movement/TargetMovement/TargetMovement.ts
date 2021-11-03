@@ -1,8 +1,9 @@
+import { NumberOfDirections } from "./../../Direction/Direction";
 import { LayerPosition } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import { Direction, NumberOfDirections } from "../../Direction/Direction";
+import { Direction } from "../../Direction/Direction";
 import { Bfs } from "../../Pathfinding/Bfs/Bfs";
 import { Movement } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
@@ -13,7 +14,7 @@ import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
 import { ShortestPathAlgorithm } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Position } from "../../GridEngine";
-import { Subject, take } from "rxjs";
+import { filter, Subject, take } from "rxjs";
 
 export interface MoveToConfig {
   noPathFoundStrategy?: NoPathFoundStrategy;
@@ -44,7 +45,6 @@ export interface Finished {
 }
 
 export class TargetMovement implements Movement {
-  private character: GridCharacter;
   private shortestPath: LayerPosition[];
   private distOffset: number;
   private posOnPath = 0;
@@ -59,8 +59,10 @@ export class TargetMovement implements Movement {
   private finished$: Subject<Finished>;
 
   constructor(
+    private character: GridCharacter,
     private tilemap: GridTilemap,
     private targetPos: LayerPosition,
+    numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR,
     private distance = 0,
     config?: MoveToConfig
   ) {
@@ -82,8 +84,10 @@ export class TargetMovement implements Movement {
         this.stop(MoveToResult.PATH_BLOCKED_MAX_RETRIES_EXCEEDED);
       }
     );
+    this.setNumberOfDirections(numberOfDirections);
     this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
     this.finished$ = new Subject<Finished>();
+    this.setCharacter(character);
   }
 
   setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void {
@@ -94,7 +98,7 @@ export class TargetMovement implements Movement {
     return this.pathBlockedStrategy;
   }
 
-  setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
+  private setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
     if (numberOfDirections === NumberOfDirections.EIGHT) {
       this.distanceUtils = new DistanceUtils8();
     } else {
@@ -102,7 +106,7 @@ export class TargetMovement implements Movement {
     }
   }
 
-  setCharacter(character: GridCharacter): void {
+  private setCharacter(character: GridCharacter): void {
     this.character = character;
     this.noPathFoundRetryable.reset();
     this.pathBlockedRetryable.reset();
@@ -110,7 +114,10 @@ export class TargetMovement implements Movement {
     this.calcShortestPath();
     this.character
       .autoMovementSet()
-      .pipe(take(1))
+      .pipe(
+        take(1),
+        filter((movement) => movement !== this)
+      )
       .subscribe(() => {
         this.stop(MoveToResult.MOVEMENT_TERMINATED);
       });

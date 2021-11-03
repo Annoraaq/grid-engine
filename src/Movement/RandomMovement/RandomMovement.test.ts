@@ -19,7 +19,6 @@ describe("RandomMovement", () => {
   }
 
   beforeEach(() => {
-    randomMovement = new RandomMovement();
     positionChangeStartedSubject$ = new Subject();
     autoMovementSetSubject$ = new Subject();
     charMock = <any>{
@@ -37,18 +36,17 @@ describe("RandomMovement", () => {
         return this.autoMovementSetSubject$;
       },
     };
+    randomMovement = new RandomMovement(charMock);
   });
 
   it("should add and update character", () => {
     mockRandom(0.5);
-    randomMovement.setCharacter(charMock);
     randomMovement.update(5);
 
     expect(charMock.move).toHaveBeenCalledWith(Direction.DOWN);
   });
   it("should add and update character", () => {
-    randomMovement = new RandomMovement(10);
-    randomMovement.setCharacter(charMock);
+    randomMovement = new RandomMovement(charMock, 10);
     randomMovement.update(5);
 
     expect(charMock.move).not.toHaveBeenCalled();
@@ -62,17 +60,15 @@ describe("RandomMovement", () => {
     mockRandom(0.5);
 
     charMock.isBlockingDirection = () => true;
-    randomMovement.setCharacter(charMock);
     randomMovement.update(5);
 
     expect(charMock.move).toHaveBeenCalledWith(Direction.NONE);
   });
 
   it("should not move further than radius", () => {
-    randomMovement = new RandomMovement(0, 2);
+    randomMovement = new RandomMovement(charMock, 0, 2);
     mockRandom(0.5);
 
-    randomMovement.setCharacter(charMock);
     charMock.getNextTilePos = () => ({
       position: new Vector2(2, 2),
       layer: "layer1",
@@ -83,10 +79,9 @@ describe("RandomMovement", () => {
   });
 
   it("should move further than radius if radius is -1", () => {
-    randomMovement = new RandomMovement(0, -1);
+    randomMovement = new RandomMovement(charMock, 0, -1);
     mockRandom(0.5);
 
-    randomMovement.setCharacter(charMock);
     charMock.getNextTilePos = () => ({
       position: new Vector2(2, 2),
       layer: "layer1",
@@ -97,10 +92,8 @@ describe("RandomMovement", () => {
   });
 
   it("should continue moving if in radius and step size", () => {
-    randomMovement = new RandomMovement(0, 2);
+    randomMovement = new RandomMovement(charMock, 0, 2);
     mockRandom(0.7);
-
-    randomMovement.setCharacter(charMock);
 
     // do first step down and set step size 2
     randomMovement.update(1);
@@ -123,9 +116,8 @@ describe("RandomMovement", () => {
   });
 
   it("should reset step size", () => {
-    randomMovement = new RandomMovement(0, 2);
+    randomMovement = new RandomMovement(charMock, 0, 2);
     mockRandom(0.7); // dir: down, stepSize: 2
-    randomMovement.setCharacter(charMock);
 
     mockRandom(0.1); // dir: up, stepSize: 1
 
@@ -146,10 +138,8 @@ describe("RandomMovement", () => {
   });
 
   it("should not continue moving if direction blocked", () => {
-    randomMovement = new RandomMovement(50, 2);
+    randomMovement = new RandomMovement(charMock, 50, 2);
     mockRandom(0.7);
-
-    randomMovement.setCharacter(charMock);
 
     // do first step down and set step size 2
     randomMovement.update(60);
@@ -164,10 +154,8 @@ describe("RandomMovement", () => {
   });
 
   it("should not continue moving if direction is out of radius", () => {
-    randomMovement = new RandomMovement(50, 2);
+    randomMovement = new RandomMovement(charMock, 50, 2);
     mockRandom(0.7);
-
-    randomMovement.setCharacter(charMock);
 
     // do first step down and set step size 2
     randomMovement.update(60);
@@ -184,9 +172,8 @@ describe("RandomMovement", () => {
   });
 
   it("should unsubscribe from positionChangeStarted on autoMovementSet", () => {
-    randomMovement = new RandomMovement(0, 2);
+    randomMovement = new RandomMovement(charMock, 0, 2);
     mockRandom(0.7); // dir: down, stepSize: 2
-    randomMovement.setCharacter(charMock);
     // start moving down
     randomMovement.update(1);
     expect(charMock.move).toHaveBeenNthCalledWith(1, Direction.DOWN);
@@ -203,24 +190,22 @@ describe("RandomMovement", () => {
 
   describe("8 directions", () => {
     beforeEach(() => {
-      randomMovement = new RandomMovement();
+      randomMovement = new RandomMovement(charMock);
       randomMovement.setNumberOfDirections(NumberOfDirections.EIGHT);
     });
 
     it("should add and update character", () => {
       mockRandom(0.7);
-      randomMovement.setCharacter(charMock);
       randomMovement.update(5);
 
       expect(charMock.move).toHaveBeenCalledWith(Direction.DOWN_RIGHT);
     });
 
     it("should not move further than radius", () => {
-      randomMovement = new RandomMovement(0, 2);
+      randomMovement = new RandomMovement(charMock, 0, 2);
       randomMovement.setNumberOfDirections(NumberOfDirections.EIGHT);
       mockRandom(0.7);
 
-      randomMovement.setCharacter(charMock);
       charMock.getNextTilePos = () => ({
         position: new Vector2(4, 4),
         layer: "layer1",
