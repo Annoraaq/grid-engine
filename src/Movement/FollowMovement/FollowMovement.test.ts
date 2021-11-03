@@ -43,6 +43,7 @@ describe("FollowMovement", () => {
   }
 
   beforeEach(() => {
+    jest.clearAllMocks();
     gridTilemapMock = {
       hasBlockingTile: jest.fn(),
       hasNoTile: jest.fn(),
@@ -96,21 +97,29 @@ describe("FollowMovement", () => {
   });
 
   it("should not update target on position change after autoMovementSet", () => {
+    // @ts-ignore
+    TargetMovement.mockClear();
     const enterTile = new Vector2(7, 7);
     mockTargetMovement.setNumberOfDirections.mockReset();
     mockTargetMovement.setCharacter.mockReset();
 
-    mockChar.autoMovementSetSubject$.next();
+    mockChar.autoMovementSetSubject$.next(undefined);
     targetChar.positionChangeStartedSubject$.next({ enterTile });
 
-    expect(TargetMovement).not.toHaveBeenCalledWith(
-      gridTilemapMock,
-      enterTile,
-      NumberOfDirections.FOUR,
-      1,
-      { noPathFoundStrategy: NoPathFoundStrategy.STOP }
-    );
-    expect(mockTargetMovement.setCharacter).not.toHaveBeenCalledWith(mockChar);
+    expect(TargetMovement).not.toHaveBeenCalled();
+  });
+
+  it("should update target on position change after autoMovementSet if movement is the same", () => {
+    // @ts-ignore
+    TargetMovement.mockClear();
+    const enterTile = new Vector2(7, 7);
+    mockTargetMovement.setNumberOfDirections.mockReset();
+    mockTargetMovement.setCharacter.mockReset();
+
+    mockChar.autoMovementSetSubject$.next(followMovement);
+    targetChar.positionChangeStartedSubject$.next({ enterTile });
+
+    expect(TargetMovement).toHaveBeenCalled();
   });
 
   it("should update added character with distance", () => {
