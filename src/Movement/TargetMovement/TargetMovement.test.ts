@@ -1164,7 +1164,6 @@ describe("TargetMovement", () => {
         path: [],
         targetPos,
       });
-      // targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
     });
 
     it("should fire when char gets new movement", () => {
@@ -1183,6 +1182,18 @@ describe("TargetMovement", () => {
           "Movement of character has been replaced before destination was reached.",
         layer: "layer1",
       });
+    });
+
+    it("should not fire when char gets same movement", () => {
+      const autoMovementSet$ = new Subject();
+      mockChar.autoMovementSet.mockReturnValue(autoMovementSet$);
+      const targetPos = layerPos(new Vector2(3, 3));
+      targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
+      const mockCall = jest.fn();
+      targetMovement.finishedObs().subscribe(mockCall);
+
+      autoMovementSet$.next(targetMovement);
+      expect(mockCall).not.toHaveBeenCalled();
     });
 
     it("should complete when char gets new movement", () => {
