@@ -1,12 +1,11 @@
+import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
 import { DistanceUtils } from "./../../Utils/DistanceUtils";
-import { getDirections, NumberOfDirections } from "./../../Direction/Direction";
+import { NumberOfDirections } from "./../../Direction/Direction";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Direction, directionVector } from "../../Direction/Direction";
 import { Movement } from "../Movement";
 import { takeUntil } from "rxjs/operators";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { DistanceUtils8 } from "../../Utils/DistanceUtils8/DistanceUtils8";
-import { DistanceUtils4 } from "../../Utils/DistanceUtils4/DistanceUtils4";
 
 export class RandomMovement implements Movement {
   private delayLeft: number;
@@ -15,11 +14,11 @@ export class RandomMovement implements Movement {
   private stepSize: number;
   private stepsWalked: number;
   private currentMovementDirection: Direction;
-  private distanceUtils: DistanceUtils = new DistanceUtils4();
+  private distanceUtils: DistanceUtils;
 
   constructor(
     private character: GridCharacter,
-    private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR,
+    numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR,
     private delay = 0,
     private radius = -1
   ) {
@@ -35,15 +34,7 @@ export class RandomMovement implements Movement {
       .subscribe(() => {
         this.stepsWalked++;
       });
-    this.setNumberOfDirections(this.numberOfDirections);
-  }
-
-  private setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
-    if (numberOfDirections === NumberOfDirections.EIGHT) {
-      this.distanceUtils = new DistanceUtils8();
-    } else {
-      this.distanceUtils = new DistanceUtils4();
-    }
+    this.distanceUtils = DistanceUtilsFactory.create(numberOfDirections);
   }
 
   update(delta: number): void {
@@ -72,9 +63,9 @@ export class RandomMovement implements Movement {
   }
 
   private getFreeDirections(): Direction[] {
-    const unblocked = getDirections(this.numberOfDirections).filter(
-      (dir) => !this.character.isBlockingDirection(dir)
-    );
+    const unblocked = this.distanceUtils
+      .getDirections()
+      .filter((dir) => !this.character.isBlockingDirection(dir));
 
     return unblocked.filter((dir) => this.isWithinRadius(dir));
   }

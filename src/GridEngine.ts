@@ -203,7 +203,7 @@ export class GridEngine {
     this.gridCharacters.get(charId).setMovement(targetMovement);
     return targetMovement.finishedObs().pipe(
       take(1),
-      map((finished) => ({
+      map((finished: Finished) => ({
         charId,
         position: finished.position,
         result: finished.result,

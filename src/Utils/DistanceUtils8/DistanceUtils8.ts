@@ -49,4 +49,17 @@ export class DistanceUtils8 implements DistanceUtils {
     }
     return Direction.NONE;
   }
+
+  getDirections(): Direction[] {
+    return [
+      Direction.UP,
+      Direction.RIGHT,
+      Direction.DOWN,
+      Direction.LEFT,
+      Direction.DOWN_LEFT,
+      Direction.DOWN_RIGHT,
+      Direction.UP_RIGHT,
+      Direction.UP_LEFT,
+    ];
+  }
 }

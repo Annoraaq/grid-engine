@@ -62,4 +62,20 @@ describe("DistanceUtils8", () => {
       );
     });
   });
+
+  describe("getDirections", () => {
+    it("should return the correct directions", () => {
+      const distanceUtils8 = new DistanceUtils8();
+      expect(distanceUtils8.getDirections()).toEqual([
+        Direction.UP,
+        Direction.RIGHT,
+        Direction.DOWN,
+        Direction.LEFT,
+        Direction.DOWN_LEFT,
+        Direction.DOWN_RIGHT,
+        Direction.UP_RIGHT,
+        Direction.UP_LEFT,
+      ]);
+    });
+  });
 });

@@ -1,3 +1,4 @@
+import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
 import { NumberOfDirections } from "./../../Direction/Direction";
 import { LayerPosition } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { DistanceUtils } from "./../../Utils/DistanceUtils";
@@ -8,8 +9,6 @@ import { Bfs } from "../../Pathfinding/Bfs/Bfs";
 import { Movement } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Retryable } from "./Retryable/Retryable";
-import { DistanceUtils8 } from "../../Utils/DistanceUtils8/DistanceUtils8";
-import { DistanceUtils4 } from "../../Utils/DistanceUtils4/DistanceUtils4";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
 import { ShortestPathAlgorithm } from "../../Pathfinding/ShortestPathAlgorithm";
@@ -55,7 +54,7 @@ export class TargetMovement implements Movement {
   private pathBlockedRetryable: Retryable;
   private pathBlockedWaitTimeoutMs: number;
   private pathBlockedWaitElapsed: number;
-  private distanceUtils: DistanceUtils = new DistanceUtils4();
+  private distanceUtils: DistanceUtils;
   private finished$: Subject<Finished>;
 
   constructor(
@@ -84,7 +83,7 @@ export class TargetMovement implements Movement {
         this.stop(MoveToResult.PATH_BLOCKED_MAX_RETRIES_EXCEEDED);
       }
     );
-    this.setNumberOfDirections(numberOfDirections);
+    this.distanceUtils = DistanceUtilsFactory.create(numberOfDirections);
     this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
     this.finished$ = new Subject<Finished>();
     this.setCharacter(character);
@@ -96,14 +95,6 @@ export class TargetMovement implements Movement {
 
   getPathBlockedStrategy(): PathBlockedStrategy {
     return this.pathBlockedStrategy;
-  }
-
-  private setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
-    if (numberOfDirections === NumberOfDirections.EIGHT) {
-      this.distanceUtils = new DistanceUtils8();
-    } else {
-      this.distanceUtils = new DistanceUtils4();
-    }
   }
 
   private setCharacter(character: GridCharacter): void {

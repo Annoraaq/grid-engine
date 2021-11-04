@@ -237,7 +237,6 @@ describe("RandomMovement", () => {
     });
 
     it("should not move further than radius", () => {
-      console.log("a");
       randomMovement = new RandomMovement(
         charMock,
         NumberOfDirections.EIGHT,

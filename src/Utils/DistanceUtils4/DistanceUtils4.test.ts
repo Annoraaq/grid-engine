@@ -77,4 +77,16 @@ describe("DistanceUtils4", () => {
       );
     });
   });
+
+  describe("getDirections", () => {
+    it("should return the correct directions", () => {
+      const distanceUtils4 = new DistanceUtils4();
+      expect(distanceUtils4.getDirections()).toEqual([
+        Direction.UP,
+        Direction.RIGHT,
+        Direction.DOWN,
+        Direction.LEFT,
+      ]);
+    });
+  });
 });
