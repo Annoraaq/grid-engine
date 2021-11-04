@@ -15,11 +15,11 @@ export class RandomMovement implements Movement {
   private stepSize: number;
   private stepsWalked: number;
   private currentMovementDirection: Direction;
-  private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR;
   private distanceUtils: DistanceUtils = new DistanceUtils4();
 
   constructor(
     private character: GridCharacter,
+    private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR,
     private delay = 0,
     private radius = -1
   ) {
@@ -35,10 +35,10 @@ export class RandomMovement implements Movement {
       .subscribe(() => {
         this.stepsWalked++;
       });
+    this.setNumberOfDirections(this.numberOfDirections);
   }
 
-  setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
-    this.numberOfDirections = numberOfDirections;
+  private setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
     if (numberOfDirections === NumberOfDirections.EIGHT) {
       this.distanceUtils = new DistanceUtils8();
     } else {

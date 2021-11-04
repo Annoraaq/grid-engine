@@ -171,10 +171,10 @@ export class GridEngine {
     this.unknownCharGuard(charId);
     const randomMovement = new RandomMovement(
       this.gridCharacters.get(charId),
+      GlobalConfig.get().numberOfDirections,
       delay,
       radius
     );
-    randomMovement.setNumberOfDirections(GlobalConfig.get().numberOfDirections);
     this.gridCharacters.get(charId).setMovement(randomMovement);
   }
 

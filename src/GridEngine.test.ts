@@ -693,30 +693,12 @@ describe("GridEngine", () => {
     expect(RandomMovement).toHaveBeenCalledWith(
       // @ts-ignore
       expect.toBeCharacter("player"),
+      NumberOfDirections.FOUR,
       123,
       3
     );
-    expect(mockRandomMovement.setNumberOfDirections).toHaveBeenCalledWith(
-      NumberOfDirections.FOUR
-    );
     expect(mockGridCharacter.setMovement).toHaveBeenCalledWith(
       mockRandomMovement
-    );
-  });
-
-  it("should move randomly with 8 directions", () => {
-    gridEngine.create(tileMapMock, {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-        },
-      ],
-      numberOfDirections: NumberOfDirections.EIGHT,
-    });
-    gridEngine.moveRandomly("player", 123, 3);
-    expect(mockRandomMovement.setNumberOfDirections).toHaveBeenCalledWith(
-      NumberOfDirections.EIGHT
     );
   });
 
