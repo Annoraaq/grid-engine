@@ -1,4 +1,5 @@
 /*eslint no-global-assign: "off"*/
+import { RandomUtils } from "./../../Utils/RandomUtils/RandomUtils";
 import { NumberOfDirections } from "./../../Direction/Direction";
 import { Direction } from "../../Direction/Direction";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
@@ -12,13 +13,24 @@ describe("RandomMovement", () => {
   let positionChangeStartedSubject$: Subject<any>;
   let autoMovementSetSubject$: Subject<any>;
 
-  function mockRandom(val: number) {
-    const mockMath = Object.create(Math);
-    mockMath.random = () => val;
-    Math = mockMath;
+  function mockDirDownStepSize3() {
+    RandomUtils.getRandomInt = jest.fn().mockReturnValue(2);
+  }
+
+  function mockDirRightStepSize2() {
+    RandomUtils.getRandomInt = jest.fn().mockReturnValue(1);
+  }
+
+  function mockDirUpStepSize1() {
+    RandomUtils.getRandomInt = jest.fn().mockReturnValue(0);
+  }
+
+  function mockDirDownRightStepSize6() {
+    RandomUtils.getRandomInt = jest.fn().mockReturnValue(5);
   }
 
   beforeEach(() => {
+    mockDirUpStepSize1();
     positionChangeStartedSubject$ = new Subject();
     autoMovementSetSubject$ = new Subject();
     charMock = <any>{
@@ -40,7 +52,7 @@ describe("RandomMovement", () => {
   });
 
   it("should add and update character", () => {
-    mockRandom(0.5);
+    mockDirDownStepSize3();
     randomMovement.update(5);
 
     expect(charMock.move).toHaveBeenCalledWith(Direction.DOWN);
@@ -58,7 +70,7 @@ describe("RandomMovement", () => {
   });
 
   it("should update only non-blocked characters", () => {
-    mockRandom(0.5);
+    mockDirDownStepSize3();
 
     charMock.isBlockingDirection = () => true;
     randomMovement.update(5);
@@ -73,7 +85,7 @@ describe("RandomMovement", () => {
       0,
       2
     );
-    mockRandom(0.5);
+    mockDirDownStepSize3();
 
     charMock.getNextTilePos = () => ({
       position: new Vector2(2, 2),
@@ -91,7 +103,7 @@ describe("RandomMovement", () => {
       0,
       -1
     );
-    mockRandom(0.5);
+    mockDirDownStepSize3();
 
     charMock.getNextTilePos = () => ({
       position: new Vector2(2, 2),
@@ -103,26 +115,27 @@ describe("RandomMovement", () => {
   });
 
   it("should continue moving if in radius and step size", () => {
+    RandomUtils.getRandomInt = jest.fn().mockReturnValue(1);
+    mockDirRightStepSize2();
+
     randomMovement = new RandomMovement(
       charMock,
       NumberOfDirections.FOUR,
       0,
       2
     );
-    mockRandom(0.7);
 
     // do first step down and set step size 2
     randomMovement.update(1);
     positionChangeStartedSubject$.next(undefined);
-    expect(charMock.move).toHaveBeenNthCalledWith(1, Direction.DOWN);
+    expect(charMock.move).toHaveBeenNthCalledWith(1, Direction.RIGHT);
 
-    // next random direction would be up
-    mockRandom(0.1);
+    mockDirUpStepSize1();
 
     // do next step which is still smaller than step size
     randomMovement.update(1);
     positionChangeStartedSubject$.next(undefined);
-    expect(charMock.move).toHaveBeenNthCalledWith(2, Direction.DOWN);
+    expect(charMock.move).toHaveBeenNthCalledWith(2, Direction.RIGHT);
 
     // do next step which exceeds step size. New random direction (up)
     // should be taken
@@ -132,15 +145,15 @@ describe("RandomMovement", () => {
   });
 
   it("should reset step size", () => {
+    mockDirRightStepSize2();
     randomMovement = new RandomMovement(
       charMock,
       NumberOfDirections.FOUR,
       0,
       2
     );
-    mockRandom(0.7); // dir: down, stepSize: 2
 
-    mockRandom(0.1); // dir: up, stepSize: 1
+    mockDirUpStepSize1();
 
     // set stepsWalked to 2
     positionChangeStartedSubject$.next(undefined);
@@ -150,7 +163,7 @@ describe("RandomMovement", () => {
     randomMovement.update(1);
     expect(charMock.move).toHaveBeenNthCalledWith(1, Direction.UP);
 
-    mockRandom(0.7); // dir: down, stepSize: 2
+    mockDirDownStepSize3();
 
     // set stepsWalked to 1
     positionChangeStartedSubject$.next(undefined);
@@ -165,7 +178,7 @@ describe("RandomMovement", () => {
       50,
       2
     );
-    mockRandom(0.7);
+    mockDirDownStepSize3();
 
     // do first step down and set step size 2
     randomMovement.update(60);
@@ -186,7 +199,8 @@ describe("RandomMovement", () => {
       50,
       2
     );
-    mockRandom(0.7);
+    // dir down
+    mockDirDownStepSize3();
 
     // do first step down and set step size 2
     randomMovement.update(60);
@@ -209,12 +223,12 @@ describe("RandomMovement", () => {
       0,
       2
     );
-    mockRandom(0.7); // dir: down, stepSize: 2
+    mockDirDownStepSize3();
     // start moving down
     randomMovement.update(1);
     expect(charMock.move).toHaveBeenNthCalledWith(1, Direction.DOWN);
 
-    mockRandom(0.1); // dir: up, stepSize: 1
+    mockDirUpStepSize1();
 
     autoMovementSetSubject$.next(undefined);
     positionChangeStartedSubject$.next(undefined);
@@ -230,7 +244,7 @@ describe("RandomMovement", () => {
     });
 
     it("should add and update character", () => {
-      mockRandom(0.7);
+      mockDirDownRightStepSize6();
       randomMovement.update(5);
 
       expect(charMock.move).toHaveBeenCalledWith(Direction.DOWN_RIGHT);
@@ -243,7 +257,7 @@ describe("RandomMovement", () => {
         0,
         2
       );
-      mockRandom(0.7);
+      mockDirRightStepSize2();
 
       charMock.getNextTilePos = () => ({
         position: new Vector2(4, 4),

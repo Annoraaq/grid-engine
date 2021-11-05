@@ -1,3 +1,4 @@
+import { RandomUtils } from "./../../Utils/RandomUtils/RandomUtils";
 import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
 import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { NumberOfDirections } from "./../../Direction/Direction";
@@ -25,7 +26,7 @@ export class RandomMovement implements Movement {
     this.delayLeft = this.delay;
     this.initialRow = character.getNextTilePos().position.y;
     this.initialCol = character.getNextTilePos().position.x;
-    this.stepSize = this.getRandomInt(this.radius) + 1;
+    this.randomizeStepSize();
     this.stepsWalked = 0;
     this.currentMovementDirection = Direction.NONE;
     this.character
@@ -48,7 +49,7 @@ export class RandomMovement implements Movement {
         this.stepsWalked = 0;
         this.character.move(dir);
         this.currentMovementDirection = dir;
-        this.stepSize = this.getRandomInt(this.radius) + 1;
+        this.randomizeStepSize();
       }
     }
   }
@@ -86,10 +87,10 @@ export class RandomMovement implements Movement {
   private getFreeRandomDirection(): Direction {
     const freeDirections = this.getFreeDirections();
     if (freeDirections.length == 0) return Direction.NONE;
-    return freeDirections[this.getRandomInt(freeDirections.length)];
+    return freeDirections[RandomUtils.getRandomInt(freeDirections.length)];
   }
 
-  private getRandomInt(max: number): number {
-    return Math.floor(Math.random() * Math.floor(max));
+  private randomizeStepSize(): void {
+    this.stepSize = RandomUtils.getRandomInt(this.radius) + 1;
   }
 }
