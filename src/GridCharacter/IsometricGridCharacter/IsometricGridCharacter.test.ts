@@ -61,6 +61,7 @@ describe("IsometricGridCharacter", () => {
       getTileDistance: jest
         .fn()
         .mockReturnValue(new Vector2(TILE_WIDTH, TILE_HEIGHT)),
+      toMapDirection: jest.fn().mockReturnValue(Direction.DOWN),
     };
     gridSpriteMock = <any>{
       getRawSprite: jest.fn(),
@@ -190,6 +191,7 @@ describe("IsometricGridCharacter", () => {
     const oppositeMapDirection = Direction.DOWN;
     gridTilemapMock.isBlocking.mockReturnValue(false);
     gridTilemapMock.tilePosToPixelPos.mockReturnValue(new Vector2(0, 0));
+    gridTilemapMock.toMapDirection.mockReturnValue(Direction.UP);
 
     gridCharacter.setTilePosition({
       position: new Vector2(3, 3),
@@ -200,6 +202,9 @@ describe("IsometricGridCharacter", () => {
     gridCharacter.update(10);
 
     const result = gridCharacter.isBlockingDirection(Direction.UP_RIGHT);
+    expect(gridTilemapMock.toMapDirection).toHaveBeenCalledWith(
+      Direction.UP_RIGHT
+    );
     expect(gridTilemapMock.isBlocking).toHaveBeenCalledWith(
       "someLayer",
       {

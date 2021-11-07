@@ -226,7 +226,7 @@ export class GridCharacter {
     return this.tilemap.isBlocking(
       layerInDirection,
       tilePosInDir,
-      oppositeDirection(this.toMapDirection(direction))
+      oppositeDirection(this.tilemap.toMapDirection(direction))
     );
   }
 
@@ -279,10 +279,6 @@ export class GridCharacter {
 
   isColliding(): boolean {
     return this.collides;
-  }
-
-  protected toMapDirection(direction: Direction): Direction {
-    return direction;
   }
 
   private _setSprite(sprite: GridSprite): void {
@@ -462,7 +458,7 @@ export class GridCharacter {
 
   private tilePosInDirection(direction: Direction): Vector2 {
     return this.nextTilePos.position.add(
-      directionVector(this.toMapDirection(direction))
+      directionVector(this.tilemap.toMapDirection(direction))
     );
   }
 

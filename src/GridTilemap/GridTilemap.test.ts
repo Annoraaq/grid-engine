@@ -762,6 +762,10 @@ describe("GridTilemap", () => {
     );
   });
 
+  it("should provide map direction", () => {
+    expect(gridTilemap.toMapDirection(Direction.DOWN)).toEqual(Direction.DOWN);
+  });
+
   describe("isometric", () => {
     const scaleFactor = 3;
 
@@ -786,6 +790,12 @@ describe("GridTilemap", () => {
       const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
       expect(gridTilemap.getTileDistance(Direction.DOWN_LEFT)).toEqual(
         new Vector2(scaledTileWidth * 0.5, scaledTileHeight * 0.5)
+      );
+    });
+
+    it("should provide map direction", () => {
+      expect(gridTilemap.toMapDirection(Direction.DOWN)).toEqual(
+        Direction.DOWN_RIGHT
       );
     });
   });

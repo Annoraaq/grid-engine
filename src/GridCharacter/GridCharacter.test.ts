@@ -70,6 +70,7 @@ describe("GridCharacter", () => {
       getTileDistance: jest
         .fn()
         .mockReturnValue(new Vector2(TILE_WIDTH, TILE_HEIGHT)),
+      toMapDirection: jest.fn().mockReturnValue(Direction.DOWN),
     };
     gridSpriteMock = <any>{
       getRawSprite: jest.fn(),
@@ -180,6 +181,8 @@ describe("GridCharacter", () => {
       .pipe(take(1))
       .toPromise();
 
+    gridTilemapMock.toMapDirection.mockReturnValue(Direction.UP);
+
     gridCharacter.move(Direction.UP);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
@@ -256,6 +259,7 @@ describe("GridCharacter", () => {
 
   it("should update depth with nextTilePos when lowering char layer", () => {
     mockNonBlockingTile();
+    gridTilemapMock.toMapDirection.mockReturnValue(Direction.UP);
     const nextTilePos = new Vector2(0, -1);
     gridTilemapMock.getTransition.mockImplementation((pos) => {
       if (pos.x == nextTilePos.x && pos.y == nextTilePos.y) {
@@ -596,8 +600,10 @@ describe("GridCharacter", () => {
       .pipe(take(1))
       .toPromise();
 
+    gridTilemapMock.toMapDirection.mockReturnValue(Direction.RIGHT);
     gridCharacter.move(Direction.RIGHT);
     gridCharacter.update(MS_FOR_12_PX);
+    gridTilemapMock.toMapDirection.mockReturnValue(Direction.DOWN);
     gridCharacter.move(Direction.DOWN);
     gridCharacter.update(MS_FOR_12_PX);
 
@@ -641,8 +647,10 @@ describe("GridCharacter", () => {
         done();
       });
 
+    gridTilemapMock.toMapDirection.mockReturnValue(Direction.RIGHT);
     gridCharacter.move(Direction.RIGHT);
     gridCharacter.update(MS_FOR_12_PX);
+    gridTilemapMock.toMapDirection.mockReturnValue(Direction.DOWN);
     gridCharacter.move(Direction.DOWN);
     gridCharacter.update(MS_FOR_12_PX);
     expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 16);
@@ -740,6 +748,7 @@ describe("GridCharacter", () => {
       const oppositeDirection = Direction.LEFT;
       gridTilemapMock.isBlocking.mockReturnValue(false);
 
+      gridTilemapMock.toMapDirection.mockReturnValue(Direction.RIGHT);
       gridCharacter.move(Direction.RIGHT);
       gridCharacter.update(10);
 
