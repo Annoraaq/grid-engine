@@ -100,24 +100,7 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getId()).toEqual("player");
     expect(gridCharacter.getSpeed()).toEqual(3);
     expect(gridCharacter.getTilePos().layer).toEqual("someLayer");
-  });
-
-  it("should get collision data", () => {
-    gridCharacter = new GridCharacter("player", {
-      sprite: gridSpriteMock,
-      tilemap: gridTilemapMock,
-      speed: 3,
-      collides: true,
-    });
     expect(gridCharacter.isColliding()).toEqual(true);
-
-    gridCharacter = new GridCharacter("player", {
-      sprite: gridSpriteMock,
-      tilemap: gridTilemapMock,
-      speed: 3,
-      collides: false,
-    });
-    expect(gridCharacter.isColliding()).toEqual(false);
   });
 
   it("should set the correct depth on construction", () => {
@@ -128,21 +111,6 @@ describe("GridCharacter", () => {
 
   it("should be facing down on construction by default", () => {
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
-  });
-
-  it("should get tile pos", () => {
-    const expectedPos = { position: new Vector2(5, 6), layer: "someLayer" };
-    const newTilePos = new Vector2(5, 6);
-    gridCharacter.setTilePosition({ position: newTilePos, layer: "someLayer" });
-    newTilePos.x = 20;
-
-    expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
-      DEPTH_OF_CHAR_LAYER +
-        parseFloat(
-          "0.00000" + (expectedPos.position.y * TILE_HEIGHT + PLAYER_Y_OFFSET)
-        )
-    );
-    expect(gridCharacter.getTilePos()).toEqual(expectedPos);
   });
 
   it("should set and get sprite", () => {
@@ -384,6 +352,7 @@ describe("GridCharacter", () => {
     const customOffsetX = 10;
     const customOffsetY = 15;
     const newTilePos = new Vector2(3, 4);
+    const expectedTilePos = { position: new Vector2(3, 4), layer: "someLayer" };
     const newPixelPos = new Vector2(10, 20);
     gridTilemapMock.tilePosToPixelPos.mockReturnValue(newPixelPos);
     gridCharacter = new GridCharacter("player", {
@@ -399,11 +368,21 @@ describe("GridCharacter", () => {
       layer: "someLayer",
     });
 
+    // mutate original object
+    newTilePos.x = 20;
+
     expect(gridSpriteMock.x).toEqual(
       newPixelPos.x + PLAYER_X_OFFSET + customOffsetX
     );
     expect(gridSpriteMock.y).toEqual(
       newPixelPos.y + PLAYER_Y_OFFSET + customOffsetY
+    );
+    expect(gridCharacter.getTilePos()).toEqual(expectedTilePos);
+    expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
+      DEPTH_OF_CHAR_LAYER +
+        parseFloat(
+          "0.00000" + (newPixelPos.y + PLAYER_Y_OFFSET + customOffsetY)
+        )
     );
   });
 

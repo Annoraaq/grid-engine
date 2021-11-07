@@ -144,29 +144,20 @@ export class GridCharacter {
     this.tilePositionSet$.next({
       ...tilePosition,
     });
-    this.positionChangeStarted$.next({
-      exitTile: this.tilePos.position,
-      enterTile: tilePosition.position,
-      exitLayer: this.tilePos.layer,
-      enterLayer: tilePosition.layer,
-    });
-    this.positionChangeFinished$.next({
-      exitTile: this.tilePos.position,
-      enterTile: tilePosition.position,
-      exitLayer: this.tilePos.layer,
-      enterLayer: tilePosition.layer,
-    });
+    this.nextTilePos = tilePosition;
+    this.fire(this.positionChangeStarted$, this.tilePos, this.nextTilePos);
+    this.fire(this.positionChangeFinished$, this.tilePos, this.nextTilePos);
     this.movementDirection = Direction.NONE;
     this.lastMovementImpulse = Direction.NONE;
-    this.nextTilePos = tilePosition;
+    // this.nextTilePos = tilePosition;
     this.tilePos = tilePosition;
-    this.updateZindex();
     this.setPosition(
       this.tilemap
         .tilePosToPixelPos(tilePosition.position)
         .add(this.getOffset())
         .add(this.customOffset)
     );
+    this.updateZindex();
   }
 
   getTilePos(): LayerPosition {
@@ -307,6 +298,40 @@ export class GridCharacter {
     const offsetY =
       -this.sprite.getScaledHeight() + this.tilemap.getTileHeight();
     return new Vector2(offsetX, offsetY);
+  }
+
+  private fire(
+    subject: Subject<PositionChange>,
+    { position: exitTile, layer: exitLayer }: LayerPosition,
+    { position: enterTile, layer: enterLayer }: LayerPosition
+  ): void {
+    subject.next({ exitTile, enterTile, exitLayer, enterLayer });
+  }
+
+  private updateCharacterPosition(delta: number): void {
+    const maxMovementForDelta = this.getSpeedPerDelta(delta);
+    const distToNextTile = this.getDistToNextTile();
+    const willCrossTileBorderThisUpdate =
+      distToNextTile.length() <= maxMovementForDelta.length();
+
+    const distToWalk = willCrossTileBorderThisUpdate
+      ? distToNextTile
+      : maxMovementForDelta;
+
+    this.moveCharacterSprite(distToWalk);
+
+    if (willCrossTileBorderThisUpdate) {
+      if (this.shouldContinueMoving()) {
+        this.fire(this.positionChangeFinished$, this.tilePos, this.nextTilePos);
+        this.startMoving(this.lastMovementImpulse);
+
+        this.updateCharacterPosition(
+          delta * this.getProportionWalked(maxMovementForDelta, distToNextTile)
+        );
+      } else {
+        this.stopMoving();
+      }
+    }
   }
 
   private createSpeedPixelsPerSecond(): { [key in Direction]: Vector2 } {
@@ -459,37 +484,6 @@ export class GridCharacter {
       .multiply(directionVector(this.movementDirection));
   }
 
-  private updateCharacterPosition(delta: number): void {
-    const maxMovementForDelta = this.getSpeedPerDelta(delta);
-    const distToNextTile = this.getDistToNextTile();
-    const willCrossTileBorderThisUpdate =
-      distToNextTile.length() <= maxMovementForDelta.length();
-
-    const distToWalk = willCrossTileBorderThisUpdate
-      ? distToNextTile
-      : maxMovementForDelta;
-
-    this.moveCharacterSprite(distToWalk);
-
-    if (willCrossTileBorderThisUpdate) {
-      if (this.shouldContinueMoving()) {
-        this.positionChangeFinished$.next({
-          exitTile: this.tilePos.position,
-          enterTile: this.nextTilePos.position,
-          exitLayer: this.tilePos.layer,
-          enterLayer: this.nextTilePos.layer,
-        });
-        this.startMoving(this.lastMovementImpulse);
-
-        this.updateCharacterPosition(
-          delta * this.getProportionWalked(maxMovementForDelta, distToNextTile)
-        );
-      } else {
-        this.stopMoving();
-      }
-    }
-  }
-
   private getProportionWalked(
     maxMovementForDelta: Vector2,
     distToNextTile: Vector2
@@ -542,12 +536,7 @@ export class GridCharacter {
     this.tilePos = this.nextTilePos;
     this.movementDirection = Direction.NONE;
     this.movementStopped$.next(lastMovementDir);
-    this.positionChangeFinished$.next({
-      exitTile: exitTile.position,
-      enterTile: enterTile.position,
-      exitLayer: exitTile.layer,
-      enterLayer: enterTile.layer,
-    });
+    this.fire(this.positionChangeFinished$, exitTile, enterTile);
   }
 
   private hasWalkedHalfATile(): boolean {
