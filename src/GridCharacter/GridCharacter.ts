@@ -414,10 +414,6 @@ export class GridCharacter {
     return floor / Math.pow(10, strPlaces);
   }
 
-  protected mapDepth(nextTilePos: LayerPosition): number {
-    return nextTilePos.position.y;
-  }
-
   private setPosition(position: Vector2): void {
     const gameObject = this.container || this.sprite;
     gameObject.x = position.x;
