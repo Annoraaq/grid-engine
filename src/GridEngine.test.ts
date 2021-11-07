@@ -4,7 +4,6 @@ import { Subject, of } from "rxjs";
 import { take } from "rxjs/operators";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { GridCharacter, PositionChange } from "./GridCharacter/GridCharacter";
-import * as Phaser from "phaser";
 
 const mockGridCharacter = {
   setTilePosition: jest.fn(),
@@ -48,6 +47,7 @@ const mockGridTileMap = {
   getTileHeight: () => 32,
   getTransition: jest.fn(),
   setTransition: jest.fn(),
+  isIsometric: jest.fn().mockReturnValue(false),
 };
 const mockGridTilemapConstructor = jest.fn(function (
   _tilemap,
@@ -173,7 +173,6 @@ describe("GridEngine", () => {
       ],
       tileWidth: 16,
       tileHeight: 16,
-      orientation: `${Phaser.Tilemaps.Orientation.ORTHOGONAL}`,
     };
     playerSpriteMock = {};
     mockTargetMovement.update.mockReset();
@@ -542,7 +541,7 @@ describe("GridEngine", () => {
 
   describe("move 4 dirs isometric", () => {
     it("should move player vertically", () => {
-      tileMapMock.orientation = `${Phaser.Tilemaps.Orientation.ISOMETRIC}`;
+      mockGridTileMap.isIsometric.mockReturnValue(true);
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -559,7 +558,7 @@ describe("GridEngine", () => {
 
     it("should show warn on orthogonal move", () => {
       console.warn = jest.fn();
-      tileMapMock.orientation = `${Phaser.Tilemaps.Orientation.ISOMETRIC}`;
+      mockGridTileMap.isIsometric.mockReturnValue(true);
       gridEngine.create(tileMapMock, {
         characters: [
           {

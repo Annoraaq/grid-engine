@@ -148,7 +148,7 @@ export class GridTilemap {
     return direction;
   }
 
-  private isIsometric(): boolean {
+  isIsometric(): boolean {
     // Against the documentation of phaser, tilemap seems to be a number instead
     // of a string. Therefore the intentional type coercion here.
     return (

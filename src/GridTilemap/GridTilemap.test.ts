@@ -766,11 +766,19 @@ describe("GridTilemap", () => {
     expect(gridTilemap.toMapDirection(Direction.DOWN)).toEqual(Direction.DOWN);
   });
 
+  it("should detect non-isometric maps", () => {
+    expect(gridTilemap.isIsometric()).toEqual(false);
+  });
+
   describe("isometric", () => {
     const scaleFactor = 3;
 
     beforeEach(() => {
       tilemapMock.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC;
+    });
+
+    it("should detect isometric maps", () => {
+      expect(gridTilemap.isIsometric()).toEqual(true);
     });
 
     it("should transform tile pos to pixel pos for isometric maps", () => {

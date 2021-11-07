@@ -494,12 +494,12 @@ export class GridEngine {
     this.unknownCharGuard(charId);
 
     if (GlobalConfig.get().numberOfDirections === NumberOfDirections.FOUR) {
-      if (!this._isIsometric() && isDiagonal(direction)) {
+      if (!this.gridTilemap.isIsometric() && isDiagonal(direction)) {
         console.warn(
           `GridEngine: Character '${charId}' can't be moved '${direction}' in 4 direction mode.`
         );
         return;
-      } else if (this._isIsometric() && !isDiagonal(direction)) {
+      } else if (this.gridTilemap.isIsometric() && !isDiagonal(direction)) {
         console.warn(
           `GridEngine: Character '${charId}' can't be moved '${direction}' in 4 direction isometric mode.`
         );
@@ -508,12 +508,6 @@ export class GridEngine {
     }
 
     this.gridCharacters.get(charId).move(direction);
-  }
-
-  private _isIsometric(): boolean {
-    return (
-      this.tilemap.orientation == `${Phaser.Tilemaps.Orientation.ISOMETRIC}`
-    );
   }
 
   private assembleMoveToConfig(config: MoveToConfig): MoveToConfig {
