@@ -1,6 +1,6 @@
+import { LayerPositionUtils } from "./../Utils/LayerPositionUtils/LayerPositionUtils";
 import { LayerPosition } from "./../Pathfinding/ShortestPathAlgorithm";
 import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
-import { VectorUtils } from "./../Utils/VectorUtils";
 import { directionVector, oppositeDirection } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
@@ -349,27 +349,22 @@ export class GridCharacter {
   }
 
   private set nextTilePos(newTilePos: LayerPosition) {
-    this._nextTilePos.position.x = newTilePos.position.x;
-    this._nextTilePos.position.y = newTilePos.position.y;
-    this._nextTilePos.layer = newTilePos.layer;
+    LayerPositionUtils.copyOver(newTilePos, this._nextTilePos);
   }
 
   private get tilePos(): LayerPosition {
-    return {
-      position: this._tilePos.position.clone(),
-      layer: this._tilePos.layer,
-    };
+    return LayerPositionUtils.clone(this._tilePos);
   }
 
   private set tilePos(newTilePos: LayerPosition) {
-    this._tilePos.position.x = newTilePos.position.x;
-    this._tilePos.position.y = newTilePos.position.y;
-    this._tilePos.layer = newTilePos.layer;
+    LayerPositionUtils.copyOver(newTilePos, this._tilePos);
+  }
+
+  private gameObject(): Phaser.GameObjects.Container | GridSprite {
+    return this.container || this.sprite;
   }
 
   private updateZindex() {
-    const gameObject = this.container || this.sprite;
-
     // get layer of top pos
     const trans =
       this.tilemap.getTransition(
@@ -407,29 +402,27 @@ export class GridCharacter {
     }
 
     if (levelingDown) {
-      gameObject.setDepth(
+      this.gameObject().setDepth(
         this.tilemap.getDepthOfCharLayer(this.nextTilePos.layer) +
-          Utils.shiftPad(gameObject.y, 7)
+          Utils.shiftPad(this.gameObject().y, 7)
       );
     } else {
-      gameObject.setDepth(
+      this.gameObject().setDepth(
         this.tilemap.getDepthOfCharLayer(this.tilePos.layer) +
-          Utils.shiftPad(gameObject.y, 7)
+          Utils.shiftPad(this.gameObject().y, 7)
       );
     }
   }
 
   private setPosition(position: Vector2): void {
-    const gameObject = this.container || this.sprite;
-    gameObject.x = position.x;
-    gameObject.y = position.y;
+    this.gameObject().x = position.x;
+    this.gameObject().y = position.y;
     // this.sprite.x = position.x;
     // this.sprite.y = position.y;
   }
 
   private getPosition(): Vector2 {
-    const gameObject = this.container || this.sprite;
-    return new Vector2(gameObject.x, gameObject.y);
+    return new Vector2(this.gameObject().x, this.gameObject().y);
   }
 
   private startMoving(direction: Direction): void {
