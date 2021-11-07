@@ -300,14 +300,6 @@ export class GridCharacter {
     return new Vector2(offsetX, offsetY);
   }
 
-  private fire(
-    subject: Subject<PositionChange>,
-    { position: exitTile, layer: exitLayer }: LayerPosition,
-    { position: enterTile, layer: enterLayer }: LayerPosition
-  ): void {
-    subject.next({ exitTile, enterTile, exitLayer, enterLayer });
-  }
-
   private updateCharacterPosition(delta: number): void {
     const maxMovementForDelta = this.getSpeedPerDelta(delta);
     const distToNextTile = this.getDistToNextTile();
@@ -375,18 +367,19 @@ export class GridCharacter {
         this.nextTilePos.layer
       ) ||
       this.tilemap.getTransition(
-        new Vector2({
-          ...this.nextTilePos.position,
-        }),
+        this.nextTilePos.position,
         this.nextTilePos.layer
       );
 
-    const levelingUp =
-      this.tilemap.getDepthOfCharLayer(this.tilePos.layer) <
-      this.tilemap.getDepthOfCharLayer(this.nextTilePos.layer);
-    const levelingDown =
-      this.tilemap.getDepthOfCharLayer(this.tilePos.layer) >
-      this.tilemap.getDepthOfCharLayer(this.nextTilePos.layer);
+    const tilePosLayerDepth = this.tilemap.getDepthOfCharLayer(
+      this.tilePos.layer
+    );
+    const nextTilePosLayerDepth = this.tilemap.getDepthOfCharLayer(
+      this.nextTilePos.layer
+    );
+    const levelingUp = tilePosLayerDepth < nextTilePosLayerDepth;
+    const levelingDown = tilePosLayerDepth > nextTilePosLayerDepth;
+
     const overlapUp =
       this.tilemap.getDepthOfCharLayer(this.nextTilePos.layer) <
       this.tilemap.getDepthOfCharLayer(trans);
@@ -401,17 +394,12 @@ export class GridCharacter {
       // this.sprite2.visible = false;
     }
 
-    if (levelingDown) {
-      this.gameObject().setDepth(
-        this.tilemap.getDepthOfCharLayer(this.nextTilePos.layer) +
-          Utils.shiftPad(this.gameObject().y, 7)
-      );
-    } else {
-      this.gameObject().setDepth(
-        this.tilemap.getDepthOfCharLayer(this.tilePos.layer) +
-          Utils.shiftPad(this.gameObject().y, 7)
-      );
-    }
+    let layer = this.tilePos.layer;
+    if (levelingDown) layer = this.nextTilePos.layer;
+    this.gameObject().setDepth(
+      this.tilemap.getDepthOfCharLayer(layer) +
+        Utils.shiftPad(this.gameObject().y, 7)
+    );
   }
 
   private setPosition(position: Vector2): void {
@@ -486,18 +474,14 @@ export class GridCharacter {
   private moveCharacterSprite(speed: Vector2): void {
     const newPlayerPos = this.getPosition().add(speed);
     this.setPosition(newPlayerPos);
-    this.tileSizePixelsWalked.x += Math.abs(speed.x);
-    this.tileSizePixelsWalked.y += Math.abs(speed.y);
+    this.tileSizePixelsWalked = this.tileSizePixelsWalked
+      .add(speed.abs())
+      .modulo(this.tilemap.getTileDistance(this.movementDirection));
+
     this.animation.updateCharacterFrame(
       this.movementDirection,
       this.hasWalkedHalfATile()
     );
-    this.tileSizePixelsWalked.x %= this.tilemap.getTileDistance(
-      this.movementDirection
-    ).x;
-    this.tileSizePixelsWalked.y %= this.tilemap.getTileDistance(
-      this.movementDirection
-    ).y;
   }
 
   private stopMoving(): void {
@@ -518,5 +502,13 @@ export class GridCharacter {
       this.tileSizePixelsWalked.y >
         this.tilemap.getTileDistance(this.movementDirection).y / 2
     );
+  }
+
+  private fire(
+    subject: Subject<PositionChange>,
+    { position: exitTile, layer: exitLayer }: LayerPosition,
+    { position: enterTile, layer: enterLayer }: LayerPosition
+  ): void {
+    subject.next({ exitTile, enterTile, exitLayer, enterLayer });
   }
 }

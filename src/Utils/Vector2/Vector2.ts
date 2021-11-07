@@ -88,6 +88,14 @@ export class Vector2 {
     return Math.sqrt(this.x * this.x + this.y * this.y);
   }
 
+  modulo(vector: Vector2): Vector2 {
+    return new Vector2(this.x % vector.x, this.y % vector.y);
+  }
+
+  scalarModulo(scalar: number): Vector2 {
+    return new Vector2(this.x % scalar, this.y % scalar);
+  }
+
   scalarMult(scalar: number): Vector2 {
     return new Vector2(this.x * scalar, this.y * scalar);
   }
