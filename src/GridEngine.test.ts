@@ -108,15 +108,6 @@ jest.mock("./GridCharacter/GridCharacter", function () {
   };
 });
 
-jest.mock(
-  "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter",
-  function () {
-    return {
-      IsometricGridCharacter: jest.fn(createMockCharConstr()),
-    };
-  }
-);
-
 const mockRandomMovement = {
   addCharacter: jest.fn(),
   update: jest.fn(),
@@ -153,7 +144,6 @@ import {
   TargetMovement,
 } from "./Movement/TargetMovement/TargetMovement";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
-import { IsometricGridCharacter } from "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter";
 import { Vector2 } from "./Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
@@ -244,32 +234,6 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       speed: 4,
       container: containerMock,
-      offsetX: undefined,
-      offsetY: undefined,
-      collides: true,
-    });
-    expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith({
-      position: new Vector2(0, 0),
-      layer: "someLayer",
-    });
-    expect(mockGridCharacter.turnTowards).not.toHaveBeenCalled();
-  });
-
-  it("should init isometric player", () => {
-    tileMapMock.orientation = `${Phaser.Tilemaps.Orientation.ISOMETRIC}`;
-    gridEngine.create(tileMapMock, {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-        },
-      ],
-    });
-    expect(IsometricGridCharacter).toHaveBeenCalledWith("player", {
-      sprite: playerSpriteMock,
-      tilemap: mockGridTileMap,
-      speed: 4,
-      container: undefined,
       offsetX: undefined,
       offsetY: undefined,
       collides: true,

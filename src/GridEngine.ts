@@ -1,6 +1,5 @@
 import { GlobalConfig } from "./GlobalConfig/GlobalConfig";
 import { CollisionStrategy } from "./Collisions/CollisionStrategy";
-import { IsometricGridCharacter } from "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import {
   Finished,
@@ -481,11 +480,7 @@ export class GridEngine {
   }
 
   private createCharacter(id: string, config: CharConfig): GridCharacter {
-    if (this._isIsometric()) {
-      return new IsometricGridCharacter(id, config);
-    } else {
-      return new GridCharacter(id, config);
-    }
+    return new GridCharacter(id, config);
   }
 
   private addCharacters() {
