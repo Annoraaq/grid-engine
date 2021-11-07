@@ -57,6 +57,7 @@ describe("IsometricGridCharacter", () => {
       getTileSize: jest
         .fn()
         .mockReturnValue(new Vector2(TILE_WIDTH, TILE_HEIGHT)),
+      tilePosToPixelPos: jest.fn(),
     };
     gridSpriteMock = <any>{
       getRawSprite: jest.fn(),
@@ -78,6 +79,9 @@ describe("IsometricGridCharacter", () => {
   it("should set tile position", () => {
     const customOffsetX = 10;
     const customOffsetY = 15;
+    const newTilePos = new Vector2(3, 4);
+    const newPixelPos = new Vector2(10, 20);
+    gridTilemapMock.tilePosToPixelPos.mockReturnValue(newPixelPos);
     gridCharacter = new IsometricGridCharacter("player", {
       sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
@@ -87,15 +91,15 @@ describe("IsometricGridCharacter", () => {
       collides: true,
     });
     gridCharacter.setTilePosition({
-      position: new Vector2(3, 4),
+      position: newTilePos,
       layer: "someLayer",
     });
 
     expect(gridSpriteMock.x).toEqual(
-      ((3 - 4) * TILE_WIDTH) / 2 + PLAYER_X_OFFSET + customOffsetX
+      newPixelPos.x + PLAYER_X_OFFSET + customOffsetX
     );
     expect(gridSpriteMock.y).toEqual(
-      ((3 + 4) * TILE_HEIGHT) / 2 + PLAYER_Y_OFFSET + customOffsetY
+      newPixelPos.y + PLAYER_Y_OFFSET + customOffsetY
     );
   });
 
@@ -178,6 +182,7 @@ describe("IsometricGridCharacter", () => {
   it("should detect non-blocking direction", () => {
     const oppositeMapDirection = Direction.DOWN;
     gridTilemapMock.isBlocking.mockReturnValue(false);
+    gridTilemapMock.tilePosToPixelPos.mockReturnValue(new Vector2(0, 0));
 
     gridCharacter.setTilePosition({
       position: new Vector2(3, 3),

@@ -66,6 +66,7 @@ describe("GridCharacter", () => {
       getTileSize: jest
         .fn()
         .mockReturnValue(new Vector2(TILE_WIDTH, TILE_HEIGHT)),
+      tilePosToPixelPos: jest.fn().mockReturnValue(new Vector2(0, 0)),
     };
     gridSpriteMock = <any>{
       getRawSprite: jest.fn(),
@@ -375,6 +376,9 @@ describe("GridCharacter", () => {
   it("should set tile position", () => {
     const customOffsetX = 10;
     const customOffsetY = 15;
+    const newTilePos = new Vector2(3, 4);
+    const newPixelPos = new Vector2(10, 20);
+    gridTilemapMock.tilePosToPixelPos.mockReturnValue(newPixelPos);
     gridCharacter = new GridCharacter("player", {
       sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
@@ -384,20 +388,22 @@ describe("GridCharacter", () => {
       collides: true,
     });
     gridCharacter.setTilePosition({
-      position: new Vector2(3, 4),
+      position: newTilePos,
       layer: "someLayer",
     });
 
     expect(gridSpriteMock.x).toEqual(
-      3 * TILE_WIDTH + PLAYER_X_OFFSET + customOffsetX
+      newPixelPos.x + PLAYER_X_OFFSET + customOffsetX
     );
     expect(gridSpriteMock.y).toEqual(
-      4 * TILE_HEIGHT + PLAYER_Y_OFFSET + customOffsetY
+      newPixelPos.y + PLAYER_Y_OFFSET + customOffsetY
     );
   });
 
   it("should set tile position with custom offset", async () => {
     const movementStoppedObs = gridCharacter.movementStopped();
+    const newTilePos = new Vector2(3, 4);
+    const newPixelPos = new Vector2(10, 20);
     jest.spyOn(movementStoppedObs, "next");
     const positionChangeStartedProm = gridCharacter
       .positionChangeStarted()
@@ -407,9 +413,10 @@ describe("GridCharacter", () => {
       .positionChangeFinished()
       .pipe(take(1))
       .toPromise();
+    gridTilemapMock.tilePosToPixelPos.mockReturnValue(newPixelPos);
 
     gridCharacter.setTilePosition({
-      position: new Vector2(3, 4),
+      position: newTilePos,
       layer: "someLayer",
     });
 
@@ -419,20 +426,20 @@ describe("GridCharacter", () => {
 
     expect(posChangeStarted).toEqual({
       exitTile: new Vector2(0, 0),
-      enterTile: new Vector2(3, 4),
+      enterTile: newTilePos,
       exitLayer: undefined,
       enterLayer: "someLayer",
     });
 
     expect(posChangeFinished).toEqual({
       exitTile: new Vector2(0, 0),
-      enterTile: new Vector2(3, 4),
+      enterTile: newTilePos,
       exitLayer: undefined,
       enterLayer: "someLayer",
     });
 
-    expect(gridSpriteMock.x).toEqual(3 * TILE_WIDTH + PLAYER_X_OFFSET);
-    expect(gridSpriteMock.y).toEqual(4 * TILE_HEIGHT + PLAYER_Y_OFFSET);
+    expect(gridSpriteMock.x).toEqual(newPixelPos.x + PLAYER_X_OFFSET);
+    expect(gridSpriteMock.y).toEqual(newPixelPos.y + PLAYER_Y_OFFSET);
   });
 
   it("should stop ongoing movement when stopping on positionChangeFinish", async () => {
@@ -461,6 +468,7 @@ describe("GridCharacter", () => {
   });
 
   it("should stop moving on set tile pos", async () => {
+    const newTilePos = new Vector2(3, 4);
     mockNonBlockingTile();
     gridCharacter.move(Direction.DOWN);
 
@@ -482,7 +490,7 @@ describe("GridCharacter", () => {
       .toPromise();
 
     gridCharacter.setTilePosition({
-      position: new Vector2(3, 4),
+      position: newTilePos,
       layer: "someLayer",
     });
 
@@ -492,14 +500,14 @@ describe("GridCharacter", () => {
     const tilePosSet = await tilePosSetProm;
     expect(posChangeStarted).toEqual({
       exitTile: new Vector2(0, 0),
-      enterTile: new Vector2(3, 4),
+      enterTile: newTilePos,
       enterLayer: "someLayer",
       exitLayer: undefined,
     });
 
     expect(posChangeFinished).toEqual({
       exitTile: new Vector2(0, 0),
-      enterTile: new Vector2(3, 4),
+      enterTile: newTilePos,
       enterLayer: "someLayer",
       exitLayer: undefined,
     });
@@ -511,7 +519,7 @@ describe("GridCharacter", () => {
 
     expect(gridCharacter.isMoving()).toEqual(false);
     expect(gridCharacter.getTilePos()).toEqual({
-      position: new Vector2(3, 4),
+      position: newTilePos,
       layer: "someLayer",
     });
   });
@@ -919,13 +927,16 @@ describe("GridCharacter", () => {
     });
 
     it("should set tile position", () => {
+      const newTilePos = new Vector2(3, 4);
+      const newPixelPos = new Vector2(10, 20);
+      gridTilemapMock.tilePosToPixelPos.mockReturnValue(newPixelPos);
       gridCharacter.setTilePosition({
-        position: new Vector2(3, 4),
+        position: newTilePos,
         layer: "someLayer",
       });
 
-      expect(containerMock.x).toEqual(3 * TILE_WIDTH + PLAYER_X_OFFSET);
-      expect(containerMock.y).toEqual(4 * TILE_HEIGHT + PLAYER_Y_OFFSET);
+      expect(containerMock.x).toEqual(newPixelPos.x + PLAYER_X_OFFSET);
+      expect(containerMock.y).toEqual(newPixelPos.y + PLAYER_Y_OFFSET);
       expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
       expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
     });

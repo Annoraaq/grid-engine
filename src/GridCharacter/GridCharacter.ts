@@ -161,7 +161,8 @@ export class GridCharacter {
     this.tilePos = tilePosition;
     this.updateZindex();
     this.setPosition(
-      this.tilePosToPixelPos(tilePosition.position)
+      this.tilemap
+        .tilePosToPixelPos(tilePosition.position)
         .add(this.getOffset())
         .add(this.customOffset)
     );
@@ -278,10 +279,6 @@ export class GridCharacter {
 
   isColliding(): boolean {
     return this.collides;
-  }
-
-  protected tilePosToPixelPos(tilePosition: Vector2): Vector2 {
-    return tilePosition.clone().multiply(this.tilemap.getTileSize());
   }
 
   protected getTileDistance(_direction: Direction): Vector2 {

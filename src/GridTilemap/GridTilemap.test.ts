@@ -6,6 +6,7 @@ import { Vector2 } from "../Utils/Vector2/Vector2";
 import { Direction, NumberOfDirections } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
 import { Rect } from "../Utils/Rect/Rect";
+import * as Phaser from "phaser";
 
 const MAX_CHAR_LAYERS = 1;
 
@@ -726,6 +727,33 @@ describe("GridTilemap", () => {
     const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
     expect(gridTilemap.getTileSize()).toEqual(
       new Vector2(scaledTileWidth, scaledTileHeight)
+    );
+  });
+
+  it("should transform tile pos to pixel pos", () => {
+    const scaleFactor = 3;
+    const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
+    const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
+    const tilePosition = new Vector2(2, 3);
+    expect(gridTilemap.tilePosToPixelPos(tilePosition)).toEqual(
+      new Vector2(
+        scaledTileWidth * tilePosition.x,
+        scaledTileHeight * tilePosition.y
+      )
+    );
+  });
+
+  it("should transform tile pos to pixel pos for isometric maps", () => {
+    tilemapMock.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC;
+    const scaleFactor = 3;
+    const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
+    const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
+    const tilePosition = new Vector2(2, 3);
+    expect(gridTilemap.tilePosToPixelPos(tilePosition)).toEqual(
+      new Vector2(
+        scaledTileWidth * 0.5 * (tilePosition.x - tilePosition.y),
+        scaledTileHeight * 0.5 * (tilePosition.x + tilePosition.y)
+      )
     );
   });
 

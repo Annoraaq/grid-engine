@@ -4,6 +4,7 @@ import { GridCharacter } from "../GridCharacter/GridCharacter";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache/CharBlockCache";
 import { Rect } from "../Utils/Rect/Rect";
+import { VectorUtils } from "../Utils/VectorUtils";
 
 export class GridTilemap {
   private static readonly MAX_PLAYER_LAYERS = 1;
@@ -111,6 +112,23 @@ export class GridTilemap {
 
   getTileSize(): Vector2 {
     return new Vector2(this.getTileWidth(), this.getTileHeight());
+  }
+
+  tilePosToPixelPos(tilePosition: Vector2): Vector2 {
+    // Against the documentation of phaser, tilemap seems to be a number instead
+    // of a string. Therefore the intentional type coercion here.
+    if (
+      this.tilemap.orientation ==
+      Phaser.Tilemaps.Orientation.ISOMETRIC.toString()
+    ) {
+      return VectorUtils.scalarMult(this.getTileSize(), 0.5).multiply(
+        new Vector2(
+          tilePosition.x - tilePosition.y,
+          tilePosition.x + tilePosition.y
+        )
+      );
+    }
+    return tilePosition.clone().multiply(this.getTileSize());
   }
 
   private isLayerBlockingAt(
