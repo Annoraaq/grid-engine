@@ -10,6 +10,7 @@ import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
 import { GridSprite } from "../GridSprite/GridSprite";
+import { Utils } from "../Utils/Utils/Utils";
 
 export interface FrameRow {
   leftFoot: number;
@@ -397,21 +398,14 @@ export class GridCharacter {
     if (levelingDown) {
       gameObject.setDepth(
         this.tilemap.getDepthOfCharLayer(this.nextTilePos.layer) +
-          this.shiftPad(gameObject.y, 7)
+          Utils.shiftPad(gameObject.y, 7)
       );
     } else {
       gameObject.setDepth(
         this.tilemap.getDepthOfCharLayer(this.tilePos.layer) +
-          this.shiftPad(gameObject.y, 7)
+          Utils.shiftPad(gameObject.y, 7)
       );
     }
-  }
-
-  private shiftPad(num: number, places: number): number {
-    const floor = Math.floor(num);
-    const str = `${floor}`.padStart(places, "0");
-    const strPlaces = str.length;
-    return floor / Math.pow(10, strPlaces);
   }
 
   private setPosition(position: Vector2): void {
