@@ -58,6 +58,9 @@ describe("IsometricGridCharacter", () => {
         .fn()
         .mockReturnValue(new Vector2(TILE_WIDTH, TILE_HEIGHT)),
       tilePosToPixelPos: jest.fn(),
+      getTileDistance: jest
+        .fn()
+        .mockReturnValue(new Vector2(TILE_WIDTH, TILE_HEIGHT)),
     };
     gridSpriteMock = <any>{
       getRawSprite: jest.fn(),
@@ -112,6 +115,10 @@ describe("IsometricGridCharacter", () => {
 
     // expected y pos 67 left padded with 0s
     const expectedNewYPosDepthOffset = 0.0000067;
+
+    gridTilemapMock.getTileDistance.mockReturnValue(
+      new Vector2(TILE_WIDTH * 0.5, TILE_HEIGHT * 0.5)
+    );
 
     mockNonBlockingTile();
 
@@ -205,6 +212,9 @@ describe("IsometricGridCharacter", () => {
   });
 
   it("should update only till tile border", () => {
+    gridTilemapMock.getTileDistance.mockReturnValue(
+      new Vector2(TILE_WIDTH * 0.5, TILE_HEIGHT * 0.5)
+    );
     mockNonBlockingTile();
 
     gridCharacter.move(Direction.UP_RIGHT);

@@ -115,12 +115,7 @@ export class GridTilemap {
   }
 
   tilePosToPixelPos(tilePosition: Vector2): Vector2 {
-    // Against the documentation of phaser, tilemap seems to be a number instead
-    // of a string. Therefore the intentional type coercion here.
-    if (
-      this.tilemap.orientation ==
-      Phaser.Tilemaps.Orientation.ISOMETRIC.toString()
-    ) {
+    if (this.isIsometric()) {
       return VectorUtils.scalarMult(this.getTileSize(), 0.5).multiply(
         new Vector2(
           tilePosition.x - tilePosition.y,
@@ -129,6 +124,30 @@ export class GridTilemap {
       );
     }
     return tilePosition.clone().multiply(this.getTileSize());
+  }
+
+  getTileDistance(direction: Direction): Vector2 {
+    if (this.isIsometric()) {
+      switch (direction) {
+        case Direction.DOWN_LEFT:
+        case Direction.DOWN_RIGHT:
+        case Direction.UP_LEFT:
+        case Direction.UP_RIGHT:
+          return VectorUtils.scalarMult(this.getTileSize(), 0.5);
+        default:
+          return this.getTileSize();
+      }
+    }
+    return this.getTileSize();
+  }
+
+  private isIsometric(): boolean {
+    // Against the documentation of phaser, tilemap seems to be a number instead
+    // of a string. Therefore the intentional type coercion here.
+    return (
+      this.tilemap.orientation ==
+      Phaser.Tilemaps.Orientation.ISOMETRIC.toString()
+    );
   }
 
   private isLayerBlockingAt(

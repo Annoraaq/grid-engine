@@ -67,6 +67,9 @@ describe("GridCharacter", () => {
         .fn()
         .mockReturnValue(new Vector2(TILE_WIDTH, TILE_HEIGHT)),
       tilePosToPixelPos: jest.fn().mockReturnValue(new Vector2(0, 0)),
+      getTileDistance: jest
+        .fn()
+        .mockReturnValue(new Vector2(TILE_WIDTH, TILE_HEIGHT)),
     };
     gridSpriteMock = <any>{
       getRawSprite: jest.fn(),

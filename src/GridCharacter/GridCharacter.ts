@@ -281,10 +281,6 @@ export class GridCharacter {
     return this.collides;
   }
 
-  protected getTileDistance(_direction: Direction): Vector2 {
-    return this.tilemap.getTileSize();
-  }
-
   protected toMapDirection(direction: Direction): Direction {
     return direction;
   }
@@ -322,10 +318,12 @@ export class GridCharacter {
       [Direction.RIGHT]: new Vector2(this.tilemap.getTileWidth(), 0),
       [Direction.UP]: new Vector2(0, this.tilemap.getTileHeight()),
       [Direction.DOWN]: new Vector2(0, this.tilemap.getTileHeight()),
-      [Direction.UP_LEFT]: this.getTileDistance(Direction.UP_LEFT),
-      [Direction.UP_RIGHT]: this.getTileDistance(Direction.UP_RIGHT),
-      [Direction.DOWN_LEFT]: this.getTileDistance(Direction.DOWN_LEFT),
-      [Direction.DOWN_RIGHT]: this.getTileDistance(Direction.DOWN_RIGHT),
+      [Direction.UP_LEFT]: this.tilemap.getTileDistance(Direction.UP_LEFT),
+      [Direction.UP_RIGHT]: this.tilemap.getTileDistance(Direction.UP_RIGHT),
+      [Direction.DOWN_LEFT]: this.tilemap.getTileDistance(Direction.DOWN_LEFT),
+      [Direction.DOWN_RIGHT]: this.tilemap.getTileDistance(
+        Direction.DOWN_RIGHT
+      ),
       [Direction.NONE]: Vector2.ZERO.clone(),
     };
 
@@ -469,7 +467,8 @@ export class GridCharacter {
   }
 
   private getDistToNextTile(): Vector2 {
-    return this.getTileDistance(this.movementDirection)
+    return this.tilemap
+      .getTileDistance(this.movementDirection)
       .clone()
       .subtract(this.tileSizePixelsWalked)
       .multiply(directionVector(this.movementDirection));
@@ -541,10 +540,10 @@ export class GridCharacter {
       this.movementDirection,
       this.hasWalkedHalfATile()
     );
-    this.tileSizePixelsWalked.x %= this.getTileDistance(
+    this.tileSizePixelsWalked.x %= this.tilemap.getTileDistance(
       this.movementDirection
     ).x;
-    this.tileSizePixelsWalked.y %= this.getTileDistance(
+    this.tileSizePixelsWalked.y %= this.tilemap.getTileDistance(
       this.movementDirection
     ).y;
   }
@@ -568,9 +567,9 @@ export class GridCharacter {
   private hasWalkedHalfATile(): boolean {
     return (
       this.tileSizePixelsWalked.x >
-        this.getTileDistance(this.movementDirection).x / 2 ||
+        this.tilemap.getTileDistance(this.movementDirection).x / 2 ||
       this.tileSizePixelsWalked.y >
-        this.getTileDistance(this.movementDirection).y / 2
+        this.tilemap.getTileDistance(this.movementDirection).y / 2
     );
   }
 }

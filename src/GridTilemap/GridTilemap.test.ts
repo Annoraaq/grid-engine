@@ -743,18 +743,51 @@ describe("GridTilemap", () => {
     );
   });
 
-  it("should transform tile pos to pixel pos for isometric maps", () => {
+  it("should provide tile distance", () => {
+    const scaleFactor = 3;
+    const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
+    const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
+    expect(gridTilemap.getTileDistance(Direction.DOWN)).toEqual(
+      new Vector2(scaledTileWidth, scaledTileHeight)
+    );
+  });
+
+  it("should provide tile distance for isometric maps on orthogonal dirs", () => {
     tilemapMock.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC;
     const scaleFactor = 3;
     const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
     const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
-    const tilePosition = new Vector2(2, 3);
-    expect(gridTilemap.tilePosToPixelPos(tilePosition)).toEqual(
-      new Vector2(
-        scaledTileWidth * 0.5 * (tilePosition.x - tilePosition.y),
-        scaledTileHeight * 0.5 * (tilePosition.x + tilePosition.y)
-      )
+    expect(gridTilemap.getTileDistance(Direction.DOWN)).toEqual(
+      new Vector2(scaledTileWidth, scaledTileHeight)
     );
+  });
+
+  describe("isometric", () => {
+    const scaleFactor = 3;
+
+    beforeEach(() => {
+      tilemapMock.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC;
+    });
+
+    it("should transform tile pos to pixel pos for isometric maps", () => {
+      const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
+      const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
+      const tilePosition = new Vector2(2, 3);
+      expect(gridTilemap.tilePosToPixelPos(tilePosition)).toEqual(
+        new Vector2(
+          scaledTileWidth * 0.5 * (tilePosition.x - tilePosition.y),
+          scaledTileHeight * 0.5 * (tilePosition.x + tilePosition.y)
+        )
+      );
+    });
+
+    it("should provide tile distance for isometric maps on diagonal dirs", () => {
+      const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
+      const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
+      expect(gridTilemap.getTileDistance(Direction.DOWN_LEFT)).toEqual(
+        new Vector2(scaledTileWidth * 0.5, scaledTileHeight * 0.5)
+      );
+    });
   });
 
   describe("transitions", () => {
