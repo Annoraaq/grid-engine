@@ -294,9 +294,8 @@ export class GridCharacter {
   private getOffset(): Vector2 {
     const offsetX =
       this.tilemap.getTileWidth() / 2 -
-      Math.floor(this.sprite.getScaledWidth() / 2);
-    const offsetY =
-      -this.sprite.getScaledHeight() + this.tilemap.getTileHeight();
+      Math.floor(this.sprite.displayWidth / 2);
+    const offsetY = -this.sprite.displayHeight + this.tilemap.getTileHeight();
     return new Vector2(offsetX, offsetY);
   }
 
@@ -398,7 +397,7 @@ export class GridCharacter {
     if (levelingDown) layer = this.nextTilePos.layer;
     this.gameObject().setDepth(
       this.tilemap.getDepthOfCharLayer(layer) +
-        Utils.shiftPad(this.gameObject().y, 7)
+        Utils.shiftPad(this.gameObject().y + this.gameObject().displayHeight, 7)
     );
   }
 
@@ -474,13 +473,13 @@ export class GridCharacter {
   private moveCharacterSprite(speed: Vector2): void {
     const newPlayerPos = this.getPosition().add(speed);
     this.setPosition(newPlayerPos);
-    this.tileSizePixelsWalked = this.tileSizePixelsWalked
-      .add(speed.abs())
-      .modulo(this.tilemap.getTileDistance(this.movementDirection));
-
+    this.tileSizePixelsWalked = this.tileSizePixelsWalked.add(speed.abs());
     this.animation.updateCharacterFrame(
       this.movementDirection,
       this.hasWalkedHalfATile()
+    );
+    this.tileSizePixelsWalked = this.tileSizePixelsWalked.modulo(
+      this.tilemap.getTileDistance(this.movementDirection)
     );
   }
 

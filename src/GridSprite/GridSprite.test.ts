@@ -17,6 +17,7 @@ describe("GridSprite", () => {
     phaserSprite = <any>{
       setOrigin: jest.fn(),
       setDepth: jest.fn(),
+      displayHeight: spriteHeight * spriteScale,
     };
 
     xSetter = jest.fn();
@@ -77,11 +78,7 @@ describe("GridSprite", () => {
     expect(phaserSprite.setDepth).toHaveBeenCalledWith(42);
   });
 
-  it("should get scaledWidth", () => {
-    expect(gridSprite.getScaledWidth()).toEqual(spriteWidth * spriteScale);
-  });
-
-  it("should get scaledHeight", () => {
-    expect(gridSprite.getScaledHeight()).toEqual(spriteHeight * spriteScale);
+  it("should delegate displayHeight", () => {
+    expect(phaserSprite.displayHeight).toEqual(spriteHeight * spriteScale);
   });
 });

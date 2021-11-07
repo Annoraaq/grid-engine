@@ -74,8 +74,8 @@ describe("GridCharacter", () => {
     };
     gridSpriteMock = <any>{
       getRawSprite: jest.fn(),
-      getScaledWidth: jest.fn().mockReturnValue(16),
-      getScaledHeight: jest.fn().mockReturnValue(20),
+      displayWidth: 16,
+      displayHeight: 20,
       setDepth: jest.fn(),
       x: 5 * TILE_WIDTH + PLAYER_X_OFFSET,
       y: 6 * TILE_HEIGHT + PLAYER_Y_OFFSET,
@@ -105,7 +105,8 @@ describe("GridCharacter", () => {
 
   it("should set the correct depth on construction", () => {
     expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
-      DEPTH_OF_CHAR_LAYER + parseFloat("0.00000" + gridSpriteMock.y)
+      DEPTH_OF_CHAR_LAYER +
+        parseFloat("0.0000" + (gridSpriteMock.y + gridSpriteMock.displayHeight))
     );
   });
 
@@ -117,6 +118,7 @@ describe("GridCharacter", () => {
     const sprite = <any>{
       setDepth: jest.fn(),
       getRawSprite: jest.fn().mockReturnValue("rawSprite"),
+      displayHeight: gridSpriteMock.displayHeight,
     };
     gridCharacter.setSprite(sprite);
 
@@ -129,7 +131,8 @@ describe("GridCharacter", () => {
       Direction.DOWN
     );
     expect(sprite.setDepth).toHaveBeenCalledWith(
-      DEPTH_OF_CHAR_LAYER + parseFloat("0.0000092")
+      DEPTH_OF_CHAR_LAYER +
+        parseFloat("0.0000" + (gridSpriteMock.y + gridSpriteMock.displayHeight))
     );
   });
 
@@ -221,7 +224,10 @@ describe("GridCharacter", () => {
     gridCharacter.update(MS_FOR_12_PX);
 
     expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
-      DEPTH_OF_CHAR_LAYER + parseFloat("0.00000" + (INITIAL_SPRITE_Y_POS - 12))
+      DEPTH_OF_CHAR_LAYER +
+        parseFloat(
+          "0.0000" + (INITIAL_SPRITE_Y_POS + gridSpriteMock.displayHeight - 12)
+        )
     );
   });
 
@@ -247,7 +253,9 @@ describe("GridCharacter", () => {
     expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
       DEPTH_OF_CHAR_LAYER -
         1 +
-        parseFloat("0.00000" + (INITIAL_SPRITE_Y_POS - 12))
+        parseFloat(
+          "0.0000" + (INITIAL_SPRITE_Y_POS + gridSpriteMock.displayHeight - 12)
+        )
     );
   });
 
@@ -270,7 +278,10 @@ describe("GridCharacter", () => {
     gridCharacter.update(MS_FOR_12_PX);
 
     expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
-      DEPTH_OF_CHAR_LAYER + parseFloat("0.00000" + (INITIAL_SPRITE_Y_POS - 12))
+      DEPTH_OF_CHAR_LAYER +
+        parseFloat(
+          "0.0000" + (INITIAL_SPRITE_Y_POS + gridSpriteMock.displayHeight - 12)
+        )
     );
   });
 
@@ -285,7 +296,10 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
     expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
-      DEPTH_OF_CHAR_LAYER + parseFloat("0.00000" + (INITIAL_SPRITE_Y_POS - 12))
+      DEPTH_OF_CHAR_LAYER +
+        parseFloat(
+          "0.0000" + (INITIAL_SPRITE_Y_POS + gridSpriteMock.displayHeight - 12)
+        )
     );
   });
 
@@ -300,7 +314,10 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.RIGHT);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
     expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
-      DEPTH_OF_CHAR_LAYER + parseFloat("0.00000" + INITIAL_SPRITE_Y_POS)
+      DEPTH_OF_CHAR_LAYER +
+        parseFloat(
+          "0.0000" + (INITIAL_SPRITE_Y_POS + gridSpriteMock.displayHeight)
+        )
     );
   });
 
@@ -315,7 +332,10 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN_LEFT);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN_LEFT);
     expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
-      DEPTH_OF_CHAR_LAYER + parseFloat("0.0000" + (INITIAL_SPRITE_Y_POS + 12))
+      DEPTH_OF_CHAR_LAYER +
+        parseFloat(
+          "0.0000" + (INITIAL_SPRITE_Y_POS + gridSpriteMock.displayHeight + 12)
+        )
     );
   });
 
@@ -381,7 +401,11 @@ describe("GridCharacter", () => {
     expect(gridSpriteMock.setDepth).toHaveBeenCalledWith(
       DEPTH_OF_CHAR_LAYER +
         parseFloat(
-          "0.00000" + (newPixelPos.y + PLAYER_Y_OFFSET + customOffsetY)
+          "0.00000" +
+            (newPixelPos.y +
+              PLAYER_Y_OFFSET +
+              customOffsetY +
+              gridSpriteMock.displayHeight)
         )
     );
   });
@@ -888,6 +912,7 @@ describe("GridCharacter", () => {
         x: 5 * TILE_WIDTH,
         y: 6 * TILE_HEIGHT,
         setDepth: jest.fn(),
+        displayHeight: 20,
       };
       gridCharacter = new GridCharacter("player", {
         sprite: gridSpriteMock,
@@ -910,7 +935,12 @@ describe("GridCharacter", () => {
       expect(gridSpriteMock.setDepth).not.toHaveBeenCalled();
       expect(containerMock.setDepth).toHaveBeenCalledWith(
         DEPTH_OF_CHAR_LAYER +
-          parseFloat("0.00000" + (6 * TILE_HEIGHT - pixelsMovedThisUpdate))
+          parseFloat(
+            "0.0000" +
+              (6 * TILE_HEIGHT +
+                gridSpriteMock.displayHeight -
+                pixelsMovedThisUpdate)
+          )
       );
       expect(containerMock.x).toEqual(5 * TILE_WIDTH);
       expect(containerMock.y).toEqual(6 * TILE_HEIGHT - pixelsMovedThisUpdate);

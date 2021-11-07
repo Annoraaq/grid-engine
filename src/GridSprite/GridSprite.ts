@@ -30,15 +30,15 @@ export class GridSprite {
     return this.rawSprite.height;
   }
 
+  get displayHeight(): number {
+    return this.rawSprite.displayHeight;
+  }
+
+  get displayWidth(): number {
+    return this.rawSprite.displayWidth;
+  }
+
   setDepth(depth: number): void {
     this.rawSprite.setDepth(depth);
-  }
-
-  getScaledWidth(): number {
-    return this.rawSprite.width * this.rawSprite.scale;
-  }
-
-  getScaledHeight(): number {
-    return this.rawSprite.height * this.rawSprite.scale;
   }
 }
