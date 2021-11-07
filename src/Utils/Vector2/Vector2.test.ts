@@ -87,4 +87,9 @@ describe("Vector2", () => {
     const v = new Vector2({ x: 4, y: -3 });
     expect(v.toString()).toEqual("4#-3");
   });
+
+  it("should multiply with scalar", () => {
+    const v = new Vector2({ x: 4, y: -3 });
+    expect(v.scalarMult(3)).toEqual(new Vector2(12, -9));
+  });
 });

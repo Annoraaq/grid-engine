@@ -334,25 +334,11 @@ export class GridCharacter {
     }
   }
 
-  private createSpeedPixelsPerSecond(): { [key in Direction]: Vector2 } {
-    const speedPixelsPerSecond = {
-      [Direction.LEFT]: new Vector2(this.tilemap.getTileWidth(), 0),
-      [Direction.RIGHT]: new Vector2(this.tilemap.getTileWidth(), 0),
-      [Direction.UP]: new Vector2(0, this.tilemap.getTileHeight()),
-      [Direction.DOWN]: new Vector2(0, this.tilemap.getTileHeight()),
-      [Direction.UP_LEFT]: this.tilemap.getTileDistance(Direction.UP_LEFT),
-      [Direction.UP_RIGHT]: this.tilemap.getTileDistance(Direction.UP_RIGHT),
-      [Direction.DOWN_LEFT]: this.tilemap.getTileDistance(Direction.DOWN_LEFT),
-      [Direction.DOWN_RIGHT]: this.tilemap.getTileDistance(
-        Direction.DOWN_RIGHT
-      ),
-      [Direction.NONE]: Vector2.ZERO,
-    };
-
-    Object.entries(speedPixelsPerSecond).forEach(([key, val]) => {
-      speedPixelsPerSecond[key] = VectorUtils.scalarMult(val, this.speed);
-    });
-    return speedPixelsPerSecond;
+  private speedPixelsPerSecond(direction: Direction): Vector2 {
+    return directionVector(direction)
+      .abs()
+      .multiply(this.tilemap.getTileDistance(direction))
+      .scalarMult(this.speed);
   }
 
   private get nextTilePos(): LayerPosition {
@@ -463,12 +449,7 @@ export class GridCharacter {
 
     const newLayer = trans || this.tilePos.layer;
     this.nextTilePos = { position: newTilePos, layer: newLayer };
-    this.positionChangeStarted$.next({
-      exitTile: this.tilePos.position,
-      enterTile: newTilePos,
-      exitLayer: this.tilePos.layer,
-      enterLayer: newLayer,
-    });
+    this.fire(this.positionChangeStarted$, this.tilePos, this.nextTilePos);
   }
 
   private tilePosInDirection(direction: Direction): Vector2 {
@@ -504,10 +485,8 @@ export class GridCharacter {
 
   private getSpeedPerDelta(delta: number): Vector2 {
     const deltaInSeconds = delta / 1000;
-    return this.createSpeedPixelsPerSecond()
-      [this.movementDirection].multiply(
-        new Vector2(deltaInSeconds, deltaInSeconds)
-      )
+    return this.speedPixelsPerSecond(this.movementDirection)
+      .scalarMult(deltaInSeconds)
       .multiply(directionVector(this.movementDirection));
   }
 
