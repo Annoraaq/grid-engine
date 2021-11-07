@@ -44,7 +44,7 @@ export class GridCharacter {
   protected tilemap: GridTilemap;
 
   private movementDirection = Direction.NONE;
-  private tileSizePixelsWalked: Vector2 = Vector2.ZERO.clone();
+  private tileSizePixelsWalked: Vector2 = Vector2.ZERO;
   private _nextTilePos: LayerPosition = {
     position: new Vector2(0, 0),
     layer: undefined,
@@ -320,7 +320,7 @@ export class GridCharacter {
       [Direction.DOWN_RIGHT]: this.tilemap.getTileDistance(
         Direction.DOWN_RIGHT
       ),
-      [Direction.NONE]: Vector2.ZERO.clone(),
+      [Direction.NONE]: Vector2.ZERO,
     };
 
     Object.entries(speedPixelsPerSecond).forEach(([key, val]) => {
@@ -465,7 +465,6 @@ export class GridCharacter {
   private getDistToNextTile(): Vector2 {
     return this.tilemap
       .getTileDistance(this.movementDirection)
-      .clone()
       .subtract(this.tileSizePixelsWalked)
       .multiply(directionVector(this.movementDirection));
   }
@@ -522,8 +521,9 @@ export class GridCharacter {
   private getSpeedPerDelta(delta: number): Vector2 {
     const deltaInSeconds = delta / 1000;
     return this.createSpeedPixelsPerSecond()
-      [this.movementDirection].clone()
-      .multiply(new Vector2(deltaInSeconds, deltaInSeconds))
+      [this.movementDirection].multiply(
+        new Vector2(deltaInSeconds, deltaInSeconds)
+      )
       .multiply(directionVector(this.movementDirection));
   }
 
