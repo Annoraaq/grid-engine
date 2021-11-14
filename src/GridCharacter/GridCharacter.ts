@@ -93,7 +93,7 @@ export class GridCharacter {
     this.sprite2.setCrop(
       0,
       0,
-      this.sprite2.width * this.sprite2.scale,
+      this.sprite2.displayWidth,
       this.sprite.height - scaledTileHeight
     );
     this._setSprite(this.sprite);
@@ -156,7 +156,6 @@ export class GridCharacter {
     this.fire(this.positionChangeFinished$, this.tilePos, this.nextTilePos);
     this.movementDirection = Direction.NONE;
     this.lastMovementImpulse = Direction.NONE;
-    // this.nextTilePos = tilePosition;
     this.tilePos = tilePosition;
     this.setPosition(
       this.tilemap
