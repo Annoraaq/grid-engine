@@ -201,6 +201,68 @@ describe("GridCharacter", () => {
     );
   });
 
+  describe("z-index", () => {
+    beforeEach(() => {
+      gridTilemapMock.getTransition.mockReturnValue(undefined);
+      gridTilemapMock.getDepthOfCharLayer.mockClear();
+      gridTilemapMock.getDepthOfCharLayer.mockReturnValue(2);
+      gridCharacter = new GridCharacter("player", {
+        sprite: gridSpriteMock,
+        layerOverlaySprite: layerOverlaySpriteMock,
+        tilemap: gridTilemapMock,
+        speed: 3,
+        collides: true,
+        charLayer: "someLayer",
+      });
+    });
+
+    it("should set the correct depth on construction for layerOverlay sprite", () => {
+      expect(gridTilemapMock.getTransition).toHaveBeenCalledWith(
+        { x: 0, y: -1 },
+        undefined
+      );
+      expect(gridTilemapMock.getDepthOfCharLayer).toHaveBeenNthCalledWith(
+        2,
+        undefined
+      );
+      expect(layerOverlaySpriteMock.setDepth).toHaveBeenCalledWith(
+        2 +
+          parseFloat(
+            "0.0000" + (gridSpriteMock.y + gridSpriteMock.displayHeight)
+          )
+      );
+    });
+
+    it("should set the correct depth if no transition for layerOverlay sprite", () => {
+      gridTilemapMock.getDepthOfCharLayer.mockClear();
+      gridCharacter.setTilePosition({
+        position: new Vector2(1, 1),
+        layer: "newLayer",
+      });
+      expect(gridTilemapMock.getTransition).toHaveBeenCalledWith(
+        { x: 1, y: 0 },
+        "newLayer"
+      );
+      expect(gridTilemapMock.getDepthOfCharLayer).toHaveBeenNthCalledWith(
+        2,
+        "newLayer"
+      );
+    });
+
+    it("should set the correct depth if transition for layerOverlay sprite", () => {
+      gridTilemapMock.getDepthOfCharLayer.mockClear();
+      gridTilemapMock.getTransition.mockReturnValue("transLayer");
+      gridCharacter.setTilePosition({
+        position: new Vector2(1, 1),
+        layer: "newLayer",
+      });
+      expect(gridTilemapMock.getDepthOfCharLayer).toHaveBeenNthCalledWith(
+        2,
+        "transLayer"
+      );
+    });
+  });
+
   it("should be facing down on construction by default", () => {
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
   });
