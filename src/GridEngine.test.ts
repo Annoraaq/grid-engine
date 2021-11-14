@@ -220,7 +220,6 @@ describe("GridEngine", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      layerOverlaySprite: mockNewSprite,
       tilemap: mockGridTileMap,
       speed: 4,
       container: containerMock,
@@ -235,6 +234,24 @@ describe("GridEngine", () => {
       layer: "someLayer",
     });
     expect(mockGridCharacter.turnTowards).not.toHaveBeenCalled();
+  });
+
+  it("should init player with layerOverlay", () => {
+    gridEngine.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+        },
+      ],
+      layerOverlay: true,
+    });
+    expect(GridCharacter).toHaveBeenCalledWith(
+      "player",
+      expect.objectContaining({
+        layerOverlaySprite: mockNewSprite,
+      })
+    );
   });
 
   it("should init player with facingDirection", () => {
@@ -263,7 +280,6 @@ describe("GridEngine", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      layerOverlaySprite: mockNewSprite,
       tilemap: mockGridTileMap,
       speed: 4,
       collides: true,
@@ -308,7 +324,6 @@ describe("GridEngine", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      layerOverlaySprite: mockNewSprite,
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping,
@@ -338,6 +353,7 @@ describe("GridEngine", () => {
       collisionTilePropertyName: "ge_collide",
       numberOfDirections: NumberOfDirections.FOUR,
       characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
+      layerOverlay: false,
     });
   });
 
@@ -355,6 +371,7 @@ describe("GridEngine", () => {
       collisionTilePropertyName: "custom_name",
       numberOfDirections: NumberOfDirections.EIGHT,
       characterCollisionStrategy: CollisionStrategy.BLOCK_ONE_TILE_AHEAD,
+      layerOverlay: true,
     };
     gridEngine.create(tileMapMock, config);
     expect(setSpy).toHaveBeenCalledWith({
@@ -414,7 +431,6 @@ describe("GridEngine", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
-      layerOverlaySprite: mockNewSprite,
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping: 3,

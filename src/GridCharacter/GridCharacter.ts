@@ -28,7 +28,7 @@ export interface PositionChange {
 
 export interface CharConfig {
   sprite: Phaser.GameObjects.Sprite;
-  layerOverlaySprite: Phaser.GameObjects.Sprite;
+  layerOverlaySprite?: Phaser.GameObjects.Sprite;
   tilemap: GridTilemap;
   speed: number;
   collides: boolean;
@@ -54,7 +54,7 @@ export class GridCharacter {
     layer: undefined,
   };
   private sprite: Phaser.GameObjects.Sprite;
-  private sprite2: Phaser.GameObjects.Sprite;
+  private layerOverlaySprite: Phaser.GameObjects.Sprite;
   private container?: Phaser.GameObjects.Container;
   private speed: number;
   private movementStarted$ = new Subject<Direction>();
@@ -87,18 +87,11 @@ export class GridCharacter {
     this._tilePos.layer = config.charLayer;
 
     this.sprite = config.sprite;
-    this.sprite2 = config.layerOverlaySprite;
-    this.sprite2.scale = this.sprite.scale;
-    const scaledTileHeight = this.tilemap.getTileHeight() / this.sprite2.scale;
-    this.sprite2.setCrop(
-      0,
-      0,
-      this.sprite2.displayWidth,
-      this.sprite.height - scaledTileHeight
-    );
+    this.layerOverlaySprite = config.layerOverlaySprite;
+    if (this.layerOverlaySprite) {
+      this.initLayerOverlaySprite();
+    }
     this._setSprite(this.sprite);
-
-    this.sprite2.setOrigin(0, 0);
   }
 
   getId(): string {
@@ -196,18 +189,20 @@ export class GridCharacter {
     this.lastMovementImpulse = Direction.NONE;
 
     // mirror sprite
-    this.sprite2.x = this.sprite.x + (this.container?.x || 0);
-    this.sprite2.y = this.sprite.y + (this.container?.y || 0);
-    this.sprite2.tint = this.sprite.tint;
-    this.sprite2.alpha = this.sprite.alpha;
-    this.sprite2.scale = this.sprite.scale;
-    this.sprite2.setFrame(this.sprite.frame.name);
-    this.sprite2.active = this.sprite.active;
-    this.sprite2.alphaBottomLeft = this.sprite.alphaBottomLeft;
-    this.sprite2.alphaBottomRight = this.sprite.alphaBottomRight;
-    this.sprite2.alphaTopLeft = this.sprite.alphaTopLeft;
-    this.sprite2.alphaTopRight = this.sprite.alphaTopRight;
-    this.sprite2.angle = this.sprite.angle;
+    if (this.layerOverlaySprite) {
+      this.layerOverlaySprite.x = this.sprite.x + (this.container?.x || 0);
+      this.layerOverlaySprite.y = this.sprite.y + (this.container?.y || 0);
+      this.layerOverlaySprite.tint = this.sprite.tint;
+      this.layerOverlaySprite.alpha = this.sprite.alpha;
+      this.layerOverlaySprite.scale = this.sprite.scale;
+      this.layerOverlaySprite.setFrame(this.sprite.frame.name);
+      this.layerOverlaySprite.active = this.sprite.active;
+      this.layerOverlaySprite.alphaBottomLeft = this.sprite.alphaBottomLeft;
+      this.layerOverlaySprite.alphaBottomRight = this.sprite.alphaBottomRight;
+      this.layerOverlaySprite.alphaTopLeft = this.sprite.alphaTopLeft;
+      this.layerOverlaySprite.alphaTopRight = this.sprite.alphaTopRight;
+      this.layerOverlaySprite.angle = this.sprite.angle;
+    }
   }
 
   getMovementDirection(): Direction {
@@ -366,15 +361,6 @@ export class GridCharacter {
   }
 
   private updateZindex() {
-    const posAbove = new Vector2({
-      ...this.nextTilePos.position,
-      y: this.nextTilePos.position.y - 1,
-    });
-
-    const transAbove =
-      this.tilemap.getTransition(posAbove, this.nextTilePos.layer) ||
-      this.nextTilePos.layer;
-
     const trans = this.tilemap.getTransition(
       this.nextTilePos.position,
       this.nextTilePos.layer
@@ -386,10 +372,24 @@ export class GridCharacter {
         Utils.shiftPad(this.gameObject().y + this.gameObject().displayHeight, 7)
     );
 
-    this.sprite2.setDepth(
-      this.tilemap.getDepthOfCharLayer(transAbove) +
-        Utils.shiftPad(this.gameObject().y + this.gameObject().displayHeight, 7)
-    );
+    if (this.layerOverlaySprite) {
+      const posAbove = new Vector2({
+        ...this.nextTilePos.position,
+        y: this.nextTilePos.position.y - 1,
+      });
+
+      const transAbove =
+        this.tilemap.getTransition(posAbove, this.nextTilePos.layer) ||
+        this.nextTilePos.layer;
+
+      this.layerOverlaySprite.setDepth(
+        this.tilemap.getDepthOfCharLayer(transAbove) +
+          Utils.shiftPad(
+            this.gameObject().y + this.gameObject().displayHeight,
+            7
+          )
+      );
+    }
   }
 
   private setPosition(position: Vector2): void {
@@ -498,5 +498,18 @@ export class GridCharacter {
     { position: enterTile, layer: enterLayer }: LayerPosition
   ): void {
     subject.next({ exitTile, enterTile, exitLayer, enterLayer });
+  }
+
+  private initLayerOverlaySprite(): void {
+    this.layerOverlaySprite.scale = this.sprite.scale;
+    const scaledTileHeight =
+      this.tilemap.getTileHeight() / this.layerOverlaySprite.scale;
+    this.layerOverlaySprite.setCrop(
+      0,
+      0,
+      this.layerOverlaySprite.displayWidth,
+      this.sprite.height - scaledTileHeight
+    );
+    this.layerOverlaySprite.setOrigin(0, 0);
   }
 }

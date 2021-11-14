@@ -103,7 +103,6 @@ describe("GridCharacter", () => {
     };
     gridCharacter = new GridCharacter("player", {
       sprite: gridSpriteMock,
-      layerOverlaySprite: layerOverlaySpriteMock,
       tilemap: gridTilemapMock,
       speed: 3,
       collides: true,
@@ -120,63 +119,76 @@ describe("GridCharacter", () => {
     expect(gridSpriteMock.setOrigin).toHaveBeenCalledWith(0, 0);
   });
 
-  it("should init overlay sprite", () => {
-    expect(layerOverlaySpriteMock.scale).toEqual(gridSpriteMock.scale);
-    expect(layerOverlaySpriteMock.setCrop).toHaveBeenCalledWith(
-      0,
-      0,
-      gridSpriteMock.displayWidth,
-      gridSpriteMock.height - TILE_HEIGHT / gridSpriteMock.scale
-    );
-    expect(layerOverlaySpriteMock.setOrigin).toHaveBeenCalledWith(0, 0);
-  });
-
-  it("should copy props from sprite to overlay sprite", () => {
-    layerOverlaySpriteMock.scale = undefined;
-    gridCharacter.update(100);
-
-    expect(layerOverlaySpriteMock.x).toEqual(gridSpriteMock.x);
-    expect(layerOverlaySpriteMock.y).toEqual(gridSpriteMock.y);
-    expect(layerOverlaySpriteMock.tint).toEqual(gridSpriteMock.tint);
-    expect(layerOverlaySpriteMock.alpha).toEqual(gridSpriteMock.alpha);
-    expect(layerOverlaySpriteMock.scale).toEqual(gridSpriteMock.scale);
-    expect(layerOverlaySpriteMock.setFrame).toHaveBeenCalledWith(
-      gridSpriteMock.frame.name
-    );
-    expect(layerOverlaySpriteMock.active).toEqual(gridSpriteMock.active);
-    expect(layerOverlaySpriteMock.alphaBottomLeft).toEqual(
-      gridSpriteMock.alphaBottomLeft
-    );
-    expect(layerOverlaySpriteMock.alphaBottomRight).toEqual(
-      gridSpriteMock.alphaBottomRight
-    );
-    expect(layerOverlaySpriteMock.alphaTopLeft).toEqual(
-      gridSpriteMock.alphaTopLeft
-    );
-    expect(layerOverlaySpriteMock.alphaTopRight).toEqual(
-      gridSpriteMock.alphaTopRight
-    );
-    expect(layerOverlaySpriteMock.angle).toEqual(gridSpriteMock.angle);
-  });
-
-  it("should copy props from sprite to overlay sprite with container", () => {
-    gridCharacter = new GridCharacter("player", {
-      sprite: gridSpriteMock,
-      container: containerMock,
-      layerOverlaySprite: layerOverlaySpriteMock,
-      tilemap: gridTilemapMock,
-      speed: 3,
-      collides: true,
-      walkingAnimationMapping: 3,
+  describe("overlay sprite", () => {
+    beforeEach(() => {
+      gridCharacter = new GridCharacter("player", {
+        sprite: gridSpriteMock,
+        layerOverlaySprite: layerOverlaySpriteMock,
+        tilemap: gridTilemapMock,
+        speed: 3,
+        collides: true,
+        walkingAnimationMapping: 3,
+      });
     });
-    gridCharacter.update(100);
 
-    expect(layerOverlaySpriteMock.x).toEqual(
-      gridSpriteMock.x + containerMock.x
-    );
-    expect(layerOverlaySpriteMock.y).toEqual(
-      gridSpriteMock.y + containerMock.y
-    );
+    it("should init overlay sprite", () => {
+      expect(layerOverlaySpriteMock.scale).toEqual(gridSpriteMock.scale);
+      expect(layerOverlaySpriteMock.setCrop).toHaveBeenCalledWith(
+        0,
+        0,
+        gridSpriteMock.displayWidth,
+        gridSpriteMock.height - TILE_HEIGHT / gridSpriteMock.scale
+      );
+      expect(layerOverlaySpriteMock.setOrigin).toHaveBeenCalledWith(0, 0);
+    });
+
+    it("should copy props from sprite to overlay sprite", () => {
+      layerOverlaySpriteMock.scale = undefined;
+      gridCharacter.update(100);
+
+      expect(layerOverlaySpriteMock.x).toEqual(gridSpriteMock.x);
+      expect(layerOverlaySpriteMock.y).toEqual(gridSpriteMock.y);
+      expect(layerOverlaySpriteMock.tint).toEqual(gridSpriteMock.tint);
+      expect(layerOverlaySpriteMock.alpha).toEqual(gridSpriteMock.alpha);
+      expect(layerOverlaySpriteMock.scale).toEqual(gridSpriteMock.scale);
+      expect(layerOverlaySpriteMock.setFrame).toHaveBeenCalledWith(
+        gridSpriteMock.frame.name
+      );
+      expect(layerOverlaySpriteMock.active).toEqual(gridSpriteMock.active);
+      expect(layerOverlaySpriteMock.alphaBottomLeft).toEqual(
+        gridSpriteMock.alphaBottomLeft
+      );
+      expect(layerOverlaySpriteMock.alphaBottomRight).toEqual(
+        gridSpriteMock.alphaBottomRight
+      );
+      expect(layerOverlaySpriteMock.alphaTopLeft).toEqual(
+        gridSpriteMock.alphaTopLeft
+      );
+      expect(layerOverlaySpriteMock.alphaTopRight).toEqual(
+        gridSpriteMock.alphaTopRight
+      );
+      expect(layerOverlaySpriteMock.angle).toEqual(gridSpriteMock.angle);
+    });
+
+    it("should copy props from sprite to overlay sprite with container", () => {
+      gridCharacter = new GridCharacter("player", {
+        sprite: gridSpriteMock,
+        container: containerMock,
+        layerOverlaySprite: layerOverlaySpriteMock,
+        tilemap: gridTilemapMock,
+        speed: 3,
+        collides: true,
+        walkingAnimationMapping: 3,
+      });
+      gridCharacter.update(100);
+
+      expect(layerOverlaySpriteMock.x).toEqual(
+        gridSpriteMock.x + containerMock.x
+      );
+      expect(layerOverlaySpriteMock.y).toEqual(
+        gridSpriteMock.y + containerMock.y
+      );
+    });
   });
 
   it("should get init data", () => {

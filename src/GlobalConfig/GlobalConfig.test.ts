@@ -10,6 +10,7 @@ describe("GlobalConfig", () => {
       collisionTilePropertyName: "ge_collides",
       numberOfDirections: NumberOfDirections.FOUR,
       characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
+      layerOverlay: false,
     };
     GlobalConfig.set(config);
     expect(GlobalConfig.get()).toBe(config);

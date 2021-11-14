@@ -41,6 +41,7 @@ export interface GridEngineConfig {
   collisionTilePropertyName?: string;
   numberOfDirections?: NumberOfDirections;
   characterCollisionStrategy?: CollisionStrategy;
+  layerOverlay?: boolean;
 }
 
 export interface WalkingAnimationMapping {
@@ -235,11 +236,9 @@ export class GridEngine {
   }
 
   update(_time: number, delta: number): void {
-    if (this.isCreated) {
-      if (this.gridCharacters) {
-        for (const [_key, val] of this.gridCharacters) {
-          val.update(delta);
-        }
+    if (this.isCreated && this.gridCharacters) {
+      for (const [_key, val] of this.gridCharacters) {
+        val.update(delta);
       }
     }
   }
@@ -247,21 +246,13 @@ export class GridEngine {
   addCharacter(charData: CharacterData): void {
     this.initGuard();
 
-    const sprite2 = this.scene.add.sprite(0, 0, charData.sprite.texture);
-    // sprite2.scale = charData.sprite.scale;
-    // const scaledTileHeight =
-    //   this.tilemap.tileHeight *
-    //   (this.tilemap.layers[0].tilemapLayer.scale / sprite2.scale);
-    // sprite2.setCrop(
-    //   0,
-    //   0,
-    //   sprite2.width * sprite2.scale,
-    //   charData.sprite.height - scaledTileHeight
-    // );
+    const layerOverlaySprite = GlobalConfig.get().layerOverlay
+      ? this.scene.add.sprite(0, 0, charData.sprite.texture)
+      : undefined;
 
     const charConfig: CharConfig = {
       sprite: charData.sprite,
-      layerOverlaySprite: sprite2,
+      layerOverlaySprite,
       speed: charData.speed || 4,
       tilemap: this.gridTilemap,
       walkingAnimationMapping: charData.walkingAnimationMapping,
@@ -457,6 +448,7 @@ export class GridEngine {
       collisionTilePropertyName: "ge_collide",
       numberOfDirections: NumberOfDirections.FOUR,
       characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
+      layerOverlay: false,
       ...config,
     };
   }

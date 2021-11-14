@@ -140,6 +140,7 @@ describe("GridTilemap", () => {
       numberOfDirections: NumberOfDirections.FOUR,
       characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
       collisionTilePropertyName: "ge_collide",
+      layerOverlay: false,
     }));
   });
 
@@ -378,6 +379,7 @@ describe("GridTilemap", () => {
       numberOfDirections: NumberOfDirections.FOUR,
       characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
       collisionTilePropertyName: "custom_collides_prop",
+      layerOverlay: false,
     }));
     gridTilemap = new GridTilemap(tilemapMock);
     const isBlockingTile = gridTilemap.hasBlockingTile(
