@@ -5,7 +5,6 @@ import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
-import { GridSprite } from "../GridSprite/GridSprite";
 
 const mockCharacterAnimation = {
   updateCharacterFrame: jest.fn(),
@@ -31,7 +30,8 @@ jest.mock("./CharacterAnimation/CharacterAnimation", function () {
 
 describe("GridCharacter", () => {
   let gridCharacter: GridCharacter;
-  let gridSpriteMock: GridSprite;
+  let gridSpriteMock: Phaser.GameObjects.Sprite;
+  let layerOverlaySpriteMock: Phaser.GameObjects.Sprite;
   let gridTilemapMock;
 
   const TILE_WIDTH = 16;
@@ -73,15 +73,25 @@ describe("GridCharacter", () => {
       toMapDirection: jest.fn().mockReturnValue(Direction.DOWN),
     };
     gridSpriteMock = <any>{
-      getRawSprite: jest.fn(),
       displayWidth: 16,
       displayHeight: 20,
       setDepth: jest.fn(),
       x: 5 * TILE_WIDTH + PLAYER_X_OFFSET,
       y: 6 * TILE_HEIGHT + PLAYER_Y_OFFSET,
+      frame: {
+        name: "someFrameName",
+      },
+      setOrigin: jest.fn(),
+    };
+    layerOverlaySpriteMock = <any>{
+      setCrop: jest.fn(),
+      setDepth: jest.fn(),
+      setOrigin: jest.fn(),
+      setFrame: jest.fn(),
     };
     gridCharacter = new GridCharacter("player", {
       sprite: gridSpriteMock,
+      layerOverlaySprite: layerOverlaySpriteMock,
       tilemap: gridTilemapMock,
       speed: 3,
       collides: true,
@@ -89,9 +99,14 @@ describe("GridCharacter", () => {
     });
   });
 
+  it("should init sprite", () => {
+    expect(gridSpriteMock.setOrigin).toHaveBeenCalledWith(0, 0);
+  });
+
   it("should get init data", () => {
     gridCharacter = new GridCharacter("player", {
       sprite: gridSpriteMock,
+      layerOverlaySprite: layerOverlaySpriteMock,
       tilemap: gridTilemapMock,
       speed: 3,
       collides: true,
@@ -117,15 +132,15 @@ describe("GridCharacter", () => {
   it("should set and get sprite", () => {
     const sprite = <any>{
       setDepth: jest.fn(),
-      getRawSprite: jest.fn().mockReturnValue("rawSprite"),
       displayHeight: gridSpriteMock.displayHeight,
+      setOrigin: jest.fn(),
     };
     gridCharacter.setSprite(sprite);
 
     expect(gridCharacter.getSprite()).toBe(sprite);
     expect(gridCharacter.getSprite().x).toEqual(80);
     expect(gridCharacter.getSprite().y).toEqual(92);
-    expect(CharacterAnimation).toHaveBeenCalledWith("rawSprite", undefined, 3);
+    expect(CharacterAnimation).toHaveBeenCalledWith(sprite, undefined, 3);
     expect(mockCharacterAnimation.setIsEnabled).toHaveBeenCalledWith(true);
     expect(mockCharacterAnimation.setStandingFrame).toHaveBeenCalledWith(
       Direction.DOWN
@@ -377,6 +392,7 @@ describe("GridCharacter", () => {
     gridTilemapMock.tilePosToPixelPos.mockReturnValue(newPixelPos);
     gridCharacter = new GridCharacter("player", {
       sprite: gridSpriteMock,
+      layerOverlaySprite: layerOverlaySpriteMock,
       tilemap: gridTilemapMock,
       speed: 3,
       offsetX: customOffsetX,
@@ -776,6 +792,7 @@ describe("GridCharacter", () => {
     it("should not detect blocking direction if char does not collide", () => {
       gridCharacter = new GridCharacter("player", {
         sprite: gridSpriteMock,
+        layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
         collides: false,
@@ -916,6 +933,7 @@ describe("GridCharacter", () => {
       };
       gridCharacter = new GridCharacter("player", {
         sprite: gridSpriteMock,
+        layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
         walkingAnimationMapping: 3,

@@ -26,7 +26,6 @@ import { Vector2 } from "./Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { Concrete } from "./Utils/TypeUtils";
-import { GridSprite } from "./GridSprite/GridSprite";
 
 export { Direction };
 
@@ -248,7 +247,7 @@ export class GridEngine {
   addCharacter(charData: CharacterData): void {
     this.initGuard();
 
-    // const sprite2 = this.scene.add.sprite(0, 0, charData.sprite.texture);
+    const sprite2 = this.scene.add.sprite(0, 0, charData.sprite.texture);
     // sprite2.scale = charData.sprite.scale;
     // const scaledTileHeight =
     //   this.tilemap.tileHeight *
@@ -261,8 +260,8 @@ export class GridEngine {
     // );
 
     const charConfig: CharConfig = {
-      sprite: new GridSprite(charData.sprite),
-      // sprite2,
+      sprite: charData.sprite,
+      layerOverlaySprite: sprite2,
       speed: charData.speed || 4,
       tilemap: this.gridTilemap,
       walkingAnimationMapping: charData.walkingAnimationMapping,
@@ -421,13 +420,14 @@ export class GridEngine {
   getSprite(charId: string): Phaser.GameObjects.Sprite {
     this.initGuard();
     this.unknownCharGuard(charId);
-    return this.gridCharacters.get(charId).getSprite().getRawSprite();
+    return this.gridCharacters.get(charId).getSprite();
   }
 
   setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void {
     this.initGuard();
     this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).setSprite(new GridSprite(sprite));
+    sprite.setOrigin(0, 0);
+    this.gridCharacters.get(charId).setSprite(sprite);
   }
 
   movementStarted(): Observable<{ charId: string; direction: Direction }> {

@@ -56,11 +56,7 @@ const mockGridTilemapConstructor = jest.fn(function (
   return mockGridTileMap;
 });
 
-const mockGridSprite = {};
-
-const mockSpriteConstructor = jest.fn(function (_rawSprite) {
-  return mockGridSprite;
-});
+const mockNewSprite = { setCrop: jest.fn(), setOrigin: jest.fn() };
 
 expect.extend({
   toBeCharacter(receivedChar: GridCharacter, expectedCharId: string) {
@@ -84,12 +80,6 @@ expect.extend({
 jest.mock("./GridTilemap/GridTilemap", function () {
   return {
     GridTilemap: mockGridTilemapConstructor,
-  };
-});
-
-jest.mock("./GridSprite/GridSprite", function () {
-  return {
-    GridSprite: mockSpriteConstructor,
   };
 });
 
@@ -163,7 +153,7 @@ describe("GridEngine", () => {
     // is not mockable by jest
     sceneMock = {
       sys: { events: { once: jest.fn(), on: jest.fn() } },
-      add: { sprite: jest.fn().mockReturnValue({ setCrop: jest.fn() }) },
+      add: { sprite: jest.fn().mockReturnValue(mockNewSprite) },
     };
     tileMapMock = {
       layers: [
@@ -174,7 +164,7 @@ describe("GridEngine", () => {
       tileWidth: 16,
       tileHeight: 16,
     };
-    playerSpriteMock = {};
+    playerSpriteMock = { setOrigin: jest.fn() };
     mockTargetMovement.update.mockReset();
     mockRandomMovement.update.mockReset();
     mockGridCharacter.update.mockReset();
@@ -229,13 +219,16 @@ describe("GridEngine", () => {
       ],
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
-      sprite: mockGridSprite,
+      sprite: playerSpriteMock,
+      layerOverlaySprite: mockNewSprite,
       tilemap: mockGridTileMap,
       speed: 4,
       container: containerMock,
       offsetX: undefined,
       offsetY: undefined,
       collides: true,
+      walkingAnimationMapping: undefined,
+      charLayer: undefined,
     });
     expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith({
       position: new Vector2(0, 0),
@@ -270,6 +263,7 @@ describe("GridEngine", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
+      layerOverlaySprite: mockNewSprite,
       tilemap: mockGridTileMap,
       speed: 4,
       collides: true,
@@ -314,6 +308,7 @@ describe("GridEngine", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
+      layerOverlaySprite: mockNewSprite,
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping,
@@ -395,13 +390,12 @@ describe("GridEngine", () => {
         },
       ],
     });
-    expect(GridCharacter).toHaveBeenCalledWith("player", {
-      sprite: playerSpriteMock,
-      tilemap: mockGridTileMap,
-      speed: 2,
-      walkingAnimationMapping: 3,
-      collides: true,
-    });
+    expect(GridCharacter).toHaveBeenCalledWith(
+      "player",
+      expect.objectContaining({
+        speed: 2,
+      })
+    );
   });
 
   it("should use config offset", () => {
@@ -420,6 +414,7 @@ describe("GridEngine", () => {
     });
     expect(GridCharacter).toHaveBeenCalledWith("player", {
       sprite: playerSpriteMock,
+      layerOverlaySprite: mockNewSprite,
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping: 3,
@@ -441,13 +436,12 @@ describe("GridEngine", () => {
         },
       ],
     });
-    expect(GridCharacter).toHaveBeenCalledWith("player", {
-      sprite: playerSpriteMock,
-      tilemap: mockGridTileMap,
-      speed: 2,
-      walkingAnimationMapping: 3,
-      collides: false,
-    });
+    expect(GridCharacter).toHaveBeenCalledWith(
+      "player",
+      expect.objectContaining({
+        collides: false,
+      })
+    );
   });
 
   it("should use config char layer", () => {
@@ -628,19 +622,16 @@ describe("GridEngine", () => {
   });
 
   it("should get sprite", () => {
-    const mockSprite = {
-      getRawSprite: jest.fn().mockReturnValue("sprite"),
-    };
-    mockGridCharacter.getSprite.mockReturnValue(mockSprite);
+    mockGridCharacter.getSprite.mockReturnValue("sprite");
 
     expect(gridEngine.getSprite("player")).toEqual("sprite");
   });
 
   it("should set sprite", () => {
-    gridEngine.setSprite("player", <any>"someSprite");
+    const mockSprite = <any>{ setOrigin: jest.fn() };
+    gridEngine.setSprite("player", mockSprite);
 
-    expect(mockSpriteConstructor).toHaveBeenCalledWith("someSprite");
-    expect(mockGridCharacter.setSprite).toHaveBeenCalledWith(mockGridSprite);
+    expect(mockGridCharacter.setSprite).toHaveBeenCalledWith(mockSprite);
   });
 
   it("should get facing position", () => {
