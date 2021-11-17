@@ -1215,7 +1215,6 @@ describe("TargetMovement", () => {
       });
       const mockCall = jest.fn();
       const targetPos = layerPos(new Vector2(3, 3));
-      // targetMovement.setCharacter(mockChar);
       targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
       targetMovement.finishedObs().subscribe(mockCall);
       targetMovement.update(100);
