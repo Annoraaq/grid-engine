@@ -10,6 +10,7 @@ import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
 import { Utils } from "../Utils/Utils/Utils";
+import { SpriteUtils } from "../Utils/SpriteUtils/SpriteUtils";
 
 export interface FrameRow {
   leftFoot: number;
@@ -188,20 +189,13 @@ export class GridCharacter {
     }
     this.lastMovementImpulse = Direction.NONE;
 
-    // mirror sprite
     if (this.layerOverlaySprite) {
+      SpriteUtils.copyOverImportantProperties(
+        this.sprite,
+        this.layerOverlaySprite
+      );
       this.layerOverlaySprite.x = this.sprite.x + (this.container?.x || 0);
       this.layerOverlaySprite.y = this.sprite.y + (this.container?.y || 0);
-      this.layerOverlaySprite.tint = this.sprite.tint;
-      this.layerOverlaySprite.alpha = this.sprite.alpha;
-      this.layerOverlaySprite.scale = this.sprite.scale;
-      this.layerOverlaySprite.setFrame(this.sprite.frame.name);
-      this.layerOverlaySprite.active = this.sprite.active;
-      this.layerOverlaySprite.alphaBottomLeft = this.sprite.alphaBottomLeft;
-      this.layerOverlaySprite.alphaBottomRight = this.sprite.alphaBottomRight;
-      this.layerOverlaySprite.alphaTopLeft = this.sprite.alphaTopLeft;
-      this.layerOverlaySprite.alphaTopRight = this.sprite.alphaTopRight;
-      this.layerOverlaySprite.angle = this.sprite.angle;
     }
   }
 

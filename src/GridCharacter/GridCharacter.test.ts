@@ -1,3 +1,4 @@
+import { SpriteUtils } from "./../Utils/SpriteUtils/SpriteUtils";
 import { GridCharacter } from "./GridCharacter";
 import { Direction } from "../Direction/Direction";
 import { take } from "rxjs/operators";
@@ -13,6 +14,8 @@ const mockCharacterAnimation = {
   setWalkingAnimationMapping: jest.fn(),
   setCharacterIndex: jest.fn(),
 };
+
+SpriteUtils.copyOverImportantProperties = jest.fn();
 
 jest.mock("./CharacterAnimation/CharacterAnimation", function () {
   return {
@@ -146,28 +149,12 @@ describe("GridCharacter", () => {
       layerOverlaySpriteMock.scale = undefined;
       gridCharacter.update(100);
 
+      expect(SpriteUtils.copyOverImportantProperties).toHaveBeenCalledWith(
+        gridSpriteMock,
+        layerOverlaySpriteMock
+      );
       expect(layerOverlaySpriteMock.x).toEqual(gridSpriteMock.x);
       expect(layerOverlaySpriteMock.y).toEqual(gridSpriteMock.y);
-      expect(layerOverlaySpriteMock.tint).toEqual(gridSpriteMock.tint);
-      expect(layerOverlaySpriteMock.alpha).toEqual(gridSpriteMock.alpha);
-      expect(layerOverlaySpriteMock.scale).toEqual(gridSpriteMock.scale);
-      expect(layerOverlaySpriteMock.setFrame).toHaveBeenCalledWith(
-        gridSpriteMock.frame.name
-      );
-      expect(layerOverlaySpriteMock.active).toEqual(gridSpriteMock.active);
-      expect(layerOverlaySpriteMock.alphaBottomLeft).toEqual(
-        gridSpriteMock.alphaBottomLeft
-      );
-      expect(layerOverlaySpriteMock.alphaBottomRight).toEqual(
-        gridSpriteMock.alphaBottomRight
-      );
-      expect(layerOverlaySpriteMock.alphaTopLeft).toEqual(
-        gridSpriteMock.alphaTopLeft
-      );
-      expect(layerOverlaySpriteMock.alphaTopRight).toEqual(
-        gridSpriteMock.alphaTopRight
-      );
-      expect(layerOverlaySpriteMock.angle).toEqual(gridSpriteMock.angle);
     });
 
     it("should copy props from sprite to overlay sprite with container", () => {
