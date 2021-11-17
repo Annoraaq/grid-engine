@@ -355,35 +355,42 @@ export class GridCharacter {
   }
 
   private updateZindex() {
-    const trans = this.tilemap.getTransition(
-      this.nextTilePos.position,
-      this.nextTilePos.layer
-    );
-
-    const layer = this.nextTilePos.layer;
-    this.gameObject().setDepth(
-      this.tilemap.getDepthOfCharLayer(trans || layer) +
-        Utils.shiftPad(this.gameObject().y + this.gameObject().displayHeight, 7)
-    );
+    this.setDepth(this.gameObject(), this.nextTilePos);
 
     if (this.layerOverlaySprite) {
       const posAbove = new Vector2({
         ...this.nextTilePos.position,
         y: this.nextTilePos.position.y - 1,
       });
-
-      const transAbove =
-        this.tilemap.getTransition(posAbove, this.nextTilePos.layer) ||
-        this.nextTilePos.layer;
-
-      this.layerOverlaySprite.setDepth(
-        this.tilemap.getDepthOfCharLayer(transAbove) +
-          Utils.shiftPad(
-            this.gameObject().y + this.gameObject().displayHeight,
-            7
-          )
-      );
+      this.setDepth(this.layerOverlaySprite, {
+        position: posAbove,
+        layer: this.nextTilePos.layer,
+      });
     }
+  }
+
+  private setDepth(
+    gameObject: Phaser.GameObjects.Container | Phaser.GameObjects.Sprite,
+    position: LayerPosition
+  ): void {
+    gameObject.setDepth(
+      this.tilemap.getDepthOfCharLayer(this.getTransitionLayer(position)) +
+        this.getPaddedPixelDepth()
+    );
+  }
+
+  private getPaddedPixelDepth(): number {
+    return Utils.shiftPad(
+      this.gameObject().y + this.gameObject().displayHeight,
+      7
+    );
+  }
+
+  private getTransitionLayer(position: LayerPosition): string {
+    return (
+      this.tilemap.getTransition(position.position, position.layer) ||
+      position.layer
+    );
   }
 
   private setPosition(position: Vector2): void {
