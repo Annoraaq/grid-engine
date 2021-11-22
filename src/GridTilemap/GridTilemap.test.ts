@@ -8,8 +8,6 @@ import { GridTilemap } from "./GridTilemap";
 import { Rect } from "../Utils/Rect/Rect";
 import * as Phaser from "phaser";
 
-const MAX_CHAR_LAYERS = 1;
-
 const mockCharBlockCache = {
   addCharacter: jest.fn(),
   removeCharacter: jest.fn(),
@@ -188,10 +186,8 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(tilemapMock);
 
     expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
-    expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(
-      MAX_CHAR_LAYERS + 2
-    );
-    expect(tilemapMock.layers[2].tilemapLayer.setDepth).toHaveBeenCalledWith(2);
+    expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(2);
+    expect(tilemapMock.layers[2].tilemapLayer.setDepth).toHaveBeenCalledWith(1);
   });
 
   it("should consider charLayers", () => {
@@ -200,18 +196,51 @@ describe("GridTilemap", () => {
 
     expect(
       tilemapMock.layers[0].tilemapLayer.setDepth
-    ).toHaveBeenLastCalledWith(0);
-    expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(1);
-    expect(tilemapMock.layers[2].tilemapLayer.setDepth).toHaveBeenCalledWith(
-      MAX_CHAR_LAYERS + 2
-    );
-    expect(tilemapMock.layers[3].tilemapLayer.setDepth).toHaveBeenCalledWith(
-      MAX_CHAR_LAYERS + 3
-    );
-    expect(gridTilemap.getDepthOfCharLayer("charLayer1")).toEqual(1);
-    expect(gridTilemap.getDepthOfCharLayer("charLayer2")).toEqual(
-      MAX_CHAR_LAYERS + 3
-    );
+    ).toHaveBeenLastCalledWith(3);
+    expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
+    expect(tilemapMock.layers[2].tilemapLayer.setDepth).toHaveBeenCalledWith(1);
+    expect(tilemapMock.layers[3].tilemapLayer.setDepth).toHaveBeenCalledWith(2);
+    expect(gridTilemap.getDepthOfCharLayer("charLayer1")).toEqual(0);
+    expect(gridTilemap.getDepthOfCharLayer("charLayer2")).toEqual(2);
+  });
+
+  it("should return highest non-char layer for undefined layer", () => {
+    tilemapMock.layers = [
+      {
+        name: "layer1",
+        tilemapLayer: {
+          setDepth: jest.fn(),
+          scale: 3,
+          tileset: "Cloud City",
+        },
+        properties: [],
+      },
+      {
+        name: "layer2",
+        tilemapLayer: {
+          setDepth: jest.fn(),
+          scale: 3,
+          tileset: "Cloud City",
+        },
+        properties: [
+          {
+            name: "ge_alwaysTop",
+            value: true,
+          },
+        ],
+      },
+      {
+        name: "layer3",
+        tilemapLayer: {
+          setDepth: jest.fn(),
+          scale: 3,
+          tileset: "Cloud City",
+        },
+        properties: [],
+      },
+    ];
+
+    expect(gridTilemap.getDepthOfCharLayer(undefined)).toEqual(1);
   });
 
   it("should consider 'heightShift' layer", () => {
@@ -267,8 +296,8 @@ describe("GridTilemap", () => {
     expect(blankLayerMock.putTileAt).toHaveBeenNthCalledWith(4, "r1#c1", 1, 1);
     expect(blankLayerMock.scale).toEqual(3);
     expect(blankLayerMock.setDepth).toHaveBeenCalledTimes(2);
-    expect(blankLayerMock.setDepth).toHaveBeenNthCalledWith(1, 0.5);
-    expect(blankLayerMock.setDepth).toHaveBeenNthCalledWith(2, 1.5);
+    expect(blankLayerMock.setDepth).toHaveBeenNthCalledWith(1, 0.0000048);
+    expect(blankLayerMock.setDepth).toHaveBeenNthCalledWith(2, 0.0000096);
     expect(tilemapMock.layers[1].tilemapLayer.destroy).toHaveBeenCalled();
   });
 

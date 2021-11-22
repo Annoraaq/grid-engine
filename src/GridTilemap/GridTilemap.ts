@@ -5,6 +5,7 @@ import { Vector2 } from "../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache/CharBlockCache";
 import { Rect } from "../Utils/Rect/Rect";
 import { VectorUtils } from "../Utils/VectorUtils";
+import { Utils } from "../Utils/Utils/Utils";
 
 export class GridTilemap {
   private static readonly MAX_PLAYER_LAYERS = 1;
@@ -248,41 +249,42 @@ export class GridTilemap {
 
   private setLayerDepths() {
     const layersToDelete: Phaser.Tilemaps.TilemapLayer[] = [];
-    let offset = 0;
+    let offset = -1;
     const onTopLayers = [];
+    let foundCharLayer = false;
     this.tilemap.layers.forEach((layerData, layerIndex) => {
       if (this.isLayerAlwaysOnTop(layerData)) {
         onTopLayers.push(layerData);
+        return;
       }
       if (this.hasLayerProp(layerData, GridTilemap.HEIGHT_SHIFT_PROP_NAME)) {
+        if (offset == -1) {
+          offset = 0;
+        }
         this.createLayerForEachRow(layerData, layerIndex, offset);
         layersToDelete.push(layerData.tilemapLayer);
-        offset += layerData.height;
       } else {
-        layerData.tilemapLayer.setDepth(layerIndex + offset);
+        offset++;
+        layerData.tilemapLayer.setDepth(offset);
       }
 
       if (this.isCharLayer(layerData)) {
+        foundCharLayer = true;
         this.visLayerDepths.set(
           this.getLayerProp(layerData, GridTilemap.CHAR_LAYER_PROP_NAME),
-          layerIndex + offset
+          offset
         );
-        offset += GridTilemap.MAX_PLAYER_LAYERS;
+      } else {
+        if (!foundCharLayer) {
+          this.visLayerDepths.set(undefined, offset);
+        }
       }
     });
 
     layersToDelete.forEach((layer) => layer.destroy());
-    if (this.visLayerDepths.size == 0) {
-      onTopLayers.forEach((layer, layerIndex) => {
-        layer.tilemapLayer.setDepth(
-          GridTilemap.MAX_PLAYER_LAYERS +
-            layerIndex +
-            offset +
-            this.tilemap.layers.length -
-            onTopLayers.length
-        );
-      });
-    }
+    onTopLayers.forEach((layer, layerIndex) => {
+      layer.tilemapLayer.setDepth(layerIndex + 1 + offset);
+    });
   }
 
   private createLayerForEachRow(
@@ -305,9 +307,8 @@ export class GridTilemap {
 
       newLayer.scale = layer.tilemapLayer.scale;
 
-      const makeHigherThanPlayerWhenOnSameLevel = 0.5;
       newLayer.setDepth(
-        offset + row + heightShift - 1 + makeHigherThanPlayerWhenOnSameLevel
+        offset + Utils.shiftPad((row + heightShift) * this.getTileHeight(), 7)
       );
     }
   }
