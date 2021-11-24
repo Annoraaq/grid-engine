@@ -1,6 +1,5 @@
 import { GlobalConfig } from "./GlobalConfig/GlobalConfig";
 import { CollisionStrategy } from "./Collisions/CollisionStrategy";
-import { IsometricGridCharacter } from "./GridCharacter/IsometricGridCharacter/IsometricGridCharacter";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import {
   Finished,
@@ -42,6 +41,7 @@ export interface GridEngineConfig {
   collisionTilePropertyName?: string;
   numberOfDirections?: NumberOfDirections;
   characterCollisionStrategy?: CollisionStrategy;
+  layerOverlay?: boolean;
 }
 
 export interface WalkingAnimationMapping {
@@ -168,8 +168,12 @@ export class GridEngine {
   moveRandomly(charId: string, delay = 0, radius = -1): void {
     this.initGuard();
     this.unknownCharGuard(charId);
-    const randomMovement = new RandomMovement(delay, radius);
-    randomMovement.setNumberOfDirections(GlobalConfig.get().numberOfDirections);
+    const randomMovement = new RandomMovement(
+      this.gridCharacters.get(charId),
+      GlobalConfig.get().numberOfDirections,
+      delay,
+      radius
+    );
     this.gridCharacters.get(charId).setMovement(randomMovement);
   }
 
@@ -183,6 +187,7 @@ export class GridEngine {
     this.initGuard();
     this.unknownCharGuard(charId);
     const targetMovement = new TargetMovement(
+      this.gridCharacters.get(charId),
       this.gridTilemap,
       {
         position: new Vector2(targetPos),
@@ -190,14 +195,14 @@ export class GridEngine {
           config?.targetLayer ||
           this.gridCharacters.get(charId).getNextTilePos().layer,
       },
+      GlobalConfig.get().numberOfDirections,
       0,
       moveToConfig
     );
-    targetMovement.setNumberOfDirections(GlobalConfig.get().numberOfDirections);
     this.gridCharacters.get(charId).setMovement(targetMovement);
     return targetMovement.finishedObs().pipe(
       take(1),
-      map((finished) => ({
+      map((finished: Finished) => ({
         charId,
         position: finished.position,
         result: finished.result,
@@ -231,11 +236,9 @@ export class GridEngine {
   }
 
   update(_time: number, delta: number): void {
-    if (this.isCreated) {
-      if (this.gridCharacters) {
-        for (const [_key, val] of this.gridCharacters) {
-          val.update(delta);
-        }
+    if (this.isCreated && this.gridCharacters) {
+      for (const [_key, val] of this.gridCharacters) {
+        val.update(delta);
       }
     }
   }
@@ -243,14 +246,15 @@ export class GridEngine {
   addCharacter(charData: CharacterData): void {
     this.initGuard();
 
+    const layerOverlaySprite = GlobalConfig.get().layerOverlay
+      ? this.scene.add.sprite(0, 0, charData.sprite.texture)
+      : undefined;
+
     const charConfig: CharConfig = {
       sprite: charData.sprite,
+      layerOverlaySprite,
       speed: charData.speed || 4,
       tilemap: this.gridTilemap,
-      tileSize: new Vector2(
-        this.gridTilemap.getTileWidth(),
-        this.gridTilemap.getTileHeight()
-      ),
       walkingAnimationMapping: charData.walkingAnimationMapping,
       container: charData.container,
       offsetX: charData.offsetX,
@@ -354,14 +358,15 @@ export class GridEngine {
     this.unknownCharGuard(charId);
     this.unknownCharGuard(charIdToFollow);
     const followMovement = new FollowMovement(
+      this.gridCharacters.get(charId),
       this.gridTilemap,
       this.gridCharacters.get(charIdToFollow),
+      GlobalConfig.get().numberOfDirections,
       distance,
       closestPointIfBlocked
         ? NoPathFoundStrategy.CLOSEST_REACHABLE
         : NoPathFoundStrategy.STOP
     );
-    followMovement.setNumberOfDirections(GlobalConfig.get().numberOfDirections);
     this.gridCharacters.get(charId).setMovement(followMovement);
   }
 
@@ -412,6 +417,7 @@ export class GridEngine {
   setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void {
     this.initGuard();
     this.unknownCharGuard(charId);
+    sprite.setOrigin(0, 0);
     this.gridCharacters.get(charId).setSprite(sprite);
   }
 
@@ -442,6 +448,7 @@ export class GridEngine {
       collisionTilePropertyName: "ge_collide",
       numberOfDirections: NumberOfDirections.FOUR,
       characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
+      layerOverlay: false,
       ...config,
     };
   }
@@ -465,11 +472,7 @@ export class GridEngine {
   }
 
   private createCharacter(id: string, config: CharConfig): GridCharacter {
-    if (this._isIsometric()) {
-      return new IsometricGridCharacter(id, config);
-    } else {
-      return new GridCharacter(id, config);
-    }
+    return new GridCharacter(id, config);
   }
 
   private addCharacters() {
@@ -483,12 +486,12 @@ export class GridEngine {
     this.unknownCharGuard(charId);
 
     if (GlobalConfig.get().numberOfDirections === NumberOfDirections.FOUR) {
-      if (!this._isIsometric() && isDiagonal(direction)) {
+      if (!this.gridTilemap.isIsometric() && isDiagonal(direction)) {
         console.warn(
           `GridEngine: Character '${charId}' can't be moved '${direction}' in 4 direction mode.`
         );
         return;
-      } else if (this._isIsometric() && !isDiagonal(direction)) {
+      } else if (this.gridTilemap.isIsometric() && !isDiagonal(direction)) {
         console.warn(
           `GridEngine: Character '${charId}' can't be moved '${direction}' in 4 direction isometric mode.`
         );
@@ -497,12 +500,6 @@ export class GridEngine {
     }
 
     this.gridCharacters.get(charId).move(direction);
-  }
-
-  private _isIsometric(): boolean {
-    return (
-      this.tilemap.orientation == `${Phaser.Tilemaps.Orientation.ISOMETRIC}`
-    );
   }
 
   private assembleMoveToConfig(config: MoveToConfig): MoveToConfig {

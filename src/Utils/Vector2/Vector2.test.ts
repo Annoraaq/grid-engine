@@ -87,4 +87,21 @@ describe("Vector2", () => {
     const v = new Vector2({ x: 4, y: -3 });
     expect(v.toString()).toEqual("4#-3");
   });
+
+  it("should multiply with scalar", () => {
+    const v = new Vector2({ x: 4, y: -3 });
+    expect(v.scalarMult(3)).toEqual(new Vector2(12, -9));
+  });
+
+  it("should modulo with vector", () => {
+    const v = new Vector2({ x: 5, y: 9 });
+    const modV = new Vector2({ x: 2, y: 5 });
+    expect(v.modulo(modV)).toEqual(new Vector2(1, 4));
+  });
+
+  it("should modulo with scalar", () => {
+    const v = new Vector2({ x: 5, y: 9 });
+    const mod = 5;
+    expect(v.scalarModulo(mod)).toEqual(new Vector2(0, 4));
+  });
 });

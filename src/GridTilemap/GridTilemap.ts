@@ -1,19 +1,21 @@
 import { GlobalConfig } from "./../GlobalConfig/GlobalConfig";
-import { Direction } from "./../Direction/Direction";
+import { Direction, turnCounterClockwise } from "./../Direction/Direction";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache/CharBlockCache";
 import { Rect } from "../Utils/Rect/Rect";
+import { VectorUtils } from "../Utils/VectorUtils";
+import { Utils } from "../Utils/Utils/Utils";
 
 export class GridTilemap {
-  private static readonly MAX_PLAYER_LAYERS = 1000;
   private static readonly ALWAYS_TOP_PROP_NAME = "ge_alwaysTop";
   private static readonly CHAR_LAYER_PROP_NAME = "ge_charLayer";
   private static readonly HEIGHT_SHIFT_PROP_NAME = "ge_heightShift";
   private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "ge_collide_";
+  private static readonly Z_INDEX_PADDING = 7;
   private characters = new Map<string, GridCharacter>();
   private charBlockCache: CharBlockCache = new CharBlockCache();
-  private visLayerDepths = new Map<string, number>();
+  private charLayerDepths = new Map<string, number>();
   private transitions: Map<string, Map<string, string>> = new Map();
 
   constructor(private tilemap: Phaser.Tilemaps.Tilemap) {
@@ -101,12 +103,59 @@ export class GridTilemap {
   }
 
   getDepthOfCharLayer(layerName: string): number {
-    return this.visLayerDepths.get(layerName) || 0;
+    return this.charLayerDepths.get(layerName) || 0;
   }
 
   isInRange(pos: Vector2): boolean {
     const rect = new Rect(0, 0, this.tilemap.width, this.tilemap.height);
     return rect.isInRange(pos);
+  }
+
+  getTileSize(): Vector2 {
+    return new Vector2(this.getTileWidth(), this.getTileHeight());
+  }
+
+  tilePosToPixelPos(tilePosition: Vector2): Vector2 {
+    if (this.isIsometric()) {
+      return VectorUtils.scalarMult(this.getTileSize(), 0.5).multiply(
+        new Vector2(
+          tilePosition.x - tilePosition.y,
+          tilePosition.x + tilePosition.y
+        )
+      );
+    }
+    return tilePosition.clone().multiply(this.getTileSize());
+  }
+
+  getTileDistance(direction: Direction): Vector2 {
+    if (this.isIsometric()) {
+      switch (direction) {
+        case Direction.DOWN_LEFT:
+        case Direction.DOWN_RIGHT:
+        case Direction.UP_LEFT:
+        case Direction.UP_RIGHT:
+          return VectorUtils.scalarMult(this.getTileSize(), 0.5);
+        default:
+          return this.getTileSize();
+      }
+    }
+    return this.getTileSize();
+  }
+
+  toMapDirection(direction: Direction): Direction {
+    if (this.isIsometric()) {
+      return turnCounterClockwise(direction);
+    }
+    return direction;
+  }
+
+  isIsometric(): boolean {
+    // Against the documentation of phaser, tilemap seems to be a number instead
+    // of a string. Therefore the intentional type coercion here.
+    return (
+      this.tilemap.orientation ==
+      Phaser.Tilemaps.Orientation.ISOMETRIC.toString()
+    );
   }
 
   private isLayerBlockingAt(
@@ -200,46 +249,44 @@ export class GridTilemap {
 
   private setLayerDepths() {
     const layersToDelete: Phaser.Tilemaps.TilemapLayer[] = [];
-    let offset = 0;
-    const onTopLayers = [];
-    this.tilemap.layers.forEach((layerData, layerIndex) => {
-      if (this.isLayerAlwaysOnTop(layerData)) {
-        onTopLayers.push(layerData);
-      }
+    let offset = -1;
+    const alwaysOnTopLayers = this.tilemap.layers.filter((l) =>
+      this.isLayerAlwaysOnTop(l)
+    );
+    const otherLayers = this.tilemap.layers.filter(
+      (l) => !this.isLayerAlwaysOnTop(l)
+    );
+    otherLayers.forEach((layerData) => {
       if (this.hasLayerProp(layerData, GridTilemap.HEIGHT_SHIFT_PROP_NAME)) {
-        this.createLayerForEachRow(layerData, layerIndex, offset);
+        this.createHeightShiftLayers(layerData, offset);
         layersToDelete.push(layerData.tilemapLayer);
-        offset += layerData.height;
       } else {
-        layerData.tilemapLayer.setDepth(layerIndex + offset);
+        this.setDepth(layerData, ++offset);
       }
-
-      if (this.isCharLayer(layerData)) {
-        this.visLayerDepths.set(
-          this.getLayerProp(layerData, GridTilemap.CHAR_LAYER_PROP_NAME),
-          layerIndex + offset
-        );
-        offset += GridTilemap.MAX_PLAYER_LAYERS;
-      }
+    });
+    otherLayers.forEach((layerData) => {
+      if (this.isCharLayer(layerData)) return;
+      this.charLayerDepths.set(undefined, offset);
+    });
+    alwaysOnTopLayers.forEach((layer, layerIndex) => {
+      layer.tilemapLayer.setDepth(layerIndex + 1 + offset);
     });
 
     layersToDelete.forEach((layer) => layer.destroy());
-    if (this.visLayerDepths.size == 0) {
-      onTopLayers.forEach((layer, layerIndex) => {
-        layer.tilemapLayer.setDepth(
-          GridTilemap.MAX_PLAYER_LAYERS +
-            layerIndex +
-            offset +
-            this.tilemap.layers.length -
-            onTopLayers.length
-        );
-      });
+  }
+
+  private setDepth(layerData: Phaser.Tilemaps.LayerData, depth: number): void {
+    layerData.tilemapLayer.setDepth(depth);
+    if (this.isCharLayer(layerData)) {
+      this.charLayerDepths.set(
+        this.getLayerProp(layerData, GridTilemap.CHAR_LAYER_PROP_NAME),
+        depth
+      );
     }
   }
 
-  private createLayerForEachRow(
+  private createHeightShiftLayers(
     layer: Phaser.Tilemaps.LayerData,
-    layerIndex: number,
     offset: number
   ) {
     const heightShift = this.getLayerProp(
@@ -247,20 +294,29 @@ export class GridTilemap {
       GridTilemap.HEIGHT_SHIFT_PROP_NAME
     );
     for (let row = 0; row < layer.height; row++) {
-      const newLayer = this.tilemap.createBlankLayer(
-        `${layerIndex}#${row}`,
-        layer.tilemapLayer.tileset
-      );
-      for (let col = 0; col < layer.width; col++) {
-        newLayer.putTileAt(layer.data[row][col], col, row);
-      }
-
+      const newLayer = this.copyLayer(layer, row);
       newLayer.scale = layer.tilemapLayer.scale;
-
-      const makeHigherThanPlayerWhenOnSameLevel = 0.5;
       newLayer.setDepth(
-        offset + row + heightShift - 1 + makeHigherThanPlayerWhenOnSameLevel
+        offset +
+          Utils.shiftPad(
+            (row + heightShift) * this.getTileHeight(),
+            GridTilemap.Z_INDEX_PADDING
+          )
       );
     }
+  }
+
+  private copyLayer(
+    layerData: Phaser.Tilemaps.LayerData,
+    row: number
+  ): Phaser.Tilemaps.TilemapLayer {
+    const newLayer = this.tilemap.createBlankLayer(
+      `${layerData.name}#${row}`,
+      layerData.tilemapLayer.tileset
+    );
+    for (let col = 0; col < layerData.width; col++) {
+      newLayer.putTileAt(layerData.data[row][col], col, row);
+    }
+    return newLayer;
   }
 }

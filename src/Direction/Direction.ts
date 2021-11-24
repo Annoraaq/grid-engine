@@ -12,27 +12,18 @@ export enum Direction {
   DOWN_LEFT = "down-left",
 }
 
-export function getDirections(
-  numberOfDirections: NumberOfDirections
-): Direction[] {
-  const directions = [
+export function directions(): Direction[] {
+  return [
     Direction.UP,
-    Direction.RIGHT,
     Direction.DOWN,
     Direction.LEFT,
-  ];
-
-  const diagonals = [
-    Direction.DOWN_LEFT,
-    Direction.DOWN_RIGHT,
-    Direction.UP_RIGHT,
+    Direction.RIGHT,
+    Direction.NONE,
     Direction.UP_LEFT,
+    Direction.UP_RIGHT,
+    Direction.DOWN_RIGHT,
+    Direction.DOWN_LEFT,
   ];
-
-  if (numberOfDirections === NumberOfDirections.EIGHT) {
-    return [...directions, ...diagonals];
-  }
-  return directions;
 }
 
 export function isDiagonal(direction: Direction): boolean {
@@ -62,15 +53,15 @@ export function turnCounterClockwise(direction: Direction): Direction {
 
 export function directionVector(direction: Direction): Vector2 {
   const directionVectors = {
-    [Direction.UP]: Vector2.UP.clone(),
-    [Direction.DOWN]: Vector2.DOWN.clone(),
-    [Direction.LEFT]: Vector2.LEFT.clone(),
-    [Direction.RIGHT]: Vector2.RIGHT.clone(),
-    [Direction.NONE]: Vector2.ZERO.clone(),
-    [Direction.UP_LEFT]: new Vector2(-1, -1),
-    [Direction.UP_RIGHT]: new Vector2(1, -1),
-    [Direction.DOWN_RIGHT]: new Vector2(1, 1),
-    [Direction.DOWN_LEFT]: new Vector2(-1, 1),
+    [Direction.UP]: Vector2.UP,
+    [Direction.DOWN]: Vector2.DOWN,
+    [Direction.LEFT]: Vector2.LEFT,
+    [Direction.RIGHT]: Vector2.RIGHT,
+    [Direction.NONE]: Vector2.ZERO,
+    [Direction.UP_LEFT]: Vector2.UP_LEFT,
+    [Direction.UP_RIGHT]: Vector2.UP_RIGHT,
+    [Direction.DOWN_RIGHT]: Vector2.DOWN_RIGHT,
+    [Direction.DOWN_LEFT]: Vector2.DOWN_LEFT,
   };
   return directionVectors[direction];
 }

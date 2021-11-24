@@ -36,4 +36,8 @@ export class DistanceUtils4 implements DistanceUtils {
       new Vector2(pos.x, pos.y - 1),
     ];
   }
+
+  getDirections(): Direction[] {
+    return [Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT];
+  }
 }

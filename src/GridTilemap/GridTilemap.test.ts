@@ -6,6 +6,7 @@ import { Vector2 } from "../Utils/Vector2/Vector2";
 import { Direction, NumberOfDirections } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
 import { Rect } from "../Utils/Rect/Rect";
+import * as Phaser from "phaser";
 
 const mockCharBlockCache = {
   addCharacter: jest.fn(),
@@ -137,6 +138,7 @@ describe("GridTilemap", () => {
       numberOfDirections: NumberOfDirections.FOUR,
       characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
       collisionTilePropertyName: "ge_collide",
+      layerOverlay: false,
     }));
   });
 
@@ -184,10 +186,8 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(tilemapMock);
 
     expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
-    expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(
-      1002
-    );
-    expect(tilemapMock.layers[2].tilemapLayer.setDepth).toHaveBeenCalledWith(2);
+    expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(2);
+    expect(tilemapMock.layers[2].tilemapLayer.setDepth).toHaveBeenCalledWith(1);
   });
 
   it("should consider charLayers", () => {
@@ -196,16 +196,51 @@ describe("GridTilemap", () => {
 
     expect(
       tilemapMock.layers[0].tilemapLayer.setDepth
-    ).toHaveBeenLastCalledWith(0);
-    expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(1);
-    expect(tilemapMock.layers[2].tilemapLayer.setDepth).toHaveBeenCalledWith(
-      1002
-    );
-    expect(tilemapMock.layers[3].tilemapLayer.setDepth).toHaveBeenCalledWith(
-      1003
-    );
-    expect(gridTilemap.getDepthOfCharLayer("charLayer1")).toEqual(1);
-    expect(gridTilemap.getDepthOfCharLayer("charLayer2")).toEqual(1003);
+    ).toHaveBeenLastCalledWith(3);
+    expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
+    expect(tilemapMock.layers[2].tilemapLayer.setDepth).toHaveBeenCalledWith(1);
+    expect(tilemapMock.layers[3].tilemapLayer.setDepth).toHaveBeenCalledWith(2);
+    expect(gridTilemap.getDepthOfCharLayer("charLayer1")).toEqual(0);
+    expect(gridTilemap.getDepthOfCharLayer("charLayer2")).toEqual(2);
+  });
+
+  it("should return highest non-char layer for undefined layer", () => {
+    tilemapMock.layers = [
+      {
+        name: "layer1",
+        tilemapLayer: {
+          setDepth: jest.fn(),
+          scale: 3,
+          tileset: "Cloud City",
+        },
+        properties: [],
+      },
+      {
+        name: "layer2",
+        tilemapLayer: {
+          setDepth: jest.fn(),
+          scale: 3,
+          tileset: "Cloud City",
+        },
+        properties: [
+          {
+            name: "ge_alwaysTop",
+            value: true,
+          },
+        ],
+      },
+      {
+        name: "layer3",
+        tilemapLayer: {
+          setDepth: jest.fn(),
+          scale: 3,
+          tileset: "Cloud City",
+        },
+        properties: [],
+      },
+    ];
+
+    expect(gridTilemap.getDepthOfCharLayer(undefined)).toEqual(1);
   });
 
   it("should consider 'heightShift' layer", () => {
@@ -246,11 +281,11 @@ describe("GridTilemap", () => {
 
     expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
     expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith(
-      "1#0",
+      "layer2#0",
       "Cloud City"
     );
     expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith(
-      "1#1",
+      "layer2#1",
       "Cloud City"
     );
 
@@ -261,8 +296,8 @@ describe("GridTilemap", () => {
     expect(blankLayerMock.putTileAt).toHaveBeenNthCalledWith(4, "r1#c1", 1, 1);
     expect(blankLayerMock.scale).toEqual(3);
     expect(blankLayerMock.setDepth).toHaveBeenCalledTimes(2);
-    expect(blankLayerMock.setDepth).toHaveBeenNthCalledWith(1, 0.5);
-    expect(blankLayerMock.setDepth).toHaveBeenNthCalledWith(2, 1.5);
+    expect(blankLayerMock.setDepth).toHaveBeenNthCalledWith(1, 0.0000048);
+    expect(blankLayerMock.setDepth).toHaveBeenNthCalledWith(2, 0.0000096);
     expect(tilemapMock.layers[1].tilemapLayer.destroy).toHaveBeenCalled();
   });
 
@@ -373,6 +408,7 @@ describe("GridTilemap", () => {
       numberOfDirections: NumberOfDirections.FOUR,
       characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
       collisionTilePropertyName: "custom_collides_prop",
+      layerOverlay: false,
     }));
     gridTilemap = new GridTilemap(tilemapMock);
     const isBlockingTile = gridTilemap.hasBlockingTile(
@@ -714,6 +750,93 @@ describe("GridTilemap", () => {
 
     expect(mockRect.isInRange).toHaveBeenCalledWith(pos);
     expect(res).toEqual(false);
+  });
+
+  it("should get tileSize", () => {
+    const scaleFactor = 3;
+    const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
+    const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
+    expect(gridTilemap.getTileSize()).toEqual(
+      new Vector2(scaledTileWidth, scaledTileHeight)
+    );
+  });
+
+  it("should transform tile pos to pixel pos", () => {
+    const scaleFactor = 3;
+    const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
+    const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
+    const tilePosition = new Vector2(2, 3);
+    expect(gridTilemap.tilePosToPixelPos(tilePosition)).toEqual(
+      new Vector2(
+        scaledTileWidth * tilePosition.x,
+        scaledTileHeight * tilePosition.y
+      )
+    );
+  });
+
+  it("should provide tile distance", () => {
+    const scaleFactor = 3;
+    const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
+    const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
+    expect(gridTilemap.getTileDistance(Direction.DOWN)).toEqual(
+      new Vector2(scaledTileWidth, scaledTileHeight)
+    );
+  });
+
+  it("should provide tile distance for isometric maps on orthogonal dirs", () => {
+    tilemapMock.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC;
+    const scaleFactor = 3;
+    const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
+    const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
+    expect(gridTilemap.getTileDistance(Direction.DOWN)).toEqual(
+      new Vector2(scaledTileWidth, scaledTileHeight)
+    );
+  });
+
+  it("should provide map direction", () => {
+    expect(gridTilemap.toMapDirection(Direction.DOWN)).toEqual(Direction.DOWN);
+  });
+
+  it("should detect non-isometric maps", () => {
+    expect(gridTilemap.isIsometric()).toEqual(false);
+  });
+
+  describe("isometric", () => {
+    const scaleFactor = 3;
+
+    beforeEach(() => {
+      tilemapMock.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC;
+    });
+
+    it("should detect isometric maps", () => {
+      expect(gridTilemap.isIsometric()).toEqual(true);
+    });
+
+    it("should transform tile pos to pixel pos for isometric maps", () => {
+      const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
+      const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
+      const tilePosition = new Vector2(2, 3);
+      expect(gridTilemap.tilePosToPixelPos(tilePosition)).toEqual(
+        new Vector2(
+          scaledTileWidth * 0.5 * (tilePosition.x - tilePosition.y),
+          scaledTileHeight * 0.5 * (tilePosition.x + tilePosition.y)
+        )
+      );
+    });
+
+    it("should provide tile distance for isometric maps on diagonal dirs", () => {
+      const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
+      const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
+      expect(gridTilemap.getTileDistance(Direction.DOWN_LEFT)).toEqual(
+        new Vector2(scaledTileWidth * 0.5, scaledTileHeight * 0.5)
+      );
+    });
+
+    it("should provide map direction", () => {
+      expect(gridTilemap.toMapDirection(Direction.DOWN)).toEqual(
+        Direction.DOWN_RIGHT
+      );
+    });
   });
 
   describe("transitions", () => {

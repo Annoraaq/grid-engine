@@ -1,4 +1,4 @@
-import { takeUntil } from "rxjs/operators";
+import { filter, takeUntil } from "rxjs/operators";
 import { NumberOfDirections } from "./../../Direction/Direction";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
@@ -9,22 +9,16 @@ import { Position } from "../../GridEngine";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 
 export class FollowMovement implements Movement {
-  private character: GridCharacter;
-  private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR;
   private targetMovement: TargetMovement;
 
   constructor(
+    private character: GridCharacter,
     private gridTilemap: GridTilemap,
     private charToFollow: GridCharacter,
+    private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR,
     private distance = 0,
     private noPathFoundStrategy: NoPathFoundStrategy = NoPathFoundStrategy.STOP
-  ) {}
-
-  setNumberOfDirections(numberOfDirections: NumberOfDirections): void {
-    this.numberOfDirections = numberOfDirections;
-  }
-
-  setCharacter(character: GridCharacter): void {
+  ) {
     this.character = character;
     this.updateTarget(
       this.charToFollow.getTilePos().position,
@@ -32,7 +26,13 @@ export class FollowMovement implements Movement {
     );
     this.charToFollow
       .positionChangeStarted()
-      .pipe(takeUntil(this.character.autoMovementSet()))
+      .pipe(
+        takeUntil(
+          this.character
+            .autoMovementSet()
+            .pipe(filter((movement) => movement !== this))
+        )
+      )
       .subscribe(({ enterTile, enterLayer }) => {
         this.updateTarget(enterTile, enterLayer);
       });
@@ -44,15 +44,15 @@ export class FollowMovement implements Movement {
 
   private updateTarget(targetPos: Position, targetLayer: string): void {
     this.targetMovement = new TargetMovement(
+      this.character,
       this.gridTilemap,
       {
         position: new Vector2(targetPos),
         layer: targetLayer,
       },
+      this.numberOfDirections,
       this.distance + 1,
       { noPathFoundStrategy: this.noPathFoundStrategy }
     );
-    this.targetMovement.setNumberOfDirections(this.numberOfDirections);
-    this.targetMovement.setCharacter(this.character);
   }
 }

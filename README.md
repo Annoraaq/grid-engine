@@ -103,3 +103,7 @@ function create() {
 # Special Thanks
 
 splashsky, therebelrobot, xLink
+
+# License
+
+Apache 2.0

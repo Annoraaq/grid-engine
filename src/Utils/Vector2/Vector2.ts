@@ -1,14 +1,48 @@
 import { Position } from "../../GridEngine";
 
 export class Vector2 {
-  static readonly ZERO = new Vector2(0, 0);
-  static readonly UP = new Vector2(0, -1);
-  static readonly DOWN = new Vector2(0, 1);
-  static readonly LEFT = new Vector2(-1, 0);
-  static readonly RIGHT = new Vector2(1, 0);
+  static get ZERO(): Vector2 {
+    return new Vector2(0, 0);
+  }
 
-  public x: number;
-  public y: number;
+  static get ONE(): Vector2 {
+    return new Vector2(1, 1);
+  }
+
+  static get UP(): Vector2 {
+    return new Vector2(0, -1);
+  }
+
+  static get DOWN(): Vector2 {
+    return new Vector2(0, 1);
+  }
+
+  static get LEFT(): Vector2 {
+    return new Vector2(-1, 0);
+  }
+
+  static get RIGHT(): Vector2 {
+    return new Vector2(1, 0);
+  }
+
+  static get UP_LEFT(): Vector2 {
+    return new Vector2(-1, -1);
+  }
+
+  static get UP_RIGHT(): Vector2 {
+    return new Vector2(1, -1);
+  }
+
+  static get DOWN_RIGHT(): Vector2 {
+    return new Vector2(1, 1);
+  }
+
+  static get DOWN_LEFT(): Vector2 {
+    return new Vector2(-1, 1);
+  }
+
+  x: number;
+  y: number;
 
   constructor(pos: Position);
   constructor(x: number, y: number);
@@ -52,6 +86,18 @@ export class Vector2 {
 
   length(): number {
     return Math.sqrt(this.x * this.x + this.y * this.y);
+  }
+
+  modulo(vector: Vector2): Vector2 {
+    return new Vector2(this.x % vector.x, this.y % vector.y);
+  }
+
+  scalarModulo(scalar: number): Vector2 {
+    return new Vector2(this.x % scalar, this.y % scalar);
+  }
+
+  scalarMult(scalar: number): Vector2 {
+    return new Vector2(this.x * scalar, this.y * scalar);
   }
 
   toString(): string {
