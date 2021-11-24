@@ -3,14 +3,14 @@ import { GridCharacter } from "../GridCharacter/GridCharacter";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 export declare class GridTilemap {
     private tilemap;
-    private static readonly MAX_PLAYER_LAYERS;
     private static readonly ALWAYS_TOP_PROP_NAME;
     private static readonly CHAR_LAYER_PROP_NAME;
     private static readonly HEIGHT_SHIFT_PROP_NAME;
     private static readonly ONE_WAY_COLLIDE_PROP_PREFIX;
+    private static readonly Z_INDEX_PADDING;
     private characters;
     private charBlockCache;
-    private visLayerDepths;
+    private charLayerDepths;
     private transitions;
     constructor(tilemap: Phaser.Tilemaps.Tilemap);
     addCharacter(character: GridCharacter): void;
@@ -27,6 +27,11 @@ export declare class GridTilemap {
     getTileHeight(): number;
     getDepthOfCharLayer(layerName: string): number;
     isInRange(pos: Vector2): boolean;
+    getTileSize(): Vector2;
+    tilePosToPixelPos(tilePosition: Vector2): Vector2;
+    getTileDistance(direction: Direction): Vector2;
+    toMapDirection(direction: Direction): Direction;
+    isIsometric(): boolean;
     private isLayerBlockingAt;
     private getCharLayerIndexes;
     private findPrevAndCharLayer;
@@ -37,5 +42,7 @@ export declare class GridTilemap {
     private isLayerAlwaysOnTop;
     private isCharLayer;
     private setLayerDepths;
-    private createLayerForEachRow;
+    private setDepth;
+    private createHeightShiftLayers;
+    private copyLayer;
 }

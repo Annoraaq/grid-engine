@@ -10,7 +10,7 @@ export declare enum Direction {
     DOWN = "down",
     DOWN_LEFT = "down-left"
 }
-export declare function getDirections(numberOfDirections: NumberOfDirections): Direction[];
+export declare function directions(): Direction[];
 export declare function isDiagonal(direction: Direction): boolean;
 export declare function turnCounterClockwise(direction: Direction): Direction;
 export declare function directionVector(direction: Direction): Vector2;

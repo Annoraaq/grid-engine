@@ -20,8 +20,8 @@ export interface PositionChange {
 }
 export interface CharConfig {
     sprite: Phaser.GameObjects.Sprite;
+    layerOverlaySprite?: Phaser.GameObjects.Sprite;
     tilemap: GridTilemap;
-    tileSize: Vector2;
     speed: number;
     collides: boolean;
     walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
@@ -32,15 +32,15 @@ export interface CharConfig {
 }
 export declare class GridCharacter {
     private id;
-    protected tileSize: Vector2;
     protected customOffset: Vector2;
+    protected tilemap: GridTilemap;
     private movementDirection;
     private tileSizePixelsWalked;
     private _nextTilePos;
     private _tilePos;
     private sprite;
+    private layerOverlaySprite;
     private container?;
-    private tilemap;
     private speed;
     private movementStarted$;
     private movementStopped$;
@@ -83,31 +83,33 @@ export declare class GridCharacter {
     tilePositionSet(): Subject<LayerPosition>;
     positionChangeStarted(): Subject<PositionChange>;
     positionChangeFinished(): Subject<PositionChange>;
-    autoMovementSet(): Subject<void>;
+    autoMovementSet(): Subject<Movement>;
     isColliding(): boolean;
-    protected tilePosToPixelPos(tilePosition: Vector2): Vector2;
-    protected getTileDistance(_direction: Direction): Vector2;
-    protected toMapDirection(direction: Direction): Direction;
     private _setSprite;
     private getOffset;
-    private createSpeedPixelsPerSecond;
+    private updateCharacterPosition;
+    private speedPixelsPerSecond;
     private get nextTilePos();
     private set nextTilePos(value);
     private get tilePos();
     private set tilePos(value);
+    private gameObject;
     private updateZindex;
-    protected mapDepth(nextTilePos: LayerPosition): number;
+    private setDepth;
+    private getPaddedPixelDepth;
+    private getTransitionLayer;
     private setPosition;
     private getPosition;
     private startMoving;
     private updateTilePos;
     private tilePosInDirection;
     private getDistToNextTile;
-    private updateCharacterPosition;
     private getProportionWalked;
     private shouldContinueMoving;
     private getSpeedPerDelta;
     private moveCharacterSprite;
     private stopMoving;
     private hasWalkedHalfATile;
+    private fire;
+    private initLayerOverlaySprite;
 }

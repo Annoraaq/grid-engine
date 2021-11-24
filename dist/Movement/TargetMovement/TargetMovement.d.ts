@@ -1,7 +1,7 @@
+import { NumberOfDirections } from "./../../Direction/Direction";
 import { LayerPosition } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import { NumberOfDirections } from "../../Direction/Direction";
 import { Movement } from "../Movement";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
@@ -33,10 +33,10 @@ export interface Finished {
     layer: string;
 }
 export declare class TargetMovement implements Movement {
+    private character;
     private tilemap;
     private targetPos;
     private distance;
-    private character;
     private shortestPath;
     private distOffset;
     private posOnPath;
@@ -49,11 +49,10 @@ export declare class TargetMovement implements Movement {
     private pathBlockedWaitElapsed;
     private distanceUtils;
     private finished$;
-    constructor(tilemap: GridTilemap, targetPos: LayerPosition, distance?: number, config?: MoveToConfig);
+    constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerPosition, numberOfDirections?: NumberOfDirections, distance?: number, config?: MoveToConfig);
     setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void;
     getPathBlockedStrategy(): PathBlockedStrategy;
-    setNumberOfDirections(numberOfDirections: NumberOfDirections): void;
-    setCharacter(character: GridCharacter): void;
+    private setCharacter;
     update(delta: number): void;
     getNeighbours: (pos: LayerPosition) => LayerPosition[];
     finishedObs(): Subject<Finished>;

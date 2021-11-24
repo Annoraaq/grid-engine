@@ -14,6 +14,7 @@ export interface GridEngineConfig {
     collisionTilePropertyName?: string;
     numberOfDirections?: NumberOfDirections;
     characterCollisionStrategy?: CollisionStrategy;
+    layerOverlay?: boolean;
 }
 export interface WalkingAnimationMapping {
     [Direction.UP]: FrameRow;
@@ -105,6 +106,5 @@ export declare class GridEngine {
     private createCharacter;
     private addCharacters;
     private moveChar;
-    private _isIsometric;
     private assembleMoveToConfig;
 }
