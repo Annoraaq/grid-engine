@@ -8,14 +8,14 @@ import { VectorUtils } from "../Utils/VectorUtils";
 import { Utils } from "../Utils/Utils/Utils";
 
 export class GridTilemap {
-  private static readonly MAX_PLAYER_LAYERS = 1;
   private static readonly ALWAYS_TOP_PROP_NAME = "ge_alwaysTop";
   private static readonly CHAR_LAYER_PROP_NAME = "ge_charLayer";
   private static readonly HEIGHT_SHIFT_PROP_NAME = "ge_heightShift";
   private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "ge_collide_";
+  private static readonly Z_INDEX_PADDING = 7;
   private characters = new Map<string, GridCharacter>();
   private charBlockCache: CharBlockCache = new CharBlockCache();
-  private visLayerDepths = new Map<string, number>();
+  private charLayerDepths = new Map<string, number>();
   private transitions: Map<string, Map<string, string>> = new Map();
 
   constructor(private tilemap: Phaser.Tilemaps.Tilemap) {
@@ -103,7 +103,7 @@ export class GridTilemap {
   }
 
   getDepthOfCharLayer(layerName: string): number {
-    return this.visLayerDepths.get(layerName) || 0;
+    return this.charLayerDepths.get(layerName) || 0;
   }
 
   isInRange(pos: Vector2): boolean {
@@ -250,46 +250,43 @@ export class GridTilemap {
   private setLayerDepths() {
     const layersToDelete: Phaser.Tilemaps.TilemapLayer[] = [];
     let offset = -1;
-    const onTopLayers = [];
-    let foundCharLayer = false;
-    this.tilemap.layers.forEach((layerData, layerIndex) => {
-      if (this.isLayerAlwaysOnTop(layerData)) {
-        onTopLayers.push(layerData);
-        return;
-      }
+    const alwaysOnTopLayers = this.tilemap.layers.filter((l) =>
+      this.isLayerAlwaysOnTop(l)
+    );
+    const otherLayers = this.tilemap.layers.filter(
+      (l) => !this.isLayerAlwaysOnTop(l)
+    );
+    otherLayers.forEach((layerData) => {
       if (this.hasLayerProp(layerData, GridTilemap.HEIGHT_SHIFT_PROP_NAME)) {
-        if (offset == -1) {
-          offset = 0;
-        }
-        this.createLayerForEachRow(layerData, layerIndex, offset);
+        this.createHeightShiftLayers(layerData, offset);
         layersToDelete.push(layerData.tilemapLayer);
       } else {
-        offset++;
-        layerData.tilemapLayer.setDepth(offset);
+        this.setDepth(layerData, ++offset);
       }
-
-      if (this.isCharLayer(layerData)) {
-        foundCharLayer = true;
-        this.visLayerDepths.set(
-          this.getLayerProp(layerData, GridTilemap.CHAR_LAYER_PROP_NAME),
-          offset
-        );
-      } else {
-        if (!foundCharLayer) {
-          this.visLayerDepths.set(undefined, offset);
-        }
-      }
+    });
+    otherLayers.forEach((layerData) => {
+      if (this.isCharLayer(layerData)) return;
+      this.charLayerDepths.set(undefined, offset);
+    });
+    alwaysOnTopLayers.forEach((layer, layerIndex) => {
+      layer.tilemapLayer.setDepth(layerIndex + 1 + offset);
     });
 
     layersToDelete.forEach((layer) => layer.destroy());
-    onTopLayers.forEach((layer, layerIndex) => {
-      layer.tilemapLayer.setDepth(layerIndex + 1 + offset);
-    });
   }
 
-  private createLayerForEachRow(
+  private setDepth(layerData: Phaser.Tilemaps.LayerData, depth: number): void {
+    layerData.tilemapLayer.setDepth(depth);
+    if (this.isCharLayer(layerData)) {
+      this.charLayerDepths.set(
+        this.getLayerProp(layerData, GridTilemap.CHAR_LAYER_PROP_NAME),
+        depth
+      );
+    }
+  }
+
+  private createHeightShiftLayers(
     layer: Phaser.Tilemaps.LayerData,
-    layerIndex: number,
     offset: number
   ) {
     const heightShift = this.getLayerProp(
@@ -297,19 +294,29 @@ export class GridTilemap {
       GridTilemap.HEIGHT_SHIFT_PROP_NAME
     );
     for (let row = 0; row < layer.height; row++) {
-      const newLayer = this.tilemap.createBlankLayer(
-        `${layerIndex}#${row}`,
-        layer.tilemapLayer.tileset
-      );
-      for (let col = 0; col < layer.width; col++) {
-        newLayer.putTileAt(layer.data[row][col], col, row);
-      }
-
+      const newLayer = this.copyLayer(layer, row);
       newLayer.scale = layer.tilemapLayer.scale;
-
       newLayer.setDepth(
-        offset + Utils.shiftPad((row + heightShift) * this.getTileHeight(), 7)
+        offset +
+          Utils.shiftPad(
+            (row + heightShift) * this.getTileHeight(),
+            GridTilemap.Z_INDEX_PADDING
+          )
       );
     }
+  }
+
+  private copyLayer(
+    layerData: Phaser.Tilemaps.LayerData,
+    row: number
+  ): Phaser.Tilemaps.TilemapLayer {
+    const newLayer = this.tilemap.createBlankLayer(
+      `${layerData.name}#${row}`,
+      layerData.tilemapLayer.tileset
+    );
+    for (let col = 0; col < layerData.width; col++) {
+      newLayer.putTileAt(layerData.data[row][col], col, row);
+    }
+    return newLayer;
   }
 }

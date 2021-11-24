@@ -281,11 +281,11 @@ describe("GridTilemap", () => {
 
     expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
     expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith(
-      "1#0",
+      "layer2#0",
       "Cloud City"
     );
     expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith(
-      "1#1",
+      "layer2#1",
       "Cloud City"
     );
 
