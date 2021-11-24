@@ -221,3 +221,9 @@ If they include a character shadow that is part of the character sprite and are 
 There are unsolved issues when using character sprites that stretch over the size of multiple tiles. These issues impact the display depth (z-index) of character sprites. There can be ugly overlapping issues. The reason for this is that the whole sprite is rendered at the depth of the character layer. But some scenarios demand parts of the sprites to be rendered at different depths.
 
 One example is our bridge example. We create a second character and let it follow our player. Then as soon as the player entered the bridge and gets transferred to the `bridge` character layer we stop. The following character will be one tile behind us but his head is rendered below our character. This is to be expected, because both characters are on different char layers. However, it is not the intended behaviour.
+
+<p align="center">
+    <img src="../img/char-layers-char-overlap.png" alt="Character overlapping issue" />
+</p>
+
+Under certain conditions you can avoid this overlapping by using the [layer overlay feature](./layer-overlay).

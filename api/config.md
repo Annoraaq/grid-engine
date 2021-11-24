@@ -26,6 +26,10 @@ The data shape of the configuration object is described here.
 |:-------------|
 | The character collision strategy. See [CollisionStrategy](#collisionstrategy). |
 
+| layerOverlay: boolean <span class="label label-purple">BETA</span><span class="label label-green">OPTIONAL</span><span class="label label-blue">DEFAULT: false</span>
+|:-------------|
+| Enables the [layer overlay feature](../features/layer-overlay). |
+
 ## CharacterData
 
 | id: string                                                                                                                                     |
