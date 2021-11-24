@@ -1,9 +1,6 @@
 import { SpriteUtils } from "./SpriteUtils";
 
 describe("SpriteUtils", () => {
-  it("should mirror sprite", () => {
-    //
-  });
   it("should copy important sprite props", () => {
     const gridSpriteMock = <any>{
       displayWidth: 16,
