@@ -71,7 +71,6 @@ export interface CharacterData {
 
 export class GridEngine {
   private gridCharacters: Map<string, GridCharacter>;
-  private tilemap: Phaser.Tilemaps.Tilemap;
   private gridTilemap: GridTilemap;
   private isCreated = false;
   private movementStopped$: Subject<{ charId: string; direction: Direction }>;
@@ -92,7 +91,6 @@ export class GridEngine {
 
   destroy(): void {
     this.scene = undefined;
-    this.tilemap = undefined;
     this.gridCharacters = undefined;
     this.gridTilemap = undefined;
     this.movementStarted$ = undefined;
@@ -130,7 +128,6 @@ export class GridEngine {
     const concreteConfig = this.setConfigDefaults(config);
 
     GlobalConfig.set(concreteConfig);
-    this.tilemap = tilemap;
     this.movementStopped$ = new Subject<{
       charId: string;
       direction: Direction;
