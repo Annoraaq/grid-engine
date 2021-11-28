@@ -382,7 +382,8 @@ export class GridEngine {
   getFacingPosition(charId: string): Position {
     this.initGuard();
     this.unknownCharGuard(charId);
-    return this.gridCharacters.get(charId).getFacingPosition();
+    const vectorPos = this.gridCharacters.get(charId).getFacingPosition();
+    return { x: vectorPos.x, y: vectorPos.y };
   }
 
   turnTowards(charId: string, direction: Direction): void {
