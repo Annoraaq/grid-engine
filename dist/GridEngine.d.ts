@@ -42,7 +42,6 @@ export interface CharacterData {
 export declare class GridEngine {
     private scene;
     private gridCharacters;
-    private tilemap;
     private gridTilemap;
     private isCreated;
     private movementStopped$;
@@ -81,6 +80,8 @@ export declare class GridEngine {
     setPosition(charId: string, pos: Position, layer?: string): void;
     getSprite(charId: string): Phaser.GameObjects.Sprite;
     setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void;
+    isBlocked(position: Position, layer: string): boolean;
+    isTileBlocked(position: Position, layer: string): boolean;
     movementStarted(): Observable<{
         charId: string;
         direction: Direction;
