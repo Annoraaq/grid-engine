@@ -18,7 +18,9 @@ nav_order: 2
 - [getSprite(...)](#getsprite)
 - [getTransition(...)](#gettransition)
 - [hasCharacter(...)](#hascharacter)
+- [isBlocked(...)](#isblocked)
 - [isMoving(...)](#ismoving)
+- [isTileBlocked(...)](#istileblocked)
 - [move(...)](#move)
 - [moveRandomly(...)](#moverandomly)
 - [moveTo(...)](#moveto)
@@ -108,11 +110,23 @@ nav_order: 2
 | :---------------------------------------------------------- |
 | Checks whether a character with the given ID is registered. |
 
+<a name="isblocked"></a>
+
+| isBlocked(position: [Position](./config.html#position), layer?: string): boolean                                                                                          |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Checks whether the given position is blocked by either the tilemap or a blocking character. If you provide no layer, be sure not to use character layers in your tilemap. |
+
 <a name="ismoving"></a>
 
 | isMoving(charId: string): boolean                    |
 | :--------------------------------------------------- |
 | Returns `true` if the character is currently moving. |
+
+<a name="istileblocked"></a>
+
+| isTileBlocked(position: [Position](./config.html#position), layer?: string): boolean                                                       |
+| :----------------------------------------------------------------------------------------------------------------------------------------- |
+| Checks whether the given position is blocked by the tilemap. If you provide no layer, be sure not to use character layers in your tilemap. |
 
 <a name="move"></a>
 
