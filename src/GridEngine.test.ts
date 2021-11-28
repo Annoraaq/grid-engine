@@ -1120,7 +1120,7 @@ describe("GridEngine", () => {
   });
 
   it("should delegate isTilemapBlocking", () => {
-    const result = gridEngine.isTileBlocking({ x: 3, y: 4 }, "someLayer");
+    const result = gridEngine.isTileBlocked({ x: 3, y: 4 }, "someLayer");
     expect(mockGridTileMap.hasBlockingTile).toHaveBeenCalledWith(
       "someLayer",
       new Vector2(3, 4)
@@ -1526,7 +1526,7 @@ describe("GridEngine", () => {
         gridEngine.isBlocked({ x: 2, y: 2 }, "someLayer")
       );
       expectUninitializedException(() =>
-        gridEngine.isTileBlocking({ x: 2, y: 2 }, "someLayer")
+        gridEngine.isTileBlocked({ x: 2, y: 2 }, "someLayer")
       );
     });
   });

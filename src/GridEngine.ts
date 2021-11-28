@@ -423,7 +423,7 @@ export class GridEngine {
     return this.gridTilemap.isBlocking(layer, new Vector2(position));
   }
 
-  isTileBlocking(position: Position, layer: string): boolean {
+  isTileBlocked(position: Position, layer: string): boolean {
     this.initGuard();
     return this.gridTilemap.hasBlockingTile(layer, new Vector2(position));
   }
