@@ -48,6 +48,8 @@ const mockGridTileMap = {
   getTransition: jest.fn(),
   setTransition: jest.fn(),
   isIsometric: jest.fn().mockReturnValue(false),
+  isBlocking: jest.fn().mockReturnValue(false),
+  hasBlockingTile: jest.fn().mockReturnValue(false),
 };
 const mockGridTilemapConstructor = jest.fn(function (
   _tilemap,
@@ -1108,6 +1110,24 @@ describe("GridEngine", () => {
     );
   });
 
+  it("should delegate isBlocking", () => {
+    const result = gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer");
+    expect(mockGridTileMap.isBlocking).toHaveBeenCalledWith(
+      "someLayer",
+      new Vector2(3, 4)
+    );
+    expect(result).toBe(false);
+  });
+
+  it("should delegate isTilemapBlocking", () => {
+    const result = gridEngine.isTileBlocked({ x: 3, y: 4 }, "someLayer");
+    expect(mockGridTileMap.hasBlockingTile).toHaveBeenCalledWith(
+      "someLayer",
+      new Vector2(3, 4)
+    );
+    expect(result).toBe(false);
+  });
+
   describe("Observables", () => {
     it("should get chars movementStarted observable", async () => {
       const mockSubject = new Subject<Direction>();
@@ -1501,6 +1521,12 @@ describe("GridEngine", () => {
           "fromLayer",
           "toLayer"
         )
+      );
+      expectUninitializedException(() =>
+        gridEngine.isBlocked({ x: 2, y: 2 }, "someLayer")
+      );
+      expectUninitializedException(() =>
+        gridEngine.isTileBlocked({ x: 2, y: 2 }, "someLayer")
       );
     });
   });
