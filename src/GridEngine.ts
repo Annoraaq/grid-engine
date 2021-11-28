@@ -418,6 +418,16 @@ export class GridEngine {
     this.gridCharacters.get(charId).setSprite(sprite);
   }
 
+  isBlocked(position: Position, layer: string): boolean {
+    this.initGuard();
+    return this.gridTilemap.isBlocking(layer, new Vector2(position));
+  }
+
+  isTileBlocking(position: Position, layer: string): boolean {
+    this.initGuard();
+    return this.gridTilemap.hasBlockingTile(layer, new Vector2(position));
+  }
+
   movementStarted(): Observable<{ charId: string; direction: Direction }> {
     return this.movementStarted$;
   }
