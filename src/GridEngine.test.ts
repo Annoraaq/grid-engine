@@ -653,11 +653,11 @@ describe("GridEngine", () => {
   });
 
   it("should get facing position", () => {
-    mockGridCharacter.getFacingPosition.mockReturnValue("facingPos");
+    mockGridCharacter.getFacingPosition.mockReturnValue(new Vector2(2, 3));
     const res = gridEngine.getFacingPosition("player");
 
     expect(mockGridCharacter.getFacingPosition).toHaveBeenCalled();
-    expect(res).toEqual("facingPos");
+    expect(res).toEqual({ x: 2, y: 3 });
   });
 
   it("should move randomly", () => {
