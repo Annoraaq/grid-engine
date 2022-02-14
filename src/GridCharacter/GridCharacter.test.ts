@@ -1117,4 +1117,45 @@ describe("GridCharacter", () => {
       expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
     });
   });
+
+  describe("collision groups", () => {
+    it("should add collision groups", () => {
+      gridCharacter.addCollisionGroup("collisionGroup1");
+      gridCharacter.addCollisionGroup("collisionGroup2");
+
+      expect(gridCharacter.getCollisionGroups()).toEqual([
+        "collisionGroup1",
+        "collisionGroup2",
+      ]);
+      expect(gridCharacter.hasCollisionGroup("collisionGroup1")).toBe(true);
+      expect(gridCharacter.hasCollisionGroup("collisionGroup2")).toBe(true);
+      expect(gridCharacter.hasCollisionGroup("unknownCollisionGroup")).toBe(
+        false
+      );
+    });
+
+    it("should remove a collision group", () => {
+      gridCharacter.addCollisionGroup("collisionGroup1");
+      gridCharacter.addCollisionGroup("collisionGroup2");
+
+      expect(gridCharacter.getCollisionGroups()).toEqual([
+        "collisionGroup1",
+        "collisionGroup2",
+      ]);
+      gridCharacter.removeCollisionGroup("collisionGroup1");
+      expect(gridCharacter.getCollisionGroups()).toEqual(["collisionGroup2"]);
+    });
+
+    it("should remove all collision groups", () => {
+      gridCharacter.addCollisionGroup("collisionGroup1");
+      gridCharacter.addCollisionGroup("collisionGroup2");
+
+      expect(gridCharacter.getCollisionGroups()).toEqual([
+        "collisionGroup1",
+        "collisionGroup2",
+      ]);
+      gridCharacter.removeAllCollisionGroups();
+      expect(gridCharacter.getCollisionGroups()).toEqual([]);
+    });
+  });
 });

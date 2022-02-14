@@ -72,6 +72,7 @@ export class GridCharacter {
   private characterIndex = -1;
   private walkingAnimationMapping: WalkingAnimationMapping;
   private hasTileCollision: boolean;
+  private readonly collisionGroups = new Set<string>();
 
   constructor(private id: string, config: CharConfig) {
     if (typeof config.walkingAnimationMapping == "number") {
@@ -235,6 +236,26 @@ export class GridCharacter {
 
   getFacingPosition(): Vector2 {
     return this._tilePos.position.add(directionVector(this.facingDirection));
+  }
+
+  addCollisionGroup(collisionGroup: string): void {
+    this.collisionGroups.add(collisionGroup);
+  }
+
+  getCollisionGroups(): string[] {
+    return Array.from(this.collisionGroups);
+  }
+
+  hasCollisionGroup(collisionGroup: string): boolean {
+    return this.collisionGroups.has(collisionGroup);
+  }
+
+  removeCollisionGroup(collisionGroup: string): void {
+    this.collisionGroups.delete(collisionGroup);
+  }
+
+  removeAllCollisionGroups(): void {
+    this.collisionGroups.clear();
   }
 
   movementStarted(): Subject<Direction> {
