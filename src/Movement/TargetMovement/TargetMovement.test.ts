@@ -34,7 +34,7 @@ describe("TargetMovement", () => {
       isMoving: () => false,
       turnTowards: jest.fn(),
       autoMovementSet: jest.fn().mockReturnValue(of()),
-      getCollides: jest.fn().mockReturnValue(true),
+      getTileCollision: jest.fn().mockReturnValue(true),
       setMovement: jest.fn(),
     };
   }
@@ -744,7 +744,7 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(3, 1));
       const targetPos = layerPos(new Vector2(1, 1));
       const mockChar = createMockChar("char1", charPos.position);
-      mockChar.getCollides.mockReturnValue(false);
+      mockChar.getTileCollision.mockReturnValue(false);
       targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
 
       gridTilemapMock.isBlocking.mockReturnValue(true);
@@ -775,7 +775,7 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(3, 1));
       const targetPos = layerPos(new Vector2(1, 1));
       const mockChar = createMockChar("char1", charPos.position);
-      mockChar.getCollides.mockReturnValue(false);
+      mockChar.getTileCollision.mockReturnValue(false);
       targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
 
       const getNeighbours = targetMovement.getNeighbours(charPos);
@@ -786,7 +786,7 @@ describe("TargetMovement", () => {
     it("should not move if no path exists", () => {
       const charPos = layerPos(new Vector2(3, 1));
       const mockChar = createMockChar("char", charPos.position);
-      mockChar.getCollides.mockReturnValue(false);
+      mockChar.getTileCollision.mockReturnValue(false);
       mockBfs.getShortestPath = jest
         .fn()
         .mockReturnValue({ path: [], closestToDistance: charPos });

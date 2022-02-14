@@ -17,7 +17,7 @@ export class CharBlockCache {
       this.tilePosToCharacters.has(posStr) &&
       this.tilePosToCharacters.get(posStr).size > 0 &&
       [...this.tilePosToCharacters.get(posStr)].some((char: GridCharacter) =>
-        char.isColliding()
+        char.getTileCollision()
       )
     );
   }

@@ -190,7 +190,7 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getId()).toEqual("player");
     expect(gridCharacter.getSpeed()).toEqual(3);
     expect(gridCharacter.getTilePos().layer).toEqual("someLayer");
-    expect(gridCharacter.isColliding()).toEqual(true);
+    expect(gridCharacter.getTileCollision()).toEqual(true);
   });
 
   it("should set the correct depth on construction", () => {

@@ -276,7 +276,7 @@ export class TargetMovement implements Movement {
   }
 
   private isBlocking = (pos?: Vector2, charLayer?: string): boolean => {
-    if (!this.character?.getCollides()) {
+    if (!this.character?.getTileCollision()) {
       return !pos || !this.tilemap.isInRange(pos);
     }
     return !pos || this.tilemap.isBlocking(charLayer, pos);

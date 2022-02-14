@@ -36,7 +36,7 @@ describe("CharBlockCache", () => {
     const char1Mock = <any>{
       ...createCharMock("player1"),
       getTilePos: () => ({ position: { x: 3, y: 3 }, layer: "someLayer" }),
-      isColliding: () => false,
+      getTileCollision: () => false,
     };
 
     charBlockCache.addCharacter(char1Mock);
@@ -330,7 +330,7 @@ describe("CharBlockCache", () => {
       getNextTilePos: () => ({ position: { x: 1, y: 1 }, layer: "someLayer" }),
       positionChangeStarted: () => of([]),
       positionChangeFinished: () => of([]),
-      isColliding: () => true,
+      getTileCollision: () => true,
       tilePositionSet: () => of([]),
     };
   }
