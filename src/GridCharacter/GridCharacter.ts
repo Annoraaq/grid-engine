@@ -38,6 +38,7 @@ export interface CharConfig {
   offsetX?: number;
   offsetY?: number;
   charLayer?: string;
+  collisionGroups?: string[];
 }
 
 export class GridCharacter {
@@ -72,7 +73,7 @@ export class GridCharacter {
   private characterIndex = -1;
   private walkingAnimationMapping: WalkingAnimationMapping;
   private hasTileCollision: boolean;
-  private readonly collisionGroups = new Set<string>();
+  private readonly collisionGroups: Set<string>;
 
   constructor(private id: string, config: CharConfig) {
     if (typeof config.walkingAnimationMapping == "number") {
@@ -90,6 +91,7 @@ export class GridCharacter {
 
     this.sprite = config.sprite;
     this.layerOverlaySprite = config.layerOverlaySprite;
+    this.collisionGroups = new Set<string>(config.collisionGroups ?? []);
     if (this.layerOverlaySprite) {
       this.initLayerOverlaySprite();
     }

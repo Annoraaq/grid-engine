@@ -1119,6 +1119,17 @@ describe("GridCharacter", () => {
   });
 
   describe("collision groups", () => {
+    it("should set collision groups from config", () => {
+      gridCharacter = new GridCharacter("player", {
+        sprite: gridSpriteMock,
+        tilemap: gridTilemapMock,
+        speed: 3,
+        collides: true,
+        collisionGroups: ["someGroup"],
+      });
+      expect(gridCharacter.getCollisionGroups()).toEqual(["someGroup"]);
+    });
+
     it("should add collision groups", () => {
       gridCharacter.addCollisionGroup("collisionGroup1");
       gridCharacter.addCollisionGroup("collisionGroup2");
