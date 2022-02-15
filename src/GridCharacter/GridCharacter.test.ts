@@ -108,7 +108,7 @@ describe("GridCharacter", () => {
       sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
       speed: 3,
-      collides: true,
+      collidesWithTiles: true,
       walkingAnimationMapping: 3,
     });
     containerMock = <any>{
@@ -129,7 +129,7 @@ describe("GridCharacter", () => {
         layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
-        collides: true,
+        collidesWithTiles: true,
         walkingAnimationMapping: 3,
       });
     });
@@ -164,7 +164,7 @@ describe("GridCharacter", () => {
         layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
-        collides: true,
+        collidesWithTiles: true,
         walkingAnimationMapping: 3,
       });
       gridCharacter.update(100);
@@ -184,13 +184,13 @@ describe("GridCharacter", () => {
       layerOverlaySprite: layerOverlaySpriteMock,
       tilemap: gridTilemapMock,
       speed: 3,
-      collides: true,
+      collidesWithTiles: true,
       charLayer: "someLayer",
     });
     expect(gridCharacter.getId()).toEqual("player");
     expect(gridCharacter.getSpeed()).toEqual(3);
     expect(gridCharacter.getTilePos().layer).toEqual("someLayer");
-    expect(gridCharacter.getTileCollision()).toEqual(true);
+    expect(gridCharacter.collidesWithTiles()).toEqual(true);
   });
 
   it("should set the correct depth on construction", () => {
@@ -210,7 +210,7 @@ describe("GridCharacter", () => {
         layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
-        collides: true,
+        collidesWithTiles: true,
         charLayer: "someLayer",
       });
     });
@@ -534,7 +534,7 @@ describe("GridCharacter", () => {
       speed: 3,
       offsetX: customOffsetX,
       offsetY: customOffsetY,
-      collides: true,
+      collidesWithTiles: true,
     });
     gridCharacter.setTilePosition({
       position: newTilePos,
@@ -932,7 +932,7 @@ describe("GridCharacter", () => {
         layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
-        collides: false,
+        collidesWithTiles: false,
         walkingAnimationMapping: 3,
       });
       const direction = Direction.RIGHT;
@@ -1075,7 +1075,7 @@ describe("GridCharacter", () => {
         speed: 3,
         walkingAnimationMapping: 3,
         container: containerMock,
-        collides: true,
+        collidesWithTiles: true,
       });
     });
 
@@ -1124,7 +1124,7 @@ describe("GridCharacter", () => {
         sprite: gridSpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
-        collides: true,
+        collidesWithTiles: true,
         collisionGroups: ["someGroup"],
       });
       expect(gridCharacter.getCollisionGroups()).toEqual(["someGroup"]);

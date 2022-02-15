@@ -227,7 +227,7 @@ describe("GridEngine", () => {
       container: containerMock,
       offsetX: undefined,
       offsetY: undefined,
-      collides: true,
+      collidesWithTiles: true,
       walkingAnimationMapping: undefined,
       charLayer: undefined,
     });
@@ -284,7 +284,7 @@ describe("GridEngine", () => {
       sprite: playerSpriteMock,
       tilemap: mockGridTileMap,
       speed: 4,
-      collides: true,
+      collidesWithTiles: true,
     });
     expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith({
       position: new Vector2(0, 0),
@@ -329,7 +329,7 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping,
-      collides: true,
+      collidesWithTiles: true,
     });
     expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith({
       position: new Vector2(0, 0),
@@ -438,7 +438,7 @@ describe("GridEngine", () => {
       walkingAnimationMapping: 3,
       offsetX,
       offsetY,
-      collides: true,
+      collidesWithTiles: true,
     });
   });
 
@@ -457,7 +457,7 @@ describe("GridEngine", () => {
     expect(GridCharacter).toHaveBeenCalledWith(
       "player",
       expect.objectContaining({
-        collides: false,
+        collidesWithTiles: false,
       })
     );
   });

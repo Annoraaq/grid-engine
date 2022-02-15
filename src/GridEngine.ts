@@ -65,6 +65,7 @@ export interface CharacterData {
   offsetX?: number;
   offsetY?: number;
   facingDirection?: Direction;
+  // TODO Release 3.0: rename to collidesWithTiles
   collides?: boolean;
   charLayer?: string;
 }
@@ -256,7 +257,8 @@ export class GridEngine {
       container: charData.container,
       offsetX: charData.offsetX,
       offsetY: charData.offsetY,
-      collides: charData.collides === undefined ? true : charData.collides,
+      collidesWithTiles:
+        charData.collides === undefined ? true : charData.collides,
       charLayer: charData.charLayer,
     };
 

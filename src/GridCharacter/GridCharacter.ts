@@ -32,7 +32,7 @@ export interface CharConfig {
   layerOverlaySprite?: Phaser.GameObjects.Sprite;
   tilemap: GridTilemap;
   speed: number;
-  collides: boolean;
+  collidesWithTiles: boolean;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
   container?: Phaser.GameObjects.Container;
   offsetX?: number;
@@ -72,7 +72,7 @@ export class GridCharacter {
   private movement: Movement;
   private characterIndex = -1;
   private walkingAnimationMapping: WalkingAnimationMapping;
-  private hasTileCollision: boolean;
+  private collidesWithTilesInternal: boolean;
   private readonly collisionGroups: Set<string>;
 
   constructor(private id: string, config: CharConfig) {
@@ -85,7 +85,7 @@ export class GridCharacter {
     this.container = config.container;
     this.tilemap = config.tilemap;
     this.speed = config.speed;
-    this.hasTileCollision = config.collides;
+    this.collidesWithTilesInternal = config.collidesWithTiles;
     this.customOffset = new Vector2(config.offsetX || 0, config.offsetY || 0);
     this._tilePos.layer = config.charLayer;
 
@@ -127,8 +127,8 @@ export class GridCharacter {
     return this.movement;
   }
 
-  getTileCollision(): boolean {
-    return this.hasTileCollision;
+  collidesWithTiles(): boolean {
+    return this.collidesWithTilesInternal;
   }
 
   setWalkingAnimationMapping(
@@ -208,7 +208,7 @@ export class GridCharacter {
 
   isBlockingDirection(direction: Direction): boolean {
     if (direction == Direction.NONE) return false;
-    if (!this.hasTileCollision) return false;
+    if (!this.collidesWithTilesInternal) return false;
     const tilePosInDir = this.tilePosInDirection(direction);
 
     const layerInDirection =
