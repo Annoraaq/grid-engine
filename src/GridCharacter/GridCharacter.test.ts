@@ -108,6 +108,7 @@ describe("GridCharacter", () => {
       sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
       speed: 3,
+      collides: true,
       collidesWithTiles: true,
       walkingAnimationMapping: 3,
     });
@@ -129,6 +130,7 @@ describe("GridCharacter", () => {
         layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
+        collides: true,
         collidesWithTiles: true,
         walkingAnimationMapping: 3,
       });
@@ -164,6 +166,7 @@ describe("GridCharacter", () => {
         layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
+        collides: true,
         collidesWithTiles: true,
         walkingAnimationMapping: 3,
       });
@@ -184,6 +187,7 @@ describe("GridCharacter", () => {
       layerOverlaySprite: layerOverlaySpriteMock,
       tilemap: gridTilemapMock,
       speed: 3,
+      collides: true,
       collidesWithTiles: true,
       charLayer: "someLayer",
     });
@@ -210,6 +214,7 @@ describe("GridCharacter", () => {
         layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
+        collides: true,
         collidesWithTiles: true,
         charLayer: "someLayer",
       });
@@ -534,6 +539,7 @@ describe("GridCharacter", () => {
       speed: 3,
       offsetX: customOffsetX,
       offsetY: customOffsetY,
+      collides: true,
       collidesWithTiles: true,
     });
     gridCharacter.setTilePosition({
@@ -921,6 +927,7 @@ describe("GridCharacter", () => {
           x: 2,
           y: 0,
         },
+        [],
         oppositeDirection
       );
       expect(result).toBe(false);
@@ -932,6 +939,7 @@ describe("GridCharacter", () => {
         layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
+        collides: true,
         collidesWithTiles: false,
         walkingAnimationMapping: 3,
       });
@@ -1075,6 +1083,7 @@ describe("GridCharacter", () => {
         speed: 3,
         walkingAnimationMapping: 3,
         container: containerMock,
+        collides: true,
         collidesWithTiles: true,
       });
     });
@@ -1124,6 +1133,7 @@ describe("GridCharacter", () => {
         sprite: gridSpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
+        collides: true,
         collidesWithTiles: true,
         collisionGroups: ["someGroup"],
       });

@@ -65,9 +65,11 @@ export interface CharacterData {
   offsetX?: number;
   offsetY?: number;
   facingDirection?: Direction;
-  // TODO Release 3.0: rename to collidesWithTiles
+  // TODO Release 3.0: remove
   collides?: boolean;
+  collidesWithTiles?: boolean;
   charLayer?: string;
+  collisionGroups?: string[];
 }
 
 export class GridEngine {
@@ -257,9 +259,13 @@ export class GridEngine {
       container: charData.container,
       offsetX: charData.offsetX,
       offsetY: charData.offsetY,
+      collides: charData.collides === undefined ? true : charData.collides,
       collidesWithTiles:
-        charData.collides === undefined ? true : charData.collides,
+        charData.collidesWithTiles === undefined
+          ? true
+          : charData.collidesWithTiles,
       charLayer: charData.charLayer,
+      collisionGroups: charData.collisionGroups || ["geDefault"],
     };
 
     const gridChar = this.createCharacter(charData.id, charConfig);

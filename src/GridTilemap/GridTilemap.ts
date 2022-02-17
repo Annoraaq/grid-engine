@@ -42,11 +42,17 @@ export class GridTilemap {
     return [...this.characters.values()];
   }
 
-  isBlocking(charLayer: string, pos: Vector2, direction?: Direction): boolean {
+  // TODO add test
+  isBlocking(
+    charLayer: string,
+    pos: Vector2,
+    collisionGroups?: string[],
+    direction?: Direction
+  ): boolean {
     return (
       this.hasNoTile(pos, charLayer) ||
       this.hasBlockingTile(charLayer, pos, direction) ||
-      this.hasBlockingChar(pos, charLayer)
+      this.hasBlockingChar(pos, charLayer, collisionGroups)
     );
   }
 
@@ -88,8 +94,13 @@ export class GridTilemap {
     );
   }
 
-  hasBlockingChar(pos: Vector2, layer: string): boolean {
-    return this.charBlockCache.isCharBlockingAt(pos, layer);
+  // TODO test
+  hasBlockingChar(
+    pos: Vector2,
+    layer: string,
+    collisionGroups: string[]
+  ): boolean {
+    return this.charBlockCache.isCharBlockingAt(pos, layer, collisionGroups);
   }
 
   getTileWidth(): number {

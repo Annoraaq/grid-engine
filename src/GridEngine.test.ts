@@ -227,15 +227,36 @@ describe("GridEngine", () => {
       container: containerMock,
       offsetX: undefined,
       offsetY: undefined,
+      collides: true,
       collidesWithTiles: true,
       walkingAnimationMapping: undefined,
       charLayer: undefined,
+      collisionGroups: ["geDefault"],
     });
     expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith({
       position: new Vector2(0, 0),
       layer: "someLayer",
     });
     expect(mockGridCharacter.turnTowards).not.toHaveBeenCalled();
+  });
+
+  it("should init player with collisionGroups", () => {
+    gridEngine.create(tileMapMock, {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          collisionGroups: ["cGroup1", "cGroup2"],
+        },
+      ],
+      layerOverlay: true,
+    });
+    expect(GridCharacter).toHaveBeenCalledWith(
+      "player",
+      expect.objectContaining({
+        collisionGroups: ["cGroup1", "cGroup2"],
+      })
+    );
   });
 
   it("should init player with layerOverlay", () => {
@@ -284,7 +305,9 @@ describe("GridEngine", () => {
       sprite: playerSpriteMock,
       tilemap: mockGridTileMap,
       speed: 4,
+      collides: true,
       collidesWithTiles: true,
+      collisionGroups: ["geDefault"],
     });
     expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith({
       position: new Vector2(0, 0),
@@ -329,7 +352,9 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping,
+      collides: true,
       collidesWithTiles: true,
+      collisionGroups: ["geDefault"],
     });
     expect(mockGridCharacter.setTilePosition).toHaveBeenCalledWith({
       position: new Vector2(0, 0),
@@ -438,7 +463,9 @@ describe("GridEngine", () => {
       walkingAnimationMapping: 3,
       offsetX,
       offsetY,
+      collides: true,
       collidesWithTiles: true,
+      collisionGroups: ["geDefault"],
     });
   });
 
@@ -451,12 +478,14 @@ describe("GridEngine", () => {
           walkingAnimationMapping: 3,
           speed: 2,
           collides: false,
+          collidesWithTiles: false,
         },
       ],
     });
     expect(GridCharacter).toHaveBeenCalledWith(
       "player",
       expect.objectContaining({
+        collides: false,
         collidesWithTiles: false,
       })
     );

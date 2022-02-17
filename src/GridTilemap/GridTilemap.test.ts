@@ -429,21 +429,25 @@ describe("GridTilemap", () => {
     const isBlockingLeft = gridTilemap.isBlocking(
       undefined,
       new Vector2(3, 4),
+      [],
       Direction.LEFT
     );
     const isBlockingRight = gridTilemap.isBlocking(
       undefined,
       new Vector2(3, 4),
+      [],
       Direction.RIGHT
     );
     const isBlockingUp = gridTilemap.isBlocking(
       undefined,
       new Vector2(3, 4),
+      [],
       Direction.UP
     );
     const isBlockingDown = gridTilemap.isBlocking(
       undefined,
       new Vector2(3, 4),
+      [],
       Direction.DOWN
     );
     expect(isBlockingLeft).toBe(true);
@@ -461,21 +465,25 @@ describe("GridTilemap", () => {
     const isBlockingLeft = gridTilemap.isBlocking(
       undefined,
       new Vector2(3, 4),
+      [],
       Direction.LEFT
     );
     const isBlockingRight = gridTilemap.isBlocking(
       undefined,
       new Vector2(3, 4),
+      [],
       Direction.RIGHT
     );
     const isBlockingUp = gridTilemap.isBlocking(
       undefined,
       new Vector2(3, 4),
+      [],
       Direction.UP
     );
     const isBlockingDown = gridTilemap.isBlocking(
       undefined,
       new Vector2(3, 4),
+      [],
       Direction.DOWN
     );
     expect(isBlockingLeft).toBe(false);
@@ -493,21 +501,25 @@ describe("GridTilemap", () => {
     const isBlockingLeft = gridTilemap.isBlocking(
       undefined,
       new Vector2(3, 4),
+      [],
       Direction.LEFT
     );
     const isBlockingRight = gridTilemap.isBlocking(
       undefined,
       new Vector2(3, 4),
+      [],
       Direction.RIGHT
     );
     const isBlockingUp = gridTilemap.isBlocking(
       undefined,
       new Vector2(3, 4),
+      [],
       Direction.UP
     );
     const isBlockingDown = gridTilemap.isBlocking(
       undefined,
       new Vector2(3, 4),
+      [],
       Direction.DOWN
     );
     expect(isBlockingLeft).toBe(false);
@@ -525,21 +537,25 @@ describe("GridTilemap", () => {
     const isBlockingLeft = gridTilemap.isBlocking(
       undefined,
       new Vector2(3, 4),
+      [],
       Direction.LEFT
     );
     const isBlockingRight = gridTilemap.isBlocking(
       undefined,
       new Vector2(3, 4),
+      [],
       Direction.RIGHT
     );
     const isBlockingUp = gridTilemap.isBlocking(
       undefined,
       new Vector2(3, 4),
+      [],
       Direction.UP
     );
     const isBlockingDown = gridTilemap.isBlocking(
       undefined,
       new Vector2(3, 4),
+      [],
       Direction.DOWN
     );
     expect(isBlockingLeft).toBe(false);
@@ -700,10 +716,13 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(tilemapMock);
     mockCharBlockCache.isCharBlockingAt = jest.fn(() => true);
 
-    expect(gridTilemap.hasBlockingChar(new Vector2(3, 3), "layer1")).toBe(true);
+    expect(
+      gridTilemap.hasBlockingChar(new Vector2(3, 3), "layer1", ["cGroup"])
+    ).toBe(true);
     expect(mockCharBlockCache.isCharBlockingAt).toHaveBeenCalledWith(
       new Vector2(3, 3),
-      "layer1"
+      "layer1",
+      ["cGroup"]
     );
   });
 
@@ -713,17 +732,12 @@ describe("GridTilemap", () => {
 
     const char1Mock = <any>{
       ...createCharMock("player1"),
-      getTilePos: () => ({ x: 3, y: 3 }),
-    };
-    const char2Mock = <any>{
-      ...createCharMock("player2"),
-      getTilePos: () => ({ x: 3, y: 3 }),
     };
     gridTilemap.addCharacter(char1Mock);
-    gridTilemap.addCharacter(char2Mock);
     const hasBlockingChar = gridTilemap.hasBlockingChar(
-      new Vector2(4, 4),
-      "layer1"
+      new Vector2(3, 3),
+      "layer1",
+      ["cGroup"]
     );
     expect(hasBlockingChar).toBe(false);
   });
@@ -884,6 +898,7 @@ describe("GridTilemap", () => {
       positionChangeStarted: () => of([]),
       positionChangeFinished: () => of([]),
       setTilePosition: jest.fn(),
+      getCollisionGroups: () => ["cGroup"],
     };
   }
 });
