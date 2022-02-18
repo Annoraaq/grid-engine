@@ -42,7 +42,6 @@ export class GridTilemap {
     return [...this.characters.values()];
   }
 
-  // TODO add test
   isBlocking(
     charLayer: string,
     pos: Vector2,
@@ -94,7 +93,6 @@ export class GridTilemap {
     );
   }
 
-  // TODO test
   hasBlockingChar(
     pos: Vector2,
     layer: string,

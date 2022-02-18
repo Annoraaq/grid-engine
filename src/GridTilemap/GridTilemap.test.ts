@@ -713,15 +713,19 @@ describe("GridTilemap", () => {
   });
 
   it("should detect blocking char", () => {
+    tilemapMock.hasTileAt.mockReturnValue(true);
     gridTilemap = new GridTilemap(tilemapMock);
     mockCharBlockCache.isCharBlockingAt = jest.fn(() => true);
 
     expect(
-      gridTilemap.hasBlockingChar(new Vector2(3, 3), "layer1", ["cGroup"])
+      gridTilemap.hasBlockingChar(new Vector2(3, 3), "charLayer1", ["cGroup"])
+    ).toBe(true);
+    expect(
+      gridTilemap.isBlocking("charLayer1", new Vector2(3, 3), ["cGroup"])
     ).toBe(true);
     expect(mockCharBlockCache.isCharBlockingAt).toHaveBeenCalledWith(
       new Vector2(3, 3),
-      "layer1",
+      "charLayer1",
       ["cGroup"]
     );
   });
