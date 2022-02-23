@@ -39,20 +39,8 @@ describe("CharBlockCache", () => {
         "unknownCGroup",
       ])
     ).toBe(false);
-  });
-
-  it("should not detect non-colliding char after adding", () => {
-    const char1Mock = <any>{
-      ...createCharMock("player1"),
-      getTilePos: () => ({ position: { x: 3, y: 3 }, layer: "someLayer" }),
-      collides: () => false,
-    };
-
-    charBlockCache.addCharacter(char1Mock);
     expect(
-      charBlockCache.isCharBlockingAt(new Vector2(3, 3), "someLayer", [
-        "cGroup1",
-      ])
+      charBlockCache.isCharBlockingAt(new Vector2(3, 3), "someLayer", [])
     ).toBe(false);
   });
 

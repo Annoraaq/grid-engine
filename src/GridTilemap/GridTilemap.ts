@@ -45,7 +45,7 @@ export class GridTilemap {
   isBlocking(
     charLayer: string,
     pos: Vector2,
-    collisionGroups?: string[],
+    collisionGroups: string[],
     direction?: Direction
   ): boolean {
     return (

@@ -20,12 +20,10 @@ export class CharBlockCache {
     return (
       this.tilePosToCharacters.has(posStr) &&
       this.tilePosToCharacters.get(posStr).size > 0 &&
-      [...this.tilePosToCharacters.get(posStr)].some(
-        (char: GridCharacter) =>
-          char.collides() &&
-          char
-            .getCollisionGroups()
-            .some((group) => collisionGroups.includes(group))
+      [...this.tilePosToCharacters.get(posStr)].some((char: GridCharacter) =>
+        char
+          .getCollisionGroups()
+          .some((group) => collisionGroups.includes(group))
       )
     );
   }

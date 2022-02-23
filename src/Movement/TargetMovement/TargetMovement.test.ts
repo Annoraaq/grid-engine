@@ -36,6 +36,7 @@ describe("TargetMovement", () => {
       autoMovementSet: jest.fn().mockReturnValue(of()),
       collidesWithTiles: jest.fn().mockReturnValue(true),
       setMovement: jest.fn(),
+      getCollisionGroups: () => ["cGroup1"],
     };
   }
   function layerPos(vec: Vector2): LayerPosition {
@@ -740,7 +741,7 @@ describe("TargetMovement", () => {
       });
     });
 
-    it("should ignore blocked tiles with non-colliding char", () => {
+    it("should ignore blocked tiles with non tile-colliding char", () => {
       const charPos = layerPos(new Vector2(3, 1));
       const targetPos = layerPos(new Vector2(1, 1));
       const mockChar = createMockChar("char1", charPos.position);
@@ -772,6 +773,7 @@ describe("TargetMovement", () => {
 
     it("should not list tiles out of range", () => {
       gridTilemapMock.isInRange.mockReturnValue(false);
+      gridTilemapMock.hasBlockingChar.mockReturnValue(false);
       const charPos = layerPos(new Vector2(3, 1));
       const targetPos = layerPos(new Vector2(1, 1));
       const mockChar = createMockChar("char1", charPos.position);
@@ -1146,11 +1148,13 @@ describe("TargetMovement", () => {
     targetMovement.update(1);
     expect(gridTilemapMock.isBlocking).not.toHaveBeenCalledWith(
       "layer1",
-      new Vector2(2, 2)
+      new Vector2(2, 2),
+      ["cGroup1"]
     );
     expect(gridTilemapMock.isBlocking).toHaveBeenCalledWith(
       "layer1",
-      new Vector2(3, 2)
+      new Vector2(3, 2),
+      ["cGroup1"]
     );
   });
 

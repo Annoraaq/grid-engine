@@ -35,6 +35,8 @@ const mockGridCharacter = {
   setCharLayer: jest.fn(),
   getCharLayer: jest.fn(),
   getTransition: jest.fn(),
+  getCollisionGroups: jest.fn().mockReturnValue(["cGroup1"]),
+  setCollisionGroups: jest.fn(),
 };
 const mockFollowMovement = {
   setCharacter: jest.fn(),
@@ -227,7 +229,6 @@ describe("GridEngine", () => {
       container: containerMock,
       offsetX: undefined,
       offsetY: undefined,
-      collides: true,
       collidesWithTiles: true,
       walkingAnimationMapping: undefined,
       charLayer: undefined,
@@ -246,7 +247,10 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
-          collisionGroups: ["cGroup1", "cGroup2"],
+          collides: {
+            collidesWithTiles: false,
+            collisionGroups: ["cGroup1", "cGroup2"],
+          },
         },
       ],
       layerOverlay: true,
@@ -254,6 +258,7 @@ describe("GridEngine", () => {
     expect(GridCharacter).toHaveBeenCalledWith(
       "player",
       expect.objectContaining({
+        collidesWithTiles: false,
         collisionGroups: ["cGroup1", "cGroup2"],
       })
     );
@@ -305,7 +310,6 @@ describe("GridEngine", () => {
       sprite: playerSpriteMock,
       tilemap: mockGridTileMap,
       speed: 4,
-      collides: true,
       collidesWithTiles: true,
       collisionGroups: ["geDefault"],
     });
@@ -352,7 +356,6 @@ describe("GridEngine", () => {
       tilemap: mockGridTileMap,
       speed: 4,
       walkingAnimationMapping,
-      collides: true,
       collidesWithTiles: true,
       collisionGroups: ["geDefault"],
     });
@@ -463,32 +466,101 @@ describe("GridEngine", () => {
       walkingAnimationMapping: 3,
       offsetX,
       offsetY,
-      collides: true,
       collidesWithTiles: true,
       collisionGroups: ["geDefault"],
     });
   });
 
-  it("should use config collides", () => {
-    gridEngine.create(tileMapMock, {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
-          speed: 2,
-          collides: false,
+  describe("collision config", () => {
+    it("should use config collides", () => {
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+            speed: 2,
+            collides: false,
+          },
+        ],
+      });
+      expect(GridCharacter).toHaveBeenCalledWith(
+        "player",
+        expect.objectContaining({
           collidesWithTiles: false,
-        },
-      ],
+          collisionGroups: [],
+        })
+      );
     });
-    expect(GridCharacter).toHaveBeenCalledWith(
-      "player",
-      expect.objectContaining({
-        collides: false,
-        collidesWithTiles: false,
-      })
-    );
+
+    it("should use config collidesWithTiles true", () => {
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+            speed: 2,
+            collides: {
+              collidesWithTiles: true,
+            },
+          },
+        ],
+      });
+      expect(GridCharacter).toHaveBeenCalledWith(
+        "player",
+        expect.objectContaining({
+          collidesWithTiles: true,
+          collisionGroups: ["geDefault"],
+        })
+      );
+    });
+
+    it("should use config collidesWithTiles false", () => {
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+            speed: 2,
+            collides: {
+              collidesWithTiles: false,
+            },
+          },
+        ],
+      });
+      expect(GridCharacter).toHaveBeenCalledWith(
+        "player",
+        expect.objectContaining({
+          collidesWithTiles: false,
+          collisionGroups: ["geDefault"],
+        })
+      );
+    });
+
+    it("should use config collisionGroups", () => {
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            walkingAnimationMapping: 3,
+            speed: 2,
+            collides: {
+              collisionGroups: ["test"],
+            },
+          },
+        ],
+      });
+      expect(GridCharacter).toHaveBeenCalledWith(
+        "player",
+        expect.objectContaining({
+          collidesWithTiles: true,
+          collisionGroups: ["test"],
+        })
+      );
+    });
   });
 
   it("should use config char layer", () => {
@@ -1140,10 +1212,23 @@ describe("GridEngine", () => {
   });
 
   it("should delegate isBlocking", () => {
+    const result = gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer", [
+      "cGroup",
+    ]);
+    expect(mockGridTileMap.isBlocking).toHaveBeenCalledWith(
+      "someLayer",
+      new Vector2(3, 4),
+      ["cGroup"]
+    );
+    expect(result).toBe(false);
+  });
+
+  it("should delegate isBlocking with default cGroup", () => {
     const result = gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer");
     expect(mockGridTileMap.isBlocking).toHaveBeenCalledWith(
       "someLayer",
-      new Vector2(3, 4)
+      new Vector2(3, 4),
+      ["geDefault"]
     );
     expect(result).toBe(false);
   });
@@ -1155,6 +1240,19 @@ describe("GridEngine", () => {
       new Vector2(3, 4)
     );
     expect(result).toBe(false);
+  });
+
+  it("should delegate getCollisionGroups", () => {
+    const result = gridEngine.getCollisionGroups("player");
+    expect(mockGridCharacter.getCollisionGroups).toHaveBeenCalled();
+    expect(result).toBe(mockGridCharacter.getCollisionGroups());
+  });
+
+  it("should delegate setCollisionGroups", () => {
+    gridEngine.setCollisionGroups("player", ["cGroup1"]);
+    expect(mockGridCharacter.setCollisionGroups).toHaveBeenCalledWith([
+      "cGroup1",
+    ]);
   });
 
   describe("Observables", () => {
@@ -1468,6 +1566,12 @@ describe("GridEngine", () => {
       expectCharUnknownException(() =>
         gridEngine.getCharLayer(UNKNOWN_CHAR_ID)
       );
+      expectCharUnknownException(() =>
+        gridEngine.getCollisionGroups(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngine.setCollisionGroups(UNKNOWN_CHAR_ID, ["cGroup"])
+      );
     });
 
     it("should throw error if follow is invoked", () => {
@@ -1556,6 +1660,12 @@ describe("GridEngine", () => {
       );
       expectUninitializedException(() =>
         gridEngine.isTileBlocked({ x: 2, y: 2 }, "someLayer")
+      );
+      expectUninitializedException(() =>
+        gridEngine.getCollisionGroups(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngine.setCollisionGroups(SOME_CHAR_ID, ["cGroup"])
       );
     });
   });

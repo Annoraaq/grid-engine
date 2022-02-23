@@ -32,7 +32,6 @@ export interface CharConfig {
   layerOverlaySprite?: Phaser.GameObjects.Sprite;
   tilemap: GridTilemap;
   speed: number;
-  collides: boolean;
   collidesWithTiles: boolean;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
   container?: Phaser.GameObjects.Container;
@@ -73,9 +72,8 @@ export class GridCharacter {
   private movement: Movement;
   private characterIndex = -1;
   private walkingAnimationMapping: WalkingAnimationMapping;
-  private collidesInternal: boolean;
   private collidesWithTilesInternal: boolean;
-  private readonly collisionGroups: Set<string>;
+  private collisionGroups: Set<string>;
 
   constructor(private id: string, config: CharConfig) {
     if (typeof config.walkingAnimationMapping == "number") {
@@ -88,13 +86,19 @@ export class GridCharacter {
     this.tilemap = config.tilemap;
     this.speed = config.speed;
     this.collidesWithTilesInternal = config.collidesWithTiles;
-    this.collidesInternal = config.collides;
+    // this.collidesInternal = config.collides;
+    // old
+    // collides: true
+    // => collidesWithTiles: true, cg: ['default']
+
+    // collides false:
+    //=> colidesWithTiles: false, cg: []
     this.customOffset = new Vector2(config.offsetX || 0, config.offsetY || 0);
     this._tilePos.layer = config.charLayer;
 
     this.sprite = config.sprite;
     this.layerOverlaySprite = config.layerOverlaySprite;
-    this.collisionGroups = new Set<string>(config.collisionGroups ?? []);
+    this.collisionGroups = new Set<string>(config.collisionGroups || []);
     if (this.layerOverlaySprite) {
       this.initLayerOverlaySprite();
     }
@@ -132,10 +136,6 @@ export class GridCharacter {
 
   collidesWithTiles(): boolean {
     return this.collidesWithTilesInternal;
-  }
-
-  collides(): boolean {
-    return this.collidesInternal;
   }
 
   setWalkingAnimationMapping(
@@ -215,7 +215,8 @@ export class GridCharacter {
 
   isBlockingDirection(direction: Direction): boolean {
     if (direction == Direction.NONE) return false;
-    if (!this.collidesWithTilesInternal) return false;
+
+    // if (!this.collidesInternal) return false;
     const tilePosInDir = this.tilePosInDirection(direction);
 
     const layerInDirection =
@@ -250,6 +251,12 @@ export class GridCharacter {
 
   addCollisionGroup(collisionGroup: string): void {
     this.collisionGroups.add(collisionGroup);
+  }
+
+  setCollisionGroups(collisionGroups: string[]): void {
+    this.collisionGroups = new Set(collisionGroups);
+    // TODO
+    // this.collisionGroups.clear
   }
 
   getCollisionGroups(): string[] {

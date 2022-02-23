@@ -276,10 +276,21 @@ export class TargetMovement implements Movement {
   }
 
   private isBlocking = (pos?: Vector2, charLayer?: string): boolean => {
+    if (!pos || !this.tilemap.isInRange(pos)) return true;
+
     if (!this.character?.collidesWithTiles()) {
-      return !pos || !this.tilemap.isInRange(pos);
+      return this.tilemap.hasBlockingChar(
+        pos,
+        charLayer,
+        this.character.getCollisionGroups()
+      );
     }
-    return !pos || this.tilemap.isBlocking(charLayer, pos);
+
+    return this.tilemap.isBlocking(
+      charLayer,
+      pos,
+      this.character.getCollisionGroups()
+    );
   };
 
   private getShortestPath(): { path: LayerPosition[]; distOffset: number } {

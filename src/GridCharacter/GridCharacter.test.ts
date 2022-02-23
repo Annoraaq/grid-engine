@@ -108,7 +108,6 @@ describe("GridCharacter", () => {
       sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
       speed: 3,
-      collides: true,
       collidesWithTiles: true,
       walkingAnimationMapping: 3,
     });
@@ -130,7 +129,6 @@ describe("GridCharacter", () => {
         layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
-        collides: true,
         collidesWithTiles: true,
         walkingAnimationMapping: 3,
       });
@@ -166,7 +164,6 @@ describe("GridCharacter", () => {
         layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
-        collides: true,
         collidesWithTiles: true,
         walkingAnimationMapping: 3,
       });
@@ -187,7 +184,6 @@ describe("GridCharacter", () => {
       layerOverlaySprite: layerOverlaySpriteMock,
       tilemap: gridTilemapMock,
       speed: 3,
-      collides: true,
       collidesWithTiles: true,
       charLayer: "someLayer",
     });
@@ -214,7 +210,6 @@ describe("GridCharacter", () => {
         layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
-        collides: true,
         collidesWithTiles: true,
         charLayer: "someLayer",
       });
@@ -539,7 +534,6 @@ describe("GridCharacter", () => {
       speed: 3,
       offsetX: customOffsetX,
       offsetY: customOffsetY,
-      collides: true,
       collidesWithTiles: true,
     });
     gridCharacter.setTilePosition({
@@ -896,6 +890,32 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getMovement()).toEqual(undefined);
   });
 
+  // describe("collides", () => {
+  //   it("should 'collide' if collides with tiles", () => {
+  //     gridCharacter = new GridCharacter("player", {
+  //       sprite: gridSpriteMock,
+  //       layerOverlaySprite: layerOverlaySpriteMock,
+  //       tilemap: gridTilemapMock,
+  //       speed: 3,
+  //       collides: false,
+  //     });
+  //     gridTilemapMock.isBlocking.mockReturnValue(true);
+  //     expect(gridCharacter.collides()).toBe(false);
+  //   });
+
+  //   it("should 'collide' if collides with tiles", () => {
+  //     gridCharacter = new GridCharacter("player", {
+  //       sprite: gridSpriteMock,
+  //       layerOverlaySprite: layerOverlaySpriteMock,
+  //       tilemap: gridTilemapMock,
+  //       speed: 3,
+  //       collides: true,
+  //     });
+  //     gridTilemapMock.isBlocking.mockReturnValue(true);
+  //     expect(gridCharacter.collides()).toBe(true);
+  //   });
+  // });
+
   describe("isBlockingDirection", () => {
     it("direction NONE never blocks", () => {
       const direction = Direction.NONE;
@@ -933,22 +953,22 @@ describe("GridCharacter", () => {
       expect(result).toBe(false);
     });
 
-    it("should not detect blocking direction if char does not collide", () => {
-      gridCharacter = new GridCharacter("player", {
-        sprite: gridSpriteMock,
-        layerOverlaySprite: layerOverlaySpriteMock,
-        tilemap: gridTilemapMock,
-        speed: 3,
-        collides: true,
-        collidesWithTiles: false,
-        walkingAnimationMapping: 3,
-      });
-      const direction = Direction.RIGHT;
-      gridTilemapMock.isBlocking.mockReturnValue(true);
+    // it("should not detect blocking direction if char does not collide", () => {
+    //   gridCharacter = new GridCharacter("player", {
+    //     sprite: gridSpriteMock,
+    //     layerOverlaySprite: layerOverlaySpriteMock,
+    //     tilemap: gridTilemapMock,
+    //     speed: 3,
+    //     collides: false,
+    //     collidesWithTiles: true,
+    //     walkingAnimationMapping: 3,
+    //   });
+    //   const direction = Direction.RIGHT;
+    //   gridTilemapMock.isBlocking.mockReturnValue(true);
 
-      const result = gridCharacter.isBlockingDirection(direction);
-      expect(result).toBe(false);
-    });
+    //   const result = gridCharacter.isBlockingDirection(direction);
+    //   expect(result).toBe(false);
+    // });
 
     it("should detect blocking direction if tilemap blocks", () => {
       const direction = Direction.RIGHT;
@@ -1083,7 +1103,6 @@ describe("GridCharacter", () => {
         speed: 3,
         walkingAnimationMapping: 3,
         container: containerMock,
-        collides: true,
         collidesWithTiles: true,
       });
     });
@@ -1133,7 +1152,6 @@ describe("GridCharacter", () => {
         sprite: gridSpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
-        collides: true,
         collidesWithTiles: true,
         collisionGroups: ["someGroup"],
       });
@@ -1177,6 +1195,20 @@ describe("GridCharacter", () => {
       ]);
       gridCharacter.removeAllCollisionGroups();
       expect(gridCharacter.getCollisionGroups()).toEqual([]);
+    });
+
+    it("should set collision groups", () => {
+      gridCharacter.setCollisionGroups(["collisionGroup1", "collisionGroup2"]);
+      expect(gridCharacter.getCollisionGroups()).toEqual([
+        "collisionGroup1",
+        "collisionGroup2",
+      ]);
+      gridCharacter.setCollisionGroups(["collisionGroup3", "collisionGroup4"]);
+
+      expect(gridCharacter.getCollisionGroups()).toEqual([
+        "collisionGroup3",
+        "collisionGroup4",
+      ]);
     });
   });
 });
