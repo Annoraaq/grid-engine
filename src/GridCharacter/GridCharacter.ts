@@ -86,13 +86,6 @@ export class GridCharacter {
     this.tilemap = config.tilemap;
     this.speed = config.speed;
     this.collidesWithTilesInternal = config.collidesWithTiles;
-    // this.collidesInternal = config.collides;
-    // old
-    // collides: true
-    // => collidesWithTiles: true, cg: ['default']
-
-    // collides false:
-    //=> colidesWithTiles: false, cg: []
     this.customOffset = new Vector2(config.offsetX || 0, config.offsetY || 0);
     this._tilePos.layer = config.charLayer;
 
@@ -216,17 +209,29 @@ export class GridCharacter {
   isBlockingDirection(direction: Direction): boolean {
     if (direction == Direction.NONE) return false;
 
-    // if (!this.collidesInternal) return false;
     const tilePosInDir = this.tilePosInDirection(direction);
 
     const layerInDirection =
       this.tilemap.getTransition(tilePosInDir, this.nextTilePos.layer) ||
       this.nextTilePos.layer;
-    return this.tilemap.isBlocking(
-      layerInDirection,
+
+    if (
+      this.collidesWithTilesInternal &&
+      this.tilemap.hasBlockingTile(layerInDirection, tilePosInDir, direction)
+    ) {
+      return true;
+    }
+
+    if (
+      this.collidesWithTilesInternal &&
+      this.tilemap.hasBlockingTile(layerInDirection, tilePosInDir, direction)
+    ) {
+      return true;
+    }
+    return this.tilemap.hasBlockingChar(
       tilePosInDir,
-      this.getCollisionGroups(),
-      oppositeDirection(this.tilemap.toMapDirection(direction))
+      layerInDirection,
+      this.getCollisionGroups()
     );
   }
 
@@ -255,8 +260,6 @@ export class GridCharacter {
 
   setCollisionGroups(collisionGroups: string[]): void {
     this.collisionGroups = new Set(collisionGroups);
-    // TODO
-    // this.collisionGroups.clear
   }
 
   getCollisionGroups(): string[] {
