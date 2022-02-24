@@ -222,12 +222,6 @@ export class GridCharacter {
       return true;
     }
 
-    if (
-      this.collidesWithTilesInternal &&
-      this.tilemap.hasBlockingTile(layerInDirection, tilePosInDir, direction)
-    ) {
-      return true;
-    }
     return this.tilemap.hasBlockingChar(
       tilePosInDir,
       layerInDirection,
