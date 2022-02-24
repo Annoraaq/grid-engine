@@ -102,7 +102,6 @@ describe("CharBlockCache", () => {
       const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
         new Vector2(3, 3),
         "someLayer",
-
         ["cGroup1"]
       );
       expect(hasBlockingCharOnOldPos).toBe(false);
@@ -144,7 +143,6 @@ describe("CharBlockCache", () => {
       const hasBlockingCharOnNextPos = charBlockCache.isCharBlockingAt(
         new Vector2(3, 4),
         "someLayer",
-
         ["cGroup1"]
       );
       expect(hasBlockingCharOnNextPos).toBe(false);
@@ -178,13 +176,11 @@ describe("CharBlockCache", () => {
       const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
         new Vector2(3, 3),
         "someLayer",
-
         ["cGroup1"]
       );
       const hasBlockingChar = charBlockCache.isCharBlockingAt(
         new Vector2(3, 4),
         "enterLayer",
-
         ["cGroup1"]
       );
       expect(hasBlockingCharOnOldPos).toBe(false);
@@ -259,7 +255,6 @@ describe("CharBlockCache", () => {
     const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
       new Vector2(3, 3),
       "someLayer",
-
       ["cGroup1"]
     );
     expect(hasBlockingCharOnOldPos).toBe(true);
@@ -299,20 +294,14 @@ describe("CharBlockCache", () => {
     expect(positionChangeFinishedSub.unsubscribe).toHaveBeenCalled();
     expect(tilePosChangedSub.unsubscribe).toHaveBeenCalled();
     expect(
-      charBlockCache.isCharBlockingAt(
-        new Vector2(0, 1),
-        "someLayer",
-
-        ["cGroup1"]
-      )
+      charBlockCache.isCharBlockingAt(new Vector2(0, 1), "someLayer", [
+        "cGroup1",
+      ])
     ).toBe(false);
     expect(
-      charBlockCache.isCharBlockingAt(
-        new Vector2(1, 1),
-        "someLayer",
-
-        ["cGroup1"]
-      )
+      charBlockCache.isCharBlockingAt(new Vector2(1, 1), "someLayer", [
+        "cGroup1",
+      ])
     ).toBe(false);
   });
 
@@ -357,7 +346,6 @@ describe("CharBlockCache", () => {
       getNextTilePos: () => ({ position: { x: 1, y: 1 }, layer: "someLayer" }),
       positionChangeStarted: () => of([]),
       positionChangeFinished: () => of([]),
-      collides: () => true,
       tilePositionSet: () => of([]),
       getCollisionGroups: () => ["cGroup1"],
     };
