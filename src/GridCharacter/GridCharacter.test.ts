@@ -49,10 +49,12 @@ describe("GridCharacter", () => {
 
   function mockNonBlockingTile() {
     gridTilemapMock.isBlocking.mockReturnValue(false);
+    gridTilemapMock.hasBlockingTile.mockReturnValue(false);
   }
 
   function mockBlockingTile() {
     gridTilemapMock.isBlocking.mockReturnValue(true);
+    gridTilemapMock.hasBlockingTile.mockReturnValue(true);
   }
 
   afterEach(() => {
@@ -63,6 +65,9 @@ describe("GridCharacter", () => {
   beforeEach(() => {
     gridTilemapMock = {
       isBlocking: jest.fn(),
+      hasNoTile: jest.fn(),
+      hasBlockingTile: jest.fn(),
+      hasBlockingChar: jest.fn(),
       getDepthOfCharLayer: jest.fn().mockReturnValue(DEPTH_OF_CHAR_LAYER),
       getTransition: jest.fn(),
       getTileWidth: jest.fn().mockReturnValue(TILE_WIDTH),
@@ -108,7 +113,7 @@ describe("GridCharacter", () => {
       sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
       speed: 3,
-      collides: true,
+      collidesWithTiles: true,
       walkingAnimationMapping: 3,
     });
     containerMock = <any>{
@@ -129,7 +134,7 @@ describe("GridCharacter", () => {
         layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
-        collides: true,
+        collidesWithTiles: true,
         walkingAnimationMapping: 3,
       });
     });
@@ -164,7 +169,7 @@ describe("GridCharacter", () => {
         layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
-        collides: true,
+        collidesWithTiles: true,
         walkingAnimationMapping: 3,
       });
       gridCharacter.update(100);
@@ -184,13 +189,13 @@ describe("GridCharacter", () => {
       layerOverlaySprite: layerOverlaySpriteMock,
       tilemap: gridTilemapMock,
       speed: 3,
-      collides: true,
+      collidesWithTiles: true,
       charLayer: "someLayer",
     });
     expect(gridCharacter.getId()).toEqual("player");
     expect(gridCharacter.getSpeed()).toEqual(3);
     expect(gridCharacter.getTilePos().layer).toEqual("someLayer");
-    expect(gridCharacter.isColliding()).toEqual(true);
+    expect(gridCharacter.collidesWithTiles()).toEqual(true);
   });
 
   it("should set the correct depth on construction", () => {
@@ -210,7 +215,7 @@ describe("GridCharacter", () => {
         layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
-        collides: true,
+        collidesWithTiles: true,
         charLayer: "someLayer",
       });
     });
@@ -534,7 +539,7 @@ describe("GridCharacter", () => {
       speed: 3,
       offsetX: customOffsetX,
       offsetY: customOffsetY,
-      collides: true,
+      collidesWithTiles: true,
     });
     gridCharacter.setTilePosition({
       position: newTilePos,
@@ -899,55 +904,73 @@ describe("GridCharacter", () => {
       expect(result).toBe(false);
     });
 
-    it("should detect non-blocking direction", () => {
+    describe("collides with tiles", () => {
       const direction = Direction.RIGHT;
-      const oppositeDirection = Direction.LEFT;
-      gridTilemapMock.isBlocking.mockReturnValue(false);
-
-      gridTilemapMock.toMapDirection.mockReturnValue(Direction.RIGHT);
-      gridCharacter.move(Direction.RIGHT);
-      gridCharacter.update(10);
-
-      gridTilemapMock.getTransition.mockReturnValue("layerInDir");
-
-      const result = gridCharacter.isBlockingDirection(direction);
-      expect(gridTilemapMock.getTransition).toHaveBeenCalledWith(
-        { x: 1, y: 0 },
-        undefined
-      );
-      expect(gridTilemapMock.isBlocking).toHaveBeenCalledWith(
-        "layerInDir",
-        {
-          x: 2,
-          y: 0,
-        },
-        oppositeDirection
-      );
-      expect(result).toBe(false);
-    });
-
-    it("should not detect blocking direction if char does not collide", () => {
-      gridCharacter = new GridCharacter("player", {
-        sprite: gridSpriteMock,
-        layerOverlaySprite: layerOverlaySpriteMock,
-        tilemap: gridTilemapMock,
-        speed: 3,
-        collides: false,
-        walkingAnimationMapping: 3,
+      beforeEach(() => {
+        gridCharacter = new GridCharacter("player", {
+          sprite: gridSpriteMock,
+          layerOverlaySprite: layerOverlaySpriteMock,
+          tilemap: gridTilemapMock,
+          speed: 3,
+          collidesWithTiles: true,
+          collisionGroups: ["cGroup1"],
+          walkingAnimationMapping: 3,
+        });
       });
-      const direction = Direction.RIGHT;
-      gridTilemapMock.isBlocking.mockReturnValue(true);
+      it("should not block when no blocking tiles and chars", () => {
+        gridTilemapMock.hasNoTile.mockReturnValue(false);
+        gridTilemapMock.hasBlockingTile.mockReturnValue(false);
+        gridTilemapMock.hasBlockingChar.mockReturnValue(false);
 
-      const result = gridCharacter.isBlockingDirection(direction);
-      expect(result).toBe(false);
+        expect(gridCharacter.isBlockingDirection(direction)).toBe(false);
+      });
+
+      it("should block when blocking tiles", () => {
+        gridTilemapMock.hasNoTile.mockReturnValue(false);
+        gridTilemapMock.hasBlockingTile.mockReturnValue(true);
+        gridTilemapMock.hasBlockingChar.mockReturnValue(false);
+
+        expect(gridCharacter.isBlockingDirection(direction)).toBe(true);
+      });
+
+      it("should block when blocking chars", () => {
+        gridTilemapMock.hasNoTile.mockReturnValue(false);
+        gridTilemapMock.hasBlockingTile.mockReturnValue(false);
+        gridTilemapMock.hasBlockingChar.mockReturnValue(true);
+
+        expect(gridCharacter.isBlockingDirection(direction)).toBe(true);
+      });
     });
 
-    it("should detect blocking direction if tilemap blocks", () => {
+    describe("does not collide with tiles", () => {
       const direction = Direction.RIGHT;
-      gridTilemapMock.isBlocking.mockReturnValue(true);
+      beforeEach(() => {
+        gridCharacter = new GridCharacter("player", {
+          sprite: gridSpriteMock,
+          layerOverlaySprite: layerOverlaySpriteMock,
+          tilemap: gridTilemapMock,
+          speed: 3,
+          collidesWithTiles: false,
+          collisionGroups: ["cGroup1"],
+          walkingAnimationMapping: 3,
+        });
+      });
 
-      const result = gridCharacter.isBlockingDirection(direction);
-      expect(result).toBe(true);
+      it("should not block when blocking tiles", () => {
+        gridTilemapMock.hasNoTile.mockReturnValue(false);
+        gridTilemapMock.hasBlockingTile.mockReturnValue(true);
+        gridTilemapMock.hasBlockingChar.mockReturnValue(false);
+
+        expect(gridCharacter.isBlockingDirection(direction)).toBe(false);
+      });
+
+      it("should block when blocking chars", () => {
+        gridTilemapMock.hasNoTile.mockReturnValue(false);
+        gridTilemapMock.hasBlockingTile.mockReturnValue(false);
+        gridTilemapMock.hasBlockingChar.mockReturnValue(true);
+
+        expect(gridCharacter.isBlockingDirection(direction)).toBe(true);
+      });
     });
   });
 
@@ -1075,7 +1098,7 @@ describe("GridCharacter", () => {
         speed: 3,
         walkingAnimationMapping: 3,
         container: containerMock,
-        collides: true,
+        collidesWithTiles: true,
       });
     });
 
@@ -1115,6 +1138,72 @@ describe("GridCharacter", () => {
       expect(containerMock.y).toEqual(newPixelPos.y + PLAYER_Y_OFFSET);
       expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS);
       expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS);
+    });
+  });
+
+  describe("collision groups", () => {
+    it("should set collision groups from config", () => {
+      gridCharacter = new GridCharacter("player", {
+        sprite: gridSpriteMock,
+        tilemap: gridTilemapMock,
+        speed: 3,
+        collidesWithTiles: true,
+        collisionGroups: ["someGroup"],
+      });
+      expect(gridCharacter.getCollisionGroups()).toEqual(["someGroup"]);
+    });
+
+    it("should add collision groups", () => {
+      gridCharacter.addCollisionGroup("collisionGroup1");
+      gridCharacter.addCollisionGroup("collisionGroup2");
+
+      expect(gridCharacter.getCollisionGroups()).toEqual([
+        "collisionGroup1",
+        "collisionGroup2",
+      ]);
+      expect(gridCharacter.hasCollisionGroup("collisionGroup1")).toBe(true);
+      expect(gridCharacter.hasCollisionGroup("collisionGroup2")).toBe(true);
+      expect(gridCharacter.hasCollisionGroup("unknownCollisionGroup")).toBe(
+        false
+      );
+    });
+
+    it("should remove a collision group", () => {
+      gridCharacter.addCollisionGroup("collisionGroup1");
+      gridCharacter.addCollisionGroup("collisionGroup2");
+
+      expect(gridCharacter.getCollisionGroups()).toEqual([
+        "collisionGroup1",
+        "collisionGroup2",
+      ]);
+      gridCharacter.removeCollisionGroup("collisionGroup1");
+      expect(gridCharacter.getCollisionGroups()).toEqual(["collisionGroup2"]);
+    });
+
+    it("should remove all collision groups", () => {
+      gridCharacter.addCollisionGroup("collisionGroup1");
+      gridCharacter.addCollisionGroup("collisionGroup2");
+
+      expect(gridCharacter.getCollisionGroups()).toEqual([
+        "collisionGroup1",
+        "collisionGroup2",
+      ]);
+      gridCharacter.removeAllCollisionGroups();
+      expect(gridCharacter.getCollisionGroups()).toEqual([]);
+    });
+
+    it("should set collision groups", () => {
+      gridCharacter.setCollisionGroups(["collisionGroup1", "collisionGroup2"]);
+      expect(gridCharacter.getCollisionGroups()).toEqual([
+        "collisionGroup1",
+        "collisionGroup2",
+      ]);
+      gridCharacter.setCollisionGroups(["collisionGroup3", "collisionGroup4"]);
+
+      expect(gridCharacter.getCollisionGroups()).toEqual([
+        "collisionGroup3",
+        "collisionGroup4",
+      ]);
     });
   });
 });

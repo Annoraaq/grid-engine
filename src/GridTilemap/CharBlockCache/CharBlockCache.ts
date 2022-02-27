@@ -11,13 +11,19 @@ export class CharBlockCache {
   private tilePosSetSubs: Map<string, Subscription> = new Map();
   private positionChangeFinishedSubs: Map<string, Subscription> = new Map();
 
-  isCharBlockingAt(pos: Vector2, layer: string): boolean {
+  isCharBlockingAt(
+    pos: Vector2,
+    layer: string,
+    collisionGroups: string[]
+  ): boolean {
     const posStr = this.posToString(pos, layer);
     return (
       this.tilePosToCharacters.has(posStr) &&
       this.tilePosToCharacters.get(posStr).size > 0 &&
       [...this.tilePosToCharacters.get(posStr)].some((char: GridCharacter) =>
-        char.isColliding()
+        char
+          .getCollisionGroups()
+          .some((group) => collisionGroups.includes(group))
       )
     );
   }

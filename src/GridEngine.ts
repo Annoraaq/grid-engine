@@ -55,6 +55,11 @@ export interface WalkingAnimationMapping {
   [Direction.DOWN_RIGHT]?: FrameRow;
 }
 
+export interface CollisionConfig {
+  collidesWithTiles?: boolean;
+  collisionGroups?: string[];
+}
+
 export interface CharacterData {
   id: string;
   sprite: Phaser.GameObjects.Sprite;
@@ -65,7 +70,8 @@ export interface CharacterData {
   offsetX?: number;
   offsetY?: number;
   facingDirection?: Direction;
-  collides?: boolean;
+  // TODO Release 3.0: remove
+  collides?: boolean | CollisionConfig;
   charLayer?: string;
 }
 
@@ -256,9 +262,24 @@ export class GridEngine {
       container: charData.container,
       offsetX: charData.offsetX,
       offsetY: charData.offsetY,
-      collides: charData.collides === undefined ? true : charData.collides,
+      collidesWithTiles: true,
+      collisionGroups: ["geDefault"],
       charLayer: charData.charLayer,
     };
+
+    if (typeof charData.collides === "boolean") {
+      if (charData.collides === false) {
+        charConfig.collidesWithTiles = false;
+        charConfig.collisionGroups = [];
+      }
+    } else if (charData.collides !== undefined) {
+      if (charData.collides.collidesWithTiles === false) {
+        charConfig.collidesWithTiles = false;
+      }
+      if (charData.collides.collisionGroups) {
+        charConfig.collisionGroups = charData.collides.collisionGroups;
+      }
+    }
 
     const gridChar = this.createCharacter(charData.id, charConfig);
 
@@ -419,14 +440,34 @@ export class GridEngine {
     this.gridCharacters.get(charId).setSprite(sprite);
   }
 
-  isBlocked(position: Position, layer: string): boolean {
+  isBlocked(
+    position: Position,
+    layer: string,
+    collisionGroups: string[] = ["geDefault"]
+  ): boolean {
     this.initGuard();
-    return this.gridTilemap.isBlocking(layer, new Vector2(position));
+    return this.gridTilemap.isBlocking(
+      layer,
+      new Vector2(position),
+      collisionGroups
+    );
   }
 
   isTileBlocked(position: Position, layer: string): boolean {
     this.initGuard();
     return this.gridTilemap.hasBlockingTile(layer, new Vector2(position));
+  }
+
+  getCollisionGroups(charId: string): string[] {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    return this.gridCharacters.get(charId).getCollisionGroups();
+  }
+
+  setCollisionGroups(charId: string, collisionGroups: string[]): void {
+    this.initGuard();
+    this.unknownCharGuard(charId);
+    this.gridCharacters.get(charId).setCollisionGroups(collisionGroups);
   }
 
   movementStarted(): Observable<{ charId: string; direction: Direction }> {

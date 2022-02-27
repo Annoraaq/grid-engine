@@ -32,12 +32,13 @@ export interface CharConfig {
   layerOverlaySprite?: Phaser.GameObjects.Sprite;
   tilemap: GridTilemap;
   speed: number;
-  collides: boolean;
+  collidesWithTiles: boolean;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
   container?: Phaser.GameObjects.Container;
   offsetX?: number;
   offsetY?: number;
   charLayer?: string;
+  collisionGroups?: string[];
 }
 
 export class GridCharacter {
@@ -71,7 +72,8 @@ export class GridCharacter {
   private movement: Movement;
   private characterIndex = -1;
   private walkingAnimationMapping: WalkingAnimationMapping;
-  private collides: boolean;
+  private collidesWithTilesInternal: boolean;
+  private collisionGroups: Set<string>;
 
   constructor(private id: string, config: CharConfig) {
     if (typeof config.walkingAnimationMapping == "number") {
@@ -83,12 +85,13 @@ export class GridCharacter {
     this.container = config.container;
     this.tilemap = config.tilemap;
     this.speed = config.speed;
-    this.collides = config.collides;
+    this.collidesWithTilesInternal = config.collidesWithTiles;
     this.customOffset = new Vector2(config.offsetX || 0, config.offsetY || 0);
     this._tilePos.layer = config.charLayer;
 
     this.sprite = config.sprite;
     this.layerOverlaySprite = config.layerOverlaySprite;
+    this.collisionGroups = new Set<string>(config.collisionGroups || []);
     if (this.layerOverlaySprite) {
       this.initLayerOverlaySprite();
     }
@@ -124,8 +127,8 @@ export class GridCharacter {
     return this.movement;
   }
 
-  getCollides(): boolean {
-    return this.collides;
+  collidesWithTiles(): boolean {
+    return this.collidesWithTilesInternal;
   }
 
   setWalkingAnimationMapping(
@@ -205,16 +208,24 @@ export class GridCharacter {
 
   isBlockingDirection(direction: Direction): boolean {
     if (direction == Direction.NONE) return false;
-    if (!this.collides) return false;
+
     const tilePosInDir = this.tilePosInDirection(direction);
 
     const layerInDirection =
       this.tilemap.getTransition(tilePosInDir, this.nextTilePos.layer) ||
       this.nextTilePos.layer;
-    return this.tilemap.isBlocking(
-      layerInDirection,
+
+    if (
+      this.collidesWithTilesInternal &&
+      this.tilemap.hasBlockingTile(layerInDirection, tilePosInDir, direction)
+    ) {
+      return true;
+    }
+
+    return this.tilemap.hasBlockingChar(
       tilePosInDir,
-      oppositeDirection(this.tilemap.toMapDirection(direction))
+      layerInDirection,
+      this.getCollisionGroups()
     );
   }
 
@@ -235,6 +246,30 @@ export class GridCharacter {
 
   getFacingPosition(): Vector2 {
     return this._tilePos.position.add(directionVector(this.facingDirection));
+  }
+
+  addCollisionGroup(collisionGroup: string): void {
+    this.collisionGroups.add(collisionGroup);
+  }
+
+  setCollisionGroups(collisionGroups: string[]): void {
+    this.collisionGroups = new Set(collisionGroups);
+  }
+
+  getCollisionGroups(): string[] {
+    return Array.from(this.collisionGroups);
+  }
+
+  hasCollisionGroup(collisionGroup: string): boolean {
+    return this.collisionGroups.has(collisionGroup);
+  }
+
+  removeCollisionGroup(collisionGroup: string): void {
+    this.collisionGroups.delete(collisionGroup);
+  }
+
+  removeAllCollisionGroups(): void {
+    this.collisionGroups.clear();
   }
 
   movementStarted(): Subject<Direction> {
@@ -263,10 +298,6 @@ export class GridCharacter {
 
   autoMovementSet(): Subject<Movement> {
     return this.autoMovementSet$;
-  }
-
-  isColliding(): boolean {
-    return this.collides;
   }
 
   private _setSprite(sprite: Phaser.GameObjects.Sprite): void {
