@@ -1,7 +1,7 @@
 import { LayerPositionUtils } from "./../Utils/LayerPositionUtils/LayerPositionUtils";
 import { LayerPosition } from "./../Pathfinding/ShortestPathAlgorithm";
 import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
-import { directionVector, oppositeDirection } from "./../Direction/Direction";
+import { directionVector } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
