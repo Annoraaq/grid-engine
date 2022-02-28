@@ -1,7 +1,7 @@
 import { LayerPositionUtils } from "./../Utils/LayerPositionUtils/LayerPositionUtils";
 import { LayerPosition } from "./../Pathfinding/ShortestPathAlgorithm";
 import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
-import { directionVector } from "./../Direction/Direction";
+import { directionVector, oppositeDirection } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
@@ -217,7 +217,11 @@ export class GridCharacter {
 
     if (
       this.collidesWithTilesInternal &&
-      this.tilemap.hasBlockingTile(layerInDirection, tilePosInDir, direction)
+      this.tilemap.hasBlockingTile(
+        layerInDirection,
+        tilePosInDir,
+        oppositeDirection(direction)
+      )
     ) {
       return true;
     }

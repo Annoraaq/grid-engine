@@ -923,6 +923,11 @@ describe("GridCharacter", () => {
         gridTilemapMock.hasBlockingChar.mockReturnValue(false);
 
         expect(gridCharacter.isBlockingDirection(direction)).toBe(false);
+        expect(gridTilemapMock.hasBlockingTile).toHaveBeenCalledWith(
+          undefined,
+          { x: 0, y: 1 },
+          Direction.LEFT
+        );
       });
 
       it("should block when blocking tiles", () => {
