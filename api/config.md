@@ -68,9 +68,9 @@ The data shape of the configuration object is described here.
 | :--------------------------------------------------------------------------------------- |
 | Sets the direction the character is initially facing.                                    |
 
-| collides: boolean <span class="label label-green">OPTIONAL</span> <span class="label label-blue">DEFAULT: true</span> |
-| :-------------------------------------------------------------------------------------------------------------------- |
-| Set to false, if character should not collide (neither with the tilemap, nor with other characters)                   |
+| collides: boolean                                                                                                                                                         | [CollisionConfig](#collisionconfig) <span class="label label-green">OPTIONAL</span> <span class="label label-blue">DEFAULT: true</span> |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Set to false, if character should not collide (neither with the tilemap, nor with other characters). For more control, pass a [CollisionConfig](#collisionconfig) object. |
 
 | charLayer: string <span class="label label-green">OPTIONAL</span> <span class="label label-purple">BETA</span>                                                                                                                     |
 | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -81,24 +81,24 @@ The data shape of the configuration object is described here.
 ```js
 {
   up: {
-    leftFoot: number,
-    standing: number,
-    rightFoot: number
+    leftFoot: number;
+    standing: number;
+    rightFoot: number;
   },
   right: {
-    leftFoot: number,
-    standing: number,
-    rightFoot: number
+    leftFoot: number;
+    standing: number;
+    rightFoot: number;
   },
   down: {
-    leftFoot: number,
-    standing: number,
-    rightFoot: number
+    leftFoot: number;
+    standing: number;
+    rightFoot: number;
   },
   left: {
-    leftFoot: number,
-    standing: number,
-    rightFoot: number
+    leftFoot: number;
+    standing: number;
+    rightFoot: number;
   }
 }
 ```
@@ -135,3 +135,16 @@ The data shape of the configuration object is described here.
 **"BLOCK_TWO_TILES"**: When character is standing, it will block only one tile. If it is moving, it will block the tile it is leaving and the tile it is entering
 
 **"BLOCK_ONE_TILE_AHEAD"**: When character is standing, it will block only one tile. If it is moving, it will only block the tile it is entering.
+
+## CollisionConfig
+
+```js
+{
+  collidesWithTiles?: boolean = true;
+  collisionGroups?: string[] = ['geDefault'];
+}
+```
+
+`collidesWithTiles` determines whether the character should collide with the tilemap.
+
+`collisionGroups` is an array with collision groups. Only characters with at least one matching collision group collide. If omitted it will be initialized with a default collision group called `geDefault`. If you want to keep a character from colliding with any other character, you can simply provide an empty array here.
