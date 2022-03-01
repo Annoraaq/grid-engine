@@ -27,6 +27,8 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
 - Following other characters
 - Diagonal movement (8 directions)
 - Isometric maps (Beta)
+- Multiple character layers (Beta)
+- Collision groups
 
 # Installation
 
