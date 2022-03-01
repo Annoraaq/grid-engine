@@ -23,12 +23,13 @@ export interface CharConfig {
     layerOverlaySprite?: Phaser.GameObjects.Sprite;
     tilemap: GridTilemap;
     speed: number;
-    collides: boolean;
+    collidesWithTiles: boolean;
     walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
     container?: Phaser.GameObjects.Container;
     offsetX?: number;
     offsetY?: number;
     charLayer?: string;
+    collisionGroups?: string[];
 }
 export declare class GridCharacter {
     private id;
@@ -55,7 +56,8 @@ export declare class GridCharacter {
     private movement;
     private characterIndex;
     private walkingAnimationMapping;
-    private collides;
+    private collidesWithTilesInternal;
+    private collisionGroups;
     constructor(id: string, config: CharConfig);
     getId(): string;
     getSpeed(): number;
@@ -64,7 +66,7 @@ export declare class GridCharacter {
     setSprite(sprite: Phaser.GameObjects.Sprite): void;
     setMovement(movement: Movement): void;
     getMovement(): Movement;
-    getCollides(): boolean;
+    collidesWithTiles(): boolean;
     setWalkingAnimationMapping(walkingAnimationMapping: WalkingAnimationMapping | number): void;
     setTilePosition(tilePosition: LayerPosition): void;
     getTilePos(): LayerPosition;
@@ -77,6 +79,12 @@ export declare class GridCharacter {
     turnTowards(direction: Direction): void;
     getFacingDirection(): Direction;
     getFacingPosition(): Vector2;
+    addCollisionGroup(collisionGroup: string): void;
+    setCollisionGroups(collisionGroups: string[]): void;
+    getCollisionGroups(): string[];
+    hasCollisionGroup(collisionGroup: string): boolean;
+    removeCollisionGroup(collisionGroup: string): void;
+    removeAllCollisionGroups(): void;
     movementStarted(): Subject<Direction>;
     movementStopped(): Subject<Direction>;
     directionChanged(): Subject<Direction>;
@@ -84,7 +92,6 @@ export declare class GridCharacter {
     positionChangeStarted(): Subject<PositionChange>;
     positionChangeFinished(): Subject<PositionChange>;
     autoMovementSet(): Subject<Movement>;
-    isColliding(): boolean;
     private _setSprite;
     private getOffset;
     private updateCharacterPosition;
