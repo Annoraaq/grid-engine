@@ -120,7 +120,7 @@ nav_order: 2
 
 <a name="isblocked"></a>
 
-| isBlocked(position: [Position](./config.html#position), layer?: string): boolean                                                                                          |
+| isBlocked(position: [Position](./config.html#position), layer?: string, collisionGroups?: string[]): boolean                                                              |
 | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Checks whether the given position is blocked by either the tilemap or a blocking character. If you provide no layer, be sure not to use character layers in your tilemap. |
 
