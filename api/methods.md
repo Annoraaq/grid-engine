@@ -12,6 +12,7 @@ nav_order: 2
 - [follow(...)](#follow)
 - [getAllCharacters(...)](#getallcharacters)
 - [getCharLayer(...)](#getcharlayer)
+- [getCollisionGroups(...)](#getcollisiongroups)
 - [getFacingDirection(...)](#getfacingdirection)
 - [getFacingPosition(...)](#getfacingposition)
 - [getPosition(...)](#getposition)
@@ -30,6 +31,7 @@ nav_order: 2
 - [positionChangeStarted(...)](#positionchangestarted)
 - [removeAllCharacters(...)](#removeallcharacters)
 - [removeCharacter(...)](#removecharacter)
+- [setCollisionGroups(...)](#setcollisiongroups)
 - [setPosition(...)](#setposition)
 - [setSpeed(...)](#setspeed)
 - [setSprite(...)](#setsprite)
@@ -73,6 +75,12 @@ nav_order: 2
 | getCharLayer(charId: string): string \| undefined <span class="label label-purple">BETA</span>                                                        |
 | :---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Returns the character layer of the given character. You can read more about character layers and transitions [here](./features/character-layers.html) |
+
+<a name="getcollisiongroups"></a>
+
+| getCollisionGroups(charId: string): string[]
+| :---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Returns all collision groups of the given character. [Collision Groups Example](../examples/collision-groups) |
 
 <a name="getfacingdirection"></a>
 
@@ -181,6 +189,12 @@ nav_order: 2
 | removeCharacter(charId: string)                          |
 | :------------------------------------------------------- |
 | Removes the character with the given ID from the plugin. |
+
+<a name="setcollisiongroups"></a>
+
+| setCollisionGroups(charId: string, collisionGroups: string[]): void
+| :---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sets collision groups of the given character. Previous collision groups will be overwritten. [Collision Groups Example](../examples/collision-groups) |
 
 <a name="setposition"></a>
 
