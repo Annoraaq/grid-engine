@@ -4,6 +4,7 @@ import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import {
   Finished,
   MoveToConfig,
+  MoveToResult,
   TargetMovement,
 } from "./Movement/TargetMovement/TargetMovement";
 import {
@@ -27,7 +28,7 @@ import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { Concrete } from "./Utils/TypeUtils";
 
-export { Direction };
+export { Direction, MoveToConfig, MoveToResult, Finished };
 
 export type TileSizePerSecond = number;
 
@@ -90,11 +91,13 @@ export class GridEngine {
     this.scene.sys.events.once("boot", this.boot, this);
   }
 
+  /** @internal */
   boot(): void {
     this.scene.sys.events.on("update", this.update, this);
     this.scene.sys.events.on("destroy", this.destroy, this);
   }
 
+  /** @internal */
   destroy(): void {
     this.scene = undefined;
     this.gridCharacters = undefined;
@@ -107,17 +110,36 @@ export class GridEngine {
     this.charRemoved$ = undefined;
   }
 
+  /**
+   * Returns the character layer of the given character.
+   * You can read more about character layers and transitions {@link https://annoraaq.github.io/grid-engine/api/features/character-layers.html | here}
+   */
   getCharLayer(charId: string): string {
     this.initGuard();
     this.unknownCharGuard(charId);
     return this.gridCharacters.get(charId).getTilePos().layer;
   }
 
+  /**
+   * @returns The character layer that the transition on the given position and character layer leads to.
+   *
+   * @beta
+   */
   getTransition(position: Position, fromLayer: string): string | undefined {
     this.initGuard();
     return this.gridTilemap.getTransition(new Vector2(position), fromLayer);
   }
 
+  /**
+   * Sets the character layer `toLayer` that the transition on position `position` from character layer `fromLayer` should lead to.
+   * You can read more about character layers and transitions {@link https://annoraaq.github.io/grid-engine/api/features/character-layers.html | here}
+   *
+   * @param position Position of the new transition
+   * @param fromLayer Character layer the new transition should start at
+   * @param toLayer Character layer the new transition should lead to
+   *
+   * @beta
+   */
   setTransition(position: Position, fromLayer: string, toLayer: string): void {
     this.initGuard();
     return this.gridTilemap.setTransition(
@@ -127,6 +149,9 @@ export class GridEngine {
     );
   }
 
+  /**
+   * Initializes GridEngine. Must be called before any other methods of GridEngine are called.
+   */
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
     this.isCreated = true;
     this.gridCharacters = new Map();
@@ -158,16 +183,38 @@ export class GridEngine {
     this.addCharacters();
   }
 
+  /**
+   * @returns The tile position of the character with the given id
+   */
   getPosition(charId: string): Position {
     this.initGuard();
     this.unknownCharGuard(charId);
     return this.gridCharacters.get(charId).getTilePos().position;
   }
 
+  /**
+   * Initiates movement of the character with the given id. If the character is
+   * already moving nothing happens. If the movement direction is currently
+   * blocked, the character will only turn towards that direction. Movement
+   * commands are **not** queued.
+   */
   move(charId: string, direction: Direction): void {
     this.moveChar(charId, direction);
   }
 
+  /**
+   * Initiates random movement of the character with the given id. The
+   * character will randomly pick one of the non-blocking directions.
+   * Optionally a `delay` in milliseconds can be provided. This represents the
+   * waiting time after a finished movement, before the next is being initiated.
+   * If a `radius` other than -1 is provided, the character will not move further
+   * than that radius from its initial position (the position it has been, when
+   * `moveRandomly` was called). The distance is calculated with the
+   * {@link https://en.wikipedia.org/wiki/Taxicab_geometry |
+   * manhattan distance}. Additionally, if a `radius` other than -1 was given, the
+   * character might move more than one tile into a random direction in one run
+   * (as long as the route is neither blocked nor outside of the radius).
+   */
   moveRandomly(charId: string, delay = 0, radius = -1): void {
     this.initGuard();
     this.unknownCharGuard(charId);
@@ -180,6 +227,16 @@ export class GridEngine {
     this.gridCharacters.get(charId).setMovement(randomMovement);
   }
 
+  /**
+   * Initiates movement toward the specified `targetPos`. The movement will
+   * happen along one shortest path. Check out {@link MoveToConfig} for
+   * pathfinding configurations.
+   *
+   * @returns an observable that will fire
+   * whenever the moveTo movement is finished or aborted. It will provide a
+   * {@link MoveToResult | result code} as well as a description and a character
+   * layer.
+   */
   moveTo(
     charId: string,
     targetPos: Position,
