@@ -87,6 +87,10 @@ export class GridEngine {
   private positionChangeFinished$: Subject<{ charId: string } & PositionChange>;
   private charRemoved$: Subject<string>;
 
+  /**
+   * Should only be called by Phaser and never directly.
+   * @internal
+   */
   constructor(private scene: Phaser.Scene) {
     this.scene.sys.events.once("boot", this.boot, this);
   }
@@ -112,7 +116,8 @@ export class GridEngine {
 
   /**
    * Returns the character layer of the given character.
-   * You can read more about character layers and transitions {@link https://annoraaq.github.io/grid-engine/api/features/character-layers.html | here}
+   * You can read more about character layers and transitions
+   * {@link https://annoraaq.github.io/grid-engine/api/features/character-layers.html | here}
    */
   getCharLayer(charId: string): string {
     this.initGuard();
@@ -121,7 +126,8 @@ export class GridEngine {
   }
 
   /**
-   * @returns The character layer that the transition on the given position and character layer leads to.
+   * @returns The character layer that the transition on the given position and
+   * character layer leads to.
    *
    * @beta
    */
@@ -131,8 +137,10 @@ export class GridEngine {
   }
 
   /**
-   * Sets the character layer `toLayer` that the transition on position `position` from character layer `fromLayer` should lead to.
-   * You can read more about character layers and transitions {@link https://annoraaq.github.io/grid-engine/api/features/character-layers.html | here}
+   * Sets the character layer `toLayer` that the transition on position
+   * `position` from character layer `fromLayer` should lead to.
+   * You can read more about character layers and transitions
+   * {@link https://annoraaq.github.io/grid-engine/api/features/character-layers.html | here}
    *
    * @param position Position of the new transition
    * @param fromLayer Character layer the new transition should start at
@@ -150,7 +158,8 @@ export class GridEngine {
   }
 
   /**
-   * Initializes GridEngine. Must be called before any other methods of GridEngine are called.
+   * Initializes GridEngine. Must be called before any other methods of
+   * GridEngine are called.
    */
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
     this.isCreated = true;
@@ -207,13 +216,13 @@ export class GridEngine {
    * character will randomly pick one of the non-blocking directions.
    * Optionally a `delay` in milliseconds can be provided. This represents the
    * waiting time after a finished movement, before the next is being initiated.
-   * If a `radius` other than -1 is provided, the character will not move further
-   * than that radius from its initial position (the position it has been, when
-   * `moveRandomly` was called). The distance is calculated with the
-   * {@link https://en.wikipedia.org/wiki/Taxicab_geometry |
-   * manhattan distance}. Additionally, if a `radius` other than -1 was given, the
-   * character might move more than one tile into a random direction in one run
-   * (as long as the route is neither blocked nor outside of the radius).
+   * If a `radius` other than -1 is provided, the character will not move
+   * further than that radius from its initial position (the position it has
+   * been, when `moveRandomly` was called). The distance is calculated with the
+   * {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
+   * . Additionally, if a `radius` other than -1 was given, the character might
+   * move more than one tile into a random direction in one run (as long as the
+   * route is neither blocked nor outside of the radius).
    */
   moveRandomly(charId: string, delay = 0, radius = -1): void {
     this.initGuard();
@@ -272,18 +281,30 @@ export class GridEngine {
     );
   }
 
+  /**
+   * Stops any automated movement such as random movement
+   * ({@link moveRandomly}), following ({@link follow}) or moving to a
+   * specified position ({@link moveTo})
+   */
   stopMovement(charId: string): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.gridCharacters.get(charId).setMovement(undefined);
   }
 
+  /** Sets the speed in tiles per second for a character. */
   setSpeed(charId: string, speed: number): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.gridCharacters.get(charId).setSpeed(speed);
   }
 
+  /**
+   * Sets the {@link WalkingAnimationMapping} for a character. Alternatively you
+   * can provide a number which is the character index (see also
+   * {@link CharacterData | Character Config}). If you provide `undefined`, it
+   * will disable walking animations for the character.
+   */
   setWalkingAnimationMapping(
     charId: string,
     walkingAnimationMapping: WalkingAnimationMapping
@@ -295,6 +316,7 @@ export class GridEngine {
       .setWalkingAnimationMapping(walkingAnimationMapping);
   }
 
+  /** @internal */
   update(_time: number, delta: number): void {
     if (this.isCreated && this.gridCharacters) {
       for (const [_key, val] of this.gridCharacters) {
@@ -303,6 +325,7 @@ export class GridEngine {
     }
   }
 
+  /** Adds a character after calling {@link create}. */
   addCharacter(charData: CharacterData): void {
     this.initGuard();
 
@@ -398,11 +421,16 @@ export class GridEngine {
       });
   }
 
+  /** Checks whether a character with the given ID is registered. */
   hasCharacter(charId: string): boolean {
     this.initGuard();
     return this.gridCharacters.has(charId);
   }
 
+  /**
+   * Removes the character with the given ID from the plugin.
+   * Please note that the corresponding sprites need to be remove separately.
+   */
   removeCharacter(charId: string): void {
     this.initGuard();
     this.unknownCharGuard(charId);
@@ -411,6 +439,10 @@ export class GridEngine {
     this.charRemoved$.next(charId);
   }
 
+  /**
+   * Removes all characters from the plugin.
+   * Please note that the corresponding sprites need to be remove separately.
+   */
   removeAllCharacters(): void {
     this.initGuard();
     for (const charId of this.gridCharacters.keys()) {
@@ -418,11 +450,27 @@ export class GridEngine {
     }
   }
 
+  /**
+   * @returns All character IDs that are registered in the plugin.
+   */
   getAllCharacters(): string[] {
     this.initGuard();
     return [...this.gridCharacters.keys()];
   }
 
+  /**
+   * Character `charId` will start to walk towards `charIdToFollow` on a
+   * shortest path until it reaches the specified `distance`.
+   *
+   * @param charId ID of character that should follow
+   * @param charIdToFollow ID of character that should be followed
+   * @param distance Minimum distance to keep to `charIdToFollow` in
+   *  {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
+   * @param closestPointIfBlocked `charId` will move to the closest point
+   *  ({@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance})
+   * to `charIdToFollow` that is reachable from `charId` in case that there does
+   * not exist a path between `charId` and `charIdToFollow`.
+   */
   follow(
     charId: string,
     charIdToFollow: string,
@@ -445,18 +493,28 @@ export class GridEngine {
     this.gridCharacters.get(charId).setMovement(followMovement);
   }
 
+  /**
+   * @returns True if the character is currently moving.
+   */
   isMoving(charId: string): boolean {
     this.initGuard();
     this.unknownCharGuard(charId);
     return this.gridCharacters.get(charId).isMoving();
   }
 
+  /**
+   * @returns Direction the character is currently facing. At time of creation
+   *  this is `down`.
+   */
   getFacingDirection(charId: string): Direction {
     this.initGuard();
     this.unknownCharGuard(charId);
     return this.gridCharacters.get(charId).getFacingDirection();
   }
 
+  /**
+   * @returns Position the character is currently facing.
+   */
   getFacingPosition(charId: string): Position {
     this.initGuard();
     this.unknownCharGuard(charId);
@@ -464,12 +522,22 @@ export class GridEngine {
     return { x: vectorPos.x, y: vectorPos.y };
   }
 
+  /**
+   * Turns the character towards the given direction without moving it.
+   */
   turnTowards(charId: string, direction: Direction): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     return this.gridCharacters.get(charId).turnTowards(direction);
   }
 
+  /**
+   * Places the character with the given id to the provided tile position. If
+   * that character is moving, the movement is stopped. The
+   * {@link positionChanged} and {@link positionChangeFinished} observables will
+   * emit. If the character was moving, the {@link movementStopped} observable
+   * will also emit.
+   */
   setPosition(charId: string, pos: Position, layer?: string): void {
     this.initGuard();
     this.unknownCharGuard(charId);
@@ -484,12 +552,18 @@ export class GridEngine {
       .setTilePosition({ position: new Vector2(pos), layer });
   }
 
+  /**
+   * @returns Sprite of given character
+   */
   getSprite(charId: string): Phaser.GameObjects.Sprite {
     this.initGuard();
     this.unknownCharGuard(charId);
     return this.gridCharacters.get(charId).getSprite();
   }
 
+  /**
+   * Sets the sprite for a character.
+   */
   setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void {
     this.initGuard();
     this.unknownCharGuard(charId);
@@ -497,9 +571,17 @@ export class GridEngine {
     this.gridCharacters.get(charId).setSprite(sprite);
   }
 
+  /**
+   * Checks whether the given position is blocked by either the tilemap or a
+   * blocking character. If you provide no layer, be sure not to use character
+   * layers in your tilemap.
+   *
+   * @returns True if position on given layer is blocked by the tilemap or a
+   *  character
+   */
   isBlocked(
     position: Position,
-    layer: string,
+    layer?: string,
     collisionGroups: string[] = ["geDefault"]
   ): boolean {
     this.initGuard();
@@ -510,39 +592,76 @@ export class GridEngine {
     );
   }
 
-  isTileBlocked(position: Position, layer: string): boolean {
+  /**
+   * Checks whether the given position is blocked by the tilemap. If you provide
+   * no layer, be sure not to use character layers in your tilemap.
+   *
+   * @returns True if position on given layer is blocked by the tilemap.
+   */
+  isTileBlocked(position: Position, layer?: string): boolean {
     this.initGuard();
     return this.gridTilemap.hasBlockingTile(layer, new Vector2(position));
   }
 
+  /**
+   * Returns all collision groups of the given character.
+   * {@link https://annoraaq.github.io/grid-engine/examples/collision-groups | Collision Groups Example}
+   *
+   * @returns All collision groups of the given character.
+   */
   getCollisionGroups(charId: string): string[] {
     this.initGuard();
     this.unknownCharGuard(charId);
     return this.gridCharacters.get(charId).getCollisionGroups();
   }
 
+  /**
+   * Sets collision groups for the given character. Previous collision groups
+   * will be overwritten.
+   */
   setCollisionGroups(charId: string, collisionGroups: string[]): void {
     this.initGuard();
     this.unknownCharGuard(charId);
     this.gridCharacters.get(charId).setCollisionGroups(collisionGroups);
   }
 
+  /**
+   * @returns Observable that on each start of a movement will provide the
+   *  character ID and the direction.
+   */
   movementStarted(): Observable<{ charId: string; direction: Direction }> {
     return this.movementStarted$;
   }
 
+  /**
+   * @returns Observable that on each stopped movement of a character will
+   *  provide it’s ID and the direction of that movement.
+   */
   movementStopped(): Observable<{ charId: string; direction: Direction }> {
     return this.movementStopped$;
   }
 
+  /**
+   * @returns Observable that will notify about every change of direction that
+   *  is not part of a movement. This is the case if the character tries to walk
+   *  towards a blocked tile. The character will turn but not move.
+   */
   directionChanged(): Observable<{ charId: string; direction: Direction }> {
     return this.directionChanged$;
   }
 
+  /**
+   * @returns Observable that will notify about every change of tile position.
+   *  It will notify at the beginning of the movement.
+   */
   positionChangeStarted(): Observable<{ charId: string } & PositionChange> {
     return this.positionChangeStarted$;
   }
 
+  /**
+   * @returns Observable that will notify about every change of tile position.
+   *  It will notify at the end of the movement.
+   */
   positionChangeFinished(): Observable<{ charId: string } & PositionChange> {
     return this.positionChangeFinished$;
   }
