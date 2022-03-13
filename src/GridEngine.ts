@@ -28,7 +28,17 @@ import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { Concrete } from "./Utils/TypeUtils";
 
-export { Direction, MoveToConfig, MoveToResult, Finished };
+export {
+  CollisionStrategy,
+  Direction,
+  MoveToConfig,
+  MoveToResult,
+  Finished,
+  FrameRow,
+  NumberOfDirections,
+  NoPathFoundStrategy,
+  PathBlockedStrategy,
+};
 
 export type TileSizePerSecond = number;
 
@@ -37,42 +47,177 @@ export interface Position {
   y: number;
 }
 
+/**
+ * Configuration object for initializing GridEngine.
+ */
 export interface GridEngineConfig {
+  /** An array of character data. Each describing a character on the map. */
   characters: CharacterData[];
+
+  /** A custom name for the collision tile property of your tilemap. */
+
   collisionTilePropertyName?: string;
+  /**
+   * The possible number of directions for moving a character. Default is 4
+   * (up, down, left, right). If set to 8 it additionaly enables diagonal
+   * movement (up-left, up-right, down-left, down-right).
+   *
+   * @defaultValue {@link NumberOfDirections.FOUR}
+   */
   numberOfDirections?: NumberOfDirections;
+
+  /**
+   * The character collision strategy.
+   *
+   * @defaultValue {@link CollisionStrategy.BLOCK_TWO_TILES}
+   */
   characterCollisionStrategy?: CollisionStrategy;
+
+  /**
+   * Enables experimental
+   * {@link https://annoraaq.github.io/grid-engine/features/layer-overlay | layer overlay feature}.
+   *
+   * @defaultValue `false`
+   *
+   * @beta
+   */
   layerOverlay?: boolean;
 }
 
 export interface WalkingAnimationMapping {
+  /** FrameRow for moving up */
   [Direction.UP]: FrameRow;
+  /** FrameRow for moving right */
   [Direction.RIGHT]: FrameRow;
+  /** FrameRow for moving down */
   [Direction.DOWN]: FrameRow;
+  /** FrameRow for moving left */
   [Direction.LEFT]: FrameRow;
+  /** FrameRow for moving up-left */
   [Direction.UP_LEFT]?: FrameRow;
+  /** FrameRow for moving up-right */
   [Direction.UP_RIGHT]?: FrameRow;
+  /** FrameRow for moving down-left */
   [Direction.DOWN_LEFT]?: FrameRow;
+  /** FrameRow for moving down-right */
   [Direction.DOWN_RIGHT]?: FrameRow;
 }
 
 export interface CollisionConfig {
+  /**
+   * Determines whether the character should collide with the tilemap.
+   *
+   * @defaultValue `true`
+   */
   collidesWithTiles?: boolean;
+
+  /**
+   * Array with collision groups. Only characters with at least one matching
+   * collision group collide. If omitted it will be initialized with a default
+   * collision group called `'geDefault'`. If you want to keep a character from
+   * colliding with any other character, you can simply provide an empty array
+   * here.
+   *
+   * @defaultValue `['geDefault']`
+   */
   collisionGroups?: string[];
 }
 
+/** Configuration object used to initialize a new character in GridEngine. */
 export interface CharacterData {
+  /**
+   * A unique identifier for the character on the map. If you provice two
+   * characters with the same id, the last one will override the previous one.
+   */
   id: string;
+
+  /** The character’s sprite. */
   sprite: Phaser.GameObjects.Sprite;
+
+  /**
+   * If not set, automatic walking animation will be disabed. Do this if you
+   * want to use a custom animation. In case of number: The 0-based index of
+   * the character on the spritesheet. Here is an
+   * {@link https://annoraaq.github.io/grid-engine/img/charIndex.png | example image showing the character indices}.
+   * In case of {@link WalkingAnimationMapping}: Alternatively to providing a
+   * characterIndex you can also provide a custom frame mapping. This is
+   * especially handy if your spritesheet has a different arrangement of frames
+   * than you can see in the {@link https://annoraaq.github.io/grid-engine/img/charIndex.png | example image}
+   * (4 rows with 3 columns). You can provide the frame number for every state
+   * of the character.
+   *
+   * For more details see the {@link https://annoraaq.github.io/grid-engine/examples/custom-walking-animation-mapping.html | custom walking animation mapping example}.
+   */
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
+
+  /**
+   * The speed of a player in tiles per second.
+   *
+   * @defaultValue `4`
+   */
   speed?: TileSizePerSecond;
+
+  /**
+   * Start tile position of the player.
+   *
+   * @defaultValue `{x: 0, y:0}`
+   */
   startPosition?: Position;
+
+  /**
+   * A container that holds the character’s sprite. This can be used in order
+   * to move more game objects along with the sprite (for example a character’s
+   * name or health bar). In order to position the container correctly on the
+   * tiles, it is necessary that you position the character’s sprite on
+   * position (0, 0) in the container.
+   *
+   * For more details see the {@link https://annoraaq.github.io/grid-engine/examples/phaser-container | container example}.
+   */
   container?: Phaser.GameObjects.Container;
+
+  /**
+   * A custom x-offset for the sprite/container.
+   *
+   * For more details see the {@link https://annoraaq.github.io/grid-engine/examples/custom-offset | custom offset example}.
+   *
+   * @defaultValue `0`
+   */
   offsetX?: number;
+
+  /**
+   * A custom y-offset for the sprite/container.
+   *
+   * For more details see the {@link https://annoraaq.github.io/grid-engine/examples/custom-offset | custom offset example}.
+   *
+   * @defaultValue `0`
+   */
   offsetY?: number;
+
+  /**
+   * Sets the direction the character is initially facing.
+   *
+   * @defaultValue {@link Direction.DOWN}
+   */
   facingDirection?: Direction;
-  // TODO Release 3.0: remove
+
+  /**
+   * Set to false, if character should not collide (neither with the tilemap,
+   * nor with other characters). For more control, pass a
+   * {@link CollisionConfig} object.
+   *
+   * @defaultValue `true`
+   */
   collides?: boolean | CollisionConfig;
+
+  /**
+   * Sets the
+   * {@link https://annoraaq.github.io/grid-engine/features/character-layers | character layer}
+   * of the character. If omitted the lowest character layer of the tilemap is
+   * taken. If there are no character layers in the tilemap, it will get the
+   * char layer `undefined`.
+   *
+   * @beta
+   */
   charLayer?: string;
 }
 
