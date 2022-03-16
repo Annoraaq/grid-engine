@@ -27,7 +27,7 @@ import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { Concrete } from "./Utils/TypeUtils";
 
-export { Direction };
+export { PathBlockedStrategy, NoPathFoundStrategy, Direction };
 
 export type TileSizePerSecond = number;
 
