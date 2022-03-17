@@ -3,7 +3,9 @@ import { Finished, MoveToConfig } from "./Movement/TargetMovement/TargetMovement
 import { CharacterIndex, FrameRow, PositionChange } from "./GridCharacter/GridCharacter";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { Observable } from "rxjs";
-export { Direction };
+import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
+import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
+export { PathBlockedStrategy, NoPathFoundStrategy, Direction };
 export declare type TileSizePerSecond = number;
 export interface Position {
     x: number;
