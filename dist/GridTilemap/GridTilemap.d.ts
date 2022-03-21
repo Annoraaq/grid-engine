@@ -16,13 +16,13 @@ export declare class GridTilemap {
     addCharacter(character: GridCharacter): void;
     removeCharacter(charId: string): void;
     getCharacters(): GridCharacter[];
-    isBlocking(charLayer: string, pos: Vector2, direction?: Direction): boolean;
+    isBlocking(charLayer: string, pos: Vector2, collisionGroups: string[], direction?: Direction): boolean;
     hasBlockingTile(charLayer: string, pos: Vector2, direction?: Direction): boolean;
     getTransition(pos: Vector2, fromLayer: string): string | undefined;
     setTransition(pos: Vector2, fromLayer: string, toLayer: string): void;
     getTransitions(): Map<string, Map<string, string>>;
     hasNoTile(pos: Vector2, charLayer: string): boolean;
-    hasBlockingChar(pos: Vector2, layer: string): boolean;
+    hasBlockingChar(pos: Vector2, layer: string, collisionGroups: string[]): boolean;
     getTileWidth(): number;
     getTileHeight(): number;
     getDepthOfCharLayer(layerName: string): number;

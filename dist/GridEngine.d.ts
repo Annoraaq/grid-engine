@@ -3,7 +3,9 @@ import { Finished, MoveToConfig } from "./Movement/TargetMovement/TargetMovement
 import { CharacterIndex, FrameRow, PositionChange } from "./GridCharacter/GridCharacter";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { Observable } from "rxjs";
-export { Direction };
+import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
+import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
+export { PathBlockedStrategy, NoPathFoundStrategy, Direction };
 export declare type TileSizePerSecond = number;
 export interface Position {
     x: number;
@@ -26,6 +28,10 @@ export interface WalkingAnimationMapping {
     [Direction.DOWN_LEFT]?: FrameRow;
     [Direction.DOWN_RIGHT]?: FrameRow;
 }
+export interface CollisionConfig {
+    collidesWithTiles?: boolean;
+    collisionGroups?: string[];
+}
 export interface CharacterData {
     id: string;
     sprite: Phaser.GameObjects.Sprite;
@@ -36,7 +42,7 @@ export interface CharacterData {
     offsetX?: number;
     offsetY?: number;
     facingDirection?: Direction;
-    collides?: boolean;
+    collides?: boolean | CollisionConfig;
     charLayer?: string;
 }
 export declare class GridEngine {
@@ -80,8 +86,10 @@ export declare class GridEngine {
     setPosition(charId: string, pos: Position, layer?: string): void;
     getSprite(charId: string): Phaser.GameObjects.Sprite;
     setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void;
-    isBlocked(position: Position, layer: string): boolean;
+    isBlocked(position: Position, layer: string, collisionGroups?: string[]): boolean;
     isTileBlocked(position: Position, layer: string): boolean;
+    getCollisionGroups(charId: string): string[];
+    setCollisionGroups(charId: string, collisionGroups: string[]): void;
     movementStarted(): Observable<{
         charId: string;
         direction: Direction;
