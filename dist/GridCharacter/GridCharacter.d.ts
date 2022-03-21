@@ -6,9 +6,13 @@ import { Position, WalkingAnimationMapping } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
+/** Frame numbers for one movement direction */
 export interface FrameRow {
+    /** Frame number for animation frame with left foot in front */
     leftFoot: number;
+    /** Frame number for animation frame standing (no foot in front) */
     standing: number;
+    /** Frame number for animation frame with right foot in front */
     rightFoot: number;
 }
 export declare type CharacterIndex = number;
