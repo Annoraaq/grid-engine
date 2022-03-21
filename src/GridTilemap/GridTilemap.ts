@@ -43,7 +43,7 @@ export class GridTilemap {
   }
 
   isBlocking(
-    charLayer: string,
+    charLayer: string | undefined,
     pos: Vector2,
     collisionGroups: string[],
     direction?: Direction
@@ -56,7 +56,7 @@ export class GridTilemap {
   }
 
   hasBlockingTile(
-    charLayer: string,
+    charLayer: string | undefined,
     pos: Vector2,
     direction?: Direction
   ): boolean {
@@ -87,7 +87,7 @@ export class GridTilemap {
     );
   }
 
-  hasNoTile(pos: Vector2, charLayer: string): boolean {
+  hasNoTile(pos: Vector2, charLayer?: string): boolean {
     return !this.getCollisionRelevantLayers(charLayer).some((layer) =>
       this.tilemap.hasTileAt(pos.x, pos.y, layer.name)
     );
@@ -95,7 +95,7 @@ export class GridTilemap {
 
   hasBlockingChar(
     pos: Vector2,
-    layer: string,
+    layer: string | undefined,
     collisionGroups: string[]
   ): boolean {
     return this.charBlockCache.isCharBlockingAt(pos, layer, collisionGroups);

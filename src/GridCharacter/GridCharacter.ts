@@ -12,9 +12,15 @@ import * as Phaser from "phaser";
 import { Utils } from "../Utils/Utils/Utils";
 import { SpriteUtils } from "../Utils/SpriteUtils/SpriteUtils";
 
+/** Frame numbers for one movement direction */
 export interface FrameRow {
+  /** Frame number for animation frame with left foot in front */
   leftFoot: number;
+
+  /** Frame number for animation frame standing (no foot in front) */
   standing: number;
+
+  /** Frame number for animation frame with right foot in front */
   rightFoot: number;
 }
 
