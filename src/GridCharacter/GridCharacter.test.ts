@@ -828,7 +828,7 @@ describe("GridCharacter", () => {
     gridCharacter.move(Direction.DOWN);
     gridCharacter.update(MS_FOR_12_PX);
     gridCharacter.move(Direction.RIGHT);
-    gridCharacter.update(83.33333333333333333333333333333333333333);
+    gridCharacter.update(83.33333333333333);
     expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 0);
     expect(Math.round(gridSpriteMock.y)).toEqual(INITIAL_SPRITE_Y_POS + 16);
     expect(gridCharacter.getTilePos()).toEqual({
@@ -843,7 +843,7 @@ describe("GridCharacter", () => {
     gridTilemapMock.getTransition.mockReturnValue("transitionLayer");
     gridCharacter.move(Direction.DOWN);
     gridCharacter.update(MS_FOR_12_PX);
-    gridCharacter.update(83.33333333333333333333333333333333333333);
+    gridCharacter.update(83.33333333333333);
 
     expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 0);
     expect(Math.round(gridSpriteMock.y)).toEqual(INITIAL_SPRITE_Y_POS + 16);

@@ -3,3 +3,4 @@ dist
 .github
 **/*.d.ts
 GridEngine.min.js
+serve
