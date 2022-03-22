@@ -31,7 +31,7 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
     <img src="https://github.com/Annoraaq/grid-engine/blob/master/images/installation-label.png" alt="Installation" />
 </p>
 
-Installing the Grid Movement plugin is simple.
+Installing the GridEngine plugin is simple.
 
 ### NPM
 
@@ -68,7 +68,7 @@ const gameConfig = {
 const game = new Phaser.Game(gameConfig);
 ```
 
-Now you're all set to start using Grid Movement in your scenes!
+Now you're all set to start using GridEngine in your scenes!
 
 ```javascript
 function create() {
