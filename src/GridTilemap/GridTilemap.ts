@@ -302,13 +302,15 @@ export class GridTilemap {
       layer,
       GridTilemap.HEIGHT_SHIFT_PROP_NAME
     );
+    const makeHigherThanCharWhenOnSameLevel = 1;
     for (let row = 0; row < layer.height; row++) {
       const newLayer = this.copyLayer(layer, row);
       newLayer.scale = layer.tilemapLayer.scale;
       newLayer.setDepth(
         offset +
           Utils.shiftPad(
-            (row + heightShift) * this.getTileHeight(),
+            (row + heightShift) * this.getTileHeight() +
+              makeHigherThanCharWhenOnSameLevel,
             GridTilemap.Z_INDEX_PADDING
           )
       );
