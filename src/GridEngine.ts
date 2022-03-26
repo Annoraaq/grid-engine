@@ -774,16 +774,25 @@ export class GridEngine {
    * @returns Observable that, whenever a specified position is entered on optionally provided layers,
    *  will notify with the target characters position change
    */
-  steppedOn(charIds: string[], tiles: Position[], layer?: string[]): Observable<{
-    charId: string;
-  } & PositionChange> {
-    return this.positionChangeFinished()
-      .pipe(
-        filter(t => charIds.includes(t.charId)
-          && tiles.some(target => target.x === t.enterTile.x && target.y === t.enterTile.y)
-          && (layer === undefined || layer.includes(t.enterLayer))
-        )
-      );
+  steppedOn(
+    charIds: string[],
+    tiles: Position[],
+    layer?: string[]
+  ): Observable<
+    {
+      charId: string;
+    } & PositionChange
+  > {
+    return this.positionChangeFinished().pipe(
+      filter(
+        (t) =>
+          charIds.includes(t.charId) &&
+          tiles.some(
+            (target) => target.x === t.enterTile.x && target.y === t.enterTile.y
+          ) &&
+          (layer === undefined || layer.includes(t.enterLayer))
+      )
+    );
   }
 
   /**

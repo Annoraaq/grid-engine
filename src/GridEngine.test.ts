@@ -1496,16 +1496,24 @@ describe("GridEngine", () => {
       const expectedLayer = "anyLayer";
       const expectedTargetPosition = new Vector2(5, 5);
       gridEngine.create(tileMapMock, {
-        characters: [{
-          id: player1,
-          sprite: playerSpriteMock,
-        }, {
-          id: player2,
-          sprite: playerSpriteMock,
-        }]
+        characters: [
+          {
+            id: player1,
+            sprite: playerSpriteMock,
+          },
+          {
+            id: player2,
+            sprite: playerSpriteMock,
+          },
+        ],
       });
 
-      gridEngine.steppedOn([player1, player2], [expectedTargetPosition], [expectedLayer])
+      gridEngine
+        .steppedOn(
+          [player1, player2],
+          [expectedTargetPosition],
+          [expectedLayer]
+        )
         .subscribe({
           complete: jest.fn(),
           next: nextMock,
@@ -1516,11 +1524,13 @@ describe("GridEngine", () => {
         enterTile: expectedTargetPosition,
         enterLayer: expectedLayer,
         exitLayer: expectedLayer,
-        charId: player1
+        charId: player1,
       });
-      expect(nextMock).toHaveBeenCalledWith(expect.objectContaining({
-        enterTile: expectedTargetPosition
-      }));
+      expect(nextMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          enterTile: expectedTargetPosition,
+        })
+      );
 
       nextMock.mockClear();
       mockSubject.next({
@@ -1528,11 +1538,13 @@ describe("GridEngine", () => {
         enterTile: expectedTargetPosition,
         enterLayer: "not matching layer",
         exitLayer: expectedLayer,
-        charId: player1
+        charId: player1,
       });
-      expect(nextMock).not.toHaveBeenCalledWith(expect.objectContaining({
-        enterTile: expectedTargetPosition
-      }));
+      expect(nextMock).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          enterTile: expectedTargetPosition,
+        })
+      );
 
       nextMock.mockClear();
       mockSubject.next({
@@ -1540,11 +1552,13 @@ describe("GridEngine", () => {
         enterTile: expectedTargetPosition,
         enterLayer: expectedLayer,
         exitLayer: expectedLayer,
-        charId: "non matching character"
+        charId: "non matching character",
       });
-      expect(nextMock).not.toHaveBeenCalledWith(expect.objectContaining({
-        enterTile: expectedTargetPosition
-      }));
+      expect(nextMock).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          enterTile: expectedTargetPosition,
+        })
+      );
 
       nextMock.mockClear();
       mockSubject.next({
@@ -1552,11 +1566,13 @@ describe("GridEngine", () => {
         enterTile: new Vector2(10, 10), // non matching tile
         enterLayer: expectedLayer,
         exitLayer: expectedLayer,
-        charId: player1
+        charId: player1,
       });
-      expect(nextMock).not.toHaveBeenCalledWith(expect.objectContaining({
-        enterTile: expectedTargetPosition
-      }));
+      expect(nextMock).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          enterTile: expectedTargetPosition,
+        })
+      );
     });
 
     it("should unsubscribe from positionChangeFinished if char removed", () => {
