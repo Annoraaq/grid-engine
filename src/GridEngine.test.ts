@@ -1487,6 +1487,78 @@ describe("GridEngine", () => {
       });
     });
 
+    it("should notify if any provided character stepped on any of the given tiles on specified layers", async () => {
+      const mockSubject = new Subject<PositionChange & { charId: string }>();
+      mockGridCharacter.positionChangeFinished.mockReturnValue(mockSubject);
+      const nextMock = jest.fn();
+      const player1 = "player1";
+      const player2 = "player2";
+      const expectedLayer = "anyLayer";
+      const expectedTargetPosition = new Vector2(5, 5);
+      gridEngine.create(tileMapMock, {
+        characters: [{
+          id: player1,
+          sprite: playerSpriteMock,
+        }, {
+          id: player2,
+          sprite: playerSpriteMock,
+        }]
+      });
+
+      gridEngine.steppedOn([player1, player2], [expectedTargetPosition], [expectedLayer])
+        .subscribe({
+          complete: jest.fn(),
+          next: nextMock,
+        });
+
+      mockSubject.next({
+        exitTile: new Vector2(1, 1),
+        enterTile: expectedTargetPosition,
+        enterLayer: expectedLayer,
+        exitLayer: expectedLayer,
+        charId: player1
+      });
+      expect(nextMock).toHaveBeenCalledWith(expect.objectContaining({
+        enterTile: expectedTargetPosition
+      }));
+
+      nextMock.mockClear();
+      mockSubject.next({
+        exitTile: new Vector2(1, 1),
+        enterTile: expectedTargetPosition,
+        enterLayer: "not matching layer",
+        exitLayer: expectedLayer,
+        charId: player1
+      });
+      expect(nextMock).not.toHaveBeenCalledWith(expect.objectContaining({
+        enterTile: expectedTargetPosition
+      }));
+
+      nextMock.mockClear();
+      mockSubject.next({
+        exitTile: new Vector2(1, 1),
+        enterTile: expectedTargetPosition,
+        enterLayer: expectedLayer,
+        exitLayer: expectedLayer,
+        charId: "non matching character"
+      });
+      expect(nextMock).not.toHaveBeenCalledWith(expect.objectContaining({
+        enterTile: expectedTargetPosition
+      }));
+
+      nextMock.mockClear();
+      mockSubject.next({
+        exitTile: new Vector2(1, 1),
+        enterTile: new Vector2(10, 10), // non matching tile
+        enterLayer: expectedLayer,
+        exitLayer: expectedLayer,
+        charId: player1
+      });
+      expect(nextMock).not.toHaveBeenCalledWith(expect.objectContaining({
+        enterTile: expectedTargetPosition
+      }));
+    });
+
     it("should unsubscribe from positionChangeFinished if char removed", async () => {
       const mockSubject = new Subject<PositionChange>();
       mockGridCharacter.positionChangeFinished.mockReturnValue(mockSubject);
