@@ -8,19 +8,9 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
     "prettier",
   ],
-  overrides: [
-    {
-      files: ['*.ts'], // Your TypeScript files extension
-
-      // As mentioned in the comments, you should extend TypeScript plugins here,
-      // instead of extending them outside the `overrides`.
-      // If you don't want to extend any rules, you don't need an `extends` attribute.
-
-      parserOptions: {
-        project: ['./tsconfig.json'], // Specify it only for TypeScript files
-      },
-    },
-  ],
+  parserOptions: {
+    project: ['./tsconfig.json'],
+  },
   rules: {
     "@typescript-eslint/no-unused-vars": [
       "error",
