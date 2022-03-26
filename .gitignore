@@ -1,3 +1,10 @@
 node_modules
 src/**/*.d.ts
 coverage
+docs/_site
+docs/.sass-cache
+docs/.jekyll-cache
+docs/.jekyll-metadata
+docs/vendor
+docs/node_modules
+docs/**/*.d.ts
