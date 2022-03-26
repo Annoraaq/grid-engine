@@ -610,7 +610,7 @@ describe("GridCharacter", () => {
     expect(gridSpriteMock.y).toEqual(newPixelPos.y + PLAYER_Y_OFFSET);
   });
 
-  it("should stop ongoing movement when stopping on positionChangeFinish", async () => {
+  it("should stop ongoing movement when stopping on positionChangeFinish", () => {
     mockNonBlockingTile();
     const posChangeFinishedCb = jest.fn();
     const posChangeStartedCb = jest.fn();

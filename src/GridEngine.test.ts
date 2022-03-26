@@ -1275,7 +1275,7 @@ describe("GridEngine", () => {
       expect(res).toEqual({ charId: "player", direction: Direction.LEFT });
     });
 
-    it("should unsubscribe from movementStarted if char removed", async () => {
+    it("should unsubscribe from movementStarted if char removed", () => {
       const mockSubject = new Subject<Direction>();
       mockGridCharacter.movementStarted.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
@@ -1318,7 +1318,7 @@ describe("GridEngine", () => {
       expect(res).toEqual({ charId: "player", direction: Direction.LEFT });
     });
 
-    it("should unsubscribe from movementStopped if char removed", async () => {
+    it("should unsubscribe from movementStopped if char removed", () => {
       const mockSubject = new Subject<Direction>();
       mockGridCharacter.movementStopped.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
@@ -1361,7 +1361,7 @@ describe("GridEngine", () => {
       expect(res).toEqual({ charId: "player", direction: Direction.LEFT });
     });
 
-    it("should unsubscribe from directionChanged if char removed", async () => {
+    it("should unsubscribe from directionChanged if char removed", () => {
       const mockSubject = new Subject<Direction>();
       mockGridCharacter.directionChanged.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
@@ -1420,7 +1420,7 @@ describe("GridEngine", () => {
       });
     });
 
-    it("should unsubscribe from positionChangeStarted if char removed", async () => {
+    it("should unsubscribe from positionChangeStarted if char removed", () => {
       const mockSubject = new Subject<PositionChange>();
       mockGridCharacter.positionChangeStarted.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
@@ -1487,7 +1487,7 @@ describe("GridEngine", () => {
       });
     });
 
-    it("should notify if any provided character stepped on any of the given tiles on specified layers", async () => {
+    it("should notify if any provided character stepped on any of the given tiles on specified layers", () => {
       const mockSubject = new Subject<PositionChange & { charId: string }>();
       mockGridCharacter.positionChangeFinished.mockReturnValue(mockSubject);
       const nextMock = jest.fn();
@@ -1559,7 +1559,7 @@ describe("GridEngine", () => {
       }));
     });
 
-    it("should unsubscribe from positionChangeFinished if char removed", async () => {
+    it("should unsubscribe from positionChangeFinished if char removed", () => {
       const mockSubject = new Subject<PositionChange>();
       mockGridCharacter.positionChangeFinished.mockReturnValue(mockSubject);
       gridEngine.create(tileMapMock, {
