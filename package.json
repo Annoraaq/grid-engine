@@ -12,7 +12,8 @@
     "build-esm": "esbuild src/main-esm.ts --bundle --minify --format=esm --external:phaser --target=es2016 --outfile=dist/GridEngine.esm.min.js",
     "build": "npm run build-web && npm run build-esm && tsc --emitDeclarationOnly --outDir dist",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "serve": "esbuild src/main-iife.ts --servedir=serve --outfile=serve/js/GridEngine.js --bundle --target=es2016 --external:phaser --global-name=GridEngine"
+    "serve": "esbuild src/main-iife.ts --servedir=serve --outfile=serve/js/GridEngine.js --bundle --target=es2016 --external:phaser --global-name=GridEngine",
+    "docs": "typedoc src/GridEngine.ts --excludePrivate --excludeProtected --excludeInternal --out docs/typedoc"
   },
   "files": [
     "dist"
@@ -37,6 +38,7 @@
     "phaser": "~3.55.2",
     "prettier": "2.6.0",
     "ts-jest": "^27.1.3",
+    "typedoc": "^0.22.13",
     "typescript": "^4.6.2"
   },
   "repository": {
