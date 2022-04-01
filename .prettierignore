@@ -2,3 +2,10 @@ node_modules
 dist
 .github
 **/*.d.ts
+coverage
+docs/_site
+docs/.sass-cache
+docs/.jekyll-cache
+docs/.jekyll-metadata
+docs/vendor
+docs/node_modules
