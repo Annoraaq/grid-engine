@@ -296,8 +296,8 @@ describe("GridTilemap", () => {
     expect(blankLayerMock.putTileAt).toHaveBeenNthCalledWith(4, "r1#c1", 1, 1);
     expect(blankLayerMock.scale).toEqual(3);
     expect(blankLayerMock.setDepth).toHaveBeenCalledTimes(2);
-    expect(blankLayerMock.setDepth).toHaveBeenNthCalledWith(1, 0.0000048);
-    expect(blankLayerMock.setDepth).toHaveBeenNthCalledWith(2, 0.0000096);
+    expect(blankLayerMock.setDepth).toHaveBeenNthCalledWith(1, 0.0000049);
+    expect(blankLayerMock.setDepth).toHaveBeenNthCalledWith(2, 0.0000097);
     expect(tilemapMock.layers[1].tilemapLayer.destroy).toHaveBeenCalled();
   });
 

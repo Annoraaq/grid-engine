@@ -366,6 +366,13 @@ export declare class GridEngine {
      */
     setCollisionGroups(charId: string, collisionGroups: string[]): void;
     /**
+     * @returns Observable that, whenever a specified position is entered on optionally provided layers,
+     *  will notify with the target characters position change
+     */
+    steppedOn(charIds: string[], tiles: Position[], layer?: string[]): Observable<{
+        charId: string;
+    } & PositionChange>;
+    /**
      * @returns Observable that on each start of a movement will provide the
      *  character ID and the direction.
      */

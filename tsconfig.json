@@ -5,7 +5,11 @@
     "allowJs": false,
     "downlevelIteration": true
   },
-  "include": ["**/*.ts"],
+  "include": [
+    "**/*.ts",
+    "jest.config.js",
+    ".eslintrc.js"
+  ],
   "exclude": [
     "./dist/**/*"
   ]
