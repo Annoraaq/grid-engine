@@ -9,7 +9,7 @@ Welcome to the **Grid Engine** plugin! This Phaser 3 plugin adds grid-based move
 This plugin is also compatible (and written in) TypeScript; enjoy full type support!
 
 <p align="center">
-    <img src="https://github.com/Annoraaq/grid-engine/blob/master/images/features-label.png" alt="Features" />
+    <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/features-label.png" alt="Features" />
 </p>
 
 - Grid-based movement, of course!
@@ -28,7 +28,7 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
 ➡️ You can try/download a list of examples [at this link here](https://annoraaq.github.io/grid-engine/examples/).
 
 <p align="center">
-    <img src="https://github.com/Annoraaq/grid-engine/blob/master/images/installation-label.png" alt="Installation" />
+    <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/installation-label.png" alt="Installation" />
 </p>
 
 Installing the GridEngine plugin is simple.
@@ -91,7 +91,7 @@ function create() {
 ```
 
 <p align="center">
-    <img src="https://github.com/Annoraaq/grid-engine/blob/master/images/gifs-label.png" alt="Example GIFs" />
+    <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/gifs-label.png" alt="Example GIFs" />
 </p>
 <p align="center">
     <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/movement.gif" />
