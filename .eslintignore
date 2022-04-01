@@ -4,3 +4,4 @@ dist
 **/*.d.ts
 GridEngine.min.js
 serve
+docs
