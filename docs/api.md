@@ -3,9 +3,9 @@ layout: default
 title: API
 permalink: /api/
 nav_order: 3
-has_children: true
+has_children: false
 ---
 
 # API
 
-Here you can find the API documentation.
+Go to our [API documentation](https://annoraaq.github.io/grid-engine/typedoc/index.html).
