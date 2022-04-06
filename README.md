@@ -24,8 +24,11 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
 - Multiple character layers (Beta)
 - Collision groups
 
-📖 Our most current documentation [is here](https://annoraaq.github.io/grid-engine/)!
-➡️ You can try/download a list of examples [at this link here](https://annoraaq.github.io/grid-engine/examples/).
+📖 Read our most current [documentation](https://annoraaq.github.io/grid-engine/).
+
+➡️ You can try/download [a list of examples](https://annoraaq.github.io/grid-engine/examples/).
+
+🛠 Also check out the [Chrome DevTools plugin](https://github.com/zewa666/grid-engine-devtools).
 
 <p align="center">
     <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/installation-label.png" alt="Installation" />
@@ -68,7 +71,7 @@ const gameConfig = {
 const game = new Phaser.Game(gameConfig);
 ```
 
-Now you're all set to start using GridEngine in your scenes!
+Now you're all set to start using Grid Engine in your scenes!
 
 ```javascript
 function create() {
