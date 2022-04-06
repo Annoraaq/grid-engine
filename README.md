@@ -34,7 +34,7 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
     <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/installation-label.png" alt="Installation" />
 </p>
 
-Installing the GridEngine plugin is simple.
+Installing the Grid Engine plugin is simple.
 
 ### NPM
 

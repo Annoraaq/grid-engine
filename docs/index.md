@@ -75,7 +75,7 @@ const gameConfig = {
 const game = new Phaser.Game(gameConfig);
 ```
 
-Now you're all set to start using GridEngine in your scenes!
+Now you're all set to start using Grid Engine in your scenes!
 
 ```javascript
 function create() {
