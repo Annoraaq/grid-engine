@@ -1487,6 +1487,50 @@ describe("GridEngine", () => {
       });
     });
 
+    it("should emit when a character is added or removed", () => {
+      const player1 = "player1";
+      const player2 = "player2";
+      const nextMock = jest.fn();
+
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: player1,
+            sprite: playerSpriteMock,
+          },
+        ],
+      });
+
+      gridEngine.characterShifted().subscribe({
+        complete: jest.fn(),
+        next: nextMock,
+      });
+
+      gridEngine.addCharacter({ id: player2, sprite: playerSpriteMock });
+      expect(nextMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          charId: player2,
+          action: "ADDED",
+        })
+      );
+
+      gridEngine.removeCharacter(player1);
+      expect(nextMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          charId: player1,
+          action: "REMOVED",
+        })
+      );
+
+      gridEngine.addCharacter({ id: player1, sprite: playerSpriteMock });
+      expect(nextMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          charId: player1,
+          action: "ADDED",
+        })
+      );
+    });
+
     it("should notify if any provided character stepped on any of the given tiles on specified layers", () => {
       const mockSubject = new Subject<PositionChange & { charId: string }>();
       mockGridCharacter.positionChangeFinished.mockReturnValue(mockSubject);

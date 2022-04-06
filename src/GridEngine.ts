@@ -22,7 +22,7 @@ import {
 import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
-import { takeUntil, filter, map, take } from "rxjs/operators";
+import { takeUntil, filter, map, take, mergeWith } from "rxjs/operators";
 import { Vector2 } from "./Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
@@ -231,6 +231,7 @@ export class GridEngine {
   private positionChangeStarted$: Subject<{ charId: string } & PositionChange>;
   private positionChangeFinished$: Subject<{ charId: string } & PositionChange>;
   private charRemoved$: Subject<string>;
+  private charAdded$: Subject<string>;
 
   /**
    * Should only be called by Phaser and never directly.
@@ -257,6 +258,7 @@ export class GridEngine {
     this.positionChangeStarted$ = undefined;
     this.positionChangeFinished$ = undefined;
     this.charRemoved$ = undefined;
+    this.charAdded$ = undefined;
   }
 
   /**
@@ -332,6 +334,7 @@ export class GridEngine {
       { charId: string } & PositionChange
     >();
     this.charRemoved$ = new Subject<string>();
+    this.charAdded$ = new Subject<string>();
     this.gridTilemap = new GridTilemap(tilemap);
 
     this.addCharacters();
@@ -564,6 +567,8 @@ export class GridEngine {
           ...positionChange,
         });
       });
+
+    this.charAdded$.next(charData.id);
   }
 
   /** Checks whether a character with the given ID is registered. */
@@ -791,6 +796,29 @@ export class GridEngine {
             (target) => target.x === t.enterTile.x && target.y === t.enterTile.y
           ) &&
           (layer === undefined || layer.includes(t.enterLayer))
+      )
+    );
+  }
+
+  /**
+   * @returns Observable that emits when a new character is added or an existing is removed.
+   */
+  characterShifted(): Observable<{
+    charId: string;
+    action: "REMOVED" | "ADDED";
+  }> {
+    return this.charAdded$.pipe(
+      map<string, { charId: string; action: "REMOVED" | "ADDED" }>((c) => ({
+        charId: c,
+        action: "ADDED",
+      })),
+      mergeWith(
+        this.charRemoved$.pipe(
+          map<string, { charId: string; action: "REMOVED" | "ADDED" }>((c) => ({
+            charId: c,
+            action: "REMOVED",
+          }))
+        )
       )
     );
   }
