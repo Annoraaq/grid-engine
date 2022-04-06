@@ -5,3 +5,5 @@ search_enabled: true
 aux_links:
   "API Documentation":
     - "https://annoraaq.github.io/grid-engine/typedoc/index.html"
+  "Chrome DevTools Plugin":
+    - "https://github.com/zewa666/grid-engine-devtools"
