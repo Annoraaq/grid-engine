@@ -221,6 +221,26 @@ export interface CharacterData {
   charLayer?: string;
 }
 
+/**
+ * Result of a modification of the internal characters array
+ */
+export interface CharacterShift {
+  /** the modified character */
+  charId: string;
+  /** The action that was performed when modifying the character */
+  action: CharacterShiftAction;
+}
+
+/**
+ * Type of modification of grid engine characters
+ */
+export enum CharacterShiftAction {
+  /** removed existing character */
+  REMOVED = "REMOVED",
+  /** added new character */
+  ADDED = "ADDED",
+}
+
 export class GridEngine {
   private gridCharacters: Map<string, GridCharacter>;
   private gridTilemap: GridTilemap;
@@ -803,20 +823,17 @@ export class GridEngine {
   /**
    * @returns Observable that emits when a new character is added or an existing is removed.
    */
-  characterShifted(): Observable<{
-    charId: string;
-    action: "REMOVED" | "ADDED";
-  }> {
+  characterShifted(): Observable<CharacterShift> {
     return this.charAdded$.pipe(
-      map<string, { charId: string; action: "REMOVED" | "ADDED" }>((c) => ({
+      map((c) => ({
         charId: c,
-        action: "ADDED",
+        action: CharacterShiftAction.ADDED,
       })),
       mergeWith(
         this.charRemoved$.pipe(
-          map<string, { charId: string; action: "REMOVED" | "ADDED" }>((c) => ({
+          map((c) => ({
             charId: c,
-            action: "REMOVED",
+            action: CharacterShiftAction.REMOVED,
           }))
         )
       )
