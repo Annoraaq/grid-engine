@@ -166,6 +166,24 @@ export interface CharacterData {
      */
     charLayer?: string;
 }
+/**
+ * Result of a modification of the internal characters array
+ */
+export interface CharacterShift {
+    /** the modified character */
+    charId: string;
+    /** The action that was performed when modifying the character */
+    action: CharacterShiftAction;
+}
+/**
+ * Type of modification of grid engine characters
+ */
+export declare enum CharacterShiftAction {
+    /** removed existing character */
+    REMOVED = "REMOVED",
+    /** added new character */
+    ADDED = "ADDED"
+}
 export declare class GridEngine {
     private scene;
     private gridCharacters;
@@ -177,6 +195,7 @@ export declare class GridEngine {
     private positionChangeStarted$;
     private positionChangeFinished$;
     private charRemoved$;
+    private charAdded$;
     /**
      * Should only be called by Phaser and never directly.
      * @internal
@@ -372,6 +391,10 @@ export declare class GridEngine {
     steppedOn(charIds: string[], tiles: Position[], layer?: string[]): Observable<{
         charId: string;
     } & PositionChange>;
+    /**
+     * @returns Observable that emits when a new character is added or an existing is removed.
+     */
+    characterShifted(): Observable<CharacterShift>;
     /**
      * @returns Observable that on each start of a movement will provide the
      *  character ID and the direction.
