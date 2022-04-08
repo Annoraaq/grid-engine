@@ -10,6 +10,7 @@ export {
   MoveToResult,
   NumberOfDirections,
   PathBlockedStrategy,
+  CharacterShiftAction
 } from "./GridEngine";
 
 export default GridEngine;
