@@ -32,6 +32,16 @@
     }
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
+    const blockerUpSprite = this.add.sprite(0, 0, "player");
+    blockerUpSprite.scale = 1.5;
+    const blockerLeftSprite = this.add.sprite(0, 0, "player");
+    blockerLeftSprite.scale = 1.5;
+    const blockerRightSprite = this.add.sprite(0, 0, "player");
+    blockerRightSprite.scale = 1.5;
+    const blockerDownSprite = this.add.sprite(0, 0, "player");
+    blockerDownSprite.scale = 1.5;
+    const followerSprite = this.add.sprite(0, 0, "player");
+    followerSprite.scale = 1.5;
     this.cameras.main.startFollow(playerSprite, true);
     this.cameras.main.setFollowOffset(-playerSprite.width, -playerSprite.height);
 
@@ -42,11 +52,45 @@
           sprite: playerSprite,
           walkingAnimationMapping: 6,
           startPosition: {x: 3, y: 3},
+          // charLayer: 'test'
+        },
+        {
+          id: "blockerUp",
+          sprite: blockerUpSprite,
+          walkingAnimationMapping: 2,
+          startPosition: {x: 7, y: 2},
+        },
+        {
+          id: "blockerLeft",
+          sprite: blockerLeftSprite,
+          walkingAnimationMapping: 2,
+          startPosition: {x: 6, y: 3},
+        },
+        {
+          id: "blockerRight",
+          sprite: blockerRightSprite,
+          walkingAnimationMapping: 2,
+          startPosition: {x: 8, y: 3},
+        },
+        // {
+        //   id: "blockerDown",
+        //   sprite: blockerDownSprite,
+        //   walkingAnimationMapping: 2,
+        //   startPosition: {x: 7, y: 4},
+        // },
+        {
+          id: "follower",
+          sprite: followerSprite,
+          walkingAnimationMapping: 3,
+          startPosition: {x: 7, y: 3},
         },
       ],
     };
 
     this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
+
+    // this.gridEngine.setPosition('follower', {x:7, y:3}, 't);
+    this.gridEngine.follow('follower', 'player',0, true);
   }
 
   function update() {
