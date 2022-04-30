@@ -49,7 +49,6 @@ export class GridTilemap {
     direction?: Direction
   ): boolean {
     return (
-      this.hasNoTile(pos, charLayer) ||
       this.hasBlockingTile(charLayer, pos, direction) ||
       this.hasBlockingChar(pos, charLayer, collisionGroups)
     );
