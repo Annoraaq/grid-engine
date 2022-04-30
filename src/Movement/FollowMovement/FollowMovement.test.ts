@@ -65,7 +65,8 @@ describe("FollowMovement", () => {
       targetCharPos,
       NumberOfDirections.FOUR,
       1,
-      { noPathFoundStrategy: NoPathFoundStrategy.STOP }
+      { noPathFoundStrategy: NoPathFoundStrategy.STOP },
+      true
     );
   });
 
@@ -92,7 +93,8 @@ describe("FollowMovement", () => {
       1,
       {
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
-      }
+      },
+      true
     );
   });
 
@@ -137,7 +139,8 @@ describe("FollowMovement", () => {
       targetCharPos,
       NumberOfDirections.EIGHT,
       8,
-      { noPathFoundStrategy: NoPathFoundStrategy.STOP }
+      { noPathFoundStrategy: NoPathFoundStrategy.STOP },
+      true
     );
   });
 
@@ -157,7 +160,8 @@ describe("FollowMovement", () => {
       targetCharPos,
       NumberOfDirections.FOUR,
       8,
-      { noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE }
+      { noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE },
+      true
     );
   });
 });

@@ -16,4 +16,20 @@ describe("LayerPositionUtils", () => {
     expect(clone).toEqual(pos);
     expect(clone).not.toBe(pos);
   });
+
+  it("should check equality", () => {
+    const pos = { position: new Vector2(5, 6), layer: "sourceLayer" };
+    const posDifferentX = { position: new Vector2(6, 6), layer: "sourceLayer" };
+    const posDifferentY = { position: new Vector2(5, 7), layer: "sourceLayer" };
+    const posDifferentLayer = {
+      position: new Vector2(5, 6),
+      layer: "otherLayer",
+    };
+    const equalPos = { position: new Vector2(5, 6), layer: "sourceLayer" };
+    expect(LayerPositionUtils.equal(pos, posDifferentX)).toBe(false);
+    expect(LayerPositionUtils.equal(pos, posDifferentY)).toBe(false);
+    expect(LayerPositionUtils.equal(pos, posDifferentLayer)).toBe(false);
+    expect(LayerPositionUtils.equal(pos, equalPos)).toBe(true);
+    expect(LayerPositionUtils.equal(equalPos, pos)).toBe(true);
+  });
 });

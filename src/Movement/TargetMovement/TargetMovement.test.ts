@@ -1158,6 +1158,35 @@ describe("TargetMovement", () => {
     );
   });
 
+  it("should not block on target", () => {
+    const charPos = layerPos(new Vector2(3, 1));
+    const targetPos = layerPos(new Vector2(3, 2));
+    const mockChar = createMockChar("char1", charPos.position);
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [layerPos(new Vector2(3, 1)), layerPos(new Vector2(3, 2))],
+      closestToTarget: new Vector2(3, 2),
+    });
+    targetMovement = new TargetMovement(
+      mockChar,
+      gridTilemapMock,
+      targetPos,
+      NumberOfDirections.FOUR,
+      0,
+      undefined,
+      true
+    );
+
+    gridTilemapMock.isBlocking.mockReturnValue(true);
+    const getNeighbours = targetMovement.getNeighbours(charPos);
+
+    expect(getNeighbours).toEqual([
+      {
+        position: new Vector2(charPos.position.x, charPos.position.y + 1),
+        layer: "layer1",
+      },
+    ]);
+  });
+
   describe("finished observable", () => {
     let mockChar;
 

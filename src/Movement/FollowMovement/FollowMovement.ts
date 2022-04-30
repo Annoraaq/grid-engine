@@ -52,7 +52,8 @@ export class FollowMovement implements Movement {
       },
       this.numberOfDirections,
       this.distance + 1,
-      { noPathFoundStrategy: this.noPathFoundStrategy }
+      { noPathFoundStrategy: this.noPathFoundStrategy },
+      true
     );
   }
 }

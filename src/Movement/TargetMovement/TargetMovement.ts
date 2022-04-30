@@ -14,6 +14,7 @@ import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
 import { ShortestPathAlgorithm } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Position } from "../../GridEngine";
 import { filter, Subject, take } from "rxjs";
+import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils";
 
 export interface MoveToConfig {
   /**
@@ -107,13 +108,15 @@ export class TargetMovement implements Movement {
   private distanceUtils: DistanceUtils;
   private finished$: Subject<Finished>;
 
+  // TODO: use parameter bag
   constructor(
     private character: GridCharacter,
     private tilemap: GridTilemap,
     private targetPos: LayerPosition,
     numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR,
     private distance = 0,
-    config?: MoveToConfig
+    config?: MoveToConfig,
+    private ignoreBlockedTarget = false
   ) {
     this.noPathFoundStrategy =
       config?.noPathFoundStrategy || NoPathFoundStrategy.STOP;
@@ -204,11 +207,7 @@ export class TargetMovement implements Movement {
 
   getNeighbours = (pos: LayerPosition): LayerPosition[] => {
     const neighbours = this.distanceUtils.neighbours(pos.position);
-    const unblockedNeighbours = neighbours.filter(
-      (neighbour) => !this.isBlocking(neighbour, pos.layer)
-    );
-
-    return unblockedNeighbours.map((unblockedNeighbour) => {
+    const transitionMappedNeighbours = neighbours.map((unblockedNeighbour) => {
       const transition = this.tilemap.getTransition(
         unblockedNeighbour,
         pos.layer
@@ -218,6 +217,13 @@ export class TargetMovement implements Movement {
         layer: transition || pos.layer,
       };
     });
+
+    return transitionMappedNeighbours.filter(
+      (neighbour) =>
+        !this.isBlocking(neighbour.position, neighbour.layer) ||
+        (this.ignoreBlockedTarget &&
+          LayerPositionUtils.equal(neighbour, this.targetPos))
+    );
   };
 
   finishedObs(): Subject<Finished> {
