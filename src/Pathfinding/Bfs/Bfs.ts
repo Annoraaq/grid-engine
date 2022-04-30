@@ -3,6 +3,7 @@ import {
   ShortestPathAlgorithm,
 } from "./../ShortestPathAlgorithm";
 import { VectorUtils } from "../../Utils/VectorUtils";
+import { Queue } from "../../Datastructures/Queue/Queue";
 
 interface ShortestPathTuple {
   shortestDistance: number;
@@ -53,14 +54,14 @@ export class Bfs implements ShortestPathAlgorithm {
   ): ShortestPathTuple {
     const previous = new Map<string, LayerPosition>();
     const visited = new Set<string>();
-    const queue: QueueEntry[] = [];
+    const queue: Queue<QueueEntry> = new Queue();
     let closestToTarget: LayerPosition = startNode;
     let smallestDistToTarget: number = this.distance(startNode, stopNode);
-    queue.push({ node: startNode, dist: 0 });
+    queue.enqueue({ node: startNode, dist: 0 });
     visited.add(this.pos2Str(startNode));
 
-    while (queue.length > 0) {
-      const { node, dist } = queue.shift();
+    while (queue.size() > 0) {
+      const { node, dist } = queue.dequeue();
       const distToTarget = this.distance(node, stopNode);
       if (distToTarget < smallestDistToTarget) {
         smallestDistToTarget = distToTarget;
@@ -73,7 +74,7 @@ export class Bfs implements ShortestPathAlgorithm {
       for (const neighbour of getNeighbours(node)) {
         if (!visited.has(this.pos2Str(neighbour))) {
           previous.set(this.pos2Str(neighbour), node);
-          queue.push({ node: neighbour, dist: dist + 1 });
+          queue.enqueue({ node: neighbour, dist: dist + 1 });
           visited.add(this.pos2Str(neighbour));
         }
       }
