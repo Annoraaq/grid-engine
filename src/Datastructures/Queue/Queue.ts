@@ -5,6 +5,10 @@ class Node<T> {
   constructor(public data: T) {}
 }
 
+/**
+ * Fast queue implementation. This is necessary because using plain JS arrays as
+ * queues takes O(n) for dequeueing.
+ */
 export class Queue<T> {
   private head: Node<T>;
   private tail: Node<T>;
@@ -26,6 +30,7 @@ export class Queue<T> {
     this.tail = this.tail.prev;
     return tailData;
   }
+
   enqueue(data: T): void {
     this.sizeInternal++;
 
