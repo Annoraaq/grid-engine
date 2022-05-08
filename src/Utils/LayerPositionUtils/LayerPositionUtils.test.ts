@@ -32,4 +32,9 @@ describe("LayerPositionUtils", () => {
     expect(LayerPositionUtils.equal(pos, equalPos)).toBe(true);
     expect(LayerPositionUtils.equal(equalPos, pos)).toBe(true);
   });
+
+  it("should convert to string", () => {
+    const pos = { position: new Vector2(5, 6), layer: "sourceLayer" };
+    expect(LayerPositionUtils.toString(pos)).toEqual("5#6#sourceLayer");
+  });
 });

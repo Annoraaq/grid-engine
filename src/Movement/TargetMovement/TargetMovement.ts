@@ -1,3 +1,4 @@
+import { BidirectionalSearch } from "./../../Pathfinding/BidirectionalSearch/BidirectionalSearch";
 import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy";
 import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
 import { NumberOfDirections } from "./../../Direction/Direction";
@@ -6,7 +7,6 @@ import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Direction } from "../../Direction/Direction";
-import { Bfs } from "../../Pathfinding/Bfs/Bfs";
 import { Movement } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Retryable } from "./Retryable/Retryable";
@@ -350,7 +350,7 @@ export class TargetMovement implements Movement {
   };
 
   private getShortestPath(): { path: LayerPosition[]; distOffset: number } {
-    const shortestPathAlgo: ShortestPathAlgorithm = new Bfs();
+    const shortestPathAlgo: ShortestPathAlgorithm = new BidirectionalSearch();
     const { path: shortestPath, closestToTarget } =
       shortestPathAlgo.getShortestPath(
         this.character.getNextTilePos(),

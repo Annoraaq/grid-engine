@@ -20,4 +20,8 @@ export class LayerPositionUtils {
       layer: layerPosition.layer,
     };
   }
+
+  static toString(layerPosition: LayerPosition): string {
+    return `${layerPosition.position.toString()}#${layerPosition.layer}`;
+  }
 }

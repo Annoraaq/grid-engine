@@ -10,13 +10,16 @@ const mockBfs = {
   getShortestPath: jest.fn(),
 };
 
-jest.mock("../../Pathfinding/Bfs/Bfs", function () {
-  return {
-    Bfs: jest.fn(function () {
-      return mockBfs;
-    }),
-  };
-});
+jest.mock(
+  "../../Pathfinding/BidirectionalSearch/BidirectionalSearch",
+  function () {
+    return {
+      BidirectionalSearch: jest.fn(function () {
+        return mockBfs;
+      }),
+    };
+  }
+);
 
 describe("TargetMovement", () => {
   let targetMovement: TargetMovement;
