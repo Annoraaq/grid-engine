@@ -11,7 +11,7 @@ parent: Examples
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-2.13.0.min.js"></script>
+<script src="js/grid-engine-2.15.1.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
@@ -239,24 +239,20 @@ function tintRadius(tilemap, posX, posY, radius, color) {
     for (let x = 0; x <= radius; x++) {
       for (let y = 0; y <= radius; y++) {
         if (manhattanDist(posX, posY, posX + x, posY + y) <= radius) {
-          tilemap.layers[i].tilemapLayer.layer.data[posX + x][
-            posY + y
-          ].tint = color;
+          tilemap.layers[i].tilemapLayer.layer.data[posX + x][posY + y].tint =
+            color;
         }
         if (manhattanDist(posX, posY, posX - x, posY + y) <= radius) {
-          tilemap.layers[i].tilemapLayer.layer.data[posX - x][
-            posY + y
-          ].tint = color;
+          tilemap.layers[i].tilemapLayer.layer.data[posX - x][posY + y].tint =
+            color;
         }
         if (manhattanDist(posX, posY, posX + x, posY - y) <= radius) {
-          tilemap.layers[i].tilemapLayer.layer.data[posX + x][
-            posY - y
-          ].tint = color;
+          tilemap.layers[i].tilemapLayer.layer.data[posX + x][posY - y].tint =
+            color;
         }
         if (manhattanDist(posX, posY, posX - x, posY - y) <= radius) {
-          tilemap.layers[i].tilemapLayer.layer.data[posX - x][
-            posY - y
-          ].tint = color;
+          tilemap.layers[i].tilemapLayer.layer.data[posX - x][posY - y].tint =
+            color;
         }
       }
     }

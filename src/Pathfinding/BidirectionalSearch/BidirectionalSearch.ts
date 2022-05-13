@@ -106,11 +106,11 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
 
       startBfs.step(getNeighbours(node), node, dist);
 
-      const { node: stopBfsNode, dist: stopBfsDIst } = stopBfs.queue.dequeue();
+      const { node: stopBfsNode, dist: stopBfsDist } = stopBfs.queue.dequeue();
       if (startBfs.visited.has(LayerPositionUtils.toString(stopBfsNode))) {
         return {
           shortestDistance:
-            stopBfsDIst +
+            stopBfsDist +
             startBfs.visited.get(LayerPositionUtils.toString(stopBfsNode)),
           previous: startBfs.previous,
           previous2: stopBfs.previous,
@@ -119,7 +119,7 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
         };
       }
 
-      stopBfs.step(getNeighbours(stopBfsNode), stopBfsNode, stopBfsDIst);
+      stopBfs.step(getNeighbours(stopBfsNode), stopBfsNode, stopBfsDist);
     }
     return {
       shortestDistance: -1,
