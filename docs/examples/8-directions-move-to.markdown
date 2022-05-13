@@ -191,9 +191,21 @@ function create() {
   };
 
   this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
-  this.gridEngine.moveTo("npc0", { x: 15, y: 18 });
-  this.gridEngine.moveTo("npc1", { x: 15, y: 19 });
-  this.gridEngine.moveTo("npc2", { x: 15, y: 20 });
+  this.gridEngine.moveTo(
+    "npc0",
+    { x: 15, y: 18 },
+    { pathBlockedStrategy: "RETRY" }
+  );
+  this.gridEngine.moveTo(
+    "npc1",
+    { x: 15, y: 19 },
+    { pathBlockedStrategy: "RETRY" }
+  );
+  this.gridEngine.moveTo(
+    "npc2",
+    { x: 15, y: 20 },
+    { pathBlockedStrategy: "RETRY" }
+  );
 }
 
 function update() {
