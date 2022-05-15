@@ -224,10 +224,10 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemapMock,
       layerPos(new Vector2(3, 1)),
-      NumberOfDirections.FOUR,
-      0,
       {
-        noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        config: {
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        },
       }
     );
     targetMovement.update(100);
@@ -260,16 +260,13 @@ describe("TargetMovement", () => {
         path: [charPos, layerPos(new Vector2(2, 1))],
         closestToTarget: layerPos(new Vector2(2, 1)),
       });
-    targetMovement = new TargetMovement(
-      mockChar,
-      gridTilemapMock,
-      targetPos,
-      NumberOfDirections.FOUR,
-      2,
-      {
+    targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos, {
+      numberOfDirections: NumberOfDirections.FOUR,
+      distance: 2,
+      config: {
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
-      }
-    );
+      },
+    });
     targetMovement.update(100);
 
     expect(mockChar.move).not.toHaveBeenCalled();
@@ -287,8 +284,9 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemapMock,
       layerPos(new Vector2(1, 3)),
-      NumberOfDirections.FOUR,
-      3
+      {
+        distance: 3,
+      }
     );
     targetMovement.update(100);
 
@@ -310,14 +308,9 @@ describe("TargetMovement", () => {
         path: [charPos, target],
         closestToTarget: target,
       });
-      targetMovement = new TargetMovement(
-        mockChar,
-        gridTilemapMock,
-        target,
-
-        NumberOfDirections.FOUR,
-        2
-      );
+      targetMovement = new TargetMovement(mockChar, gridTilemapMock, target, {
+        distance: 2,
+      });
       targetMovement.update(100);
 
       expect(mockChar.turnTowards).toHaveBeenCalledWith(Direction.LEFT);
@@ -332,14 +325,9 @@ describe("TargetMovement", () => {
         closestToTarget: target,
       });
 
-      targetMovement = new TargetMovement(
-        mockChar,
-        gridTilemapMock,
-        target,
-
-        NumberOfDirections.FOUR,
-        2
-      );
+      targetMovement = new TargetMovement(mockChar, gridTilemapMock, target, {
+        distance: 2,
+      });
       targetMovement.update(100);
 
       expect(mockChar.turnTowards).toHaveBeenCalledWith(Direction.RIGHT);
@@ -354,14 +342,9 @@ describe("TargetMovement", () => {
         closestToTarget: target,
       });
 
-      targetMovement = new TargetMovement(
-        mockChar,
-        gridTilemapMock,
-        target,
-
-        NumberOfDirections.FOUR,
-        2
-      );
+      targetMovement = new TargetMovement(mockChar, gridTilemapMock, target, {
+        distance: 2,
+      });
       targetMovement.update(100);
 
       expect(mockChar.turnTowards).toHaveBeenCalledWith(Direction.UP);
@@ -376,15 +359,9 @@ describe("TargetMovement", () => {
         closestToTarget: target,
       });
 
-      targetMovement = new TargetMovement(
-        mockChar,
-        gridTilemapMock,
-        target,
-
-        NumberOfDirections.FOUR,
-
-        2
-      );
+      targetMovement = new TargetMovement(mockChar, gridTilemapMock, target, {
+        distance: 2,
+      });
       targetMovement.update(100);
 
       expect(mockChar.turnTowards).toHaveBeenCalledWith(Direction.DOWN);
@@ -399,14 +376,9 @@ describe("TargetMovement", () => {
         closestToTarget: target,
       });
 
-      targetMovement = new TargetMovement(
-        mockChar,
-        gridTilemapMock,
-        target,
-
-        NumberOfDirections.FOUR,
-        3
-      );
+      targetMovement = new TargetMovement(mockChar, gridTilemapMock, target, {
+        distance: 3,
+      });
       targetMovement.update(100);
 
       expect(mockChar.turnTowards).toHaveBeenCalledWith(Direction.DOWN);
@@ -435,10 +407,11 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemapMock,
       layerPos(new Vector2(1, 5)),
-      NumberOfDirections.FOUR,
-      3,
       {
-        noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        distance: 3,
+        config: {
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        },
       }
     );
     targetMovement.update(100);
@@ -464,10 +437,11 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemapMock,
       layerPos(new Vector2(1, 5)),
-      NumberOfDirections.FOUR,
-      3,
       {
-        noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        distance: 3,
+        config: {
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        },
       }
     );
     targetMovement.update(100);
@@ -490,16 +464,10 @@ describe("TargetMovement", () => {
         closestToTarget: new Vector2(1, 3),
       });
 
-    targetMovement = new TargetMovement(
-      mockChar,
-      gridTilemapMock,
-      target,
-      NumberOfDirections.FOUR,
-      1,
-      {
-        noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
-      }
-    );
+    targetMovement = new TargetMovement(mockChar, gridTilemapMock, target, {
+      distance: 1,
+      config: { noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE },
+    });
     targetMovement.update(100);
 
     expect(mockChar.move).not.toHaveBeenCalled();
@@ -534,10 +502,10 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemapMock,
         layerPos(new Vector2(3, 2)),
-        NumberOfDirections.FOUR,
-        0,
         {
-          noPathFoundStrategy: NoPathFoundStrategy.RETRY,
+          config: {
+            noPathFoundStrategy: NoPathFoundStrategy.RETRY,
+          },
         }
       );
       targetMovement.update(100);
@@ -566,11 +534,11 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemapMock,
         layerPos(new Vector2(3, 2)),
-        NumberOfDirections.FOUR,
-        0,
         {
-          noPathFoundStrategy: NoPathFoundStrategy.RETRY,
-          noPathFoundRetryBackoffMs: 150,
+          config: {
+            noPathFoundStrategy: NoPathFoundStrategy.RETRY,
+            noPathFoundRetryBackoffMs: 150,
+          },
         }
       );
       targetMovement.update(100);
@@ -598,12 +566,12 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemapMock,
         layerPos(new Vector2(3, 2)),
-        NumberOfDirections.FOUR,
-        0,
         {
-          noPathFoundStrategy: NoPathFoundStrategy.RETRY,
-          noPathFoundRetryBackoffMs: 1,
-          noPathFoundMaxRetries: 2,
+          config: {
+            noPathFoundStrategy: NoPathFoundStrategy.RETRY,
+            noPathFoundRetryBackoffMs: 1,
+            noPathFoundMaxRetries: 2,
+          },
         }
       );
       const finishedObsCallbackMock = jest.fn();
@@ -644,11 +612,11 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemapMock,
         layerPos(new Vector2(3, 2)),
-        NumberOfDirections.FOUR,
-        0,
         {
-          noPathFoundStrategy: NoPathFoundStrategy.RETRY,
-          noPathFoundRetryBackoffMs: 1,
+          config: {
+            noPathFoundStrategy: NoPathFoundStrategy.RETRY,
+            noPathFoundRetryBackoffMs: 1,
+          },
         }
       );
       targetMovement.update(1);
@@ -673,12 +641,12 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemapMock,
         layerPos(new Vector2(3, 2)),
-        NumberOfDirections.FOUR,
-        0,
         {
-          noPathFoundStrategy: NoPathFoundStrategy.RETRY,
-          noPathFoundRetryBackoffMs: 1,
-          noPathFoundMaxRetries: -1,
+          config: {
+            noPathFoundStrategy: NoPathFoundStrategy.RETRY,
+            noPathFoundRetryBackoffMs: 1,
+            noPathFoundMaxRetries: -1,
+          },
         }
       );
       targetMovement.update(1);
@@ -704,10 +672,10 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemapMock,
         layerPos(new Vector2(3, 2)),
-        NumberOfDirections.FOUR,
-        0,
         {
-          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          config: {
+            noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          },
         }
       );
       const finishedObsCallbackMock = jest.fn();
@@ -879,10 +847,10 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemapMock,
       layerPos(new Vector2(2, 2)),
-      NumberOfDirections.FOUR,
-      0,
       {
-        pathBlockedWaitTimeoutMs: 2000,
+        config: {
+          pathBlockedWaitTimeoutMs: 2000,
+        },
       }
     );
     const finishedObsCallbackMock = jest.fn();
@@ -919,10 +887,10 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemapMock,
       layerPos(new Vector2(2, 2)),
-      NumberOfDirections.FOUR,
-      0,
       {
-        pathBlockedWaitTimeoutMs: 2000,
+        config: {
+          pathBlockedWaitTimeoutMs: 2000,
+        },
       }
     );
     targetMovement.update(500);
@@ -954,10 +922,10 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemapMock,
       layerPos(new Vector2(3, 2)),
-      NumberOfDirections.FOUR,
-      0,
       {
-        pathBlockedStrategy: PathBlockedStrategy.RETRY,
+        config: {
+          pathBlockedStrategy: PathBlockedStrategy.RETRY,
+        },
       }
     );
 
@@ -990,10 +958,10 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemapMock,
       layerPos(new Vector2(3, 2)),
-      NumberOfDirections.FOUR,
-      0,
       {
-        pathBlockedStrategy: PathBlockedStrategy.RETRY,
+        config: {
+          pathBlockedStrategy: PathBlockedStrategy.RETRY,
+        },
       }
     );
 
@@ -1020,11 +988,11 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemapMock,
       layerPos(new Vector2(3, 2)),
-      NumberOfDirections.FOUR,
-      0,
       {
-        pathBlockedStrategy: PathBlockedStrategy.RETRY,
-        pathBlockedRetryBackoffMs: 150,
+        config: {
+          pathBlockedStrategy: PathBlockedStrategy.RETRY,
+          pathBlockedRetryBackoffMs: 150,
+        },
       }
     );
 
@@ -1053,11 +1021,11 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemapMock,
       layerPos(new Vector2(3, 2)),
-      NumberOfDirections.FOUR,
-      0,
       {
-        pathBlockedStrategy: PathBlockedStrategy.RETRY,
-        pathBlockedMaxRetries: 2,
+        config: {
+          pathBlockedStrategy: PathBlockedStrategy.RETRY,
+          pathBlockedMaxRetries: 2,
+        },
       }
     );
 
@@ -1169,15 +1137,9 @@ describe("TargetMovement", () => {
       path: [layerPos(new Vector2(3, 1)), layerPos(new Vector2(3, 2))],
       closestToTarget: new Vector2(3, 2),
     });
-    targetMovement = new TargetMovement(
-      mockChar,
-      gridTilemapMock,
-      targetPos,
-      NumberOfDirections.FOUR,
-      0,
-      undefined,
-      true
-    );
+    targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos, {
+      ignoreBlockedTarget: true,
+    });
 
     gridTilemapMock.isBlocking.mockReturnValue(true);
     const getNeighbours = targetMovement.getNeighbours(charPos);
@@ -1292,7 +1254,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemapMock,
         targetPos,
-        NumberOfDirections.EIGHT
+        { numberOfDirections: NumberOfDirections.EIGHT }
       );
       gridTilemapMock.isBlocking.mockReturnValue(true);
       let getNeighbours = targetMovement.getNeighbours(charPos);
@@ -1323,7 +1285,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemapMock,
         layerPos(new Vector2(1, 0)),
-        NumberOfDirections.EIGHT
+        { numberOfDirections: NumberOfDirections.EIGHT }
       );
       targetMovement.update(100);
 
@@ -1341,7 +1303,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemapMock,
         layerPos(new Vector2(1, 0)),
-        NumberOfDirections.EIGHT
+        { numberOfDirections: NumberOfDirections.EIGHT }
       );
       targetMovement.update(100);
 
@@ -1359,7 +1321,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemapMock,
         layerPos(new Vector2(1, 2)),
-        NumberOfDirections.EIGHT
+        { numberOfDirections: NumberOfDirections.EIGHT }
       );
       targetMovement.update(100);
 
@@ -1377,7 +1339,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemapMock,
         layerPos(new Vector2(1, 2)),
-        NumberOfDirections.EIGHT
+        { numberOfDirections: NumberOfDirections.EIGHT }
       );
       targetMovement.update(100);
 
@@ -1403,10 +1365,12 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemapMock,
         targetPos,
-        NumberOfDirections.EIGHT,
-        2,
         {
-          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+          numberOfDirections: NumberOfDirections.EIGHT,
+          distance: 2,
+          config: {
+            noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+          },
         }
       );
       targetMovement.update(100);

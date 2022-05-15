@@ -784,11 +784,13 @@ describe("GridEngine", () => {
         expect.toBeCharacter("player"),
         mockGridTileMap,
         { position: targetVec.position, layer: "someLayer" },
-        NumberOfDirections.FOUR,
-        0,
         {
-          noPathFoundStrategy: NoPathFoundStrategy.STOP,
-          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+          numberOfDirections: NumberOfDirections.FOUR,
+          distance: 0,
+          config: {
+            noPathFoundStrategy: NoPathFoundStrategy.STOP,
+            pathBlockedStrategy: PathBlockedStrategy.WAIT,
+          },
         }
       );
       expect(mockGridCharacter.setMovement).toHaveBeenCalledWith(
@@ -807,12 +809,14 @@ describe("GridEngine", () => {
         expect.toBeCharacter("player"),
         mockGridTileMap,
         targetVec,
-        NumberOfDirections.FOUR,
-        0,
         {
-          noPathFoundStrategy: NoPathFoundStrategy.STOP,
-          pathBlockedStrategy: PathBlockedStrategy.WAIT,
-          targetLayer: "layer1",
+          numberOfDirections: NumberOfDirections.FOUR,
+          distance: 0,
+          config: {
+            noPathFoundStrategy: NoPathFoundStrategy.STOP,
+            pathBlockedStrategy: PathBlockedStrategy.WAIT,
+            targetLayer: "layer1",
+          },
         }
       );
     });
@@ -864,14 +868,14 @@ describe("GridEngine", () => {
         expect.anything(),
         expect.anything(),
         expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        {
-          noPathFoundStrategy: NoPathFoundStrategy.STOP,
-          pathBlockedStrategy: PathBlockedStrategy.WAIT,
-          noPathFoundRetryBackoffMs: 500,
-          noPathFoundMaxRetries: 10,
-        }
+        expect.objectContaining({
+          config: {
+            noPathFoundStrategy: NoPathFoundStrategy.STOP,
+            pathBlockedStrategy: PathBlockedStrategy.WAIT,
+            noPathFoundRetryBackoffMs: 500,
+            noPathFoundMaxRetries: 10,
+          },
+        })
       );
     });
 
@@ -884,12 +888,12 @@ describe("GridEngine", () => {
         expect.anything(),
         expect.anything(),
         expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        {
-          noPathFoundStrategy: NoPathFoundStrategy.STOP,
-          pathBlockedStrategy: PathBlockedStrategy.WAIT,
-        }
+        expect.objectContaining({
+          config: {
+            noPathFoundStrategy: NoPathFoundStrategy.STOP,
+            pathBlockedStrategy: PathBlockedStrategy.WAIT,
+          },
+        })
       );
     });
 
@@ -902,12 +906,12 @@ describe("GridEngine", () => {
         expect.anything(),
         expect.anything(),
         expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        {
-          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
-          pathBlockedStrategy: PathBlockedStrategy.WAIT,
-        }
+        expect.objectContaining({
+          config: {
+            noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+            pathBlockedStrategy: PathBlockedStrategy.WAIT,
+          },
+        })
       );
     });
 
@@ -920,12 +924,12 @@ describe("GridEngine", () => {
         expect.anything(),
         expect.anything(),
         expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        {
-          noPathFoundStrategy: NoPathFoundStrategy.STOP,
-          pathBlockedStrategy: PathBlockedStrategy.WAIT,
-        }
+        expect.objectContaining({
+          config: {
+            noPathFoundStrategy: NoPathFoundStrategy.STOP,
+            pathBlockedStrategy: PathBlockedStrategy.WAIT,
+          },
+        })
       );
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Unknown NoPathFoundStrategy 'unknown strategy'. Falling back to 'STOP'"
@@ -942,12 +946,12 @@ describe("GridEngine", () => {
         expect.anything(),
         expect.anything(),
         expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        {
-          noPathFoundStrategy: NoPathFoundStrategy.STOP,
-          pathBlockedStrategy: PathBlockedStrategy.WAIT,
-        }
+        expect.objectContaining({
+          config: {
+            noPathFoundStrategy: NoPathFoundStrategy.STOP,
+            pathBlockedStrategy: PathBlockedStrategy.WAIT,
+          },
+        })
       );
     });
 
@@ -961,12 +965,12 @@ describe("GridEngine", () => {
         expect.anything(),
         expect.anything(),
         expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        {
-          noPathFoundStrategy: NoPathFoundStrategy.STOP,
-          pathBlockedStrategy: PathBlockedStrategy.RETRY,
-        }
+        expect.objectContaining({
+          config: {
+            noPathFoundStrategy: NoPathFoundStrategy.STOP,
+            pathBlockedStrategy: PathBlockedStrategy.RETRY,
+          },
+        })
       );
     });
 
@@ -980,12 +984,12 @@ describe("GridEngine", () => {
         expect.anything(),
         expect.anything(),
         expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        {
-          noPathFoundStrategy: NoPathFoundStrategy.STOP,
-          pathBlockedStrategy: PathBlockedStrategy.WAIT,
-        }
+        expect.objectContaining({
+          config: {
+            noPathFoundStrategy: NoPathFoundStrategy.STOP,
+            pathBlockedStrategy: PathBlockedStrategy.WAIT,
+          },
+        })
       );
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Unknown PathBlockedStrategy 'unknown strategy'. Falling back to 'WAIT'"

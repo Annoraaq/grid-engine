@@ -94,6 +94,13 @@ export interface Finished {
   layer: string;
 }
 
+export interface Options {
+  numberOfDirections?: NumberOfDirections;
+  distance?: number;
+  config?: MoveToConfig;
+  ignoreBlockedTarget?: boolean;
+}
+
 export class TargetMovement implements Movement {
   private shortestPath: LayerPosition[];
   private distOffset: number;
@@ -107,17 +114,23 @@ export class TargetMovement implements Movement {
   private pathBlockedWaitElapsed: number;
   private distanceUtils: DistanceUtils;
   private finished$: Subject<Finished>;
+  private ignoreBlockedTarget: boolean;
+  private distance: number;
 
   // TODO: use parameter bag
   constructor(
     private character: GridCharacter,
     private tilemap: GridTilemap,
     private targetPos: LayerPosition,
-    numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR,
-    private distance = 0,
-    config?: MoveToConfig,
-    private ignoreBlockedTarget = false
+    {
+      numberOfDirections = NumberOfDirections.FOUR,
+      config,
+      ignoreBlockedTarget = false,
+      distance = 0,
+    }: Options = {}
   ) {
+    this.ignoreBlockedTarget = ignoreBlockedTarget;
+    this.distance = distance;
     this.noPathFoundStrategy =
       config?.noPathFoundStrategy || NoPathFoundStrategy.STOP;
     this.pathBlockedStrategy =
