@@ -432,9 +432,11 @@ export class GridEngine {
           config?.targetLayer ||
           this.gridCharacters.get(charId).getNextTilePos().layer,
       },
-      GlobalConfig.get().numberOfDirections,
-      0,
-      moveToConfig
+      {
+        numberOfDirections: GlobalConfig.get().numberOfDirections,
+        distance: 0,
+        config: moveToConfig,
+      }
     );
     this.gridCharacters.get(charId).setMovement(targetMovement);
     return targetMovement.finishedObs().pipe(

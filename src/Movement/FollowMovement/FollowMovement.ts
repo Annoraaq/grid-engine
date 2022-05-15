@@ -50,9 +50,12 @@ export class FollowMovement implements Movement {
         position: new Vector2(targetPos),
         layer: targetLayer,
       },
-      this.numberOfDirections,
-      this.distance + 1,
-      { noPathFoundStrategy: this.noPathFoundStrategy }
+      {
+        numberOfDirections: this.numberOfDirections,
+        distance: this.distance + 1,
+        config: { noPathFoundStrategy: this.noPathFoundStrategy },
+        ignoreBlockedTarget: true,
+      }
     );
   }
 }

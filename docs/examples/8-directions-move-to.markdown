@@ -11,7 +11,7 @@ parent: Examples (8 directions)
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-2.13.0.min.js"></script>
+<script src="js/grid-engine-2.15.1.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
@@ -85,9 +85,9 @@ parent: Examples (8 directions)
     };
 
     this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
-    this.gridEngine.moveTo('npc0', {x: 15, y: 18});
-    this.gridEngine.moveTo('npc1', {x: 15, y: 19});
-    this.gridEngine.moveTo('npc2', {x: 15, y: 20});
+    this.gridEngine.moveTo('npc0', {x: 15, y: 18}, {pathBlockedStrategy: 'RETRY'});
+    this.gridEngine.moveTo('npc1', {x: 15, y: 19}, {pathBlockedStrategy: 'RETRY'});
+    this.gridEngine.moveTo('npc2', {x: 15, y: 20}, {pathBlockedStrategy: 'RETRY'});
   }
 
   function update () {
@@ -191,9 +191,21 @@ function create() {
   };
 
   this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
-  this.gridEngine.moveTo("npc0", { x: 15, y: 18 });
-  this.gridEngine.moveTo("npc1", { x: 15, y: 19 });
-  this.gridEngine.moveTo("npc2", { x: 15, y: 20 });
+  this.gridEngine.moveTo(
+    "npc0",
+    { x: 15, y: 18 },
+    { pathBlockedStrategy: "RETRY" }
+  );
+  this.gridEngine.moveTo(
+    "npc1",
+    { x: 15, y: 19 },
+    { pathBlockedStrategy: "RETRY" }
+  );
+  this.gridEngine.moveTo(
+    "npc2",
+    { x: 15, y: 20 },
+    { pathBlockedStrategy: "RETRY" }
+  );
 }
 
 function update() {

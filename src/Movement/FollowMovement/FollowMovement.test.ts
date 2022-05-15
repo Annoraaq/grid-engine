@@ -63,9 +63,12 @@ describe("FollowMovement", () => {
       mockChar,
       gridTilemapMock,
       targetCharPos,
-      NumberOfDirections.FOUR,
-      1,
-      { noPathFoundStrategy: NoPathFoundStrategy.STOP }
+      {
+        numberOfDirections: NumberOfDirections.FOUR,
+        distance: 1,
+        config: { noPathFoundStrategy: NoPathFoundStrategy.STOP },
+        ignoreBlockedTarget: true,
+      }
     );
   });
 
@@ -88,10 +91,13 @@ describe("FollowMovement", () => {
       mockChar,
       gridTilemapMock,
       enterTile,
-      NumberOfDirections.FOUR,
-      1,
       {
-        noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        numberOfDirections: NumberOfDirections.FOUR,
+        distance: 1,
+        config: {
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        },
+        ignoreBlockedTarget: true,
       }
     );
   });
@@ -135,9 +141,12 @@ describe("FollowMovement", () => {
       mockChar,
       gridTilemapMock,
       targetCharPos,
-      NumberOfDirections.EIGHT,
-      8,
-      { noPathFoundStrategy: NoPathFoundStrategy.STOP }
+      {
+        numberOfDirections: NumberOfDirections.EIGHT,
+        distance: 8,
+        config: { noPathFoundStrategy: NoPathFoundStrategy.STOP },
+        ignoreBlockedTarget: true,
+      }
     );
   });
 
@@ -155,9 +164,12 @@ describe("FollowMovement", () => {
       mockChar,
       gridTilemapMock,
       targetCharPos,
-      NumberOfDirections.FOUR,
-      8,
-      { noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE }
+      {
+        numberOfDirections: NumberOfDirections.FOUR,
+        distance: 8,
+        config: { noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE },
+        ignoreBlockedTarget: true,
+      }
     );
   });
 });

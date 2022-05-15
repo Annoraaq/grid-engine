@@ -1,3 +1,4 @@
+import { BidirectionalSearch } from "./../../Pathfinding/BidirectionalSearch/BidirectionalSearch";
 import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy";
 import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
 import { NumberOfDirections } from "./../../Direction/Direction";
@@ -6,7 +7,6 @@ import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Direction } from "../../Direction/Direction";
-import { Bfs } from "../../Pathfinding/Bfs/Bfs";
 import { Movement } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Retryable } from "./Retryable/Retryable";
@@ -14,6 +14,7 @@ import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
 import { ShortestPathAlgorithm } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Position } from "../../GridEngine";
 import { filter, Subject, take } from "rxjs";
+import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils";
 
 export interface MoveToConfig {
   /**
@@ -93,6 +94,13 @@ export interface Finished {
   layer: string;
 }
 
+export interface Options {
+  numberOfDirections?: NumberOfDirections;
+  distance?: number;
+  config?: MoveToConfig;
+  ignoreBlockedTarget?: boolean;
+}
+
 export class TargetMovement implements Movement {
   private shortestPath: LayerPosition[];
   private distOffset: number;
@@ -106,15 +114,22 @@ export class TargetMovement implements Movement {
   private pathBlockedWaitElapsed: number;
   private distanceUtils: DistanceUtils;
   private finished$: Subject<Finished>;
+  private ignoreBlockedTarget: boolean;
+  private distance: number;
 
   constructor(
     private character: GridCharacter,
     private tilemap: GridTilemap,
     private targetPos: LayerPosition,
-    numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR,
-    private distance = 0,
-    config?: MoveToConfig
+    {
+      numberOfDirections = NumberOfDirections.FOUR,
+      config,
+      ignoreBlockedTarget = false,
+      distance = 0,
+    }: Options = {}
   ) {
+    this.ignoreBlockedTarget = ignoreBlockedTarget;
+    this.distance = distance;
     this.noPathFoundStrategy =
       config?.noPathFoundStrategy || NoPathFoundStrategy.STOP;
     this.pathBlockedStrategy =
@@ -204,11 +219,7 @@ export class TargetMovement implements Movement {
 
   getNeighbours = (pos: LayerPosition): LayerPosition[] => {
     const neighbours = this.distanceUtils.neighbours(pos.position);
-    const unblockedNeighbours = neighbours.filter(
-      (neighbour) => !this.isBlocking(neighbour, pos.layer)
-    );
-
-    return unblockedNeighbours.map((unblockedNeighbour) => {
+    const transitionMappedNeighbours = neighbours.map((unblockedNeighbour) => {
       const transition = this.tilemap.getTransition(
         unblockedNeighbour,
         pos.layer
@@ -218,6 +229,13 @@ export class TargetMovement implements Movement {
         layer: transition || pos.layer,
       };
     });
+
+    return transitionMappedNeighbours.filter(
+      (neighbour) =>
+        !this.isBlocking(neighbour.position, neighbour.layer) ||
+        (this.ignoreBlockedTarget &&
+          LayerPositionUtils.equal(neighbour, this.targetPos))
+    );
   };
 
   finishedObs(): Subject<Finished> {
@@ -344,7 +362,7 @@ export class TargetMovement implements Movement {
   };
 
   private getShortestPath(): { path: LayerPosition[]; distOffset: number } {
-    const shortestPathAlgo: ShortestPathAlgorithm = new Bfs();
+    const shortestPathAlgo: ShortestPathAlgorithm = new BidirectionalSearch();
     const { path: shortestPath, closestToTarget } =
       shortestPathAlgo.getShortestPath(
         this.character.getNextTilePos(),
