@@ -117,7 +117,6 @@ export class TargetMovement implements Movement {
   private ignoreBlockedTarget: boolean;
   private distance: number;
 
-  // TODO: use parameter bag
   constructor(
     private character: GridCharacter,
     private tilemap: GridTilemap,
