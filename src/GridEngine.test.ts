@@ -45,6 +45,7 @@ const mockFollowMovement = {
 const mockGridTileMap = {
   addCharacter: jest.fn(),
   removeCharacter: jest.fn(),
+  getCharactersAt: jest.fn(),
   getTileWidth: () => 32,
   getTileHeight: () => 32,
   getTransition: jest.fn(),
@@ -1069,6 +1070,25 @@ describe("GridEngine", () => {
     const chars = gridEngine.getAllCharacters();
     expect(chars).toEqual(["player", "player2"]);
   });
+
+  it("should delegate to get all chars at position", () => {
+    mockGridTileMap.getCharactersAt = jest.fn(() => new Set([
+      { getId: () => "player" }
+    ]));
+
+    gridEngine.create(tileMapMock, {
+      characters: [{
+        id: "player",
+        sprite: playerSpriteMock,
+      }]
+    });
+    const chars = gridEngine.getCharactersAt(new Vector2(5, 4), "layer");
+    expect(mockGridTileMap.getCharactersAt).toHaveBeenCalledWith(
+      { x: 5, y: 4 },
+      "layer"
+    );
+    expect(chars).toEqual(["player"]);
+  })
 
   it("should check if char is registered", () => {
     gridEngine.addCharacter({

@@ -704,6 +704,16 @@ export class GridEngine {
   }
 
   /**
+   * Finds the identifiers of all characters at the provided tile position.
+   * @returns The identifiers of all characters on this tile.
+   */
+  getCharactersAt(position: Position, layer: string): string[] {
+    this.initGuard();
+    const characters = this.gridTilemap.getCharactersAt(new Vector2(position), layer);
+    return Array.from(characters).map(char => char.getId());
+  }
+
+  /**
    * Places the character with the given id to the provided tile position. If
    * that character is moving, the movement is stopped. The
    * {@link positionChanged} and {@link positionChangeFinished} observables will
