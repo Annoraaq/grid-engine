@@ -75,11 +75,16 @@ export interface Finished {
     description?: string;
     layer: string;
 }
+export interface Options {
+    numberOfDirections?: NumberOfDirections;
+    distance?: number;
+    config?: MoveToConfig;
+    ignoreBlockedTarget?: boolean;
+}
 export declare class TargetMovement implements Movement {
     private character;
     private tilemap;
     private targetPos;
-    private distance;
     private shortestPath;
     private distOffset;
     private posOnPath;
@@ -92,7 +97,9 @@ export declare class TargetMovement implements Movement {
     private pathBlockedWaitElapsed;
     private distanceUtils;
     private finished$;
-    constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerPosition, numberOfDirections?: NumberOfDirections, distance?: number, config?: MoveToConfig);
+    private ignoreBlockedTarget;
+    private distance;
+    constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerPosition, { numberOfDirections, config, ignoreBlockedTarget, distance, }?: Options);
     setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void;
     getPathBlockedStrategy(): PathBlockedStrategy;
     private setCharacter;
