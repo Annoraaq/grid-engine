@@ -12,6 +12,7 @@ const mockCharBlockCache = {
   addCharacter: jest.fn(),
   removeCharacter: jest.fn(),
   isCharBlockingAt: jest.fn(),
+  getCharactersAt: jest.fn(),
 };
 
 const mockCharLayers = [
@@ -374,6 +375,21 @@ describe("GridTilemap", () => {
 
     expect(gridTilemap.getCharacters()).toEqual([charMock2]);
     expect(mockCharBlockCache.removeCharacter).toHaveBeenCalledWith(charMock1);
+  });
+
+  it("should find characters", () => {
+    gridTilemap = new GridTilemap(tilemapMock);
+
+    const charMocks = new Set<GridCharacter>();
+    charMocks.add(createCharMock("player"));
+    mockCharBlockCache.getCharactersAt = jest.fn(() => charMocks);
+
+    const set = gridTilemap.getCharactersAt(new Vector2(1, 1), "layer1");
+    expect(mockCharBlockCache.getCharactersAt).toHaveBeenCalledWith(
+      { x: 1, y: 1 },
+      "layer1"
+    );
+    expect(set).toBe(charMocks);
   });
 
   it("should detect blocking tiles", () => {

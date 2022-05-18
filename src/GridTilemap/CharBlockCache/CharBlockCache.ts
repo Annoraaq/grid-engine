@@ -28,6 +28,15 @@ export class CharBlockCache {
     );
   }
 
+  getCharactersAt(
+    pos: Vector2,
+    layer: string
+  ): Set<GridCharacter> {
+    const posStr = this.posToString(pos, layer);
+    const characters = this.tilePosToCharacters.get(posStr);
+    return new Set(characters);
+  }
+
   addCharacter(character: GridCharacter): void {
     this.add(
       this.posToString(

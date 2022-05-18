@@ -42,6 +42,10 @@ export class GridTilemap {
     return [...this.characters.values()];
   }
 
+  getCharactersAt(position: Vector2, layer: string): Set<GridCharacter> {
+    return this.charBlockCache.getCharactersAt(position, layer);
+  }
+
   isBlocking(
     charLayer: string | undefined,
     pos: Vector2,

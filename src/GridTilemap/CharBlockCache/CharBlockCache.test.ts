@@ -260,6 +260,37 @@ describe("CharBlockCache", () => {
     expect(hasBlockingCharOnOldPos).toBe(true);
   });
 
+  it("should find all characters", () => {
+    const charMock1 = <any>{
+      ...createCharMock("charMock1"),
+      getTilePos: () => ({ position: { x: 0, y: 1 }, layer: "someLayer" }),
+    };
+    const charMock2 = <any>{
+      ...createCharMock("charMock2"),
+      getTilePos: () => ({ position: { x: 0, y: 1 }, layer: "someLayer" }),
+    };
+    const charMockDifferentLayer = <any>{
+      ...createCharMock("charMockDifferentLayer"),
+      getTilePos: () => ({ position: { x: 0, y: 1 }, layer: "otherLayer" }),
+    };
+    
+    charBlockCache.addCharacter(charMock1);
+    charBlockCache.addCharacter(charMock2);
+    charBlockCache.addCharacter(charMockDifferentLayer);
+    expect(
+      charBlockCache.getCharactersAt(new Vector2(0, 1), "someLayer")
+    ).toContain(charMock1);
+    expect(
+      charBlockCache.getCharactersAt(new Vector2(0, 1), "someLayer")
+    ).toContain(charMock2);
+    expect(
+      charBlockCache.getCharactersAt(new Vector2(0, 1), "otherLayer")
+    ).toContain(charMockDifferentLayer);
+    expect(
+      charBlockCache.getCharactersAt(new Vector2(1, 1), "someLayer").size
+    ).toBe(0);
+  });
+
   it("should remove a character", () => {
     const positionChangeStartedSub = { unsubscribe: jest.fn() };
     const positionChangeStarted = {
