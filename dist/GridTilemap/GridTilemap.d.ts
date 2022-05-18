@@ -16,6 +16,7 @@ export declare class GridTilemap {
     addCharacter(character: GridCharacter): void;
     removeCharacter(charId: string): void;
     getCharacters(): GridCharacter[];
+    getCharactersAt(position: Vector2, layer: string): Set<GridCharacter>;
     isBlocking(charLayer: string | undefined, pos: Vector2, collisionGroups: string[], direction?: Direction): boolean;
     hasBlockingTile(charLayer: string | undefined, pos: Vector2, direction?: Direction): boolean;
     getTransition(pos: Vector2, fromLayer: string): string | undefined;

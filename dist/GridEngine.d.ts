@@ -341,6 +341,11 @@ export declare class GridEngine {
      */
     turnTowards(charId: string, direction: Direction): void;
     /**
+     * Finds the identifiers of all characters at the provided tile position.
+     * @returns The identifiers of all characters on this tile.
+     */
+    getCharactersAt(position: Position, layer: string): string[];
+    /**
      * Places the character with the given id to the provided tile position. If
      * that character is moving, the movement is stopped. The
      * {@link positionChanged} and {@link positionChangeFinished} observables will

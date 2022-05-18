@@ -6,6 +6,7 @@ export declare class CharBlockCache {
     private tilePosSetSubs;
     private positionChangeFinishedSubs;
     isCharBlockingAt(pos: Vector2, layer: string, collisionGroups: string[]): boolean;
+    getCharactersAt(pos: Vector2, layer: string): Set<GridCharacter>;
     addCharacter(character: GridCharacter): void;
     removeCharacter(character: GridCharacter): void;
     private add;
