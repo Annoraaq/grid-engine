@@ -89,7 +89,6 @@ export class GridCharacter {
     } else {
       this.walkingAnimationMapping = config.walkingAnimationMapping;
     }
-
     this.container = config.container;
     this.tilemap = config.tilemap;
     this.speed = config.speed;
@@ -100,12 +99,36 @@ export class GridCharacter {
     this.sprite = config.sprite;
     this.layerOverlaySprite = config.layerOverlaySprite;
     this.collisionGroups = new Set<string>(config.collisionGroups || []);
+
     if (this.sprite) {
       this._setSprite(this.sprite);
       if (this.layerOverlaySprite) {
         this.initLayerOverlaySprite();
       }
     }
+  }
+
+  private updateAnimationSprite() {
+    if (!this.sprite) return;
+
+    if (!this.animation) {
+      this.animation = new CharacterAnimation(
+        this.walkingAnimationMapping,
+        this.characterIndex,
+        this.sprite.texture.source[0].width /
+          this.sprite.width /
+          CharacterAnimation.FRAMES_CHAR_ROW
+      );
+
+      this.animation.frameChange().subscribe((frameNo) => {
+        this.sprite?.setFrame(frameNo);
+      });
+    }
+
+    this.animation.setIsEnabled(
+      this.walkingAnimationMapping !== undefined || this.characterIndex !== -1
+    );
+    this.animation.setStandingFrame(Direction.DOWN);
   }
 
   getId(): string {
@@ -144,16 +167,6 @@ export class GridCharacter {
   getAnimation(): CharacterAnimation | undefined {
     return this.animation;
   }
-
-  // setWalkingAnimationMapping(
-  //   walkingAnimationMapping: WalkingAnimationMapping | number
-  // ): void {
-  //   if (typeof walkingAnimationMapping == "number") {
-  //     this.animation.setCharacterIndex(walkingAnimationMapping);
-  //   } else {
-  //     this.animation.setWalkingAnimationMapping(walkingAnimationMapping);
-  //   }
-  // }
 
   setTilePosition(tilePosition: LayerPosition): void {
     if (this.isMoving()) {
@@ -329,17 +342,7 @@ export class GridCharacter {
       sprite.y = this.sprite.y;
     }
     this.sprite = sprite;
-    this.animation = new CharacterAnimation(
-      this.sprite,
-      this.walkingAnimationMapping,
-      this.characterIndex
-    );
-
-    this.animation.setIsEnabled(
-      this.walkingAnimationMapping !== undefined || this.characterIndex !== -1
-    );
-    this.animation.setStandingFrame(Direction.DOWN);
-
+    this.updateAnimationSprite();
     this.updateZindex();
   }
 
@@ -520,10 +523,14 @@ export class GridCharacter {
     const newPlayerPos = this.getPosition(gameObject).add(speed);
     this.setPosition(newPlayerPos, gameObject);
     this.tileSizePixelsWalked = this.tileSizePixelsWalked.add(speed.abs());
-    this.animation?.updateCharacterFrame(
-      this.movementDirection,
-      this.hasWalkedHalfATile()
-    );
+
+    if (this.sprite) {
+      this.animation?.updateCharacterFrame(
+        this.movementDirection,
+        this.hasWalkedHalfATile(),
+        Number(this.sprite.frame.name)
+      );
+    }
     this.tileSizePixelsWalked = this.tileSizePixelsWalked.modulo(
       this.tilemap.getTileDistance(this.movementDirection)
     );

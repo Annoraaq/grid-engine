@@ -1,9 +1,10 @@
 import { Direction } from "./../../Direction/Direction";
 import { FrameRow } from "./../GridCharacter";
 import { WalkingAnimationMapping } from "../../GridEngine";
+import { Observable, Subject } from "rxjs";
 
 export class CharacterAnimation {
-  private static readonly FRAMES_CHAR_ROW = 3;
+  static readonly FRAMES_CHAR_ROW = 3;
   private static readonly FRAMES_CHAR_COL = 4;
   private lastFootLeft = false;
   private directionToFrameRow: { [key in Direction]?: number } = {
@@ -17,12 +18,17 @@ export class CharacterAnimation {
     [Direction.UP_RIGHT]: 2,
   };
   private _isEnabled = true;
+  private frameChange$ = new Subject<number>();
 
   constructor(
-    private sprite: Phaser.GameObjects.Sprite,
     private walkingAnimationMapping: WalkingAnimationMapping | undefined,
-    private characterIndex: number
+    private characterIndex: number,
+    private charsInRow: number
   ) {}
+
+  frameChange(): Observable<number> {
+    return this.frameChange$;
+  }
 
   setIsEnabled(isEnabled: boolean): void {
     this._isEnabled = isEnabled;
@@ -34,11 +40,12 @@ export class CharacterAnimation {
 
   updateCharacterFrame(
     movementDirection: Direction,
-    hasWalkedHalfATile: boolean
+    hasWalkedHalfATile: boolean,
+    currentFrame: number
   ): void {
     if (this._isEnabled) {
       if (hasWalkedHalfATile) {
-        this.setStandingFrameDuringWalk(movementDirection);
+        this.setStandingFrameDuringWalk(movementDirection, currentFrame);
       } else {
         this.setWalkingFrame(movementDirection);
       }
@@ -71,8 +78,11 @@ export class CharacterAnimation {
     return this.characterIndex;
   }
 
-  private setStandingFrameDuringWalk(direction: Direction): void {
-    if (!this.isCurrentFrameStanding(direction)) {
+  private setStandingFrameDuringWalk(
+    direction: Direction,
+    currentFrame: number
+  ): void {
+    if (!this.isCurrentFrameStanding(direction, currentFrame)) {
       this.lastFootLeft = !this.lastFootLeft;
     }
     this._setStandingFrame(direction);
@@ -81,7 +91,7 @@ export class CharacterAnimation {
   private setWalkingFrame(direction: Direction): void {
     const frameRow = this.framesOfDirection(direction);
     if (frameRow)
-      this.sprite.setFrame(
+      this.frameChange$.next(
         this.lastFootLeft ? frameRow.rightFoot : frameRow.leftFoot
       );
   }
@@ -89,15 +99,15 @@ export class CharacterAnimation {
   private _setStandingFrame(direction: Direction): void {
     const framesOfDirection = this.framesOfDirection(direction);
     if (framesOfDirection) {
-      this.sprite.setFrame(framesOfDirection.standing);
+      this.frameChange$.next(framesOfDirection.standing);
     }
   }
 
-  private isCurrentFrameStanding(direction: Direction): boolean {
-    return (
-      Number(this.sprite.frame.name) ==
-      this.framesOfDirection(direction)?.standing
-    );
+  private isCurrentFrameStanding(
+    direction: Direction,
+    currentFrame: number
+  ): boolean {
+    return currentFrame === this.framesOfDirection(direction)?.standing;
   }
 
   private framesOfDirection(direction: Direction): FrameRow | undefined {
@@ -133,13 +143,9 @@ export class CharacterAnimation {
   }
 
   private getFramesForCharIndex(direction: Direction): FrameRow {
-    const charsInRow =
-      this.sprite.texture.source[0].width /
-      this.sprite.width /
-      CharacterAnimation.FRAMES_CHAR_ROW;
-    const playerCharRow = Math.floor(this.characterIndex / charsInRow);
-    const playerCharCol = this.characterIndex % charsInRow;
-    const framesInRow = charsInRow * CharacterAnimation.FRAMES_CHAR_ROW;
+    const playerCharRow = Math.floor(this.characterIndex / this.charsInRow);
+    const playerCharCol = this.characterIndex % this.charsInRow;
+    const framesInRow = this.charsInRow * CharacterAnimation.FRAMES_CHAR_ROW;
     const framesInSameRowBefore =
       CharacterAnimation.FRAMES_CHAR_ROW * playerCharCol;
     const rows =

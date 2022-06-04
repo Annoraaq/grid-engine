@@ -2,10 +2,10 @@ import { SpriteUtils } from "./../Utils/SpriteUtils/SpriteUtils";
 import { GridCharacter } from "./GridCharacter";
 import { Direction } from "../Direction/Direction";
 import { take } from "rxjs/operators";
-import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
+import { of } from "rxjs";
 
 const mockCharacterAnimation = {
   updateCharacterFrame: jest.fn(),
@@ -13,6 +13,8 @@ const mockCharacterAnimation = {
   setIsEnabled: jest.fn(),
   setWalkingAnimationMapping: jest.fn(),
   setCharacterIndex: jest.fn(),
+  setSprite: jest.fn(),
+  frameChange: jest.fn().mockReturnValue(of()),
 };
 
 SpriteUtils.copyOverImportantProperties = jest.fn();
@@ -88,10 +90,11 @@ describe("GridCharacter", () => {
       x: 5 * TILE_WIDTH + PLAYER_X_OFFSET,
       y: 6 * TILE_HEIGHT + PLAYER_Y_OFFSET,
       frame: {
-        name: "someFrameName",
+        name: "0",
       },
       setOrigin: jest.fn(),
       scale: 2,
+      width: 33,
       height: 33,
       tint: "someTint",
       alpha: "alpha",
@@ -101,6 +104,9 @@ describe("GridCharacter", () => {
       alphaTopLeft: "alphaTopLeft",
       alphaTopRight: "alphaTopRight",
       angle: "angle",
+      texture: {
+        source: [{ width: 100 }],
+      },
     };
     layerOverlaySpriteMock = <any>{
       displayWidth: 16,
@@ -285,7 +291,6 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getSprite()).toBe(sprite);
     expect(gridCharacter.getSprite()?.x).toEqual(80);
     expect(gridCharacter.getSprite()?.y).toEqual(92);
-    expect(CharacterAnimation).toHaveBeenCalledWith(sprite, undefined, 3);
     expect(mockCharacterAnimation.setIsEnabled).toHaveBeenCalledWith(true);
     expect(mockCharacterAnimation.setStandingFrame).toHaveBeenCalledWith(
       Direction.DOWN
@@ -1054,10 +1059,10 @@ describe("GridCharacter", () => {
 
       expect(
         mockCharacterAnimation.updateCharacterFrame
-      ).toHaveBeenNthCalledWith(1, Direction.UP, false);
+      ).toHaveBeenNthCalledWith(1, Direction.UP, false, 0);
       expect(
         mockCharacterAnimation.updateCharacterFrame
-      ).toHaveBeenNthCalledWith(2, Direction.UP, true);
+      ).toHaveBeenNthCalledWith(2, Direction.UP, true, 0);
     });
 
     it("should set players standing frame if direction blocked", (done) => {
