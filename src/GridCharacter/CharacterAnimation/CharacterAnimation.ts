@@ -52,7 +52,7 @@ export class CharacterAnimation {
   }
 
   setWalkingAnimationMapping(
-    walkingAnimationMapping: WalkingAnimationMapping
+    walkingAnimationMapping?: WalkingAnimationMapping
   ): void {
     this.walkingAnimationMapping = walkingAnimationMapping;
     this._isEnabled = this.walkingAnimationMapping !== undefined;
@@ -80,30 +80,37 @@ export class CharacterAnimation {
 
   private setWalkingFrame(direction: Direction): void {
     const frameRow = this.framesOfDirection(direction);
-    this.sprite.setFrame(
-      this.lastFootLeft ? frameRow.rightFoot : frameRow.leftFoot
-    );
+    if (frameRow)
+      this.sprite.setFrame(
+        this.lastFootLeft ? frameRow.rightFoot : frameRow.leftFoot
+      );
   }
 
   private _setStandingFrame(direction: Direction): void {
-    this.sprite.setFrame(this.framesOfDirection(direction).standing);
+    const framesOfDirection = this.framesOfDirection(direction);
+    if (framesOfDirection) {
+      this.sprite.setFrame(framesOfDirection.standing);
+    }
   }
 
   private isCurrentFrameStanding(direction: Direction): boolean {
     return (
       Number(this.sprite.frame.name) ==
-      this.framesOfDirection(direction).standing
+      this.framesOfDirection(direction)?.standing
     );
   }
 
-  private framesOfDirection(direction: Direction): FrameRow {
+  private framesOfDirection(direction: Direction): FrameRow | undefined {
     if (this.walkingAnimationMapping) {
       return this.getFramesForAnimationMapping(direction);
     }
     return this.getFramesForCharIndex(direction);
   }
 
-  private getFramesForAnimationMapping(direction: Direction): FrameRow {
+  private getFramesForAnimationMapping(
+    direction: Direction
+  ): FrameRow | undefined {
+    if (!this.walkingAnimationMapping) return;
     return (
       this.walkingAnimationMapping[direction] ||
       this.walkingAnimationMapping[this.fallbackDirection(direction)]
@@ -136,7 +143,7 @@ export class CharacterAnimation {
     const framesInSameRowBefore =
       CharacterAnimation.FRAMES_CHAR_ROW * playerCharCol;
     const rows =
-      this.directionToFrameRow[direction] +
+      (this.directionToFrameRow[direction] ?? 0) +
       playerCharRow * CharacterAnimation.FRAMES_CHAR_COL;
     const startFrame = framesInSameRowBefore + rows * framesInRow;
     return {

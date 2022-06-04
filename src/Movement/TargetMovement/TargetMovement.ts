@@ -1,3 +1,4 @@
+import { LayerName } from "./../../GridTilemap/GridTilemap";
 import { BidirectionalSearch } from "./../../Pathfinding/BidirectionalSearch/BidirectionalSearch";
 import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy";
 import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
@@ -91,7 +92,7 @@ export interface Finished {
   position: Position;
   result?: MoveToResult;
   description?: string;
-  layer: string;
+  layer: LayerName;
 }
 
 export interface Options {
@@ -277,9 +278,11 @@ export class TargetMovement implements Movement {
   }
 
   private moveCharOnPath(): void {
+    const nextTilePosOnPath = this.nextTileOnPath();
+    if (!nextTilePosOnPath) return;
     const dir = this.getDir(
       this.character.getNextTilePos().position,
-      this.nextTileOnPath().position
+      nextTilePosOnPath.position
     );
     this.character.move(dir);
   }

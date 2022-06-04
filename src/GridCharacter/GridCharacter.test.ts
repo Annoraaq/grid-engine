@@ -151,7 +151,7 @@ describe("GridCharacter", () => {
     });
 
     it("should copy props from sprite to overlay sprite", () => {
-      layerOverlaySpriteMock.scale = undefined;
+      layerOverlaySpriteMock.scale = 0;
       gridCharacter.update(100);
 
       expect(SpriteUtils.copyOverImportantProperties).toHaveBeenCalledWith(
@@ -335,9 +335,10 @@ describe("GridCharacter", () => {
       position: new Vector2(0, -1),
       layer: undefined,
     });
-    const { exitTile, enterTile } = await posChangedProm;
-    expect(exitTile).toEqual(new Vector2(0, 0));
-    expect(enterTile).toEqual(new Vector2(0, -1));
+
+    const posChanged = await posChangedProm;
+    expect(posChanged?.exitTile).toEqual(new Vector2(0, 0));
+    expect(posChanged?.enterTile).toEqual(new Vector2(0, -1));
   });
 
   it("should not update if not moving", () => {
@@ -768,9 +769,9 @@ describe("GridCharacter", () => {
     gridCharacter.move(Direction.DOWN);
     gridCharacter.update(MS_FOR_12_PX);
 
-    const { exitTile, enterTile } = await prom;
-    expect(exitTile).toEqual(new Vector2(0, 0));
-    expect(enterTile).toEqual(new Vector2(1, 0));
+    const posChange = await prom;
+    expect(posChange?.exitTile).toEqual(new Vector2(0, 0));
+    expect(posChange?.enterTile).toEqual(new Vector2(1, 0));
     expect(gridSpriteMock.x).toEqual(INITIAL_SPRITE_X_POS + 16);
     expect(gridSpriteMock.y).toEqual(INITIAL_SPRITE_Y_POS + 8);
     expect(gridCharacter.getTilePos()).toEqual({

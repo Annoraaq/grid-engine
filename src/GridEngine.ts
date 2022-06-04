@@ -19,7 +19,7 @@ import {
   isDiagonal,
   NumberOfDirections,
 } from "./Direction/Direction";
-import { GridTilemap } from "./GridTilemap/GridTilemap";
+import { GridTilemap, LayerName } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
 import { takeUntil, filter, map, take, mergeWith } from "rxjs/operators";
@@ -38,6 +38,7 @@ export {
   NumberOfDirections,
   NoPathFoundStrategy,
   PathBlockedStrategy,
+  LayerName,
 };
 
 export type TileSizePerSecond = number;
@@ -264,21 +265,6 @@ export class GridEngine {
   /** @internal */
   boot(): void {
     this.scene.sys.events.on("update", this.update, this);
-    this.scene.sys.events.on("destroy", this.destroy, this);
-  }
-
-  /** @internal */
-  destroy(): void {
-    this.scene = undefined;
-    this.gridCharacters = undefined;
-    this.gridTilemap = undefined;
-    this.movementStarted$ = undefined;
-    this.movementStopped$ = undefined;
-    this.directionChanged$ = undefined;
-    this.positionChangeStarted$ = undefined;
-    this.positionChangeFinished$ = undefined;
-    this.charRemoved$ = undefined;
-    this.charAdded$ = undefined;
   }
 
   /**
@@ -286,10 +272,11 @@ export class GridEngine {
    * You can read more about character layers and transitions
    * {@link https://annoraaq.github.io/grid-engine/api/features/character-layers.html | here}
    */
-  getCharLayer(charId: string): string {
+  getCharLayer(charId: string): string | undefined {
     this.initGuard();
-    this.unknownCharGuard(charId);
-    return this.gridCharacters.get(charId).getTilePos().layer;
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.getTilePos().layer;
   }
 
   /**
@@ -365,8 +352,9 @@ export class GridEngine {
    */
   getPosition(charId: string): Position {
     this.initGuard();
-    this.unknownCharGuard(charId);
-    return this.gridCharacters.get(charId).getTilePos().position;
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.getTilePos().position;
   }
 
   /**
@@ -394,14 +382,15 @@ export class GridEngine {
    */
   moveRandomly(charId: string, delay = 0, radius = -1): void {
     this.initGuard();
-    this.unknownCharGuard(charId);
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
     const randomMovement = new RandomMovement(
-      this.gridCharacters.get(charId),
+      gridChar,
       GlobalConfig.get().numberOfDirections,
       delay,
       radius
     );
-    this.gridCharacters.get(charId).setMovement(randomMovement);
+    gridChar.setMovement(randomMovement);
   }
 
   /**
@@ -422,15 +411,14 @@ export class GridEngine {
     const moveToConfig = this.assembleMoveToConfig(config);
 
     this.initGuard();
-    this.unknownCharGuard(charId);
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
     const targetMovement = new TargetMovement(
-      this.gridCharacters.get(charId),
+      gridChar,
       this.gridTilemap,
       {
         position: new Vector2(targetPos),
-        layer:
-          config?.targetLayer ||
-          this.gridCharacters.get(charId).getNextTilePos().layer,
+        layer: config?.targetLayer || gridChar.getNextTilePos().layer,
       },
       {
         numberOfDirections: GlobalConfig.get().numberOfDirections,
@@ -438,7 +426,7 @@ export class GridEngine {
         config: moveToConfig,
       }
     );
-    this.gridCharacters.get(charId).setMovement(targetMovement);
+    gridChar.setMovement(targetMovement);
     return targetMovement.finishedObs().pipe(
       take(1),
       map((finished: Finished) => ({
@@ -458,15 +446,17 @@ export class GridEngine {
    */
   stopMovement(charId: string): void {
     this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).setMovement(undefined);
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.setMovement(undefined);
   }
 
   /** Sets the speed in tiles per second for a character. */
   setSpeed(charId: string, speed: number): void {
     this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).setSpeed(speed);
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.setSpeed(speed);
   }
 
   /**
@@ -480,10 +470,9 @@ export class GridEngine {
     walkingAnimationMapping: WalkingAnimationMapping
   ): void {
     this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters
-      .get(charId)
-      .setWalkingAnimationMapping(walkingAnimationMapping);
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.setWalkingAnimationMapping(walkingAnimationMapping);
   }
 
   /** @internal */
@@ -605,7 +594,8 @@ export class GridEngine {
    */
   removeCharacter(charId: string): void {
     this.initGuard();
-    this.unknownCharGuard(charId);
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
     this.gridTilemap.removeCharacter(charId);
     this.gridCharacters.delete(charId);
     this.charRemoved$.next(charId);
@@ -650,19 +640,21 @@ export class GridEngine {
     closestPointIfBlocked = false
   ): void {
     this.initGuard();
-    this.unknownCharGuard(charId);
-    this.unknownCharGuard(charIdToFollow);
+    const gridChar = this.gridCharacters.get(charId);
+    const gridCharToFollow = this.gridCharacters.get(charIdToFollow);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    if (!gridCharToFollow) throw this.createCharUnknownErr(charIdToFollow);
     const followMovement = new FollowMovement(
-      this.gridCharacters.get(charId),
+      gridChar,
       this.gridTilemap,
-      this.gridCharacters.get(charIdToFollow),
+      gridCharToFollow,
       GlobalConfig.get().numberOfDirections,
       distance,
       closestPointIfBlocked
         ? NoPathFoundStrategy.CLOSEST_REACHABLE
         : NoPathFoundStrategy.STOP
     );
-    this.gridCharacters.get(charId).setMovement(followMovement);
+    gridChar.setMovement(followMovement);
   }
 
   /**
@@ -670,8 +662,9 @@ export class GridEngine {
    */
   isMoving(charId: string): boolean {
     this.initGuard();
-    this.unknownCharGuard(charId);
-    return this.gridCharacters.get(charId).isMoving();
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.isMoving();
   }
 
   /**
@@ -680,8 +673,9 @@ export class GridEngine {
    */
   getFacingDirection(charId: string): Direction {
     this.initGuard();
-    this.unknownCharGuard(charId);
-    return this.gridCharacters.get(charId).getFacingDirection();
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.getFacingDirection();
   }
 
   /**
@@ -689,8 +683,9 @@ export class GridEngine {
    */
   getFacingPosition(charId: string): Position {
     this.initGuard();
-    this.unknownCharGuard(charId);
-    const vectorPos = this.gridCharacters.get(charId).getFacingPosition();
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    const vectorPos = gridChar.getFacingPosition();
     return { x: vectorPos.x, y: vectorPos.y };
   }
 
@@ -699,8 +694,9 @@ export class GridEngine {
    */
   turnTowards(charId: string, direction: Direction): void {
     this.initGuard();
-    this.unknownCharGuard(charId);
-    return this.gridCharacters.get(charId).turnTowards(direction);
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.turnTowards(direction);
   }
 
   /**
@@ -709,8 +705,11 @@ export class GridEngine {
    */
   getCharactersAt(position: Position, layer: string): string[] {
     this.initGuard();
-    const characters = this.gridTilemap.getCharactersAt(new Vector2(position), layer);
-    return Array.from(characters).map(char => char.getId());
+    const characters = this.gridTilemap.getCharactersAt(
+      new Vector2(position),
+      layer
+    );
+    return Array.from(characters).map((char) => char.getId());
   }
 
   /**
@@ -722,16 +721,15 @@ export class GridEngine {
    */
   setPosition(charId: string, pos: Position, layer?: string): void {
     this.initGuard();
-    this.unknownCharGuard(charId);
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
     if (!layer) {
-      this.gridCharacters.get(charId).setTilePosition({
+      gridChar.setTilePosition({
         position: new Vector2(pos),
-        layer: this.gridCharacters.get(charId).getTilePos().layer,
+        layer: gridChar.getTilePos().layer,
       });
     }
-    this.gridCharacters
-      .get(charId)
-      .setTilePosition({ position: new Vector2(pos), layer });
+    gridChar.setTilePosition({ position: new Vector2(pos), layer });
   }
 
   /**
@@ -739,8 +737,9 @@ export class GridEngine {
    */
   getSprite(charId: string): Phaser.GameObjects.Sprite {
     this.initGuard();
-    this.unknownCharGuard(charId);
-    return this.gridCharacters.get(charId).getSprite();
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.getSprite();
   }
 
   /**
@@ -748,9 +747,10 @@ export class GridEngine {
    */
   setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void {
     this.initGuard();
-    this.unknownCharGuard(charId);
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
     sprite.setOrigin(0, 0);
-    this.gridCharacters.get(charId).setSprite(sprite);
+    gridChar.setSprite(sprite);
   }
 
   /**
@@ -793,8 +793,9 @@ export class GridEngine {
    */
   getCollisionGroups(charId: string): string[] {
     this.initGuard();
-    this.unknownCharGuard(charId);
-    return this.gridCharacters.get(charId).getCollisionGroups();
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return this.gridCharacters.get(charId)?.getCollisionGroups() || [];
   }
 
   /**
@@ -803,8 +804,9 @@ export class GridEngine {
    */
   setCollisionGroups(charId: string, collisionGroups: string[]): void {
     this.initGuard();
-    this.unknownCharGuard(charId);
-    this.gridCharacters.get(charId).setCollisionGroups(collisionGroups);
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    this.gridCharacters.get(charId)?.setCollisionGroups(collisionGroups);
   }
 
   /**
@@ -814,7 +816,7 @@ export class GridEngine {
   steppedOn(
     charIds: string[],
     tiles: Position[],
-    layer?: string[]
+    layer?: LayerName[]
   ): Observable<
     {
       charId: string;
@@ -917,12 +919,6 @@ export class GridEngine {
     }
   }
 
-  private unknownCharGuard(charId: string) {
-    if (!this.gridCharacters.has(charId)) {
-      throw new Error(`Character unknown: ${charId}`);
-    }
-  }
-
   private createCharacter(id: string, config: CharConfig): GridCharacter {
     return new GridCharacter(id, config);
   }
@@ -935,7 +931,8 @@ export class GridEngine {
 
   private moveChar(charId: string, direction: Direction): void {
     this.initGuard();
-    this.unknownCharGuard(charId);
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
 
     if (GlobalConfig.get().numberOfDirections === NumberOfDirections.FOUR) {
       if (!this.gridTilemap.isIsometric() && isDiagonal(direction)) {
@@ -951,10 +948,14 @@ export class GridEngine {
       }
     }
 
-    this.gridCharacters.get(charId).move(direction);
+    gridChar.move(direction);
   }
 
-  private assembleMoveToConfig(config: MoveToConfig): MoveToConfig {
+  private createCharUnknownErr(charId: string): Error {
+    return new Error(`Character unknown: ${charId}`);
+  }
+
+  private assembleMoveToConfig(config: MoveToConfig = {}): MoveToConfig {
     const moveToConfig = {
       ...config,
       noPathFoundStrategy: NoPathFoundStrategy.STOP,

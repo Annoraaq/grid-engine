@@ -7,6 +7,8 @@ import { Rect } from "../Utils/Rect/Rect";
 import { VectorUtils } from "../Utils/VectorUtils";
 import { Utils } from "../Utils/Utils/Utils";
 
+export type LayerName = string | undefined;
+
 export class GridTilemap {
   private static readonly ALWAYS_TOP_PROP_NAME = "ge_alwaysTop";
   private static readonly CHAR_LAYER_PROP_NAME = "ge_charLayer";
@@ -15,8 +17,8 @@ export class GridTilemap {
   private static readonly Z_INDEX_PADDING = 7;
   private characters = new Map<string, GridCharacter>();
   private charBlockCache: CharBlockCache = new CharBlockCache();
-  private charLayerDepths = new Map<string, number>();
-  private transitions: Map<string, Map<string, string>> = new Map();
+  private charLayerDepths = new Map<LayerName, number>();
+  private transitions: Map<LayerName, Map<LayerName, LayerName>> = new Map();
 
   constructor(private tilemap: Phaser.Tilemaps.Tilemap) {
     this.setLayerDepths();
@@ -34,7 +36,9 @@ export class GridTilemap {
   }
 
   removeCharacter(charId: string): void {
-    this.charBlockCache.removeCharacter(this.characters.get(charId));
+    const gridChar = this.characters.get(charId);
+    if (!gridChar) return;
+    this.charBlockCache.removeCharacter(gridChar);
     this.characters.delete(charId);
   }
 
@@ -69,7 +73,7 @@ export class GridTilemap {
     );
   }
 
-  getTransition(pos: Vector2, fromLayer: string): string | undefined {
+  getTransition(pos: Vector2, fromLayer?: string): string | undefined {
     const transitions = this.transitions.get(pos.toString());
 
     if (transitions) {
@@ -77,14 +81,14 @@ export class GridTilemap {
     }
   }
 
-  setTransition(pos: Vector2, fromLayer: string, toLayer: string): void {
+  setTransition(pos: Vector2, fromLayer: LayerName, toLayer: LayerName): void {
     if (!this.transitions.has(pos.toString())) {
       this.transitions.set(pos.toString(), new Map());
     }
-    this.transitions.get(pos.toString()).set(fromLayer, toLayer);
+    this.transitions.get(pos.toString())?.set(fromLayer, toLayer);
   }
 
-  getTransitions(): Map<string, Map<string, string>> {
+  getTransitions(): Map<LayerName, Map<LayerName, LayerName>> {
     return new Map(
       [...this.transitions].map(([pos, map]) => [pos, new Map(map)])
     );
@@ -114,7 +118,7 @@ export class GridTilemap {
     return this.tilemap.tileHeight * tilemapScale;
   }
 
-  getDepthOfCharLayer(layerName: string): number {
+  getDepthOfCharLayer(layerName: LayerName): number {
     return this.charLayerDepths.get(layerName) || 0;
   }
 
@@ -219,7 +223,7 @@ export class GridTilemap {
   }
 
   private getCollisionRelevantLayers(
-    charLayer: string
+    charLayer?: string
   ): Phaser.Tilemaps.LayerData[] {
     if (!charLayer) return this.tilemap.layers;
 

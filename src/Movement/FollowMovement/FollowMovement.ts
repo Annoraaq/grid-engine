@@ -1,6 +1,6 @@
 import { filter, takeUntil } from "rxjs/operators";
 import { NumberOfDirections } from "./../../Direction/Direction";
-import { GridTilemap } from "../../GridTilemap/GridTilemap";
+import { GridTilemap, LayerName } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
 import { Movement } from "../Movement";
@@ -42,7 +42,7 @@ export class FollowMovement implements Movement {
     this.targetMovement?.update(delta);
   }
 
-  private updateTarget(targetPos: Position, targetLayer: string): void {
+  private updateTarget(targetPos: Position, targetLayer: LayerName): void {
     this.targetMovement = new TargetMovement(
       this.character,
       this.gridTilemap,

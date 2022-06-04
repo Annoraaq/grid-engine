@@ -3,7 +3,7 @@ import { LayerPosition } from "./../Pathfinding/ShortestPathAlgorithm";
 import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
 import { directionVector, oppositeDirection } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
-import { GridTilemap } from "../GridTilemap/GridTilemap";
+import { GridTilemap, LayerName } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
 import { Position, WalkingAnimationMapping } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
@@ -29,8 +29,8 @@ export type CharacterIndex = number;
 export interface PositionChange {
   exitTile: Position;
   enterTile: Position;
-  exitLayer: string;
-  enterLayer: string;
+  exitLayer: LayerName;
+  enterLayer: LayerName;
 }
 
 export interface CharConfig {
@@ -62,7 +62,7 @@ export class GridCharacter {
     layer: undefined,
   };
   private sprite: Phaser.GameObjects.Sprite;
-  private layerOverlaySprite: Phaser.GameObjects.Sprite;
+  private layerOverlaySprite?: Phaser.GameObjects.Sprite;
   private container?: Phaser.GameObjects.Container;
   private speed: number;
   private movementStarted$ = new Subject<Direction>();
@@ -71,13 +71,13 @@ export class GridCharacter {
   private positionChangeStarted$ = new Subject<PositionChange>();
   private positionChangeFinished$ = new Subject<PositionChange>();
   private tilePositionSet$ = new Subject<LayerPosition>();
-  private autoMovementSet$ = new Subject<Movement>();
+  private autoMovementSet$ = new Subject<Movement | undefined>();
   private lastMovementImpulse = Direction.NONE;
   private facingDirection: Direction = Direction.DOWN;
   private animation: CharacterAnimation;
-  private movement: Movement;
+  private movement?: Movement;
   private characterIndex = -1;
-  private walkingAnimationMapping: WalkingAnimationMapping;
+  private walkingAnimationMapping?: WalkingAnimationMapping;
   private collidesWithTilesInternal: boolean;
   private collisionGroups: Set<string>;
 
@@ -124,12 +124,12 @@ export class GridCharacter {
     this._setSprite(sprite);
   }
 
-  setMovement(movement: Movement): void {
+  setMovement(movement?: Movement): void {
     this.autoMovementSet$.next(movement);
     this.movement = movement;
   }
 
-  getMovement(): Movement {
+  getMovement(): Movement | undefined {
     return this.movement;
   }
 
@@ -306,7 +306,7 @@ export class GridCharacter {
     return this.positionChangeFinished$;
   }
 
-  autoMovementSet(): Subject<Movement> {
+  autoMovementSet(): Subject<Movement | undefined> {
     return this.autoMovementSet$;
   }
 
@@ -427,7 +427,7 @@ export class GridCharacter {
     );
   }
 
-  private getTransitionLayer(position: LayerPosition): string {
+  private getTransitionLayer(position: LayerPosition): LayerName {
     return (
       this.tilemap.getTransition(position.position, position.layer) ||
       position.layer
@@ -543,6 +543,7 @@ export class GridCharacter {
   }
 
   private initLayerOverlaySprite(): void {
+    if (!this.layerOverlaySprite) return;
     this.layerOverlaySprite.scale = this.sprite.scale;
     const scaledTileHeight =
       this.tilemap.getTileHeight() / this.layerOverlaySprite.scale;

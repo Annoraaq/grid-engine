@@ -241,7 +241,6 @@ describe("GridEngine", () => {
     });
     expect(mockGridCharacter.turnTowards).not.toHaveBeenCalled();
   });
-
   it("should init player with collisionGroups", () => {
     gridEngine.create(tileMapMock, {
       characters: [
@@ -1072,15 +1071,17 @@ describe("GridEngine", () => {
   });
 
   it("should delegate to get all chars at position", () => {
-    mockGridTileMap.getCharactersAt = jest.fn(() => new Set([
-      { getId: () => "player" }
-    ]));
+    mockGridTileMap.getCharactersAt = jest.fn(
+      () => new Set([{ getId: () => "player" }])
+    );
 
     gridEngine.create(tileMapMock, {
-      characters: [{
-        id: "player",
-        sprite: playerSpriteMock,
-      }]
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+        },
+      ],
     });
     const chars = gridEngine.getCharactersAt(new Vector2(5, 4), "layer");
     expect(mockGridTileMap.getCharactersAt).toHaveBeenCalledWith(
@@ -1088,7 +1089,7 @@ describe("GridEngine", () => {
       "layer"
     );
     expect(chars).toEqual(["player"]);
-  })
+  });
 
   it("should check if char is registered", () => {
     gridEngine.addCharacter({

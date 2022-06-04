@@ -4,6 +4,7 @@ import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Position } from "../../GridEngine";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
+import { LayerName } from "../GridTilemap";
 
 export class CharBlockCache {
   private tilePosToCharacters: Map<string, Set<GridCharacter>> = new Map();
@@ -13,14 +14,15 @@ export class CharBlockCache {
 
   isCharBlockingAt(
     pos: Vector2,
-    layer: string,
+    layer: LayerName,
     collisionGroups: string[]
   ): boolean {
     const posStr = this.posToString(pos, layer);
-    return (
-      this.tilePosToCharacters.has(posStr) &&
-      this.tilePosToCharacters.get(posStr).size > 0 &&
-      [...this.tilePosToCharacters.get(posStr)].some((char: GridCharacter) =>
+    const charSet = this.tilePosToCharacters.get(posStr);
+    return !!(
+      charSet &&
+      charSet.size > 0 &&
+      [...charSet].some((char: GridCharacter) =>
         char
           .getCollisionGroups()
           .some((group) => collisionGroups.includes(group))
@@ -28,10 +30,7 @@ export class CharBlockCache {
     );
   }
 
-  getCharactersAt(
-    pos: Vector2,
-    layer: string
-  ): Set<GridCharacter> {
+  getCharactersAt(pos: Vector2, layer: string): Set<GridCharacter> {
     const posStr = this.posToString(pos, layer);
     const characters = this.tilePosToCharacters.get(posStr);
     return new Set(characters);
@@ -59,9 +58,9 @@ export class CharBlockCache {
 
   removeCharacter(character: GridCharacter): void {
     const charId = character.getId();
-    this.positionChangeStartedSubs.get(charId).unsubscribe();
-    this.positionChangeFinishedSubs.get(charId).unsubscribe();
-    this.tilePosSetSubs.get(charId).unsubscribe();
+    this.positionChangeStartedSubs.get(charId)?.unsubscribe();
+    this.positionChangeFinishedSubs.get(charId)?.unsubscribe();
+    this.tilePosSetSubs.get(charId)?.unsubscribe();
     this.tilePosToCharacters
       .get(
         this.posToString(
@@ -69,7 +68,7 @@ export class CharBlockCache {
           character.getTilePos().layer
         )
       )
-      .delete(character);
+      ?.delete(character);
     this.tilePosToCharacters
       .get(
         this.posToString(
@@ -77,14 +76,14 @@ export class CharBlockCache {
           character.getNextTilePos().layer
         )
       )
-      .delete(character);
+      ?.delete(character);
   }
 
   private add(pos: string, character: GridCharacter): void {
     if (!this.tilePosToCharacters.has(pos)) {
       this.tilePosToCharacters.set(pos, new Set());
     }
-    this.tilePosToCharacters.get(pos).add(character);
+    this.tilePosToCharacters.get(pos)?.add(character);
   }
 
   private addTilePosSetSub(character: GridCharacter) {
@@ -98,7 +97,7 @@ export class CharBlockCache {
               character.getNextTilePos().layer
             )
           )
-          .delete(character);
+          ?.delete(character);
       });
     this.tilePosSetSubs.set(character.getId(), tilePosSetSub);
   }
@@ -118,7 +117,7 @@ export class CharBlockCache {
                 positionChange.exitLayer
               )
             )
-            .delete(character);
+            ?.delete(character);
         }
         this.add(
           this.posToString(positionChange.enterTile, positionChange.enterLayer),
@@ -139,7 +138,7 @@ export class CharBlockCache {
           .get(
             this.posToString(positionChange.exitTile, positionChange.exitLayer)
           )
-          .delete(character);
+          ?.delete(character);
       });
     this.positionChangeFinishedSubs.set(
       character.getId(),
@@ -147,7 +146,7 @@ export class CharBlockCache {
     );
   }
 
-  private posToString(pos: Position, layer: string): string {
+  private posToString(pos: Position, layer: LayerName): string {
     return `${pos.x}#${pos.y}#${layer}`;
   }
 }
