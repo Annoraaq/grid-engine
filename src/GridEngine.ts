@@ -133,7 +133,7 @@ export interface CharacterData {
   id: string;
 
   /** The character’s sprite. */
-  sprite: Phaser.GameObjects.Sprite;
+  sprite?: Phaser.GameObjects.Sprite;
 
   /**
    * If not set, automatic walking animation will be disabed. Do this if you
@@ -467,12 +467,18 @@ export class GridEngine {
    */
   setWalkingAnimationMapping(
     charId: string,
-    walkingAnimationMapping: WalkingAnimationMapping
+    walkingAnimationMapping?: WalkingAnimationMapping | number
   ): void {
     this.initGuard();
     const gridChar = this.gridCharacters.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
-    gridChar.setWalkingAnimationMapping(walkingAnimationMapping);
+
+    const animation = gridChar.getAnimation();
+    if (typeof walkingAnimationMapping == "number") {
+      animation?.setCharacterIndex(walkingAnimationMapping);
+    } else {
+      animation?.setWalkingAnimationMapping(walkingAnimationMapping);
+    }
   }
 
   /** @internal */
@@ -488,9 +494,10 @@ export class GridEngine {
   addCharacter(charData: CharacterData): void {
     this.initGuard();
 
-    const layerOverlaySprite = GlobalConfig.get().layerOverlay
-      ? this.scene.add.sprite(0, 0, charData.sprite.texture)
-      : undefined;
+    const layerOverlaySprite =
+      GlobalConfig.get().layerOverlay && charData.sprite
+        ? this.scene.add.sprite(0, 0, charData.sprite.texture)
+        : undefined;
 
     const charConfig: CharConfig = {
       sprite: charData.sprite,
@@ -735,7 +742,7 @@ export class GridEngine {
   /**
    * @returns Sprite of given character
    */
-  getSprite(charId: string): Phaser.GameObjects.Sprite {
+  getSprite(charId: string): Phaser.GameObjects.Sprite | undefined {
     this.initGuard();
     const gridChar = this.gridCharacters.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);

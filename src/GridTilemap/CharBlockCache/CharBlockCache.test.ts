@@ -273,7 +273,7 @@ describe("CharBlockCache", () => {
       ...createCharMock("charMockDifferentLayer"),
       getTilePos: () => ({ position: { x: 0, y: 1 }, layer: "otherLayer" }),
     };
-    
+
     charBlockCache.addCharacter(charMock1);
     charBlockCache.addCharacter(charMock2);
     charBlockCache.addCharacter(charMockDifferentLayer);

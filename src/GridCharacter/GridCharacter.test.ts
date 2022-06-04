@@ -104,10 +104,13 @@ describe("GridCharacter", () => {
     };
     layerOverlaySpriteMock = <any>{
       displayWidth: 16,
+      displayHeight: 20,
       setCrop: jest.fn(),
       setDepth: jest.fn(),
       setOrigin: jest.fn(),
       setFrame: jest.fn(),
+      x: 5 * TILE_WIDTH + PLAYER_X_OFFSET,
+      y: 6 * TILE_HEIGHT + PLAYER_Y_OFFSET,
     };
     gridCharacter = new GridCharacter("player", {
       sprite: gridSpriteMock,
@@ -280,8 +283,8 @@ describe("GridCharacter", () => {
     gridCharacter.setSprite(sprite);
 
     expect(gridCharacter.getSprite()).toBe(sprite);
-    expect(gridCharacter.getSprite().x).toEqual(80);
-    expect(gridCharacter.getSprite().y).toEqual(92);
+    expect(gridCharacter.getSprite()?.x).toEqual(80);
+    expect(gridCharacter.getSprite()?.y).toEqual(92);
     expect(CharacterAnimation).toHaveBeenCalledWith(sprite, undefined, 3);
     expect(mockCharacterAnimation.setIsEnabled).toHaveBeenCalledWith(true);
     expect(mockCharacterAnimation.setStandingFrame).toHaveBeenCalledWith(
@@ -495,21 +498,6 @@ describe("GridCharacter", () => {
           "0.0000" + (INITIAL_SPRITE_Y_POS + gridSpriteMock.displayHeight + 12)
         )
     );
-  });
-
-  it("should set walkingAnimationMapping", () => {
-    const walkingAnimationMappingMock = <any>{};
-    gridCharacter.setWalkingAnimationMapping(walkingAnimationMappingMock);
-
-    expect(
-      mockCharacterAnimation.setWalkingAnimationMapping
-    ).toHaveBeenCalledWith(walkingAnimationMappingMock);
-  });
-
-  it("should set characterIndex", () => {
-    gridCharacter.setWalkingAnimationMapping(3);
-
-    expect(mockCharacterAnimation.setCharacterIndex).toHaveBeenCalledWith(3);
   });
 
   it("should update only till tile border", () => {

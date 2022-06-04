@@ -5,6 +5,11 @@ import { take } from "rxjs/operators";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { GridCharacter, PositionChange } from "./GridCharacter/GridCharacter";
 
+const mockCharacterAnimation = {
+  setCharacterIndex: jest.fn(),
+  setWalkingAnimationMapping: jest.fn(),
+};
+
 const mockGridCharacter = {
   setTilePosition: jest.fn(),
   move: jest.fn(),
@@ -37,6 +42,7 @@ const mockGridCharacter = {
   getTransition: jest.fn(),
   getCollisionGroups: jest.fn().mockReturnValue(["cGroup1"]),
   setCollisionGroups: jest.fn(),
+  getAnimation: jest.fn().mockReturnValue(mockCharacterAnimation),
 };
 const mockFollowMovement = {
   setCharacter: jest.fn(),
@@ -1158,41 +1164,21 @@ describe("GridEngine", () => {
   });
 
   it("should set walkingAnimationMapping", () => {
-    gridEngine.create(tileMapMock, {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
-        },
-      ],
-    });
-    const mockMapping = {
-      up: {
-        leftFoot: 0,
-        standing: 1,
-        rightFoot: 2,
-      },
-      right: {
-        leftFoot: 3,
-        standing: 4,
-        rightFoot: 5,
-      },
-      down: {
-        leftFoot: 6,
-        standing: 7,
-        rightFoot: 8,
-      },
-      left: {
-        leftFoot: 9,
-        standing: 10,
-        rightFoot: 11,
-      },
-    };
-    gridEngine.setWalkingAnimationMapping("player", mockMapping);
-    expect(mockGridCharacter.setWalkingAnimationMapping).toHaveBeenCalledWith(
-      mockMapping
+    const walkingAnimationMappingMock = <any>{};
+    gridEngine.setWalkingAnimationMapping(
+      "player",
+      walkingAnimationMappingMock
     );
+
+    expect(
+      mockCharacterAnimation.setWalkingAnimationMapping
+    ).toHaveBeenCalledWith(walkingAnimationMappingMock);
+  });
+
+  it("should set characterIndex", () => {
+    gridEngine.setWalkingAnimationMapping("player", 3);
+
+    expect(mockCharacterAnimation.setCharacterIndex).toHaveBeenCalledWith(3);
   });
 
   it("should delegate isMoving", () => {
