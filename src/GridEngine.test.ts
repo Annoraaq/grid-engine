@@ -67,7 +67,11 @@ const mockGridTilemapConstructor = jest.fn(function (
   return mockGridTileMap;
 });
 
-const mockNewSprite = { setCrop: jest.fn(), setOrigin: jest.fn() };
+const mockNewSprite = {
+  setCrop: jest.fn(),
+  setOrigin: jest.fn(),
+  scale: 1,
+};
 
 expect.extend({
   toBeCharacter(receivedChar: GridCharacter, expectedCharId: string) {
@@ -286,6 +290,15 @@ describe("GridEngine", () => {
         layerOverlaySprite: mockNewSprite,
       })
     );
+    expect(mockNewSprite.scale).toEqual(playerSpriteMock.scale);
+    expect(mockNewSprite.setCrop).toHaveBeenCalledWith(
+      0,
+      0,
+      playerSpriteMock.displayWidth,
+      playerSpriteMock.height -
+        mockGridTileMap.getTileHeight() / mockNewSprite.scale
+    );
+    expect(mockNewSprite.setOrigin).toHaveBeenCalledWith(0, 0);
   });
 
   it("should init player with facingDirection", () => {

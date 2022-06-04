@@ -529,6 +529,19 @@ export class GridEngine {
 
     const gridChar = this.createCharacter(charData.id, charConfig);
 
+    if (charConfig.sprite && layerOverlaySprite) {
+      layerOverlaySprite.scale = charConfig.sprite.scale;
+      const scaledTileHeight =
+        this.gridTilemap.getTileHeight() / layerOverlaySprite.scale;
+      layerOverlaySprite.setCrop(
+        0,
+        0,
+        layerOverlaySprite.displayWidth,
+        charConfig.sprite.height - scaledTileHeight
+      );
+      layerOverlaySprite.setOrigin(0, 0);
+    }
+
     if (charData.facingDirection) {
       gridChar.turnTowards(charData.facingDirection);
     }

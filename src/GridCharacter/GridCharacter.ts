@@ -102,9 +102,6 @@ export class GridCharacter {
 
     if (this.sprite) {
       this._setSprite(this.sprite);
-      if (this.layerOverlaySprite) {
-        this.initLayerOverlaySprite();
-      }
     }
   }
 
@@ -562,20 +559,5 @@ export class GridCharacter {
     { position: enterTile, layer: enterLayer }: LayerPosition
   ): void {
     subject.next({ exitTile, enterTile, exitLayer, enterLayer });
-  }
-
-  private initLayerOverlaySprite(): void {
-    if (!this.layerOverlaySprite) return;
-    if (!this.sprite) return;
-    this.layerOverlaySprite.scale = this.sprite.scale;
-    const scaledTileHeight =
-      this.tilemap.getTileHeight() / this.layerOverlaySprite.scale;
-    this.layerOverlaySprite.setCrop(
-      0,
-      0,
-      this.layerOverlaySprite.displayWidth,
-      this.sprite.height - scaledTileHeight
-    );
-    this.layerOverlaySprite.setOrigin(0, 0);
   }
 }

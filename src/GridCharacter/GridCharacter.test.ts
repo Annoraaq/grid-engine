@@ -148,17 +148,6 @@ describe("GridCharacter", () => {
       });
     });
 
-    it("should init overlay sprite", () => {
-      expect(layerOverlaySpriteMock.scale).toEqual(gridSpriteMock.scale);
-      expect(layerOverlaySpriteMock.setCrop).toHaveBeenCalledWith(
-        0,
-        0,
-        gridSpriteMock.displayWidth,
-        gridSpriteMock.height - TILE_HEIGHT / gridSpriteMock.scale
-      );
-      expect(layerOverlaySpriteMock.setOrigin).toHaveBeenCalledWith(0, 0);
-    });
-
     it("should copy props from sprite to overlay sprite", () => {
       layerOverlaySpriteMock.scale = 0;
       gridCharacter.update(100);
