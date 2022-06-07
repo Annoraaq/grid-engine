@@ -119,7 +119,7 @@ describe("GridCharacter", () => {
       y: 6 * TILE_HEIGHT + PLAYER_Y_OFFSET,
     };
     gridCharacter = new GridCharacter("player", {
-      sprite: gridSpriteMock,
+      // sprite: gridSpriteMock,
       tilemap: gridTilemapMock,
       speed: 3,
       collidesWithTiles: true,
@@ -139,8 +139,8 @@ describe("GridCharacter", () => {
   describe("overlay sprite", () => {
     beforeEach(() => {
       gridCharacter = new GridCharacter("player", {
-        sprite: gridSpriteMock,
-        layerOverlaySprite: layerOverlaySpriteMock,
+        // sprite: gridSpriteMock,
+        // layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
         collidesWithTiles: true,
@@ -162,9 +162,9 @@ describe("GridCharacter", () => {
 
     it("should copy props from sprite to overlay sprite with container", () => {
       gridCharacter = new GridCharacter("player", {
-        sprite: gridSpriteMock,
-        container: containerMock,
-        layerOverlaySprite: layerOverlaySpriteMock,
+        // sprite: gridSpriteMock,
+        // container: containerMock,
+        // layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
         collidesWithTiles: true,
@@ -183,8 +183,8 @@ describe("GridCharacter", () => {
 
   it("should get init data", () => {
     gridCharacter = new GridCharacter("player", {
-      sprite: gridSpriteMock,
-      layerOverlaySprite: layerOverlaySpriteMock,
+      // sprite: gridSpriteMock,
+      // layerOverlaySprite: layerOverlaySpriteMock,
       tilemap: gridTilemapMock,
       speed: 3,
       collidesWithTiles: true,
@@ -209,8 +209,8 @@ describe("GridCharacter", () => {
       gridTilemapMock.getDepthOfCharLayer.mockClear();
       gridTilemapMock.getDepthOfCharLayer.mockReturnValue(2);
       gridCharacter = new GridCharacter("player", {
-        sprite: gridSpriteMock,
-        layerOverlaySprite: layerOverlaySpriteMock,
+        // sprite: gridSpriteMock,
+        // layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
         collidesWithTiles: true,
@@ -275,11 +275,11 @@ describe("GridCharacter", () => {
       displayHeight: gridSpriteMock.displayHeight,
       setOrigin: jest.fn(),
     };
-    gridCharacter.setSprite(sprite);
+    // gridCharacter.setSprite(sprite);
 
-    expect(gridCharacter.getSprite()).toBe(sprite);
-    expect(gridCharacter.getSprite()?.x).toEqual(80);
-    expect(gridCharacter.getSprite()?.y).toEqual(92);
+    // expect(gridCharacter.getSprite()).toBe(sprite);
+    // expect(gridCharacter.getSprite()?.x).toEqual(80);
+    // expect(gridCharacter.getSprite()?.y).toEqual(92);
     expect(mockCharacterAnimation.setIsEnabled).toHaveBeenCalledWith(true);
     expect(mockCharacterAnimation.setStandingFrame).toHaveBeenCalledWith(
       Direction.DOWN
@@ -516,8 +516,8 @@ describe("GridCharacter", () => {
     const newPixelPos = new Vector2(10, 20);
     gridTilemapMock.tilePosToPixelPos.mockReturnValue(newPixelPos);
     gridCharacter = new GridCharacter("player", {
-      sprite: gridSpriteMock,
-      layerOverlaySprite: layerOverlaySpriteMock,
+      // sprite: gridSpriteMock,
+      // layerOverlaySprite: layerOverlaySpriteMock,
       tilemap: gridTilemapMock,
       speed: 3,
       offsetX: customOffsetX,
@@ -891,8 +891,8 @@ describe("GridCharacter", () => {
       const direction = Direction.RIGHT;
       beforeEach(() => {
         gridCharacter = new GridCharacter("player", {
-          sprite: gridSpriteMock,
-          layerOverlaySprite: layerOverlaySpriteMock,
+          // sprite: gridSpriteMock,
+          // layerOverlaySprite: layerOverlaySpriteMock,
           tilemap: gridTilemapMock,
           speed: 3,
           collidesWithTiles: true,
@@ -934,8 +934,8 @@ describe("GridCharacter", () => {
       const direction = Direction.RIGHT;
       beforeEach(() => {
         gridCharacter = new GridCharacter("player", {
-          sprite: gridSpriteMock,
-          layerOverlaySprite: layerOverlaySpriteMock,
+          // sprite: gridSpriteMock,
+          // layerOverlaySprite: layerOverlaySpriteMock,
           tilemap: gridTilemapMock,
           speed: 3,
           collidesWithTiles: false,
@@ -1080,12 +1080,12 @@ describe("GridCharacter", () => {
         displayHeight: 20,
       };
       gridCharacter = new GridCharacter("player", {
-        sprite: gridSpriteMock,
-        layerOverlaySprite: layerOverlaySpriteMock,
+        // sprite: gridSpriteMock,
+        // layerOverlaySprite: layerOverlaySpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
         walkingAnimationMapping: 3,
-        container: containerMock,
+        // container: containerMock,
         collidesWithTiles: true,
       });
     });
@@ -1132,7 +1132,7 @@ describe("GridCharacter", () => {
   describe("collision groups", () => {
     it("should set collision groups from config", () => {
       gridCharacter = new GridCharacter("player", {
-        sprite: gridSpriteMock,
+        // sprite: gridSpriteMock,
         tilemap: gridTilemapMock,
         speed: 3,
         collidesWithTiles: true,

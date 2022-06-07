@@ -1,3 +1,4 @@
+import { GridCharacterPhaser } from "./GridEnginePhaser/GridCharacterPhaser/GridCharacterPhaser";
 import { GlobalConfig } from "./GlobalConfig/GlobalConfig";
 import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
@@ -9,9 +10,8 @@ import {
 } from "./Movement/TargetMovement/TargetMovement";
 import {
   CharacterIndex,
-  CharConfig,
   FrameRow,
-  GridCharacter,
+  GameObject,
   PositionChange,
 } from "./GridCharacter/GridCharacter";
 import {
@@ -27,6 +27,10 @@ import { Vector2 } from "./Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { Concrete } from "./Utils/TypeUtils";
+import { Utils } from "./Utils/Utils/Utils";
+import { LayerPosition } from "./Pathfinding/ShortestPathAlgorithm";
+import { SpriteUtils } from "./Utils/SpriteUtils/SpriteUtils";
+import { CharacterAnimation } from "./GridCharacter/CharacterAnimation/CharacterAnimation";
 
 export {
   CollisionStrategy,
@@ -243,7 +247,7 @@ export enum CharacterShiftAction {
 }
 
 export class GridEngine {
-  private gridCharacters: Map<string, GridCharacter>;
+  private gridCharacters: Map<string, GridCharacterPhaser>;
   private gridTilemap: GridTilemap;
   private isCreated = false;
   private movementStopped$: Subject<{ charId: string; direction: Direction }>;
@@ -274,7 +278,7 @@ export class GridEngine {
    */
   getCharLayer(charId: string): string | undefined {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getTilePos().layer;
   }
@@ -352,7 +356,7 @@ export class GridEngine {
    */
   getPosition(charId: string): Position {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getTilePos().position;
   }
@@ -382,7 +386,7 @@ export class GridEngine {
    */
   moveRandomly(charId: string, delay = 0, radius = -1): void {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     const randomMovement = new RandomMovement(
       gridChar,
@@ -411,7 +415,7 @@ export class GridEngine {
     const moveToConfig = this.assembleMoveToConfig(config);
 
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     const targetMovement = new TargetMovement(
       gridChar,
@@ -446,7 +450,7 @@ export class GridEngine {
    */
   stopMovement(charId: string): void {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     gridChar.setMovement(undefined);
   }
@@ -454,7 +458,7 @@ export class GridEngine {
   /** Sets the speed in tiles per second for a character. */
   setSpeed(charId: string, speed: number): void {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     gridChar.setSpeed(speed);
   }
@@ -470,7 +474,7 @@ export class GridEngine {
     walkingAnimationMapping?: WalkingAnimationMapping | number
   ): void {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
 
     const animation = gridChar.getAnimation();
@@ -485,7 +489,17 @@ export class GridEngine {
   update(_time: number, delta: number): void {
     if (this.isCreated && this.gridCharacters) {
       for (const [_key, val] of this.gridCharacters) {
-        val.update(delta);
+        const gridChar = val.getGridCharacter();
+        gridChar.update(delta);
+
+        const layerOverlaySprite = val.getLayerOverlaySprite();
+        const sprite = val.getSprite();
+        const container = val.getContainer();
+        if (layerOverlaySprite && sprite) {
+          SpriteUtils.copyOverImportantProperties(sprite, layerOverlaySprite);
+          layerOverlaySprite.x = sprite.x + (container?.x || 0);
+          layerOverlaySprite.y = sprite.y + (container?.y || 0);
+        }
       }
     }
   }
@@ -494,67 +508,46 @@ export class GridEngine {
   addCharacter(charData: CharacterData): void {
     this.initGuard();
 
-    const layerOverlaySprite =
-      GlobalConfig.get().layerOverlay && charData.sprite
-        ? this.scene.add.sprite(0, 0, charData.sprite.texture)
-        : undefined;
+    const gridCharPhaser = new GridCharacterPhaser(
+      charData,
+      this.scene,
+      this.gridTilemap,
+      GlobalConfig.get().layerOverlay
+    );
+    const gridChar = gridCharPhaser.getGridCharacter();
 
-    const charConfig: CharConfig = {
-      sprite: charData.sprite,
-      layerOverlaySprite,
-      speed: charData.speed || 4,
-      tilemap: this.gridTilemap,
-      walkingAnimationMapping: charData.walkingAnimationMapping,
-      container: charData.container,
-      offsetX: charData.offsetX,
-      offsetY: charData.offsetY,
-      collidesWithTiles: true,
-      collisionGroups: ["geDefault"],
-      charLayer: charData.charLayer,
-    };
+    gridChar
+      .pixelPositionChanged()
+      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
+      .subscribe((pixelPos: Vector2) => {
+        const gameObj =
+          gridCharPhaser.getContainer() || gridCharPhaser.getSprite();
+        if (gameObj) {
+          gameObj.x = pixelPos.x;
+          gameObj.y = pixelPos.y;
+        }
 
-    if (typeof charData.collides === "boolean") {
-      if (charData.collides === false) {
-        charConfig.collidesWithTiles = false;
-        charConfig.collisionGroups = [];
-      }
-    } else if (charData.collides !== undefined) {
-      if (charData.collides.collidesWithTiles === false) {
-        charConfig.collidesWithTiles = false;
-      }
-      if (charData.collides.collisionGroups) {
-        charConfig.collisionGroups = charData.collides.collisionGroups;
-      }
-    }
+        const sprite = gridCharPhaser.getSprite();
+        if (sprite) {
+          if (gridChar.isMoving()) {
+            gridChar
+              .getAnimation()
+              ?.updateCharacterFrame(
+                gridChar.getMovementDirection(),
+                gridChar.hasWalkedHalfATile(),
+                Number(sprite.frame.name)
+              );
+          } else {
+            gridChar
+              .getAnimation()
+              ?.setStandingFrame(gridChar.getFacingDirection());
+          }
+        }
 
-    const gridChar = this.createCharacter(charData.id, charConfig);
+        this.setD(gridCharPhaser);
+      });
 
-    if (charConfig.sprite && layerOverlaySprite) {
-      layerOverlaySprite.scale = charConfig.sprite.scale;
-      const scaledTileHeight =
-        this.gridTilemap.getTileHeight() / layerOverlaySprite.scale;
-      layerOverlaySprite.setCrop(
-        0,
-        0,
-        layerOverlaySprite.displayWidth,
-        charConfig.sprite.height - scaledTileHeight
-      );
-      layerOverlaySprite.setOrigin(0, 0);
-    }
-
-    if (charData.facingDirection) {
-      gridChar.turnTowards(charData.facingDirection);
-    }
-
-    this.gridCharacters.set(charData.id, gridChar);
-
-    const startPos = charData.startPosition
-      ? new Vector2(charData.startPosition)
-      : new Vector2(0, 0);
-    gridChar.setTilePosition({
-      position: startPos,
-      layer: gridChar.getTilePos().layer,
-    });
+    this.gridCharacters.set(charData.id, gridCharPhaser);
 
     this.gridTilemap.addCharacter(gridChar);
 
@@ -600,6 +593,23 @@ export class GridEngine {
       });
 
     this.charAdded$.next(charData.id);
+  }
+
+  private setDepth(gameObject: GameObject, position: LayerPosition): void {
+    gameObject.setDepth(
+      this.gridTilemap.getDepthOfCharLayer(this.getTransitionLayer(position)) +
+        this.getPaddedPixelDepth(gameObject)
+    );
+  }
+  private getPaddedPixelDepth(gameObject: GameObject): number {
+    return Utils.shiftPad(gameObject.y + gameObject.displayHeight, 7);
+  }
+
+  private getTransitionLayer(position: LayerPosition): LayerName {
+    return (
+      this.gridTilemap.getTransition(position.position, position.layer) ||
+      position.layer
+    );
   }
 
   /** Checks whether a character with the given ID is registered. */
@@ -660,8 +670,10 @@ export class GridEngine {
     closestPointIfBlocked = false
   ): void {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
-    const gridCharToFollow = this.gridCharacters.get(charIdToFollow);
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
+    const gridCharToFollow = this.gridCharacters
+      .get(charIdToFollow)
+      ?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     if (!gridCharToFollow) throw this.createCharUnknownErr(charIdToFollow);
     const followMovement = new FollowMovement(
@@ -682,7 +694,7 @@ export class GridEngine {
    */
   isMoving(charId: string): boolean {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.isMoving();
   }
@@ -693,7 +705,7 @@ export class GridEngine {
    */
   getFacingDirection(charId: string): Direction {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getFacingDirection();
   }
@@ -703,7 +715,7 @@ export class GridEngine {
    */
   getFacingPosition(charId: string): Position {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     const vectorPos = gridChar.getFacingPosition();
     return { x: vectorPos.x, y: vectorPos.y };
@@ -714,7 +726,7 @@ export class GridEngine {
    */
   turnTowards(charId: string, direction: Direction): void {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.turnTowards(direction);
   }
@@ -741,7 +753,7 @@ export class GridEngine {
    */
   setPosition(charId: string, pos: Position, layer?: string): void {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     if (!layer) {
       gridChar.setTilePosition({
@@ -757,9 +769,10 @@ export class GridEngine {
    */
   getSprite(charId: string): Phaser.GameObjects.Sprite | undefined {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
+    const gridCharPhaser = this.gridCharacters.get(charId);
+    const gridChar = gridCharPhaser?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
-    return gridChar.getSprite();
+    return gridCharPhaser?.getSprite();
   }
 
   /**
@@ -767,10 +780,72 @@ export class GridEngine {
    */
   setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
-    if (!gridChar) throw this.createCharUnknownErr(charId);
+    const gridCharPhaser = this.gridCharacters.get(charId);
+    if (!gridCharPhaser) throw this.createCharUnknownErr(charId);
     sprite.setOrigin(0, 0);
-    gridChar.setSprite(sprite);
+    this.setCharSprite(sprite, gridCharPhaser);
+  }
+
+  private setCharSprite(
+    sprite: Phaser.GameObjects.Sprite,
+    gridCharPhaser: GridCharacterPhaser
+  ) {
+    sprite.setOrigin(0, 0);
+    const oldSprite = gridCharPhaser.getSprite();
+    if (oldSprite) {
+      sprite.x = oldSprite.x;
+      sprite.y = oldSprite.y;
+    }
+    gridCharPhaser.setSprite(sprite);
+    const gridChar = gridCharPhaser.getGridCharacter();
+
+    if (!gridChar.getAnimation()) {
+      const animation = new CharacterAnimation(
+        gridChar.getWalkingAnimationMapping(),
+        gridChar.getCharacterIndex(),
+        sprite.texture.source[0].width /
+          sprite.width /
+          CharacterAnimation.FRAMES_CHAR_ROW
+      );
+      gridChar.setAnimation(animation);
+
+      animation.frameChange().subscribe((frameNo) => {
+        sprite.setFrame(frameNo);
+      });
+    }
+
+    gridChar
+      .getAnimation()
+      ?.setIsEnabled(
+        gridChar.getWalkingAnimationMapping() !== undefined ||
+          gridChar.getCharacterIndex() !== -1
+      );
+    gridChar.getAnimation()?.setStandingFrame(Direction.DOWN);
+
+    this.setD(gridCharPhaser);
+  }
+
+  private setD(gridCharPhaser: GridCharacterPhaser) {
+    const gameObject =
+      gridCharPhaser.getContainer() || gridCharPhaser.getSprite();
+
+    if (!gameObject) return;
+    this.setDepth(
+      gameObject,
+      gridCharPhaser.getGridCharacter().getNextTilePos()
+    );
+    const layerOverlaySprite = gridCharPhaser.getLayerOverlaySprite();
+
+    if (layerOverlaySprite) {
+      const posAbove = new Vector2({
+        ...gridCharPhaser.getGridCharacter().getNextTilePos().position,
+        y: gridCharPhaser.getGridCharacter().getNextTilePos().position.y - 1,
+      });
+      this.setDepth(layerOverlaySprite, {
+        position: posAbove,
+        layer: gridCharPhaser.getGridCharacter().getNextTilePos().layer,
+      });
+    }
   }
 
   /**
@@ -813,9 +888,9 @@ export class GridEngine {
    */
   getCollisionGroups(charId: string): string[] {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
-    return this.gridCharacters.get(charId)?.getCollisionGroups() || [];
+    return gridChar.getCollisionGroups() || [];
   }
 
   /**
@@ -824,9 +899,9 @@ export class GridEngine {
    */
   setCollisionGroups(charId: string, collisionGroups: string[]): void {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
-    this.gridCharacters.get(charId)?.setCollisionGroups(collisionGroups);
+    gridChar.setCollisionGroups(collisionGroups);
   }
 
   /**
@@ -939,10 +1014,6 @@ export class GridEngine {
     }
   }
 
-  private createCharacter(id: string, config: CharConfig): GridCharacter {
-    return new GridCharacter(id, config);
-  }
-
   private addCharacters() {
     GlobalConfig.get().characters.forEach((charData) =>
       this.addCharacter(charData)
@@ -951,7 +1022,7 @@ export class GridEngine {
 
   private moveChar(charId: string, direction: Direction): void {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId);
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
 
     if (GlobalConfig.get().numberOfDirections === NumberOfDirections.FOUR) {

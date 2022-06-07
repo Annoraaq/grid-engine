@@ -9,10 +9,10 @@ import { Position, WalkingAnimationMapping } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
-import { Utils } from "../Utils/Utils/Utils";
-import { SpriteUtils } from "../Utils/SpriteUtils/SpriteUtils";
 
-type GameObject = Phaser.GameObjects.Container | Phaser.GameObjects.Sprite;
+export type GameObject =
+  | Phaser.GameObjects.Container
+  | Phaser.GameObjects.Sprite;
 
 /** Frame numbers for one movement direction */
 export interface FrameRow {
@@ -36,13 +36,10 @@ export interface PositionChange {
 }
 
 export interface CharConfig {
-  sprite?: Phaser.GameObjects.Sprite;
-  layerOverlaySprite?: Phaser.GameObjects.Sprite;
   tilemap: GridTilemap;
   speed: number;
   collidesWithTiles: boolean;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
-  container?: Phaser.GameObjects.Container;
   offsetX?: number;
   offsetY?: number;
   charLayer?: string;
@@ -63,9 +60,6 @@ export class GridCharacter {
     position: new Vector2(0, 0),
     layer: undefined,
   };
-  private sprite?: Phaser.GameObjects.Sprite;
-  private layerOverlaySprite?: Phaser.GameObjects.Sprite;
-  private container?: Phaser.GameObjects.Container;
   private speed: number;
   private movementStarted$ = new Subject<Direction>();
   private movementStopped$ = new Subject<Direction>();
@@ -82,6 +76,11 @@ export class GridCharacter {
   private walkingAnimationMapping?: WalkingAnimationMapping;
   private collidesWithTilesInternal: boolean;
   private collisionGroups: Set<string>;
+  private pixelPositionChanged$ = new Subject<Vector2>();
+  private depthChanged$ = new Subject<LayerPosition>();
+  private pixelPosition = new Vector2(0, 0);
+
+  engineOffset = new Vector2(0, 0);
 
   constructor(private id: string, config: CharConfig) {
     if (typeof config.walkingAnimationMapping == "number") {
@@ -89,43 +88,13 @@ export class GridCharacter {
     } else {
       this.walkingAnimationMapping = config.walkingAnimationMapping;
     }
-    this.container = config.container;
     this.tilemap = config.tilemap;
     this.speed = config.speed;
     this.collidesWithTilesInternal = config.collidesWithTiles;
     this.customOffset = new Vector2(config.offsetX || 0, config.offsetY || 0);
     this._tilePos.layer = config.charLayer;
 
-    this.sprite = config.sprite;
-    this.layerOverlaySprite = config.layerOverlaySprite;
     this.collisionGroups = new Set<string>(config.collisionGroups || []);
-
-    if (this.sprite) {
-      this._setSprite(this.sprite);
-    }
-  }
-
-  private updateAnimationSprite() {
-    if (!this.sprite) return;
-
-    if (!this.animation) {
-      this.animation = new CharacterAnimation(
-        this.walkingAnimationMapping,
-        this.characterIndex,
-        this.sprite.texture.source[0].width /
-          this.sprite.width /
-          CharacterAnimation.FRAMES_CHAR_ROW
-      );
-
-      this.animation.frameChange().subscribe((frameNo) => {
-        this.sprite?.setFrame(frameNo);
-      });
-    }
-
-    this.animation.setIsEnabled(
-      this.walkingAnimationMapping !== undefined || this.characterIndex !== -1
-    );
-    this.animation.setStandingFrame(Direction.DOWN);
   }
 
   getId(): string {
@@ -138,14 +107,6 @@ export class GridCharacter {
 
   setSpeed(speed: number): void {
     this.speed = speed;
-  }
-
-  getSprite(): Phaser.GameObjects.Sprite | undefined {
-    return this.sprite;
-  }
-
-  setSprite(sprite: Phaser.GameObjects.Sprite): void {
-    this._setSprite(sprite);
   }
 
   setMovement(movement?: Movement): void {
@@ -178,17 +139,20 @@ export class GridCharacter {
     this.movementDirection = Direction.NONE;
     this.lastMovementImpulse = Direction.NONE;
     this.tilePos = tilePosition;
-    const gameObject = this.gameObject();
-    if (gameObject) {
-      this.setPosition(
-        this.tilemap
-          .tilePosToPixelPos(tilePosition.position)
-          .add(this.getOffset())
-          .add(this.customOffset),
-        gameObject
-      );
-    }
-    this.updateZindex();
+    this.setPixelPosition(
+      this.tilemap
+        .tilePosToPixelPos(tilePosition.position)
+        .add(this.engineOffset)
+        .add(this.customOffset)
+    );
+  }
+
+  getOffsetX(): number {
+    return this.customOffset.x;
+  }
+
+  getOffsetY(): number {
+    return this.customOffset.y;
   }
 
   getTilePos(): LayerPosition {
@@ -212,22 +176,24 @@ export class GridCharacter {
     }
   }
 
+  getWalkingAnimationMapping(): WalkingAnimationMapping | undefined {
+    return this.walkingAnimationMapping;
+  }
+
+  getCharacterIndex(): number {
+    return this.characterIndex;
+  }
+
+  setAnimation(animation: CharacterAnimation): void {
+    this.animation = animation;
+  }
+
   update(delta: number): void {
     this.movement?.update(delta);
-    if (this.isMoving() && this.sprite) {
+    if (this.isMoving()) {
       this.updateCharacterPosition(delta);
-      this.updateZindex();
     }
     this.lastMovementImpulse = Direction.NONE;
-
-    if (this.layerOverlaySprite && this.sprite) {
-      SpriteUtils.copyOverImportantProperties(
-        this.sprite,
-        this.layerOverlaySprite
-      );
-      this.layerOverlaySprite.x = this.sprite.x + (this.container?.x || 0);
-      this.layerOverlaySprite.y = this.sprite.y + (this.container?.y || 0);
-    }
   }
 
   getMovementDirection(): Direction {
@@ -332,24 +298,12 @@ export class GridCharacter {
     return this.autoMovementSet$;
   }
 
-  private _setSprite(sprite: Phaser.GameObjects.Sprite): void {
-    sprite.setOrigin(0, 0);
-    if (this.sprite) {
-      sprite.x = this.sprite.x;
-      sprite.y = this.sprite.y;
-    }
-    this.sprite = sprite;
-    this.updateAnimationSprite();
-    this.updateZindex();
+  pixelPositionChanged(): Subject<Vector2> {
+    return this.pixelPositionChanged$;
   }
 
-  private getOffset(): Vector2 {
-    const offsetX =
-      this.tilemap.getTileWidth() / 2 -
-      Math.floor((this.sprite?.displayWidth ?? 0) / 2);
-    const offsetY =
-      -(this.sprite?.displayHeight ?? 0) + this.tilemap.getTileHeight();
-    return new Vector2(offsetX, offsetY);
+  depthChanged(): Subject<LayerPosition> {
+    return this.depthChanged$;
   }
 
   private updateCharacterPosition(delta: number): void {
@@ -362,10 +316,7 @@ export class GridCharacter {
       ? distToNextTile
       : maxMovementForDelta;
 
-    const gameObject = this.gameObject();
-    if (gameObject) {
-      this.moveCharacterSprite(distToWalk, gameObject);
-    }
+    this.moveCharacterSprite(distToWalk);
 
     if (willCrossTileBorderThisUpdate) {
       if (this.shouldContinueMoving()) {
@@ -407,55 +358,13 @@ export class GridCharacter {
     LayerPositionUtils.copyOver(newTilePos, this._tilePos);
   }
 
-  private gameObject():
-    | Phaser.GameObjects.Container
-    | Phaser.GameObjects.Sprite
-    | undefined {
-    return this.container || this.sprite;
+  private setPixelPosition(position: Vector2): void {
+    this.pixelPosition = new Vector2(position);
+    this.pixelPositionChanged$.next(new Vector2(this.pixelPosition));
   }
 
-  private updateZindex() {
-    const gameObject = this.gameObject();
-    if (!gameObject) return;
-    this.setDepth(gameObject, this.nextTilePos);
-
-    if (this.layerOverlaySprite) {
-      const posAbove = new Vector2({
-        ...this.nextTilePos.position,
-        y: this.nextTilePos.position.y - 1,
-      });
-      this.setDepth(this.layerOverlaySprite, {
-        position: posAbove,
-        layer: this.nextTilePos.layer,
-      });
-    }
-  }
-
-  private setDepth(gameObject: GameObject, position: LayerPosition): void {
-    gameObject.setDepth(
-      this.tilemap.getDepthOfCharLayer(this.getTransitionLayer(position)) +
-        this.getPaddedPixelDepth(gameObject)
-    );
-  }
-
-  private getPaddedPixelDepth(gameObject: GameObject): number {
-    return Utils.shiftPad(gameObject.y + gameObject.displayHeight, 7);
-  }
-
-  private getTransitionLayer(position: LayerPosition): LayerName {
-    return (
-      this.tilemap.getTransition(position.position, position.layer) ||
-      position.layer
-    );
-  }
-
-  private setPosition(position: Vector2, gameObject: GameObject): void {
-    gameObject.x = position.x;
-    gameObject.y = position.y;
-  }
-
-  private getPosition(gameObject: GameObject): Vector2 {
-    return new Vector2(gameObject.x, gameObject.y);
+  private getPixelPosition(): Vector2 {
+    return new Vector2(this.pixelPosition);
   }
 
   private startMoving(direction: Direction): void {
@@ -516,18 +425,11 @@ export class GridCharacter {
       .multiply(directionVector(this.movementDirection));
   }
 
-  private moveCharacterSprite(speed: Vector2, gameObject: GameObject): void {
-    const newPlayerPos = this.getPosition(gameObject).add(speed);
-    this.setPosition(newPlayerPos, gameObject);
+  private moveCharacterSprite(speed: Vector2): void {
+    const newPlayerPos = this.getPixelPosition().add(speed);
     this.tileSizePixelsWalked = this.tileSizePixelsWalked.add(speed.abs());
+    this.setPixelPosition(newPlayerPos);
 
-    if (this.sprite) {
-      this.animation?.updateCharacterFrame(
-        this.movementDirection,
-        this.hasWalkedHalfATile(),
-        Number(this.sprite.frame.name)
-      );
-    }
     this.tileSizePixelsWalked = this.tileSizePixelsWalked.modulo(
       this.tilemap.getTileDistance(this.movementDirection)
     );
@@ -544,7 +446,7 @@ export class GridCharacter {
     this.fire(this.positionChangeFinished$, exitTile, enterTile);
   }
 
-  private hasWalkedHalfATile(): boolean {
+  hasWalkedHalfATile(): boolean {
     return (
       this.tileSizePixelsWalked.x >
         this.tilemap.getTileDistance(this.movementDirection).x / 2 ||

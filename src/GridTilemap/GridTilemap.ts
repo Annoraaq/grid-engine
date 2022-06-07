@@ -119,7 +119,7 @@ export class GridTilemap {
   }
 
   getDepthOfCharLayer(layerName: LayerName): number {
-    return this.charLayerDepths.get(layerName) || 0;
+    return this.charLayerDepths.get(layerName) ?? 0;
   }
 
   isInRange(pos: Vector2): boolean {
