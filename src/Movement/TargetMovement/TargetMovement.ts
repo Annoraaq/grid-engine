@@ -8,7 +8,7 @@ import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Direction } from "../../Direction/Direction";
-import { Movement } from "../Movement";
+import { Movement, MovementInfo } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Retryable } from "./Retryable/Retryable";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
@@ -241,6 +241,21 @@ export class TargetMovement implements Movement {
 
   finishedObs(): Subject<Finished> {
     return this.finished$;
+  }
+
+  getInfo(): MovementInfo {
+    return {
+      type: "Target",
+      config: {
+        ignoreBlockedTarget: this.ignoreBlockedTarget,
+        distance: this.distance,
+        targetPos: this.targetPos,
+        noPathFoundStrategy: this.noPathFoundStrategy,
+        pathBlockedStrategy: this.pathBlockedStrategy,
+        noPathFoundRetryBackoffMs: this.noPathFoundRetryable.getBackoffMs(),
+        noPathFoundMaxRetries: this.noPathFoundRetryable.getMaxRetries(),
+      },
+    };
   }
 
   private resultToReason(result?: MoveToResult): string | undefined {

@@ -31,6 +31,7 @@ import { Utils } from "./Utils/Utils/Utils";
 import { LayerPosition } from "./Pathfinding/ShortestPathAlgorithm";
 import { SpriteUtils } from "./Utils/SpriteUtils/SpriteUtils";
 import { CharacterAnimation } from "./GridCharacter/CharacterAnimation/CharacterAnimation";
+import { MovementInfo } from "./Movement/Movement";
 
 export {
   CollisionStrategy,
@@ -397,6 +398,22 @@ export class GridEngine {
     gridChar.setMovement(randomMovement);
   }
 
+  // TODO test init guard
+  // TODO test method
+  getMovement(charId: string): MovementInfo {
+    this.initGuard();
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+
+    const movement = gridChar.getMovement();
+    if (!movement) {
+      return {
+        type: "none",
+      };
+    }
+    return movement.getInfo();
+  }
+
   /**
    * Initiates movement toward the specified `targetPos`. The movement will
    * happen along one shortest path. Check out {@link MoveToConfig} for
@@ -432,7 +449,6 @@ export class GridEngine {
     );
     gridChar.setMovement(targetMovement);
     return targetMovement.finishedObs().pipe(
-      take(1),
       map((finished: Finished) => ({
         charId,
         position: finished.position,

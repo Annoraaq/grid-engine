@@ -4,7 +4,7 @@ import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { NumberOfDirections } from "./../../Direction/Direction";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Direction, directionVector } from "../../Direction/Direction";
-import { Movement } from "../Movement";
+import { Movement, MovementInfo } from "../Movement";
 import { takeUntil } from "rxjs/operators";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 
@@ -52,6 +52,17 @@ export class RandomMovement implements Movement {
         this.randomizeStepSize();
       }
     }
+  }
+
+  // TODO get numberofDirections from character
+  getInfo(): MovementInfo {
+    return {
+      type: "Random",
+      config: {
+        delay: this.delay,
+        radius: this.radius,
+      },
+    };
   }
 
   private shouldContinueWalkingCurrentDirection(): boolean {

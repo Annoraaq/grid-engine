@@ -48,6 +48,7 @@ const mockGridCharacter = {
 const mockFollowMovement = {
   setCharacter: jest.fn(),
   update: jest.fn(),
+  getInfo: jest.fn(),
 };
 const mockGridTileMap = {
   addCharacter: jest.fn(),
@@ -65,6 +66,7 @@ const mockGridTileMap = {
   hasBlockingChar: jest.fn().mockReturnValue(false),
   getDepthOfCharLayer: jest.fn().mockReturnValue(0),
   getTileDistance: jest.fn().mockReturnValue(new Vector2(1, 1)),
+  isInRange: jest.fn(),
 };
 const mockGridTilemapConstructor = jest.fn(function (
   _tilemap,
@@ -119,26 +121,26 @@ jest.mock("./GridTilemap/GridTilemap", function () {
 //   };
 // });
 
-const mockRandomMovement = {
-  addCharacter: jest.fn(),
-  update: jest.fn(),
-  setNumberOfDirections: jest.fn(),
-};
+// const mockRandomMovement = {
+//   addCharacter: jest.fn(),
+//   update: jest.fn(),
+//   setNumberOfDirections: jest.fn(),
+// };
 
-const mockTargetMovement = {
-  setCharacter: jest.fn(),
-  update: jest.fn(),
-  removeCharacter: jest.fn(),
-  finishedObs: jest.fn().mockReturnValue(of()),
-};
+// const mockTargetMovement = {
+//   setCharacter: jest.fn(),
+//   update: jest.fn(),
+//   removeCharacter: jest.fn(),
+//   finishedObs: jest.fn().mockReturnValue(of()),
+// };
 
-jest.mock("./Movement/RandomMovement/RandomMovement", () => ({
-  RandomMovement: jest.fn(() => mockRandomMovement),
-}));
+// jest.mock("./Movement/RandomMovement/RandomMovement", () => ({
+//   RandomMovement: jest.fn(() => mockRandomMovement),
+// }));
 
-jest.mock("./Movement/TargetMovement/TargetMovement", () => ({
-  TargetMovement: jest.fn(() => mockTargetMovement),
-}));
+// jest.mock("./Movement/TargetMovement/TargetMovement", () => ({
+//   TargetMovement: jest.fn(() => mockTargetMovement),
+// }));
 
 jest.mock("./Movement/FollowMovement/FollowMovement", () => ({
   FollowMovement: jest.fn(function () {
@@ -149,7 +151,7 @@ jest.mock("./Movement/FollowMovement/FollowMovement", () => ({
 jest.mock("./GridTilemap/GridTilemap");
 
 import { GridEngine } from "./GridEngine";
-import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
+// import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import {
   Finished,
   TargetMovement,
@@ -157,6 +159,7 @@ import {
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
+import { Vector } from "matter";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;
@@ -203,8 +206,8 @@ describe("GridEngine", () => {
         name: "1",
       },
     } as any;
-    mockTargetMovement.update.mockReset();
-    mockRandomMovement.update.mockReset();
+    // mockTargetMovement.update.mockReset();
+    // mockRandomMovement.update.mockReset();
     mockGridCharacter.update.mockReset();
     mockFollowMovement.setCharacter.mockReset();
     mockFollowMovement.update.mockReset();
@@ -404,7 +407,6 @@ describe("GridEngine", () => {
     });
   });
 
-  // TODO should be covered already, if so: delete
   it("should use config startPosition", () => {
     gridEngine.create(tileMapMock, {
       characters: [
@@ -419,7 +421,6 @@ describe("GridEngine", () => {
     expect(gridEngine.getPosition("player")).toEqual(new Vector2(3, 4));
   });
 
-  // TODO should be covered already, if so: delete
   it("should use config speed", () => {
     gridEngine.create(tileMapMock, {
       characters: [
@@ -671,13 +672,6 @@ describe("GridEngine", () => {
     });
   });
 
-  // TODO better test side effects. So this method is already covered most likely.
-  // xit("should update", () => {
-  //   gridEngine.update(123, 456);
-
-  //   expect(mockGridCharacter.update).toHaveBeenCalledWith(456);
-  // });
-
   it("should set tile position", () => {
     gridEngine.setPosition("player", { x: 3, y: 4 }, "someOtherLayer");
     expect(gridEngine.getPosition("player")).toEqual({ x: 3, y: 4 });
@@ -703,43 +697,32 @@ describe("GridEngine", () => {
     expect(gridEngine.getFacingPosition("player")).toEqual({ x: 1, y: 0 });
   });
 
-  // TODO check movement
-  xit("should move randomly", () => {
+  it("should move randomly", () => {
     gridEngine.moveRandomly("player", 123, 3);
-    expect(RandomMovement).toHaveBeenCalledWith(
-      // @ts-ignore
-      expect.toBeCharacter("player"),
-      NumberOfDirections.FOUR,
-      123,
-      3
-    );
-    expect(mockGridCharacter.setMovement).toHaveBeenCalledWith(
-      mockRandomMovement
-    );
+    expect(gridEngine.getMovement("player")).toEqual({
+      type: "Random",
+      config: {
+        delay: 123,
+        radius: 3,
+      },
+    });
   });
 
   describe("moveTo", () => {
-    // TODO check movement
-    xit("should move to coordinates", () => {
+    it("should move to coordinates", () => {
+      console.warn = jest.fn();
       const targetVec = { position: new Vector2(3, 4), layer: "layer1" };
       gridEngine.moveTo("player", targetVec.position);
-      expect(TargetMovement).toHaveBeenCalledWith(
-        // @ts-ignore
-        expect.toBeCharacter("player"),
-        mockGridTileMap,
-        { position: targetVec.position, layer: undefined },
-        {
-          numberOfDirections: NumberOfDirections.FOUR,
+      expect(gridEngine.getMovement("player")).toEqual({
+        type: "Target",
+        config: expect.objectContaining({
+          ignoreBlockedTarget: false,
           distance: 0,
-          config: {
-            noPathFoundStrategy: NoPathFoundStrategy.STOP,
-            pathBlockedStrategy: PathBlockedStrategy.WAIT,
-          },
-        }
-      );
-      expect(mockGridCharacter.setMovement).toHaveBeenCalledWith(
-        mockTargetMovement
-      );
+          targetPos: { position: targetVec.position, layer: undefined },
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+        }),
+      });
       expect(console.warn).not.toHaveBeenCalled();
     });
 
@@ -748,58 +731,32 @@ describe("GridEngine", () => {
       gridEngine.moveTo("player", targetVec.position, {
         targetLayer: "layer1",
       });
-      expect(TargetMovement).toHaveBeenCalledWith(
-        // @ts-ignore
-        expect.toBeCharacter("player"),
-        mockGridTileMap,
-        targetVec,
-        {
-          numberOfDirections: NumberOfDirections.FOUR,
+
+      expect(gridEngine.getMovement("player")).toEqual({
+        type: "Target",
+        config: expect.objectContaining({
           distance: 0,
-          config: {
-            noPathFoundStrategy: NoPathFoundStrategy.STOP,
-            pathBlockedStrategy: PathBlockedStrategy.WAIT,
-            targetLayer: "layer1",
-          },
-        }
-      );
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+          targetPos: targetVec,
+          ignoreBlockedTarget: false,
+        }),
+      });
     });
 
     it("should return observable", (done) => {
-      const finishedSubject = new Subject<Finished>();
-      mockTargetMovement.finishedObs.mockReturnValue(finishedSubject);
-      const targetVec = new Vector2(3, 4);
+      const targetVec = new Vector2(-1, 0);
       gridEngine.moveTo("player", targetVec).subscribe((finished) => {
-        expect(finished.charId).toEqual("player");
-        expect(finished.position).toEqual({ x: 1, y: 2 });
-        expect(finished.description).toEqual("errorReason");
+        expect(finished).toEqual({
+          charId: "player",
+          position: new Vector2(0, 0),
+          result: "NO_PATH_FOUND",
+          description: "NoPathFoundStrategy STOP: No path found.",
+          layer: undefined,
+        });
         done();
       });
-      finishedSubject.next(<Finished>{
-        position: { x: 1, y: 2 },
-        result: "PATH_BLOCKED",
-        description: "errorReason",
-      });
-    });
-
-    it("should return observable only once", (done) => {
-      const finishedSubject = new Subject<Finished>();
-      mockTargetMovement.finishedObs.mockReturnValue(finishedSubject);
-      const targetVec = new Vector2(3, 4);
-      const callMock = jest.fn();
-      gridEngine.moveTo("player", targetVec).subscribe(callMock).add(done);
-      finishedSubject.next(<Finished>{
-        position: { x: 1, y: 2 },
-        result: "PATH_BLOCKED",
-        description: "errorReason",
-      });
-      finishedSubject.next(<Finished>{
-        position: { x: 1, y: 2 },
-        result: "PATH_BLOCKED",
-        description: "errorReason",
-      });
-
-      expect(callMock).toHaveBeenCalledTimes(1);
+      gridEngine.update(2000, 1000);
     });
 
     it("should use backoff and retry", () => {
@@ -808,19 +765,21 @@ describe("GridEngine", () => {
         noPathFoundRetryBackoffMs: 500,
         noPathFoundMaxRetries: 10,
       });
-      expect(TargetMovement).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        expect.objectContaining({
-          config: {
-            noPathFoundStrategy: NoPathFoundStrategy.STOP,
-            pathBlockedStrategy: PathBlockedStrategy.WAIT,
-            noPathFoundRetryBackoffMs: 500,
-            noPathFoundMaxRetries: 10,
+      expect(gridEngine.getMovement("player")).toEqual({
+        type: "Target",
+        config: {
+          distance: 0,
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+          noPathFoundRetryBackoffMs: 500,
+          noPathFoundMaxRetries: 10,
+          targetPos: {
+            position: targetVec,
+            layer: undefined,
           },
-        })
-      );
+          ignoreBlockedTarget: false,
+        },
+      });
     });
 
     it("should move to coordinates STOP", () => {
@@ -828,17 +787,13 @@ describe("GridEngine", () => {
       gridEngine.moveTo("player", targetVec, {
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
       });
-      expect(TargetMovement).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        expect.objectContaining({
-          config: {
-            noPathFoundStrategy: NoPathFoundStrategy.STOP,
-            pathBlockedStrategy: PathBlockedStrategy.WAIT,
-          },
-        })
-      );
+      expect(gridEngine.getMovement("player")).toEqual({
+        type: "Target",
+        config: expect.objectContaining({
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+        }),
+      });
     });
 
     it("should move to coordinates CLOSEST_REACHABLE", () => {
@@ -846,17 +801,13 @@ describe("GridEngine", () => {
       gridEngine.moveTo("player", targetVec, {
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
       });
-      expect(TargetMovement).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        expect.objectContaining({
-          config: {
-            noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
-            pathBlockedStrategy: PathBlockedStrategy.WAIT,
-          },
-        })
-      );
+      expect(gridEngine.getMovement("player")).toEqual({
+        type: "Target",
+        config: expect.objectContaining({
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+        }),
+      });
     });
 
     it("should move to coordinates STOP on unknown strategy", () => {
@@ -865,17 +816,13 @@ describe("GridEngine", () => {
       gridEngine.moveTo("player", targetVec, {
         noPathFoundStrategy: <NoPathFoundStrategy>"unknown strategy",
       });
-      expect(TargetMovement).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        expect.objectContaining({
-          config: {
-            noPathFoundStrategy: NoPathFoundStrategy.STOP,
-            pathBlockedStrategy: PathBlockedStrategy.WAIT,
-          },
-        })
-      );
+      expect(gridEngine.getMovement("player")).toEqual({
+        type: "Target",
+        config: expect.objectContaining({
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+        }),
+      });
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Unknown NoPathFoundStrategy 'unknown strategy'. Falling back to 'STOP'"
       );
@@ -887,17 +834,13 @@ describe("GridEngine", () => {
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
         pathBlockedStrategy: PathBlockedStrategy.WAIT,
       });
-      expect(TargetMovement).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        expect.objectContaining({
-          config: {
-            noPathFoundStrategy: NoPathFoundStrategy.STOP,
-            pathBlockedStrategy: PathBlockedStrategy.WAIT,
-          },
-        })
-      );
+      expect(gridEngine.getMovement("player")).toEqual({
+        type: "Target",
+        config: expect.objectContaining({
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+        }),
+      });
     });
 
     it("should use pathBlockedStrategy = RETRY", () => {
@@ -906,17 +849,13 @@ describe("GridEngine", () => {
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
         pathBlockedStrategy: PathBlockedStrategy.RETRY,
       });
-      expect(TargetMovement).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        expect.objectContaining({
-          config: {
-            noPathFoundStrategy: NoPathFoundStrategy.STOP,
-            pathBlockedStrategy: PathBlockedStrategy.RETRY,
-          },
-        })
-      );
+      expect(gridEngine.getMovement("player")).toEqual({
+        type: "Target",
+        config: expect.objectContaining({
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.RETRY,
+        }),
+      });
     });
 
     it("should use pathBlockedStrategy WAIT and warn on unkown input", () => {
@@ -926,17 +865,13 @@ describe("GridEngine", () => {
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
         pathBlockedStrategy: <PathBlockedStrategy>"unknown strategy",
       });
-      expect(TargetMovement).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        expect.objectContaining({
-          config: {
-            noPathFoundStrategy: NoPathFoundStrategy.STOP,
-            pathBlockedStrategy: PathBlockedStrategy.WAIT,
-          },
-        })
-      );
+      expect(gridEngine.getMovement("player")).toEqual({
+        type: "Target",
+        config: expect.objectContaining({
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          pathBlockedStrategy: PathBlockedStrategy.WAIT,
+        }),
+      });
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Unknown PathBlockedStrategy 'unknown strategy'. Falling back to 'WAIT'"
       );
@@ -955,10 +890,11 @@ describe("GridEngine", () => {
     expect(gridEngine.getSpeed("player")).toEqual(2);
   });
 
-  it("should not call update before create", () => {
-    gridEngine.update(123, 456);
-    expect(mockRandomMovement.update).not.toHaveBeenCalled();
-    expect(mockTargetMovement.update).not.toHaveBeenCalled();
+  // TODO
+  xit("should not call update before create", () => {
+    // gridEngine.update(123, 456);
+    // expect(mockRandomMovement.update).not.toHaveBeenCalled();
+    // expect(mockTargetMovement.update).not.toHaveBeenCalled();
   });
 
   it("should add chars on the go", () => {

@@ -3,7 +3,7 @@ import { NumberOfDirections } from "./../../Direction/Direction";
 import { GridTilemap, LayerName } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
-import { Movement } from "../Movement";
+import { Movement, MovementInfo } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Position } from "../../GridEngine";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
@@ -40,6 +40,17 @@ export class FollowMovement implements Movement {
 
   update(delta: number): void {
     this.targetMovement?.update(delta);
+  }
+
+  getInfo(): MovementInfo {
+    return {
+      type: "Follow",
+      config: {
+        charToFollow: this.charToFollow.getId(),
+        distance: this.distance,
+        noPathFoundStrategy: this.noPathFoundStrategy,
+      },
+    };
   }
 
   private updateTarget(targetPos: Position, targetLayer: LayerName): void {
