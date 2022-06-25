@@ -306,6 +306,10 @@ export class GridCharacter {
     return this.depthChanged$;
   }
 
+  getPixelPos(): Vector2 {
+    return this.pixelPosition.clone();
+  }
+
   private updateCharacterPosition(delta: number): void {
     const maxMovementForDelta = this.getSpeedPerDelta(delta);
     const distToNextTile = this.getDistToNextTile();

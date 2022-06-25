@@ -463,6 +463,78 @@ export class GridEngine {
     gridChar.setSpeed(speed);
   }
 
+  // TODO test initGuard
+  /** @returns Speed in tiles per second for a character. */
+  getSpeed(charId: string): number {
+    this.initGuard();
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.getSpeed();
+  }
+
+  // TODO test initGuard
+  /** @returns Container for a character. */
+  getContainer(charId: string): Phaser.GameObjects.Container | undefined {
+    this.initGuard();
+    const gridChar = this.gridCharacters.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.getContainer();
+  }
+
+  // TODO test initGuard
+  /** @returns X-offset for a character. */
+  getOffsetX(charId: string): number {
+    this.initGuard();
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.getOffsetX();
+  }
+
+  // TODO test initGuard
+  /** @returns Y-offset for a character. */
+  getOffsetY(charId: string): number {
+    this.initGuard();
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.getOffsetY();
+  }
+
+  // TODO test initGuard
+  /** @returns Whether character collides with tiles */
+  collidesWithTiles(charId: string): boolean {
+    this.initGuard();
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.collidesWithTiles();
+  }
+
+  // TODO test initGuard and logic
+  /**
+   * @returns {@link WalkingAnimationMapping} for a character. If a character
+   * index was set, it will be returned instead.
+   */
+  getWalkingAnimationMapping(
+    charId: string
+  ): WalkingAnimationMapping | number | undefined {
+    this.initGuard();
+    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    const animation = gridChar.getAnimation();
+    if (animation?.getCharacterIndex() !== -1) {
+      return animation?.getCharacterIndex();
+    }
+    return animation?.getWalkingAnimationMapping();
+  }
+
+  // TODO test
+  /**
+   * @returns `true` if {@link https://annoraaq.github.io/grid-engine/features/layer-overlay | layer overlay}
+   * is activated.
+   */
+  hasLayerOverlay(): boolean {
+    return GlobalConfig.get().layerOverlay;
+  }
+
   /**
    * Sets the {@link WalkingAnimationMapping} for a character. Alternatively you
    * can provide a number which is the character index (see also
@@ -481,6 +553,7 @@ export class GridEngine {
     if (typeof walkingAnimationMapping == "number") {
       animation?.setCharacterIndex(walkingAnimationMapping);
     } else {
+      animation?.setCharacterIndex(-1);
       animation?.setWalkingAnimationMapping(walkingAnimationMapping);
     }
   }
@@ -515,37 +588,6 @@ export class GridEngine {
       GlobalConfig.get().layerOverlay
     );
     const gridChar = gridCharPhaser.getGridCharacter();
-
-    gridChar
-      .pixelPositionChanged()
-      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
-      .subscribe((pixelPos: Vector2) => {
-        const gameObj =
-          gridCharPhaser.getContainer() || gridCharPhaser.getSprite();
-        if (gameObj) {
-          gameObj.x = pixelPos.x;
-          gameObj.y = pixelPos.y;
-        }
-
-        const sprite = gridCharPhaser.getSprite();
-        if (sprite) {
-          if (gridChar.isMoving()) {
-            gridChar
-              .getAnimation()
-              ?.updateCharacterFrame(
-                gridChar.getMovementDirection(),
-                gridChar.hasWalkedHalfATile(),
-                Number(sprite.frame.name)
-              );
-          } else {
-            gridChar
-              .getAnimation()
-              ?.setStandingFrame(gridChar.getFacingDirection());
-          }
-        }
-
-        this.setD(gridCharPhaser);
-      });
 
     this.gridCharacters.set(charData.id, gridCharPhaser);
 
@@ -790,6 +832,7 @@ export class GridEngine {
     sprite: Phaser.GameObjects.Sprite,
     gridCharPhaser: GridCharacterPhaser
   ) {
+    // TODO: move this to GridCharPhaser
     sprite.setOrigin(0, 0);
     const oldSprite = gridCharPhaser.getSprite();
     if (oldSprite) {

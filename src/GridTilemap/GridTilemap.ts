@@ -280,10 +280,7 @@ export class GridTilemap {
         this.setDepth(layerData, ++offset);
       }
     });
-    otherLayers.forEach((layerData) => {
-      if (this.isCharLayer(layerData)) return;
-      this.charLayerDepths.set(undefined, offset);
-    });
+    this.charLayerDepths.set(undefined, offset);
     alwaysOnTopLayers.forEach((layer, layerIndex) => {
       layer.tilemapLayer.setDepth(layerIndex + 1 + offset);
     });

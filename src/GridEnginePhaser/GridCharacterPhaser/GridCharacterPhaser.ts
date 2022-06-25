@@ -1,6 +1,9 @@
 import { GridTilemap, LayerName } from "./../../GridTilemap/GridTilemap";
-// import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
-import { CharConfig, GridCharacter } from "../../GridCharacter/GridCharacter";
+import {
+  CharConfig,
+  GameObject,
+  GridCharacter,
+} from "../../GridCharacter/GridCharacter";
 import { CharacterData, Direction } from "../../GridEngine";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CharacterAnimation } from "../../GridCharacter/CharacterAnimation/CharacterAnimation";
@@ -22,6 +25,34 @@ export class GridCharacterPhaser {
     private tilemap: GridTilemap,
     private layerOverlay: boolean
   ) {}
+
+  getGridCharacter(): GridCharacter {
+    return this.gridCharacter;
+  }
+
+  setSprite(sprite?: Phaser.GameObjects.Sprite): void {
+    this.sprite = sprite;
+  }
+
+  getSprite(): Phaser.GameObjects.Sprite | undefined {
+    return this.sprite;
+  }
+
+  setLayerOverlaySprite(sprite?: Phaser.GameObjects.Sprite): void {
+    this.layerOverlaySprite = sprite;
+  }
+
+  getLayerOverlaySprite(): Phaser.GameObjects.Sprite | undefined {
+    return this.layerOverlaySprite;
+  }
+
+  setContainer(container?: Phaser.GameObjects.Container): void {
+    this.container = container;
+  }
+
+  getContainer(): Phaser.GameObjects.Container | undefined {
+    return this.container;
+  }
 
   private createChar(
     charData: CharacterData,
@@ -126,46 +157,72 @@ export class GridCharacterPhaser {
       // );
     }
 
+    // TODO takeUntil
+    gridChar.pixelPositionChanged().subscribe((pixelPos: Vector2) => {
+      const gameObj = this.container || this.sprite;
+      if (gameObj) {
+        gameObj.x = pixelPos.x;
+        gameObj.y = pixelPos.y;
+      }
+
+      if (this.sprite) {
+        if (gridChar.isMoving()) {
+          gridChar
+            .getAnimation()
+            ?.updateCharacterFrame(
+              gridChar.getMovementDirection(),
+              gridChar.hasWalkedHalfATile(),
+              Number(this.sprite.frame.name)
+            );
+        } else {
+          // I don't think this is necessary because if a char's tile pos is changed
+          // when it is not moving, the animation should not be changed either.
+          // gridChar
+          //   .getAnimation()
+          //   ?.setStandingFrame(gridChar.getFacingDirection());
+        }
+      }
+
+      this.updateDepth();
+    });
+
     return gridChar;
   }
 
-  private getPaddedPixelDepth(sprite: Phaser.GameObjects.Sprite): number {
-    return Utils.shiftPad(sprite.y + sprite.displayHeight, 7);
+  private updateDepth() {
+    const gameObject = this.getContainer() || this.getSprite();
+
+    if (!gameObject) return;
+    this.setDepth(gameObject, this.getGridCharacter().getNextTilePos());
+    const layerOverlaySprite = this.getLayerOverlaySprite();
+
+    if (layerOverlaySprite) {
+      const posAbove = new Vector2({
+        ...this.getGridCharacter().getNextTilePos().position,
+        y: this.getGridCharacter().getNextTilePos().position.y - 1,
+      });
+      this.setDepth(layerOverlaySprite, {
+        position: posAbove,
+        layer: this.getGridCharacter().getNextTilePos().layer,
+      });
+    }
+  }
+
+  private setDepth(gameObject: GameObject, position: LayerPosition): void {
+    gameObject.setDepth(
+      this.tilemap.getDepthOfCharLayer(this.getTransitionLayer(position)) +
+        this.getPaddedPixelDepth(gameObject)
+    );
+  }
+
+  private getPaddedPixelDepth(gameObject: GameObject): number {
+    return Utils.shiftPad(gameObject.y + gameObject.displayHeight, 7);
   }
 
   private getTransitionLayer(position: LayerPosition): LayerName {
-    console.log("tranlay", position);
     return (
       this.tilemap.getTransition(position.position, position.layer) ||
       position.layer
     );
-  }
-
-  getGridCharacter(): GridCharacter {
-    return this.gridCharacter;
-  }
-
-  setSprite(sprite?: Phaser.GameObjects.Sprite): void {
-    this.sprite = sprite;
-  }
-
-  getSprite(): Phaser.GameObjects.Sprite | undefined {
-    return this.sprite;
-  }
-
-  setLayerOverlaySprite(sprite?: Phaser.GameObjects.Sprite): void {
-    this.layerOverlaySprite = sprite;
-  }
-
-  getLayerOverlaySprite(): Phaser.GameObjects.Sprite | undefined {
-    return this.layerOverlaySprite;
-  }
-
-  setContainer(container?: Phaser.GameObjects.Container): void {
-    this.container = container;
-  }
-
-  getContainer(): Phaser.GameObjects.Container | undefined {
-    return this.container;
   }
 }
