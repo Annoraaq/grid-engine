@@ -30,7 +30,6 @@ import { Concrete } from "./Utils/TypeUtils";
 import { Utils } from "./Utils/Utils/Utils";
 import { LayerPosition } from "./Pathfinding/ShortestPathAlgorithm";
 import { SpriteUtils } from "./Utils/SpriteUtils/SpriteUtils";
-import { CharacterAnimation } from "./GridCharacter/CharacterAnimation/CharacterAnimation";
 import { MovementInfo } from "./Movement/Movement";
 
 export {
@@ -841,6 +840,7 @@ export class GridEngine {
     const gridCharPhaser = this.gridCharacters.get(charId);
     if (!gridCharPhaser) throw this.createCharUnknownErr(charId);
     sprite.setOrigin(0, 0);
+
     this.setCharSprite(sprite, gridCharPhaser);
   }
 
@@ -848,64 +848,62 @@ export class GridEngine {
     sprite: Phaser.GameObjects.Sprite,
     gridCharPhaser: GridCharacterPhaser
   ) {
-    // TODO: move this to GridCharPhaser
-    sprite.setOrigin(0, 0);
-    const oldSprite = gridCharPhaser.getSprite();
-    if (oldSprite) {
-      sprite.x = oldSprite.x;
-      sprite.y = oldSprite.y;
-    }
     gridCharPhaser.setSprite(sprite);
-    const gridChar = gridCharPhaser.getGridCharacter();
 
-    if (!gridChar.getAnimation()) {
-      const animation = new CharacterAnimation(
-        gridChar.getWalkingAnimationMapping(),
-        gridChar.getCharacterIndex(),
-        sprite.texture.source[0].width /
-          sprite.width /
-          CharacterAnimation.FRAMES_CHAR_ROW
-      );
-      gridChar.setAnimation(animation);
-
-      animation.frameChange().subscribe((frameNo) => {
-        sprite.setFrame(frameNo);
-      });
-    }
-
-    gridChar
-      .getAnimation()
-      ?.setIsEnabled(
-        gridChar.getWalkingAnimationMapping() !== undefined ||
-          gridChar.getCharacterIndex() !== -1
-      );
-    gridChar.getAnimation()?.setStandingFrame(Direction.DOWN);
-
-    this.setD(gridCharPhaser);
+    // TODO: move this to GridCharPhaser
+    // sprite.setOrigin(0, 0);
+    // const oldSprite = gridCharPhaser.getSprite();
+    // if (oldSprite) {
+    //   sprite.x = oldSprite.x;
+    //   sprite.y = oldSprite.y;
+    // }
+    // gridCharPhaser.setSprite(sprite);
+    // const gridChar = gridCharPhaser.getGridCharacter();
+    // if (!gridChar.getAnimation()) {
+    //   const animation = new CharacterAnimation(
+    //     gridChar.getWalkingAnimationMapping(),
+    //     gridChar.getCharacterIndex(),
+    //     sprite.texture.source[0].width /
+    //       sprite.width /
+    //       CharacterAnimation.FRAMES_CHAR_ROW
+    //   );
+    //   gridChar.setAnimation(animation);
+    //   animation.frameChange().subscribe((frameNo) => {
+    //     sprite.setFrame(frameNo);
+    //   });
+    // }
+    // gridChar
+    //   .getAnimation()
+    //   ?.setIsEnabled(
+    //     gridChar.getWalkingAnimationMapping() !== undefined ||
+    //       gridChar.getCharacterIndex() !== -1
+    //   );
+    // gridChar.getAnimation()?.setStandingFrame(Direction.DOWN);
+    // this.setD(gridCharPhaser);
   }
 
-  private setD(gridCharPhaser: GridCharacterPhaser) {
-    const gameObject =
-      gridCharPhaser.getContainer() || gridCharPhaser.getSprite();
+  // private setD(gridCharPhaser: GridCharacterPhaser) {
+  //   const gameObject =
+  //     gridCharPhaser.getContainer() || gridCharPhaser.getSprite();
 
-    if (!gameObject) return;
-    this.setDepth(
-      gameObject,
-      gridCharPhaser.getGridCharacter().getNextTilePos()
-    );
-    const layerOverlaySprite = gridCharPhaser.getLayerOverlaySprite();
+  //   if (!gameObject) return;
+  //   this.setDepth(
+  //     gameObject,
+  //     gridCharPhaser.getGridCharacter().getNextTilePos()
+  //   );
+  //   const layerOverlaySprite = gridCharPhaser.getLayerOverlaySprite();
 
-    if (layerOverlaySprite) {
-      const posAbove = new Vector2({
-        ...gridCharPhaser.getGridCharacter().getNextTilePos().position,
-        y: gridCharPhaser.getGridCharacter().getNextTilePos().position.y - 1,
-      });
-      this.setDepth(layerOverlaySprite, {
-        position: posAbove,
-        layer: gridCharPhaser.getGridCharacter().getNextTilePos().layer,
-      });
-    }
-  }
+  //   if (layerOverlaySprite) {
+  //     const posAbove = new Vector2({
+  //       ...gridCharPhaser.getGridCharacter().getNextTilePos().position,
+  //       y: gridCharPhaser.getGridCharacter().getNextTilePos().position.y - 1,
+  //     });
+  //     this.setDepth(layerOverlaySprite, {
+  //       position: posAbove,
+  //       layer: gridCharPhaser.getGridCharacter().getNextTilePos().layer,
+  //     });
+  //   }
+  // }
 
   /**
    * Checks whether the given position is blocked by either the tilemap or a

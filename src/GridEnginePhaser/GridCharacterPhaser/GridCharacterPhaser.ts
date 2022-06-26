@@ -31,15 +31,21 @@ export class GridCharacterPhaser {
   }
 
   setSprite(sprite?: Phaser.GameObjects.Sprite): void {
-    this.sprite = sprite;
+    if (sprite) {
+      if (this.sprite) {
+        sprite.x = this.sprite.x;
+        sprite.y = this.sprite.y;
+      }
+      this.sprite = sprite;
+      this.updateOverlaySprite();
+    } else {
+      this.layerOverlaySprite = undefined;
+      this.sprite = undefined;
+    }
   }
 
   getSprite(): Phaser.GameObjects.Sprite | undefined {
     return this.sprite;
-  }
-
-  setLayerOverlaySprite(sprite?: Phaser.GameObjects.Sprite): void {
-    this.layerOverlaySprite = sprite;
   }
 
   getLayerOverlaySprite(): Phaser.GameObjects.Sprite | undefined {
@@ -121,18 +127,7 @@ export class GridCharacterPhaser {
       );
       animation.setStandingFrame(Direction.DOWN);
 
-      if (this.sprite && this.layerOverlaySprite) {
-        this.layerOverlaySprite.scale = this.sprite.scale;
-        const scaledTileHeight =
-          this.tilemap.getTileHeight() / this.layerOverlaySprite.scale;
-        this.layerOverlaySprite.setCrop(
-          0,
-          0,
-          this.layerOverlaySprite.displayWidth,
-          this.sprite.height - scaledTileHeight
-        );
-        this.layerOverlaySprite.setOrigin(0, 0);
-      }
+      this.updateOverlaySprite();
 
       // TODO: maybe move to GridCharacter since it has nothing to do with phaser
       if (charData.facingDirection) {
@@ -187,6 +182,21 @@ export class GridCharacterPhaser {
     });
 
     return gridChar;
+  }
+
+  private updateOverlaySprite() {
+    if (!this.layerOverlaySprite || !this.sprite) return;
+
+    this.layerOverlaySprite.scale = this.sprite.scale;
+    const scaledTileHeight =
+      this.tilemap.getTileHeight() / this.layerOverlaySprite.scale;
+    this.layerOverlaySprite.setCrop(
+      0,
+      0,
+      this.layerOverlaySprite.displayWidth,
+      this.sprite.height - scaledTileHeight
+    );
+    this.layerOverlaySprite.setOrigin(0, 0);
   }
 
   private updateDepth() {

@@ -11,34 +11,39 @@ import { CharacterData } from "../../GridEngine";
   // do nothing
 })(Phaser);
 
+function createSpriteMock() {
+  return {
+    x: 10,
+    y: 12,
+    displayWidth: 20,
+    displayHeight: 40,
+    width: 20,
+    height: 20,
+    setOrigin: jest.fn(),
+    texture: {
+      source: [{ width: 240 }],
+    },
+    setFrame: jest.fn(function (name) {
+      this.frame.name = name;
+    }),
+    setDepth: jest.fn(),
+    scale: 2,
+    frame: {
+      name: "1",
+    },
+  } as any;
+}
+
 describe("GridCharacterPhaser", () => {
   let gridTilemap: GridTilemap;
   let tilemapMock;
-  let mockNewSprite;
+  let overlaySpriteMock;
   let sceneMock;
   let blankLayerMock;
   let spriteMock;
 
   beforeEach(() => {
-    spriteMock = {
-      x: 10,
-      y: 12,
-      displayWidth: 20,
-      displayHeight: 40,
-      width: 20,
-      setOrigin: jest.fn(),
-      texture: {
-        source: [{ width: 240 }],
-      },
-      setFrame: jest.fn(function (name) {
-        this.frame.name = name;
-      }),
-      setDepth: jest.fn(),
-      scale: 2,
-      frame: {
-        name: "1",
-      },
-    } as any;
+    spriteMock = createSpriteMock();
     blankLayerMock = {
       scale: 0,
       putTileAt: jest.fn(),
@@ -83,7 +88,7 @@ describe("GridCharacterPhaser", () => {
       hasTileAt: jest.fn().mockReturnValue(true),
       createBlankLayer: jest.fn().mockReturnValue(blankLayerMock),
     };
-    mockNewSprite = {
+    overlaySpriteMock = {
       setCrop: jest.fn(),
       setOrigin: jest.fn(),
       scale: 1,
@@ -94,7 +99,7 @@ describe("GridCharacterPhaser", () => {
     };
     sceneMock = {
       sys: { events: { once: jest.fn(), on: jest.fn() } },
-      add: { sprite: jest.fn().mockReturnValue(mockNewSprite) },
+      add: { sprite: jest.fn().mockReturnValue(overlaySpriteMock) },
     };
     gridTilemap = new GridTilemap(tilemapMock);
   });
@@ -131,7 +136,7 @@ describe("GridCharacterPhaser", () => {
       const gridChar = gridCharPhaser.getGridCharacter();
       expect(gridChar.getId()).toBe("charID");
       expect(gridCharPhaser.getSprite()).toBe(spriteMock);
-      expect(gridCharPhaser.getLayerOverlaySprite()).toBe(mockNewSprite);
+      expect(gridCharPhaser.getLayerOverlaySprite()).toBe(overlaySpriteMock);
       expect(gridChar.getWalkingAnimationMapping()).toBe(walkingAnimationMock);
       expect(gridChar.getCharacterIndex()).toBe(-1);
       expect(gridChar.getSpeed()).toBe(5);
@@ -201,16 +206,16 @@ describe("GridCharacterPhaser", () => {
         walkingAnimationMapping: 3,
       };
       createChar(charData, true);
-      expect(mockNewSprite.scale).toEqual(spriteMock.scale);
-      expect(mockNewSprite.setCrop).toHaveBeenCalledWith(
+      expect(overlaySpriteMock.scale).toEqual(spriteMock.scale);
+      expect(overlaySpriteMock.setCrop).toHaveBeenCalledWith(
         0,
         0,
-        mockNewSprite.displayWidth,
+        overlaySpriteMock.displayWidth,
         spriteMock.height -
           (tilemapMock.tileHeight * tilemapMock.layers[0].tilemapLayer.scale) /
-            mockNewSprite.scale
+            overlaySpriteMock.scale
       );
-      expect(mockNewSprite.setOrigin).toHaveBeenCalledWith(0, 0);
+      expect(overlaySpriteMock.setOrigin).toHaveBeenCalledWith(0, 0);
     });
 
     // it("should set depth of sprite on creation", () => {
@@ -370,17 +375,6 @@ describe("GridCharacterPhaser", () => {
       expect(gridCharPhaser.getSprite()).toBe(spriteMock);
     });
 
-    it("should keep a layer overlay sprite", () => {
-      const charData = {
-        id: "charID",
-      };
-      const gridCharPhaser = createChar(charData, false);
-      const spriteMock = {} as any;
-      gridCharPhaser.setLayerOverlaySprite(spriteMock);
-
-      expect(gridCharPhaser.getLayerOverlaySprite()).toBe(spriteMock);
-    });
-
     it("should keep a container", () => {
       const charData = {
         id: "charID",
@@ -390,6 +384,61 @@ describe("GridCharacterPhaser", () => {
       gridCharPhaser.setContainer(containerMock);
 
       expect(gridCharPhaser.getContainer()).toBe(containerMock);
+    });
+  });
+
+  describe("set new sprite", () => {
+    it("should set overlay sprite properties", () => {
+      const charData = {
+        id: "charID",
+        sprite: spriteMock,
+        walkingAnimationMapping: 3,
+      };
+      const gridCharPhaser = createChar(charData, true);
+      const newSpriteMock = createSpriteMock();
+      newSpriteMock.scale = 20;
+      newSpriteMock.height = 200;
+      gridCharPhaser.setSprite(newSpriteMock);
+
+      expect(overlaySpriteMock.scale).toEqual(newSpriteMock.scale);
+      expect(overlaySpriteMock.setCrop).toHaveBeenCalledWith(
+        0,
+        0,
+        overlaySpriteMock.displayWidth,
+        newSpriteMock.height -
+          (tilemapMock.tileHeight * tilemapMock.layers[0].tilemapLayer.scale) /
+            overlaySpriteMock.scale
+      );
+      expect(overlaySpriteMock.setOrigin).toHaveBeenCalledWith(0, 0);
+    });
+
+    it("should set old sprite position", () => {
+      const charData = {
+        id: "charID",
+        sprite: spriteMock,
+        walkingAnimationMapping: 3,
+      };
+      const gridCharPhaser = createChar(charData, true);
+      gridCharPhaser
+        .getGridCharacter()
+        .setTilePosition({ position: new Vector2(3, 2), layer: undefined });
+      const newSpriteMock = createSpriteMock();
+      gridCharPhaser.setSprite(newSpriteMock);
+
+      expect(newSpriteMock.x).toEqual(spriteMock.x);
+      expect(newSpriteMock.y).toEqual(spriteMock.y);
+    });
+
+    it("should unset sprite", () => {
+      const charData = {
+        id: "charID",
+        sprite: spriteMock,
+        walkingAnimationMapping: 3,
+      };
+      const gridCharPhaser = createChar(charData, true);
+      gridCharPhaser.setSprite(undefined);
+      expect(gridCharPhaser.getSprite()).toBeUndefined();
+      expect(gridCharPhaser.getLayerOverlaySprite()).toBeUndefined();
     });
   });
 
@@ -556,8 +605,9 @@ describe("GridCharacterPhaser", () => {
         gridChar.move(Direction.RIGHT);
         gridChar.update(10);
 
-        const pixelDepth = mockNewSprite.y + mockNewSprite.displayHeight;
-        expect(mockNewSprite.setDepth).toHaveBeenCalledWith(
+        const pixelDepth =
+          overlaySpriteMock.y + overlaySpriteMock.displayHeight;
+        expect(overlaySpriteMock.setDepth).toHaveBeenCalledWith(
           +`${lowerCharLayerDepth}.00000${pixelDepth}`
         );
       });
