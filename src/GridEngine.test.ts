@@ -1,50 +1,10 @@
 import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { GlobalConfig } from "./GlobalConfig/GlobalConfig";
-import { Subject, of } from "rxjs";
 import { take } from "rxjs/operators";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
-import { GridCharacter, PositionChange } from "./GridCharacter/GridCharacter";
+import { GridCharacter } from "./GridCharacter/GridCharacter";
 import { Vector2 } from "./Utils/Vector2/Vector2";
 
-const mockCharacterAnimation = {
-  setCharacterIndex: jest.fn(),
-  setWalkingAnimationMapping: jest.fn(),
-};
-
-const mockGridCharacter = {
-  setTilePosition: jest.fn(),
-  move: jest.fn(),
-  update: jest.fn(),
-  getTilePos: jest.fn(() => ({
-    position: new Vector2(0, 0),
-    layer: "someLayer",
-  })),
-  getNextTilePos: jest.fn(() => ({
-    position: new Vector2(0, 0),
-    layer: "someLayer",
-  })),
-  setSpeed: jest.fn(),
-  setWalkingAnimationMapping: jest.fn(),
-  movementStarted: jest.fn(),
-  movementStopped: jest.fn(),
-  directionChanged: jest.fn(),
-  positionChangeStarted: jest.fn(),
-  positionChangeFinished: jest.fn(),
-  isMoving: jest.fn(),
-  getFacingDirection: jest.fn(),
-  getFacingPosition: jest.fn(),
-  turnTowards: jest.fn(),
-  setMovement: jest.fn(),
-  getMovement: jest.fn(),
-  getSprite: jest.fn(),
-  setSprite: jest.fn(),
-  setCharLayer: jest.fn(),
-  getCharLayer: jest.fn(),
-  getTransition: jest.fn(),
-  getCollisionGroups: jest.fn().mockReturnValue(["cGroup1"]),
-  setCollisionGroups: jest.fn(),
-  getAnimation: jest.fn().mockReturnValue(mockCharacterAnimation),
-};
 const mockFollowMovement = {
   setCharacter: jest.fn(),
   update: jest.fn(),
@@ -106,60 +66,11 @@ jest.mock("./GridTilemap/GridTilemap", function () {
   };
 });
 
-// function createMockCharConstr() {
-//   return (id: string) => {
-//     return {
-//       ...mockGridCharacter,
-//       getId: () => id,
-//     };
-//   };
-// }
-
-// jest.mock("./GridCharacter/GridCharacter", function () {
-//   return {
-//     GridCharacter: jest.fn(createMockCharConstr()),
-//   };
-// });
-
-// const mockRandomMovement = {
-//   addCharacter: jest.fn(),
-//   update: jest.fn(),
-//   setNumberOfDirections: jest.fn(),
-// };
-
-// const mockTargetMovement = {
-//   setCharacter: jest.fn(),
-//   update: jest.fn(),
-//   removeCharacter: jest.fn(),
-//   finishedObs: jest.fn().mockReturnValue(of()),
-// };
-
-// jest.mock("./Movement/RandomMovement/RandomMovement", () => ({
-//   RandomMovement: jest.fn(() => mockRandomMovement),
-// }));
-
-// jest.mock("./Movement/TargetMovement/TargetMovement", () => ({
-//   TargetMovement: jest.fn(() => mockTargetMovement),
-// }));
-
-jest.mock("./Movement/FollowMovement/FollowMovement", () => ({
-  FollowMovement: jest.fn(function () {
-    return mockFollowMovement;
-  }),
-}));
-
 jest.mock("./GridTilemap/GridTilemap");
 
 import { GridEngine } from "./GridEngine";
-// import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
-import {
-  Finished,
-  TargetMovement,
-} from "./Movement/TargetMovement/TargetMovement";
-import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
-import { Vector } from "matter";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;
@@ -206,16 +117,8 @@ describe("GridEngine", () => {
         name: "1",
       },
     } as any;
-    // mockTargetMovement.update.mockReset();
-    // mockRandomMovement.update.mockReset();
-    mockGridCharacter.update.mockReset();
     mockFollowMovement.setCharacter.mockReset();
     mockFollowMovement.update.mockReset();
-    mockGridCharacter.movementStarted.mockReset().mockReturnValue(of());
-    mockGridCharacter.movementStopped.mockReset().mockReturnValue(of());
-    mockGridCharacter.directionChanged.mockReset().mockReturnValue(of());
-    mockGridCharacter.positionChangeStarted.mockReset().mockReturnValue(of());
-    mockGridCharacter.positionChangeFinished.mockReset().mockReturnValue(of());
     mockGridTileMap.hasBlockingTile.mockReturnValue(false);
     mockGridTileMap.toMapDirection.mockReturnValue(Direction.LEFT);
     mockGridTileMap.getTransition.mockReturnValue(undefined);
@@ -878,23 +781,14 @@ describe("GridEngine", () => {
     });
   });
 
-  // TODO check movement
-  xit("should stop moving", () => {
-    mockGridCharacter.getMovement.mockReturnValue({});
+  it("should stop moving", () => {
     gridEngine.stopMovement("player");
-    expect(mockGridCharacter.setMovement).toHaveBeenCalledWith(undefined);
+    expect(gridEngine.getMovement("player")).toEqual({ type: "None" });
   });
 
   it("should set speed", () => {
     gridEngine.setSpeed("player", 2);
     expect(gridEngine.getSpeed("player")).toEqual(2);
-  });
-
-  // TODO
-  xit("should not call update before create", () => {
-    // gridEngine.update(123, 456);
-    // expect(mockRandomMovement.update).not.toHaveBeenCalled();
-    // expect(mockTargetMovement.update).not.toHaveBeenCalled();
   });
 
   it("should add chars on the go", () => {
@@ -984,8 +878,7 @@ describe("GridEngine", () => {
     expect(gridEngine.hasCharacter("unknownCharId")).toBe(false);
   });
 
-  // TODO check movement
-  xit("should follow a char", () => {
+  it("should follow a char", () => {
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -999,23 +892,18 @@ describe("GridEngine", () => {
       ],
     });
     gridEngine.follow("player", "player2", 7, true);
-    expect(FollowMovement).toHaveBeenCalledWith(
-      // @ts-ignore
-      expect.toBeCharacter("player"),
-      mockGridTileMap,
-      // @ts-ignore
-      expect.toBeCharacter("player2"),
-      NumberOfDirections.FOUR,
-      7,
-      NoPathFoundStrategy.CLOSEST_REACHABLE
-    );
-    expect(mockGridCharacter.setMovement).toHaveBeenCalledWith(
-      mockFollowMovement
-    );
+
+    expect(gridEngine.getMovement("player")).toEqual({
+      type: "Follow",
+      config: {
+        charToFollow: "player2",
+        distance: 7,
+        noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+      },
+    });
   });
 
-  // TODO check movement
-  xit("should follow a char with default distance", () => {
+  it("should follow a char with default distance", () => {
     gridEngine.create(tileMapMock, {
       characters: [
         {
@@ -1028,18 +916,17 @@ describe("GridEngine", () => {
         },
       ],
     });
+
     gridEngine.follow("player", "player2");
-    expect(FollowMovement).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-      0,
-      NoPathFoundStrategy.STOP
-    );
-    expect(mockGridCharacter.setMovement).toHaveBeenCalledWith(
-      mockFollowMovement
-    );
+
+    expect(gridEngine.getMovement("player")).toEqual({
+      type: "Follow",
+      config: {
+        charToFollow: "player2",
+        distance: 0,
+        noPathFoundStrategy: NoPathFoundStrategy.STOP,
+      },
+    });
   });
 
   it("should set walkingAnimationMapping", () => {
@@ -1136,8 +1023,7 @@ describe("GridEngine", () => {
       expect(res).toEqual({ charId: "player", direction: Direction.LEFT });
     });
 
-    // TODO think of a way of testing this
-    xit("should unsubscribe from movementStarted if char removed", () => {
+    it("should unsubscribe from movementStarted if char removed", () => {
       gridEngine.create(tileMapMock, {
         characters: [
           {
@@ -1147,16 +1033,19 @@ describe("GridEngine", () => {
         ],
       });
 
-      gridEngine.removeCharacter("player");
       const nextMock = jest.fn();
-
       gridEngine.movementStarted().subscribe({
         complete: jest.fn(),
         next: nextMock,
       });
 
       gridEngine.move("player", Direction.LEFT);
-      expect(nextMock).not.toHaveBeenCalled();
+      gridEngine.update(2000, 100);
+      gridEngine.move("player", Direction.DOWN);
+      gridEngine.removeCharacter("player");
+      gridEngine.update(2000, 3000);
+
+      expect(nextMock).toHaveBeenCalledTimes(1);
     });
 
     it("should get chars movementStopped observable", async () => {
@@ -1225,34 +1114,7 @@ describe("GridEngine", () => {
       });
     });
 
-    // TODO find a way to test this
-    xit("should unsubscribe from directionChanged if char removed", () => {
-      // const mockSubject = new Subject<Direction>();
-      // mockGridCharacter.directionChanged.mockReturnValue(mockSubject);
-      gridEngine.create(tileMapMock, {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
-      });
-
-      gridEngine.removeCharacter("player");
-      const nextMock = jest.fn();
-
-      gridEngine.directionChanged().subscribe({
-        complete: jest.fn(),
-        next: nextMock,
-      });
-
-      // mockSubject.next(Direction.LEFT);
-      expect(nextMock).not.toHaveBeenCalled();
-    });
-
     it("should get chars positionChangeStarted observable", async () => {
-      // const mockSubject = new Subject<PositionChange>();
-      // mockGridCharacter.positionChangeStarted.mockReturnValue(mockSubject);
       mockGridTileMap.toMapDirection.mockReturnValue(Direction.LEFT);
       gridEngine.create(tileMapMock, {
         characters: [
@@ -1274,36 +1136,6 @@ describe("GridEngine", () => {
         enterLayer: undefined,
         exitLayer: undefined,
       });
-    });
-
-    // TODO find a way to test
-    xit("should unsubscribe from positionChangeStarted if char removed", () => {
-      // const mockSubject = new Subject<PositionChange>();
-      // mockGridCharacter.positionChangeStarted.mockReturnValue(mockSubject);
-      gridEngine.create(tileMapMock, {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
-      });
-
-      gridEngine.removeCharacter("player");
-      const nextMock = jest.fn();
-
-      gridEngine.positionChangeStarted().subscribe({
-        complete: jest.fn(),
-        next: nextMock,
-      });
-
-      // const exitTile = new Vector2(1, 2);
-      // const enterTile = new Vector2(2, 2);
-      // const exitLayer = "firstLayer";
-      // const enterLayer = "secondLayer";
-
-      // mockSubject.next({ exitTile, enterTile, enterLayer, exitLayer });
-      expect(nextMock).not.toHaveBeenCalled();
     });
 
     it("should get chars positionChangeFinished observable", async () => {
@@ -1380,93 +1212,90 @@ describe("GridEngine", () => {
       );
     });
 
-    // TODO split and remove mock
-    xit("should notify if any provided character stepped on any of the given tiles on specified layers", () => {
-      const mockSubject = new Subject<PositionChange & { charId: string }>();
-      mockGridCharacter.positionChangeFinished.mockReturnValue(mockSubject);
-      const nextMock = jest.fn();
-      const player1 = "player1";
-      const player2 = "player2";
+    describe("steppedOn", () => {
+      let nextMock;
+      const player = "player1";
+      const nonMatchingChar = "non matching char";
       const expectedLayer = "anyLayer";
       const expectedTargetPosition = new Vector2(5, 5);
-      gridEngine.create(tileMapMock, {
-        characters: [
-          {
-            id: player1,
-            sprite: playerSpriteMock,
-          },
-          {
-            id: player2,
-            sprite: playerSpriteMock,
-          },
-        ],
-      });
-
-      gridEngine
-        .steppedOn(
-          [player1, player2],
-          [expectedTargetPosition],
-          [expectedLayer]
-        )
-        .subscribe({
-          complete: jest.fn(),
-          next: nextMock,
+      beforeEach(() => {
+        nextMock = jest.fn();
+        gridEngine.create(tileMapMock, {
+          characters: [
+            {
+              id: player,
+              sprite: playerSpriteMock,
+            },
+            {
+              id: nonMatchingChar,
+              sprite: playerSpriteMock,
+            },
+          ],
         });
-
-      mockSubject.next({
-        exitTile: new Vector2(1, 1),
-        enterTile: expectedTargetPosition,
-        enterLayer: expectedLayer,
-        exitLayer: expectedLayer,
-        charId: player1,
+        gridEngine
+          .steppedOn([player], [expectedTargetPosition], [expectedLayer])
+          .subscribe({
+            complete: jest.fn(),
+            next: nextMock,
+          });
       });
-      expect(nextMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          enterTile: expectedTargetPosition,
-        })
-      );
 
-      nextMock.mockClear();
-      mockSubject.next({
-        exitTile: new Vector2(1, 1),
-        enterTile: expectedTargetPosition,
-        enterLayer: "not matching layer",
-        exitLayer: expectedLayer,
-        charId: player1,
-      });
-      expect(nextMock).not.toHaveBeenCalledWith(
-        expect.objectContaining({
-          enterTile: expectedTargetPosition,
-        })
-      );
+      it("should notify if character stepped on tile", () => {
+        gridEngine.setPosition(player, new Vector2(4, 5), expectedLayer);
+        mockGridTileMap.toMapDirection.mockReturnValue(Direction.RIGHT);
+        gridEngine.move(player, Direction.RIGHT);
+        gridEngine.update(2000, 300);
 
-      nextMock.mockClear();
-      mockSubject.next({
-        exitTile: new Vector2(1, 1),
-        enterTile: expectedTargetPosition,
-        enterLayer: expectedLayer,
-        exitLayer: expectedLayer,
-        charId: "non matching character",
+        expect(nextMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            enterTile: expectedTargetPosition,
+          })
+        );
       });
-      expect(nextMock).not.toHaveBeenCalledWith(
-        expect.objectContaining({
-          enterTile: expectedTargetPosition,
-        })
-      );
 
-      nextMock.mockClear();
-      mockSubject.next({
-        exitTile: new Vector2(1, 1),
-        enterTile: new Vector2(10, 10), // non matching tile
-        enterLayer: expectedLayer,
-        exitLayer: expectedLayer,
-        charId: player1,
+      it("should not notify if character stepped on tile with non matching layer", () => {
+        gridEngine.setPosition(player, new Vector2(4, 5), "not matching layer");
+        gridEngine.move(player, Direction.RIGHT);
+        gridEngine.update(2000, 300);
+
+        expect(nextMock).not.toHaveBeenCalledWith(
+          expect.objectContaining({
+            enterTile: expectedTargetPosition,
+          })
+        );
       });
-      expect(nextMock).not.toHaveBeenCalledWith(
-        expect.objectContaining({
-          enterTile: expectedTargetPosition,
-        })
-      );
+
+      it("should not notify if character stepped on tile with non matching char", () => {
+        gridEngine.setPosition(
+          nonMatchingChar,
+          new Vector2(4, 5),
+          expectedLayer
+        );
+        gridEngine.move(nonMatchingChar, Direction.RIGHT);
+        gridEngine.update(2000, 300);
+
+        expect(nextMock).not.toHaveBeenCalledWith(
+          expect.objectContaining({
+            enterTile: expectedTargetPosition,
+          })
+        );
+      });
+
+      it("should not notify if character stepped on tile with non matching tile", () => {
+        gridEngine.setPosition(
+          player,
+          new Vector2(10, 10), // non matching tile
+          expectedLayer
+        );
+        gridEngine.move(player, Direction.RIGHT);
+        gridEngine.update(2000, 300);
+
+        expect(nextMock).not.toHaveBeenCalledWith(
+          expect.objectContaining({
+            enterTile: expectedTargetPosition,
+          })
+        );
+      });
     });
 
     it("should unsubscribe from positionChangeFinished if char removed", () => {

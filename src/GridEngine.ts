@@ -22,7 +22,7 @@ import {
 import { GridTilemap, LayerName } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
-import { takeUntil, filter, map, take, mergeWith } from "rxjs/operators";
+import { takeUntil, filter, map, mergeWith } from "rxjs/operators";
 import { Vector2 } from "./Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
@@ -408,7 +408,7 @@ export class GridEngine {
     const movement = gridChar.getMovement();
     if (!movement) {
       return {
-        type: "none",
+        type: "None",
       };
     }
     return movement.getInfo();
