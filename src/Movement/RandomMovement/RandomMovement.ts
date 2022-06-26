@@ -19,6 +19,7 @@ export class RandomMovement implements Movement {
 
   constructor(
     private character: GridCharacter,
+    // TODO: get numberOfDirections from character
     numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR,
     private delay = 0,
     private radius = -1
@@ -54,7 +55,6 @@ export class RandomMovement implements Movement {
     }
   }
 
-  // TODO get numberofDirections from character
   getInfo(): MovementInfo {
     return {
       type: "Random",
