@@ -62,13 +62,13 @@ export class CharacterAnimation {
   setWalkingAnimationMapping(
     walkingAnimationMapping?: WalkingAnimationMapping
   ): void {
-    // TODO consider unsetting charIndex here
+    // TODO: consider unsetting charIndex here
     this.walkingAnimationMapping = walkingAnimationMapping;
     this._isEnabled = this.walkingAnimationMapping !== undefined;
   }
 
   setCharacterIndex(characterIndex: number): void {
-    // TODO consider unsetting walkingAnimationMapping here
+    // TODO: consider unsetting walkingAnimationMapping here
     this.characterIndex = characterIndex;
     this._isEnabled = this.characterIndex !== -1;
   }
