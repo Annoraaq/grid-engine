@@ -5,34 +5,12 @@ import { GridCharacterPhaser } from "./GridCharacterPhaser";
 import * as Phaser from "phaser";
 import { Direction } from "../../Direction/Direction";
 import { CharacterData } from "../../GridEngine";
+import { createSpriteMock } from "../../Utils/MockFactory/MockFactory";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
   // do nothing
 })(Phaser);
-
-function createSpriteMock() {
-  return {
-    x: 10,
-    y: 12,
-    displayWidth: 20,
-    displayHeight: 40,
-    width: 20,
-    height: 20,
-    setOrigin: jest.fn(),
-    texture: {
-      source: [{ width: 240 }],
-    },
-    setFrame: jest.fn(function (name) {
-      this.frame.name = name;
-    }),
-    setDepth: jest.fn(),
-    scale: 2,
-    frame: {
-      name: "1",
-    },
-  } as any;
-}
 
 describe("GridCharacterPhaser", () => {
   let gridTilemap: GridTilemap;
@@ -369,7 +347,7 @@ describe("GridCharacterPhaser", () => {
       };
 
       const gridCharPhaser = createChar(charData, false);
-      const spriteMock = {} as any;
+      const spriteMock = createSpriteMock();
       gridCharPhaser.setSprite(spriteMock);
 
       expect(gridCharPhaser.getSprite()).toBe(spriteMock);
@@ -439,6 +417,155 @@ describe("GridCharacterPhaser", () => {
       gridCharPhaser.setSprite(undefined);
       expect(gridCharPhaser.getSprite()).toBeUndefined();
       expect(gridCharPhaser.getLayerOverlaySprite()).toBeUndefined();
+    });
+
+    it("should create new animation", () => {
+      const charData = {
+        id: "charID",
+        sprite: spriteMock,
+        walkingAnimationMapping: 3,
+      };
+      const gridCharPhaser = createChar(charData, true);
+      const newSpriteMock = createSpriteMock();
+      const gridChar = gridCharPhaser.getGridCharacter();
+      const oldAnimation = gridChar.getAnimation();
+      gridCharPhaser.setSprite(newSpriteMock);
+
+      (oldAnimation?.frameChange() as any).next(13);
+      expect(newSpriteMock.setFrame).not.toHaveBeenCalledWith(13);
+      spriteMock.setFrame.mockReset();
+      (gridChar.getAnimation()?.frameChange() as any).next(13);
+      expect(gridChar.getAnimation()?.isEnabled()).toBe(true);
+      expect(newSpriteMock.setFrame).toHaveBeenCalledWith(13);
+      expect(spriteMock.setFrame).not.toHaveBeenCalled();
+    });
+
+    it("should unsubscribe from old animation", () => {
+      const charData = {
+        id: "charID",
+        sprite: spriteMock,
+        walkingAnimationMapping: 3,
+      };
+      const gridCharPhaser = createChar(charData, true);
+      const newSpriteMock = createSpriteMock();
+      const gridChar = gridCharPhaser.getGridCharacter();
+      gridCharPhaser.setSprite(newSpriteMock);
+      const oldAnimation = gridChar.getAnimation();
+      gridCharPhaser.setSprite(newSpriteMock);
+
+      newSpriteMock.setFrame.mockReset();
+      (oldAnimation?.frameChange() as any).next(13);
+      (gridChar.getAnimation()?.frameChange() as any).next(13);
+
+      expect(gridChar.getAnimation()).not.toBe(oldAnimation);
+      expect(newSpriteMock.setFrame).toHaveBeenCalledTimes(1);
+    });
+
+    it("should disable animation", () => {
+      const charData = {
+        id: "charID",
+        sprite: spriteMock,
+      };
+      const gridCharPhaser = createChar(charData, true);
+      const newSpriteMock = createSpriteMock();
+      const gridChar = gridCharPhaser.getGridCharacter();
+
+      gridCharPhaser.setSprite(newSpriteMock);
+
+      expect(gridChar.getAnimation()?.isEnabled()).toBe(false);
+    });
+
+    it("should set standing frame", () => {
+      const charData = {
+        id: "charID",
+        sprite: spriteMock,
+        walkingAnimationMapping: 0,
+      };
+      const standingFrameNumber = 13;
+      const gridCharPhaser = createChar(charData, true);
+      const newSpriteMock = createSpriteMock();
+      const gridChar = gridCharPhaser.getGridCharacter();
+      gridChar.turnTowards(Direction.LEFT);
+
+      gridCharPhaser.setSprite(newSpriteMock);
+
+      expect(newSpriteMock.setFrame).toHaveBeenCalledWith(standingFrameNumber);
+    });
+
+    it("should set depth of sprite", () => {
+      const startPos = { x: 2, y: 2 };
+      const charData = {
+        id: "charID",
+        sprite: spriteMock,
+        walkingAnimationMapping: 0,
+        startPosition: startPos,
+      };
+      const charLayerDepth = 1;
+      const gridCharPhaser = createChar(charData, false);
+      const newSpriteMock = createSpriteMock();
+
+      gridCharPhaser.setSprite(newSpriteMock);
+
+      checkSpriteDepth(newSpriteMock, charLayerDepth, "00000");
+    });
+
+    it("should set depth of sprite on char layer", () => {
+      const startPos = { x: 2, y: 2 };
+      const charData = {
+        id: "charID",
+        sprite: spriteMock,
+        walkingAnimationMapping: 0,
+        startPosition: startPos,
+        charLayer: "lowerCharLayer",
+      };
+      const charLayerDepth = 0;
+      const gridCharPhaser = createChar(charData, false);
+      const newSpriteMock = createSpriteMock();
+
+      gridCharPhaser.setSprite(newSpriteMock);
+
+      checkSpriteDepth(newSpriteMock, charLayerDepth, "00000");
+    });
+
+    it("should set depth of container", () => {
+      const containerMock = {
+        y: 20,
+        displayHeight: 21,
+        setDepth: jest.fn(),
+      } as any;
+      const startPos = { x: 2, y: 2 };
+      const charData = {
+        id: "charID",
+        sprite: spriteMock,
+        container: containerMock,
+        walkingAnimationMapping: 0,
+        startPosition: startPos,
+      };
+      const uppermostCharLayerDepth = 1;
+      const gridCharPhaser = createChar(charData, false);
+      const newSpriteMock = createSpriteMock();
+
+      gridCharPhaser.setSprite(newSpriteMock);
+
+      checkSpriteDepth(containerMock, uppermostCharLayerDepth, "00000");
+    });
+
+    it("should set depth of pos above for overlay sprite", () => {
+      const startPos = { x: 2, y: 2 };
+      const charData = {
+        id: "charID",
+        sprite: spriteMock,
+        walkingAnimationMapping: 0,
+        startPosition: startPos,
+        charLayer: "testCharLayer",
+      };
+      const charLayerDepth = 1;
+      const gridCharPhaser = createChar(charData, true);
+      const newSpriteMock = createSpriteMock();
+
+      gridCharPhaser.setSprite(newSpriteMock);
+
+      checkSpriteDepth(overlaySpriteMock, charLayerDepth, "00000");
     });
   });
 
@@ -527,10 +654,7 @@ describe("GridCharacterPhaser", () => {
       gridChar.move(Direction.RIGHT);
       gridChar.update(10);
 
-      const pixelDepth = spriteMock.y + spriteMock.displayHeight;
-      expect(spriteMock.setDepth).toHaveBeenCalledWith(
-        +`${charLayerDepth}.0000${pixelDepth}`
-      );
+      checkSpriteDepth(spriteMock, charLayerDepth, "0000");
     });
 
     it("should set depth of sprite on char layer", () => {
@@ -549,10 +673,7 @@ describe("GridCharacterPhaser", () => {
       gridChar.move(Direction.RIGHT);
       gridChar.update(10);
 
-      const pixelDepth = spriteMock.y + spriteMock.displayHeight;
-      expect(spriteMock.setDepth).toHaveBeenCalledWith(
-        +`${charLayerDepth}.0000${pixelDepth}`
-      );
+      checkSpriteDepth(spriteMock, charLayerDepth, "0000");
     });
 
     it("should set depth of container", () => {
@@ -576,10 +697,7 @@ describe("GridCharacterPhaser", () => {
       gridChar.move(Direction.RIGHT);
       gridChar.update(10);
 
-      const pixelDepth = containerMock.y + containerMock.displayHeight;
-      expect(containerMock.setDepth).toHaveBeenCalledWith(
-        +`${uppermostCharLayerDepth}.0000${pixelDepth}`
-      );
+      checkSpriteDepth(containerMock, uppermostCharLayerDepth, "0000");
     });
 
     describe("for overlay sprite", () => {
@@ -605,12 +723,19 @@ describe("GridCharacterPhaser", () => {
         gridChar.move(Direction.RIGHT);
         gridChar.update(10);
 
-        const pixelDepth =
-          overlaySpriteMock.y + overlaySpriteMock.displayHeight;
-        expect(overlaySpriteMock.setDepth).toHaveBeenCalledWith(
-          +`${lowerCharLayerDepth}.00000${pixelDepth}`
-        );
+        checkSpriteDepth(overlaySpriteMock, lowerCharLayerDepth, "00000");
       });
     });
   });
 });
+
+function checkSpriteDepth(
+  spriteMock,
+  charLayerDepth: number,
+  zeroPrefix: string
+) {
+  const pixelDepth = spriteMock.y + spriteMock.displayHeight;
+  expect(spriteMock.setDepth).toHaveBeenCalledWith(
+    +`${charLayerDepth}.${zeroPrefix}${pixelDepth}`
+  );
+}

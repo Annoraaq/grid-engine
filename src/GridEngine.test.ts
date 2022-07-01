@@ -71,6 +71,7 @@ jest.mock("./GridTilemap/GridTilemap");
 import { GridEngine } from "./GridEngine";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
+import { createSpriteMock } from "./Utils/MockFactory/MockFactory";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;
@@ -177,6 +178,7 @@ describe("GridEngine", () => {
     expect(gridEngine.getWalkingAnimationMapping("player")).toEqual(undefined);
     expect(gridEngine.getCharLayer("player")).toEqual(undefined);
     expect(gridEngine.getCollisionGroups("player")).toEqual(["geDefault"]);
+    expect(gridEngine.hasLayerOverlay()).toEqual(false);
   });
 
   it("should init player with collisionGroups", () => {
@@ -589,7 +591,7 @@ describe("GridEngine", () => {
   });
 
   it("should set sprite", () => {
-    const mockSprite = <any>{ setOrigin: jest.fn(), setDepth: jest.fn() };
+    const mockSprite = createSpriteMock();
     gridEngine.setSprite("player", mockSprite);
 
     expect(gridEngine.getSprite("player")).toEqual(mockSprite);
@@ -931,6 +933,19 @@ describe("GridEngine", () => {
 
   it("should set walkingAnimationMapping", () => {
     const walkingAnimationMappingMock = <any>{};
+    gridEngine.setWalkingAnimationMapping(
+      "player",
+      walkingAnimationMappingMock
+    );
+
+    expect(gridEngine.getWalkingAnimationMapping("player")).toEqual(
+      walkingAnimationMappingMock
+    );
+  });
+
+  it("should set walkingAnimationMapping after setting char index", () => {
+    const walkingAnimationMappingMock = <any>{};
+    gridEngine.setWalkingAnimationMapping("player", 1);
     gridEngine.setWalkingAnimationMapping(
       "player",
       walkingAnimationMappingMock
@@ -1377,6 +1392,19 @@ describe("GridEngine", () => {
       expectCharUnknownException(() =>
         gridEngine.setCollisionGroups(UNKNOWN_CHAR_ID, ["cGroup"])
       );
+      expectCharUnknownException(() =>
+        gridEngine.getWalkingAnimationMapping(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngine.collidesWithTiles(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() => gridEngine.getOffsetY(UNKNOWN_CHAR_ID));
+      expectCharUnknownException(() => gridEngine.getOffsetX(UNKNOWN_CHAR_ID));
+      expectCharUnknownException(() =>
+        gridEngine.getContainer(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() => gridEngine.getSpeed(UNKNOWN_CHAR_ID));
+      expectCharUnknownException(() => gridEngine.getMovement(UNKNOWN_CHAR_ID));
     });
 
     it("should throw error if follow is invoked", () => {
@@ -1472,6 +1500,17 @@ describe("GridEngine", () => {
       expectUninitializedException(() =>
         gridEngine.setCollisionGroups(SOME_CHAR_ID, ["cGroup"])
       );
+      expectUninitializedException(() =>
+        gridEngine.getWalkingAnimationMapping(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngine.collidesWithTiles(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() => gridEngine.getOffsetY(SOME_CHAR_ID));
+      expectUninitializedException(() => gridEngine.getOffsetX(SOME_CHAR_ID));
+      expectUninitializedException(() => gridEngine.getContainer(SOME_CHAR_ID));
+      expectUninitializedException(() => gridEngine.getSpeed(SOME_CHAR_ID));
+      expectUninitializedException(() => gridEngine.getMovement(SOME_CHAR_ID));
     });
   });
 });

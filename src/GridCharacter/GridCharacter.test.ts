@@ -38,13 +38,9 @@ describe("GridCharacter", () => {
 
   const TILE_WIDTH = 16;
   const TILE_HEIGHT = 16;
-  // const PLAYER_X_OFFSET = 0;
-  // const PLAYER_Y_OFFSET = -4;
   const PLAYER_X_OFFSET = 0;
   const PLAYER_Y_OFFSET = 0;
   const MS_FOR_12_PX = 250;
-  // const INITIAL_SPRITE_X_POS = 5 * TILE_WIDTH + PLAYER_X_OFFSET;
-  // const INITIAL_SPRITE_Y_POS = 6 * TILE_HEIGHT + PLAYER_Y_OFFSET;
   const INITIAL_SPRITE_X_POS = 0;
   const INITIAL_SPRITE_Y_POS = 0;
   const DEPTH_OF_CHAR_LAYER = 10;
@@ -99,11 +95,13 @@ describe("GridCharacter", () => {
       speed: 3,
       collidesWithTiles: true,
       charLayer: "someLayer",
+      facingDirection: Direction.RIGHT,
     });
     expect(gridCharacter.getId()).toEqual("player");
     expect(gridCharacter.getSpeed()).toEqual(3);
     expect(gridCharacter.getTilePos().layer).toEqual("someLayer");
     expect(gridCharacter.collidesWithTiles()).toEqual(true);
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
   });
 
   it("should be facing down on construction by default", () => {

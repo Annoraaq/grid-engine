@@ -4,16 +4,19 @@ import {
   GameObject,
   GridCharacter,
 } from "../../GridCharacter/GridCharacter";
-import { CharacterData, Direction } from "../../GridEngine";
+import { CharacterData } from "../../GridEngine";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CharacterAnimation } from "../../GridCharacter/CharacterAnimation/CharacterAnimation";
 import { LayerPosition } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Utils } from "../../Utils/Utils/Utils";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 export class GridCharacterPhaser {
   private sprite?: Phaser.GameObjects.Sprite;
   private layerOverlaySprite?: Phaser.GameObjects.Sprite;
   private container?: Phaser.GameObjects.Container;
+  private newSpriteSet$ = new Subject<void>();
   private gridCharacter: GridCharacter = this.createChar(
     this.charData,
     this.layerOverlay
@@ -37,7 +40,13 @@ export class GridCharacterPhaser {
         sprite.y = this.sprite.y;
       }
       this.sprite = sprite;
+      this.newSpriteSet$.next();
+      this.layerOverlaySprite = this.layerOverlaySprite
+        ? this.scene.add.sprite(0, 0, this.sprite.texture)
+        : undefined;
       this.updateOverlaySprite();
+      this.resetAnimation(this.gridCharacter, this.sprite);
+      this.updateDepth();
     } else {
       this.layerOverlaySprite = undefined;
       this.sprite = undefined;
@@ -78,6 +87,7 @@ export class GridCharacterPhaser {
       collidesWithTiles: true,
       collisionGroups: ["geDefault"],
       charLayer: charData.charLayer,
+      facingDirection: charData.facingDirection,
     };
 
     if (typeof charData.collides === "boolean") {
@@ -109,30 +119,9 @@ export class GridCharacterPhaser {
         -(this.sprite.displayHeight ?? 0) + this.tilemap.getTileHeight();
       gridChar.engineOffset = new Vector2(offsetX, offsetY);
 
-      const animation = new CharacterAnimation(
-        gridChar.getWalkingAnimationMapping(),
-        gridChar.getCharacterIndex(),
-        this.sprite.texture.source[0].width /
-          this.sprite.width /
-          CharacterAnimation.FRAMES_CHAR_ROW
-      );
-      gridChar.setAnimation(animation);
-      animation.frameChange().subscribe((frameNo) => {
-        this.sprite?.setFrame(frameNo);
-      });
-
-      animation.setIsEnabled(
-        gridChar.getWalkingAnimationMapping() !== undefined ||
-          gridChar.getCharacterIndex() !== -1
-      );
-      animation.setStandingFrame(Direction.DOWN);
+      this.resetAnimation(gridChar, this.sprite);
 
       this.updateOverlaySprite();
-
-      // TODO: maybe move to GridCharacter since it has nothing to do with phaser
-      if (charData.facingDirection) {
-        gridChar.turnTowards(charData.facingDirection);
-      }
 
       if (charData.startPosition) {
         gridChar.setTilePosition({
@@ -140,19 +129,9 @@ export class GridCharacterPhaser {
           layer: gridChar.getTilePos().layer,
         });
       }
-
-      // no need to set detph here because tilePOsition is set later to set start position
-      // it is sufficient if this will trigger it
-      // So this needs to be checked in a different test for setting the sprite or tile pos I guess
-
-      // this.sprite.setDepth(
-      //   this.tilemap.getDepthOfCharLayer(
-      //     this.getTransitionLayer(gridChar.getNextTilePos())
-      //   ) + this.getPaddedPixelDepth(this.sprite)
-      // );
     }
 
-    // TODO takeUntil
+    // TODO: check for memory leak
     gridChar.pixelPositionChanged().subscribe((pixelPos: Vector2) => {
       const gameObj = this.container || this.sprite;
       if (gameObj) {
@@ -160,28 +139,46 @@ export class GridCharacterPhaser {
         gameObj.y = pixelPos.y;
       }
 
-      if (this.sprite) {
-        if (gridChar.isMoving()) {
-          gridChar
-            .getAnimation()
-            ?.updateCharacterFrame(
-              gridChar.getMovementDirection(),
-              gridChar.hasWalkedHalfATile(),
-              Number(this.sprite.frame.name)
-            );
-        } else {
-          // I don't think this is necessary because if a char's tile pos is changed
-          // when it is not moving, the animation should not be changed either.
-          // gridChar
-          //   .getAnimation()
-          //   ?.setStandingFrame(gridChar.getFacingDirection());
-        }
+      if (this.sprite && gridChar.isMoving()) {
+        gridChar
+          .getAnimation()
+          ?.updateCharacterFrame(
+            gridChar.getMovementDirection(),
+            gridChar.hasWalkedHalfATile(),
+            Number(this.sprite.frame.name)
+          );
       }
 
       this.updateDepth();
     });
 
     return gridChar;
+  }
+
+  private resetAnimation(
+    gridChar: GridCharacter,
+    sprite: Phaser.GameObjects.Sprite
+  ) {
+    const animation = new CharacterAnimation(
+      gridChar.getWalkingAnimationMapping(),
+      gridChar.getCharacterIndex(),
+      sprite.texture.source[0].width /
+        sprite.width /
+        CharacterAnimation.FRAMES_CHAR_ROW
+    );
+    gridChar.setAnimation(animation);
+    animation
+      .frameChange()
+      .pipe(takeUntil(this.newSpriteSet$))
+      .subscribe((frameNo) => {
+        sprite?.setFrame(frameNo);
+      });
+
+    animation.setIsEnabled(
+      gridChar.getWalkingAnimationMapping() !== undefined ||
+        gridChar.getCharacterIndex() !== -1
+    );
+    animation.setStandingFrame(gridChar.getFacingDirection());
   }
 
   private updateOverlaySprite() {

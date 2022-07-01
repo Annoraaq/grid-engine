@@ -44,6 +44,7 @@ export interface CharConfig {
   offsetY?: number;
   charLayer?: string;
   collisionGroups?: string[];
+  facingDirection?: Direction;
 }
 
 export class GridCharacter {
@@ -95,6 +96,10 @@ export class GridCharacter {
     this._tilePos.layer = config.charLayer;
 
     this.collisionGroups = new Set<string>(config.collisionGroups || []);
+
+    if (config.facingDirection) {
+      this.turnTowards(config.facingDirection);
+    }
   }
 
   getId(): string {

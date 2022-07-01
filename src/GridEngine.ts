@@ -11,7 +11,6 @@ import {
 import {
   CharacterIndex,
   FrameRow,
-  GameObject,
   PositionChange,
 } from "./GridCharacter/GridCharacter";
 import {
@@ -27,8 +26,6 @@ import { Vector2 } from "./Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { Concrete } from "./Utils/TypeUtils";
-import { Utils } from "./Utils/Utils/Utils";
-import { LayerPosition } from "./Pathfinding/ShortestPathAlgorithm";
 import { SpriteUtils } from "./Utils/SpriteUtils/SpriteUtils";
 import { MovementInfo } from "./Movement/Movement";
 
@@ -397,8 +394,6 @@ export class GridEngine {
     gridChar.setMovement(randomMovement);
   }
 
-  // TODO test init guard
-  // TODO test method
   getMovement(charId: string): MovementInfo {
     this.initGuard();
     const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
@@ -478,7 +473,6 @@ export class GridEngine {
     gridChar.setSpeed(speed);
   }
 
-  // TODO test initGuard
   /** @returns Speed in tiles per second for a character. */
   getSpeed(charId: string): number {
     this.initGuard();
@@ -487,7 +481,6 @@ export class GridEngine {
     return gridChar.getSpeed();
   }
 
-  // TODO test initGuard
   /** @returns Container for a character. */
   getContainer(charId: string): Phaser.GameObjects.Container | undefined {
     this.initGuard();
@@ -496,7 +489,6 @@ export class GridEngine {
     return gridChar.getContainer();
   }
 
-  // TODO test initGuard
   /** @returns X-offset for a character. */
   getOffsetX(charId: string): number {
     this.initGuard();
@@ -505,7 +497,6 @@ export class GridEngine {
     return gridChar.getOffsetX();
   }
 
-  // TODO test initGuard
   /** @returns Y-offset for a character. */
   getOffsetY(charId: string): number {
     this.initGuard();
@@ -514,7 +505,6 @@ export class GridEngine {
     return gridChar.getOffsetY();
   }
 
-  // TODO test initGuard
   /** @returns Whether character collides with tiles */
   collidesWithTiles(charId: string): boolean {
     this.initGuard();
@@ -523,7 +513,6 @@ export class GridEngine {
     return gridChar.collidesWithTiles();
   }
 
-  // TODO test initGuard and logic
   /**
    * @returns {@link WalkingAnimationMapping} for a character. If a character
    * index was set, it will be returned instead.
@@ -541,7 +530,6 @@ export class GridEngine {
     return animation?.getWalkingAnimationMapping();
   }
 
-  // TODO test
   /**
    * @returns `true` if {@link https://annoraaq.github.io/grid-engine/features/layer-overlay | layer overlay}
    * is activated.
@@ -607,66 +595,51 @@ export class GridEngine {
     this.gridCharacters.set(charData.id, gridCharPhaser);
 
     this.gridTilemap.addCharacter(gridChar);
+    const id = gridChar.getId();
+    const takeUntilCharRemoved$ = this.takeUntilCharRemoved(id);
 
     gridChar
       .movementStopped()
-      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
+      .pipe(takeUntilCharRemoved$)
       .subscribe((direction: Direction) => {
-        this.movementStopped$.next({ charId: gridChar.getId(), direction });
+        this.movementStopped$.next({ charId: id, direction });
       });
 
     gridChar
       .movementStarted()
-      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
+      .pipe(takeUntilCharRemoved$)
       .subscribe((direction: Direction) => {
-        this.movementStarted$.next({ charId: gridChar.getId(), direction });
+        this.movementStarted$.next({ charId: id, direction });
       });
 
     gridChar
       .directionChanged()
-      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
+      .pipe(takeUntilCharRemoved$)
       .subscribe((direction: Direction) => {
-        this.directionChanged$.next({ charId: gridChar.getId(), direction });
+        this.directionChanged$.next({ charId: id, direction });
       });
 
     gridChar
       .positionChangeStarted()
-      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
+      .pipe(takeUntilCharRemoved$)
       .subscribe((positionChange: PositionChange) => {
         this.positionChangeStarted$.next({
-          charId: gridChar.getId(),
+          charId: id,
           ...positionChange,
         });
       });
 
     gridChar
       .positionChangeFinished()
-      .pipe(this.takeUntilCharRemoved(gridChar.getId()))
+      .pipe(takeUntilCharRemoved$)
       .subscribe((positionChange: PositionChange) => {
         this.positionChangeFinished$.next({
-          charId: gridChar.getId(),
+          charId: id,
           ...positionChange,
         });
       });
 
-    this.charAdded$.next(charData.id);
-  }
-
-  private setDepth(gameObject: GameObject, position: LayerPosition): void {
-    gameObject.setDepth(
-      this.gridTilemap.getDepthOfCharLayer(this.getTransitionLayer(position)) +
-        this.getPaddedPixelDepth(gameObject)
-    );
-  }
-  private getPaddedPixelDepth(gameObject: GameObject): number {
-    return Utils.shiftPad(gameObject.y + gameObject.displayHeight, 7);
-  }
-
-  private getTransitionLayer(position: LayerPosition): LayerName {
-    return (
-      this.gridTilemap.getTransition(position.position, position.layer) ||
-      position.layer
-    );
+    this.charAdded$.next(id);
   }
 
   /** Checks whether a character with the given ID is registered. */
@@ -849,61 +822,7 @@ export class GridEngine {
     gridCharPhaser: GridCharacterPhaser
   ) {
     gridCharPhaser.setSprite(sprite);
-
-    // TODO: move this to GridCharPhaser
-    // sprite.setOrigin(0, 0);
-    // const oldSprite = gridCharPhaser.getSprite();
-    // if (oldSprite) {
-    //   sprite.x = oldSprite.x;
-    //   sprite.y = oldSprite.y;
-    // }
-    // gridCharPhaser.setSprite(sprite);
-    // const gridChar = gridCharPhaser.getGridCharacter();
-    // if (!gridChar.getAnimation()) {
-    //   const animation = new CharacterAnimation(
-    //     gridChar.getWalkingAnimationMapping(),
-    //     gridChar.getCharacterIndex(),
-    //     sprite.texture.source[0].width /
-    //       sprite.width /
-    //       CharacterAnimation.FRAMES_CHAR_ROW
-    //   );
-    //   gridChar.setAnimation(animation);
-    //   animation.frameChange().subscribe((frameNo) => {
-    //     sprite.setFrame(frameNo);
-    //   });
-    // }
-    // gridChar
-    //   .getAnimation()
-    //   ?.setIsEnabled(
-    //     gridChar.getWalkingAnimationMapping() !== undefined ||
-    //       gridChar.getCharacterIndex() !== -1
-    //   );
-    // gridChar.getAnimation()?.setStandingFrame(Direction.DOWN);
-    // this.setD(gridCharPhaser);
   }
-
-  // private setD(gridCharPhaser: GridCharacterPhaser) {
-  //   const gameObject =
-  //     gridCharPhaser.getContainer() || gridCharPhaser.getSprite();
-
-  //   if (!gameObject) return;
-  //   this.setDepth(
-  //     gameObject,
-  //     gridCharPhaser.getGridCharacter().getNextTilePos()
-  //   );
-  //   const layerOverlaySprite = gridCharPhaser.getLayerOverlaySprite();
-
-  //   if (layerOverlaySprite) {
-  //     const posAbove = new Vector2({
-  //       ...gridCharPhaser.getGridCharacter().getNextTilePos().position,
-  //       y: gridCharPhaser.getGridCharacter().getNextTilePos().position.y - 1,
-  //     });
-  //     this.setDepth(layerOverlaySprite, {
-  //       position: posAbove,
-  //       layer: gridCharPhaser.getGridCharacter().getNextTilePos().layer,
-  //     });
-  //   }
-  // }
 
   /**
    * Checks whether the given position is blocked by either the tilemap or a
