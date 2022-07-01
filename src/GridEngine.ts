@@ -394,6 +394,10 @@ export class GridEngine {
     gridChar.setMovement(randomMovement);
   }
 
+  /**
+   * @returns Information about the current automatic movement (including
+   * random movement, follow movement and target movement)
+   */
   getMovement(charId: string): MovementInfo {
     this.initGuard();
     const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
