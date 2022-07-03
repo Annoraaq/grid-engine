@@ -46,7 +46,7 @@ export class GridCharacterPhaser {
         : undefined;
       this.updateOverlaySprite();
       this.resetAnimation(this.gridCharacter, this.sprite);
-      this.updateDepth();
+      this.updateDepth(this.gridCharacter);
     } else {
       this.layerOverlaySprite = undefined;
       this.sprite = undefined;
@@ -109,6 +109,26 @@ export class GridCharacterPhaser {
 
     const gridChar = new GridCharacter(charData.id, charConfig);
 
+    gridChar.pixelPositionChanged().subscribe((pixelPos: Vector2) => {
+      const gameObj = this.container || this.sprite;
+      if (gameObj) {
+        gameObj.x = pixelPos.x;
+        gameObj.y = pixelPos.y;
+      }
+
+      if (this.sprite && gridChar.isMoving()) {
+        gridChar
+          .getAnimation()
+          ?.updateCharacterFrame(
+            gridChar.getMovementDirection(),
+            gridChar.hasWalkedHalfATile(),
+            Number(this.sprite.frame.name)
+          );
+      }
+
+      this.updateDepth(gridChar);
+    });
+
     if (this.sprite) {
       this.sprite.setOrigin(0, 0);
 
@@ -132,25 +152,6 @@ export class GridCharacterPhaser {
     }
 
     // TODO: check for memory leak
-    gridChar.pixelPositionChanged().subscribe((pixelPos: Vector2) => {
-      const gameObj = this.container || this.sprite;
-      if (gameObj) {
-        gameObj.x = pixelPos.x;
-        gameObj.y = pixelPos.y;
-      }
-
-      if (this.sprite && gridChar.isMoving()) {
-        gridChar
-          .getAnimation()
-          ?.updateCharacterFrame(
-            gridChar.getMovementDirection(),
-            gridChar.hasWalkedHalfATile(),
-            Number(this.sprite.frame.name)
-          );
-      }
-
-      this.updateDepth();
-    });
 
     return gridChar;
   }
@@ -196,21 +197,21 @@ export class GridCharacterPhaser {
     this.layerOverlaySprite.setOrigin(0, 0);
   }
 
-  private updateDepth() {
-    const gameObject = this.getContainer() || this.getSprite();
+  private updateDepth(gridChar: GridCharacter) {
+    const gameObject = this.container || this.sprite;
 
     if (!gameObject) return;
-    this.setDepth(gameObject, this.getGridCharacter().getNextTilePos());
+    this.setDepth(gameObject, gridChar.getNextTilePos());
     const layerOverlaySprite = this.getLayerOverlaySprite();
 
     if (layerOverlaySprite) {
       const posAbove = new Vector2({
-        ...this.getGridCharacter().getNextTilePos().position,
-        y: this.getGridCharacter().getNextTilePos().position.y - 1,
+        ...gridChar.getNextTilePos().position,
+        y: gridChar.getNextTilePos().position.y - 1,
       });
       this.setDepth(layerOverlaySprite, {
         position: posAbove,
-        layer: this.getGridCharacter().getNextTilePos().layer,
+        layer: gridChar.getNextTilePos().layer,
       });
     }
   }

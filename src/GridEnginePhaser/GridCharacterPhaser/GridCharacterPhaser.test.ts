@@ -95,7 +95,7 @@ describe("GridCharacterPhaser", () => {
     it("should create a grid character", () => {
       const walkingAnimationMock = {} as any;
       const startPos = { x: 5, y: 6 };
-      const containerMock = {} as any;
+      const containerMock = { x: 0, y: 0 } as any;
       const charData = {
         id: "charID",
         sprite: spriteMock,
@@ -148,6 +148,10 @@ describe("GridCharacterPhaser", () => {
           CharacterAnimation.FRAMES_CHAR_ROW
       );
 
+      // should set pixel position
+      expect(containerMock.x).not.toEqual(0);
+      expect(containerMock.y).not.toEqual(0);
+
       expect(gridChar.getAnimation()?.isEnabled()).toBe(true);
     });
 
@@ -195,49 +199,6 @@ describe("GridCharacterPhaser", () => {
       );
       expect(overlaySpriteMock.setOrigin).toHaveBeenCalledWith(0, 0);
     });
-
-    // it("should set depth of sprite on creation", () => {
-    //   const charData = {
-    //     id: "charID",
-    //     sprite: spriteMock,
-    //     walkingAnimationMapping: 3,
-    //   };
-    //   new GridCharacterPhaser(charData, sceneMock, gridTilemap, true);
-
-    //   expect(spriteMock.setDepth).toHaveBeenCalledWith(
-    //     Number(`1.00000${spriteMock.displayHeight + spriteMock.y}`)
-    //   );
-    // });
-
-    // fit("should set depth of sprite with transitionLayer", () => {
-    //   const charData = {
-    //     id: "charID",
-    //     sprite: spriteMock,
-    //     walkingAnimationMapping: 3,
-    //     charLayer: "charLayer1",
-    //     collides: false,
-    //   };
-    //   tilemapMock.layers = mockCharLayers;
-    //   gridTilemap = new GridTilemap(tilemapMock);
-    //   gridTilemap.setTransition(new Vector2(0, 1), "charLayer1", "charLayer2");
-    //   const gridCharPhaser = new GridCharacterPhaser(
-    //     charData,
-    //     sceneMock,
-    //     gridTilemap,
-    //     true
-    //   );
-    //   const gridChar = gridCharPhaser.getGridCharacter();
-    //   gridChar.move(Direction.DOWN);
-    //   gridChar.update(1);
-    //   console.log("ntp", gridChar.getNextTilePos());
-
-    //   const depthOfCharLayer2 = 2;
-    //   expect(spriteMock.setDepth).toHaveBeenCalledWith(
-    //     Number(
-    //       `1.00000${spriteMock.displayHeight + spriteMock.y + depthOfCharLayer2}`
-    //     )
-    //   );
-    // });
 
     it("should disable animation", () => {
       const charData = {
@@ -506,7 +467,7 @@ describe("GridCharacterPhaser", () => {
 
       gridCharPhaser.setSprite(newSpriteMock);
 
-      checkSpriteDepth(newSpriteMock, charLayerDepth, "00000");
+      checkSpriteDepth(newSpriteMock, charLayerDepth, "0000");
     });
 
     it("should set depth of sprite on char layer", () => {
@@ -524,7 +485,7 @@ describe("GridCharacterPhaser", () => {
 
       gridCharPhaser.setSprite(newSpriteMock);
 
-      checkSpriteDepth(newSpriteMock, charLayerDepth, "00000");
+      checkSpriteDepth(newSpriteMock, charLayerDepth, "0000");
     });
 
     it("should set depth of container", () => {
@@ -547,7 +508,7 @@ describe("GridCharacterPhaser", () => {
 
       gridCharPhaser.setSprite(newSpriteMock);
 
-      checkSpriteDepth(containerMock, uppermostCharLayerDepth, "00000");
+      checkSpriteDepth(containerMock, uppermostCharLayerDepth, "0000");
     });
 
     it("should set depth of pos above for overlay sprite", () => {
