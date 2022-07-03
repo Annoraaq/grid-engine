@@ -38,8 +38,6 @@ describe("GridCharacter", () => {
 
   const TILE_WIDTH = 16;
   const TILE_HEIGHT = 16;
-  const PLAYER_X_OFFSET = 0;
-  const PLAYER_Y_OFFSET = 0;
   const MS_FOR_12_PX = 250;
   const INITIAL_SPRITE_X_POS = 0;
   const INITIAL_SPRITE_Y_POS = 0;
@@ -259,10 +257,10 @@ describe("GridCharacter", () => {
     newTilePos.x = 20;
 
     expect(gridCharacter.getPixelPos().x).toEqual(
-      newPixelPos.x + PLAYER_X_OFFSET + customOffsetX
+      newPixelPos.x + customOffsetX
     );
     expect(gridCharacter.getPixelPos().y).toEqual(
-      newPixelPos.y + PLAYER_Y_OFFSET + customOffsetY
+      newPixelPos.y + customOffsetY
     );
     expect(gridCharacter.getTilePos()).toEqual(expectedTilePos);
   });
@@ -305,12 +303,8 @@ describe("GridCharacter", () => {
       enterLayer: "someLayer",
     });
 
-    expect(gridCharacter.getPixelPos().x).toEqual(
-      newPixelPos.x + PLAYER_X_OFFSET
-    );
-    expect(gridCharacter.getPixelPos().y).toEqual(
-      newPixelPos.y + PLAYER_Y_OFFSET
-    );
+    expect(gridCharacter.getPixelPos().x).toEqual(newPixelPos.x);
+    expect(gridCharacter.getPixelPos().y).toEqual(newPixelPos.y);
   });
 
   it("should stop ongoing movement when stopping on positionChangeFinish", () => {
