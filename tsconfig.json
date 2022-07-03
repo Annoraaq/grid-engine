@@ -3,7 +3,8 @@
     "target": "es5",
     "declaration": true,
     "allowJs": false,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "strictNullChecks": true
   },
   "include": [
     "**/*.ts",

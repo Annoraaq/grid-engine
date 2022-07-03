@@ -54,7 +54,7 @@ describe("CharacterAnimation", () => {
   });
 
   it("should enable and disable", () => {
-    characterAnimation = new CharacterAnimation(spriteMock, undefined, 3);
+    characterAnimation = new CharacterAnimation(undefined, 3, 3);
     expect(characterAnimation.isEnabled()).toBe(true);
     characterAnimation.setIsEnabled(false);
     expect(characterAnimation.isEnabled()).toBe(false);
@@ -65,122 +65,135 @@ describe("CharacterAnimation", () => {
   describe("setStandingFrame", () => {
     beforeEach(() => {
       spriteMock.setFrame = jest.fn();
-      characterAnimation = new CharacterAnimation(spriteMock, undefined, 3);
+      characterAnimation = new CharacterAnimation(undefined, 3, 3);
       characterAnimation.setIsEnabled(true);
     });
 
     it("should set standing frame", () => {
+      const setFrameObsCallbackMock = jest.fn();
+      characterAnimation.frameChange().subscribe({
+        next: setFrameObsCallbackMock,
+      });
       characterAnimation.setStandingFrame(Direction.LEFT);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.left.standing
       );
     });
 
     it("should not set standing frame if disabled", () => {
+      const setFrameObsCallbackMock = jest.fn();
+      characterAnimation.frameChange().subscribe({
+        next: setFrameObsCallbackMock,
+      });
       characterAnimation.setIsEnabled(false);
       characterAnimation.setStandingFrame(Direction.LEFT);
-      expect(spriteMock.setFrame).not.toHaveBeenCalled();
+      expect(setFrameObsCallbackMock).not.toHaveBeenCalled();
     });
   });
 
   describe("update character frame", () => {
+    let setFrameObsCallbackMock = jest.fn();
     beforeEach(() => {
+      setFrameObsCallbackMock = jest.fn();
       spriteMock.setFrame = jest.fn();
       spriteMock.frame = <any>{ name: walkingAnimationMapping.up.standing };
-      characterAnimation = new CharacterAnimation(spriteMock, undefined, 3);
+      characterAnimation = new CharacterAnimation(undefined, 3, 3);
       characterAnimation.setIsEnabled(true);
+      characterAnimation.frameChange().subscribe({
+        next: setFrameObsCallbackMock,
+      });
     });
 
     it("should not update if disabled", () => {
       characterAnimation.setIsEnabled(false);
-      characterAnimation.updateCharacterFrame(Direction.UP, false);
-      expect(spriteMock.setFrame).not.toHaveBeenCalledWith();
+      characterAnimation.updateCharacterFrame(Direction.UP, false, 0);
+      expect(setFrameObsCallbackMock).not.toHaveBeenCalled();
     });
 
     it("Direction.UP", () => {
-      characterAnimation.updateCharacterFrame(Direction.UP, false);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      characterAnimation.updateCharacterFrame(Direction.UP, false, 0);
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.up.leftFoot
       );
-      characterAnimation.updateCharacterFrame(Direction.UP, true);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      characterAnimation.updateCharacterFrame(Direction.UP, true, 0);
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.up.standing
       );
     });
 
     it("Direction.UP_LEFT", () => {
-      characterAnimation.updateCharacterFrame(Direction.UP_LEFT, false);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      characterAnimation.updateCharacterFrame(Direction.UP_LEFT, false, 0);
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.left.leftFoot
       );
-      characterAnimation.updateCharacterFrame(Direction.UP_LEFT, true);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      characterAnimation.updateCharacterFrame(Direction.UP_LEFT, true, 0);
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.left.standing
       );
     });
 
     it("Direction.UP_RIGHT", () => {
-      characterAnimation.updateCharacterFrame(Direction.UP_RIGHT, false);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      characterAnimation.updateCharacterFrame(Direction.UP_RIGHT, false, 0);
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.right.leftFoot
       );
-      characterAnimation.updateCharacterFrame(Direction.UP_RIGHT, true);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      characterAnimation.updateCharacterFrame(Direction.UP_RIGHT, true, 0);
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.right.standing
       );
     });
 
     it("Direction.RIGHT", () => {
-      characterAnimation.updateCharacterFrame(Direction.RIGHT, false);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      characterAnimation.updateCharacterFrame(Direction.RIGHT, false, 0);
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.right.leftFoot
       );
-      characterAnimation.updateCharacterFrame(Direction.RIGHT, true);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      characterAnimation.updateCharacterFrame(Direction.RIGHT, true, 0);
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.right.standing
       );
     });
 
     it("Direction.DOWN", () => {
-      characterAnimation.updateCharacterFrame(Direction.DOWN, false);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      characterAnimation.updateCharacterFrame(Direction.DOWN, false, 0);
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.down.leftFoot
       );
-      characterAnimation.updateCharacterFrame(Direction.DOWN, true);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      characterAnimation.updateCharacterFrame(Direction.DOWN, true, 0);
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.down.standing
       );
     });
 
     it("Direction.DOWN_LEFT", () => {
-      characterAnimation.updateCharacterFrame(Direction.DOWN_LEFT, false);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      characterAnimation.updateCharacterFrame(Direction.DOWN_LEFT, false, 0);
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.left.leftFoot
       );
-      characterAnimation.updateCharacterFrame(Direction.DOWN_LEFT, true);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      characterAnimation.updateCharacterFrame(Direction.DOWN_LEFT, true, 0);
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.left.standing
       );
     });
 
     it("Direction.DOWN_RIGHT", () => {
-      characterAnimation.updateCharacterFrame(Direction.DOWN_RIGHT, false);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      characterAnimation.updateCharacterFrame(Direction.DOWN_RIGHT, false, 0);
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.right.leftFoot
       );
-      characterAnimation.updateCharacterFrame(Direction.DOWN_RIGHT, true);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      characterAnimation.updateCharacterFrame(Direction.DOWN_RIGHT, true, 0);
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.right.standing
       );
     });
 
     it("Direction.LEFT", () => {
-      characterAnimation.updateCharacterFrame(Direction.LEFT, false);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      characterAnimation.updateCharacterFrame(Direction.LEFT, false, 0);
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.left.leftFoot
       );
-      characterAnimation.updateCharacterFrame(Direction.LEFT, true);
-      expect(spriteMock.setFrame).toHaveBeenCalledWith(
+      characterAnimation.updateCharacterFrame(Direction.LEFT, true, 0);
+      expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
         walkingAnimationMapping.left.standing
       );
     });
@@ -213,50 +226,60 @@ describe("CharacterAnimation", () => {
           rightFoot: 12,
         },
       };
+
+      let setFrameObsCallbackMock = jest.fn();
+
       beforeEach(() => {
+        setFrameObsCallbackMock = jest.fn();
         characterAnimation = new CharacterAnimation(
-          spriteMock,
           customWalkingAnimationMapping,
+          3,
           3
         );
         characterAnimation.setIsEnabled(true);
+        characterAnimation.frameChange().subscribe({
+          next: setFrameObsCallbackMock,
+        });
       });
 
       it("should use custom walkingAnimationMapping", () => {
-        characterAnimation.updateCharacterFrame(Direction.UP, false);
-        expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        characterAnimation.updateCharacterFrame(Direction.UP, false, 0);
+        expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
           customWalkingAnimationMapping.up.leftFoot
         );
-        characterAnimation.updateCharacterFrame(Direction.UP, true);
-        expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        characterAnimation.updateCharacterFrame(Direction.UP, true, 0);
+        expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
           customWalkingAnimationMapping.up.standing
         );
       });
 
       it("should use custom mapping for diagonal movement", () => {
-        characterAnimation.updateCharacterFrame(Direction.UP_LEFT, false);
-        expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        characterAnimation.updateCharacterFrame(Direction.UP_LEFT, false, 0);
+        expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
           customWalkingAnimationMapping["up-left"].leftFoot
         );
-        characterAnimation.updateCharacterFrame(Direction.UP_LEFT, true);
-        expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        characterAnimation.updateCharacterFrame(Direction.UP_LEFT, true, 0);
+        expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
           customWalkingAnimationMapping["up-left"].standing
         );
       });
 
       it("should fall back for diagonal movement", () => {
-        characterAnimation.updateCharacterFrame(Direction.UP_RIGHT, false);
-        expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        characterAnimation.updateCharacterFrame(Direction.UP_RIGHT, false, 0);
+        expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
           customWalkingAnimationMapping.right.leftFoot
         );
-        characterAnimation.updateCharacterFrame(Direction.UP_RIGHT, true);
-        expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        characterAnimation.updateCharacterFrame(Direction.UP_RIGHT, true, 0);
+        expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
           customWalkingAnimationMapping.right.standing
         );
       });
 
       it("should set custom walkingAnimationMapping", () => {
-        characterAnimation = new CharacterAnimation(spriteMock, undefined, 3);
+        characterAnimation = new CharacterAnimation(undefined, 3, 3);
+        characterAnimation.frameChange().subscribe({
+          next: setFrameObsCallbackMock,
+        });
         characterAnimation.setWalkingAnimationMapping(
           customWalkingAnimationMapping
         );
@@ -264,18 +287,18 @@ describe("CharacterAnimation", () => {
         expect(characterAnimation.getWalkingAnimationMapping()).toEqual(
           customWalkingAnimationMapping
         );
-        characterAnimation.updateCharacterFrame(Direction.UP, false);
-        expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        characterAnimation.updateCharacterFrame(Direction.UP, false, 0);
+        expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
           customWalkingAnimationMapping.up.leftFoot
         );
-        characterAnimation.updateCharacterFrame(Direction.UP, true);
-        expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        characterAnimation.updateCharacterFrame(Direction.UP, true, 0);
+        expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
           customWalkingAnimationMapping.up.standing
         );
       });
 
       it("should remove customWalkingAnimation", () => {
-        characterAnimation = new CharacterAnimation(spriteMock, undefined, 3);
+        characterAnimation = new CharacterAnimation(undefined, 3, 3);
         expect(characterAnimation.isEnabled()).toBe(true);
         characterAnimation.setWalkingAnimationMapping(undefined);
         expect(characterAnimation.isEnabled()).toBe(false);
@@ -288,7 +311,7 @@ describe("CharacterAnimation", () => {
 
     describe("characterIndex", () => {
       it("should set characterIndex", () => {
-        characterAnimation = new CharacterAnimation(spriteMock, undefined, 1);
+        characterAnimation = new CharacterAnimation(undefined, 1, 3);
         expect(characterAnimation.getCharacterIndex()).toEqual(1);
         expect(characterAnimation.isEnabled()).toEqual(true);
         characterAnimation.setCharacterIndex(-1);
@@ -304,17 +327,23 @@ describe("CharacterAnimation", () => {
         spriteMock.frame.name = "" + walkingAnimationMapping.up.leftFoot;
       }
 
+      let setFrameObsCallbackMock = jest.fn();
+
       beforeEach(() => {
+        setFrameObsCallbackMock = jest.fn();
         setNonStandingFrame();
       });
 
       it("should flip foot", () => {
-        characterAnimation.updateCharacterFrame(Direction.UP, true);
-        expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        characterAnimation.frameChange().subscribe({
+          next: setFrameObsCallbackMock,
+        });
+        characterAnimation.updateCharacterFrame(Direction.UP, true, 0);
+        expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
           walkingAnimationMapping.up.standing
         );
-        characterAnimation.updateCharacterFrame(Direction.UP, false);
-        expect(spriteMock.setFrame).toHaveBeenCalledWith(
+        characterAnimation.updateCharacterFrame(Direction.UP, false, 0);
+        expect(setFrameObsCallbackMock).toHaveBeenCalledWith(
           walkingAnimationMapping.up.rightFoot
         );
       });

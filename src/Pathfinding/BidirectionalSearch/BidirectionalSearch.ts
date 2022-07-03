@@ -86,7 +86,9 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
     stopBfs.visited.set(LayerPositionUtils.toString(stopNode), 0);
 
     while (startBfs.queue.size() > 0 && stopBfs.queue.size() > 0) {
-      const { node, dist } = startBfs.queue.dequeue();
+      const startDequeued = startBfs.queue.dequeue();
+      if (!startDequeued) break;
+      const { node, dist } = startDequeued;
       const distToTarget = this.distance(node, stopNode);
       if (distToTarget < smallestDistToTarget) {
         smallestDistToTarget = distToTarget;
@@ -96,7 +98,8 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
       if (stopBfs.visited.has(LayerPositionUtils.toString(node))) {
         return {
           shortestDistance:
-            dist + stopBfs.visited.get(LayerPositionUtils.toString(node)),
+            dist +
+            (stopBfs.visited.get(LayerPositionUtils.toString(node)) ?? 0),
           previous: startBfs.previous,
           previous2: stopBfs.previous,
           closestToTarget: stopNode,
@@ -105,13 +108,15 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
       }
 
       startBfs.step(getNeighbours(node), node, dist);
-
-      const { node: stopBfsNode, dist: stopBfsDist } = stopBfs.queue.dequeue();
+      const stopDequeued = stopBfs.queue.dequeue();
+      if (!stopDequeued) break;
+      const { node: stopBfsNode, dist: stopBfsDist } = stopDequeued;
       if (startBfs.visited.has(LayerPositionUtils.toString(stopBfsNode))) {
         return {
           shortestDistance:
             stopBfsDist +
-            startBfs.visited.get(LayerPositionUtils.toString(stopBfsNode)),
+            (startBfs.visited.get(LayerPositionUtils.toString(stopBfsNode)) ??
+              0),
           previous: startBfs.previous,
           previous2: stopBfs.previous,
           closestToTarget: stopNode,
@@ -160,7 +165,7 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
     stopNode: LayerPosition
   ): LayerPosition[] {
     const ret: LayerPosition[] = [];
-    let currentNode: LayerPosition = stopNode;
+    let currentNode: LayerPosition | undefined = stopNode;
     ret.push(currentNode);
     while (!this.equal(currentNode, startNode)) {
       currentNode = previous.get(LayerPositionUtils.toString(currentNode));

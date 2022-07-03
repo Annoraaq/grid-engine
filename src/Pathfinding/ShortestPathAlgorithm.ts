@@ -1,8 +1,9 @@
+import { LayerName } from "../GridTilemap/GridTilemap";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 
 export interface LayerPosition {
   position: Vector2;
-  layer: string;
+  layer: LayerName;
 }
 
 export interface ShortestPathAlgorithm {

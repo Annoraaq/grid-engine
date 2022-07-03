@@ -61,7 +61,10 @@ export class Bfs implements ShortestPathAlgorithm {
     visited.add(this.pos2Str(startNode));
 
     while (queue.size() > 0) {
-      const { node, dist } = queue.dequeue();
+      const dequeued = queue.dequeue();
+      if (!dequeued) break;
+      const { node, dist } = dequeued;
+
       const distToTarget = this.distance(node, stopNode);
       if (distToTarget < smallestDistToTarget) {
         smallestDistToTarget = distToTarget;
@@ -88,7 +91,7 @@ export class Bfs implements ShortestPathAlgorithm {
     stopNode: LayerPosition
   ): LayerPosition[] {
     const ret: LayerPosition[] = [];
-    let currentNode: LayerPosition = stopNode;
+    let currentNode: LayerPosition | undefined = stopNode;
     ret.push(currentNode);
     while (!this.equal(currentNode, startNode)) {
       currentNode = previous.get(this.pos2Str(currentNode));

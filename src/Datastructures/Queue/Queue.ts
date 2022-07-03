@@ -10,8 +10,8 @@ class Node<T> {
  * queues takes O(n) for dequeueing.
  */
 export class Queue<T> {
-  private head: Node<T>;
-  private tail: Node<T>;
+  private head?: Node<T>;
+  private tail?: Node<T>;
   private sizeInternal = 0;
 
   dequeue(): T | undefined {

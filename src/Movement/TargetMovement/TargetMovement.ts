@@ -1,3 +1,4 @@
+import { LayerName } from "./../../GridTilemap/GridTilemap";
 import { BidirectionalSearch } from "./../../Pathfinding/BidirectionalSearch/BidirectionalSearch";
 import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy";
 import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
@@ -7,7 +8,7 @@ import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Direction } from "../../Direction/Direction";
-import { Movement } from "../Movement";
+import { Movement, MovementInfo } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Retryable } from "./Retryable/Retryable";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
@@ -91,7 +92,7 @@ export interface Finished {
   position: Position;
   result?: MoveToResult;
   description?: string;
-  layer: string;
+  layer: LayerName;
 }
 
 export interface Options {
@@ -242,6 +243,22 @@ export class TargetMovement implements Movement {
     return this.finished$;
   }
 
+  // TODO: test
+  getInfo(): MovementInfo {
+    return {
+      type: "Target",
+      config: {
+        ignoreBlockedTarget: this.ignoreBlockedTarget,
+        distance: this.distance,
+        targetPos: this.targetPos,
+        noPathFoundStrategy: this.noPathFoundStrategy,
+        pathBlockedStrategy: this.pathBlockedStrategy,
+        noPathFoundRetryBackoffMs: this.noPathFoundRetryable.getBackoffMs(),
+        noPathFoundMaxRetries: this.noPathFoundRetryable.getMaxRetries(),
+      },
+    };
+  }
+
   private resultToReason(result?: MoveToResult): string | undefined {
     switch (result) {
       case MoveToResult.SUCCESS:
@@ -277,9 +294,11 @@ export class TargetMovement implements Movement {
   }
 
   private moveCharOnPath(): void {
+    const nextTilePosOnPath = this.nextTileOnPath();
+    if (!nextTilePosOnPath) return;
     const dir = this.getDir(
       this.character.getNextTilePos().position,
-      this.nextTileOnPath().position
+      nextTilePosOnPath.position
     );
     this.character.move(dir);
   }

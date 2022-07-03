@@ -29,6 +29,10 @@ export class Retryable {
     return this.maxRetries;
   }
 
+  getBackoffMs(): number {
+    return this.backoffMs;
+  }
+
   private shouldRetry(): boolean {
     return this.maxRetries === -1 || this.retries < this.maxRetries;
   }
