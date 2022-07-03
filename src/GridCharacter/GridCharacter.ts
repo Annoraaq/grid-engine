@@ -81,6 +81,8 @@ export class GridCharacter {
   private depthChanged$ = new Subject<LayerPosition>();
   private pixelPosition = new Vector2(0, 0);
 
+  // TODO: move this to GridCharPhaser as soon as GridChar will be made
+  // independent of pixel positions and will get a "movement progress" instead
   engineOffset = new Vector2(0, 0);
 
   constructor(private id: string, config: CharConfig) {
