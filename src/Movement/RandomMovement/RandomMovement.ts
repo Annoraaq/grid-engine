@@ -55,6 +55,7 @@ export class RandomMovement implements Movement {
     }
   }
 
+  // TODO: test
   getInfo(): MovementInfo {
     return {
       type: "Random",

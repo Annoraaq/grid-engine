@@ -243,6 +243,7 @@ export class TargetMovement implements Movement {
     return this.finished$;
   }
 
+  // TODO: test
   getInfo(): MovementInfo {
     return {
       type: "Target",
