@@ -20,7 +20,6 @@ export class CharacterAnimation {
   private _isEnabled = true;
   private frameChange$ = new Subject<number>();
 
-  // Idea: instead of observable we could use an interface
   constructor(
     private walkingAnimationMapping: WalkingAnimationMapping | undefined,
     private characterIndex: number,
