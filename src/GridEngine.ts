@@ -26,7 +26,6 @@ import { Vector2 } from "./Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { Concrete } from "./Utils/TypeUtils";
-import { SpriteUtils } from "./Utils/SpriteUtils/SpriteUtils";
 import { MovementInfo } from "./Movement/Movement";
 
 export {
@@ -571,15 +570,6 @@ export class GridEngine {
       for (const [_key, val] of this.gridCharacters) {
         const gridChar = val.getGridCharacter();
         gridChar.update(delta);
-
-        const layerOverlaySprite = val.getLayerOverlaySprite();
-        const sprite = val.getSprite();
-        const container = val.getContainer();
-        if (layerOverlaySprite && sprite) {
-          SpriteUtils.copyOverImportantProperties(sprite, layerOverlaySprite);
-          layerOverlaySprite.x = sprite.x + (container?.x || 0);
-          layerOverlaySprite.y = sprite.y + (container?.y || 0);
-        }
       }
     }
   }
