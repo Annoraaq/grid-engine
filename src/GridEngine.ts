@@ -39,6 +39,8 @@ export {
   NoPathFoundStrategy,
   PathBlockedStrategy,
   LayerName,
+  MovementInfo,
+  PositionChange,
 };
 
 export type TileSizePerSecond = number;
