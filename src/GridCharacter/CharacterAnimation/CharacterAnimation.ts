@@ -66,11 +66,7 @@ export class CharacterAnimation {
     walkingAnimationMapping?: WalkingAnimationMapping | number
   ): void {
     this.walkingAnimationMapping = walkingAnimationMapping;
-    this.updateEnabled();
-  }
-
-  private updateEnabled() {
-    this._isEnabled = this.walkingAnimationMapping !== undefined; //|| this.characterIndex !== -1;
+    this._isEnabled = this.walkingAnimationMapping !== undefined;
   }
 
   getWalkingAnimationMapping(): WalkingAnimationMapping | number | undefined {
