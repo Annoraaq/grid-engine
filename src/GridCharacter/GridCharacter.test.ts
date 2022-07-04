@@ -1,36 +1,13 @@
 import { SpriteUtils } from "./../Utils/SpriteUtils/SpriteUtils";
 import { GridCharacter } from "./GridCharacter";
 import { Direction } from "../Direction/Direction";
+import { trackEmit } from "../Testing/Utils";
 import { take } from "rxjs/operators";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
-import { of } from "rxjs";
-
-const mockCharacterAnimation = {
-  updateCharacterFrame: jest.fn(),
-  setStandingFrame: jest.fn(),
-  setIsEnabled: jest.fn(),
-  setWalkingAnimationMapping: jest.fn(),
-  setCharacterIndex: jest.fn(),
-  setSprite: jest.fn(),
-  frameChange: jest.fn().mockReturnValue(of()),
-};
+import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
 
 SpriteUtils.copyOverImportantProperties = jest.fn();
-
-jest.mock("./CharacterAnimation/CharacterAnimation", function () {
-  return {
-    CharacterAnimation: jest
-      .fn()
-      .mockImplementation(function (
-        _sprite,
-        _walkingAnimationMapping,
-        _characterIndex
-      ) {
-        return mockCharacterAnimation;
-      }),
-  };
-});
 
 describe("GridCharacter", () => {
   let gridCharacter: GridCharacter;
@@ -52,11 +29,6 @@ describe("GridCharacter", () => {
     gridTilemapMock.isBlocking.mockReturnValue(true);
     gridTilemapMock.hasBlockingTile.mockReturnValue(true);
   }
-
-  afterEach(() => {
-    mockCharacterAnimation.updateCharacterFrame.mockReset();
-    mockCharacterAnimation.setStandingFrame.mockReset();
-  });
 
   beforeEach(() => {
     gridTilemapMock = {
@@ -83,8 +55,8 @@ describe("GridCharacter", () => {
       collidesWithTiles: true,
       walkingAnimationMapping: 3,
     });
-    // TODO: replace animation mock and only mock Phaser sprite
-    gridCharacter.setAnimation(mockCharacterAnimation as any);
+    const animation = new CharacterAnimation(undefined, 0, 1);
+    gridCharacter.setAnimation(animation);
   });
 
   it("should get init data", () => {
@@ -734,27 +706,32 @@ describe("GridCharacter", () => {
   });
 
   describe("turnTowards", () => {
-    beforeEach(() => {
-      mockCharacterAnimation.setStandingFrame.mockReset();
-    });
-    it("should turn towards left", () => {
+    it("should turn towards left", (done) => {
+      const leftStandingFrame = 4;
+      gridCharacter
+        .getAnimation()
+        ?.frameChange()
+        .pipe(take(1))
+        .subscribe((frameNo: number) => {
+          expect(frameNo).toEqual(leftStandingFrame);
+          expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
+          done();
+        });
       gridCharacter.turnTowards(Direction.LEFT);
-      expect(mockCharacterAnimation.setStandingFrame).toHaveBeenCalledWith(
-        Direction.LEFT
-      );
-      expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
     });
 
     it("should not turn if moving", () => {
       gridCharacter.move(Direction.DOWN);
-      mockCharacterAnimation.setStandingFrame.mockReset();
+      const hasEmitted = trackEmit(gridCharacter.getAnimation()?.frameChange());
       gridCharacter.turnTowards(Direction.LEFT);
-      expect(mockCharacterAnimation.setStandingFrame).not.toHaveBeenCalled();
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
+      expect(hasEmitted()).toBe(false);
     });
 
     it("should not turn if direction NONE", () => {
+      const hasEmitted = trackEmit(gridCharacter.getAnimation()?.frameChange());
       gridCharacter.turnTowards(Direction.NONE);
-      expect(mockCharacterAnimation.setStandingFrame).not.toHaveBeenCalled();
+      expect(hasEmitted()).toBe(false);
     });
   });
 
@@ -762,19 +739,24 @@ describe("GridCharacter", () => {
     beforeEach(() => {
       mockNonBlockingTile();
     });
-
     it("should set players standing frame if direction blocked", (done) => {
+      const upStandingFrame = 10;
       mockBlockingTile();
       expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+      let currentFrame: number | undefined = undefined;
+      gridCharacter
+        .getAnimation()
+        ?.frameChange()
+        .pipe(take(1))
+        .subscribe((frameNo: number) => {
+          currentFrame = frameNo;
+        });
       gridCharacter.directionChanged().subscribe((direction) => {
         expect(direction).toEqual(Direction.UP);
         done();
       });
-
       gridCharacter.move(Direction.UP);
-      expect(mockCharacterAnimation.setStandingFrame).toHaveBeenCalledWith(
-        Direction.UP
-      );
+      expect(currentFrame).toEqual(upStandingFrame);
       expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
     });
   });
