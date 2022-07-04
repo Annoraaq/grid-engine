@@ -575,9 +575,16 @@ describe("GridCharacter", () => {
   });
 
   it("should set movement", async () => {
+    const oldMovement: Movement = <any>{
+      setCharacter: jest.fn(),
+      update: jest.fn(),
+      destroy: jest.fn(),
+    };
+    gridCharacter.setMovement(oldMovement);
     const movement: Movement = <any>{
       setCharacter: jest.fn(),
       update: jest.fn(),
+      destroy: jest.fn(),
     };
     const autoMovementSet = gridCharacter
       .autoMovementSet()
@@ -589,6 +596,7 @@ describe("GridCharacter", () => {
     expect(movement.update).toHaveBeenCalledWith(100);
     expect(gridCharacter.getMovement()).toEqual(movement);
     expect(res).toBe(movement);
+    expect(oldMovement.destroy).toHaveBeenCalled();
   });
 
   it("should set movement to undefined", () => {

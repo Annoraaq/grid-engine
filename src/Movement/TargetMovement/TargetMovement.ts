@@ -259,6 +259,10 @@ export class TargetMovement implements Movement {
     };
   }
 
+  destroy(): void {
+    // TODO free observables
+  }
+
   private resultToReason(result?: MoveToResult): string | undefined {
     switch (result) {
       case MoveToResult.SUCCESS:

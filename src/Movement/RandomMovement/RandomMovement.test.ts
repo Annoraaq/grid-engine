@@ -29,11 +29,10 @@ describe("RandomMovement", () => {
     RandomUtils.getRandomInt = jest.fn().mockReturnValue(5);
   }
 
-  beforeEach(() => {
-    mockDirUpStepSize1();
+  function createCharMock() {
     positionChangeStartedSubject$ = new Subject();
     autoMovementSetSubject$ = new Subject();
-    charMock = <any>{
+    return {
       positionChangeStartedSubject$: positionChangeStartedSubject$,
       autoMovementSetSubject$,
       getId: () => "char",
@@ -47,7 +46,12 @@ describe("RandomMovement", () => {
       autoMovementSet: function () {
         return this.autoMovementSetSubject$;
       },
-    };
+    } as any;
+  }
+
+  beforeEach(() => {
+    mockDirUpStepSize1();
+    charMock = createCharMock();
     randomMovement = new RandomMovement(charMock);
   });
 
@@ -216,7 +220,8 @@ describe("RandomMovement", () => {
     expect(charMock.move).toHaveBeenCalledTimes(1);
   });
 
-  it("should unsubscribe from positionChangeStarted on autoMovementSet", () => {
+  it("should unsubscribe from positionChangeStarted on destroy", () => {
+    charMock = createCharMock();
     randomMovement = new RandomMovement(
       charMock,
       NumberOfDirections.FOUR,
@@ -230,7 +235,9 @@ describe("RandomMovement", () => {
 
     mockDirUpStepSize1();
 
-    autoMovementSetSubject$.next(undefined);
+    randomMovement.destroy();
+    positionChangeStartedSubject$.next(undefined);
+    positionChangeStartedSubject$.next(undefined);
     positionChangeStartedSubject$.next(undefined);
     positionChangeStartedSubject$.next(undefined);
 
