@@ -111,6 +111,5 @@ export class RandomMovement implements Movement {
 
   private randomizeStepSize(): void {
     this.stepSize = RandomUtils.getRandomInt(this.radius) + 1;
-    // console.log("stepSize:", this.stepSize, this.radius);
   }
 }
