@@ -24,7 +24,10 @@ export class CharacterAnimation {
     private walkingAnimationMapping: WalkingAnimationMapping | undefined,
     private characterIndex: number,
     private charsInRow: number
-  ) {}
+  ) {
+    this.setCharacterIndex(characterIndex);
+    this.setWalkingAnimationMapping(walkingAnimationMapping);
+  }
 
   frameChange(): Observable<number> {
     return this.frameChange$;
@@ -61,13 +64,22 @@ export class CharacterAnimation {
   setWalkingAnimationMapping(
     walkingAnimationMapping?: WalkingAnimationMapping
   ): void {
-    // TODO: consider unsetting charIndex here
+    if (walkingAnimationMapping) {
+      this.characterIndex = -1;
+    }
     this.walkingAnimationMapping = walkingAnimationMapping;
-    this._isEnabled = this.walkingAnimationMapping !== undefined;
+    this.updateEnabled();
+  }
+
+  private updateEnabled() {
+    this._isEnabled =
+      this.walkingAnimationMapping !== undefined || this.characterIndex !== -1;
   }
 
   setCharacterIndex(characterIndex: number): void {
-    // TODO: consider unsetting walkingAnimationMapping here
+    if (characterIndex !== -1) {
+      this.walkingAnimationMapping = undefined;
+    }
     this.characterIndex = characterIndex;
     this._isEnabled = this.characterIndex !== -1;
   }
