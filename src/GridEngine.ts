@@ -529,9 +529,6 @@ export class GridEngine {
     const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     const animation = gridChar.getAnimation();
-    // if (animation?.getCharacterIndex() !== -1) {
-    //   return animation?.getCharacterIndex();
-    // }
     return animation?.getWalkingAnimationMapping();
   }
 
