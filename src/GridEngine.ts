@@ -561,7 +561,6 @@ export class GridEngine {
     if (typeof walkingAnimationMapping == "number") {
       animation?.setCharacterIndex(walkingAnimationMapping);
     } else {
-      animation?.setCharacterIndex(-1);
       animation?.setWalkingAnimationMapping(walkingAnimationMapping);
     }
   }
