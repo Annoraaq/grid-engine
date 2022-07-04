@@ -55,7 +55,7 @@ describe("GridCharacter", () => {
       collidesWithTiles: true,
       walkingAnimationMapping: 3,
     });
-    const animation = new CharacterAnimation(undefined, 0, 1);
+    const animation = new CharacterAnimation(0, 1);
     gridCharacter.setAnimation(animation);
   });
 

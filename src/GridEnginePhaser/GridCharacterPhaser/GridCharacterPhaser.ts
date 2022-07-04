@@ -162,7 +162,6 @@ export class GridCharacterPhaser {
   ) {
     const animation = new CharacterAnimation(
       gridChar.getWalkingAnimationMapping(),
-      gridChar.getCharacterIndex(),
       sprite.texture.source[0].width /
         sprite.width /
         CharacterAnimation.FRAMES_CHAR_ROW
@@ -175,10 +174,7 @@ export class GridCharacterPhaser {
         sprite?.setFrame(frameNo);
       });
 
-    animation.setIsEnabled(
-      gridChar.getWalkingAnimationMapping() !== undefined ||
-        gridChar.getCharacterIndex() !== -1
-    );
+    animation.setIsEnabled(gridChar.getWalkingAnimationMapping() !== undefined);
     animation.setStandingFrame(gridChar.getFacingDirection());
   }
 
