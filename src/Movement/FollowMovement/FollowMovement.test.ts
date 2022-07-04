@@ -172,4 +172,23 @@ describe("FollowMovement", () => {
       }
     );
   });
+
+  it("should show movement information", () => {
+    followMovement = new FollowMovement(
+      mockChar,
+      gridTilemapMock,
+      targetChar,
+      NumberOfDirections.FOUR,
+      7,
+      NoPathFoundStrategy.CLOSEST_REACHABLE
+    );
+    expect(followMovement.getInfo()).toEqual({
+      type: "Follow",
+      config: {
+        charToFollow: targetChar.getId(),
+        distance: 7,
+        noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+      },
+    });
+  });
 });

@@ -42,7 +42,6 @@ export class FollowMovement implements Movement {
     this.targetMovement?.update(delta);
   }
 
-  // TODO: test
   getInfo(): MovementInfo {
     return {
       type: "Follow",
