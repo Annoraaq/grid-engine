@@ -1,6 +1,7 @@
 export interface Movement {
   update(delta: number): void;
   getInfo(): MovementInfo;
+  destroy(): void;
 }
 
 /** Automatic movement information. */

@@ -54,6 +54,10 @@ export class FollowMovement implements Movement {
     };
   }
 
+  destroy(): void {
+    // TODO free observables
+  }
+
   private updateTarget(targetPos: Position, targetLayer: LayerName): void {
     this.targetMovement = new TargetMovement(
       this.character,
