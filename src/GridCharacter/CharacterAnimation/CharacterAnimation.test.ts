@@ -54,7 +54,7 @@ describe("CharacterAnimation", () => {
   });
 
   it("should enable and disable", () => {
-    characterAnimation = new CharacterAnimation(undefined, 3, 3);
+    characterAnimation = new CharacterAnimation(3, 3);
     expect(characterAnimation.isEnabled()).toBe(true);
     characterAnimation.setIsEnabled(false);
     expect(characterAnimation.isEnabled()).toBe(false);
@@ -65,7 +65,7 @@ describe("CharacterAnimation", () => {
   describe("setStandingFrame", () => {
     beforeEach(() => {
       spriteMock.setFrame = jest.fn();
-      characterAnimation = new CharacterAnimation(undefined, 3, 3);
+      characterAnimation = new CharacterAnimation(3, 3);
       characterAnimation.setIsEnabled(true);
     });
 
@@ -97,7 +97,7 @@ describe("CharacterAnimation", () => {
       setFrameObsCallbackMock = jest.fn();
       spriteMock.setFrame = jest.fn();
       spriteMock.frame = <any>{ name: walkingAnimationMapping.up.standing };
-      characterAnimation = new CharacterAnimation(undefined, 3, 3);
+      characterAnimation = new CharacterAnimation(3, 3);
       characterAnimation.setIsEnabled(true);
       characterAnimation.frameChange().subscribe({
         next: setFrameObsCallbackMock,
@@ -233,7 +233,6 @@ describe("CharacterAnimation", () => {
         setFrameObsCallbackMock = jest.fn();
         characterAnimation = new CharacterAnimation(
           customWalkingAnimationMapping,
-          3,
           3
         );
         characterAnimation.setIsEnabled(true);
@@ -276,14 +275,13 @@ describe("CharacterAnimation", () => {
       });
 
       it("should set custom walkingAnimationMapping", () => {
-        characterAnimation = new CharacterAnimation(undefined, 3, 3);
+        characterAnimation = new CharacterAnimation(undefined, 3);
         characterAnimation.frameChange().subscribe({
           next: setFrameObsCallbackMock,
         });
         characterAnimation.setWalkingAnimationMapping(
           customWalkingAnimationMapping
         );
-        expect(characterAnimation.getCharacterIndex()).toEqual(-1);
         expect(characterAnimation.isEnabled()).toBe(true);
         expect(characterAnimation.getWalkingAnimationMapping()).toEqual(
           customWalkingAnimationMapping
@@ -298,17 +296,9 @@ describe("CharacterAnimation", () => {
         );
       });
 
-      it("should not unset charIndex if walkingAnimation is undefined", () => {
-        characterAnimation = new CharacterAnimation(undefined, 3, 3);
-        characterAnimation.setWalkingAnimationMapping(undefined);
-        expect(characterAnimation.getCharacterIndex()).toEqual(3);
-        expect(characterAnimation.isEnabled()).toBe(true);
-      });
-
       it("should remove customWalkingAnimation", () => {
         characterAnimation = new CharacterAnimation(
           customWalkingAnimationMapping,
-          -1,
           3
         );
         expect(characterAnimation.isEnabled()).toBe(true);
@@ -323,47 +313,14 @@ describe("CharacterAnimation", () => {
 
     describe("characterIndex", () => {
       it("should set characterIndex", () => {
-        characterAnimation = new CharacterAnimation(undefined, 1, 3);
-        expect(characterAnimation.getCharacterIndex()).toEqual(1);
+        characterAnimation = new CharacterAnimation(1, 3);
+        expect(characterAnimation.getWalkingAnimationMapping()).toEqual(1);
         expect(characterAnimation.isEnabled()).toEqual(true);
-        characterAnimation.setCharacterIndex(-1);
+        characterAnimation.setWalkingAnimationMapping(undefined);
         expect(characterAnimation.isEnabled()).toEqual(false);
-        characterAnimation.setCharacterIndex(3);
-        expect(characterAnimation.getCharacterIndex()).toEqual(3);
+        characterAnimation.setWalkingAnimationMapping(3);
+        expect(characterAnimation.getWalkingAnimationMapping()).toEqual(3);
         expect(characterAnimation.isEnabled()).toEqual(true);
-      });
-
-      it("should not set charIndex if walkingAnimation is also set", () => {
-        characterAnimation = new CharacterAnimation(
-          walkingAnimationMapping,
-          1,
-          3
-        );
-        expect(characterAnimation.getCharacterIndex()).toEqual(-1);
-      });
-
-      it("should unset walkingAnimation if charIndex is set", () => {
-        characterAnimation = new CharacterAnimation(
-          walkingAnimationMapping,
-          1,
-          3
-        );
-
-        characterAnimation.setCharacterIndex(3);
-        expect(characterAnimation.getWalkingAnimationMapping()).toBe(undefined);
-      });
-
-      it("should not unset walkingAnimation if charIndex is -1", () => {
-        characterAnimation = new CharacterAnimation(
-          walkingAnimationMapping,
-          1,
-          3
-        );
-
-        characterAnimation.setCharacterIndex(-1);
-        expect(characterAnimation.getWalkingAnimationMapping()).not.toBe(
-          undefined
-        );
       });
     });
 

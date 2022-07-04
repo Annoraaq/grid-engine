@@ -21,11 +21,12 @@ export class CharacterAnimation {
   private frameChange$ = new Subject<number>();
 
   constructor(
-    private walkingAnimationMapping: WalkingAnimationMapping | undefined,
-    private characterIndex: number,
+    private walkingAnimationMapping:
+      | WalkingAnimationMapping
+      | number
+      | undefined,
     private charsInRow: number
   ) {
-    this.setCharacterIndex(characterIndex);
     this.setWalkingAnimationMapping(walkingAnimationMapping);
   }
 
@@ -62,34 +63,18 @@ export class CharacterAnimation {
   }
 
   setWalkingAnimationMapping(
-    walkingAnimationMapping?: WalkingAnimationMapping
+    walkingAnimationMapping?: WalkingAnimationMapping | number
   ): void {
-    if (walkingAnimationMapping) {
-      this.characterIndex = -1;
-    }
     this.walkingAnimationMapping = walkingAnimationMapping;
     this.updateEnabled();
   }
 
   private updateEnabled() {
-    this._isEnabled =
-      this.walkingAnimationMapping !== undefined || this.characterIndex !== -1;
+    this._isEnabled = this.walkingAnimationMapping !== undefined; //|| this.characterIndex !== -1;
   }
 
-  setCharacterIndex(characterIndex: number): void {
-    if (characterIndex !== -1) {
-      this.walkingAnimationMapping = undefined;
-    }
-    this.characterIndex = characterIndex;
-    this._isEnabled = this.characterIndex !== -1;
-  }
-
-  getWalkingAnimationMapping(): WalkingAnimationMapping | undefined {
+  getWalkingAnimationMapping(): WalkingAnimationMapping | number | undefined {
     return this.walkingAnimationMapping;
-  }
-
-  getCharacterIndex(): number {
-    return this.characterIndex;
   }
 
   getCharsInRow(): number {
@@ -129,10 +114,13 @@ export class CharacterAnimation {
   }
 
   private framesOfDirection(direction: Direction): FrameRow | undefined {
-    if (this.walkingAnimationMapping) {
-      return this.getFramesForAnimationMapping(direction);
+    if (typeof this.walkingAnimationMapping === "number") {
+      return this.getFramesForCharIndex(
+        direction,
+        this.walkingAnimationMapping
+      );
     }
-    return this.getFramesForCharIndex(direction);
+    return this.getFramesForAnimationMapping(direction);
   }
 
   private getFramesForAnimationMapping(
@@ -160,9 +148,12 @@ export class CharacterAnimation {
     return direction;
   }
 
-  private getFramesForCharIndex(direction: Direction): FrameRow {
-    const playerCharRow = Math.floor(this.characterIndex / this.charsInRow);
-    const playerCharCol = this.characterIndex % this.charsInRow;
+  private getFramesForCharIndex(
+    direction: Direction,
+    characterIndex: number
+  ): FrameRow {
+    const playerCharRow = Math.floor(characterIndex / this.charsInRow);
+    const playerCharCol = characterIndex % this.charsInRow;
     const framesInRow = this.charsInRow * CharacterAnimation.FRAMES_CHAR_ROW;
     const framesInSameRowBefore =
       CharacterAnimation.FRAMES_CHAR_ROW * playerCharCol;

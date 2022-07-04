@@ -73,8 +73,7 @@ export class GridCharacter {
   private facingDirection: Direction = Direction.DOWN;
   private animation?: CharacterAnimation;
   private movement?: Movement;
-  private characterIndex = -1;
-  private walkingAnimationMapping?: WalkingAnimationMapping;
+  private walkingAnimationMapping?: WalkingAnimationMapping | number;
   private collidesWithTilesInternal: boolean;
   private collisionGroups: Set<string>;
   private pixelPositionChanged$ = new Subject<Vector2>();
@@ -86,11 +85,7 @@ export class GridCharacter {
   engineOffset = new Vector2(0, 0);
 
   constructor(private id: string, config: CharConfig) {
-    if (typeof config.walkingAnimationMapping == "number") {
-      this.characterIndex = config.walkingAnimationMapping;
-    } else {
-      this.walkingAnimationMapping = config.walkingAnimationMapping;
-    }
+    this.walkingAnimationMapping = config.walkingAnimationMapping;
     this.tilemap = config.tilemap;
     this.speed = config.speed;
     this.collidesWithTilesInternal = config.collidesWithTiles;
@@ -184,12 +179,8 @@ export class GridCharacter {
     }
   }
 
-  getWalkingAnimationMapping(): WalkingAnimationMapping | undefined {
+  getWalkingAnimationMapping(): WalkingAnimationMapping | number | undefined {
     return this.walkingAnimationMapping;
-  }
-
-  getCharacterIndex(): number {
-    return this.characterIndex;
   }
 
   setAnimation(animation: CharacterAnimation): void {

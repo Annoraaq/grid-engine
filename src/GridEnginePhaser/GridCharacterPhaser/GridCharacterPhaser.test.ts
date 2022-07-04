@@ -116,7 +116,6 @@ describe("GridCharacterPhaser", () => {
       expect(gridCharPhaser.getSprite()).toBe(spriteMock);
       expect(gridCharPhaser.getLayerOverlaySprite()).toBe(overlaySpriteMock);
       expect(gridChar.getWalkingAnimationMapping()).toBe(walkingAnimationMock);
-      expect(gridChar.getCharacterIndex()).toBe(-1);
       expect(gridChar.getSpeed()).toBe(5);
       expect(gridChar.getTilePos().position).toEqual(startPos);
       expect(gridCharPhaser.getContainer()).toBe(containerMock);
@@ -141,7 +140,6 @@ describe("GridCharacterPhaser", () => {
       expect(gridChar.getAnimation()?.getWalkingAnimationMapping()).toBe(
         walkingAnimationMock
       );
-      expect(gridChar.getAnimation()?.getCharacterIndex()).toBe(-1);
       expect(gridChar.getAnimation()?.getCharsInRow()).toBe(
         spriteMock.texture.source[0].width /
           spriteMock.width /
@@ -177,7 +175,7 @@ describe("GridCharacterPhaser", () => {
       const gridCharPhaser = createChar(charData, true);
       const gridChar = gridCharPhaser.getGridCharacter();
 
-      expect(gridChar.getCharacterIndex()).toBe(3);
+      expect(gridChar.getWalkingAnimationMapping()).toBe(3);
       expect(gridChar.getAnimation()?.isEnabled()).toBe(true);
     });
 
