@@ -7,7 +7,7 @@ import { Observable } from "rxjs";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { MovementInfo } from "./Movement/Movement";
-export { CollisionStrategy, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, LayerName, };
+export { CollisionStrategy, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, LayerName, MovementInfo, PositionChange, };
 export declare type TileSizePerSecond = number;
 export interface Position {
     x: number;
