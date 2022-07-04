@@ -2,10 +2,12 @@ import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { Finished, MoveToConfig, MoveToResult } from "./Movement/TargetMovement/TargetMovement";
 import { CharacterIndex, FrameRow, PositionChange } from "./GridCharacter/GridCharacter";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
+import { LayerName } from "./GridTilemap/GridTilemap";
 import { Observable } from "rxjs";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
-export { CollisionStrategy, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, };
+import { MovementInfo } from "./Movement/Movement";
+export { CollisionStrategy, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, LayerName, };
 export declare type TileSizePerSecond = number;
 export interface Position {
     x: number;
@@ -87,7 +89,7 @@ export interface CharacterData {
      */
     id: string;
     /** The character’s sprite. */
-    sprite: Phaser.GameObjects.Sprite;
+    sprite?: Phaser.GameObjects.Sprite;
     /**
      * If not set, automatic walking animation will be disabed. Do this if you
      * want to use a custom animation. In case of number: The 0-based index of
@@ -203,14 +205,12 @@ export declare class GridEngine {
     constructor(scene: Phaser.Scene);
     /** @internal */
     boot(): void;
-    /** @internal */
-    destroy(): void;
     /**
      * Returns the character layer of the given character.
      * You can read more about character layers and transitions
      * {@link https://annoraaq.github.io/grid-engine/api/features/character-layers.html | here}
      */
-    getCharLayer(charId: string): string;
+    getCharLayer(charId: string): string | undefined;
     /**
      * @returns The character layer that the transition on the given position and
      * character layer leads to.
@@ -262,6 +262,11 @@ export declare class GridEngine {
      */
     moveRandomly(charId: string, delay?: number, radius?: number): void;
     /**
+     * @returns Information about the current automatic movement (including
+     * random movement, follow movement and target movement)
+     */
+    getMovement(charId: string): MovementInfo;
+    /**
      * Initiates movement toward the specified `targetPos`. The movement will
      * happen along one shortest path. Check out {@link MoveToConfig} for
      * pathfinding configurations.
@@ -282,13 +287,33 @@ export declare class GridEngine {
     stopMovement(charId: string): void;
     /** Sets the speed in tiles per second for a character. */
     setSpeed(charId: string, speed: number): void;
+    /** @returns Speed in tiles per second for a character. */
+    getSpeed(charId: string): number;
+    /** @returns Container for a character. */
+    getContainer(charId: string): Phaser.GameObjects.Container | undefined;
+    /** @returns X-offset for a character. */
+    getOffsetX(charId: string): number;
+    /** @returns Y-offset for a character. */
+    getOffsetY(charId: string): number;
+    /** @returns Whether character collides with tiles */
+    collidesWithTiles(charId: string): boolean;
+    /**
+     * @returns {@link WalkingAnimationMapping} for a character. If a character
+     * index was set, it will be returned instead.
+     */
+    getWalkingAnimationMapping(charId: string): WalkingAnimationMapping | number | undefined;
+    /**
+     * @returns `true` if {@link https://annoraaq.github.io/grid-engine/features/layer-overlay | layer overlay}
+     * is activated.
+     */
+    hasLayerOverlay(): boolean;
     /**
      * Sets the {@link WalkingAnimationMapping} for a character. Alternatively you
      * can provide a number which is the character index (see also
      * {@link CharacterData | Character Config}). If you provide `undefined`, it
      * will disable walking animations for the character.
      */
-    setWalkingAnimationMapping(charId: string, walkingAnimationMapping: WalkingAnimationMapping): void;
+    setWalkingAnimationMapping(charId: string, walkingAnimationMapping?: WalkingAnimationMapping | number): void;
     /** @internal */
     update(_time: number, delta: number): void;
     /** Adds a character after calling {@link create}. */
@@ -356,11 +381,12 @@ export declare class GridEngine {
     /**
      * @returns Sprite of given character
      */
-    getSprite(charId: string): Phaser.GameObjects.Sprite;
+    getSprite(charId: string): Phaser.GameObjects.Sprite | undefined;
     /**
      * Sets the sprite for a character.
      */
     setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void;
+    private setCharSprite;
     /**
      * Checks whether the given position is blocked by either the tilemap or a
      * blocking character. If you provide no layer, be sure not to use character
@@ -393,7 +419,7 @@ export declare class GridEngine {
      * @returns Observable that, whenever a specified position is entered on optionally provided layers,
      *  will notify with the target characters position change
      */
-    steppedOn(charIds: string[], tiles: Position[], layer?: string[]): Observable<{
+    steppedOn(charIds: string[], tiles: Position[], layer?: LayerName[]): Observable<{
         charId: string;
     } & PositionChange>;
     /**
@@ -442,9 +468,8 @@ export declare class GridEngine {
     private setConfigDefaults;
     private takeUntilCharRemoved;
     private initGuard;
-    private unknownCharGuard;
-    private createCharacter;
     private addCharacters;
     private moveChar;
+    private createCharUnknownErr;
     private assembleMoveToConfig;
 }

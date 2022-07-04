@@ -1,9 +1,10 @@
+import { LayerName } from "./../../GridTilemap/GridTilemap";
 import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy";
 import { NumberOfDirections } from "./../../Direction/Direction";
 import { LayerPosition } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import { Movement } from "../Movement";
+import { Movement, MovementInfo } from "../Movement";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
 import { Position } from "../../GridEngine";
 import { Subject } from "rxjs";
@@ -73,7 +74,7 @@ export interface Finished {
     position: Position;
     result?: MoveToResult;
     description?: string;
-    layer: string;
+    layer: LayerName;
 }
 export interface Options {
     numberOfDirections?: NumberOfDirections;
@@ -106,6 +107,8 @@ export declare class TargetMovement implements Movement {
     update(delta: number): void;
     getNeighbours: (pos: LayerPosition) => LayerPosition[];
     finishedObs(): Subject<Finished>;
+    getInfo(): MovementInfo;
+    destroy(): void;
     private resultToReason;
     private applyPathBlockedStrategy;
     private moveCharOnPath;

@@ -3,8 +3,8 @@
  * queues takes O(n) for dequeueing.
  */
 export declare class Queue<T> {
-    private head;
-    private tail;
+    private head?;
+    private tail?;
     private sizeInternal;
     dequeue(): T | undefined;
     enqueue(data: T): void;

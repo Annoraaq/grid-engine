@@ -1,11 +1,13 @@
 import { LayerPosition } from "./../Pathfinding/ShortestPathAlgorithm";
+import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
 import { Direction } from "../Direction/Direction";
-import { GridTilemap } from "../GridTilemap/GridTilemap";
+import { GridTilemap, LayerName } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
 import { Position, WalkingAnimationMapping } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
+export declare type GameObject = Phaser.GameObjects.Container | Phaser.GameObjects.Sprite;
 /** Frame numbers for one movement direction */
 export interface FrameRow {
     /** Frame number for animation frame with left foot in front */
@@ -19,21 +21,19 @@ export declare type CharacterIndex = number;
 export interface PositionChange {
     exitTile: Position;
     enterTile: Position;
-    exitLayer: string;
-    enterLayer: string;
+    exitLayer: LayerName;
+    enterLayer: LayerName;
 }
 export interface CharConfig {
-    sprite: Phaser.GameObjects.Sprite;
-    layerOverlaySprite?: Phaser.GameObjects.Sprite;
     tilemap: GridTilemap;
     speed: number;
     collidesWithTiles: boolean;
     walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
-    container?: Phaser.GameObjects.Container;
     offsetX?: number;
     offsetY?: number;
     charLayer?: string;
     collisionGroups?: string[];
+    facingDirection?: Direction;
 }
 export declare class GridCharacter {
     private id;
@@ -43,9 +43,6 @@ export declare class GridCharacter {
     private tileSizePixelsWalked;
     private _nextTilePos;
     private _tilePos;
-    private sprite;
-    private layerOverlaySprite;
-    private container?;
     private speed;
     private movementStarted$;
     private movementStopped$;
@@ -56,26 +53,33 @@ export declare class GridCharacter {
     private autoMovementSet$;
     private lastMovementImpulse;
     private facingDirection;
-    private animation;
-    private movement;
+    private animation?;
+    private movement?;
     private characterIndex;
-    private walkingAnimationMapping;
+    private walkingAnimationMapping?;
     private collidesWithTilesInternal;
     private collisionGroups;
+    private pixelPositionChanged$;
+    private depthChanged$;
+    private pixelPosition;
+    engineOffset: Vector2;
     constructor(id: string, config: CharConfig);
     getId(): string;
     getSpeed(): number;
     setSpeed(speed: number): void;
-    getSprite(): Phaser.GameObjects.Sprite;
-    setSprite(sprite: Phaser.GameObjects.Sprite): void;
-    setMovement(movement: Movement): void;
-    getMovement(): Movement;
+    setMovement(movement?: Movement): void;
+    getMovement(): Movement | undefined;
     collidesWithTiles(): boolean;
-    setWalkingAnimationMapping(walkingAnimationMapping: WalkingAnimationMapping | number): void;
+    getAnimation(): CharacterAnimation | undefined;
     setTilePosition(tilePosition: LayerPosition): void;
+    getOffsetX(): number;
+    getOffsetY(): number;
     getTilePos(): LayerPosition;
     getNextTilePos(): LayerPosition;
     move(direction: Direction): void;
+    getWalkingAnimationMapping(): WalkingAnimationMapping | undefined;
+    getCharacterIndex(): number;
+    setAnimation(animation: CharacterAnimation): void;
     update(delta: number): void;
     getMovementDirection(): Direction;
     isBlockingDirection(direction: Direction): boolean;
@@ -95,22 +99,18 @@ export declare class GridCharacter {
     tilePositionSet(): Subject<LayerPosition>;
     positionChangeStarted(): Subject<PositionChange>;
     positionChangeFinished(): Subject<PositionChange>;
-    autoMovementSet(): Subject<Movement>;
-    private _setSprite;
-    private getOffset;
+    autoMovementSet(): Subject<Movement | undefined>;
+    pixelPositionChanged(): Subject<Vector2>;
+    depthChanged(): Subject<LayerPosition>;
+    getPixelPos(): Vector2;
     private updateCharacterPosition;
     private speedPixelsPerSecond;
     private get nextTilePos();
     private set nextTilePos(value);
     private get tilePos();
     private set tilePos(value);
-    private gameObject;
-    private updateZindex;
-    private setDepth;
-    private getPaddedPixelDepth;
-    private getTransitionLayer;
-    private setPosition;
-    private getPosition;
+    private setPixelPosition;
+    private getPixelPosition;
     private startMoving;
     private updateTilePos;
     private tilePosInDirection;
@@ -120,7 +120,6 @@ export declare class GridCharacter {
     private getSpeedPerDelta;
     private moveCharacterSprite;
     private stopMoving;
-    private hasWalkedHalfATile;
+    hasWalkedHalfATile(): boolean;
     private fire;
-    private initLayerOverlaySprite;
 }

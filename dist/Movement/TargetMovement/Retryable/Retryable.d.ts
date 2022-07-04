@@ -8,5 +8,6 @@ export declare class Retryable {
     retry(elapsed: number, fn: () => any): void;
     reset(): void;
     getMaxRetries(): number;
+    getBackoffMs(): number;
     private shouldRetry;
 }
