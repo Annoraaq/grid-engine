@@ -466,7 +466,7 @@ export declare class GridEngine {
         charId: string;
     } & PositionChange>;
     private setConfigDefaults;
-    private takeUntilCharRemoved;
+    private charRemoved;
     private initGuard;
     private addCharacters;
     private moveChar;

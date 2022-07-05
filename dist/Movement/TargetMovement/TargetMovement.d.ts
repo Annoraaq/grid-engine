@@ -108,7 +108,6 @@ export declare class TargetMovement implements Movement {
     getNeighbours: (pos: LayerPosition) => LayerPosition[];
     finishedObs(): Subject<Finished>;
     getInfo(): MovementInfo;
-    destroy(): void;
     private resultToReason;
     private applyPathBlockedStrategy;
     private moveCharOnPath;

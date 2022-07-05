@@ -55,7 +55,6 @@ export declare class GridCharacter {
     private facingDirection;
     private animation?;
     private movement?;
-    private characterIndex;
     private walkingAnimationMapping?;
     private collidesWithTilesInternal;
     private collisionGroups;
@@ -77,8 +76,7 @@ export declare class GridCharacter {
     getTilePos(): LayerPosition;
     getNextTilePos(): LayerPosition;
     move(direction: Direction): void;
-    getWalkingAnimationMapping(): WalkingAnimationMapping | undefined;
-    getCharacterIndex(): number;
+    getWalkingAnimationMapping(): WalkingAnimationMapping | number | undefined;
     setAnimation(animation: CharacterAnimation): void;
     update(delta: number): void;
     getMovementDirection(): Direction;

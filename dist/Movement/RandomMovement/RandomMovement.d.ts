@@ -12,11 +12,9 @@ export declare class RandomMovement implements Movement {
     private stepsWalked;
     private currentMovementDirection;
     private distanceUtils;
-    private destroy$;
     constructor(character: GridCharacter, numberOfDirections?: NumberOfDirections, delay?: number, radius?: number);
     update(delta: number): void;
     getInfo(): MovementInfo;
-    destroy(): void;
     private shouldContinueWalkingCurrentDirection;
     private getFreeDirections;
     private isWithinRadius;

@@ -3,7 +3,6 @@ import { WalkingAnimationMapping } from "../../GridEngine";
 import { Observable } from "rxjs";
 export declare class CharacterAnimation {
     private walkingAnimationMapping;
-    private characterIndex;
     private charsInRow;
     static readonly FRAMES_CHAR_ROW = 3;
     private static readonly FRAMES_CHAR_COL;
@@ -11,16 +10,14 @@ export declare class CharacterAnimation {
     private directionToFrameRow;
     private _isEnabled;
     private frameChange$;
-    constructor(walkingAnimationMapping: WalkingAnimationMapping | undefined, characterIndex: number, charsInRow: number);
+    constructor(walkingAnimationMapping: WalkingAnimationMapping | number | undefined, charsInRow: number);
     frameChange(): Observable<number>;
     setIsEnabled(isEnabled: boolean): void;
     isEnabled(): boolean;
     updateCharacterFrame(movementDirection: Direction, hasWalkedHalfATile: boolean, currentFrame: number): void;
     setStandingFrame(direction: Direction): void;
-    setWalkingAnimationMapping(walkingAnimationMapping?: WalkingAnimationMapping): void;
-    setCharacterIndex(characterIndex: number): void;
-    getWalkingAnimationMapping(): WalkingAnimationMapping | undefined;
-    getCharacterIndex(): number;
+    setWalkingAnimationMapping(walkingAnimationMapping?: WalkingAnimationMapping | number): void;
+    getWalkingAnimationMapping(): WalkingAnimationMapping | number | undefined;
     getCharsInRow(): number;
     private setStandingFrameDuringWalk;
     private setWalkingFrame;
