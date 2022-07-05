@@ -568,7 +568,6 @@ describe("GridCharacter", () => {
     expect(movement.update).toHaveBeenCalledWith(100);
     expect(gridCharacter.getMovement()).toEqual(movement);
     expect(res).toBe(movement);
-    expect(oldMovement.destroy).toHaveBeenCalled();
   });
 
   it("should set movement to undefined", () => {

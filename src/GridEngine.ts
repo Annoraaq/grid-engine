@@ -21,7 +21,7 @@ import {
 import { GridTilemap, LayerName } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
-import { takeUntil, filter, map, mergeWith } from "rxjs/operators";
+import { take, takeUntil, filter, map, mergeWith } from "rxjs/operators";
 import { Vector2 } from "./Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
@@ -584,32 +584,31 @@ export class GridEngine {
 
     this.gridTilemap.addCharacter(gridChar);
     const id = gridChar.getId();
-    const takeUntilCharRemoved$ = this.takeUntilCharRemoved(id);
 
     gridChar
       .movementStopped()
-      .pipe(takeUntilCharRemoved$)
+      .pipe(takeUntil(this.charRemoved(id)))
       .subscribe((direction: Direction) => {
         this.movementStopped$.next({ charId: id, direction });
       });
 
     gridChar
       .movementStarted()
-      .pipe(takeUntilCharRemoved$)
+      .pipe(takeUntil(this.charRemoved(id)))
       .subscribe((direction: Direction) => {
         this.movementStarted$.next({ charId: id, direction });
       });
 
     gridChar
       .directionChanged()
-      .pipe(takeUntilCharRemoved$)
+      .pipe(takeUntil(this.charRemoved(id)))
       .subscribe((direction: Direction) => {
         this.directionChanged$.next({ charId: id, direction });
       });
 
     gridChar
       .positionChangeStarted()
-      .pipe(takeUntilCharRemoved$)
+      .pipe(takeUntil(this.charRemoved(id)))
       .subscribe((positionChange: PositionChange) => {
         this.positionChangeStarted$.next({
           charId: id,
@@ -619,7 +618,7 @@ export class GridEngine {
 
     gridChar
       .positionChangeFinished()
-      .pipe(takeUntilCharRemoved$)
+      .pipe(takeUntil(this.charRemoved(id)))
       .subscribe((positionChange: PositionChange) => {
         this.positionChangeFinished$.next({
           charId: id,
@@ -966,8 +965,11 @@ export class GridEngine {
     };
   }
 
-  private takeUntilCharRemoved(charId: string) {
-    return takeUntil(this.charRemoved$.pipe(filter((cId) => cId == charId)));
+  private charRemoved(charId: string) {
+    return this.charRemoved$.pipe(
+      take(1),
+      filter((cId) => cId == charId)
+    );
   }
 
   private initGuard() {

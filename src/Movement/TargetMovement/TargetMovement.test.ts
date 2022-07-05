@@ -80,6 +80,49 @@ describe("TargetMovement", () => {
     expect(mockChar.move).toHaveBeenCalledWith(Direction.RIGHT);
   });
 
+  it("should return info", () => {
+    const charPos = layerPos(new Vector2(1, 1));
+    const mockChar = createMockChar("char1", charPos.position);
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [charPos, layerPos(new Vector2(2, 1)), layerPos(new Vector2(3, 1))],
+      closestToTarget: new Vector2(3, 1),
+    });
+    targetMovement = new TargetMovement(
+      mockChar,
+      gridTilemapMock,
+      {
+        position: new Vector2(3, 1),
+        layer: "layer2",
+      },
+      {
+        config: {
+          noPathFoundMaxRetries: 3,
+          noPathFoundRetryBackoffMs: 200,
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+          pathBlockedStrategy: PathBlockedStrategy.RETRY,
+        },
+        ignoreBlockedTarget: true,
+        distance: 12,
+      }
+    );
+
+    expect(targetMovement.getInfo()).toEqual({
+      type: "Target",
+      config: {
+        ignoreBlockedTarget: true,
+        distance: 12,
+        targetPos: {
+          position: new Vector2(3, 1),
+          layer: "layer2",
+        },
+        noPathFoundMaxRetries: 3,
+        noPathFoundRetryBackoffMs: 200,
+        noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        pathBlockedStrategy: PathBlockedStrategy.RETRY,
+      },
+    });
+  });
+
   it("should move char", () => {
     const charPos = layerPos(new Vector2(1, 1));
     const mockChar = createMockChar("char", charPos.position);

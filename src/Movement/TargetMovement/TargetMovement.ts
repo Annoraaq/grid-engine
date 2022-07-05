@@ -243,7 +243,6 @@ export class TargetMovement implements Movement {
     return this.finished$;
   }
 
-  // TODO: test
   getInfo(): MovementInfo {
     return {
       type: "Target",
@@ -257,10 +256,6 @@ export class TargetMovement implements Movement {
         noPathFoundMaxRetries: this.noPathFoundRetryable.getMaxRetries(),
       },
     };
-  }
-
-  destroy(): void {
-    // TODO free observables
   }
 
   private resultToReason(result?: MoveToResult): string | undefined {

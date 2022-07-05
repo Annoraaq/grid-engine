@@ -113,7 +113,6 @@ export class GridCharacter {
 
   setMovement(movement?: Movement): void {
     this.autoMovementSet$.next(movement);
-    this.movement?.destroy();
     this.movement = movement;
   }
 

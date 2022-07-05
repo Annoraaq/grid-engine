@@ -5,9 +5,8 @@ import { NumberOfDirections } from "./../../Direction/Direction";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Direction, directionVector } from "../../Direction/Direction";
 import { Movement, MovementInfo } from "../Movement";
-import { takeUntil } from "rxjs/operators";
+import { takeUntil, filter, take } from "rxjs/operators";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { Subject } from "rxjs";
 
 export class RandomMovement implements Movement {
   private delayLeft: number;
@@ -17,7 +16,6 @@ export class RandomMovement implements Movement {
   private stepsWalked: number;
   private currentMovementDirection: Direction;
   private distanceUtils: DistanceUtils;
-  private destroy$ = new Subject<void>();
 
   constructor(
     private character: GridCharacter,
@@ -34,7 +32,14 @@ export class RandomMovement implements Movement {
     this.currentMovementDirection = Direction.NONE;
     this.character
       .positionChangeStarted()
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        takeUntil(
+          this.character.autoMovementSet().pipe(
+            take(1),
+            filter((movement) => movement !== this)
+          )
+        )
+      )
       .subscribe(() => {
         this.stepsWalked++;
       });
@@ -57,7 +62,6 @@ export class RandomMovement implements Movement {
     }
   }
 
-  // TODO: test
   getInfo(): MovementInfo {
     return {
       type: "Random",
@@ -66,11 +70,6 @@ export class RandomMovement implements Movement {
         radius: this.radius,
       },
     };
-  }
-
-  destroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   private shouldContinueWalkingCurrentDirection(): boolean {
