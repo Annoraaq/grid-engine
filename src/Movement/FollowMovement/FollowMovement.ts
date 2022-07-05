@@ -1,4 +1,4 @@
-import { filter, takeUntil } from "rxjs/operators";
+import { filter, takeUntil, take } from "rxjs/operators";
 import { NumberOfDirections } from "./../../Direction/Direction";
 import { GridTilemap, LayerName } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
@@ -28,9 +28,10 @@ export class FollowMovement implements Movement {
       .positionChangeStarted()
       .pipe(
         takeUntil(
-          this.character
-            .autoMovementSet()
-            .pipe(filter((movement) => movement !== this))
+          this.character.autoMovementSet().pipe(
+            take(1),
+            filter((movement) => movement !== this)
+          )
         )
       )
       .subscribe(({ enterTile, enterLayer }) => {
@@ -51,10 +52,6 @@ export class FollowMovement implements Movement {
         noPathFoundStrategy: this.noPathFoundStrategy,
       },
     };
-  }
-
-  destroy(): void {
-    // TODO free observables
   }
 
   private updateTarget(targetPos: Position, targetLayer: LayerName): void {

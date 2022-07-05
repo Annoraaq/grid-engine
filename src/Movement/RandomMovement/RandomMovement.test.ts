@@ -62,6 +62,23 @@ describe("RandomMovement", () => {
     expect(charMock.move).toHaveBeenCalledWith(Direction.DOWN);
   });
 
+  it("should return info", () => {
+    randomMovement = new RandomMovement(
+      charMock,
+      NumberOfDirections.FOUR,
+      10,
+      2
+    );
+
+    expect(randomMovement.getInfo()).toEqual({
+      type: "Random",
+      config: {
+        delay: 10,
+        radius: 2,
+      },
+    });
+  });
+
   it("should add and update character", () => {
     randomMovement = new RandomMovement(charMock, NumberOfDirections.FOUR, 10);
     randomMovement.update(5);
@@ -220,8 +237,7 @@ describe("RandomMovement", () => {
     expect(charMock.move).toHaveBeenCalledTimes(1);
   });
 
-  it("should unsubscribe from positionChangeStarted on destroy", () => {
-    charMock = createCharMock();
+  it("should unsubscribe from positionChangeStarted on autoMovementSet", () => {
     randomMovement = new RandomMovement(
       charMock,
       NumberOfDirections.FOUR,
@@ -235,9 +251,7 @@ describe("RandomMovement", () => {
 
     mockDirUpStepSize1();
 
-    randomMovement.destroy();
-    positionChangeStartedSubject$.next(undefined);
-    positionChangeStartedSubject$.next(undefined);
+    autoMovementSetSubject$.next(undefined);
     positionChangeStartedSubject$.next(undefined);
     positionChangeStartedSubject$.next(undefined);
 
