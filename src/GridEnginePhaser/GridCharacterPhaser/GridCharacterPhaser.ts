@@ -17,6 +17,7 @@ export class GridCharacterPhaser {
   private layerOverlaySprite?: Phaser.GameObjects.Sprite;
   private container?: Phaser.GameObjects.Container;
   private newSpriteSet$ = new Subject<void>();
+  private destroy$ = new Subject<void>();
   private gridCharacter: GridCharacter = this.createChar(
     this.charData,
     this.layerOverlay
@@ -28,6 +29,12 @@ export class GridCharacterPhaser {
     private tilemap: GridTilemap,
     private layerOverlay: boolean
   ) {}
+
+  destroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.newSpriteSet$.complete();
+  }
 
   getGridCharacter(): GridCharacter {
     return this.gridCharacter;
@@ -109,25 +116,28 @@ export class GridCharacterPhaser {
 
     const gridChar = new GridCharacter(charData.id, charConfig);
 
-    gridChar.pixelPositionChanged().subscribe((pixelPos: Vector2) => {
-      const gameObj = this.container || this.sprite;
-      if (gameObj) {
-        gameObj.x = pixelPos.x;
-        gameObj.y = pixelPos.y;
-      }
+    gridChar
+      .pixelPositionChanged()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((pixelPos: Vector2) => {
+        const gameObj = this.container || this.sprite;
+        if (gameObj) {
+          gameObj.x = pixelPos.x;
+          gameObj.y = pixelPos.y;
+        }
 
-      if (this.sprite && gridChar.isMoving()) {
-        gridChar
-          .getAnimation()
-          ?.updateCharacterFrame(
-            gridChar.getMovementDirection(),
-            gridChar.hasWalkedHalfATile(),
-            Number(this.sprite.frame.name)
-          );
-      }
+        if (this.sprite && gridChar.isMoving()) {
+          gridChar
+            .getAnimation()
+            ?.updateCharacterFrame(
+              gridChar.getMovementDirection(),
+              gridChar.hasWalkedHalfATile(),
+              Number(this.sprite.frame.name)
+            );
+        }
 
-      this.updateDepth(gridChar);
-    });
+        this.updateDepth(gridChar);
+      });
 
     if (this.sprite) {
       this.sprite.setOrigin(0, 0);
@@ -150,8 +160,6 @@ export class GridCharacterPhaser {
         });
       }
     }
-
-    // TODO: check for memory leak
 
     return gridChar;
   }

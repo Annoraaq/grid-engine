@@ -643,6 +643,7 @@ export class GridEngine {
     this.initGuard();
     const gridChar = this.gridCharacters.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.destroy();
     this.gridTilemap.removeCharacter(charId);
     this.gridCharacters.delete(charId);
     this.charRemoved$.next(charId);
