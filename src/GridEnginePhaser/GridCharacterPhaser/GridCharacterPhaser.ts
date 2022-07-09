@@ -14,6 +14,7 @@ import { takeUntil } from "rxjs/operators";
 import { directionVector } from "../../Direction/Direction";
 
 export class GridCharacterPhaser {
+  customOffset: Vector2;
   private engineOffset: Vector2;
 
   private sprite?: Phaser.GameObjects.Sprite;
@@ -83,6 +84,14 @@ export class GridCharacterPhaser {
     return this.engineOffset;
   }
 
+  getOffsetX(): number {
+    return this.customOffset.x;
+  }
+
+  getOffsetY(): number {
+    return this.customOffset.y;
+  }
+
   update(delta: number): void {
     this.gridCharacter.update(delta);
     this.updateGridChar(this.gridCharacter);
@@ -95,7 +104,7 @@ export class GridCharacterPhaser {
     const basePixelPos = this.tilemap
       .tilePosToPixelPos(tp)
       .add(this.engineOffset)
-      .add(gridChar.customOffset);
+      .add(this.customOffset);
     const newPixelPos = basePixelPos.add(
       directionVector(
         this.tilemap.toMapDirection(gridChar.getMovementDirection())
@@ -128,13 +137,16 @@ export class GridCharacterPhaser {
       speed: charData.speed || 4,
       tilemap: this.tilemap,
       walkingAnimationMapping: charData.walkingAnimationMapping,
-      offsetX: charData.offsetX,
-      offsetY: charData.offsetY,
       collidesWithTiles: true,
       collisionGroups: ["geDefault"],
       charLayer: charData.charLayer,
       facingDirection: charData.facingDirection,
     };
+
+    this.customOffset = new Vector2(
+      charData.offsetX || 0,
+      charData.offsetY || 0
+    );
 
     if (typeof charData.collides === "boolean") {
       if (charData.collides === false) {

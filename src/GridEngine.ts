@@ -497,7 +497,7 @@ export class GridEngine {
   /** @returns X-offset for a character. */
   getOffsetX(charId: string): number {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
+    const gridChar = this.gridCharacters.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getOffsetX();
   }
@@ -505,7 +505,7 @@ export class GridEngine {
   /** @returns Y-offset for a character. */
   getOffsetY(charId: string): number {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
+    const gridChar = this.gridCharacters.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getOffsetY();
   }

@@ -208,8 +208,6 @@ describe("GridCharacter", () => {
   });
 
   it("should set tile position", () => {
-    const customOffsetX = 10;
-    const customOffsetY = 15;
     const newTilePos = new Vector2(3, 4);
     const expectedTilePos = { position: new Vector2(3, 4), layer: "someLayer" };
     const newPixelPos = new Vector2(10, 20);
@@ -217,8 +215,6 @@ describe("GridCharacter", () => {
     gridCharacter = new GridCharacter("player", {
       tilemap: gridTilemapMock,
       speed: 3,
-      offsetX: customOffsetX,
-      offsetY: customOffsetY,
       collidesWithTiles: true,
     });
     gridCharacter.setTilePosition({

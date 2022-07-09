@@ -119,8 +119,8 @@ describe("GridCharacterPhaser", () => {
       expect(gridChar.getSpeed()).toBe(5);
       expect(gridChar.getTilePos().position).toEqual(startPos);
       expect(gridCharPhaser.getContainer()).toBe(containerMock);
-      expect(gridChar.getOffsetX()).toBe(5);
-      expect(gridChar.getOffsetY()).toBe(6);
+      expect(gridCharPhaser.getOffsetX()).toBe(5);
+      expect(gridCharPhaser.getOffsetY()).toBe(6);
       expect(gridChar.getFacingDirection()).toBe(Direction.RIGHT);
       expect(gridChar.collidesWithTiles()).toBe(true);
       expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
@@ -236,8 +236,8 @@ describe("GridCharacterPhaser", () => {
       expect(gridChar.getWalkingAnimationMapping()).toBe(undefined);
       expect(gridChar.getSpeed()).toBe(4);
       expect(gridCharPhaser.getContainer()).toBe(undefined);
-      expect(gridChar.getOffsetX()).toBe(0);
-      expect(gridChar.getOffsetY()).toBe(0);
+      expect(gridCharPhaser.getOffsetX()).toBe(0);
+      expect(gridCharPhaser.getOffsetY()).toBe(0);
       expect(gridChar.collidesWithTiles()).toBe(true);
       expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
       expect(gridChar.getTilePos().layer).toBe(undefined);

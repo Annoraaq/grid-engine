@@ -42,19 +42,17 @@ export interface CharConfig {
   speed: number;
   collidesWithTiles: boolean;
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
-  offsetX?: number;
-  offsetY?: number;
   charLayer?: string;
   collisionGroups?: string[];
   facingDirection?: Direction;
 }
 
 export class GridCharacter {
-  customOffset: Vector2;
+  // customOffset: Vector2;
   protected tilemap: GridTilemap;
 
   private movementDirection = Direction.NONE;
-  private tileSizePixelsWalked: Vector2 = Vector2.ZERO;
+  // private tileSizePixelsWalked: Vector2 = Vector2.ZERO;
   private _nextTilePos: LayerPosition = {
     position: new Vector2(0, 0),
     layer: undefined,
@@ -86,7 +84,6 @@ export class GridCharacter {
     this.tilemap = config.tilemap;
     this.speed = config.speed;
     this.collidesWithTilesInternal = config.collidesWithTiles;
-    this.customOffset = new Vector2(config.offsetX || 0, config.offsetY || 0);
     this._tilePos.layer = config.charLayer;
 
     this.collisionGroups = new Set<string>(config.collisionGroups || []);
@@ -141,15 +138,15 @@ export class GridCharacter {
     this.movementProgress = 0;
   }
 
-  // TODO move to phaserChar
-  getOffsetX(): number {
-    return this.customOffset.x;
-  }
+  // // TODO move to phaserChar
+  // getOffsetX(): number {
+  //   return this.customOffset.x;
+  // }
 
-  // TODO move to phaserChar
-  getOffsetY(): number {
-    return this.customOffset.y;
-  }
+  // // TODO move to phaserChar
+  // getOffsetY(): number {
+  //   return this.customOffset.y;
+  // }
 
   getTilePos(): LayerPosition {
     return this.tilePos;
