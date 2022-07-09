@@ -138,16 +138,6 @@ export class GridCharacter {
     this.movementProgress = 0;
   }
 
-  // // TODO move to phaserChar
-  // getOffsetX(): number {
-  //   return this.customOffset.x;
-  // }
-
-  // // TODO move to phaserChar
-  // getOffsetY(): number {
-  //   return this.customOffset.y;
-  // }
-
   getTilePos(): LayerPosition {
     return this.tilePos;
   }
