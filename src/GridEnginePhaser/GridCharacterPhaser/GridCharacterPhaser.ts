@@ -14,7 +14,7 @@ import { takeUntil } from "rxjs/operators";
 import { directionVector } from "../../Direction/Direction";
 
 export class GridCharacterPhaser {
-  customOffset: Vector2;
+  private customOffset: Vector2;
   private engineOffset: Vector2;
 
   private sprite?: Phaser.GameObjects.Sprite;
