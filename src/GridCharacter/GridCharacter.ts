@@ -48,11 +48,9 @@ export interface CharConfig {
 }
 
 export class GridCharacter {
-  // customOffset: Vector2;
   protected tilemap: GridTilemap;
 
   private movementDirection = Direction.NONE;
-  // private tileSizePixelsWalked: Vector2 = Vector2.ZERO;
   private _nextTilePos: LayerPosition = {
     position: new Vector2(0, 0),
     layer: undefined,
