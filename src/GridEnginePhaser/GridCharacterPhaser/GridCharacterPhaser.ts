@@ -106,10 +106,10 @@ export class GridCharacterPhaser {
       .add(this.engineOffset)
       .add(this.customOffset);
     const newPixelPos = basePixelPos.add(
-      directionVector(
-        this.tilemap.toMapDirection(gridChar.getMovementDirection())
-      ).multiply(
-        this.tilemap.getTileSize().scalarMult(movementProgressProportional)
+      directionVector(gridChar.getMovementDirection()).multiply(
+        this.tilemap
+          .getTileDistance(gridChar.getMovementDirection())
+          .scalarMult(movementProgressProportional)
       )
     );
 

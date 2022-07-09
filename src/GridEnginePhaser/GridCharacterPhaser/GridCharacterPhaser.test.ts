@@ -653,6 +653,63 @@ describe("GridCharacterPhaser", () => {
       });
     });
 
+    describe("update sprite pixel pos isometric", () => {
+      let charData;
+      let charTilePos;
+      let gridCharPhaser;
+      let gridChar;
+      beforeEach(() => {
+        tilemapMock.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC;
+        charData = {
+          id: "charID",
+          sprite: spriteMock,
+          offsetX: 10,
+          offsetY: 15,
+        };
+        charTilePos = new Vector2(3, 4);
+        gridCharPhaser = createChar(charData, false);
+        gridChar = gridCharPhaser.getGridCharacter();
+        gridChar.setSpeed(1);
+        gridChar.setTilePosition({
+          position: charTilePos,
+          layer: undefined,
+        });
+      });
+
+      it("should update sprite pixel pos vertically", () => {
+        gridChar.move(Direction.UP);
+        gridCharPhaser.update(250);
+
+        const expectedYPos =
+          gridTilemap.tilePosToPixelPos(charTilePos).y +
+          gridCharPhaser.engineOffset.y +
+          charData.offsetY +
+          gridTilemap.getTileDistance(Direction.UP).y * -0.25;
+
+        expect(gridCharPhaser.getSprite()?.x).toBe(0);
+        expect(gridCharPhaser.getSprite()?.y).toBe(expectedYPos);
+      });
+
+      it("should update sprite pixel pos diagonally", () => {
+        gridChar.move(Direction.UP_LEFT);
+        gridCharPhaser.update(250);
+
+        const expectedXPos =
+          gridTilemap.tilePosToPixelPos(charTilePos).x +
+          gridCharPhaser.engineOffset.x +
+          charData.offsetX +
+          gridTilemap.getTileDistance(Direction.UP_LEFT).x * -0.25;
+        const expectedYPos =
+          gridTilemap.tilePosToPixelPos(charTilePos).y +
+          gridCharPhaser.engineOffset.y +
+          charData.offsetY +
+          gridTilemap.getTileDistance(Direction.UP_LEFT).y * -0.25;
+
+        expect(gridCharPhaser.getSprite()?.x).toBe(expectedXPos);
+        expect(gridCharPhaser.getSprite()?.y).toBe(expectedYPos);
+      });
+    });
+
     it("should update walking animation", () => {
       const charData = {
         id: "charID",
