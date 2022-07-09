@@ -15,6 +15,7 @@ const mockGridTileMap = {
   removeCharacter: jest.fn(),
   getCharactersAt: jest.fn(),
   getTileWidth: () => 32,
+  getTileSize: jest.fn().mockReturnValue(new Vector2(32, 32)),
   getTileHeight: () => 32,
   getTransition: jest.fn(),
   setTransition: jest.fn(),
@@ -38,6 +39,7 @@ const mockGridTilemapConstructor = jest.fn(function (
 const mockNewSprite = {
   setCrop: jest.fn(),
   setOrigin: jest.fn(),
+  setDepth: jest.fn(),
   scale: 1,
 };
 

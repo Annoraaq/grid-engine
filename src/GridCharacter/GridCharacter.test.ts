@@ -15,9 +15,7 @@ describe("GridCharacter", () => {
 
   const TILE_WIDTH = 16;
   const TILE_HEIGHT = 16;
-  const MS_FOR_12_PX = 250;
-  const INITIAL_SPRITE_X_POS = 0;
-  const INITIAL_SPRITE_Y_POS = 0;
+  const QUARTER_SECOND = 250;
   const DEPTH_OF_CHAR_LAYER = 10;
 
   function mockNonBlockingTile() {
@@ -128,12 +126,10 @@ describe("GridCharacter", () => {
 
   it("should not update if not moving", () => {
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
-    expect(gridCharacter.getPixelPos().x).toEqual(0);
-    expect(gridCharacter.getPixelPos().y).toEqual(0);
+    expect(gridCharacter.getMovementProgress()).toEqual(0);
 
     gridCharacter.update(300);
-    expect(gridCharacter.getPixelPos().x).toEqual(0);
-    expect(gridCharacter.getPixelPos().y).toEqual(0);
+    expect(gridCharacter.getMovementProgress()).toEqual(0);
   });
 
   it("should not move if no direction", () => {
@@ -146,24 +142,28 @@ describe("GridCharacter", () => {
     mockNonBlockingTile();
 
     gridCharacter.move(Direction.UP);
-    gridCharacter.update(MS_FOR_12_PX / 2);
+    gridCharacter.update(QUARTER_SECOND / 2);
 
-    expect(gridCharacter.getPixelPos().x).toEqual(INITIAL_SPRITE_X_POS);
-    expect(gridCharacter.getPixelPos().y).toEqual(INITIAL_SPRITE_Y_POS - 6);
+    expect(gridCharacter.getMovementProgress()).toEqual(
+      Math.floor(3 * (QUARTER_SECOND / 2))
+    );
 
     gridCharacter.setSpeed(1.5);
-    gridCharacter.update(MS_FOR_12_PX / 2);
-    expect(gridCharacter.getPixelPos().y).toEqual(INITIAL_SPRITE_Y_POS - 9);
+    gridCharacter.update(QUARTER_SECOND / 2);
+    expect(gridCharacter.getMovementProgress()).toEqual(
+      Math.floor(3 * (QUARTER_SECOND / 2) + 1.5 * (QUARTER_SECOND / 2))
+    );
   });
 
   it("should update vertically", () => {
     mockNonBlockingTile();
 
     gridCharacter.move(Direction.UP);
-    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.update(QUARTER_SECOND);
 
-    expect(gridCharacter.getPixelPos().x).toEqual(INITIAL_SPRITE_X_POS);
-    expect(gridCharacter.getPixelPos().y).toEqual(INITIAL_SPRITE_Y_POS - 12);
+    expect(gridCharacter.getMovementProgress()).toEqual(
+      Math.floor(3 * QUARTER_SECOND)
+    );
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
   });
@@ -172,10 +172,11 @@ describe("GridCharacter", () => {
     mockNonBlockingTile();
 
     gridCharacter.move(Direction.RIGHT);
-    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.update(QUARTER_SECOND);
 
-    expect(gridCharacter.getPixelPos().x).toEqual(INITIAL_SPRITE_X_POS + 12);
-    expect(gridCharacter.getPixelPos().y).toEqual(INITIAL_SPRITE_Y_POS);
+    expect(gridCharacter.getMovementProgress()).toEqual(
+      Math.floor(3 * QUARTER_SECOND)
+    );
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.RIGHT);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
   });
@@ -184,10 +185,11 @@ describe("GridCharacter", () => {
     mockNonBlockingTile();
 
     gridCharacter.move(Direction.DOWN_LEFT);
-    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.update(QUARTER_SECOND);
 
-    expect(gridCharacter.getPixelPos().x).toEqual(INITIAL_SPRITE_X_POS - 12);
-    expect(gridCharacter.getPixelPos().y).toEqual(INITIAL_SPRITE_Y_POS + 12);
+    expect(gridCharacter.getMovementProgress()).toEqual(
+      Math.floor(3 * QUARTER_SECOND)
+    );
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN_LEFT);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN_LEFT);
   });
@@ -196,19 +198,16 @@ describe("GridCharacter", () => {
     mockNonBlockingTile();
 
     gridCharacter.move(Direction.UP);
-    gridCharacter.update(MS_FOR_12_PX);
-    gridCharacter.update(MS_FOR_12_PX);
-    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.update(QUARTER_SECOND);
+    gridCharacter.update(QUARTER_SECOND);
+    gridCharacter.update(QUARTER_SECOND);
 
-    expect(gridCharacter.getPixelPos().x).toEqual(INITIAL_SPRITE_X_POS);
-    expect(gridCharacter.getPixelPos().y).toEqual(INITIAL_SPRITE_Y_POS - 16);
+    expect(gridCharacter.getMovementProgress()).toEqual(0);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
   });
 
   it("should set tile position", () => {
-    const customOffsetX = 10;
-    const customOffsetY = 15;
     const newTilePos = new Vector2(3, 4);
     const expectedTilePos = { position: new Vector2(3, 4), layer: "someLayer" };
     const newPixelPos = new Vector2(10, 20);
@@ -216,8 +215,6 @@ describe("GridCharacter", () => {
     gridCharacter = new GridCharacter("player", {
       tilemap: gridTilemapMock,
       speed: 3,
-      offsetX: customOffsetX,
-      offsetY: customOffsetY,
       collidesWithTiles: true,
     });
     gridCharacter.setTilePosition({
@@ -228,12 +225,7 @@ describe("GridCharacter", () => {
     // mutate original object
     newTilePos.x = 20;
 
-    expect(gridCharacter.getPixelPos().x).toEqual(
-      newPixelPos.x + customOffsetX
-    );
-    expect(gridCharacter.getPixelPos().y).toEqual(
-      newPixelPos.y + customOffsetY
-    );
+    expect(gridCharacter.getMovementProgress()).toEqual(0);
     expect(gridCharacter.getTilePos()).toEqual(expectedTilePos);
   });
 
@@ -275,8 +267,7 @@ describe("GridCharacter", () => {
       enterLayer: "someLayer",
     });
 
-    expect(gridCharacter.getPixelPos().x).toEqual(newPixelPos.x);
-    expect(gridCharacter.getPixelPos().y).toEqual(newPixelPos.y);
+    expect(gridCharacter.getMovementProgress()).toEqual(0);
   });
 
   it("should stop ongoing movement when stopping on positionChangeFinish", () => {
@@ -432,16 +423,19 @@ describe("GridCharacter", () => {
 
     gridTilemapMock.toMapDirection.mockReturnValue(Direction.RIGHT);
     gridCharacter.move(Direction.RIGHT);
-    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.update(QUARTER_SECOND);
     gridTilemapMock.toMapDirection.mockReturnValue(Direction.DOWN);
     gridCharacter.move(Direction.DOWN);
-    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.update(QUARTER_SECOND);
 
     const posChange = await prom;
     expect(posChange?.exitTile).toEqual(new Vector2(0, 0));
     expect(posChange?.enterTile).toEqual(new Vector2(1, 0));
-    expect(gridCharacter.getPixelPos().x).toEqual(INITIAL_SPRITE_X_POS + 16);
-    expect(gridCharacter.getPixelPos().y).toEqual(INITIAL_SPRITE_Y_POS + 8);
+
+    expect(gridCharacter.getMovementProgress()).toEqual(
+      Math.floor(2 * QUARTER_SECOND)
+    );
+
     expect(gridCharacter.getTilePos()).toEqual({
       position: new Vector2(1, 0),
       layer: undefined,
@@ -452,7 +446,7 @@ describe("GridCharacter", () => {
     mockNonBlockingTile();
 
     gridCharacter.move(Direction.RIGHT);
-    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.update(QUARTER_SECOND);
 
     gridCharacter
       .movementStarted()
@@ -462,46 +456,19 @@ describe("GridCharacter", () => {
       });
 
     gridCharacter.move(Direction.RIGHT);
-    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.update(QUARTER_SECOND);
     done();
-  });
-
-  it("should continue moving to different dir", (done) => {
-    mockNonBlockingTile();
-
-    gridCharacter
-      .positionChangeFinished()
-      .subscribe(({ exitTile, enterTile }) => {
-        expect(exitTile).toEqual(new Vector2(0, 0));
-        expect(enterTile).toEqual(new Vector2(1, 0));
-        done();
-      });
-
-    gridTilemapMock.toMapDirection.mockReturnValue(Direction.RIGHT);
-    gridCharacter.move(Direction.RIGHT);
-    gridCharacter.update(MS_FOR_12_PX);
-    gridTilemapMock.toMapDirection.mockReturnValue(Direction.DOWN);
-    gridCharacter.move(Direction.DOWN);
-    gridCharacter.update(MS_FOR_12_PX);
-    expect(gridCharacter.getPixelPos().x).toEqual(INITIAL_SPRITE_X_POS + 16);
-    expect(gridCharacter.getPixelPos().y).toEqual(INITIAL_SPRITE_Y_POS + 8);
-    expect(gridCharacter.getTilePos()).toEqual({
-      position: new Vector2(1, 0),
-      layer: undefined,
-    });
   });
 
   it("should continue moving on tile border edge case vertically", () => {
     mockNonBlockingTile();
+    gridCharacter.setSpeed(1);
 
     gridCharacter.move(Direction.DOWN);
-    gridCharacter.update(MS_FOR_12_PX);
+    gridCharacter.update(QUARTER_SECOND * 3);
     gridCharacter.move(Direction.RIGHT);
-    gridCharacter.update(83.33333333333333);
-    expect(gridCharacter.getPixelPos().x).toEqual(INITIAL_SPRITE_X_POS + 0);
-    expect(Math.round(gridCharacter.getPixelPos().y)).toEqual(
-      INITIAL_SPRITE_Y_POS + 16
-    );
+    gridCharacter.update(QUARTER_SECOND);
+    expect(gridCharacter.getMovementProgress()).toEqual(0);
     expect(gridCharacter.getTilePos()).toEqual({
       position: new Vector2(0, 1),
       layer: undefined,
@@ -510,16 +477,30 @@ describe("GridCharacter", () => {
 
   it("should stop moving on tile border edge case", () => {
     mockNonBlockingTile();
+    gridCharacter.setSpeed(1);
 
     gridTilemapMock.getTransition.mockReturnValue("transitionLayer");
     gridCharacter.move(Direction.DOWN);
-    gridCharacter.update(MS_FOR_12_PX);
-    gridCharacter.update(83.33333333333333);
+    gridCharacter.update(QUARTER_SECOND * 3);
+    gridCharacter.update(QUARTER_SECOND * 1);
 
-    expect(gridCharacter.getPixelPos().x).toEqual(INITIAL_SPRITE_X_POS + 0);
-    expect(Math.round(gridCharacter.getPixelPos().y)).toEqual(
-      INITIAL_SPRITE_Y_POS + 16
-    );
+    expect(gridCharacter.getMovementProgress()).toEqual(0);
+    expect(gridCharacter.getTilePos()).toEqual({
+      position: new Vector2(0, 1),
+      layer: "transitionLayer",
+    });
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+  });
+
+  it("should stop moving on tile border edge case in one update", () => {
+    mockNonBlockingTile();
+    gridCharacter.setSpeed(1);
+
+    gridTilemapMock.getTransition.mockReturnValue("transitionLayer");
+    gridCharacter.move(Direction.DOWN);
+    gridCharacter.update(QUARTER_SECOND * 4);
+
+    expect(gridCharacter.getMovementProgress()).toEqual(0);
     expect(gridCharacter.getTilePos()).toEqual({
       position: new Vector2(0, 1),
       layer: "transitionLayer",

@@ -11,8 +11,12 @@ import { LayerPosition } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Utils } from "../../Utils/Utils/Utils";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import { directionVector } from "../../Direction/Direction";
 
 export class GridCharacterPhaser {
+  customOffset: Vector2;
+  private engineOffset: Vector2;
+
   private sprite?: Phaser.GameObjects.Sprite;
   private layerOverlaySprite?: Phaser.GameObjects.Sprite;
   private container?: Phaser.GameObjects.Container;
@@ -76,6 +80,50 @@ export class GridCharacterPhaser {
     return this.container;
   }
 
+  getEngineOffset(): Vector2 {
+    return this.engineOffset;
+  }
+
+  getOffsetX(): number {
+    return this.customOffset.x;
+  }
+
+  getOffsetY(): number {
+    return this.customOffset.y;
+  }
+
+  update(delta: number): void {
+    this.gridCharacter.update(delta);
+    this.updateGridChar(this.gridCharacter);
+  }
+
+  private updatePixelPos(gridChar: GridCharacter) {
+    const tp = gridChar.getTilePos().position.clone();
+    const movementProgressProportional = gridChar.getMovementProgress() / 1000;
+
+    const basePixelPos = this.tilemap
+      .tilePosToPixelPos(tp)
+      .add(this.engineOffset)
+      .add(this.customOffset);
+    const newPixelPos = basePixelPos.add(
+      directionVector(gridChar.getMovementDirection()).multiply(
+        this.tilemap
+          .getTileDistance(gridChar.getMovementDirection())
+          .scalarMult(movementProgressProportional)
+      )
+    );
+
+    const gameObj = this.getGameObj();
+    if (gameObj) {
+      gameObj.x = newPixelPos.x;
+      gameObj.y = newPixelPos.y;
+    }
+  }
+
+  private getGameObj(): GameObject | undefined {
+    return this.container || this.sprite;
+  }
+
   private createChar(
     charData: CharacterData,
     layerOverlay: boolean
@@ -89,13 +137,16 @@ export class GridCharacterPhaser {
       speed: charData.speed || 4,
       tilemap: this.tilemap,
       walkingAnimationMapping: charData.walkingAnimationMapping,
-      offsetX: charData.offsetX,
-      offsetY: charData.offsetY,
       collidesWithTiles: true,
       collisionGroups: ["geDefault"],
       charLayer: charData.charLayer,
       facingDirection: charData.facingDirection,
     };
+
+    this.customOffset = new Vector2(
+      charData.offsetX || 0,
+      charData.offsetY || 0
+    );
 
     if (typeof charData.collides === "boolean") {
       if (charData.collides === false) {
@@ -116,29 +167,6 @@ export class GridCharacterPhaser {
 
     const gridChar = new GridCharacter(charData.id, charConfig);
 
-    gridChar
-      .pixelPositionChanged()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((pixelPos: Vector2) => {
-        const gameObj = this.container || this.sprite;
-        if (gameObj) {
-          gameObj.x = pixelPos.x;
-          gameObj.y = pixelPos.y;
-        }
-
-        if (this.sprite && gridChar.isMoving()) {
-          gridChar
-            .getAnimation()
-            ?.updateCharacterFrame(
-              gridChar.getMovementDirection(),
-              gridChar.hasWalkedHalfATile(),
-              Number(this.sprite.frame.name)
-            );
-        }
-
-        this.updateDepth(gridChar);
-      });
-
     if (this.sprite) {
       this.sprite.setOrigin(0, 0);
 
@@ -147,7 +175,7 @@ export class GridCharacterPhaser {
         Math.floor((this.sprite.displayWidth ?? 0) / 2);
       const offsetY =
         -(this.sprite.displayHeight ?? 0) + this.tilemap.getTileHeight();
-      gridChar.engineOffset = new Vector2(offsetX, offsetY);
+      this.engineOffset = new Vector2(offsetX, offsetY);
 
       this.resetAnimation(gridChar, this.sprite);
 
@@ -158,10 +186,26 @@ export class GridCharacterPhaser {
           position: new Vector2(charData.startPosition),
           layer: gridChar.getTilePos().layer,
         });
+        this.updateGridChar(gridChar);
       }
     }
 
     return gridChar;
+  }
+
+  private updateGridChar(gridChar: GridCharacter) {
+    this.updatePixelPos(gridChar);
+    if (this.sprite && gridChar.isMoving()) {
+      gridChar
+        .getAnimation()
+        ?.updateCharacterFrame(
+          gridChar.getMovementDirection(),
+          gridChar.hasWalkedHalfATile(),
+          Number(this.sprite.frame.name)
+        );
+    }
+
+    this.updateDepth(gridChar);
   }
 
   private resetAnimation(
@@ -202,7 +246,7 @@ export class GridCharacterPhaser {
   }
 
   private updateDepth(gridChar: GridCharacter) {
-    const gameObject = this.container || this.sprite;
+    const gameObject = this.getGameObj();
 
     if (!gameObject) return;
     this.setDepth(gameObject, gridChar.getNextTilePos());
