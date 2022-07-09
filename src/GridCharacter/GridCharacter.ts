@@ -50,7 +50,7 @@ export interface CharConfig {
 }
 
 export class GridCharacter {
-  protected customOffset: Vector2;
+  customOffset: Vector2;
   protected tilemap: GridTilemap;
 
   private movementDirection = Direction.NONE;
@@ -78,14 +78,8 @@ export class GridCharacter {
   private walkingAnimationMapping?: WalkingAnimationMapping | number;
   private collidesWithTilesInternal: boolean;
   private collisionGroups: Set<string>;
-  private pixelPositionChanged$ = new Subject<Vector2>();
   private depthChanged$ = new Subject<LayerPosition>();
-  private pixelPosition = new Vector2(0, 0);
   private movementProgress = 0;
-
-  // TODO: move this to GridCharPhaser as soon as GridChar will be made
-  // independent of pixel positions and will get a "movement progress" instead
-  engineOffset = new Vector2(0, 0);
 
   constructor(private id: string, config: CharConfig) {
     this.walkingAnimationMapping = config.walkingAnimationMapping;
@@ -144,18 +138,15 @@ export class GridCharacter {
     this.movementDirection = Direction.NONE;
     this.lastMovementImpulse = Direction.NONE;
     this.tilePos = tilePosition;
-    this.setPixelPosition(
-      this.tilemap
-        .tilePosToPixelPos(tilePosition.position)
-        .add(this.engineOffset)
-        .add(this.customOffset)
-    );
+    this.movementProgress = 0;
   }
 
+  // TODO move to phaserChar
   getOffsetX(): number {
     return this.customOffset.x;
   }
 
+  // TODO move to phaserChar
   getOffsetY(): number {
     return this.customOffset.y;
   }
@@ -299,63 +290,50 @@ export class GridCharacter {
     return this.autoMovementSet$;
   }
 
-  pixelPositionChanged(): Subject<Vector2> {
-    return this.pixelPositionChanged$;
-  }
-
   depthChanged(): Subject<LayerPosition> {
     return this.depthChanged$;
-  }
-
-  getPixelPos(): Vector2 {
-    return this.pixelPosition.clone();
   }
 
   getMovementProgress(): number {
     return this.movementProgress;
   }
 
+  hasWalkedHalfATile(): boolean {
+    return this.movementProgress > MAX_MOVEMENT_PROGRESS / 2;
+  }
+
   private updateCharacterPosition(delta: number): void {
-    const maxMovementForDelta = this.getSpeedPerDelta(delta);
     const millisecondsPerSecond = 1000;
     const deltaInSeconds = delta / millisecondsPerSecond;
-    const distToNextTile = this.getDistToNextTile();
 
-    const maxMovementForDelta2 = Math.floor(
+    const maxProgressForDelta = Math.floor(
       deltaInSeconds * this.speed * MAX_MOVEMENT_PROGRESS
     );
     const willCrossTileBorderThisUpdate =
-      MAX_MOVEMENT_PROGRESS - this.movementProgress <= maxMovementForDelta2;
+      MAX_MOVEMENT_PROGRESS - this.movementProgress <= maxProgressForDelta &&
+      this.movementProgress < MAX_MOVEMENT_PROGRESS;
 
-    const distToWalk = willCrossTileBorderThisUpdate
-      ? distToNextTile
-      : maxMovementForDelta;
+    const progressThisUpdate = willCrossTileBorderThisUpdate
+      ? MAX_MOVEMENT_PROGRESS - this.movementProgress
+      : maxProgressForDelta;
 
-    this.movementProgress += maxMovementForDelta2;
-    this.movementProgress %= MAX_MOVEMENT_PROGRESS;
-    this.moveCharacterSprite(distToWalk);
+    const proportionToWalk = 1 - progressThisUpdate / maxProgressForDelta;
+
+    this.movementProgress = Math.min(
+      this.movementProgress + maxProgressForDelta,
+      MAX_MOVEMENT_PROGRESS
+    );
 
     if (willCrossTileBorderThisUpdate) {
-      if (this.shouldContinueMoving()) {
+      this.movementProgress = 0;
+      if (this.shouldContinueMoving() && proportionToWalk > 0) {
         this.fire(this.positionChangeFinished$, this.tilePos, this.nextTilePos);
         this.startMoving(this.lastMovementImpulse);
-        this.movementProgress = 0;
-
-        this.updateCharacterPosition(
-          delta * this.getProportionWalked(maxMovementForDelta, distToNextTile)
-        );
+        this.updateCharacterPosition(delta * proportionToWalk);
       } else {
-        this.movementProgress = 0;
         this.stopMoving();
       }
     }
-  }
-
-  private speedPixelsPerSecond(direction: Direction): Vector2 {
-    return directionVector(direction)
-      .abs()
-      .multiply(this.tilemap.getTileDistance(direction))
-      .scalarMult(this.speed);
   }
 
   private get nextTilePos(): LayerPosition {
@@ -375,15 +353,6 @@ export class GridCharacter {
 
   private set tilePos(newTilePos: LayerPosition) {
     LayerPositionUtils.copyOver(newTilePos, this._tilePos);
-  }
-
-  private setPixelPosition(position: Vector2): void {
-    this.pixelPosition = new Vector2(position);
-    this.pixelPositionChanged$.next(new Vector2(this.pixelPosition));
-  }
-
-  private getPixelPosition(): Vector2 {
-    return new Vector2(this.pixelPosition);
   }
 
   private startMoving(direction: Direction): void {
@@ -412,45 +381,10 @@ export class GridCharacter {
     );
   }
 
-  private getDistToNextTile(): Vector2 {
-    return this.tilemap
-      .getTileDistance(this.movementDirection)
-      .subtract(this.tileSizePixelsWalked)
-      .multiply(directionVector(this.movementDirection));
-  }
-
-  private getProportionWalked(
-    maxMovementForDelta: Vector2,
-    distToNextTile: Vector2
-  ): number {
-    const toWalkOnNextTileThisUpdate =
-      maxMovementForDelta.subtract(distToNextTile);
-    const propVec = toWalkOnNextTileThisUpdate.divide(maxMovementForDelta);
-    if (isNaN(propVec.x)) propVec.x = 0;
-    return Math.max(Math.abs(propVec.x), Math.abs(propVec.y));
-  }
-
   private shouldContinueMoving(): boolean {
     return (
       this.lastMovementImpulse !== Direction.NONE &&
       !this.isBlockingDirection(this.lastMovementImpulse)
-    );
-  }
-
-  private getSpeedPerDelta(delta: number): Vector2 {
-    const deltaInSeconds = delta / 1000;
-    return this.speedPixelsPerSecond(this.movementDirection)
-      .scalarMult(deltaInSeconds)
-      .multiply(directionVector(this.movementDirection));
-  }
-
-  private moveCharacterSprite(speed: Vector2): void {
-    const newPlayerPos = this.getPixelPosition().add(speed);
-    this.tileSizePixelsWalked = this.tileSizePixelsWalked.add(speed.abs());
-    this.setPixelPosition(newPlayerPos);
-
-    this.tileSizePixelsWalked = this.tileSizePixelsWalked.modulo(
-      this.tilemap.getTileDistance(this.movementDirection)
     );
   }
 
@@ -463,10 +397,6 @@ export class GridCharacter {
     this.movementDirection = Direction.NONE;
     this.movementStopped$.next(lastMovementDir);
     this.fire(this.positionChangeFinished$, exitTile, enterTile);
-  }
-
-  hasWalkedHalfATile(): boolean {
-    return this.movementProgress > MAX_MOVEMENT_PROGRESS / 2;
   }
 
   private fire(

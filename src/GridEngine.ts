@@ -561,8 +561,7 @@ export class GridEngine {
   /** @internal */
   update(_time: number, delta: number): void {
     if (this.isCreated && this.gridCharacters) {
-      for (const [_key, val] of this.gridCharacters) {
-        const gridChar = val.getGridCharacter();
+      for (const [_key, gridChar] of this.gridCharacters) {
         gridChar.update(delta);
       }
     }

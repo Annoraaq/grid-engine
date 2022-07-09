@@ -95,7 +95,7 @@ describe("GridCharacterPhaser", () => {
     it("should create a grid character", () => {
       const walkingAnimationMock = {} as any;
       const startPos = { x: 5, y: 6 };
-      const containerMock = { x: 0, y: 0 } as any;
+      const containerMock = { x: 0, y: 0, setDepth: jest.fn() } as any;
       const charData = {
         id: "charID",
         sprite: spriteMock,
@@ -125,7 +125,7 @@ describe("GridCharacterPhaser", () => {
       expect(gridChar.collidesWithTiles()).toBe(true);
       expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
       expect(gridChar.getTilePos().layer).toBe("someLayer");
-      expect(gridChar.engineOffset).toEqual(
+      expect(gridCharPhaser.getEngineOffset()).toEqual(
         new Vector2(
           (tilemapMock.tileWidth * tilemapMock.layers[0].tilemapLayer.scale) /
             2 -
@@ -533,33 +533,124 @@ describe("GridCharacterPhaser", () => {
       const containerMock = {
         x: 0,
         y: 0,
+        setDepth: jest.fn(),
       } as any;
       const charData = {
         id: "charID",
         sprite: spriteMock,
         container: containerMock,
+        offsetX: 10,
+        offsetY: 15,
       };
+      const spriteInitialXPos = spriteMock.x;
+      const spriteInitialYPos = spriteMock.y;
+      const charTilePos = new Vector2(3, 4);
       const gridCharPhaser = createChar(charData, false);
       const gridChar = gridCharPhaser.getGridCharacter();
-      gridChar.pixelPositionChanged().next(new Vector2(10, 20));
+      gridChar.setSpeed(1);
+      gridChar.setTilePosition({
+        position: charTilePos,
+        layer: undefined,
+      });
+      gridChar.move(Direction.RIGHT);
+      gridCharPhaser.update(250);
 
-      expect(gridCharPhaser.getContainer()?.x).toBe(10);
-      expect(gridCharPhaser.getContainer()?.y).toBe(20);
-      expect(gridCharPhaser.getSprite()?.x).toBe(10);
-      expect(gridCharPhaser.getSprite()?.y).toBe(12);
+      const scaledTileSize = 16 * 3;
+      const expectedXPos =
+        charTilePos.x * scaledTileSize +
+        gridCharPhaser.getEngineOffset().x +
+        charData.offsetX +
+        scaledTileSize * 0.25;
+      const expectedYPos =
+        charTilePos.y * scaledTileSize +
+        gridCharPhaser.getEngineOffset().y +
+        charData.offsetY;
+
+      expect(gridCharPhaser.getContainer()?.x).toBe(expectedXPos);
+      expect(gridCharPhaser.getContainer()?.y).toBe(expectedYPos);
+      expect(gridCharPhaser.getSprite()?.x).toBe(spriteInitialXPos);
+      expect(gridCharPhaser.getSprite()?.y).toBe(spriteInitialYPos);
     });
 
-    it("should update sprite pixel pos", () => {
-      const charData = {
-        id: "charID",
-        sprite: spriteMock,
-      };
-      const gridCharPhaser = createChar(charData, false);
-      const gridChar = gridCharPhaser.getGridCharacter();
-      gridChar.pixelPositionChanged().next(new Vector2(10, 20));
+    describe("update sprite pixel pos", () => {
+      let charData;
+      let charTilePos;
+      let gridCharPhaser;
+      let gridChar;
+      beforeEach(() => {
+        charData = {
+          id: "charID",
+          sprite: spriteMock,
+          offsetX: 10,
+          offsetY: 15,
+        };
+        charTilePos = new Vector2(3, 4);
+        gridCharPhaser = createChar(charData, false);
+        gridChar = gridCharPhaser.getGridCharacter();
+        gridChar.setSpeed(1);
+        gridChar.setTilePosition({
+          position: charTilePos,
+          layer: undefined,
+        });
+      });
 
-      expect(gridCharPhaser.getSprite()?.x).toBe(10);
-      expect(gridCharPhaser.getSprite()?.y).toBe(20);
+      it("should update sprite pixel pos horizontally", () => {
+        gridChar.move(Direction.RIGHT);
+        gridCharPhaser.update(250);
+
+        const scaledTileSize = 16 * 3;
+        const expectedXPos =
+          charTilePos.x * scaledTileSize +
+          gridCharPhaser.engineOffset.x +
+          charData.offsetX +
+          scaledTileSize * 0.25;
+        const expectedYPos =
+          charTilePos.y * scaledTileSize +
+          gridCharPhaser.engineOffset.y +
+          charData.offsetY;
+
+        expect(gridCharPhaser.getSprite()?.x).toBe(expectedXPos);
+        expect(gridCharPhaser.getSprite()?.y).toBe(expectedYPos);
+      });
+
+      it("should update sprite pixel pos diagonally", () => {
+        gridChar.move(Direction.DOWN_LEFT);
+        gridCharPhaser.update(250);
+
+        const scaledTileSize = 16 * 3;
+        const expectedXPos =
+          charTilePos.x * scaledTileSize +
+          gridCharPhaser.engineOffset.x +
+          charData.offsetX +
+          scaledTileSize * -0.25;
+        const expectedYPos =
+          charTilePos.y * scaledTileSize +
+          gridCharPhaser.engineOffset.y +
+          charData.offsetY +
+          scaledTileSize * 0.25;
+
+        expect(gridCharPhaser.getSprite()?.x).toBe(expectedXPos);
+        expect(gridCharPhaser.getSprite()?.y).toBe(expectedYPos);
+      });
+
+      it("should update sprite pixel pos horizontally", () => {
+        gridChar.move(Direction.UP);
+        gridCharPhaser.update(250);
+
+        const scaledTileSize = 16 * 3;
+        const expectedXPos =
+          charTilePos.x * scaledTileSize +
+          gridCharPhaser.engineOffset.x +
+          charData.offsetX;
+        const expectedYPos =
+          charTilePos.y * scaledTileSize +
+          gridCharPhaser.engineOffset.y +
+          charData.offsetY +
+          scaledTileSize * -0.25;
+
+        expect(gridCharPhaser.getSprite()?.x).toBe(expectedXPos);
+        expect(gridCharPhaser.getSprite()?.y).toBe(expectedYPos);
+      });
     });
 
     it("should update walking animation", () => {
@@ -574,7 +665,7 @@ describe("GridCharacterPhaser", () => {
       const gridCharPhaser = createChar(charData, false);
       const gridChar = gridCharPhaser.getGridCharacter();
       gridChar.move(Direction.RIGHT);
-      gridChar.update(1);
+      gridCharPhaser.update(1);
 
       // after starting movement, set left foot animation
       expect(spriteMock.setFrame).toHaveBeenCalledWith(
@@ -582,7 +673,7 @@ describe("GridCharacterPhaser", () => {
       );
 
       gridChar.move(Direction.RIGHT);
-      gridChar.update(200);
+      gridCharPhaser.update(200);
 
       // after walking half a tile, set standing animation
       expect(spriteMock.setFrame).toHaveBeenCalledWith(
@@ -590,7 +681,7 @@ describe("GridCharacterPhaser", () => {
       );
 
       gridChar.move(Direction.RIGHT);
-      gridChar.update(300);
+      gridCharPhaser.update(300);
 
       // at the beginning of next tile start with right foot
       expect(spriteMock.setFrame).toHaveBeenCalledWith(
@@ -611,7 +702,7 @@ describe("GridCharacterPhaser", () => {
       const gridChar = gridCharPhaser.getGridCharacter();
 
       gridChar.move(Direction.RIGHT);
-      gridChar.update(10);
+      gridCharPhaser.update(10);
 
       checkSpriteDepth(spriteMock, charLayerDepth, "0000");
     });
@@ -630,7 +721,7 @@ describe("GridCharacterPhaser", () => {
       const gridChar = gridCharPhaser.getGridCharacter();
 
       gridChar.move(Direction.RIGHT);
-      gridChar.update(10);
+      gridCharPhaser.update(10);
 
       checkSpriteDepth(spriteMock, charLayerDepth, "0000");
     });
@@ -654,7 +745,7 @@ describe("GridCharacterPhaser", () => {
       const gridChar = gridCharPhaser.getGridCharacter();
 
       gridChar.move(Direction.RIGHT);
-      gridChar.update(10);
+      gridCharPhaser.update(10);
 
       checkSpriteDepth(containerMock, uppermostCharLayerDepth, "0000");
     });
@@ -680,7 +771,7 @@ describe("GridCharacterPhaser", () => {
         const gridChar = gridCharPhaser.getGridCharacter();
 
         gridChar.move(Direction.RIGHT);
-        gridChar.update(10);
+        gridCharPhaser.update(10);
 
         checkSpriteDepth(overlaySpriteMock, lowerCharLayerDepth, "00000");
       });
