@@ -4,14 +4,14 @@ import {
   GameObject,
   GridCharacter,
 } from "../../GridCharacter/GridCharacter";
-import { CharacterData } from "../../GridEngine";
+import { CharacterData, WalkingAnimationMapping } from "../../GridEngine";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CharacterAnimation } from "../../GridCharacter/CharacterAnimation/CharacterAnimation";
 import { LayerPosition } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Utils } from "../../Utils/Utils/Utils";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
-import { directionVector } from "../../Direction/Direction";
+import { Direction, directionVector } from "../../Direction/Direction";
 
 export class GridCharacterPhaser {
   private customOffset: Vector2;
@@ -26,6 +26,8 @@ export class GridCharacterPhaser {
     this.charData,
     this.layerOverlay
   );
+  private walkingAnimationMapping?: WalkingAnimationMapping | number;
+  private animation?: CharacterAnimation;
 
   constructor(
     private charData: CharacterData,
@@ -92,6 +94,25 @@ export class GridCharacterPhaser {
     return this.customOffset.y;
   }
 
+  getWalkingAnimationMapping(): WalkingAnimationMapping | number | undefined {
+    return this.walkingAnimationMapping;
+  }
+
+  turnTowards(direction: Direction): void {
+    if (this.gridCharacter.isMoving()) return;
+    if (direction == Direction.NONE) return;
+    this.gridCharacter.turnTowards(direction);
+    this.animation?.setStandingFrame(direction);
+  }
+
+  getAnimation(): CharacterAnimation | undefined {
+    return this.animation;
+  }
+
+  setAnimation(animation: CharacterAnimation): void {
+    this.animation = animation;
+  }
+
   update(delta: number): void {
     this.gridCharacter.update(delta);
     this.updateGridChar(this.gridCharacter);
@@ -133,10 +154,11 @@ export class GridCharacterPhaser {
         ? this.scene.add.sprite(0, 0, charData.sprite.texture)
         : undefined;
 
+    this.walkingAnimationMapping = charData.walkingAnimationMapping;
+
     const charConfig: CharConfig = {
       speed: charData.speed || 4,
       tilemap: this.tilemap,
-      walkingAnimationMapping: charData.walkingAnimationMapping,
       collidesWithTiles: true,
       collisionGroups: ["geDefault"],
       charLayer: charData.charLayer,
@@ -167,6 +189,10 @@ export class GridCharacterPhaser {
 
     const gridChar = new GridCharacter(charData.id, charConfig);
 
+    gridChar.directionChanged().subscribe((direction) => {
+      this.animation?.setStandingFrame(direction);
+    });
+
     if (this.sprite) {
       this.sprite.setOrigin(0, 0);
 
@@ -196,13 +222,11 @@ export class GridCharacterPhaser {
   private updateGridChar(gridChar: GridCharacter) {
     this.updatePixelPos(gridChar);
     if (this.sprite && gridChar.isMoving()) {
-      gridChar
-        .getAnimation()
-        ?.updateCharacterFrame(
-          gridChar.getMovementDirection(),
-          gridChar.hasWalkedHalfATile(),
-          Number(this.sprite.frame.name)
-        );
+      this.getAnimation()?.updateCharacterFrame(
+        gridChar.getMovementDirection(),
+        gridChar.hasWalkedHalfATile(),
+        Number(this.sprite.frame.name)
+      );
     }
 
     this.updateDepth(gridChar);
@@ -213,12 +237,12 @@ export class GridCharacterPhaser {
     sprite: Phaser.GameObjects.Sprite
   ) {
     const animation = new CharacterAnimation(
-      gridChar.getWalkingAnimationMapping(),
+      this.walkingAnimationMapping,
       sprite.texture.source[0].width /
         sprite.width /
         CharacterAnimation.FRAMES_CHAR_ROW
     );
-    gridChar.setAnimation(animation);
+    this.setAnimation(animation);
     animation
       .frameChange()
       .pipe(takeUntil(this.newSpriteSet$))
@@ -226,7 +250,7 @@ export class GridCharacterPhaser {
         sprite?.setFrame(frameNo);
       });
 
-    animation.setIsEnabled(gridChar.getWalkingAnimationMapping() !== undefined);
+    animation.setIsEnabled(this.walkingAnimationMapping !== undefined);
     animation.setStandingFrame(gridChar.getFacingDirection());
   }
 

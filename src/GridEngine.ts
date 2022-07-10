@@ -8,11 +8,7 @@ import {
   MoveToResult,
   TargetMovement,
 } from "./Movement/TargetMovement/TargetMovement";
-import {
-  CharacterIndex,
-  FrameRow,
-  PositionChange,
-} from "./GridCharacter/GridCharacter";
+import { PositionChange } from "./GridCharacter/GridCharacter";
 import {
   Direction,
   isDiagonal,
@@ -27,6 +23,10 @@ import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { Concrete } from "./Utils/TypeUtils";
 import { MovementInfo } from "./Movement/Movement";
+import {
+  CharacterIndex,
+  FrameRow,
+} from "./GridCharacter/CharacterAnimation/CharacterAnimation";
 
 export {
   CollisionStrategy,
@@ -526,7 +526,7 @@ export class GridEngine {
     charId: string
   ): WalkingAnimationMapping | number | undefined {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
+    const gridChar = this.gridCharacters.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     const animation = gridChar.getAnimation();
     return animation?.getWalkingAnimationMapping();
@@ -551,7 +551,7 @@ export class GridEngine {
     walkingAnimationMapping?: WalkingAnimationMapping | number
   ): void {
     this.initGuard();
-    const gridChar = this.gridCharacters.get(charId)?.getGridCharacter();
+    const gridChar = this.gridCharacters.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
 
     const animation = gridChar.getAnimation();

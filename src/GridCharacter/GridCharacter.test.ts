@@ -1,11 +1,9 @@
 import { SpriteUtils } from "./../Utils/SpriteUtils/SpriteUtils";
 import { GridCharacter } from "./GridCharacter";
 import { Direction } from "../Direction/Direction";
-import { trackEmit } from "../Testing/Utils";
 import { take } from "rxjs/operators";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
-import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import * as Phaser from "phaser";
 
@@ -82,10 +80,7 @@ describe("GridCharacter", () => {
       tilemap: gridTilemap,
       speed: 3,
       collidesWithTiles: true,
-      walkingAnimationMapping: 3,
     });
-    const animation = new CharacterAnimation(0, 1);
-    gridCharacter.setAnimation(animation);
   });
 
   it("should get init data", () => {
@@ -596,7 +591,6 @@ describe("GridCharacter", () => {
           speed: 3,
           collidesWithTiles: true,
           collisionGroups: ["cGroup1"],
-          walkingAnimationMapping: 3,
         });
       });
       it("should not block when no blocking tiles and chars", () => {
@@ -637,7 +631,6 @@ describe("GridCharacter", () => {
           speed: 3,
           collidesWithTiles: false,
           collisionGroups: ["cGroup1"],
-          walkingAnimationMapping: 3,
         });
       });
 
@@ -716,32 +709,20 @@ describe("GridCharacter", () => {
   });
 
   describe("turnTowards", () => {
-    it("should turn towards left", (done) => {
-      const leftStandingFrame = 4;
-      gridCharacter
-        .getAnimation()
-        ?.frameChange()
-        .pipe(take(1))
-        .subscribe((frameNo: number) => {
-          expect(frameNo).toEqual(leftStandingFrame);
-          expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
-          done();
-        });
+    it("should turn towards left", () => {
       gridCharacter.turnTowards(Direction.LEFT);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
     });
 
     it("should not turn if moving", () => {
       gridCharacter.move(Direction.DOWN);
-      const hasEmitted = trackEmit(gridCharacter.getAnimation()?.frameChange());
       gridCharacter.turnTowards(Direction.LEFT);
       expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
-      expect(hasEmitted()).toBe(false);
     });
 
     it("should not turn if direction NONE", () => {
-      const hasEmitted = trackEmit(gridCharacter.getAnimation()?.frameChange());
       gridCharacter.turnTowards(Direction.NONE);
-      expect(hasEmitted()).toBe(false);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
     });
   });
 
@@ -749,24 +730,14 @@ describe("GridCharacter", () => {
     beforeEach(() => {
       mockNonBlockingTile();
     });
-    it("should set players standing frame if direction blocked", (done) => {
-      const upStandingFrame = 10;
+    it("should turn player if direction blocked", (done) => {
       mockBlockingTile();
       expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
-      let currentFrame: number | undefined = undefined;
-      gridCharacter
-        .getAnimation()
-        ?.frameChange()
-        .pipe(take(1))
-        .subscribe((frameNo: number) => {
-          currentFrame = frameNo;
-        });
       gridCharacter.directionChanged().subscribe((direction) => {
         expect(direction).toEqual(Direction.UP);
         done();
       });
       gridCharacter.move(Direction.UP);
-      expect(currentFrame).toEqual(upStandingFrame);
       expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
     });
   });

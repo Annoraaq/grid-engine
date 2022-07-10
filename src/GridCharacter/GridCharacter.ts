@@ -1,6 +1,5 @@
 import { LayerPositionUtils } from "./../Utils/LayerPositionUtils/LayerPositionUtils";
 import { LayerPosition } from "./../Pathfinding/ShortestPathAlgorithm";
-import { CharacterAnimation } from "./CharacterAnimation/CharacterAnimation";
 import { directionVector, oppositeDirection } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
 import { GridTilemap, LayerName } from "../GridTilemap/GridTilemap";
@@ -9,26 +8,13 @@ import { Position, WalkingAnimationMapping } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
+import { CoreTilemap } from "../GridTilemap/CoreTilemap";
 
 const MAX_MOVEMENT_PROGRESS = 1000;
 
 export type GameObject =
   | Phaser.GameObjects.Container
   | Phaser.GameObjects.Sprite;
-
-/** Frame numbers for one movement direction */
-export interface FrameRow {
-  /** Frame number for animation frame with left foot in front */
-  leftFoot: number;
-
-  /** Frame number for animation frame standing (no foot in front) */
-  standing: number;
-
-  /** Frame number for animation frame with right foot in front */
-  rightFoot: number;
-}
-
-export type CharacterIndex = number;
 
 export interface PositionChange {
   exitTile: Position;
@@ -41,14 +27,13 @@ export interface CharConfig {
   tilemap: GridTilemap;
   speed: number;
   collidesWithTiles: boolean;
-  walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
   charLayer?: string;
   collisionGroups?: string[];
   facingDirection?: Direction;
 }
 
 export class GridCharacter {
-  protected tilemap: GridTilemap;
+  protected tilemap: CoreTilemap;
 
   private movementDirection = Direction.NONE;
   private _tilePos: LayerPosition = {
@@ -65,7 +50,6 @@ export class GridCharacter {
   private autoMovementSet$ = new Subject<Movement | undefined>();
   private lastMovementImpulse = Direction.NONE;
   private facingDirection: Direction = Direction.DOWN;
-  private animation?: CharacterAnimation;
   private movement?: Movement;
   private walkingAnimationMapping?: WalkingAnimationMapping | number;
   private collidesWithTilesInternal: boolean;
@@ -74,7 +58,6 @@ export class GridCharacter {
   private movementProgress = 0;
 
   constructor(private id: string, config: CharConfig) {
-    this.walkingAnimationMapping = config.walkingAnimationMapping;
     this.tilemap = config.tilemap;
     this.speed = config.speed;
     this.collidesWithTilesInternal = config.collidesWithTiles;
@@ -110,10 +93,6 @@ export class GridCharacter {
 
   collidesWithTiles(): boolean {
     return this.collidesWithTilesInternal;
-  }
-
-  getAnimation(): CharacterAnimation | undefined {
-    return this.animation;
   }
 
   setTilePosition(tilePosition: LayerPosition): void {
@@ -165,19 +144,10 @@ export class GridCharacter {
     if (this.isMoving()) return;
     if (this.isBlockingDirection(direction)) {
       this.facingDirection = direction;
-      this.animation?.setStandingFrame(direction);
       this.directionChanged$.next(direction);
     } else {
       this.startMoving(direction);
     }
-  }
-
-  getWalkingAnimationMapping(): WalkingAnimationMapping | number | undefined {
-    return this.walkingAnimationMapping;
-  }
-
-  setAnimation(animation: CharacterAnimation): void {
-    this.animation = animation;
   }
 
   update(delta: number): void {
@@ -230,7 +200,6 @@ export class GridCharacter {
     if (this.isMoving()) return;
     if (direction == Direction.NONE) return;
     this.facingDirection = direction;
-    this.animation?.setStandingFrame(direction);
   }
 
   getFacingDirection(): Direction {
