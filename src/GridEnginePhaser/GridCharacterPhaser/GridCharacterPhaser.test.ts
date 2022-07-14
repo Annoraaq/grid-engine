@@ -1,4 +1,5 @@
 import { CharacterAnimation } from "./../../GridCharacter/CharacterAnimation/CharacterAnimation";
+import { trackEmit } from "../../Testing/Utils";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { GridTilemap } from "./../../GridTilemap/GridTilemap";
 import { GridCharacterPhaser } from "./GridCharacterPhaser";
@@ -6,6 +7,7 @@ import * as Phaser from "phaser";
 import { Direction } from "../../Direction/Direction";
 import { CharacterData } from "../../GridEngine";
 import { createSpriteMock } from "../../Utils/MockFactory/MockFactory";
+import { take } from "rxjs/operators";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -115,7 +117,9 @@ describe("GridCharacterPhaser", () => {
       expect(gridChar.getId()).toBe("charID");
       expect(gridCharPhaser.getSprite()).toBe(spriteMock);
       expect(gridCharPhaser.getLayerOverlaySprite()).toBe(overlaySpriteMock);
-      expect(gridChar.getWalkingAnimationMapping()).toBe(walkingAnimationMock);
+      expect(gridCharPhaser.getWalkingAnimationMapping()).toBe(
+        walkingAnimationMock
+      );
       expect(gridChar.getSpeed()).toBe(5);
       expect(gridChar.getTilePos().position).toEqual(startPos);
       expect(gridCharPhaser.getContainer()).toBe(containerMock);
@@ -137,10 +141,10 @@ describe("GridCharacterPhaser", () => {
       );
 
       expect(spriteMock.setOrigin).toHaveBeenCalledWith(0, 0);
-      expect(gridChar.getAnimation()?.getWalkingAnimationMapping()).toBe(
+      expect(gridCharPhaser.getAnimation()?.getWalkingAnimationMapping()).toBe(
         walkingAnimationMock
       );
-      expect(gridChar.getAnimation()?.getCharsInRow()).toBe(
+      expect(gridCharPhaser.getAnimation()?.getCharsInRow()).toBe(
         spriteMock.texture.source[0].width /
           spriteMock.width /
           CharacterAnimation.FRAMES_CHAR_ROW
@@ -150,7 +154,7 @@ describe("GridCharacterPhaser", () => {
       expect(containerMock.x).not.toEqual(0);
       expect(containerMock.y).not.toEqual(0);
 
-      expect(gridChar.getAnimation()?.isEnabled()).toBe(true);
+      expect(gridCharPhaser.getAnimation()?.isEnabled()).toBe(true);
     });
 
     it("should update sprite on animation changes", () => {
@@ -160,9 +164,8 @@ describe("GridCharacterPhaser", () => {
         walkingAnimationMapping: 3,
       };
       const gridCharPhaser = createChar(charData, true);
-      const gridChar = gridCharPhaser.getGridCharacter();
 
-      (gridChar.getAnimation()?.frameChange() as any).next(13);
+      (gridCharPhaser.getAnimation()?.frameChange() as any).next(13);
       expect(spriteMock.setFrame).toHaveBeenCalledWith(13);
     });
 
@@ -173,10 +176,9 @@ describe("GridCharacterPhaser", () => {
         walkingAnimationMapping: 3,
       };
       const gridCharPhaser = createChar(charData, true);
-      const gridChar = gridCharPhaser.getGridCharacter();
 
-      expect(gridChar.getWalkingAnimationMapping()).toBe(3);
-      expect(gridChar.getAnimation()?.isEnabled()).toBe(true);
+      expect(gridCharPhaser.getWalkingAnimationMapping()).toBe(3);
+      expect(gridCharPhaser.getAnimation()?.isEnabled()).toBe(true);
     });
 
     it("should set overlay sprite properties on creation", () => {
@@ -205,9 +207,8 @@ describe("GridCharacterPhaser", () => {
         walkingAnimationMapping: undefined,
       };
       const gridCharPhaser = createChar(charData, true);
-      const gridChar = gridCharPhaser.getGridCharacter();
 
-      expect(gridChar.getAnimation()?.isEnabled()).toBe(false);
+      expect(gridCharPhaser.getAnimation()?.isEnabled()).toBe(false);
     });
 
     it("should set standing frame on creation", () => {
@@ -233,7 +234,7 @@ describe("GridCharacterPhaser", () => {
       expect(gridChar.getId()).toBe("charID");
       expect(gridCharPhaser.getSprite()).toBe(undefined);
       expect(gridCharPhaser.getLayerOverlaySprite()).toBe(undefined);
-      expect(gridChar.getWalkingAnimationMapping()).toBe(undefined);
+      expect(gridCharPhaser.getWalkingAnimationMapping()).toBe(undefined);
       expect(gridChar.getSpeed()).toBe(4);
       expect(gridCharPhaser.getContainer()).toBe(undefined);
       expect(gridCharPhaser.getOffsetX()).toBe(0);
@@ -386,15 +387,14 @@ describe("GridCharacterPhaser", () => {
       };
       const gridCharPhaser = createChar(charData, true);
       const newSpriteMock = createSpriteMock();
-      const gridChar = gridCharPhaser.getGridCharacter();
-      const oldAnimation = gridChar.getAnimation();
+      const oldAnimation = gridCharPhaser.getAnimation();
       gridCharPhaser.setSprite(newSpriteMock);
 
       (oldAnimation?.frameChange() as any).next(13);
       expect(newSpriteMock.setFrame).not.toHaveBeenCalledWith(13);
       spriteMock.setFrame.mockReset();
-      (gridChar.getAnimation()?.frameChange() as any).next(13);
-      expect(gridChar.getAnimation()?.isEnabled()).toBe(true);
+      (gridCharPhaser.getAnimation()?.frameChange() as any).next(13);
+      expect(gridCharPhaser.getAnimation()?.isEnabled()).toBe(true);
       expect(newSpriteMock.setFrame).toHaveBeenCalledWith(13);
       expect(spriteMock.setFrame).not.toHaveBeenCalled();
     });
@@ -407,16 +407,15 @@ describe("GridCharacterPhaser", () => {
       };
       const gridCharPhaser = createChar(charData, true);
       const newSpriteMock = createSpriteMock();
-      const gridChar = gridCharPhaser.getGridCharacter();
       gridCharPhaser.setSprite(newSpriteMock);
-      const oldAnimation = gridChar.getAnimation();
+      const oldAnimation = gridCharPhaser.getAnimation();
       gridCharPhaser.setSprite(newSpriteMock);
 
       newSpriteMock.setFrame.mockReset();
       (oldAnimation?.frameChange() as any).next(13);
-      (gridChar.getAnimation()?.frameChange() as any).next(13);
+      (gridCharPhaser.getAnimation()?.frameChange() as any).next(13);
 
-      expect(gridChar.getAnimation()).not.toBe(oldAnimation);
+      expect(gridCharPhaser.getAnimation()).not.toBe(oldAnimation);
       expect(newSpriteMock.setFrame).toHaveBeenCalledTimes(1);
     });
 
@@ -427,11 +426,10 @@ describe("GridCharacterPhaser", () => {
       };
       const gridCharPhaser = createChar(charData, true);
       const newSpriteMock = createSpriteMock();
-      const gridChar = gridCharPhaser.getGridCharacter();
 
       gridCharPhaser.setSprite(newSpriteMock);
 
-      expect(gridChar.getAnimation()?.isEnabled()).toBe(false);
+      expect(gridCharPhaser.getAnimation()?.isEnabled()).toBe(false);
     });
 
     it("should set standing frame", () => {
@@ -832,6 +830,81 @@ describe("GridCharacterPhaser", () => {
 
         checkSpriteDepth(overlaySpriteMock, lowerCharLayerDepth, "00000");
       });
+    });
+  });
+
+  describe("turn towards", () => {
+    let gridCharPhaser;
+    beforeEach(() => {
+      const startPos = { x: 2, y: 2 };
+      const charData = {
+        id: "charID",
+        sprite: spriteMock,
+        walkingAnimationMapping: 0,
+        startPosition: startPos,
+        charLayer: "testCharLayer",
+      };
+      gridCharPhaser = createChar(charData, true);
+    });
+
+    it("should turn towards left", (done) => {
+      const leftStandingFrame = 13;
+      gridCharPhaser
+        .getAnimation()
+        ?.frameChange()
+        .pipe(take(1))
+        .subscribe((frameNo: number) => {
+          expect(frameNo).toEqual(leftStandingFrame);
+          done();
+        });
+      gridCharPhaser.turnTowards(Direction.LEFT);
+    });
+
+    it("should not turn if moving", () => {
+      const gridChar = gridCharPhaser.getGridCharacter();
+      gridChar.move(Direction.DOWN);
+      const hasEmitted = trackEmit(
+        gridCharPhaser.getAnimation()?.frameChange()
+      );
+      gridCharPhaser.turnTowards(Direction.LEFT);
+      expect(hasEmitted()).toBe(false);
+    });
+
+    it("should not turn if direction NONE", () => {
+      const hasEmitted = trackEmit(
+        gridCharPhaser.getAnimation()?.frameChange()
+      );
+      gridCharPhaser.turnTowards(Direction.NONE);
+      expect(hasEmitted()).toBe(false);
+    });
+  });
+
+  describe("walking frames", () => {
+    it("should set players standing frame if direction blocked", () => {
+      tilemapMock.hasTileAt.mockReturnValue(false);
+      const startPos = { x: 2, y: 2 };
+      const charData = {
+        id: "charID",
+        sprite: spriteMock,
+        walkingAnimationMapping: 0,
+        startPosition: startPos,
+        charLayer: "testCharLayer",
+      };
+      const gridCharPhaser = createChar(charData, true);
+      const gridChar = gridCharPhaser.getGridCharacter();
+
+      const upStandingFrame = 37;
+      expect(gridChar.getMovementDirection()).toEqual(Direction.NONE);
+      let currentFrame: number | undefined = undefined;
+      gridCharPhaser
+        .getAnimation()
+        ?.frameChange()
+        .pipe(take(1))
+        .subscribe((frameNo: number) => {
+          currentFrame = frameNo;
+        });
+      gridChar.move(Direction.UP);
+      expect(currentFrame).toEqual(upStandingFrame);
     });
   });
 });

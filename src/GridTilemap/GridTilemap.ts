@@ -1,11 +1,11 @@
 import { GlobalConfig } from "./../GlobalConfig/GlobalConfig";
 import { Direction, turnCounterClockwise } from "./../Direction/Direction";
-import { GridCharacter } from "../GridCharacter/GridCharacter";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache/CharBlockCache";
 import { Rect } from "../Utils/Rect/Rect";
 import { VectorUtils } from "../Utils/VectorUtils";
 import { Utils } from "../Utils/Utils/Utils";
+import { GridCharacter } from "../GridCharacter/GridCharacter";
 
 export type LayerName = string | undefined;
 

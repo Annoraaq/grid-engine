@@ -1,7 +1,20 @@
 import { Direction } from "./../../Direction/Direction";
-import { FrameRow } from "./../GridCharacter";
 import { WalkingAnimationMapping } from "../../GridEngine";
 import { Observable, Subject } from "rxjs";
+
+export type CharacterIndex = number;
+
+/** Frame numbers for one movement direction */
+export interface FrameRow {
+  /** Frame number for animation frame with left foot in front */
+  leftFoot: number;
+
+  /** Frame number for animation frame standing (no foot in front) */
+  standing: number;
+
+  /** Frame number for animation frame with right foot in front */
+  rightFoot: number;
+}
 
 export class CharacterAnimation {
   static readonly FRAMES_CHAR_ROW = 3;
