@@ -8,7 +8,6 @@ import { Position, WalkingAnimationMapping } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
-import { CoreTilemap } from "../GridTilemap/CoreTilemap";
 
 const MAX_MOVEMENT_PROGRESS = 1000;
 
@@ -33,7 +32,7 @@ export interface CharConfig {
 }
 
 export class GridCharacter {
-  protected tilemap: CoreTilemap;
+  protected tilemap: GridTilemap;
 
   private movementDirection = Direction.NONE;
   private _tilePos: LayerPosition = {
