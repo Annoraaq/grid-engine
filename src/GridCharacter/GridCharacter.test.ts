@@ -726,20 +726,15 @@ describe("GridCharacter", () => {
     });
   });
 
-  describe("walking frames", () => {
-    beforeEach(() => {
-      mockNonBlockingTile();
+  it("should turn player if direction blocked", (done) => {
+    mockBlockingTile();
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+    gridCharacter.directionChanged().subscribe((direction) => {
+      expect(direction).toEqual(Direction.UP);
+      done();
     });
-    it("should turn player if direction blocked", (done) => {
-      mockBlockingTile();
-      expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
-      gridCharacter.directionChanged().subscribe((direction) => {
-        expect(direction).toEqual(Direction.UP);
-        done();
-      });
-      gridCharacter.move(Direction.UP);
-      expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
-    });
+    gridCharacter.move(Direction.UP);
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
   });
 
   describe("collision groups", () => {
