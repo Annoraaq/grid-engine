@@ -1052,9 +1052,7 @@ export class GridEngine {
 
   private initGuard() {
     if (!this.isCreatedInternal) {
-      throw new Error(
-        "Plugin not initialized. You need to call create() first."
-      );
+      throw this.createUninitializedErr();
     }
   }
 
