@@ -6,6 +6,10 @@ import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import * as Phaser from "phaser";
+import {
+  createBlankLayerMock,
+  createTilemapMock,
+} from "../Utils/MockFactory/MockFactory";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -31,50 +35,8 @@ describe("GridCharacter", () => {
   }
 
   beforeEach(() => {
-    blankLayerMock = {
-      scale: 0,
-      putTileAt: jest.fn(),
-      setDepth: jest.fn(),
-    };
-    tilemapMock = {
-      layers: [
-        {
-          name: "layer1",
-          tilemapLayer: {
-            setDepth: jest.fn(),
-            scale: 3,
-            tileset: "Cloud City",
-          },
-          properties: [
-            {
-              name: "ge_charLayer",
-              value: "lowerCharLayer",
-            },
-          ],
-        },
-        {
-          name: "layer2",
-          tilemapLayer: {
-            setDepth: jest.fn(),
-            tileset: "Cloud City",
-            scale: 3,
-          },
-          properties: [
-            {
-              name: "ge_charLayer",
-              value: "testCharLayer",
-            },
-          ],
-        },
-      ],
-      tileWidth: 16,
-      tileHeight: 16,
-      width: 20,
-      height: 30,
-      getTileAt: jest.fn().mockReturnValue({}),
-      hasTileAt: jest.fn().mockReturnValue(true),
-      createBlankLayer: jest.fn().mockReturnValue(blankLayerMock),
-    };
+    blankLayerMock = createBlankLayerMock();
+    tilemapMock = createTilemapMock(blankLayerMock);
     gridTilemap = new GridTilemap(tilemapMock);
     gridCharacter = new GridCharacter("player", {
       tilemap: gridTilemap,
@@ -96,6 +58,7 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getTilePos().layer).toEqual("someLayer");
     expect(gridCharacter.collidesWithTiles()).toEqual(true);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
+    expect(gridCharacter.getLabels()).toEqual([]);
   });
 
   it("should be facing down on construction by default", () => {
@@ -574,6 +537,39 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getMovement()).toEqual(undefined);
   });
 
+  it("should set labels on creation", () => {
+    gridCharacter = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      labels: ["label1", "label2"],
+    });
+
+    expect(gridCharacter.getLabels()).toEqual(["label1", "label2"]);
+  });
+
+  it("should set labels", () => {
+    gridCharacter.addLabels(["label1", "label2"]);
+
+    expect(gridCharacter.hasLabel("label1")).toEqual(true);
+    expect(gridCharacter.hasLabel("label2")).toEqual(true);
+    expect(gridCharacter.hasLabel("unknownLabel")).toEqual(false);
+    expect(gridCharacter.getLabels()).toEqual(["label1", "label2"]);
+  });
+
+  it("should remove labels", () => {
+    gridCharacter.addLabels(["label1", "label2"]);
+    gridCharacter.removeLabels(["label2"]);
+
+    expect(gridCharacter.getLabels()).toEqual(["label1"]);
+  });
+
+  it("should clear labels", () => {
+    gridCharacter.addLabels(["label1", "label2"]);
+    gridCharacter.clearLabels();
+    expect(gridCharacter.getLabels()).toEqual([]);
+  });
+
   describe("isBlockingDirection", () => {
     it("direction NONE never blocks", () => {
       const direction = Direction.NONE;
@@ -726,20 +722,15 @@ describe("GridCharacter", () => {
     });
   });
 
-  describe("walking frames", () => {
-    beforeEach(() => {
-      mockNonBlockingTile();
+  it("should turn player if direction blocked", (done) => {
+    mockBlockingTile();
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+    gridCharacter.directionChanged().subscribe((direction) => {
+      expect(direction).toEqual(Direction.UP);
+      done();
     });
-    it("should turn player if direction blocked", (done) => {
-      mockBlockingTile();
-      expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
-      gridCharacter.directionChanged().subscribe((direction) => {
-        expect(direction).toEqual(Direction.UP);
-        done();
-      });
-      gridCharacter.move(Direction.UP);
-      expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
-    });
+    gridCharacter.move(Direction.UP);
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
   });
 
   describe("collision groups", () => {

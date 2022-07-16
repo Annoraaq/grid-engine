@@ -9,7 +9,7 @@ import { Position } from "../../GridEngine";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 
 export class FollowMovement implements Movement {
-  private targetMovement: TargetMovement;
+  private targetMovement?: TargetMovement;
 
   constructor(
     private character: GridCharacter,
