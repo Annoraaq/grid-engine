@@ -70,6 +70,10 @@ jest.mock("./GridTilemap/GridTilemap", function () {
 
 jest.mock("./GridTilemap/GridTilemap");
 
+jest.mock("../package.json", () => ({
+  version: "GRID.ENGINE.VERSION",
+}));
+
 import { GridEngine } from "./GridEngine";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
@@ -80,12 +84,17 @@ describe("GridEngine", () => {
   let sceneMock;
   let tileMapMock;
   let playerSpriteMock;
+  let consoleLogBackup;
 
   afterEach(() => {
+    console.log = consoleLogBackup;
     jest.clearAllMocks();
   });
 
   beforeEach(() => {
+    consoleLogBackup = console.log;
+    console.log = jest.fn();
+
     // hacky way of avoiding errors in Plugin Initialization because Phaser
     // is not mockable by jest
     sceneMock = {
@@ -1635,5 +1644,13 @@ describe("GridEngine", () => {
       );
       expectUninitializedException(() => gridEngine.clearLabels(SOME_CHAR_ID));
     });
+  });
+
+  it("logs version", () => {
+    gridEngine = new GridEngine(sceneMock);
+
+    expect(console.log).toHaveBeenCalledWith(
+      "Using GridEngine vGRID.ENGINE.VERSION"
+    );
   });
 });

@@ -32,6 +32,8 @@ import {
   filterCharacters,
 } from "./GridCharacter/CharacterFilter/CharacterFilter";
 
+import { version as VERSION } from "../package.json";
+
 export {
   CollisionStrategy,
   CharacterFilteringOptions,
@@ -276,6 +278,7 @@ export class GridEngine {
    * @internal
    */
   constructor(private scene: Phaser.Scene) {
+    console.log(`Using GridEngine v${VERSION}`);
     this.scene.sys.events.once("boot", this.boot, this);
   }
 
