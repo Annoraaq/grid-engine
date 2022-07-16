@@ -242,6 +242,19 @@ describe("GridCharacterPhaser", () => {
       expect(gridChar.collidesWithTiles()).toBe(true);
       expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
       expect(gridChar.getTilePos().layer).toBe(undefined);
+      expect(gridChar.getLabels()).toEqual([]);
+    });
+
+    it("should create a grid character with labels", () => {
+      const charData = {
+        id: "charID",
+        labels: ["label1", "label2"],
+      };
+
+      const gridCharPhaser = createChar(charData, false);
+      const gridChar = gridCharPhaser.getGridCharacter();
+
+      expect(gridChar.getLabels()).toEqual(["label1", "label2"]);
     });
 
     it("should create a grid character with collides=false", () => {

@@ -14,8 +14,8 @@ import { takeUntil } from "rxjs/operators";
 import { Direction, directionVector } from "../../Direction/Direction";
 
 export class GridCharacterPhaser {
-  private customOffset: Vector2;
-  private engineOffset: Vector2;
+  private customOffset = new Vector2(0, 0);
+  private engineOffset = new Vector2(0, 0);
 
   private sprite?: Phaser.GameObjects.Sprite;
   private layerOverlaySprite?: Phaser.GameObjects.Sprite;
@@ -163,6 +163,7 @@ export class GridCharacterPhaser {
       collisionGroups: ["geDefault"],
       charLayer: charData.charLayer,
       facingDirection: charData.facingDirection,
+      labels: charData.labels,
     };
 
     this.customOffset = new Vector2(

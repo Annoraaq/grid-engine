@@ -181,6 +181,7 @@ describe("GridEngine", () => {
     expect(gridEngine.getCharLayer("player")).toEqual(undefined);
     expect(gridEngine.getCollisionGroups("player")).toEqual(["geDefault"]);
     expect(gridEngine.hasLayerOverlay()).toEqual(false);
+    expect(gridEngine.getLabels("player")).toEqual([]);
   });
 
   it("should init player with collisionGroups", () => {
@@ -1339,6 +1340,110 @@ describe("GridEngine", () => {
     });
   });
 
+  describe("labels", () => {
+    it("should add labels on creation", () => {
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+            labels: ["someLabel", "someOtherLabel"],
+          },
+        ],
+      });
+      expect(gridEngine.getLabels("player")).toEqual([
+        "someLabel",
+        "someOtherLabel",
+      ]);
+    });
+
+    it("should add labels", () => {
+      expect(gridEngine.getLabels("player")).toEqual([]);
+      gridEngine.addLabels("player", ["someLabel", "someOtherLabel"]);
+      expect(gridEngine.getLabels("player")).toEqual([
+        "someLabel",
+        "someOtherLabel",
+      ]);
+    });
+
+    it("should remove labels", () => {
+      expect(gridEngine.getLabels("player")).toEqual([]);
+      gridEngine.addLabels("player", ["label1", "label2", "label3"]);
+      gridEngine.removeLabels("player", ["label1", "label3"]);
+      expect(gridEngine.getLabels("player")).toEqual(["label2"]);
+    });
+
+    it("should clear labels", () => {
+      gridEngine.addLabels("player", ["label1", "label2", "label3"]);
+      gridEngine.clearLabels("player");
+      expect(gridEngine.getLabels("player")).toEqual([]);
+    });
+
+    it("should get all characters with specific labels", () => {
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: "player1",
+            labels: ["label1", "label2"],
+          },
+          {
+            id: "player2",
+            labels: ["label2"],
+          },
+          {
+            id: "player3",
+            labels: [],
+          },
+        ],
+      });
+
+      expect(
+        gridEngine.getAllCharacters({
+          labels: { withOneOfLabels: ["label1", "label2"] },
+        })
+      ).toEqual(["player1", "player2"]);
+
+      expect(
+        gridEngine.getAllCharacters({
+          labels: { withAllLabels: ["label1", "label2"] },
+        })
+      ).toEqual(["player1"]);
+
+      expect(
+        gridEngine.getAllCharacters({
+          labels: { withNoneLabels: ["label1", "label2"] },
+        })
+      ).toEqual(["player3"]);
+
+      expect(
+        gridEngine.getAllCharacters({
+          labels: {
+            withAllLabels: ["label1", "label2"],
+            withOneOfLabels: ["label1", "label2"],
+            withNoneLabels: ["label1", "label2"],
+          },
+        })
+      ).toEqual(["player1"]);
+
+      expect(
+        gridEngine.getAllCharacters({
+          labels: {
+            withOneOfLabels: ["label1", "label2"],
+            withNoneLabels: ["label1", "label2"],
+          },
+        })
+      ).toEqual(["player1", "player2"]);
+
+      expect(
+        gridEngine.getAllCharacters({
+          labels: {
+            withAllLabels: ["label1", "label2"],
+            withNoneLabels: ["label1", "label2"],
+          },
+        })
+      ).toEqual(["player1"]);
+    });
+  });
+
   describe("Error Handling unknown char id", () => {
     const UNKNOWN_CHAR_ID = "unknownCharId";
 
@@ -1407,6 +1512,14 @@ describe("GridEngine", () => {
       );
       expectCharUnknownException(() => gridEngine.getSpeed(UNKNOWN_CHAR_ID));
       expectCharUnknownException(() => gridEngine.getMovement(UNKNOWN_CHAR_ID));
+      expectCharUnknownException(() => gridEngine.getLabels(UNKNOWN_CHAR_ID));
+      expectCharUnknownException(() =>
+        gridEngine.addLabels(UNKNOWN_CHAR_ID, ["label"])
+      );
+      expectCharUnknownException(() =>
+        gridEngine.removeLabels(UNKNOWN_CHAR_ID, ["label"])
+      );
+      expectCharUnknownException(() => gridEngine.clearLabels(UNKNOWN_CHAR_ID));
     });
 
     it("should throw error if follow is invoked", () => {
@@ -1513,6 +1626,14 @@ describe("GridEngine", () => {
       expectUninitializedException(() => gridEngine.getContainer(SOME_CHAR_ID));
       expectUninitializedException(() => gridEngine.getSpeed(SOME_CHAR_ID));
       expectUninitializedException(() => gridEngine.getMovement(SOME_CHAR_ID));
+      expectUninitializedException(() => gridEngine.getLabels(SOME_CHAR_ID));
+      expectUninitializedException(() =>
+        gridEngine.addLabels(SOME_CHAR_ID, ["label"])
+      );
+      expectUninitializedException(() =>
+        gridEngine.removeLabels(SOME_CHAR_ID, ["label"])
+      );
+      expectUninitializedException(() => gridEngine.clearLabels(SOME_CHAR_ID));
     });
   });
 });

@@ -4,7 +4,7 @@ import { directionVector, oppositeDirection } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
 import { GridTilemap, LayerName } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
-import { Position, WalkingAnimationMapping } from "../GridEngine";
+import { Position } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
@@ -29,6 +29,7 @@ export interface CharConfig {
   charLayer?: string;
   collisionGroups?: string[];
   facingDirection?: Direction;
+  labels?: string[];
 }
 
 export class GridCharacter {
@@ -50,11 +51,11 @@ export class GridCharacter {
   private lastMovementImpulse = Direction.NONE;
   private facingDirection: Direction = Direction.DOWN;
   private movement?: Movement;
-  private walkingAnimationMapping?: WalkingAnimationMapping | number;
   private collidesWithTilesInternal: boolean;
   private collisionGroups: Set<string>;
   private depthChanged$ = new Subject<LayerPosition>();
   private movementProgress = 0;
+  private labels: Set<string>;
 
   constructor(private id: string, config: CharConfig) {
     this.tilemap = config.tilemap;
@@ -63,6 +64,7 @@ export class GridCharacter {
     this._tilePos.layer = config.charLayer;
 
     this.collisionGroups = new Set<string>(config.collisionGroups || []);
+    this.labels = new Set<string>(config.labels || []);
 
     if (config.facingDirection) {
       this.turnTowards(config.facingDirection);
@@ -231,6 +233,30 @@ export class GridCharacter {
 
   removeAllCollisionGroups(): void {
     this.collisionGroups.clear();
+  }
+
+  addLabels(labels: string[]): void {
+    for (const label of labels) {
+      this.labels.add(label);
+    }
+  }
+
+  getLabels(): string[] {
+    return [...this.labels.values()];
+  }
+
+  hasLabel(label: string): boolean {
+    return this.labels.has(label);
+  }
+
+  clearLabels(): void {
+    this.labels.clear();
+  }
+
+  removeLabels(labels: string[]): void {
+    for (const label of labels) {
+      this.labels.delete(label);
+    }
   }
 
   movementStarted(): Subject<Direction> {

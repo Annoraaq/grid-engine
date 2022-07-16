@@ -103,8 +103,8 @@ export interface Options {
 }
 
 export class TargetMovement implements Movement {
-  private shortestPath: LayerPosition[];
-  private distOffset: number;
+  private shortestPath: LayerPosition[] = [];
+  private distOffset = 0;
   private posOnPath = 0;
   private pathBlockedStrategy: PathBlockedStrategy;
   private noPathFoundStrategy: NoPathFoundStrategy;
@@ -112,7 +112,7 @@ export class TargetMovement implements Movement {
   private noPathFoundRetryable: Retryable;
   private pathBlockedRetryable: Retryable;
   private pathBlockedWaitTimeoutMs: number;
-  private pathBlockedWaitElapsed: number;
+  private pathBlockedWaitElapsed = 0;
   private distanceUtils: DistanceUtils;
   private finished$: Subject<Finished>;
   private ignoreBlockedTarget: boolean;

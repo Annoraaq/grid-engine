@@ -12,7 +12,7 @@ export class RandomMovement implements Movement {
   private delayLeft: number;
   private initialRow: number;
   private initialCol: number;
-  private stepSize: number;
+  private stepSize = 0;
   private stepsWalked: number;
   private currentMovementDirection: Direction;
   private distanceUtils: DistanceUtils;
