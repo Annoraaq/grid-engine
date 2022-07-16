@@ -10,7 +10,7 @@ export declare class FollowMovement implements Movement {
     private numberOfDirections;
     private distance;
     private noPathFoundStrategy;
-    private targetMovement;
+    private targetMovement?;
     constructor(character: GridCharacter, gridTilemap: GridTilemap, charToFollow: GridCharacter, numberOfDirections?: NumberOfDirections, distance?: number, noPathFoundStrategy?: NoPathFoundStrategy);
     update(delta: number): void;
     getInfo(): MovementInfo;

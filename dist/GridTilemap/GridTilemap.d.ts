@@ -1,6 +1,6 @@
 import { Direction } from "./../Direction/Direction";
-import { GridCharacter } from "../GridCharacter/GridCharacter";
 import { Vector2 } from "../Utils/Vector2/Vector2";
+import { GridCharacter } from "../GridCharacter/GridCharacter";
 export declare type LayerName = string | undefined;
 export declare class GridTilemap {
     private tilemap;

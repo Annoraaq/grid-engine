@@ -1,13 +1,15 @@
 import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { Finished, MoveToConfig, MoveToResult } from "./Movement/TargetMovement/TargetMovement";
-import { CharacterIndex, FrameRow, PositionChange } from "./GridCharacter/GridCharacter";
+import { PositionChange } from "./GridCharacter/GridCharacter";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { LayerName } from "./GridTilemap/GridTilemap";
 import { Observable } from "rxjs";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { MovementInfo } from "./Movement/Movement";
-export { CollisionStrategy, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, LayerName, MovementInfo, PositionChange, };
+import { CharacterIndex, FrameRow } from "./GridCharacter/CharacterAnimation/CharacterAnimation";
+import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter";
+export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, LayerName, MovementInfo, PositionChange, };
 export declare type TileSizePerSecond = number;
 export interface Position {
     x: number;
@@ -167,6 +169,13 @@ export interface CharacterData {
      * @beta
      */
     charLayer?: string;
+    /**
+     * Sets labels for the character. They can be used to filter and logically
+     * group characters.
+     *
+     * @defaultValue `[]`
+     */
+    labels?: string[];
 }
 /**
  * Result of a modification of the internal characters array
@@ -188,16 +197,16 @@ export declare enum CharacterShiftAction {
 }
 export declare class GridEngine {
     private scene;
-    private gridCharacters;
-    private gridTilemap;
-    private isCreated;
-    private movementStopped$;
-    private movementStarted$;
-    private directionChanged$;
-    private positionChangeStarted$;
-    private positionChangeFinished$;
-    private charRemoved$;
-    private charAdded$;
+    private gridCharacters?;
+    private gridTilemap?;
+    private isCreatedInternal;
+    private movementStopped$?;
+    private movementStarted$?;
+    private directionChanged$?;
+    private positionChangeStarted$?;
+    private positionChangeFinished$?;
+    private charRemoved$?;
+    private charAdded$?;
     /**
      * Should only be called by Phaser and never directly.
      * @internal
@@ -331,9 +340,26 @@ export declare class GridEngine {
      */
     removeAllCharacters(): void;
     /**
-     * @returns All character IDs that are registered in the plugin.
+     * @returns All character IDs that are registered in the plugin, satisfying
+     * the provided filtering options.
      */
-    getAllCharacters(): string[];
+    getAllCharacters(options?: CharacterFilteringOptions): string[];
+    /**
+     * @returns All labels, attached to the character.
+     */
+    getLabels(charId: string): string[];
+    /**
+     * Add labels to the character.
+     */
+    addLabels(charId: string, labels: string[]): void;
+    /**
+     * Remove labels from the character.
+     */
+    removeLabels(charId: string, labels: string[]): void;
+    /**
+     * Removes all labels from the character.
+     */
+    clearLabels(charId: string): void;
     /**
      * Character `charId` will start to walk towards `charIdToFollow` on a
      * shortest path until it reaches the specified `distance`.
@@ -468,6 +494,7 @@ export declare class GridEngine {
     private setConfigDefaults;
     private charRemoved;
     private initGuard;
+    private createUninitializedErr;
     private addCharacters;
     private moveChar;
     private createCharUnknownErr;
