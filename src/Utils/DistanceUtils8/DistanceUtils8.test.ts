@@ -15,11 +15,11 @@ describe("DistanceUtils8", () => {
     });
   });
 
-  describe("neighbours", () => {
-    it("should return the correct neighbours", () => {
+  describe("neighbors", () => {
+    it("should return the correct neighbors", () => {
       const distanceUtils8 = new DistanceUtils8();
       const vector = new Vector2(3, -1);
-      expect(distanceUtils8.neighbours(vector)).toEqual([
+      expect(distanceUtils8.neighbors(vector)).toEqual([
         new Vector2(3, 0),
         new Vector2(4, -1),
         new Vector2(2, -1),

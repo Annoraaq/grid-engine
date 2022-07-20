@@ -6,10 +6,17 @@ export interface LayerPosition {
   layer: LayerName;
 }
 
+export type GetNeighbors = (pos: LayerPosition) => LayerPosition[];
+
+export interface ShortestPath {
+  path: LayerPosition[];
+  distOffset: number;
+}
+
 export interface ShortestPathAlgorithm {
   getShortestPath(
     startPos: LayerPosition,
     targetPos: LayerPosition,
-    getNeighbours: (pos: LayerPosition) => LayerPosition[]
+    getNeighbors: GetNeighbors
   ): { path: LayerPosition[]; closestToTarget: LayerPosition };
 }

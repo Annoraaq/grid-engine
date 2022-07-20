@@ -763,9 +763,9 @@ describe("TargetMovement", () => {
       targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
 
       gridTilemapMock.isBlocking.mockReturnValue(true);
-      const getNeighbours = targetMovement.getNeighbours(charPos);
+      const getNeighbors = targetMovement.getNeighbors(charPos);
 
-      expect(getNeighbours).toEqual([
+      expect(getNeighbors).toEqual([
         {
           position: new Vector2(charPos.position.x, charPos.position.y + 1),
           layer: "layer1",
@@ -794,9 +794,9 @@ describe("TargetMovement", () => {
       mockChar.collidesWithTiles.mockReturnValue(false);
       targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
 
-      const getNeighbours = targetMovement.getNeighbours(charPos);
+      const getNeighbors = targetMovement.getNeighbors(charPos);
 
-      expect(getNeighbours).toEqual([]);
+      expect(getNeighbors).toEqual([]);
     });
 
     it("should not move if no path exists", () => {
@@ -816,7 +816,7 @@ describe("TargetMovement", () => {
     });
   });
 
-  it("should delegate getNeighbours to gridTilemap", () => {
+  it("should delegate getNeighbors to gridTilemap", () => {
     const charPos = layerPos(new Vector2(3, 1));
     const targetPos = layerPos(new Vector2(1, 1));
     const mockChar = createMockChar("char1", charPos.position);
@@ -827,13 +827,13 @@ describe("TargetMovement", () => {
     gridTilemapMock.isBlocking.mockReturnValue(true);
 
     targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
-    let getNeighbours = targetMovement.getNeighbours(charPos);
-    expect(getNeighbours).toEqual([]);
+    let getNeighbors = targetMovement.getNeighbors(charPos);
+    expect(getNeighbors).toEqual([]);
 
     gridTilemapMock.isBlocking.mockReturnValue(false);
     gridTilemapMock.getTransition.mockReturnValue("layer2");
-    getNeighbours = targetMovement.getNeighbours(charPos);
-    expect(getNeighbours).toEqual([
+    getNeighbors = targetMovement.getNeighbors(charPos);
+    expect(getNeighbors).toEqual([
       {
         position: new Vector2(charPos.position.x, charPos.position.y + 1),
         layer: "layer2",
@@ -949,150 +949,190 @@ describe("TargetMovement", () => {
     expect(mockChar.move).toHaveBeenCalled();
   });
 
-  it("should recalculate shortest path on strategy RETRY", () => {
-    const mockChar = createMockChar("char", new Vector2(2, 1));
-    gridTilemapMock.isBlocking.mockReturnValue(true);
-    mockBfs.getShortestPath = jest.fn().mockReturnValue({
-      path: [
-        layerPos(new Vector2(2, 1)),
-        layerPos(new Vector2(2, 2)),
+  describe("PathBlockedStrategy = RETRY", () => {
+    it("should recalculate shortest path", () => {
+      const mockChar = createMockChar("char", new Vector2(2, 1));
+      gridTilemapMock.isBlocking.mockReturnValue(true);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [
+          layerPos(new Vector2(2, 1)),
+          layerPos(new Vector2(2, 2)),
+          layerPos(new Vector2(3, 2)),
+        ],
+        closestToTarget: new Vector2(3, 2),
+      });
+
+      targetMovement = new TargetMovement(
+        mockChar,
+        gridTilemapMock,
         layerPos(new Vector2(3, 2)),
-      ],
-      closestToTarget: new Vector2(3, 2),
+        {
+          config: {
+            pathBlockedStrategy: PathBlockedStrategy.RETRY,
+          },
+        }
+      );
+
+      gridTilemapMock.isBlocking.mockReturnValue(true);
+      targetMovement.update(200);
+
+      expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(2);
+      expect(mockChar.move).not.toHaveBeenCalled();
+
+      gridTilemapMock.isBlocking.mockReturnValue(false);
+      targetMovement.update(200);
+
+      expect(mockChar.move).toHaveBeenCalledWith(Direction.DOWN);
     });
 
-    targetMovement = new TargetMovement(
-      mockChar,
-      gridTilemapMock,
-      layerPos(new Vector2(3, 2)),
-      {
-        config: {
-          pathBlockedStrategy: PathBlockedStrategy.RETRY,
-        },
-      }
-    );
+    it("should keep retrying if no path can be found anymore after it was blocked", () => {
+      const mockChar = createMockChar("char", new Vector2(2, 1));
+      gridTilemapMock.isBlocking.mockReturnValue(true);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [
+          layerPos(new Vector2(2, 1)),
+          layerPos(new Vector2(2, 2)),
+          layerPos(new Vector2(3, 2)),
+        ],
+        closestToTarget: new Vector2(3, 2),
+      });
 
-    gridTilemapMock.isBlocking.mockReturnValue(true);
-    targetMovement.update(200);
-
-    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(2);
-    expect(mockChar.move).not.toHaveBeenCalled();
-
-    gridTilemapMock.isBlocking.mockReturnValue(false);
-    targetMovement.update(200);
-
-    expect(mockChar.move).toHaveBeenCalledWith(Direction.DOWN);
-  });
-
-  it("should recalculate shortest path on strategy RETRY after default backoff", () => {
-    const defaultBackoff = 200;
-    const mockChar = createMockChar("char", new Vector2(2, 1));
-    gridTilemapMock.isBlocking.mockReturnValue(true);
-    mockBfs.getShortestPath = jest.fn().mockReturnValue({
-      path: [
-        layerPos(new Vector2(2, 1)),
-        layerPos(new Vector2(2, 2)),
+      targetMovement = new TargetMovement(
+        mockChar,
+        gridTilemapMock,
         layerPos(new Vector2(3, 2)),
-      ],
-      closestToTarget: new Vector2(3, 2),
+        {
+          config: {
+            pathBlockedStrategy: PathBlockedStrategy.RETRY,
+          },
+        }
+      );
+
+      gridTilemapMock.isBlocking.mockReturnValue(true);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [],
+        closestToTarget: new Vector2(2, 1),
+      });
+      targetMovement.update(200);
+      targetMovement.update(200);
+
+      expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(2);
+
+      targetMovement.update(200);
+      expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(3);
     });
 
-    targetMovement = new TargetMovement(
-      mockChar,
-      gridTilemapMock,
-      layerPos(new Vector2(3, 2)),
-      {
-        config: {
-          pathBlockedStrategy: PathBlockedStrategy.RETRY,
-        },
-      }
-    );
+    it("should recalculate shortest path after default backoff", () => {
+      const defaultBackoff = 200;
+      const mockChar = createMockChar("char", new Vector2(2, 1));
+      gridTilemapMock.isBlocking.mockReturnValue(true);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [
+          layerPos(new Vector2(2, 1)),
+          layerPos(new Vector2(2, 2)),
+          layerPos(new Vector2(3, 2)),
+        ],
+        closestToTarget: new Vector2(3, 2),
+      });
 
-    gridTilemapMock.isBlocking.mockReturnValue(true);
-    targetMovement.update(defaultBackoff - 1);
-    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
-    targetMovement.update(1);
-    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(2);
-  });
-
-  it("should recalculate shortest path on strategy RETRY after custom backoff", () => {
-    const mockChar = createMockChar("char", new Vector2(2, 1));
-    gridTilemapMock.isBlocking.mockReturnValue(true);
-    mockBfs.getShortestPath = jest.fn().mockReturnValue({
-      path: [
-        layerPos(new Vector2(2, 1)),
-        layerPos(new Vector2(2, 2)),
+      targetMovement = new TargetMovement(
+        mockChar,
+        gridTilemapMock,
         layerPos(new Vector2(3, 2)),
-      ],
-      closestToTarget: new Vector2(3, 2),
+        {
+          config: {
+            pathBlockedStrategy: PathBlockedStrategy.RETRY,
+          },
+        }
+      );
+
+      gridTilemapMock.isBlocking.mockReturnValue(true);
+      targetMovement.update(defaultBackoff - 1);
+      expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
+      targetMovement.update(1);
+      expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(2);
     });
 
-    targetMovement = new TargetMovement(
-      mockChar,
-      gridTilemapMock,
-      layerPos(new Vector2(3, 2)),
-      {
-        config: {
-          pathBlockedStrategy: PathBlockedStrategy.RETRY,
-          pathBlockedRetryBackoffMs: 150,
-        },
-      }
-    );
+    it("should recalculate shortest path after custom backoff", () => {
+      const mockChar = createMockChar("char", new Vector2(2, 1));
+      gridTilemapMock.isBlocking.mockReturnValue(true);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [
+          layerPos(new Vector2(2, 1)),
+          layerPos(new Vector2(2, 2)),
+          layerPos(new Vector2(3, 2)),
+        ],
+        closestToTarget: new Vector2(3, 2),
+      });
 
-    gridTilemapMock.isBlocking.mockReturnValue(true);
-    targetMovement.update(100);
-    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
-    targetMovement.update(49);
-    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
-    targetMovement.update(1);
-    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(2);
-  });
-
-  it("should recalculate shortest path on strategy RETRY with maxRetries", () => {
-    const mockChar = createMockChar("char", new Vector2(2, 1));
-    gridTilemapMock.isBlocking.mockReturnValue(true);
-    mockBfs.getShortestPath = jest.fn().mockReturnValue({
-      path: [
-        layerPos(new Vector2(2, 1)),
-        layerPos(new Vector2(2, 2)),
+      targetMovement = new TargetMovement(
+        mockChar,
+        gridTilemapMock,
         layerPos(new Vector2(3, 2)),
-      ],
-      closestToTarget: new Vector2(3, 2),
+        {
+          config: {
+            pathBlockedStrategy: PathBlockedStrategy.RETRY,
+            pathBlockedRetryBackoffMs: 150,
+          },
+        }
+      );
+
+      gridTilemapMock.isBlocking.mockReturnValue(true);
+      targetMovement.update(100);
+      expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
+      targetMovement.update(49);
+      expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(1);
+      targetMovement.update(1);
+      expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(2);
     });
 
-    targetMovement = new TargetMovement(
-      mockChar,
-      gridTilemapMock,
-      layerPos(new Vector2(3, 2)),
-      {
-        config: {
-          pathBlockedStrategy: PathBlockedStrategy.RETRY,
-          pathBlockedMaxRetries: 2,
-        },
-      }
-    );
+    it("should recalculate shortest path with maxRetries", () => {
+      const mockChar = createMockChar("char", new Vector2(2, 1));
+      gridTilemapMock.isBlocking.mockReturnValue(true);
+      mockBfs.getShortestPath = jest.fn().mockReturnValue({
+        path: [
+          layerPos(new Vector2(2, 1)),
+          layerPos(new Vector2(2, 2)),
+          layerPos(new Vector2(3, 2)),
+        ],
+        closestToTarget: new Vector2(3, 2),
+      });
 
-    const finishedObsCallbackMock = jest.fn();
-    const finishedObsCompleteMock = jest.fn();
-    targetMovement.finishedObs().subscribe({
-      next: finishedObsCallbackMock,
-      complete: finishedObsCompleteMock,
+      targetMovement = new TargetMovement(
+        mockChar,
+        gridTilemapMock,
+        layerPos(new Vector2(3, 2)),
+        {
+          config: {
+            pathBlockedStrategy: PathBlockedStrategy.RETRY,
+            pathBlockedMaxRetries: 2,
+          },
+        }
+      );
+
+      const finishedObsCallbackMock = jest.fn();
+      const finishedObsCompleteMock = jest.fn();
+      targetMovement.finishedObs().subscribe({
+        next: finishedObsCallbackMock,
+        complete: finishedObsCompleteMock,
+      });
+
+      gridTilemapMock.isBlocking.mockReturnValue(true);
+      targetMovement.update(200); // retry 1
+      targetMovement.update(200); // retry 2
+      targetMovement.update(200); // retry 3 should not happen
+
+      expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(3);
+      expect(mockChar.move).not.toHaveBeenCalled();
+      expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+        position: new Vector2(1, 1),
+        result: MoveToResult.PATH_BLOCKED_MAX_RETRIES_EXCEEDED,
+        description:
+          "PathBlockedStrategy RETRY: Maximum retries of 2 exceeded.",
+        layer: "layer1",
+      });
+      expect(finishedObsCompleteMock).toHaveBeenCalled();
     });
-
-    gridTilemapMock.isBlocking.mockReturnValue(true);
-    targetMovement.update(200); // retry 1
-    targetMovement.update(200); // retry 2
-    targetMovement.update(200); // retry 3 should not happen
-
-    expect(mockBfs.getShortestPath).toHaveBeenCalledTimes(3);
-    expect(mockChar.move).not.toHaveBeenCalled();
-    expect(finishedObsCallbackMock).toHaveBeenCalledWith({
-      position: new Vector2(1, 1),
-      result: MoveToResult.PATH_BLOCKED_MAX_RETRIES_EXCEEDED,
-      description: "PathBlockedStrategy RETRY: Maximum retries of 2 exceeded.",
-      layer: "layer1",
-    });
-    expect(finishedObsCompleteMock).toHaveBeenCalled();
   });
 
   it("should stop on pathBlockedStrategy STOP", () => {
@@ -1185,9 +1225,9 @@ describe("TargetMovement", () => {
     });
 
     gridTilemapMock.isBlocking.mockReturnValue(true);
-    const getNeighbours = targetMovement.getNeighbours(charPos);
+    const getNeighbors = targetMovement.getNeighbors(charPos);
 
-    expect(getNeighbours).toEqual([
+    expect(getNeighbors).toEqual([
       {
         position: new Vector2(charPos.position.x, charPos.position.y + 1),
         layer: "layer1",
@@ -1284,7 +1324,7 @@ describe("TargetMovement", () => {
   });
 
   describe("8 directions", () => {
-    it("should get 8 neighbours", () => {
+    it("should get 8 neighbors", () => {
       const charPos = layerPos(new Vector2(3, 1));
       const targetPos = layerPos(new Vector2(1, 1));
       const mockChar = createMockChar("char1", charPos.position);
@@ -1300,12 +1340,12 @@ describe("TargetMovement", () => {
         { numberOfDirections: NumberOfDirections.EIGHT }
       );
       gridTilemapMock.isBlocking.mockReturnValue(true);
-      let getNeighbours = targetMovement.getNeighbours(charPos);
-      expect(getNeighbours).toEqual([]);
+      let getNeighbors = targetMovement.getNeighbors(charPos);
+      expect(getNeighbors).toEqual([]);
 
       gridTilemapMock.isBlocking.mockReturnValue(false);
-      getNeighbours = targetMovement.getNeighbours(charPos);
-      expect(getNeighbours).toEqual([
+      getNeighbors = targetMovement.getNeighbors(charPos);
+      expect(getNeighbors).toEqual([
         layerPos(new Vector2(charPos.position.x, charPos.position.y + 1)),
         layerPos(new Vector2(charPos.position.x + 1, charPos.position.y)),
         layerPos(new Vector2(charPos.position.x - 1, charPos.position.y)),

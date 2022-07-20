@@ -6,7 +6,7 @@ export interface DistanceUtils {
 
   direction(from: Vector2, to: Vector2): Direction;
 
-  neighbours(pos: Vector2): Vector2[];
+  neighbors(pos: Vector2): Vector2[];
 
   getDirections(): Direction[];
 }
