@@ -6,7 +6,7 @@ import { Bfs } from "./Bfs";
 describe("Bfs", () => {
   let bfs: Bfs;
 
-  const getNeighbours = (pos: LayerPosition) => [
+  const getNeighbors = (pos: LayerPosition) => [
     {
       position: new Vector2(pos.position.x, pos.position.y + 1),
       layer: pos.layer,
@@ -36,7 +36,7 @@ describe("Bfs", () => {
     const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
-      getNeighbours
+      getNeighbors
     );
     expect(path).toEqual([
       { position: new Vector2(3, 3), layer: "layer1" },
@@ -52,7 +52,7 @@ describe("Bfs", () => {
     const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
-      getNeighbours
+      getNeighbors
     );
     expect(path).toEqual([
       { position: new Vector2(3, 3), layer: "layer1" },
@@ -72,7 +72,7 @@ describe("Bfs", () => {
     const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
-      getNeighbours
+      getNeighbors
     );
     expect(path).toEqual([{ position: new Vector2(3, 3), layer: "layer1" }]);
     expect(closestToTarget).toEqual(targetPos);
@@ -118,7 +118,7 @@ describe("Bfs", () => {
       startPos,
       targetPos,
       (pos) =>
-        getNeighbours(pos).filter((n) =>
+        getNeighbors(pos).filter((n) =>
           unblockedTiles.includes(VectorUtils.vec2str(n.position))
         )
     );
@@ -162,7 +162,7 @@ describe("Bfs", () => {
       startPos,
       targetPos,
       (pos) =>
-        getNeighbours(pos).filter((n) =>
+        getNeighbors(pos).filter((n) =>
           unblockedTiles.includes(VectorUtils.vec2str(n.position))
         )
     );

@@ -16,11 +16,11 @@ describe("DistanceUtils4", () => {
     });
   });
 
-  describe("neighbours", () => {
-    it("should return the correct neighbours", () => {
+  describe("neighbors", () => {
+    it("should return the correct neighbors", () => {
       const distanceUtils4 = new DistanceUtils4();
       const vector = new Vector2(3, -1);
-      expect(distanceUtils4.neighbours(vector)).toEqual([
+      expect(distanceUtils4.neighbors(vector)).toEqual([
         new Vector2(3, 0),
         new Vector2(4, -1),
         new Vector2(2, -1),
@@ -34,7 +34,7 @@ describe("DistanceUtils4", () => {
       const distanceUtils4 = new DistanceUtils4();
       const vector = new Vector2(3, -1);
 
-      // neighbours
+      // neighbors
       expect(distanceUtils4.direction(vector, new Vector2(2, -1))).toEqual(
         Direction.LEFT
       );
@@ -48,7 +48,7 @@ describe("DistanceUtils4", () => {
         Direction.DOWN
       );
 
-      // diagonal neighbours
+      // diagonal neighbors
       expect(distanceUtils4.direction(vector, new Vector2(2, 0))).toEqual(
         Direction.DOWN
       );

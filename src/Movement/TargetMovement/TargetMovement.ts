@@ -3,7 +3,10 @@ import { BidirectionalSearch } from "./../../Pathfinding/BidirectionalSearch/Bid
 import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy";
 import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
 import { NumberOfDirections } from "./../../Direction/Direction";
-import { LayerPosition } from "./../../Pathfinding/ShortestPathAlgorithm";
+import {
+  LayerPosition,
+  ShortestPath,
+} from "./../../Pathfinding/ShortestPathAlgorithm";
 import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
@@ -218,20 +221,20 @@ export class TargetMovement implements Movement {
     }
   }
 
-  getNeighbours = (pos: LayerPosition): LayerPosition[] => {
-    const neighbours = this.distanceUtils.neighbours(pos.position);
-    const transitionMappedNeighbours = neighbours.map((unblockedNeighbour) => {
+  getNeighbors = (pos: LayerPosition): LayerPosition[] => {
+    const neighbours = this.distanceUtils.neighbors(pos.position);
+    const transitionMappedNeighbors = neighbours.map((unblockedNeighbor) => {
       const transition = this.tilemap.getTransition(
-        unblockedNeighbour,
+        unblockedNeighbor,
         pos.layer
       );
       return {
-        position: unblockedNeighbour,
+        position: unblockedNeighbor,
         layer: transition || pos.layer,
       };
     });
 
-    return transitionMappedNeighbours.filter(
+    return transitionMappedNeighbors.filter(
       (neighbour) =>
         !this.isBlocking(neighbour.position, neighbour.layer) ||
         (this.ignoreBlockedTarget &&
@@ -279,7 +282,12 @@ export class TargetMovement implements Movement {
 
   private applyPathBlockedStrategy(delta: number): void {
     if (this.pathBlockedStrategy === PathBlockedStrategy.RETRY) {
-      this.pathBlockedRetryable.retry(delta, () => this.calcShortestPath());
+      this.pathBlockedRetryable.retry(delta, () => {
+        const shortestPath = this.getShortestPath();
+        if (shortestPath.path.length > 0) {
+          this.calcShortestPath(shortestPath);
+        }
+      });
     } else if (this.pathBlockedStrategy === PathBlockedStrategy.STOP) {
       this.stop(MoveToResult.PATH_BLOCKED);
     } else if (this.pathBlockedStrategy === PathBlockedStrategy.WAIT) {
@@ -354,8 +362,8 @@ export class TargetMovement implements Movement {
     return this.shortestPath.length === 0;
   }
 
-  private calcShortestPath(): void {
-    const shortestPath = this.getShortestPath();
+  private calcShortestPath(shortestPath?: ShortestPath): void {
+    shortestPath = shortestPath ?? this.getShortestPath();
     this.posOnPath = 0;
     this.shortestPath = shortestPath.path;
     this.distOffset = shortestPath.distOffset;
@@ -379,13 +387,13 @@ export class TargetMovement implements Movement {
     );
   };
 
-  private getShortestPath(): { path: LayerPosition[]; distOffset: number } {
+  private getShortestPath(): ShortestPath {
     const shortestPathAlgo: ShortestPathAlgorithm = new BidirectionalSearch();
     const { path: shortestPath, closestToTarget } =
       shortestPathAlgo.getShortestPath(
         this.character.getNextTilePos(),
         this.targetPos,
-        this.getNeighbours
+        this.getNeighbors
       );
 
     const noPathFound = shortestPath.length == 0;
@@ -397,7 +405,7 @@ export class TargetMovement implements Movement {
       const shortestPathToClosestPoint = shortestPathAlgo.getShortestPath(
         this.character.getNextTilePos(),
         closestToTarget,
-        this.getNeighbours
+        this.getNeighbors
       ).path;
       const distOffset = this.distanceUtils.distance(
         closestToTarget.position,

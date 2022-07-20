@@ -6,7 +6,7 @@ import { BidirectionalSearch } from "./BidirectionalSearch";
 describe("BidirectionalSearch", () => {
   let bidirectionalSearch: BidirectionalSearch;
 
-  const getNeighbours = (pos: LayerPosition) => [
+  const getNeighbors = (pos: LayerPosition) => [
     {
       position: new Vector2(pos.position.x, pos.position.y + 1),
       layer: pos.layer,
@@ -36,7 +36,7 @@ describe("BidirectionalSearch", () => {
     const { path, closestToTarget } = bidirectionalSearch.getShortestPath(
       startPos,
       targetPos,
-      getNeighbours
+      getNeighbors
     );
     expect(path).toEqual([
       { position: new Vector2(3, 3), layer: "layer1" },
@@ -52,7 +52,7 @@ describe("BidirectionalSearch", () => {
     const { path, closestToTarget } = bidirectionalSearch.getShortestPath(
       startPos,
       targetPos,
-      getNeighbours
+      getNeighbors
     );
     expect(path).toEqual([
       { position: new Vector2(3, 3), layer: "layer1" },
@@ -72,7 +72,7 @@ describe("BidirectionalSearch", () => {
     const { path, closestToTarget } = bidirectionalSearch.getShortestPath(
       startPos,
       targetPos,
-      getNeighbours
+      getNeighbors
     );
     expect(path).toEqual([{ position: new Vector2(3, 3), layer: "layer1" }]);
     expect(closestToTarget).toEqual(targetPos);
@@ -85,6 +85,28 @@ describe("BidirectionalSearch", () => {
       startPos,
       targetPos,
       () => []
+    );
+    expect(path).toEqual([]);
+    expect(closestToTarget).toEqual(startPos);
+  });
+
+  it("should not find a path if target is blocked", () => {
+    const startPos = { position: new Vector2(3, 3), layer: "layer1" };
+    const targetPos = { position: new Vector2(3, 4), layer: "layer1" };
+    const { path, closestToTarget } = bidirectionalSearch.getShortestPath(
+      startPos,
+      targetPos,
+      (pos: LayerPosition) => {
+        const positions = getNeighbors(pos);
+
+        const filtered = positions.filter((pos: LayerPosition) => {
+          return !(
+            pos.position.x == targetPos.position.x &&
+            pos.position.y == targetPos.position.y
+          );
+        });
+        return filtered;
+      }
     );
     expect(path).toEqual([]);
     expect(closestToTarget).toEqual(startPos);
@@ -118,7 +140,7 @@ describe("BidirectionalSearch", () => {
       startPos,
       targetPos,
       (pos) =>
-        getNeighbours(pos).filter((n) =>
+        getNeighbors(pos).filter((n) =>
           unblockedTiles.includes(VectorUtils.vec2str(n.position))
         )
     );
@@ -162,7 +184,7 @@ describe("BidirectionalSearch", () => {
       startPos,
       targetPos,
       (pos) =>
-        getNeighbours(pos).filter((n) =>
+        getNeighbors(pos).filter((n) =>
           unblockedTiles.includes(VectorUtils.vec2str(n.position))
         )
     );

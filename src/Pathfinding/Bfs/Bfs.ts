@@ -1,4 +1,5 @@
 import {
+  GetNeighbors,
   LayerPosition,
   ShortestPathAlgorithm,
 } from "./../ShortestPathAlgorithm";
@@ -20,12 +21,12 @@ export class Bfs implements ShortestPathAlgorithm {
   getShortestPath(
     startPos: LayerPosition,
     targetPos: LayerPosition,
-    getNeighbours: (pos: LayerPosition) => LayerPosition[]
+    getNeighbors: GetNeighbors
   ): { path: LayerPosition[]; closestToTarget: LayerPosition } {
     const shortestPath = this.shortestPathBfs(
       startPos,
       targetPos,
-      getNeighbours
+      getNeighbors
     );
     return {
       path: this.returnPath(shortestPath.previous, startPos, targetPos),
@@ -50,7 +51,7 @@ export class Bfs implements ShortestPathAlgorithm {
   private shortestPathBfs(
     startNode: LayerPosition,
     stopNode: LayerPosition,
-    getNeighbours: (pos: LayerPosition) => LayerPosition[]
+    getNeighbors: GetNeighbors
   ): ShortestPathTuple {
     const previous = new Map<string, LayerPosition>();
     const visited = new Set<string>();
@@ -74,11 +75,11 @@ export class Bfs implements ShortestPathAlgorithm {
         return { shortestDistance: dist, previous, closestToTarget };
       }
 
-      for (const neighbour of getNeighbours(node)) {
-        if (!visited.has(this.pos2Str(neighbour))) {
-          previous.set(this.pos2Str(neighbour), node);
-          queue.enqueue({ node: neighbour, dist: dist + 1 });
-          visited.add(this.pos2Str(neighbour));
+      for (const neighbor of getNeighbors(node)) {
+        if (!visited.has(this.pos2Str(neighbor))) {
+          previous.set(this.pos2Str(neighbor), node);
+          queue.enqueue({ node: neighbor, dist: dist + 1 });
+          visited.add(this.pos2Str(neighbor));
         }
       }
     }
