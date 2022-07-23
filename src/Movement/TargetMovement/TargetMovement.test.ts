@@ -5,6 +5,8 @@ import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
 import { of, Subject } from "rxjs";
+import { Position } from "../../GridEngine";
+import { Bfs } from "../../Pathfinding/Bfs/Bfs";
 
 const mockBfs = {
   getShortestPath: jest.fn(),
@@ -1459,5 +1461,44 @@ describe("TargetMovement", () => {
       targetMovement.update(100);
       expect(mockChar.move).not.toHaveBeenCalled();
     });
+  });
+
+  it("Should not consider forbidden positions as neighbors", () => {
+    function posToStr(pos: Position, charLayer?: string): string {
+      return `${pos.x}#${pos.y}#${charLayer}`;
+    }
+    const playerPos = { position: new Vector2(5, 5), layer: "layer1" };
+    const targetPos = { position: new Vector2(10, 10), layer: "layer1" };
+    const leftOfPlayer = { position: new Vector2(4, 5), layer: "layer1" };
+    const topOfPlayer = { position: new Vector2(5, 4), layer: "layer1" };
+    const rightOfPlayer = { position: new Vector2(6, 5), layer: "layer1" };
+    const bottomOfPlayer = { position: new Vector2(5, 6), layer: "layer1" };
+    const rightOfPlayerOtherLayer = {
+      position: new Vector2(4, 5),
+      layer: "unknownCharLayer",
+    };
+    const forbiddenPositions = new Set<string>();
+    forbiddenPositions.add(posToStr(leftOfPlayer.position, leftOfPlayer.layer));
+    forbiddenPositions.add(
+      posToStr(rightOfPlayerOtherLayer.position, rightOfPlayerOtherLayer.layer)
+    );
+
+    const mockChar = createMockChar("char", playerPos.position);
+    const bfs = new Bfs();
+    mockBfs.getShortestPath = jest.fn((startPos, targetPos, getNeighbors) =>
+      bfs.getShortestPath(startPos, targetPos, getNeighbors)
+    );
+    targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos, {
+      config: {
+        isPositionAllowedFn: (pos, charLayer) =>
+          !forbiddenPositions.has(posToStr(pos, charLayer)),
+      },
+    });
+
+    expect(targetMovement.getNeighbors(playerPos)).toEqual([
+      bottomOfPlayer,
+      rightOfPlayer,
+      topOfPlayer,
+    ]);
   });
 });

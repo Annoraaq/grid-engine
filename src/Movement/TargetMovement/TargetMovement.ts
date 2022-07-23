@@ -79,7 +79,24 @@ export interface MoveToConfig {
    * the current char layer of the moving character is used.
    */
   targetLayer?: string;
+
+  /**
+   * Function to specify whether a certain position is allowed for pathfinding.
+   * If the function returns false, the tile will be consindered as blocked.
+   *
+   * It can be used to restrict pathfinding to specific regions.
+   *
+   * Beware that this method can become a performance bottleneck easily. So be
+   * careful and keep it as efficient as possible. An asymptotic runtime
+   * complexity of O(1) is recommended.
+   */
+  isPositionAllowedFn?: IsPositionAllowedFn;
 }
+
+export type IsPositionAllowedFn = (
+  pos: Position,
+  charLayer?: string
+) => boolean;
 
 export enum MoveToResult {
   SUCCESS = "SUCCESS",
@@ -120,6 +137,7 @@ export class TargetMovement implements Movement {
   private finished$: Subject<Finished>;
   private ignoreBlockedTarget: boolean;
   private distance: number;
+  private isPositionAllowed: IsPositionAllowedFn = () => true;
 
   constructor(
     private character: GridCharacter,
@@ -152,6 +170,11 @@ export class TargetMovement implements Movement {
         this.stop(MoveToResult.PATH_BLOCKED_MAX_RETRIES_EXCEEDED);
       }
     );
+
+    if (config?.isPositionAllowedFn) {
+      this.isPositionAllowed = config.isPositionAllowedFn;
+    }
+
     this.distanceUtils = DistanceUtilsFactory.create(numberOfDirections);
     this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
     this.finished$ = new Subject<Finished>();
@@ -235,10 +258,11 @@ export class TargetMovement implements Movement {
     });
 
     return transitionMappedNeighbors.filter(
-      (neighbour) =>
-        !this.isBlocking(neighbour.position, neighbour.layer) ||
+      (neighbor) =>
+        (this.isPositionAllowed(neighbor.position, neighbor.layer) &&
+          !this.isBlocking(neighbor.position, neighbor.layer)) ||
         (this.ignoreBlockedTarget &&
-          LayerPositionUtils.equal(neighbour, this.targetPos))
+          LayerPositionUtils.equal(neighbor, this.targetPos))
     );
   };
 
