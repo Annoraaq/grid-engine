@@ -60,7 +60,19 @@ export interface MoveToConfig {
      * the current char layer of the moving character is used.
      */
     targetLayer?: string;
+    /**
+     * Function to specify whether a certain position is allowed for pathfinding.
+     * If the function returns false, the tile will be consindered as blocked.
+     *
+     * It can be used to restrict pathfinding to specific regions.
+     *
+     * Beware that this method can become a performance bottleneck easily. So be
+     * careful and keep it as efficient as possible. An asymptotic runtime
+     * complexity of O(1) is recommended.
+     */
+    isPositionAllowedFn?: IsPositionAllowedFn;
 }
+export declare type IsPositionAllowedFn = (pos: Position, charLayer?: string) => boolean;
 export declare enum MoveToResult {
     SUCCESS = "SUCCESS",
     NO_PATH_FOUND_MAX_RETRIES_EXCEEDED = "NO_PATH_FOUND_MAX_RETRIES_EXCEEDED",
@@ -100,6 +112,7 @@ export declare class TargetMovement implements Movement {
     private finished$;
     private ignoreBlockedTarget;
     private distance;
+    private isPositionAllowed;
     constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerPosition, { numberOfDirections, config, ignoreBlockedTarget, distance, }?: Options);
     setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void;
     getPathBlockedStrategy(): PathBlockedStrategy;
