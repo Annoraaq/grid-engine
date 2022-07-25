@@ -1,6 +1,6 @@
 import { SpriteUtils } from "./../Utils/SpriteUtils/SpriteUtils";
 import { GridCharacter } from "./GridCharacter";
-import { Direction } from "../Direction/Direction";
+import { Direction, NumberOfDirections } from "../Direction/Direction";
 import { take } from "rxjs/operators";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
@@ -42,6 +42,7 @@ describe("GridCharacter", () => {
       tilemap: gridTilemap,
       speed: 3,
       collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
     });
   });
 
@@ -52,6 +53,7 @@ describe("GridCharacter", () => {
       collidesWithTiles: true,
       charLayer: "someLayer",
       facingDirection: Direction.RIGHT,
+      numberOfDirections: NumberOfDirections.EIGHT,
     });
     expect(gridCharacter.getId()).toEqual("player");
     expect(gridCharacter.getSpeed()).toEqual(3);
@@ -59,6 +61,9 @@ describe("GridCharacter", () => {
     expect(gridCharacter.collidesWithTiles()).toEqual(true);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
     expect(gridCharacter.getLabels()).toEqual([]);
+    expect(gridCharacter.getNumberOfDirections()).toEqual(
+      NumberOfDirections.EIGHT
+    );
   });
 
   it("should be facing down on construction by default", () => {
@@ -201,6 +206,7 @@ describe("GridCharacter", () => {
       tilemap: gridTilemap,
       speed: 3,
       collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
     });
     gridCharacter.setTilePosition({
       position: newTilePos,
@@ -543,6 +549,7 @@ describe("GridCharacter", () => {
       speed: 3,
       collidesWithTiles: true,
       labels: ["label1", "label2"],
+      numberOfDirections: NumberOfDirections.FOUR,
     });
 
     expect(gridCharacter.getLabels()).toEqual(["label1", "label2"]);
@@ -587,6 +594,7 @@ describe("GridCharacter", () => {
           speed: 3,
           collidesWithTiles: true,
           collisionGroups: ["cGroup1"],
+          numberOfDirections: NumberOfDirections.FOUR,
         });
       });
       it("should not block when no blocking tiles and chars", () => {
@@ -608,6 +616,7 @@ describe("GridCharacter", () => {
           speed: 3,
           collidesWithTiles: true,
           collisionGroups: ["cGroup1"],
+          numberOfDirections: NumberOfDirections.FOUR,
         });
         blockingChar.setTilePosition({
           position: new Vector2(1, 0),
@@ -627,6 +636,7 @@ describe("GridCharacter", () => {
           speed: 3,
           collidesWithTiles: false,
           collisionGroups: ["cGroup1"],
+          numberOfDirections: NumberOfDirections.FOUR,
         });
       });
 
@@ -643,6 +653,7 @@ describe("GridCharacter", () => {
           speed: 3,
           collidesWithTiles: true,
           collisionGroups: ["cGroup1"],
+          numberOfDirections: NumberOfDirections.FOUR,
         });
         blockingChar.setTilePosition({
           position: new Vector2(1, 0),
@@ -740,6 +751,7 @@ describe("GridCharacter", () => {
         speed: 3,
         collidesWithTiles: true,
         collisionGroups: ["someGroup"],
+        numberOfDirections: NumberOfDirections.FOUR,
       });
       expect(gridCharacter.getCollisionGroups()).toEqual(["someGroup"]);
     });

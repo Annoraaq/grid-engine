@@ -1,3 +1,4 @@
+import { NumberOfDirections } from "../../Direction/Direction";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { createTilemapMock } from "../../Utils/MockFactory/MockFactory";
 import { GridCharacter } from "../GridCharacter";
@@ -14,6 +15,7 @@ describe("CharacterFilter", () => {
       speed: 3,
       collidesWithTiles: true,
       labels,
+      numberOfDirections: NumberOfDirections.FOUR,
     });
   }
   it("should get all characters with specific labels", () => {

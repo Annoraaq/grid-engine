@@ -1,5 +1,4 @@
 import { filter, takeUntil, take } from "rxjs/operators";
-import { NumberOfDirections } from "./../../Direction/Direction";
 import { GridTilemap, LayerName } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
@@ -15,7 +14,6 @@ export class FollowMovement implements Movement {
     private character: GridCharacter,
     private gridTilemap: GridTilemap,
     private charToFollow: GridCharacter,
-    private numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR,
     private distance = 0,
     private noPathFoundStrategy: NoPathFoundStrategy = NoPathFoundStrategy.STOP
   ) {
@@ -63,7 +61,7 @@ export class FollowMovement implements Movement {
         layer: targetLayer,
       },
       {
-        numberOfDirections: this.numberOfDirections,
+        numberOfDirections: this.character.getNumberOfDirections(),
         distance: this.distance + 1,
         config: { noPathFoundStrategy: this.noPathFoundStrategy },
         ignoreBlockedTarget: true,

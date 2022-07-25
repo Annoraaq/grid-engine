@@ -67,6 +67,7 @@ export interface GridEngineConfig {
   /** A custom name for the collision tile property of your tilemap. */
 
   collisionTilePropertyName?: string;
+
   /**
    * The possible number of directions for moving a character. Default is 4
    * (up, down, left, right). If set to 8 it additionaly enables diagonal
@@ -237,6 +238,13 @@ export interface CharacterData {
    * @defaultValue `[]`
    */
   labels?: string[];
+
+  /**
+   * The possible number of directions for moving a character. This setting can
+   * be used to override the {@link GridEngineConfig.numberOfDirections | global setting}
+   * in the GridEngine configuration for specific characters.
+   */
+  numberOfDirections?: NumberOfDirections;
 }
 
 /**
@@ -768,7 +776,6 @@ export class GridEngine {
       gridChar,
       this.gridTilemap,
       gridCharToFollow,
-      GlobalConfig.get().numberOfDirections,
       distance,
       closestPointIfBlocked
         ? NoPathFoundStrategy.CLOSEST_REACHABLE

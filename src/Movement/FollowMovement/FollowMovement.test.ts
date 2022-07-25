@@ -9,7 +9,6 @@ import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 const mockTargetMovement = {
   setCharacter: jest.fn(),
   update: jest.fn(),
-  setNumberOfDirections: jest.fn(),
 };
 
 jest.mock("../TargetMovement/TargetMovement", () => ({
@@ -39,6 +38,7 @@ describe("FollowMovement", () => {
       autoMovementSet: function () {
         return this.autoMovementSetSubject$;
       },
+      getNumberOfDirections: jest.fn(() => NumberOfDirections.FOUR),
     };
   }
 
@@ -79,7 +79,6 @@ describe("FollowMovement", () => {
 
   it("should update target on position change", () => {
     const enterTile = { position: new Vector2(7, 7), layer: "layer1" };
-    mockTargetMovement.setNumberOfDirections.mockReset();
     mockTargetMovement.setCharacter.mockReset();
 
     targetChar.positionChangeStartedSubject$.next({
@@ -106,7 +105,6 @@ describe("FollowMovement", () => {
     // @ts-ignore
     TargetMovement.mockClear();
     const enterTile = new Vector2(7, 7);
-    mockTargetMovement.setNumberOfDirections.mockReset();
     mockTargetMovement.setCharacter.mockReset();
 
     mockChar.autoMovementSetSubject$.next(undefined);
@@ -119,7 +117,6 @@ describe("FollowMovement", () => {
     // @ts-ignore
     TargetMovement.mockClear();
     const enterTile = new Vector2(7, 7);
-    mockTargetMovement.setNumberOfDirections.mockReset();
     mockTargetMovement.setCharacter.mockReset();
 
     mockChar.autoMovementSetSubject$.next(followMovement);
@@ -133,7 +130,6 @@ describe("FollowMovement", () => {
       mockChar,
       gridTilemapMock,
       targetChar,
-      NumberOfDirections.EIGHT,
       7
     );
     followMovement.update(100);
@@ -142,7 +138,7 @@ describe("FollowMovement", () => {
       gridTilemapMock,
       targetCharPos,
       {
-        numberOfDirections: NumberOfDirections.EIGHT,
+        numberOfDirections: NumberOfDirections.FOUR,
         distance: 8,
         config: { noPathFoundStrategy: NoPathFoundStrategy.STOP },
         ignoreBlockedTarget: true,
@@ -155,7 +151,6 @@ describe("FollowMovement", () => {
       mockChar,
       gridTilemapMock,
       targetChar,
-      NumberOfDirections.FOUR,
       7,
       NoPathFoundStrategy.CLOSEST_REACHABLE
     );
@@ -178,7 +173,6 @@ describe("FollowMovement", () => {
       mockChar,
       gridTilemapMock,
       targetChar,
-      NumberOfDirections.FOUR,
       7,
       NoPathFoundStrategy.CLOSEST_REACHABLE
     );
