@@ -61,7 +61,6 @@ export class FollowMovement implements Movement {
         layer: targetLayer,
       },
       {
-        numberOfDirections: this.character.getNumberOfDirections(),
         distance: this.distance + 1,
         config: { noPathFoundStrategy: this.noPathFoundStrategy },
         ignoreBlockedTarget: true,

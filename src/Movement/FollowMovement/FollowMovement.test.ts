@@ -64,7 +64,6 @@ describe("FollowMovement", () => {
       gridTilemapMock,
       targetCharPos,
       {
-        numberOfDirections: NumberOfDirections.FOUR,
         distance: 1,
         config: { noPathFoundStrategy: NoPathFoundStrategy.STOP },
         ignoreBlockedTarget: true,
@@ -91,7 +90,6 @@ describe("FollowMovement", () => {
       gridTilemapMock,
       enterTile,
       {
-        numberOfDirections: NumberOfDirections.FOUR,
         distance: 1,
         config: {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
@@ -138,7 +136,6 @@ describe("FollowMovement", () => {
       gridTilemapMock,
       targetCharPos,
       {
-        numberOfDirections: NumberOfDirections.FOUR,
         distance: 8,
         config: { noPathFoundStrategy: NoPathFoundStrategy.STOP },
         ignoreBlockedTarget: true,
@@ -160,7 +157,6 @@ describe("FollowMovement", () => {
       gridTilemapMock,
       targetCharPos,
       {
-        numberOfDirections: NumberOfDirections.FOUR,
         distance: 8,
         config: { noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE },
         ignoreBlockedTarget: true,

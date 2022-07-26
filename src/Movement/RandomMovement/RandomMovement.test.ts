@@ -46,6 +46,7 @@ describe("RandomMovement", () => {
       autoMovementSet: function () {
         return this.autoMovementSetSubject$;
       },
+      getNumberOfDirections: jest.fn().mockReturnValue(NumberOfDirections.FOUR),
     } as any;
   }
 
@@ -63,12 +64,7 @@ describe("RandomMovement", () => {
   });
 
   it("should return info", () => {
-    randomMovement = new RandomMovement(
-      charMock,
-      NumberOfDirections.FOUR,
-      10,
-      2
-    );
+    randomMovement = new RandomMovement(charMock, 10, 2);
 
     expect(randomMovement.getInfo()).toEqual({
       type: "Random",
@@ -80,7 +76,7 @@ describe("RandomMovement", () => {
   });
 
   it("should add and update character", () => {
-    randomMovement = new RandomMovement(charMock, NumberOfDirections.FOUR, 10);
+    randomMovement = new RandomMovement(charMock, 10);
     randomMovement.update(5);
 
     expect(charMock.move).not.toHaveBeenCalled();
@@ -100,12 +96,7 @@ describe("RandomMovement", () => {
   });
 
   it("should not move further than radius", () => {
-    randomMovement = new RandomMovement(
-      charMock,
-      NumberOfDirections.FOUR,
-      0,
-      2
-    );
+    randomMovement = new RandomMovement(charMock, 0, 2);
     mockDirDownStepSize3();
 
     charMock.getNextTilePos = () => ({
@@ -118,12 +109,7 @@ describe("RandomMovement", () => {
   });
 
   it("should move further than radius if radius is -1", () => {
-    randomMovement = new RandomMovement(
-      charMock,
-      NumberOfDirections.FOUR,
-      0,
-      -1
-    );
+    randomMovement = new RandomMovement(charMock, 0, -1);
     mockDirDownStepSize3();
 
     charMock.getNextTilePos = () => ({
@@ -139,12 +125,7 @@ describe("RandomMovement", () => {
     RandomUtils.getRandomInt = jest.fn().mockReturnValue(1);
     mockDirRightStepSize2();
 
-    randomMovement = new RandomMovement(
-      charMock,
-      NumberOfDirections.FOUR,
-      0,
-      2
-    );
+    randomMovement = new RandomMovement(charMock, 0, 2);
 
     // do first step down and set step size 2
     randomMovement.update(1);
@@ -167,12 +148,7 @@ describe("RandomMovement", () => {
 
   it("should reset step size", () => {
     mockDirRightStepSize2();
-    randomMovement = new RandomMovement(
-      charMock,
-      NumberOfDirections.FOUR,
-      0,
-      2
-    );
+    randomMovement = new RandomMovement(charMock, 0, 2);
 
     mockDirUpStepSize1();
 
@@ -193,12 +169,7 @@ describe("RandomMovement", () => {
   });
 
   it("should not continue moving if direction blocked", () => {
-    randomMovement = new RandomMovement(
-      charMock,
-      NumberOfDirections.FOUR,
-      50,
-      2
-    );
+    randomMovement = new RandomMovement(charMock, 50, 2);
     mockDirDownStepSize3();
 
     // do first step down and set step size 2
@@ -214,12 +185,7 @@ describe("RandomMovement", () => {
   });
 
   it("should not continue moving if direction is out of radius", () => {
-    randomMovement = new RandomMovement(
-      charMock,
-      NumberOfDirections.FOUR,
-      50,
-      2
-    );
+    randomMovement = new RandomMovement(charMock, 50, 2);
     // dir down
     mockDirDownStepSize3();
 
@@ -238,12 +204,7 @@ describe("RandomMovement", () => {
   });
 
   it("should unsubscribe from positionChangeStarted on autoMovementSet", () => {
-    randomMovement = new RandomMovement(
-      charMock,
-      NumberOfDirections.FOUR,
-      0,
-      2
-    );
+    randomMovement = new RandomMovement(charMock, 0, 2);
     mockDirDownStepSize3();
     // start moving down
     randomMovement.update(1);
@@ -261,7 +222,10 @@ describe("RandomMovement", () => {
 
   describe("8 directions", () => {
     beforeEach(() => {
-      randomMovement = new RandomMovement(charMock, NumberOfDirections.EIGHT);
+      (charMock as any).getNumberOfDirections.mockReturnValue(
+        NumberOfDirections.EIGHT
+      );
+      randomMovement = new RandomMovement(charMock);
     });
 
     it("should add and update character", () => {
@@ -272,12 +236,7 @@ describe("RandomMovement", () => {
     });
 
     it("should not move further than radius", () => {
-      randomMovement = new RandomMovement(
-        charMock,
-        NumberOfDirections.EIGHT,
-        0,
-        2
-      );
+      randomMovement = new RandomMovement(charMock, 0, 2);
       mockDirRightStepSize2();
 
       charMock.getNextTilePos = () => ({

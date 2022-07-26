@@ -2,7 +2,6 @@ import { LayerName } from "./../../GridTilemap/GridTilemap";
 import { BidirectionalSearch } from "./../../Pathfinding/BidirectionalSearch/BidirectionalSearch";
 import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy";
 import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
-import { NumberOfDirections } from "./../../Direction/Direction";
 import {
   LayerPosition,
   ShortestPath,
@@ -116,7 +115,6 @@ export interface Finished {
 }
 
 export interface Options {
-  numberOfDirections?: NumberOfDirections;
   distance?: number;
   config?: MoveToConfig;
   ignoreBlockedTarget?: boolean;
@@ -143,12 +141,7 @@ export class TargetMovement implements Movement {
     private character: GridCharacter,
     private tilemap: GridTilemap,
     private targetPos: LayerPosition,
-    {
-      numberOfDirections = NumberOfDirections.FOUR,
-      config,
-      ignoreBlockedTarget = false,
-      distance = 0,
-    }: Options = {}
+    { config, ignoreBlockedTarget = false, distance = 0 }: Options = {}
   ) {
     this.ignoreBlockedTarget = ignoreBlockedTarget;
     this.distance = distance;
@@ -175,7 +168,9 @@ export class TargetMovement implements Movement {
       this.isPositionAllowed = config.isPositionAllowedFn;
     }
 
-    this.distanceUtils = DistanceUtilsFactory.create(numberOfDirections);
+    this.distanceUtils = DistanceUtilsFactory.create(
+      character.getNumberOfDirections()
+    );
     this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
     this.finished$ = new Subject<Finished>();
     this.setCharacter(character);

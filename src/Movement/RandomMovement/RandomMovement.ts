@@ -1,7 +1,6 @@
 import { RandomUtils } from "./../../Utils/RandomUtils/RandomUtils";
 import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
 import { DistanceUtils } from "./../../Utils/DistanceUtils";
-import { NumberOfDirections } from "./../../Direction/Direction";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Direction, directionVector } from "../../Direction/Direction";
 import { Movement, MovementInfo } from "../Movement";
@@ -19,8 +18,6 @@ export class RandomMovement implements Movement {
 
   constructor(
     private character: GridCharacter,
-    // TODO: get numberOfDirections from character
-    numberOfDirections: NumberOfDirections = NumberOfDirections.FOUR,
     private delay = 0,
     private radius = -1
   ) {
@@ -43,7 +40,10 @@ export class RandomMovement implements Movement {
       .subscribe(() => {
         this.stepsWalked++;
       });
-    this.distanceUtils = DistanceUtilsFactory.create(numberOfDirections);
+
+    this.distanceUtils = DistanceUtilsFactory.create(
+      character.getNumberOfDirections()
+    );
   }
 
   update(delta: number): void {

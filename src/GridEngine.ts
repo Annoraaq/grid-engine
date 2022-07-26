@@ -412,12 +412,7 @@ export class GridEngine {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
-    const randomMovement = new RandomMovement(
-      gridChar,
-      GlobalConfig.get().numberOfDirections,
-      delay,
-      radius
-    );
+    const randomMovement = new RandomMovement(gridChar, delay, radius);
     gridChar.setMovement(randomMovement);
   }
 
@@ -468,7 +463,6 @@ export class GridEngine {
         layer: config?.targetLayer || gridChar.getNextTilePos().layer,
       },
       {
-        numberOfDirections: GlobalConfig.get().numberOfDirections,
         distance: 0,
         config: moveToConfig,
       }
