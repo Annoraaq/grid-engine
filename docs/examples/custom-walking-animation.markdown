@@ -11,7 +11,7 @@ parent: Examples
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-2.19.0.min.js"></script>
+<script src="js/grid-engine-2.20.0.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>
