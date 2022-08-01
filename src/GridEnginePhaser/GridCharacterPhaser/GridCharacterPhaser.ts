@@ -81,18 +81,6 @@ export class GridCharacterPhaser {
     return this.container;
   }
 
-  getEngineOffset(): Vector2 {
-    if (!this.sprite) {
-      return Vector2.ZERO;
-    }
-    const offsetX =
-      this.tilemap.getTileWidth() / 2 -
-      Math.floor((this.sprite?.displayWidth ?? 0) / 2);
-    const offsetY =
-      -(this.sprite?.displayHeight ?? 0) + this.tilemap.getTileHeight();
-    return new Vector2(offsetX, offsetY);
-  }
-
   getOffsetX(): number {
     return this.customOffset.x;
   }
@@ -123,6 +111,18 @@ export class GridCharacterPhaser {
   update(delta: number): void {
     this.gridCharacter.update(delta);
     this.updateGridChar(this.gridCharacter);
+  }
+
+  private getEngineOffset(): Vector2 {
+    if (!this.sprite) {
+      return Vector2.ZERO;
+    }
+    const offsetX =
+      this.tilemap.getTileWidth() / 2 -
+      Math.floor((this.sprite?.displayWidth ?? 0) / 2);
+    const offsetY =
+      -(this.sprite?.displayHeight ?? 0) + this.tilemap.getTileHeight();
+    return new Vector2(offsetX, offsetY);
   }
 
   private updatePixelPos(gridChar: GridCharacter) {
