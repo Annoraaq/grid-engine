@@ -1,7 +1,8 @@
----
+--
 layout: default
 title: Custom Character Offset
 parent: Examples
+
 ---
 
 # Custom character offset

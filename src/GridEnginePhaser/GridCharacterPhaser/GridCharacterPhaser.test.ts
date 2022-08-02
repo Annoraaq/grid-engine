@@ -142,16 +142,6 @@ describe("GridCharacterPhaser", () => {
       expect(gridChar.collidesWithTiles()).toBe(true);
       expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
       expect(gridChar.getTilePos().layer).toBe("someLayer");
-      expect(gridCharPhaser.getEngineOffset()).toEqual(
-        new Vector2(
-          (tilemapMock.tileWidth * tilemapMock.layers[0].tilemapLayer.scale) /
-            2 -
-            spriteMock.displayWidth / 2,
-
-          -spriteMock.displayHeight +
-            tilemapMock.tileHeight * tilemapMock.layers[0].tilemapLayer.scale
-        )
-      );
 
       expect(spriteMock.setOrigin).toHaveBeenCalledWith(0, 0);
       expect(gridCharPhaser.getAnimation()?.getWalkingAnimationMapping()).toBe(
@@ -587,12 +577,12 @@ describe("GridCharacterPhaser", () => {
       const scaledTileSize = 16 * 3;
       const expectedXPos =
         charTilePos.x * scaledTileSize +
-        gridCharPhaser.getEngineOffset().x +
+        expectedXEngineOffset() +
         charData.offsetX +
         scaledTileSize * 0.25;
       const expectedYPos =
         charTilePos.y * scaledTileSize +
-        gridCharPhaser.getEngineOffset().y +
+        expectedYEngineOffset() +
         charData.offsetY;
 
       expect(gridCharPhaser.getContainer()?.x).toBe(expectedXPos);
@@ -630,12 +620,12 @@ describe("GridCharacterPhaser", () => {
         const scaledTileSize = 16 * 3;
         const expectedXPos =
           charTilePos.x * scaledTileSize +
-          gridCharPhaser.engineOffset.x +
+          expectedXEngineOffset() +
           charData.offsetX +
           scaledTileSize * 0.25;
         const expectedYPos =
           charTilePos.y * scaledTileSize +
-          gridCharPhaser.engineOffset.y +
+          expectedYEngineOffset() +
           charData.offsetY;
 
         expect(gridCharPhaser.getSprite()?.x).toBe(expectedXPos);
@@ -649,12 +639,12 @@ describe("GridCharacterPhaser", () => {
         const scaledTileSize = 16 * 3;
         const expectedXPos =
           charTilePos.x * scaledTileSize +
-          gridCharPhaser.engineOffset.x +
+          expectedXEngineOffset() +
           charData.offsetX +
           scaledTileSize * -0.25;
         const expectedYPos =
           charTilePos.y * scaledTileSize +
-          gridCharPhaser.engineOffset.y +
+          expectedYEngineOffset() +
           charData.offsetY +
           scaledTileSize * 0.25;
 
@@ -669,13 +659,34 @@ describe("GridCharacterPhaser", () => {
         const scaledTileSize = 16 * 3;
         const expectedXPos =
           charTilePos.x * scaledTileSize +
-          gridCharPhaser.engineOffset.x +
+          expectedXEngineOffset() +
           charData.offsetX;
         const expectedYPos =
           charTilePos.y * scaledTileSize +
-          gridCharPhaser.engineOffset.y +
+          expectedYEngineOffset() +
           charData.offsetY +
           scaledTileSize * -0.25;
+
+        expect(gridCharPhaser.getSprite()?.x).toBe(expectedXPos);
+        expect(gridCharPhaser.getSprite()?.y).toBe(expectedYPos);
+      });
+
+      it("should update sprite pixel pos with new displayWidth and displayHeight", () => {
+        spriteMock.displayWidth = 10;
+        spriteMock.displayHeight = 10;
+        gridChar.move(Direction.RIGHT);
+        gridCharPhaser.update(250);
+
+        const scaledTileSize = 16 * 3;
+        const expectedXPos =
+          charTilePos.x * scaledTileSize +
+          expectedXEngineOffset() +
+          charData.offsetX +
+          scaledTileSize * 0.25;
+        const expectedYPos =
+          charTilePos.y * scaledTileSize +
+          expectedYEngineOffset() +
+          charData.offsetY;
 
         expect(gridCharPhaser.getSprite()?.x).toBe(expectedXPos);
         expect(gridCharPhaser.getSprite()?.y).toBe(expectedYPos);
@@ -711,7 +722,7 @@ describe("GridCharacterPhaser", () => {
 
         const expectedYPos =
           gridTilemap.tilePosToPixelPos(charTilePos).y +
-          gridCharPhaser.engineOffset.y +
+          expectedYEngineOffset() +
           charData.offsetY +
           gridTilemap.getTileDistance(Direction.UP).y * -0.25;
 
@@ -725,12 +736,12 @@ describe("GridCharacterPhaser", () => {
 
         const expectedXPos =
           gridTilemap.tilePosToPixelPos(charTilePos).x +
-          gridCharPhaser.engineOffset.x +
+          expectedXEngineOffset() +
           charData.offsetX +
           gridTilemap.getTileDistance(Direction.UP_LEFT).x * -0.25;
         const expectedYPos =
           gridTilemap.tilePosToPixelPos(charTilePos).y +
-          gridCharPhaser.engineOffset.y +
+          expectedYEngineOffset() +
           charData.offsetY +
           gridTilemap.getTileDistance(Direction.UP_LEFT).y * -0.25;
 
@@ -938,6 +949,19 @@ describe("GridCharacterPhaser", () => {
       expect(currentFrame).toEqual(upStandingFrame);
     });
   });
+
+  function expectedXEngineOffset(): number {
+    return (
+      (tilemapMock.tileWidth * tilemapMock.layers[0].tilemapLayer.scale) / 2 -
+      spriteMock.displayWidth / 2
+    );
+  }
+  function expectedYEngineOffset(): number {
+    return (
+      -spriteMock.displayHeight +
+      tilemapMock.tileHeight * tilemapMock.layers[0].tilemapLayer.scale
+    );
+  }
 });
 
 function checkSpriteDepth(

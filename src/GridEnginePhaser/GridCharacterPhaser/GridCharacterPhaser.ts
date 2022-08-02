@@ -16,7 +16,6 @@ import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
 
 export class GridCharacterPhaser {
   private customOffset = new Vector2(0, 0);
-  private engineOffset = new Vector2(0, 0);
 
   private sprite?: Phaser.GameObjects.Sprite;
   private layerOverlaySprite?: Phaser.GameObjects.Sprite;
@@ -83,10 +82,6 @@ export class GridCharacterPhaser {
     return this.container;
   }
 
-  getEngineOffset(): Vector2 {
-    return this.engineOffset;
-  }
-
   getOffsetX(): number {
     return this.customOffset.x;
   }
@@ -119,13 +114,25 @@ export class GridCharacterPhaser {
     this.updateGridChar(this.gridCharacter);
   }
 
+  private getEngineOffset(): Vector2 {
+    if (!this.sprite) {
+      return Vector2.ZERO;
+    }
+    const offsetX =
+      this.tilemap.getTileWidth() / 2 -
+      Math.floor((this.sprite?.displayWidth ?? 0) / 2);
+    const offsetY =
+      -(this.sprite?.displayHeight ?? 0) + this.tilemap.getTileHeight();
+    return new Vector2(offsetX, offsetY);
+  }
+
   private updatePixelPos(gridChar: GridCharacter) {
     const tp = gridChar.getTilePos().position.clone();
     const movementProgressProportional = gridChar.getMovementProgress() / 1000;
 
     const basePixelPos = this.tilemap
       .tilePosToPixelPos(tp)
-      .add(this.engineOffset)
+      .add(this.getEngineOffset())
       .add(this.customOffset);
     const newPixelPos = basePixelPos.add(
       directionVector(gridChar.getMovementDirection()).multiply(
@@ -199,13 +206,6 @@ export class GridCharacterPhaser {
 
     if (this.sprite) {
       this.sprite.setOrigin(0, 0);
-
-      const offsetX =
-        this.tilemap.getTileWidth() / 2 -
-        Math.floor((this.sprite.displayWidth ?? 0) / 2);
-      const offsetY =
-        -(this.sprite.displayHeight ?? 0) + this.tilemap.getTileHeight();
-      this.engineOffset = new Vector2(offsetX, offsetY);
 
       this.resetAnimation(gridChar, this.sprite);
 
