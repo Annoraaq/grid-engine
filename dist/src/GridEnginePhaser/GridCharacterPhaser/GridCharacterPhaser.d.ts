@@ -1,7 +1,6 @@
 import { GridTilemap } from "./../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { CharacterData, WalkingAnimationMapping } from "../../GridEngine";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CharacterAnimation } from "../../GridCharacter/CharacterAnimation/CharacterAnimation";
 import { Direction } from "../../Direction/Direction";
 export declare class GridCharacterPhaser {
@@ -10,7 +9,6 @@ export declare class GridCharacterPhaser {
     private tilemap;
     private layerOverlay;
     private customOffset;
-    private engineOffset;
     private sprite?;
     private layerOverlaySprite?;
     private container?;
@@ -27,7 +25,6 @@ export declare class GridCharacterPhaser {
     getLayerOverlaySprite(): Phaser.GameObjects.Sprite | undefined;
     setContainer(container?: Phaser.GameObjects.Container): void;
     getContainer(): Phaser.GameObjects.Container | undefined;
-    getEngineOffset(): Vector2;
     getOffsetX(): number;
     getOffsetY(): number;
     getWalkingAnimationMapping(): WalkingAnimationMapping | number | undefined;
@@ -35,6 +32,7 @@ export declare class GridCharacterPhaser {
     getAnimation(): CharacterAnimation | undefined;
     setAnimation(animation: CharacterAnimation): void;
     update(delta: number): void;
+    private getEngineOffset;
     private updatePixelPos;
     private getGameObj;
     private createChar;
