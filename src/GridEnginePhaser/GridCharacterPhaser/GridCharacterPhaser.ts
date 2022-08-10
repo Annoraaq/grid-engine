@@ -12,6 +12,7 @@ import { Utils } from "../../Utils/Utils/Utils";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { Direction, directionVector } from "../../Direction/Direction";
+import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
 
 export class GridCharacterPhaser {
   private customOffset = new Vector2(0, 0);
@@ -171,6 +172,8 @@ export class GridCharacterPhaser {
       charLayer: charData.charLayer,
       facingDirection: charData.facingDirection,
       labels: charData.labels,
+      numberOfDirections:
+        charData.numberOfDirections ?? GlobalConfig.get().numberOfDirections,
     };
 
     this.customOffset = new Vector2(

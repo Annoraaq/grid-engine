@@ -42,6 +42,7 @@ describe("TargetMovement", () => {
       collidesWithTiles: jest.fn().mockReturnValue(true),
       setMovement: jest.fn(),
       getCollisionGroups: () => ["cGroup1"],
+      getNumberOfDirections: jest.fn().mockReturnValue(NumberOfDirections.FOUR),
     };
   }
   function layerPos(vec: Vector2): LayerPosition {
@@ -306,7 +307,6 @@ describe("TargetMovement", () => {
         closestToTarget: layerPos(new Vector2(2, 1)),
       });
     targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos, {
-      numberOfDirections: NumberOfDirections.FOUR,
       distance: 2,
       config: {
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
@@ -1330,17 +1330,13 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(3, 1));
       const targetPos = layerPos(new Vector2(1, 1));
       const mockChar = createMockChar("char1", charPos.position);
+      mockChar.getNumberOfDirections.mockReturnValue(NumberOfDirections.EIGHT);
       mockBfs.getShortestPath = jest.fn().mockReturnValue({
         path: [],
         closestToTarget: undefined,
       });
       gridTilemapMock.isBlocking.mockReturnValue(true);
-      targetMovement = new TargetMovement(
-        mockChar,
-        gridTilemapMock,
-        targetPos,
-        { numberOfDirections: NumberOfDirections.EIGHT }
-      );
+      targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
       gridTilemapMock.isBlocking.mockReturnValue(true);
       let getNeighbors = targetMovement.getNeighbors(charPos);
       expect(getNeighbors).toEqual([]);
@@ -1362,6 +1358,7 @@ describe("TargetMovement", () => {
     it("should move up-left along path", () => {
       const charPos = layerPos(new Vector2(1, 1));
       const mockChar = createMockChar("char", charPos.position);
+      mockChar.getNumberOfDirections.mockReturnValue(NumberOfDirections.EIGHT);
       mockBfs.getShortestPath = jest.fn().mockReturnValue({
         path: [charPos, layerPos(new Vector2(0, 0))],
         closestToTarget: new Vector2(1, 0),
@@ -1369,8 +1366,7 @@ describe("TargetMovement", () => {
       targetMovement = new TargetMovement(
         mockChar,
         gridTilemapMock,
-        layerPos(new Vector2(1, 0)),
-        { numberOfDirections: NumberOfDirections.EIGHT }
+        layerPos(new Vector2(1, 0))
       );
       targetMovement.update(100);
 
@@ -1380,6 +1376,7 @@ describe("TargetMovement", () => {
     it("should move up-right along path", () => {
       const charPos = layerPos(new Vector2(1, 1));
       const mockChar = createMockChar("char", charPos.position);
+      mockChar.getNumberOfDirections.mockReturnValue(NumberOfDirections.EIGHT);
       mockBfs.getShortestPath = jest.fn().mockReturnValue({
         path: [charPos, layerPos(new Vector2(2, 0))],
         closestToTarget: new Vector2(1, 0),
@@ -1387,8 +1384,7 @@ describe("TargetMovement", () => {
       targetMovement = new TargetMovement(
         mockChar,
         gridTilemapMock,
-        layerPos(new Vector2(1, 0)),
-        { numberOfDirections: NumberOfDirections.EIGHT }
+        layerPos(new Vector2(1, 0))
       );
       targetMovement.update(100);
 
@@ -1398,6 +1394,7 @@ describe("TargetMovement", () => {
     it("should move down-left along path", () => {
       const charPos = layerPos(new Vector2(1, 1));
       const mockChar = createMockChar("char", charPos.position);
+      mockChar.getNumberOfDirections.mockReturnValue(NumberOfDirections.EIGHT);
       mockBfs.getShortestPath = jest.fn().mockReturnValue({
         path: [charPos, layerPos(new Vector2(0, 2))],
         closestToTarget: new Vector2(1, 2),
@@ -1405,8 +1402,7 @@ describe("TargetMovement", () => {
       targetMovement = new TargetMovement(
         mockChar,
         gridTilemapMock,
-        layerPos(new Vector2(1, 2)),
-        { numberOfDirections: NumberOfDirections.EIGHT }
+        layerPos(new Vector2(1, 2))
       );
       targetMovement.update(100);
 
@@ -1416,6 +1412,7 @@ describe("TargetMovement", () => {
     it("should move down-right along path", () => {
       const charPos = layerPos(new Vector2(1, 1));
       const mockChar = createMockChar("char", charPos.position);
+      mockChar.getNumberOfDirections.mockReturnValue(NumberOfDirections.EIGHT);
       mockBfs.getShortestPath = jest.fn().mockReturnValue({
         path: [charPos, layerPos(new Vector2(2, 2))],
         closestToTarget: new Vector2(1, 2),
@@ -1423,8 +1420,7 @@ describe("TargetMovement", () => {
       targetMovement = new TargetMovement(
         mockChar,
         gridTilemapMock,
-        layerPos(new Vector2(1, 2)),
-        { numberOfDirections: NumberOfDirections.EIGHT }
+        layerPos(new Vector2(1, 2))
       );
       targetMovement.update(100);
 
@@ -1436,6 +1432,7 @@ describe("TargetMovement", () => {
       const targetPos = layerPos(new Vector2(3, 3));
       const closestToTarget = layerPos(new Vector2(2, 2));
       const mockChar = createMockChar("char", charPos.position);
+      mockChar.getNumberOfDirections.mockReturnValue(NumberOfDirections.EIGHT);
       mockBfs.getShortestPath = jest
         .fn()
         .mockReturnValueOnce({
@@ -1451,7 +1448,6 @@ describe("TargetMovement", () => {
         gridTilemapMock,
         targetPos,
         {
-          numberOfDirections: NumberOfDirections.EIGHT,
           distance: 2,
           config: {
             noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,

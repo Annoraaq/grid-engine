@@ -1,6 +1,10 @@
 import { LayerPositionUtils } from "./../Utils/LayerPositionUtils/LayerPositionUtils";
 import { LayerPosition } from "./../Pathfinding/ShortestPathAlgorithm";
-import { directionVector, oppositeDirection } from "./../Direction/Direction";
+import {
+  directionVector,
+  NumberOfDirections,
+  oppositeDirection,
+} from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
 import { GridTilemap, LayerName } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
@@ -26,6 +30,7 @@ export interface CharConfig {
   tilemap: GridTilemap;
   speed: number;
   collidesWithTiles: boolean;
+  numberOfDirections: NumberOfDirections;
   charLayer?: string;
   collisionGroups?: string[];
   facingDirection?: Direction;
@@ -56,6 +61,7 @@ export class GridCharacter {
   private depthChanged$ = new Subject<LayerPosition>();
   private movementProgress = 0;
   private labels: Set<string>;
+  private numberOfDirections: NumberOfDirections;
 
   constructor(private id: string, config: CharConfig) {
     this.tilemap = config.tilemap;
@@ -65,6 +71,8 @@ export class GridCharacter {
 
     this.collisionGroups = new Set<string>(config.collisionGroups || []);
     this.labels = new Set<string>(config.labels || []);
+
+    this.numberOfDirections = config.numberOfDirections;
 
     if (config.facingDirection) {
       this.turnTowards(config.facingDirection);
@@ -257,6 +265,10 @@ export class GridCharacter {
     for (const label of labels) {
       this.labels.delete(label);
     }
+  }
+
+  getNumberOfDirections(): NumberOfDirections {
+    return this.numberOfDirections;
   }
 
   movementStarted(): Subject<Direction> {

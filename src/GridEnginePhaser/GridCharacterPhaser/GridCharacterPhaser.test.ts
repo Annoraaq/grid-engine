@@ -4,10 +4,11 @@ import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { GridTilemap } from "./../../GridTilemap/GridTilemap";
 import { GridCharacterPhaser } from "./GridCharacterPhaser";
 import * as Phaser from "phaser";
-import { Direction } from "../../Direction/Direction";
-import { CharacterData } from "../../GridEngine";
+import { Direction, NumberOfDirections } from "../../Direction/Direction";
+import { CharacterData, CollisionStrategy } from "../../GridEngine";
 import { createSpriteMock } from "../../Utils/MockFactory/MockFactory";
 import { take } from "rxjs/operators";
+import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -81,6 +82,13 @@ describe("GridCharacterPhaser", () => {
       sys: { events: { once: jest.fn(), on: jest.fn() } },
       add: { sprite: jest.fn().mockReturnValue(overlaySpriteMock) },
     };
+    GlobalConfig.set({
+      collisionTilePropertyName: "ge_collide",
+      numberOfDirections: NumberOfDirections.FOUR,
+      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
+      layerOverlay: false,
+      characters: [],
+    });
     gridTilemap = new GridTilemap(tilemapMock);
   });
 
@@ -94,6 +102,10 @@ describe("GridCharacterPhaser", () => {
   }
 
   describe("On creation", () => {
+    afterEach(() => {
+      GlobalConfig.get().numberOfDirections = NumberOfDirections.FOUR;
+    });
+
     it("should create a grid character", () => {
       const walkingAnimationMock = {} as any;
       const startPos = { x: 5, y: 6 };
@@ -110,6 +122,7 @@ describe("GridCharacterPhaser", () => {
         facingDirection: Direction.RIGHT,
         startPosition: startPos,
         charLayer: "someLayer",
+        numberOfDirections: NumberOfDirections.EIGHT,
       };
       const gridCharPhaser = createChar(charData, true);
 
@@ -145,6 +158,7 @@ describe("GridCharacterPhaser", () => {
       expect(containerMock.y).not.toEqual(0);
 
       expect(gridCharPhaser.getAnimation()?.isEnabled()).toBe(true);
+      expect(gridChar.getNumberOfDirections()).toBe(NumberOfDirections.EIGHT);
     });
 
     it("should update sprite on animation changes", () => {
@@ -215,6 +229,7 @@ describe("GridCharacterPhaser", () => {
     });
 
     it("should create a grid character with default values", () => {
+      GlobalConfig.get().numberOfDirections = NumberOfDirections.EIGHT;
       const charData = {
         id: "charID",
       };
@@ -233,6 +248,9 @@ describe("GridCharacterPhaser", () => {
       expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
       expect(gridChar.getTilePos().layer).toBe(undefined);
       expect(gridChar.getLabels()).toEqual([]);
+      expect(gridChar.getNumberOfDirections()).toEqual(
+        NumberOfDirections.EIGHT
+      );
     });
 
     it("should create a grid character with labels", () => {
