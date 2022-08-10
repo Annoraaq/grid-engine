@@ -1,6 +1,5 @@
 import { LayerName } from "./../../GridTilemap/GridTilemap";
 import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy";
-import { NumberOfDirections } from "./../../Direction/Direction";
 import { LayerPosition } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
@@ -89,7 +88,6 @@ export interface Finished {
     layer: LayerName;
 }
 export interface Options {
-    numberOfDirections?: NumberOfDirections;
     distance?: number;
     config?: MoveToConfig;
     ignoreBlockedTarget?: boolean;
@@ -113,7 +111,7 @@ export declare class TargetMovement implements Movement {
     private ignoreBlockedTarget;
     private distance;
     private isPositionAllowed;
-    constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerPosition, { numberOfDirections, config, ignoreBlockedTarget, distance, }?: Options);
+    constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerPosition, { config, ignoreBlockedTarget, distance }?: Options);
     setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void;
     getPathBlockedStrategy(): PathBlockedStrategy;
     private setCharacter;

@@ -176,6 +176,12 @@ export interface CharacterData {
      * @defaultValue `[]`
      */
     labels?: string[];
+    /**
+     * The possible number of directions for moving a character. This setting can
+     * be used to override the {@link GridEngineConfig.numberOfDirections | global setting}
+     * in the GridEngine configuration for specific characters.
+     */
+    numberOfDirections?: NumberOfDirections;
 }
 /**
  * Result of a modification of the internal characters array

@@ -1,4 +1,3 @@
-import { NumberOfDirections } from "./../../Direction/Direction";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Movement, MovementInfo } from "../Movement";
 export declare class RandomMovement implements Movement {
@@ -12,7 +11,7 @@ export declare class RandomMovement implements Movement {
     private stepsWalked;
     private currentMovementDirection;
     private distanceUtils;
-    constructor(character: GridCharacter, numberOfDirections?: NumberOfDirections, delay?: number, radius?: number);
+    constructor(character: GridCharacter, delay?: number, radius?: number);
     update(delta: number): void;
     getInfo(): MovementInfo;
     private shouldContinueWalkingCurrentDirection;

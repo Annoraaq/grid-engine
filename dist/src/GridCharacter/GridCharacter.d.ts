@@ -1,4 +1,5 @@
 import { LayerPosition } from "./../Pathfinding/ShortestPathAlgorithm";
+import { NumberOfDirections } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
 import { GridTilemap, LayerName } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
@@ -17,6 +18,7 @@ export interface CharConfig {
     tilemap: GridTilemap;
     speed: number;
     collidesWithTiles: boolean;
+    numberOfDirections: NumberOfDirections;
     charLayer?: string;
     collisionGroups?: string[];
     facingDirection?: Direction;
@@ -43,6 +45,7 @@ export declare class GridCharacter {
     private depthChanged$;
     private movementProgress;
     private labels;
+    private numberOfDirections;
     constructor(id: string, config: CharConfig);
     getId(): string;
     getSpeed(): number;
@@ -72,6 +75,7 @@ export declare class GridCharacter {
     hasLabel(label: string): boolean;
     clearLabels(): void;
     removeLabels(labels: string[]): void;
+    getNumberOfDirections(): NumberOfDirections;
     movementStarted(): Subject<Direction>;
     movementStopped(): Subject<Direction>;
     directionChanged(): Subject<Direction>;
