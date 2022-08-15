@@ -18,7 +18,7 @@ For example a tileset like the following can be used for a 4-direction collision
     <img src="../img/collision_tileset.png" alt="Collision Tileset" />
 </p>
 
-A red border means that the tile blocks from this direction. Now you can add it as a tileset in tiled and give the corresponding collision tile-properties to the tiles (see also [collisions](./collisions)):
+A red border means that the tile blocks from this direction. Now you can add it as a tileset in tiled and give the corresponding collision tile-properties to the tiles (see also [collisions](./collision)):
 
 <p align="center">
     <img src="../img/collision-tileset-properties.png" alt="Collision tileset collision properties" />
