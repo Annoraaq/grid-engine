@@ -35,6 +35,8 @@ export interface CharConfig {
   collisionGroups?: string[];
   facingDirection?: Direction;
   labels?: string[];
+  tileWidth?: number;
+  tileHeight?: number;
 }
 
 export class GridCharacter {
@@ -62,6 +64,8 @@ export class GridCharacter {
   private movementProgress = 0;
   private labels: Set<string>;
   private numberOfDirections: NumberOfDirections;
+  private tileWidth: number;
+  private tileHeight: number;
 
   constructor(private id: string, config: CharConfig) {
     this.tilemap = config.tilemap;
@@ -77,6 +81,9 @@ export class GridCharacter {
     if (config.facingDirection) {
       this.turnTowards(config.facingDirection);
     }
+
+    this.tileWidth = config.tileWidth ?? 1;
+    this.tileHeight = config.tileHeight ?? 1;
   }
 
   getId(): string {
@@ -145,6 +152,14 @@ export class GridCharacter {
       ),
       layer,
     };
+  }
+
+  getTileWidth(): number {
+    return this.tileWidth;
+  }
+
+  getTileHeight(): number {
+    return this.tileHeight;
   }
 
   move(direction: Direction): void {

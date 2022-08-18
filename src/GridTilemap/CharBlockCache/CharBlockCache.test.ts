@@ -1,15 +1,16 @@
 import { CollisionStrategy } from "./../../Collisions/CollisionStrategy";
 import { NumberOfDirections } from "./../../Direction/Direction";
 import { GlobalConfig } from "./../../GlobalConfig/GlobalConfig";
-import { of, Subject } from "rxjs";
+import { NEVER, of, Subject } from "rxjs";
 import {
   GridCharacter,
   PositionChange,
 } from "../../GridCharacter/GridCharacter";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache";
-import { GridEngineConfig, Position } from "../../GridEngine";
+import { GridEngineConfig } from "../../GridEngine";
 import { Concrete } from "../../Utils/TypeUtils";
+import { LayerPosition } from "../../Pathfinding/ShortestPathAlgorithm";
 describe("CharBlockCache", () => {
   let charBlockCache: CharBlockCache;
 
@@ -21,27 +22,49 @@ describe("CharBlockCache", () => {
     const char1Mock = <any>{
       ...createCharMock("player1"),
       getTilePos: () => ({ position: { x: 3, y: 3 }, layer: "someLayer" }),
+      getNextTilePos: () => ({
+        position: { x: 4, y: 3 },
+        layer: "enterLayer",
+      }),
     };
 
     charBlockCache.addCharacter(char1Mock);
-    expect(
-      charBlockCache.isCharBlockingAt(new Vector2(3, 3), "someLayer", [
-        "cGroup1",
-      ])
-    ).toBe(true);
-    expect(
-      charBlockCache.isCharBlockingAt(new Vector2(3, 3), "otherLayer", [
-        "cGroup1",
-      ])
-    ).toBe(false);
-    expect(
-      charBlockCache.isCharBlockingAt(new Vector2(3, 3), "someLayer", [
-        "unknownCGroup",
-      ])
-    ).toBe(false);
-    expect(
-      charBlockCache.isCharBlockingAt(new Vector2(3, 3), "someLayer", [])
-    ).toBe(false);
+    const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
+      new Vector2(3, 3),
+      "someLayer",
+      ["cGroup1"]
+    );
+    const hasBlockingCharOnOldPosTileWidth = charBlockCache.isCharBlockingAt(
+      new Vector2(7, 4),
+      "someLayer",
+      ["cGroup1"]
+    );
+    const hasBlockingCharOnOldPosOtherLayer = charBlockCache.isCharBlockingAt(
+      new Vector2(3, 3),
+      "otherLayer",
+      ["cGroup1"]
+    );
+    const hasBlockingCharOnOldPosOtherCGroup = charBlockCache.isCharBlockingAt(
+      new Vector2(3, 3),
+      "someLayer",
+      ["unknownCGroup"]
+    );
+    const hasBlockingCharOnOldPosNoCGroup = charBlockCache.isCharBlockingAt(
+      new Vector2(3, 3),
+      "someLayer",
+      []
+    );
+    const hasBlockingCharOnNextPos = charBlockCache.isCharBlockingAt(
+      new Vector2(8, 4),
+      "enterLayer",
+      ["cGroup1"]
+    );
+    expect(hasBlockingCharOnOldPos).toBe(true);
+    expect(hasBlockingCharOnOldPosTileWidth).toBe(true);
+    expect(hasBlockingCharOnOldPosOtherLayer).toBe(false);
+    expect(hasBlockingCharOnOldPosOtherCGroup).toBe(false);
+    expect(hasBlockingCharOnOldPosNoCGroup).toBe(false);
+    expect(hasBlockingCharOnNextPos).toBe(true);
   });
 
   describe("blocking strategy BLOCK_TWO_TILES", () => {
@@ -73,13 +96,19 @@ describe("CharBlockCache", () => {
         "someLayer",
         ["cGroup1"]
       );
-      const hasBlockingChar = charBlockCache.isCharBlockingAt(
+      const hasBlockingCharOnNextPos = charBlockCache.isCharBlockingAt(
         new Vector2(3, 4),
         "enterLayer",
         ["cGroup1"]
       );
+      const hasBlockingCharOnNextPosTileWidth = charBlockCache.isCharBlockingAt(
+        new Vector2(7, 5),
+        "enterLayer",
+        ["cGroup1"]
+      );
       expect(hasBlockingCharOnOldPos).toBe(true);
-      expect(hasBlockingChar).toBe(true);
+      expect(hasBlockingCharOnNextPos).toBe(true);
+      expect(hasBlockingCharOnNextPosTileWidth).toBe(true);
     });
 
     it("should unblock old pos", () => {
@@ -104,12 +133,18 @@ describe("CharBlockCache", () => {
         "someLayer",
         ["cGroup1"]
       );
+      const hasBlockingCharOnOldPosTileWidth = charBlockCache.isCharBlockingAt(
+        new Vector2(4, 3),
+        "someLayer",
+        ["cGroup1"]
+      );
       expect(hasBlockingCharOnOldPos).toBe(false);
+      expect(hasBlockingCharOnOldPosTileWidth).toBe(false);
     });
 
-    it("should unblock nextPos on pos change while moving", () => {
+    it("should unblock nextPos on tile pos change while moving", () => {
       const positionChangeStarted = new Subject<PositionChange>();
-      const tilePosSet = new Subject<Position>();
+      const tilePosSet = new Subject<LayerPosition>();
 
       const char1Mock = <any>{
         ...createCharMock("player1"),
@@ -136,16 +171,34 @@ describe("CharBlockCache", () => {
       });
 
       tilePosSet.next({
-        x: 6,
-        y: 6,
+        position: new Vector2(6, 6),
+        layer: "someLayer",
       });
 
+      const hasBlockingCharOnNewPos = charBlockCache.isCharBlockingAt(
+        new Vector2(6, 6),
+        "someLayer",
+        ["cGroup1"]
+      );
+      const hasBlockingCharOnNewPosTileWidth = charBlockCache.isCharBlockingAt(
+        new Vector2(10, 7),
+        "someLayer",
+        ["cGroup1"]
+      );
       const hasBlockingCharOnNextPos = charBlockCache.isCharBlockingAt(
         new Vector2(3, 4),
         "someLayer",
         ["cGroup1"]
       );
+      const hasBlockingCharOnNextPosTileWidth = charBlockCache.isCharBlockingAt(
+        new Vector2(7, 5),
+        "someLayer",
+        ["cGroup1"]
+      );
       expect(hasBlockingCharOnNextPos).toBe(false);
+      expect(hasBlockingCharOnNextPosTileWidth).toBe(false);
+      expect(hasBlockingCharOnNewPos).toBe(true);
+      expect(hasBlockingCharOnNewPosTileWidth).toBe(true);
     });
   });
 
@@ -178,13 +231,25 @@ describe("CharBlockCache", () => {
         "someLayer",
         ["cGroup1"]
       );
+      const hasBlockingCharOnOldPosTileWidth = charBlockCache.isCharBlockingAt(
+        new Vector2(7, 4),
+        "someLayer",
+        ["cGroup1"]
+      );
       const hasBlockingChar = charBlockCache.isCharBlockingAt(
         new Vector2(3, 4),
         "enterLayer",
         ["cGroup1"]
       );
+      const hasBlockingCharTileWidth = charBlockCache.isCharBlockingAt(
+        new Vector2(7, 5),
+        "enterLayer",
+        ["cGroup1"]
+      );
       expect(hasBlockingCharOnOldPos).toBe(false);
+      expect(hasBlockingCharOnOldPosTileWidth).toBe(false);
       expect(hasBlockingChar).toBe(true);
+      expect(hasBlockingCharTileWidth).toBe(true);
     });
   });
 
@@ -235,6 +300,11 @@ describe("CharBlockCache", () => {
         "cGroup1",
       ])
     ).toBe(true);
+    expect(
+      charBlockCache.isCharBlockingAt(new Vector2(7, 4), "someLayer", [
+        "cGroup1",
+      ])
+    ).toBe(true);
   });
 
   it("should consider several chars for blocking", () => {
@@ -257,7 +327,13 @@ describe("CharBlockCache", () => {
       "someLayer",
       ["cGroup1"]
     );
+    const hasBlockingCharOnOldPosTileWidth = charBlockCache.isCharBlockingAt(
+      new Vector2(7, 4),
+      "someLayer",
+      ["cGroup1"]
+    );
     expect(hasBlockingCharOnOldPos).toBe(true);
+    expect(hasBlockingCharOnOldPosTileWidth).toBe(true);
   });
 
   it("should find all characters", () => {
@@ -287,7 +363,7 @@ describe("CharBlockCache", () => {
       charBlockCache.getCharactersAt(new Vector2(0, 1), "otherLayer")
     ).toContain(charMockDifferentLayer);
     expect(
-      charBlockCache.getCharactersAt(new Vector2(1, 1), "someLayer").size
+      charBlockCache.getCharactersAt(new Vector2(5, 5), "someLayer").size
     ).toBe(0);
   });
 
@@ -314,8 +390,8 @@ describe("CharBlockCache", () => {
     };
     const charMock2 = <any>{
       ...createCharMock("player2"),
-      getTilePos: () => ({ position: { x: 2, y: 2 }, layer: "someLayer" }),
-      getNextTilePos: () => ({ position: { x: 2, y: 2 }, layer: "someLayer" }),
+      getTilePos: () => ({ position: { x: 10, y: 2 }, layer: "someLayer" }),
+      getNextTilePos: () => ({ position: { x: 10, y: 2 }, layer: "someLayer" }),
     };
     charBlockCache.addCharacter(charMock1);
     charBlockCache.addCharacter(charMock2);
@@ -330,7 +406,17 @@ describe("CharBlockCache", () => {
       ])
     ).toBe(false);
     expect(
+      charBlockCache.isCharBlockingAt(new Vector2(4, 2), "someLayer", [
+        "cGroup1",
+      ])
+    ).toBe(false);
+    expect(
       charBlockCache.isCharBlockingAt(new Vector2(1, 1), "someLayer", [
+        "cGroup1",
+      ])
+    ).toBe(false);
+    expect(
+      charBlockCache.isCharBlockingAt(new Vector2(5, 2), "someLayer", [
         "cGroup1",
       ])
     ).toBe(false);
@@ -363,7 +449,17 @@ describe("CharBlockCache", () => {
       ])
     ).toBe(false);
     expect(
+      charBlockCache.isCharBlockingAt(new Vector2(4, 2), "someLayer", [
+        "cGroup1",
+      ])
+    ).toBe(false);
+    expect(
       charBlockCache.isCharBlockingAt(new Vector2(1, 1), "someLayer", [
+        "cGroup1",
+      ])
+    ).toBe(false);
+    expect(
+      charBlockCache.isCharBlockingAt(new Vector2(5, 2), "someLayer", [
         "cGroup1",
       ])
     ).toBe(false);
@@ -377,8 +473,10 @@ describe("CharBlockCache", () => {
       getNextTilePos: () => ({ position: { x: 1, y: 1 }, layer: "someLayer" }),
       positionChangeStarted: () => of([]),
       positionChangeFinished: () => of([]),
-      tilePositionSet: () => of([]),
+      tilePositionSet: () => NEVER,
       getCollisionGroups: () => ["cGroup1"],
+      getTileWidth: () => 5,
+      getTileHeight: () => 2,
     };
   }
 

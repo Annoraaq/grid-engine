@@ -51,19 +51,41 @@ describe("GridCharacter", () => {
       tilemap: gridTilemap,
       speed: 3,
       collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.EIGHT,
       charLayer: "someLayer",
       facingDirection: Direction.RIGHT,
-      numberOfDirections: NumberOfDirections.EIGHT,
+      collisionGroups: ["test"],
+      labels: ["someLabel"],
+      tileWidth: 2,
+      tileHeight: 3,
     });
     expect(gridCharacter.getId()).toEqual("player");
     expect(gridCharacter.getSpeed()).toEqual(3);
     expect(gridCharacter.getTilePos().layer).toEqual("someLayer");
     expect(gridCharacter.collidesWithTiles()).toEqual(true);
-    expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
-    expect(gridCharacter.getLabels()).toEqual([]);
     expect(gridCharacter.getNumberOfDirections()).toEqual(
       NumberOfDirections.EIGHT
     );
+    expect(gridCharacter.getCollisionGroups()).toEqual(["test"]);
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
+    expect(gridCharacter.getLabels()).toEqual(["someLabel"]);
+    expect(gridCharacter.getTileWidth()).toEqual(2);
+    expect(gridCharacter.getTileHeight()).toEqual(3);
+  });
+
+  it("should set default init data", () => {
+    gridCharacter = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.EIGHT,
+    });
+    expect(gridCharacter.getTilePos().layer).toEqual(undefined);
+    expect(gridCharacter.getCollisionGroups()).toEqual([]);
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
+    expect(gridCharacter.getLabels()).toEqual([]);
+    expect(gridCharacter.getTileWidth()).toEqual(1);
+    expect(gridCharacter.getTileHeight()).toEqual(1);
   });
 
   it("should be facing down on construction by default", () => {
