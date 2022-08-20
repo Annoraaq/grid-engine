@@ -384,8 +384,8 @@ describe("CharBlockCache", () => {
       ...createCharMock("player"),
       getTilePos: () => ({ position: { x: 0, y: 1 }, layer: "someLayer" }),
       getNextTilePos: () => ({ position: { x: 1, y: 1 }, layer: "someLayer" }),
-      positionChangeStarted: () => positionChangeStarted,
-      positionChangeFinished: () => positionChangeFinished,
+      positionChangeStarted: () => ({ pipe: () => positionChangeStarted }),
+      positionChangeFinished: () => ({ pipe: () => positionChangeFinished }),
       tilePositionSet: () => tilePosSet,
     };
     const charMock2 = <any>{
@@ -435,8 +435,8 @@ describe("CharBlockCache", () => {
       ...createCharMock("player"),
       getTilePos: () => ({ position: { x: 0, y: 1 }, layer: "someLayer" }),
       getNextTilePos: () => ({ position: { x: 1, y: 1 }, layer: "someLayer" }),
-      positionChangeStarted: () => positionChangeStarted,
-      positionChangeFinished: () => positionChangeFinished,
+      positionChangeStarted: () => ({ pipe: () => positionChangeStarted }),
+      positionChangeFinished: () => ({ pipe: () => positionChangeFinished }),
     };
     charBlockCache.addCharacter(charMock1);
     charBlockCache.removeCharacter(charMock1);
