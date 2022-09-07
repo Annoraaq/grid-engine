@@ -15,6 +15,8 @@ import * as Phaser from "phaser";
 
 const MAX_MOVEMENT_PROGRESS = 1000;
 
+export type CharId = string;
+
 export type GameObject =
   | Phaser.GameObjects.Container
   | Phaser.GameObjects.Sprite;
@@ -198,22 +200,47 @@ export class GridCharacter {
       this.tilemap.getTransition(tilePosInDir, this.getNextTilePos().layer) ||
       this.getNextTilePos().layer;
 
-    if (
-      this.collidesWithTilesInternal &&
-      this.tilemap.hasBlockingTile(
-        layerInDirection,
-        tilePosInDir,
-        oppositeDirection(direction)
-      )
-    ) {
-      return true;
+    if (this.collidesWithTilesInternal) {
+      const isTileBlocking = this.isTileBlocking(direction, layerInDirection);
+      if (isTileBlocking) return true;
     }
 
-    return this.tilemap.hasBlockingChar(
-      tilePosInDir,
-      layerInDirection,
-      this.getCollisionGroups()
-    );
+    return this.isCharBlocking(direction, layerInDirection);
+  }
+
+  private isTileBlocking(
+    direction: Direction,
+    layerInDirection: LayerName
+  ): boolean {
+    return this.someCharTile((x, y) => {
+      const tilePosInDir = this.tilePosInDirection(
+        new Vector2(x, y),
+        direction
+      );
+      return this.tilemap.hasBlockingTile(
+        tilePosInDir,
+        layerInDirection,
+        oppositeDirection(direction)
+      );
+    });
+  }
+
+  private isCharBlocking(
+    direction: Direction,
+    layerInDirection: LayerName
+  ): boolean {
+    return this.someCharTile((x, y) => {
+      const tilePosInDir = this.tilePosInDirection(
+        new Vector2(x, y),
+        direction
+      );
+      return this.tilemap.hasBlockingChar(
+        tilePosInDir,
+        layerInDirection,
+        this.getCollisionGroups(),
+        new Set([this.getId()])
+      );
+    });
   }
 
   isMoving(): boolean {
@@ -411,5 +438,15 @@ export class GridCharacter {
     { position: enterTile, layer: enterLayer }: LayerPosition
   ): void {
     subject.next({ exitTile, enterTile, exitLayer, enterLayer });
+  }
+
+  private someCharTile(predicate: (x: number, y: number) => boolean): boolean {
+    const tilePos = this.tilePos.position;
+    for (let x = tilePos.x; x < tilePos.x + this.getTileWidth(); x++) {
+      for (let y = tilePos.y; y < tilePos.y + this.getTileHeight(); y++) {
+        if (predicate(x, y)) return true;
+      }
+    }
+    return false;
   }
 }

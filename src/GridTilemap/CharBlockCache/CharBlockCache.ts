@@ -10,6 +10,7 @@ import {
   takeUntil,
 } from "rxjs";
 import {
+  CharId,
   GridCharacter,
   PositionChange,
 } from "../../GridCharacter/GridCharacter";
@@ -26,18 +27,21 @@ export class CharBlockCache {
   isCharBlockingAt(
     pos: Vector2,
     layer: LayerName,
-    collisionGroups: string[]
+    collisionGroups: string[],
+    exclude = new Set<CharId>()
   ): boolean {
     const posStr = this.posToString(pos, layer);
     const charSet = this.tilePosToCharacters.get(posStr);
     return !!(
       charSet &&
       charSet.size > 0 &&
-      [...charSet].some((char: GridCharacter) =>
-        char
-          .getCollisionGroups()
-          .some((group) => collisionGroups.includes(group))
-      )
+      [...charSet]
+        .filter((char: GridCharacter) => !exclude.has(char.getId()))
+        .some((char: GridCharacter) =>
+          char
+            .getCollisionGroups()
+            .some((group) => collisionGroups.includes(group))
+        )
     );
   }
 

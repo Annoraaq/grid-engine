@@ -348,6 +348,24 @@ describe("CharBlockCache", () => {
     ).toBe(false);
   });
 
+  it("should respect excluded chars", () => {
+    const char = createChar("player");
+    char.move(Direction.RIGHT);
+    char.update(1);
+
+    charBlockCache.addCharacter(char);
+    const oldPos = { position: new Vector2(3, 3), layer: "someLayer" };
+    const oldPosTileWidth = {
+      position: new Vector2(
+        3 + char.getTileWidth() - 1,
+        3 + char.getTileHeight() - 1
+      ),
+      layer: "someLayer",
+    };
+    expect(isCharBlockingAt(oldPos, ["player"])).toBe(false);
+    expect(isCharBlockingAt(oldPosTileWidth, ["player"])).toBe(false);
+  });
+
   function createChar(id = "player"): GridCharacter {
     const char = new GridCharacter(id, {
       tilemap: gridTilemap,
@@ -365,10 +383,13 @@ describe("CharBlockCache", () => {
     return char;
   }
 
-  function isCharBlockingAt(pos: LayerPosition): boolean {
-    return charBlockCache.isCharBlockingAt(pos.position, pos.layer, [
-      "cGroup1",
-    ]);
+  function isCharBlockingAt(pos: LayerPosition, exclude?: string[]): boolean {
+    return charBlockCache.isCharBlockingAt(
+      pos.position,
+      pos.layer,
+      ["cGroup1"],
+      new Set(exclude)
+    );
   }
 
   function createMockConf(): Concrete<GridEngineConfig> {

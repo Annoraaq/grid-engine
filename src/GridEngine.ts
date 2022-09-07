@@ -929,7 +929,7 @@ export class GridEngine {
    */
   isTileBlocked(position: Position, layer?: string): boolean {
     this.initGuard();
-    return !!this.gridTilemap?.hasBlockingTile(layer, new Vector2(position));
+    return !!this.gridTilemap?.hasBlockingTile(new Vector2(position), layer);
   }
 
   /**
