@@ -441,7 +441,7 @@ export class GridCharacter {
   }
 
   private someCharTile(predicate: (x: number, y: number) => boolean): boolean {
-    const tilePos = this.tilePos.position;
+    const tilePos = this.getNextTilePos().position;
     for (let x = tilePos.x; x < tilePos.x + this.getTileWidth(); x++) {
       for (let y = tilePos.y; y < tilePos.y + this.getTileHeight(); y++) {
         if (predicate(x, y)) return true;

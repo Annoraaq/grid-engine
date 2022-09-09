@@ -670,6 +670,14 @@ describe("GridCharacter", () => {
         expect(gridCharacter.isBlockingDirection(Direction.RIGHT)).toBe(true);
       });
 
+      it("should block when blocking tiles in multi-tile radius x when moving", () => {
+        mockBlockingTile([{ position: new Vector2(3, 1), layer: undefined }]);
+        gridCharacter.move(Direction.RIGHT);
+        gridCharacter.update(1);
+
+        expect(gridCharacter.isBlockingDirection(Direction.RIGHT)).toBe(true);
+      });
+
       it(
         "should block when blocking tiles in multi-tile radius on layer " +
           "transition of main tile",
