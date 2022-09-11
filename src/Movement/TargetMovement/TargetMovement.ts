@@ -395,14 +395,19 @@ export class TargetMovement implements Movement {
       return this.tilemap.hasBlockingChar(
         pos,
         charLayer,
-        this.character.getCollisionGroups()
+        this.character.getCollisionGroups(),
+        new Set([this.character.getId()])
       );
     }
 
-    return this.tilemap.isBlocking(
-      charLayer,
-      pos,
-      this.character.getCollisionGroups()
+    return (
+      this.tilemap.hasBlockingTile(pos, charLayer) ||
+      this.tilemap.hasBlockingChar(
+        pos,
+        charLayer,
+        this.character.getCollisionGroups(),
+        new Set([this.character.getId()])
+      )
     );
   };
 

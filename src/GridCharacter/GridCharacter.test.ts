@@ -640,7 +640,12 @@ describe("GridCharacter", () => {
     });
 
     describe("collides with tiles", () => {
-      const direction = Direction.RIGHT;
+      const charPosX = 0;
+      const charPosY = 0;
+      const charWidth = 2;
+      const charHeight = 2;
+      const charRightBorder = charPosX + charWidth - 1;
+      const charBottomBorder = charPosY + charHeight - 1;
       beforeEach(() => {
         gridCharacter = new GridCharacter("player", {
           tilemap: gridTilemap,
@@ -658,20 +663,24 @@ describe("GridCharacter", () => {
         expect(gridCharacter.isBlockingDirection(Direction.RIGHT)).toBe(false);
       });
 
-      it("should block when blocking tiles", () => {
-        mockBlockingTile([{ position: new Vector2(1, 0), layer: undefined }]);
-
-        expect(gridCharacter.isBlockingDirection(Direction.RIGHT)).toBe(true);
-      });
-
       it("should block when blocking tiles in multi-tile radius x", () => {
-        mockBlockingTile([{ position: new Vector2(1, 1), layer: undefined }]);
+        mockBlockingTile([
+          {
+            position: new Vector2(charRightBorder + 1, charBottomBorder),
+            layer: undefined,
+          },
+        ]);
 
         expect(gridCharacter.isBlockingDirection(Direction.RIGHT)).toBe(true);
       });
 
       it("should block when blocking tiles in multi-tile radius x when moving", () => {
-        mockBlockingTile([{ position: new Vector2(3, 1), layer: undefined }]);
+        mockBlockingTile([
+          {
+            position: new Vector2(charRightBorder + 2, charBottomBorder),
+            layer: undefined,
+          },
+        ]);
         gridCharacter.move(Direction.RIGHT);
         gridCharacter.update(1);
 
@@ -684,45 +693,34 @@ describe("GridCharacter", () => {
         () => {
           mockNonBlockingTile();
           gridCharacter.setTilePosition({
-            position: new Vector2(0, 0),
+            position: new Vector2(charPosX, charPosY),
             layer: "lowerCharLayer",
           });
           gridTilemap.setTransition(
-            new Vector2(1, 0),
+            new Vector2(charPosX + 1, charPosY),
             "lowerCharLayer",
             "testCharLayer"
           );
 
           // we need to provide the layer name, not the char layer name for
           // mocking
-          mockBlockingTile([{ position: new Vector2(1, 0), layer: "layer2" }]);
+          mockBlockingTile([
+            { position: new Vector2(charPosX + 1, charPosY), layer: "layer2" },
+          ]);
 
           expect(gridCharacter.isBlockingDirection(Direction.RIGHT)).toBe(true);
         }
       );
 
       it("should block when blocking tiles in multi-tile radius y", () => {
-        mockBlockingTile([{ position: new Vector2(1, 1), layer: undefined }]);
+        mockBlockingTile([
+          {
+            position: new Vector2(charRightBorder, charBottomBorder + 1),
+            layer: undefined,
+          },
+        ]);
 
         expect(gridCharacter.isBlockingDirection(Direction.DOWN)).toBe(true);
-      });
-
-      it("should block when blocking chars", () => {
-        mockNonBlockingTile();
-        const blockingChar = new GridCharacter("blocker", {
-          tilemap: gridTilemap,
-          speed: 3,
-          collidesWithTiles: true,
-          collisionGroups: ["cGroup1"],
-          numberOfDirections: NumberOfDirections.FOUR,
-        });
-        blockingChar.setTilePosition({
-          position: new Vector2(1, 0),
-          layer: undefined,
-        });
-        gridTilemap.addCharacter(gridCharacter);
-        gridTilemap.addCharacter(blockingChar);
-        expect(gridCharacter.isBlockingDirection(direction)).toBe(true);
       });
 
       it("should block when blocking chars in multi-tile radius x", () => {
@@ -735,12 +733,12 @@ describe("GridCharacter", () => {
           numberOfDirections: NumberOfDirections.FOUR,
         });
         blockingChar.setTilePosition({
-          position: new Vector2(1, 1),
+          position: new Vector2(charRightBorder + 1, charBottomBorder),
           layer: undefined,
         });
         gridTilemap.addCharacter(gridCharacter);
         gridTilemap.addCharacter(blockingChar);
-        expect(gridCharacter.isBlockingDirection(direction)).toBe(true);
+        expect(gridCharacter.isBlockingDirection(Direction.RIGHT)).toBe(true);
       });
 
       it("should block when blocking chars in multi-tile radius y", () => {
@@ -753,7 +751,7 @@ describe("GridCharacter", () => {
           numberOfDirections: NumberOfDirections.FOUR,
         });
         blockingChar.setTilePosition({
-          position: new Vector2(1, 1),
+          position: new Vector2(charRightBorder, charBottomBorder + 1),
           layer: undefined,
         });
         gridTilemap.addCharacter(gridCharacter);

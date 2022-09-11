@@ -914,10 +914,10 @@ export class GridEngine {
     collisionGroups: string[] = ["geDefault"]
   ): boolean {
     this.initGuard();
-    return !!this.gridTilemap?.isBlocking(
-      layer,
-      new Vector2(position),
-      collisionGroups
+    const positionVec = new Vector2(position);
+    return !!(
+      this.gridTilemap?.hasBlockingTile(positionVec, layer) ||
+      this.gridTilemap?.hasBlockingChar(positionVec, layer, collisionGroups)
     );
   }
 

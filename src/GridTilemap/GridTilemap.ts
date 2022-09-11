@@ -50,18 +50,6 @@ export class GridTilemap {
     return this.charBlockCache.getCharactersAt(position, layer);
   }
 
-  isBlocking(
-    charLayer: string | undefined,
-    pos: Vector2,
-    collisionGroups: string[],
-    direction?: Direction
-  ): boolean {
-    return (
-      this.hasBlockingTile(pos, charLayer, direction) ||
-      this.hasBlockingChar(pos, charLayer, collisionGroups)
-    );
-  }
-
   hasBlockingTile(
     pos: Vector2,
     charLayer: string | undefined,
