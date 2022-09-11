@@ -1177,8 +1177,10 @@ describe("TargetMovement", () => {
     expect(finishedObsCompleteMock).toHaveBeenCalled();
   });
 
-  it("should not block itself", () => {
+  it("should not block itself on tile", () => {
     const mockChar = createMockChar("char", new Vector2(2, 1));
+    mockChar.getTileWidth = () => 2;
+    mockChar.getTileHeight = () => 2;
     gridTilemapMock.hasBlockingTile.mockReturnValue(false);
     mockBfs.getShortestPath = jest.fn().mockReturnValue({
       path: [
@@ -1208,6 +1210,38 @@ describe("TargetMovement", () => {
     expect(gridTilemapMock.hasBlockingTile).toHaveBeenCalledWith(
       new Vector2(3, 2),
       "layer1"
+    );
+  });
+
+  it("should not block itself for multi-tile chars", () => {
+    const mockChar = createMockChar("char", new Vector2(2, 1));
+    gridTilemapMock.hasBlockingTile.mockReturnValue(false);
+    mockBfs.getShortestPath = jest.fn().mockReturnValue({
+      path: [
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(2, 2)),
+        layerPos(new Vector2(3, 2)),
+      ],
+      closestToTarget: new Vector2(3, 2),
+    });
+
+    targetMovement = new TargetMovement(
+      mockChar,
+      gridTilemapMock,
+      layerPos(new Vector2(3, 2))
+    );
+    targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
+
+    mockChar.getNextTilePos.mockReturnValue({
+      position: new Vector2(2, 2),
+      layer: "layer1",
+    });
+    targetMovement.update(1);
+    expect(gridTilemapMock.hasBlockingChar).toHaveBeenCalledWith(
+      new Vector2(3, 2),
+      "layer1",
+      ["cGroup1"],
+      new Set(["char"])
     );
   });
 
