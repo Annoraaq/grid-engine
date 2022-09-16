@@ -1,3 +1,4 @@
+import { Position } from "../GridEngine";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 
 export enum Direction {
@@ -79,6 +80,24 @@ export function oppositeDirection(direction: Direction): Direction {
     [Direction.DOWN_LEFT]: Direction.UP_RIGHT,
   };
   return oppositeDirections[direction];
+}
+
+// TODO: write test
+export function directionFromPos(src: Position, dest: Position): Direction {
+  if (src.x === dest.x) {
+    if (src.y > dest.y) return Direction.UP;
+    if (src.y < dest.y) return Direction.DOWN;
+  } else if (src.y === dest.y) {
+    if (src.x > dest.x) return Direction.LEFT;
+    if (src.x < dest.x) return Direction.RIGHT;
+  } else if (src.x > dest.x) {
+    if (src.y < dest.y) return Direction.DOWN_LEFT;
+    if (src.y > dest.y) return Direction.UP_LEFT;
+  } else if (src.x < dest.x) {
+    if (src.y < dest.y) return Direction.DOWN_RIGHT;
+    if (src.y > dest.y) return Direction.UP_RIGHT;
+  }
+  return Direction.NONE;
 }
 
 export enum NumberOfDirections {

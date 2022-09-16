@@ -9,7 +9,7 @@ import {
 import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import { Direction } from "../../Direction/Direction";
+import { Direction, directionFromPos } from "../../Direction/Direction";
 import { Movement, MovementInfo } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Retryable } from "./Retryable/Retryable";
@@ -401,7 +401,10 @@ export class TargetMovement implements Movement {
     }
 
     return (
-      this.tilemap.hasBlockingTile(pos, charLayer) ||
+      this.character?.isTileBlocking(
+        directionFromPos(this.character.getNextTilePos().position, pos),
+        charLayer
+      ) ||
       this.tilemap.hasBlockingChar(
         pos,
         charLayer,

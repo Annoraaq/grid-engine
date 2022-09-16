@@ -208,10 +208,7 @@ export class GridCharacter {
     return this.isCharBlocking(direction, layerInDirection);
   }
 
-  private isTileBlocking(
-    direction: Direction,
-    layerInDirection: LayerName
-  ): boolean {
+  isTileBlocking(direction: Direction, layerInDirection: LayerName): boolean {
     return this.someCharTile((x, y) => {
       const tilePosInDir = this.tilePosInDirection(
         new Vector2(x, y),
