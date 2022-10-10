@@ -42,7 +42,6 @@ jest.mock(
 
 describe("TargetMovement", () => {
   let targetMovement: TargetMovement;
-  let gridTilemapMock;
   let blankLayerMock;
   let tilemapMock;
   let gridTilemap;
@@ -66,13 +65,6 @@ describe("TargetMovement", () => {
     blankLayerMock = createBlankLayerMock();
     tilemapMock = createTilemapMock(blankLayerMock);
     gridTilemap = new GridTilemap(tilemapMock as any);
-    gridTilemapMock = {
-      hasBlockingTile: jest.fn(),
-      hasNoTile: jest.fn(),
-      hasBlockingChar: jest.fn().mockReturnValue(false),
-      getTransition: jest.fn(),
-      isInRange: jest.fn().mockReturnValue(true),
-    };
     mockBfs.getShortestPath = jest.fn();
   });
 
@@ -84,7 +76,7 @@ describe("TargetMovement", () => {
       path: [charPos, layerPos(new Vector2(2, 1)), layerPos(new Vector2(3, 1))],
       closestToTarget: new Vector2(3, 1),
     });
-    targetMovement = new TargetMovement(mockChar, gridTilemapMock, {
+    targetMovement = new TargetMovement(mockChar, gridTilemap, {
       position: new Vector2(3, 1),
       layer: "layer2",
     });
@@ -107,7 +99,7 @@ describe("TargetMovement", () => {
     });
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       {
         position: new Vector2(3, 1),
         layer: "layer2",
@@ -155,7 +147,7 @@ describe("TargetMovement", () => {
     });
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(3, 1))
     );
     targetMovement.update(100);
@@ -174,7 +166,7 @@ describe("TargetMovement", () => {
     });
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(3, 1))
     );
     targetMovement.update(100);
@@ -190,7 +182,7 @@ describe("TargetMovement", () => {
     });
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(2, 1))
     );
     targetMovement.update(100);
@@ -208,7 +200,7 @@ describe("TargetMovement", () => {
     });
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(0, 1))
     );
     targetMovement.update(100);
@@ -226,7 +218,7 @@ describe("TargetMovement", () => {
     });
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(1, 2))
     );
     targetMovement.update(100);
@@ -244,7 +236,7 @@ describe("TargetMovement", () => {
     });
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(1, 0))
     );
     targetMovement.update(100);
@@ -269,7 +261,7 @@ describe("TargetMovement", () => {
 
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(3, 1)),
       {
         config: {
@@ -307,7 +299,7 @@ describe("TargetMovement", () => {
         path: [charPos, layerPos(new Vector2(2, 1))],
         closestToTarget: layerPos(new Vector2(2, 1)),
       });
-    targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos, {
+    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       distance: 2,
       config: {
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
@@ -331,7 +323,7 @@ describe("TargetMovement", () => {
 
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(1, 3)),
       {
         distance: 3,
@@ -356,7 +348,7 @@ describe("TargetMovement", () => {
         path: [charPos, target],
         closestToTarget: target,
       });
-      targetMovement = new TargetMovement(mockChar, gridTilemapMock, target, {
+      targetMovement = new TargetMovement(mockChar, gridTilemap, target, {
         distance: 2,
       });
       expect(mockChar.getFacingDirection()).not.toEqual(Direction.LEFT);
@@ -374,7 +366,7 @@ describe("TargetMovement", () => {
         closestToTarget: target,
       });
 
-      targetMovement = new TargetMovement(mockChar, gridTilemapMock, target, {
+      targetMovement = new TargetMovement(mockChar, gridTilemap, target, {
         distance: 2,
       });
       expect(mockChar.getFacingDirection()).not.toEqual(Direction.RIGHT);
@@ -392,7 +384,7 @@ describe("TargetMovement", () => {
         closestToTarget: target,
       });
 
-      targetMovement = new TargetMovement(mockChar, gridTilemapMock, target, {
+      targetMovement = new TargetMovement(mockChar, gridTilemap, target, {
         distance: 2,
       });
       expect(mockChar.getFacingDirection()).not.toEqual(Direction.UP);
@@ -411,7 +403,7 @@ describe("TargetMovement", () => {
         closestToTarget: target,
       });
 
-      targetMovement = new TargetMovement(mockChar, gridTilemapMock, target, {
+      targetMovement = new TargetMovement(mockChar, gridTilemap, target, {
         distance: 2,
       });
       expect(mockChar.getFacingDirection()).not.toEqual(Direction.DOWN);
@@ -430,7 +422,7 @@ describe("TargetMovement", () => {
         closestToTarget: target,
       });
 
-      targetMovement = new TargetMovement(mockChar, gridTilemapMock, target, {
+      targetMovement = new TargetMovement(mockChar, gridTilemap, target, {
         distance: 3,
       });
       expect(mockChar.getFacingDirection()).not.toEqual(Direction.DOWN);
@@ -460,7 +452,7 @@ describe("TargetMovement", () => {
 
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(1, 5)),
       {
         distance: 3,
@@ -491,7 +483,7 @@ describe("TargetMovement", () => {
 
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(1, 5)),
       {
         distance: 3,
@@ -520,7 +512,7 @@ describe("TargetMovement", () => {
         closestToTarget: new Vector2(1, 3),
       });
 
-    targetMovement = new TargetMovement(mockChar, gridTilemapMock, target, {
+    targetMovement = new TargetMovement(mockChar, gridTilemap, target, {
       distance: 1,
       config: { noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE },
     });
@@ -538,7 +530,7 @@ describe("TargetMovement", () => {
 
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(3, 2))
     );
     targetMovement.update(100);
@@ -556,7 +548,7 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(
         mockChar,
-        gridTilemapMock,
+        gridTilemap,
         layerPos(new Vector2(3, 2)),
         {
           config: {
@@ -589,7 +581,7 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(
         mockChar,
-        gridTilemapMock,
+        gridTilemap,
         layerPos(new Vector2(3, 2)),
         {
           config: {
@@ -622,7 +614,7 @@ describe("TargetMovement", () => {
         .mockReturnValue({ path: [], closestToDistance: charPos });
       targetMovement = new TargetMovement(
         mockChar,
-        gridTilemapMock,
+        gridTilemap,
         layerPos(new Vector2(3, 2)),
         {
           config: {
@@ -670,7 +662,7 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(
         mockChar,
-        gridTilemapMock,
+        gridTilemap,
         layerPos(new Vector2(3, 2)),
         {
           config: {
@@ -703,7 +695,7 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(
         mockChar,
-        gridTilemapMock,
+        gridTilemap,
         layerPos(new Vector2(3, 2)),
         {
           config: {
@@ -736,7 +728,7 @@ describe("TargetMovement", () => {
         .mockReturnValue({ path: [], closestToDistance: charPos });
       targetMovement = new TargetMovement(
         mockChar,
-        gridTilemapMock,
+        gridTilemap,
         layerPos(new Vector2(3, 2)),
         {
           config: {
@@ -786,7 +778,7 @@ describe("TargetMovement", () => {
         tilemap: gridTilemap,
         collidesWithTiles: false,
       });
-      targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos);
 
       tilemapMock.hasTileAt.mockReturnValue(false);
       const getNeighbors = targetMovement.getNeighbors(charPos);
@@ -812,20 +804,29 @@ describe("TargetMovement", () => {
     });
 
     it("should not list tiles out of range", () => {
-      gridTilemapMock.isInRange.mockReturnValue(false);
-      gridTilemapMock.hasBlockingChar.mockReturnValue(false);
-      const charPos = layerPos(new Vector2(3, 1));
+      const charPos = layerPos(new Vector2(0, 0));
+      const charPos2 = layerPos(new Vector2(19, 29));
       const targetPos = layerPos(new Vector2(1, 1));
       const mockChar = createMockChar("char1", charPos, {
         ...TEST_CHAR_CONFIG,
         tilemap: gridTilemap,
         collidesWithTiles: false,
       });
-      targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos);
 
-      const getNeighbors = targetMovement.getNeighbors(charPos);
+      const neighbors = targetMovement.getNeighbors(charPos);
 
-      expect(getNeighbors).toEqual([]);
+      expect(neighbors).toEqual([
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+
+      const neighbors2 = targetMovement.getNeighbors(charPos2);
+
+      expect(neighbors2).toEqual([
+        layerPos(new Vector2(18, 29)),
+        layerPos(new Vector2(19, 28)),
+      ]);
     });
 
     it("should not move if no path exists", () => {
@@ -840,7 +841,7 @@ describe("TargetMovement", () => {
         .mockReturnValue({ path: [], closestToDistance: charPos });
       targetMovement = new TargetMovement(
         mockChar,
-        gridTilemapMock,
+        gridTilemap,
         layerPos(new Vector2(3, 2))
       );
       targetMovement.update(100);
@@ -859,7 +860,7 @@ describe("TargetMovement", () => {
 
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(2, 2))
     );
     targetMovement.update(100);
@@ -885,7 +886,7 @@ describe("TargetMovement", () => {
 
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(2, 2)),
       {
         config: {
@@ -925,7 +926,7 @@ describe("TargetMovement", () => {
 
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(2, 2)),
       {
         config: {
@@ -960,7 +961,7 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(
         mockChar,
-        gridTilemapMock,
+        gridTilemap,
         layerPos(new Vector2(3, 2)),
         {
           config: {
@@ -996,7 +997,7 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(
         mockChar,
-        gridTilemapMock,
+        gridTilemap,
         layerPos(new Vector2(3, 2)),
         {
           config: {
@@ -1034,7 +1035,7 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(
         mockChar,
-        gridTilemapMock,
+        gridTilemap,
         layerPos(new Vector2(3, 2)),
         {
           config: {
@@ -1064,7 +1065,7 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(
         mockChar,
-        gridTilemapMock,
+        gridTilemap,
         layerPos(new Vector2(3, 2)),
         {
           config: {
@@ -1097,7 +1098,7 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(
         mockChar,
-        gridTilemapMock,
+        gridTilemap,
         layerPos(new Vector2(3, 2)),
         {
           config: {
@@ -1146,7 +1147,7 @@ describe("TargetMovement", () => {
 
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(3, 2))
     );
     targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
@@ -1192,7 +1193,7 @@ describe("TargetMovement", () => {
 
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(3, 2))
     );
     targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
@@ -1216,7 +1217,7 @@ describe("TargetMovement", () => {
 
     targetMovement = new TargetMovement(
       mockChar,
-      gridTilemapMock,
+      gridTilemap,
       layerPos(new Vector2(3, 2))
     );
     targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
@@ -1279,7 +1280,7 @@ describe("TargetMovement", () => {
       path: [layerPos(new Vector2(3, 1)), layerPos(new Vector2(3, 2))],
       closestToTarget: new Vector2(3, 2),
     });
-    targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos, {
+    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       ignoreBlockedTarget: true,
     });
 
@@ -1308,7 +1309,7 @@ describe("TargetMovement", () => {
 
     it("should fire when char gets new movement", () => {
       const targetPos = layerPos(new Vector2(3, 3));
-      targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos);
       const mockCall = jest.fn();
       targetMovement.finishedObs().subscribe(mockCall);
 
@@ -1324,7 +1325,7 @@ describe("TargetMovement", () => {
 
     it("should not fire when char gets same movement", () => {
       const targetPos = layerPos(new Vector2(3, 3));
-      targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos);
       const mockCall = jest.fn();
       targetMovement.finishedObs().subscribe(mockCall);
 
@@ -1335,7 +1336,7 @@ describe("TargetMovement", () => {
     it("should complete when char gets new movement", () => {
       const mockCall = jest.fn();
       const targetPos = layerPos(new Vector2(3, 3));
-      targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos);
       targetMovement.finishedObs().subscribe({ complete: mockCall });
       mockChar.setMovement(undefined);
       expect(mockCall).toHaveBeenCalled();
@@ -1349,7 +1350,7 @@ describe("TargetMovement", () => {
       });
       const mockCall = jest.fn();
       const targetPos = layerPos(new Vector2(3, 3));
-      targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos);
       targetMovement.finishedObs().subscribe(mockCall);
       targetMovement.update(100);
       expect(mockCall).toHaveBeenCalledWith({
@@ -1368,7 +1369,7 @@ describe("TargetMovement", () => {
         closestToTarget: charPos,
       });
       const mockCall = jest.fn();
-      targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos);
       targetMovement.finishedObs().subscribe(mockCall);
       targetMovement.update(100);
       targetMovement.update(100);
@@ -1390,7 +1391,7 @@ describe("TargetMovement", () => {
         closestToTarget: undefined,
       });
       tilemapMock.hasTileAt.mockReturnValue(false);
-      targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos);
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos);
       let getNeighbors = targetMovement.getNeighbors(charPos);
       expect(getNeighbors).toEqual([]);
 
@@ -1421,7 +1422,7 @@ describe("TargetMovement", () => {
       });
       targetMovement = new TargetMovement(
         mockChar,
-        gridTilemapMock,
+        gridTilemap,
         layerPos(new Vector2(1, 0))
       );
       targetMovement.update(100);
@@ -1443,7 +1444,7 @@ describe("TargetMovement", () => {
       });
       targetMovement = new TargetMovement(
         mockChar,
-        gridTilemapMock,
+        gridTilemap,
         layerPos(new Vector2(1, 0))
       );
       targetMovement.update(100);
@@ -1465,7 +1466,7 @@ describe("TargetMovement", () => {
       });
       targetMovement = new TargetMovement(
         mockChar,
-        gridTilemapMock,
+        gridTilemap,
         layerPos(new Vector2(1, 2))
       );
       targetMovement.update(100);
@@ -1487,7 +1488,7 @@ describe("TargetMovement", () => {
       });
       targetMovement = new TargetMovement(
         mockChar,
-        gridTilemapMock,
+        gridTilemap,
         layerPos(new Vector2(1, 2))
       );
       targetMovement.update(100);
@@ -1515,23 +1516,18 @@ describe("TargetMovement", () => {
           path: [charPos, closestToTarget],
           closestToTarget: closestToTarget,
         });
-      targetMovement = new TargetMovement(
-        mockChar,
-        gridTilemapMock,
-        targetPos,
-        {
-          distance: 2,
-          config: {
-            noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
-          },
-        }
-      );
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        distance: 2,
+        config: {
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        },
+      });
       targetMovement.update(100);
       expect(mockChar.isMoving()).toBe(false);
     });
   });
 
-  it("Should not consider forbidden positions as neighbors", () => {
+  it("should not consider forbidden positions as neighbors", () => {
     function posToStr(pos: Position, charLayer?: string): string {
       return `${pos.x}#${pos.y}#${charLayer}`;
     }
@@ -1571,7 +1567,7 @@ describe("TargetMovement", () => {
     mockBfs.getShortestPath = jest.fn((startPos, targetPos, getNeighbors) =>
       bfs.getShortestPath(startPos, targetPos, getNeighbors)
     );
-    targetMovement = new TargetMovement(mockChar, gridTilemapMock, targetPos, {
+    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: {
         isPositionAllowedFn: (pos, charLayer) =>
           !forbiddenPositions.has(posToStr(pos, charLayer)),
@@ -1583,5 +1579,80 @@ describe("TargetMovement", () => {
       rightOfPlayer,
       topOfPlayer,
     ]);
+  });
+
+  describe("multi-tile chars neighbors", () => {
+    let playerPos;
+    let mockChar;
+    let left, right, top, bottom;
+
+    beforeEach(() => {
+      playerPos = layerPos(new Vector2(10, 10));
+      mockChar = createMockChar("char", playerPos, {
+        ...TEST_CHAR_CONFIG,
+        tilemap: gridTilemap,
+        tileWidth: 2,
+        tileHeight: 2,
+      });
+      const bfs = new Bfs();
+      mockBfs.getShortestPath = jest.fn((startPos, targetPos, getNeighbors) =>
+        bfs.getShortestPath(startPos, targetPos, getNeighbors)
+      );
+      left = layerPos(new Vector2(0, 1));
+      right = layerPos(new Vector2(2, 1));
+      top = layerPos(new Vector2(1, 0));
+      bottom = layerPos(new Vector2(1, 2));
+      targetMovement = new TargetMovement(
+        mockChar,
+        gridTilemap,
+        layerPos(new Vector2(3, 3))
+      );
+    });
+
+    it("should get all neighbors for unblocked chars", () => {
+      // . = unblocked
+      // # = blocked
+      // p = player
+      //
+      // ....
+      // .pp.
+      // .pp.
+      // ....
+
+      tilemapMock.hasTileAt.mockReturnValue(true);
+
+      expect(targetMovement.getNeighbors(layerPos(new Vector2(1, 1)))).toEqual([
+        bottom,
+        right,
+        left,
+        top,
+      ]);
+    });
+
+    it("should get no neighbors for completely blocked chars", () => {
+      // . = unblocked
+      // # = blocked
+      // p = player
+      //
+      // ..#.
+      // .pp.
+      // #pp#
+      // ..#.
+
+      const blockedTiles = [
+        [2, 0],
+        [0, 2],
+        [3, 2],
+        [2, 3],
+      ];
+
+      tilemapMock.hasTileAt.mockImplementation((x, y) => {
+        return !blockedTiles.some(([pX, pY]) => pX === x && pY === y);
+      });
+
+      expect(targetMovement.getNeighbors(layerPos(new Vector2(1, 1)))).toEqual(
+        []
+      );
+    });
   });
 });
