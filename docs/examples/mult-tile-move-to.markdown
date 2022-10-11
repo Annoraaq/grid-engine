@@ -107,7 +107,7 @@ parent: Examples
           tintTile(cloudCityTilemap, enterTile.y+i, enterTile.x+j, 0xff7a4a);
         }
       }
-    })
+    });
   }
 
   function update() {
