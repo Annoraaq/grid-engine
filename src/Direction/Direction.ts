@@ -82,7 +82,6 @@ export function oppositeDirection(direction: Direction): Direction {
   return oppositeDirections[direction];
 }
 
-// TODO: write test
 export function directionFromPos(src: Position, dest: Position): Direction {
   if (src.x === dest.x) {
     if (src.y > dest.y) return Direction.UP;
