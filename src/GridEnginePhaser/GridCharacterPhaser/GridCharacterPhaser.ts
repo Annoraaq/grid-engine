@@ -174,6 +174,8 @@ export class GridCharacterPhaser {
       labels: charData.labels,
       numberOfDirections:
         charData.numberOfDirections ?? GlobalConfig.get().numberOfDirections,
+      tileWidth: charData.tileWidth,
+      tileHeight: charData.tileHeight,
     };
 
     this.customOffset = new Vector2(

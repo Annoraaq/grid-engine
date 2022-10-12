@@ -5,7 +5,7 @@ import { CharBlockCache } from "./CharBlockCache/CharBlockCache";
 import { Rect } from "../Utils/Rect/Rect";
 import { VectorUtils } from "../Utils/VectorUtils";
 import { Utils } from "../Utils/Utils/Utils";
-import { GridCharacter } from "../GridCharacter/GridCharacter";
+import { CharId, GridCharacter } from "../GridCharacter/GridCharacter";
 
 export type LayerName = string | undefined;
 
@@ -50,21 +50,9 @@ export class GridTilemap {
     return this.charBlockCache.getCharactersAt(position, layer);
   }
 
-  isBlocking(
-    charLayer: string | undefined,
-    pos: Vector2,
-    collisionGroups: string[],
-    direction?: Direction
-  ): boolean {
-    return (
-      this.hasBlockingTile(charLayer, pos, direction) ||
-      this.hasBlockingChar(pos, charLayer, collisionGroups)
-    );
-  }
-
   hasBlockingTile(
-    charLayer: string | undefined,
     pos: Vector2,
+    charLayer: string | undefined,
     direction?: Direction
   ): boolean {
     if (this.hasNoTile(pos, charLayer)) return true;
@@ -103,9 +91,15 @@ export class GridTilemap {
   hasBlockingChar(
     pos: Vector2,
     layer: string | undefined,
-    collisionGroups: string[]
+    collisionGroups: string[],
+    exclude = new Set<CharId>()
   ): boolean {
-    return this.charBlockCache.isCharBlockingAt(pos, layer, collisionGroups);
+    return this.charBlockCache.isCharBlockingAt(
+      pos,
+      layer,
+      collisionGroups,
+      exclude
+    );
   }
 
   getTileWidth(): number {

@@ -15,6 +15,8 @@ import * as Phaser from "phaser";
 
 const MAX_MOVEMENT_PROGRESS = 1000;
 
+export type CharId = string;
+
 export type GameObject =
   | Phaser.GameObjects.Container
   | Phaser.GameObjects.Sprite;
@@ -35,6 +37,8 @@ export interface CharConfig {
   collisionGroups?: string[];
   facingDirection?: Direction;
   labels?: string[];
+  tileWidth?: number;
+  tileHeight?: number;
 }
 
 export class GridCharacter {
@@ -62,6 +66,8 @@ export class GridCharacter {
   private movementProgress = 0;
   private labels: Set<string>;
   private numberOfDirections: NumberOfDirections;
+  private tileWidth: number;
+  private tileHeight: number;
 
   constructor(private id: string, config: CharConfig) {
     this.tilemap = config.tilemap;
@@ -77,6 +83,9 @@ export class GridCharacter {
     if (config.facingDirection) {
       this.turnTowards(config.facingDirection);
     }
+
+    this.tileWidth = config.tileWidth ?? 1;
+    this.tileHeight = config.tileHeight ?? 1;
   }
 
   getId(): string {
@@ -147,6 +156,14 @@ export class GridCharacter {
     };
   }
 
+  getTileWidth(): number {
+    return this.tileWidth;
+  }
+
+  getTileHeight(): number {
+    return this.tileHeight;
+  }
+
   move(direction: Direction): void {
     this.lastMovementImpulse = direction;
     if (direction == Direction.NONE) return;
@@ -183,22 +200,44 @@ export class GridCharacter {
       this.tilemap.getTransition(tilePosInDir, this.getNextTilePos().layer) ||
       this.getNextTilePos().layer;
 
-    if (
-      this.collidesWithTilesInternal &&
-      this.tilemap.hasBlockingTile(
-        layerInDirection,
-        tilePosInDir,
-        oppositeDirection(direction)
-      )
-    ) {
-      return true;
+    if (this.collidesWithTilesInternal) {
+      const isTileBlocking = this.isTileBlocking(direction, layerInDirection);
+      if (isTileBlocking) return true;
     }
 
-    return this.tilemap.hasBlockingChar(
-      tilePosInDir,
-      layerInDirection,
-      this.getCollisionGroups()
-    );
+    return this.isCharBlocking(direction, layerInDirection);
+  }
+
+  isTileBlocking(direction: Direction, layerInDirection: LayerName): boolean {
+    return this.someCharTile((x, y) => {
+      const tilePosInDir = this.tilePosInDirection(
+        new Vector2(x, y),
+        direction
+      );
+      return this.tilemap.hasBlockingTile(
+        tilePosInDir,
+        layerInDirection,
+        oppositeDirection(direction)
+      );
+    });
+  }
+
+  private isCharBlocking(
+    direction: Direction,
+    layerInDirection: LayerName
+  ): boolean {
+    return this.someCharTile((x, y) => {
+      const tilePosInDir = this.tilePosInDirection(
+        new Vector2(x, y),
+        direction
+      );
+      return this.tilemap.hasBlockingChar(
+        tilePosInDir,
+        layerInDirection,
+        this.getCollisionGroups(),
+        new Set([this.getId()])
+      );
+    });
   }
 
   isMoving(): boolean {
@@ -396,5 +435,15 @@ export class GridCharacter {
     { position: enterTile, layer: enterLayer }: LayerPosition
   ): void {
     subject.next({ exitTile, enterTile, exitLayer, enterLayer });
+  }
+
+  private someCharTile(predicate: (x: number, y: number) => boolean): boolean {
+    const tilePos = this.getNextTilePos().position;
+    for (let x = tilePos.x; x < tilePos.x + this.getTileWidth(); x++) {
+      for (let y = tilePos.y; y < tilePos.y + this.getTileHeight(); y++) {
+        if (predicate(x, y)) return true;
+      }
+    }
+    return false;
   }
 }

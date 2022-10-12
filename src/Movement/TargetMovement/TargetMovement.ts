@@ -9,7 +9,11 @@ import {
 import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import { Direction } from "../../Direction/Direction";
+import {
+  Direction,
+  directionFromPos,
+  oppositeDirection,
+} from "../../Direction/Direction";
 import { Movement, MovementInfo } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Retryable } from "./Retryable/Retryable";
@@ -395,14 +399,19 @@ export class TargetMovement implements Movement {
       return this.tilemap.hasBlockingChar(
         pos,
         charLayer,
-        this.character.getCollisionGroups()
+        this.character.getCollisionGroups(),
+        new Set([this.character.getId()])
       );
     }
 
-    return this.tilemap.isBlocking(
-      charLayer,
-      pos,
-      this.character.getCollisionGroups()
+    return (
+      this.hasBlockingTileForChar(pos, charLayer) ||
+      this.tilemap.hasBlockingChar(
+        pos,
+        charLayer,
+        this.character.getCollisionGroups(),
+        new Set([this.character.getId()])
+      )
     );
   };
 
@@ -438,5 +447,20 @@ export class TargetMovement implements Movement {
 
   private getDir(from: Vector2, to: Vector2): Direction {
     return this.distanceUtils.direction(from, to);
+  }
+
+  private hasBlockingTileForChar(pos: Position, layer: LayerName): boolean {
+    for (let x = pos.x; x < pos.x + this.character.getTileWidth(); x++) {
+      for (let y = pos.y; y < pos.y + this.character.getTileHeight(); y++) {
+        const res = this.tilemap.hasBlockingTile(
+          new Vector2(x, y),
+          layer,
+          oppositeDirection(directionFromPos(pos, new Vector2(x, y)))
+        );
+
+        if (res) return true;
+      }
+    }
+    return false;
   }
 }

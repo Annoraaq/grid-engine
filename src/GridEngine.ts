@@ -245,6 +245,22 @@ export interface CharacterData {
    * in the GridEngine configuration for specific characters.
    */
   numberOfDirections?: NumberOfDirections;
+
+  /**
+   * With of the character in tiles. This allows to specify character that span
+   * more than just one tile.
+   *
+   * @defaultValue 1
+   */
+  tileWidth?: number;
+
+  /**
+   * Height of the character in tiles. This allows to specify character that span
+   * more than just one tile.
+   *
+   * @defaultValue 1
+   */
+  tileHeight?: number;
 }
 
 /**
@@ -898,10 +914,10 @@ export class GridEngine {
     collisionGroups: string[] = ["geDefault"]
   ): boolean {
     this.initGuard();
-    return !!this.gridTilemap?.isBlocking(
-      layer,
-      new Vector2(position),
-      collisionGroups
+    const positionVec = new Vector2(position);
+    return !!(
+      this.gridTilemap?.hasBlockingTile(positionVec, layer) ||
+      this.gridTilemap?.hasBlockingChar(positionVec, layer, collisionGroups)
     );
   }
 
@@ -913,7 +929,7 @@ export class GridEngine {
    */
   isTileBlocked(position: Position, layer?: string): boolean {
     this.initGuard();
-    return !!this.gridTilemap?.hasBlockingTile(layer, new Vector2(position));
+    return !!this.gridTilemap?.hasBlockingTile(new Vector2(position), layer);
   }
 
   /**

@@ -123,6 +123,8 @@ describe("GridCharacterPhaser", () => {
         startPosition: startPos,
         charLayer: "someLayer",
         numberOfDirections: NumberOfDirections.EIGHT,
+        tileWidth: 2,
+        tileHeight: 3,
       };
       const gridCharPhaser = createChar(charData, true);
 
@@ -141,6 +143,9 @@ describe("GridCharacterPhaser", () => {
       expect(gridChar.getFacingDirection()).toBe(Direction.RIGHT);
       expect(gridChar.collidesWithTiles()).toBe(true);
       expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
+      expect(gridChar.getTilePos().layer).toBe("someLayer");
+      expect(gridChar.getTileWidth()).toEqual(2);
+      expect(gridChar.getTileHeight()).toEqual(3);
       expect(gridChar.getTilePos().layer).toBe("someLayer");
 
       expect(spriteMock.setOrigin).toHaveBeenCalledWith(0, 0);

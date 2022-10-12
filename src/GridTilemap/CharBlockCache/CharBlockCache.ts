@@ -1,32 +1,47 @@
 import { GlobalConfig } from "./../../GlobalConfig/GlobalConfig";
-import { Subscription } from "rxjs";
-import { GridCharacter } from "../../GridCharacter/GridCharacter";
+import {
+  filter,
+  map,
+  Observable,
+  OperatorFunction,
+  pipe,
+  Subject,
+  take,
+  takeUntil,
+} from "rxjs";
+import {
+  CharId,
+  GridCharacter,
+  PositionChange,
+} from "../../GridCharacter/GridCharacter";
 import { Position } from "../../GridEngine";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
 import { LayerName } from "../GridTilemap";
+import { LayerPosition } from "../../Pathfinding/ShortestPathAlgorithm";
 
 export class CharBlockCache {
   private tilePosToCharacters: Map<string, Set<GridCharacter>> = new Map();
-  private positionChangeStartedSubs: Map<string, Subscription> = new Map();
-  private tilePosSetSubs: Map<string, Subscription> = new Map();
-  private positionChangeFinishedSubs: Map<string, Subscription> = new Map();
+  private charRemoved$ = new Subject<string>();
 
   isCharBlockingAt(
     pos: Vector2,
     layer: LayerName,
-    collisionGroups: string[]
+    collisionGroups: string[],
+    exclude = new Set<CharId>()
   ): boolean {
     const posStr = this.posToString(pos, layer);
     const charSet = this.tilePosToCharacters.get(posStr);
     return !!(
       charSet &&
       charSet.size > 0 &&
-      [...charSet].some((char: GridCharacter) =>
-        char
-          .getCollisionGroups()
-          .some((group) => collisionGroups.includes(group))
-      )
+      [...charSet]
+        .filter((char: GridCharacter) => !exclude.has(char.getId()))
+        .some((char: GridCharacter) =>
+          char
+            .getCollisionGroups()
+            .some((group) => collisionGroups.includes(group))
+        )
     );
   }
 
@@ -37,20 +52,8 @@ export class CharBlockCache {
   }
 
   addCharacter(character: GridCharacter): void {
-    this.add(
-      this.posToString(
-        character.getTilePos().position,
-        character.getTilePos().layer
-      ),
-      character
-    );
-    this.add(
-      this.posToString(
-        character.getNextTilePos().position,
-        character.getNextTilePos().layer
-      ),
-      character
-    );
+    this.addTilePositions(character.getTilePos(), character);
+    this.addTilePositions(character.getNextTilePos(), character);
     this.addPositionChangeSub(character);
     this.addPositionChangeFinishedSub(character);
     this.addTilePosSetSub(character);
@@ -58,25 +61,9 @@ export class CharBlockCache {
 
   removeCharacter(character: GridCharacter): void {
     const charId = character.getId();
-    this.positionChangeStartedSubs.get(charId)?.unsubscribe();
-    this.positionChangeFinishedSubs.get(charId)?.unsubscribe();
-    this.tilePosSetSubs.get(charId)?.unsubscribe();
-    this.tilePosToCharacters
-      .get(
-        this.posToString(
-          character.getTilePos().position,
-          character.getTilePos().layer
-        )
-      )
-      ?.delete(character);
-    this.tilePosToCharacters
-      .get(
-        this.posToString(
-          character.getNextTilePos().position,
-          character.getNextTilePos().layer
-        )
-      )
-      ?.delete(character);
+    this.charRemoved$.next(charId);
+    this.deleteTilePositions(character.getTilePos(), character);
+    this.deleteTilePositions(character.getNextTilePos(), character);
   }
 
   private add(pos: string, character: GridCharacter): void {
@@ -87,62 +74,103 @@ export class CharBlockCache {
   }
 
   private addTilePosSetSub(character: GridCharacter) {
-    const tilePosSetSub = character
+    character
       .tilePositionSet()
-      .subscribe((_layerPosition) => {
-        this.tilePosToCharacters
-          .get(
-            this.posToString(
-              character.getNextTilePos().position,
-              character.getNextTilePos().layer
-            )
-          )
-          ?.delete(character);
+      .pipe(takeUntil(this.charRemoved(character.getId())))
+      .subscribe((layerPosition) => {
+        this.deleteTilePositions(character.getNextTilePos(), character);
+        this.addTilePositions(layerPosition, character);
       });
-    this.tilePosSetSubs.set(character.getId(), tilePosSetSub);
+  }
+
+  private charRemoved(charId: string): Observable<string> {
+    return this.charRemoved$?.pipe(
+      take(1),
+      filter((cId) => cId == charId)
+    );
   }
 
   private addPositionChangeSub(character: GridCharacter) {
-    const positionChangeStartedSub = character
+    character
       .positionChangeStarted()
-      .subscribe((positionChange) => {
+      .pipe(
+        takeUntil(this.charRemoved(character.getId())),
+        this.posChangeToLayerPos()
+      )
+      .subscribe((posChange) => {
         if (
           GlobalConfig.get().characterCollisionStrategy ===
           CollisionStrategy.BLOCK_ONE_TILE_AHEAD
         ) {
-          this.tilePosToCharacters
-            .get(
-              this.posToString(
-                positionChange.exitTile,
-                positionChange.exitLayer
-              )
-            )
-            ?.delete(character);
+          this.deleteTilePositions(posChange.exit, character);
         }
-        this.add(
-          this.posToString(positionChange.enterTile, positionChange.enterLayer),
-          character
-        );
+        this.addTilePositions(posChange.enter, character);
       });
-    this.positionChangeStartedSubs.set(
-      character.getId(),
-      positionChangeStartedSub
-    );
   }
 
   private addPositionChangeFinishedSub(character: GridCharacter) {
-    const positionChangeFinishedSub = character
+    character
       .positionChangeFinished()
-      .subscribe((positionChange) => {
-        this.tilePosToCharacters
-          .get(
-            this.posToString(positionChange.exitTile, positionChange.exitLayer)
-          )
-          ?.delete(character);
+      .pipe(
+        takeUntil(this.charRemoved(character.getId())),
+        this.posChangeToLayerPos()
+      )
+      .subscribe((posChange) => {
+        this.deleteTilePositions(posChange.exit, character);
+        this.addTilePositions(posChange.enter, character);
       });
-    this.positionChangeFinishedSubs.set(
-      character.getId(),
-      positionChangeFinishedSub
+  }
+
+  private addTilePositions(pos: LayerPosition, character: GridCharacter): void {
+    this.forEachCharTile(pos, character, (x, y) => {
+      this.add(this.posToString(new Vector2(x, y), pos.layer), character);
+    });
+  }
+
+  private deleteTilePositions(
+    pos: LayerPosition,
+    character: GridCharacter
+  ): void {
+    this.forEachCharTile(pos, character, (x, y) => {
+      this.tilePosToCharacters
+        .get(this.posToString(new Vector2(x, y), pos.layer))
+        ?.delete(character);
+    });
+  }
+
+  private forEachCharTile(
+    pos: LayerPosition,
+    character: GridCharacter,
+    fn: (x: number, y: number) => void
+  ): void {
+    const tilePos = pos.position;
+    for (let x = tilePos.x; x < tilePos.x + character.getTileWidth(); x++) {
+      for (let y = tilePos.y; y < tilePos.y + character.getTileHeight(); y++) {
+        fn(x, y);
+      }
+    }
+  }
+
+  private posChangeToLayerPos(): OperatorFunction<
+    PositionChange,
+    {
+      enter: LayerPosition;
+      exit: LayerPosition;
+    }
+  > {
+    return pipe(
+      map((posChange: PositionChange) => {
+        return {
+          enter: {
+            position: new Vector2(posChange.enterTile),
+            layer: posChange.enterLayer,
+          },
+          exit: {
+            position: new Vector2(posChange.exitTile),
+            layer: posChange.exitLayer,
+          },
+        };
+      })
     );
   }
 

@@ -10,6 +10,9 @@ import {
   createBlankLayerMock,
   createTilemapMock,
 } from "../Utils/MockFactory/MockFactory";
+import { CollisionStrategy } from "../GridEngine";
+import { LayerPosition } from "../Pathfinding/ShortestPathAlgorithm";
+import { GlobalConfig } from "../GlobalConfig/GlobalConfig";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -30,8 +33,20 @@ describe("GridCharacter", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
   }
 
-  function mockBlockingTile() {
-    tilemapMock.hasTileAt.mockReturnValue(false);
+  function mockBlockingTile(blockingPositions?: LayerPosition[]) {
+    if (!blockingPositions) {
+      tilemapMock.hasTileAt.mockReturnValue(false);
+    } else {
+      tilemapMock.hasTileAt.mockImplementation((x, y, layer) => {
+        return !blockingPositions.some((pos) => {
+          return (
+            pos.position.x == x &&
+            pos.position.y == y &&
+            (pos.layer === undefined || layer === pos.layer)
+          );
+        });
+      });
+    }
   }
 
   beforeEach(() => {
@@ -44,6 +59,14 @@ describe("GridCharacter", () => {
       collidesWithTiles: true,
       numberOfDirections: NumberOfDirections.FOUR,
     });
+    gridTilemap.addCharacter(gridCharacter);
+    GlobalConfig.set({
+      collisionTilePropertyName: "ge_collide",
+      numberOfDirections: NumberOfDirections.FOUR,
+      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
+      layerOverlay: false,
+      characters: [],
+    });
   });
 
   it("should get init data", () => {
@@ -51,19 +74,41 @@ describe("GridCharacter", () => {
       tilemap: gridTilemap,
       speed: 3,
       collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.EIGHT,
       charLayer: "someLayer",
       facingDirection: Direction.RIGHT,
-      numberOfDirections: NumberOfDirections.EIGHT,
+      collisionGroups: ["test"],
+      labels: ["someLabel"],
+      tileWidth: 2,
+      tileHeight: 3,
     });
     expect(gridCharacter.getId()).toEqual("player");
     expect(gridCharacter.getSpeed()).toEqual(3);
     expect(gridCharacter.getTilePos().layer).toEqual("someLayer");
     expect(gridCharacter.collidesWithTiles()).toEqual(true);
-    expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
-    expect(gridCharacter.getLabels()).toEqual([]);
     expect(gridCharacter.getNumberOfDirections()).toEqual(
       NumberOfDirections.EIGHT
     );
+    expect(gridCharacter.getCollisionGroups()).toEqual(["test"]);
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
+    expect(gridCharacter.getLabels()).toEqual(["someLabel"]);
+    expect(gridCharacter.getTileWidth()).toEqual(2);
+    expect(gridCharacter.getTileHeight()).toEqual(3);
+  });
+
+  it("should set default init data", () => {
+    gridCharacter = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.EIGHT,
+    });
+    expect(gridCharacter.getTilePos().layer).toEqual(undefined);
+    expect(gridCharacter.getCollisionGroups()).toEqual([]);
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
+    expect(gridCharacter.getLabels()).toEqual([]);
+    expect(gridCharacter.getTileWidth()).toEqual(1);
+    expect(gridCharacter.getTileHeight()).toEqual(1);
   });
 
   it("should be facing down on construction by default", () => {
@@ -74,7 +119,7 @@ describe("GridCharacter", () => {
     mockNonBlockingTile();
     expect(gridCharacter.getTilePos()).toEqual({
       position: new Vector2(0, 0),
-      layer: undefined,
+      layer: "lowerCharLayer",
     });
     const movementStartedProm = gridCharacter
       .movementStarted()
@@ -91,11 +136,11 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getTilePos()).toEqual({
       position: new Vector2(0, 0),
-      layer: undefined,
+      layer: "lowerCharLayer",
     });
     expect(gridCharacter.getNextTilePos()).toEqual({
       position: new Vector2(0, -1),
-      layer: undefined,
+      layer: "lowerCharLayer",
     });
     const dir = await movementStartedProm;
     expect(dir).toEqual(Direction.UP);
@@ -104,11 +149,11 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
     expect(gridCharacter.getTilePos()).toEqual({
       position: new Vector2(0, 0),
-      layer: undefined,
+      layer: "lowerCharLayer",
     });
     expect(gridCharacter.getNextTilePos()).toEqual({
       position: new Vector2(0, -1),
-      layer: undefined,
+      layer: "lowerCharLayer",
     });
 
     const posChanged = await posChangedProm;
@@ -245,14 +290,14 @@ describe("GridCharacter", () => {
     expect(posChangeStarted).toEqual({
       exitTile: new Vector2(0, 0),
       enterTile: newTilePos,
-      exitLayer: undefined,
+      exitLayer: "lowerCharLayer",
       enterLayer: "someLayer",
     });
 
     expect(posChangeFinished).toEqual({
       exitTile: new Vector2(0, 0),
       enterTile: newTilePos,
-      exitLayer: undefined,
+      exitLayer: "lowerCharLayer",
       enterLayer: "someLayer",
     });
 
@@ -319,14 +364,14 @@ describe("GridCharacter", () => {
       exitTile: new Vector2(0, 0),
       enterTile: newTilePos,
       enterLayer: "someLayer",
-      exitLayer: undefined,
+      exitLayer: "lowerCharLayer",
     });
 
     expect(posChangeFinished).toEqual({
       exitTile: new Vector2(0, 0),
       enterTile: newTilePos,
       enterLayer: "someLayer",
-      exitLayer: undefined,
+      exitLayer: "lowerCharLayer",
     });
     expect(dir).toEqual(Direction.DOWN);
     expect(tilePosSet).toEqual({
@@ -354,7 +399,7 @@ describe("GridCharacter", () => {
     const dir = await movementStoppedProm;
     expect(gridCharacter.getTilePos()).toEqual({
       position: { x: 0, y: 1 },
-      layer: undefined,
+      layer: "lowerCharLayer",
     });
     expect(dir).toEqual(Direction.DOWN);
   });
@@ -367,7 +412,7 @@ describe("GridCharacter", () => {
       .subscribe(() => {
         expect(gridCharacter.getTilePos()).toEqual({
           position: { x: 0, y: 1 },
-          layer: undefined,
+          layer: "lowerCharLayer",
         });
         expect(gridCharacter.isMoving()).toEqual(false);
         done();
@@ -425,7 +470,7 @@ describe("GridCharacter", () => {
 
     expect(gridCharacter.getTilePos()).toEqual({
       position: new Vector2(1, 0),
-      layer: undefined,
+      layer: "lowerCharLayer",
     });
   });
 
@@ -458,7 +503,7 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getMovementProgress()).toEqual(0);
     expect(gridCharacter.getTilePos()).toEqual({
       position: new Vector2(0, 1),
-      layer: undefined,
+      layer: "lowerCharLayer",
     });
   });
 
@@ -466,7 +511,11 @@ describe("GridCharacter", () => {
     mockNonBlockingTile();
     gridCharacter.setSpeed(1);
 
-    gridTilemap.setTransition(new Vector2(0, 1), undefined, "testCharLayer");
+    gridTilemap.setTransition(
+      new Vector2(0, 1),
+      "lowerCharLayer",
+      "testCharLayer"
+    );
     gridCharacter.move(Direction.DOWN);
     gridCharacter.update(QUARTER_SECOND * 3);
     gridCharacter.update(QUARTER_SECOND * 1);
@@ -483,7 +532,11 @@ describe("GridCharacter", () => {
     mockNonBlockingTile();
     gridCharacter.setSpeed(1);
 
-    gridTilemap.setTransition(new Vector2(0, 1), undefined, "testCharLayer");
+    gridTilemap.setTransition(
+      new Vector2(0, 1),
+      "lowerCharLayer",
+      "testCharLayer"
+    );
     gridCharacter.move(Direction.DOWN);
     gridCharacter.update(QUARTER_SECOND * 4);
 
@@ -496,7 +549,7 @@ describe("GridCharacter", () => {
   });
 
   it("should stop moving if blocking", () => {
-    mockBlockingTile();
+    mockBlockingTile([{ position: new Vector2(0, 1), layer: undefined }]);
     gridCharacter.move(Direction.DOWN);
     gridCharacter.update(1);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
@@ -509,7 +562,7 @@ describe("GridCharacter", () => {
   });
 
   it("should detect non-movement", () => {
-    mockBlockingTile();
+    mockBlockingTile([{ position: new Vector2(0, 1), layer: undefined }]);
     gridCharacter.move(Direction.DOWN);
     expect(gridCharacter.isMoving()).toBeFalsy();
   });
@@ -587,7 +640,12 @@ describe("GridCharacter", () => {
     });
 
     describe("collides with tiles", () => {
-      const direction = Direction.RIGHT;
+      const charPosX = 0;
+      const charPosY = 0;
+      const charWidth = 2;
+      const charHeight = 2;
+      const charRightBorder = charPosX + charWidth - 1;
+      const charBottomBorder = charPosY + charHeight - 1;
       beforeEach(() => {
         gridCharacter = new GridCharacter("player", {
           tilemap: gridTilemap,
@@ -595,21 +653,77 @@ describe("GridCharacter", () => {
           collidesWithTiles: true,
           collisionGroups: ["cGroup1"],
           numberOfDirections: NumberOfDirections.FOUR,
+          tileWidth: 2,
+          tileHeight: 2,
         });
       });
       it("should not block when no blocking tiles and chars", () => {
         mockNonBlockingTile();
 
-        expect(gridCharacter.isBlockingDirection(direction)).toBe(false);
+        expect(gridCharacter.isBlockingDirection(Direction.RIGHT)).toBe(false);
       });
 
-      it("should block when blocking tiles", () => {
-        mockBlockingTile();
+      it("should block when blocking tiles in multi-tile radius x", () => {
+        mockBlockingTile([
+          {
+            position: new Vector2(charRightBorder + 1, charBottomBorder),
+            layer: undefined,
+          },
+        ]);
 
-        expect(gridCharacter.isBlockingDirection(direction)).toBe(true);
+        expect(gridCharacter.isBlockingDirection(Direction.RIGHT)).toBe(true);
       });
 
-      it("should block when blocking chars", () => {
+      it("should block when blocking tiles in multi-tile radius x when moving", () => {
+        mockBlockingTile([
+          {
+            position: new Vector2(charRightBorder + 2, charBottomBorder),
+            layer: undefined,
+          },
+        ]);
+        gridCharacter.move(Direction.RIGHT);
+        gridCharacter.update(1);
+
+        expect(gridCharacter.isBlockingDirection(Direction.RIGHT)).toBe(true);
+      });
+
+      it(
+        "should block when blocking tiles in multi-tile radius on layer " +
+          "transition of main tile",
+        () => {
+          mockNonBlockingTile();
+          gridCharacter.setTilePosition({
+            position: new Vector2(charPosX, charPosY),
+            layer: "lowerCharLayer",
+          });
+          gridTilemap.setTransition(
+            new Vector2(charPosX + 1, charPosY),
+            "lowerCharLayer",
+            "testCharLayer"
+          );
+
+          // we need to provide the layer name, not the char layer name for
+          // mocking
+          mockBlockingTile([
+            { position: new Vector2(charPosX + 1, charPosY), layer: "layer2" },
+          ]);
+
+          expect(gridCharacter.isBlockingDirection(Direction.RIGHT)).toBe(true);
+        }
+      );
+
+      it("should block when blocking tiles in multi-tile radius y", () => {
+        mockBlockingTile([
+          {
+            position: new Vector2(charRightBorder, charBottomBorder + 1),
+            layer: undefined,
+          },
+        ]);
+
+        expect(gridCharacter.isBlockingDirection(Direction.DOWN)).toBe(true);
+      });
+
+      it("should block when blocking chars in multi-tile radius x", () => {
         mockNonBlockingTile();
         const blockingChar = new GridCharacter("blocker", {
           tilemap: gridTilemap,
@@ -619,12 +733,30 @@ describe("GridCharacter", () => {
           numberOfDirections: NumberOfDirections.FOUR,
         });
         blockingChar.setTilePosition({
-          position: new Vector2(1, 0),
+          position: new Vector2(charRightBorder + 1, charBottomBorder),
           layer: undefined,
         });
         gridTilemap.addCharacter(gridCharacter);
         gridTilemap.addCharacter(blockingChar);
-        expect(gridCharacter.isBlockingDirection(direction)).toBe(true);
+        expect(gridCharacter.isBlockingDirection(Direction.RIGHT)).toBe(true);
+      });
+
+      it("should block when blocking chars in multi-tile radius y", () => {
+        mockNonBlockingTile();
+        const blockingChar = new GridCharacter("blocker", {
+          tilemap: gridTilemap,
+          speed: 3,
+          collidesWithTiles: true,
+          collisionGroups: ["cGroup1"],
+          numberOfDirections: NumberOfDirections.FOUR,
+        });
+        blockingChar.setTilePosition({
+          position: new Vector2(charRightBorder, charBottomBorder + 1),
+          layer: undefined,
+        });
+        gridTilemap.addCharacter(gridCharacter);
+        gridTilemap.addCharacter(blockingChar);
+        expect(gridCharacter.isBlockingDirection(Direction.DOWN)).toBe(true);
       });
     });
 
@@ -734,7 +866,7 @@ describe("GridCharacter", () => {
   });
 
   it("should turn player if direction blocked", (done) => {
-    mockBlockingTile();
+    mockBlockingTile([{ position: new Vector2(0, -1), layer: undefined }]);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
     gridCharacter.directionChanged().subscribe((direction) => {
       expect(direction).toEqual(Direction.UP);

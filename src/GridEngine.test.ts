@@ -20,7 +20,6 @@ const mockGridTileMap = {
   getTransition: jest.fn(),
   setTransition: jest.fn(),
   isIsometric: jest.fn().mockReturnValue(false),
-  isBlocking: jest.fn().mockReturnValue(false),
   hasBlockingTile: jest.fn().mockReturnValue(false),
   tilePosToPixelPos: jest.fn().mockReturnValue(new Vector2(0, 0)),
   toMapDirection: jest.fn(),
@@ -995,33 +994,61 @@ describe("GridEngine", () => {
     );
   });
 
-  it("should delegate isBlocking", () => {
+  it("should block if tile is blocking", () => {
+    mockGridTileMap.hasBlockingTile.mockReturnValue(true);
+    mockGridTileMap.hasBlockingChar.mockReturnValue(false);
     const result = gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer", [
       "cGroup",
     ]);
-    expect(mockGridTileMap.isBlocking).toHaveBeenCalledWith(
-      "someLayer",
+    expect(mockGridTileMap.hasBlockingTile).toHaveBeenCalledWith(
       new Vector2(3, 4),
+      "someLayer"
+    );
+    expect(result).toBe(true);
+  });
+
+  it("should block if char is blocking", () => {
+    mockGridTileMap.hasBlockingTile.mockReturnValue(false);
+    mockGridTileMap.hasBlockingChar.mockReturnValue(true);
+    const result = gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer", [
+      "cGroup",
+    ]);
+    expect(mockGridTileMap.hasBlockingChar).toHaveBeenCalledWith(
+      new Vector2(3, 4),
+      "someLayer",
+      ["cGroup"]
+    );
+    expect(result).toBe(true);
+  });
+
+  it("should not block", () => {
+    mockGridTileMap.hasBlockingTile.mockReturnValue(false);
+    mockGridTileMap.hasBlockingChar.mockReturnValue(false);
+    const result = gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer", [
+      "cGroup",
+    ]);
+    expect(mockGridTileMap.hasBlockingChar).toHaveBeenCalledWith(
+      new Vector2(3, 4),
+      "someLayer",
       ["cGroup"]
     );
     expect(result).toBe(false);
   });
 
-  it("should delegate isBlocking with default cGroup", () => {
-    const result = gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer");
-    expect(mockGridTileMap.isBlocking).toHaveBeenCalledWith(
-      "someLayer",
+  it("should check blocking with default cGroup", () => {
+    gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer");
+    expect(mockGridTileMap.hasBlockingChar).toHaveBeenCalledWith(
       new Vector2(3, 4),
+      "someLayer",
       ["geDefault"]
     );
-    expect(result).toBe(false);
   });
 
   it("should delegate isTilemapBlocking", () => {
     const result = gridEngine.isTileBlocked({ x: 3, y: 4 }, "someLayer");
     expect(mockGridTileMap.hasBlockingTile).toHaveBeenCalledWith(
-      "someLayer",
-      new Vector2(3, 4)
+      new Vector2(3, 4),
+      "someLayer"
     );
     expect(result).toBe(false);
   });

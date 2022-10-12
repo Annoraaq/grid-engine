@@ -1,47 +1,73 @@
 import { CollisionStrategy } from "./../../Collisions/CollisionStrategy";
-import { NumberOfDirections } from "./../../Direction/Direction";
+import { Direction, NumberOfDirections } from "./../../Direction/Direction";
 import { GlobalConfig } from "./../../GlobalConfig/GlobalConfig";
-import { of, Subject } from "rxjs";
-import {
-  GridCharacter,
-  PositionChange,
-} from "../../GridCharacter/GridCharacter";
+import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache";
-import { GridEngineConfig, Position } from "../../GridEngine";
+import { GridEngineConfig } from "../../GridEngine";
 import { Concrete } from "../../Utils/TypeUtils";
+import { GridTilemap } from "../GridTilemap";
+import { createTilemapMock } from "../../Utils/MockFactory/MockFactory";
+import * as Phaser from "phaser";
+import { LayerPosition } from "../../Pathfinding/ShortestPathAlgorithm";
+
+// Hack to get Phaser included at runtime
+((_a) => {
+  // do nothing
+})(Phaser);
+
 describe("CharBlockCache", () => {
   let charBlockCache: CharBlockCache;
+  let gridTilemap: GridTilemap;
 
   beforeEach(() => {
+    gridTilemap = new GridTilemap(createTilemapMock() as any);
+    gridTilemap.setTransition(new Vector2(4, 3), "someLayer", "enterLayer");
     charBlockCache = new CharBlockCache();
   });
 
   it("should detect blocking char after adding", () => {
-    const char1Mock = <any>{
-      ...createCharMock("player1"),
-      getTilePos: () => ({ position: { x: 3, y: 3 }, layer: "someLayer" }),
-    };
+    const char = createChar("player1");
+    char.move(Direction.RIGHT);
+    char.update(1);
 
-    charBlockCache.addCharacter(char1Mock);
-    expect(
-      charBlockCache.isCharBlockingAt(new Vector2(3, 3), "someLayer", [
-        "cGroup1",
-      ])
-    ).toBe(true);
-    expect(
-      charBlockCache.isCharBlockingAt(new Vector2(3, 3), "otherLayer", [
-        "cGroup1",
-      ])
-    ).toBe(false);
-    expect(
-      charBlockCache.isCharBlockingAt(new Vector2(3, 3), "someLayer", [
-        "unknownCGroup",
-      ])
-    ).toBe(false);
-    expect(
-      charBlockCache.isCharBlockingAt(new Vector2(3, 3), "someLayer", [])
-    ).toBe(false);
+    charBlockCache.addCharacter(char);
+    const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
+      new Vector2(3, 3),
+      "someLayer",
+      ["cGroup1"]
+    );
+    const hasBlockingCharOnOldPosTileWidth = charBlockCache.isCharBlockingAt(
+      new Vector2(7, 4),
+      "someLayer",
+      ["cGroup1"]
+    );
+    const hasBlockingCharOnOldPosOtherLayer = charBlockCache.isCharBlockingAt(
+      new Vector2(3, 3),
+      "otherLayer",
+      ["cGroup1"]
+    );
+    const hasBlockingCharOnOldPosOtherCGroup = charBlockCache.isCharBlockingAt(
+      new Vector2(3, 3),
+      "someLayer",
+      ["unknownCGroup"]
+    );
+    const hasBlockingCharOnOldPosNoCGroup = charBlockCache.isCharBlockingAt(
+      new Vector2(3, 3),
+      "someLayer",
+      []
+    );
+    const hasBlockingCharOnNextPos = charBlockCache.isCharBlockingAt(
+      new Vector2(8, 4),
+      "enterLayer",
+      ["cGroup1"]
+    );
+    expect(hasBlockingCharOnOldPos).toBe(true);
+    expect(hasBlockingCharOnOldPosTileWidth).toBe(true);
+    expect(hasBlockingCharOnOldPosOtherLayer).toBe(false);
+    expect(hasBlockingCharOnOldPosOtherCGroup).toBe(false);
+    expect(hasBlockingCharOnOldPosNoCGroup).toBe(false);
+    expect(hasBlockingCharOnNextPos).toBe(true);
   });
 
   describe("blocking strategy BLOCK_TWO_TILES", () => {
@@ -53,99 +79,94 @@ describe("CharBlockCache", () => {
     });
 
     it("should block new and old pos on movement", () => {
-      const positionChangeStarted = new Subject<PositionChange>();
+      const char = createChar("player1");
+      charBlockCache.addCharacter(char);
+      char.move(Direction.RIGHT);
+      char.update(1);
 
-      const char1Mock = <any>{
-        ...createCharMock("player1"),
-        getTilePos: () => ({ position: { x: 3, y: 3 }, layer: "someLayer" }),
-        positionChangeStarted: () => positionChangeStarted,
+      const oldPos = { position: new Vector2(3, 3), layer: "someLayer" };
+      const oldPosTileWidth = {
+        position: new Vector2(
+          3 + char.getTileWidth() - 1,
+          3 + char.getTileHeight() - 1
+        ),
+        layer: "someLayer",
       };
-      charBlockCache.addCharacter(char1Mock);
-      positionChangeStarted.next({
-        enterTile: new Vector2(3, 4),
-        exitTile: new Vector2(3, 3),
-        enterLayer: "enterLayer",
-        exitLayer: "someLayer",
-      });
+      const nextPos = { position: new Vector2(4, 3), layer: "enterLayer" };
+      const nextPosTileWidth = {
+        position: new Vector2(
+          4 + char.getTileWidth() - 1,
+          3 + char.getTileHeight() - 1
+        ),
+        layer: "enterLayer",
+      };
 
-      const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
-        new Vector2(3, 3),
-        "someLayer",
-        ["cGroup1"]
-      );
-      const hasBlockingChar = charBlockCache.isCharBlockingAt(
-        new Vector2(3, 4),
-        "enterLayer",
-        ["cGroup1"]
-      );
-      expect(hasBlockingCharOnOldPos).toBe(true);
-      expect(hasBlockingChar).toBe(true);
+      expect(isCharBlockingAt(oldPos)).toBe(true);
+      expect(isCharBlockingAt(oldPosTileWidth)).toBe(true);
+      expect(isCharBlockingAt(nextPos)).toBe(true);
+      expect(isCharBlockingAt(nextPosTileWidth)).toBe(true);
     });
 
-    it("should unblock old pos", () => {
-      const positionChangeFinished = new Subject<PositionChange>();
+    it("should unblock old pos after movement finished", () => {
+      const char = createChar("player1");
+      charBlockCache.addCharacter(char);
+      char.move(Direction.RIGHT);
+      char.update(1000);
 
-      const char1Mock = <any>{
-        ...createCharMock("player1"),
-        getTilePos: () => ({ position: { x: 3, y: 3 }, layer: "someLayer" }),
-        positionChangeFinished: () => positionChangeFinished,
+      const oldPos = { position: new Vector2(3, 3), layer: "someLayer" };
+      const oldPosTileWidth = {
+        position: new Vector2(
+          3 + char.getTileWidth() - 1,
+          3 + char.getTileHeight() - 1
+        ),
+        layer: "someLayer",
       };
-      charBlockCache.addCharacter(char1Mock);
 
-      positionChangeFinished.next({
-        enterTile: new Vector2(3, 4),
-        exitTile: new Vector2(3, 3),
-        enterLayer: "enterLayer",
-        exitLayer: "someLayer",
-      });
-
-      const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
-        new Vector2(3, 3),
-        "someLayer",
-        ["cGroup1"]
-      );
-      expect(hasBlockingCharOnOldPos).toBe(false);
+      expect(isCharBlockingAt(oldPos)).toBe(false);
+      expect(isCharBlockingAt(oldPosTileWidth)).toBe(false);
     });
 
-    it("should unblock nextPos on pos change while moving", () => {
-      const positionChangeStarted = new Subject<PositionChange>();
-      const tilePosSet = new Subject<Position>();
-
-      const char1Mock = <any>{
-        ...createCharMock("player1"),
-        getTilePos: () => ({ position: { x: 3, y: 3 }, layer: "someLayer" }),
-        getNextTilePos: () => ({
-          position: { x: 3, y: 3 },
-          layer: "someLayer",
-        }),
-        positionChangeStarted: () => positionChangeStarted,
-        tilePositionSet: () => tilePosSet,
-      };
-      charBlockCache.addCharacter(char1Mock);
-
-      char1Mock.getNextTilePos = () => ({
-        position: { x: 3, y: 4 },
+    it("should unblock nextPos on tile pos change while moving", () => {
+      const char = createChar("player1");
+      charBlockCache.addCharacter(char);
+      char.move(Direction.RIGHT);
+      char.update(1);
+      char.setTilePosition({
+        position: new Vector2(6, 6),
         layer: "someLayer",
       });
 
-      positionChangeStarted.next({
-        enterTile: new Vector2(3, 4),
-        enterLayer: "someLayer",
-        exitTile: new Vector2(3, 3),
-        exitLayer: "someLayer",
-      });
+      const oldPos = { position: new Vector2(3, 3), layer: "someLayer" };
+      const oldPosTileWidth = {
+        position: new Vector2(
+          3 + char.getTileWidth() - 1,
+          3 + char.getTileHeight() - 1
+        ),
+        layer: "someLayer",
+      };
+      const newPos = { position: new Vector2(6, 6), layer: "someLayer" };
+      const newPosTileWidth = {
+        position: new Vector2(
+          6 + char.getTileWidth() - 1,
+          6 + char.getTileHeight() - 1
+        ),
+        layer: "someLayer",
+      };
+      const nextPos = { position: new Vector2(4, 3), layer: "enterLayer" };
+      const nextPosTileWidth = {
+        position: new Vector2(
+          4 + char.getTileWidth() - 1,
+          3 + char.getTileHeight() - 1
+        ),
+        layer: "enterLayer",
+      };
 
-      tilePosSet.next({
-        x: 6,
-        y: 6,
-      });
-
-      const hasBlockingCharOnNextPos = charBlockCache.isCharBlockingAt(
-        new Vector2(3, 4),
-        "someLayer",
-        ["cGroup1"]
-      );
-      expect(hasBlockingCharOnNextPos).toBe(false);
+      expect(isCharBlockingAt(oldPos)).toBe(false);
+      expect(isCharBlockingAt(oldPosTileWidth)).toBe(false);
+      expect(isCharBlockingAt(nextPos)).toBe(false);
+      expect(isCharBlockingAt(nextPosTileWidth)).toBe(false);
+      expect(isCharBlockingAt(newPos)).toBe(true);
+      expect(isCharBlockingAt(newPosTileWidth)).toBe(true);
     });
   });
 
@@ -158,228 +179,217 @@ describe("CharBlockCache", () => {
     });
 
     it("should block pos on movement and release old one", () => {
-      const positionChangeStarted = new Subject<PositionChange>();
+      const char = createChar("player1");
+      charBlockCache.addCharacter(char);
+      char.move(Direction.RIGHT);
+      char.update(1);
 
-      const char1Mock = <any>{
-        ...createCharMock("player1"),
-        getTilePos: () => ({ position: { x: 3, y: 3 }, layer: "someLayer" }),
-        positionChangeStarted: () => positionChangeStarted,
+      const oldPos = { position: new Vector2(3, 3), layer: "someLayer" };
+      const oldPosTileWidth = {
+        position: new Vector2(
+          3 + char.getTileWidth() - 1,
+          3 + char.getTileHeight() - 1
+        ),
+        layer: "someLayer",
       };
-      charBlockCache.addCharacter(char1Mock);
-      positionChangeStarted.next({
-        enterTile: new Vector2(3, 4),
-        exitTile: new Vector2(3, 3),
-        enterLayer: "enterLayer",
-        exitLayer: "someLayer",
-      });
+      const nextPos = { position: new Vector2(4, 3), layer: "enterLayer" };
+      const nextPosTileWidth = {
+        position: new Vector2(
+          4 + char.getTileWidth() - 1,
+          3 + char.getTileHeight() - 1
+        ),
+        layer: "enterLayer",
+      };
 
-      const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
-        new Vector2(3, 3),
-        "someLayer",
-        ["cGroup1"]
-      );
-      const hasBlockingChar = charBlockCache.isCharBlockingAt(
-        new Vector2(3, 4),
-        "enterLayer",
-        ["cGroup1"]
-      );
-      expect(hasBlockingCharOnOldPos).toBe(false);
-      expect(hasBlockingChar).toBe(true);
+      expect(isCharBlockingAt(oldPos)).toBe(false);
+      expect(isCharBlockingAt(oldPosTileWidth)).toBe(false);
+      expect(isCharBlockingAt(nextPos)).toBe(true);
+      expect(isCharBlockingAt(nextPosTileWidth)).toBe(true);
     });
   });
 
   it("should consider serveral chars for blocking after pos change", () => {
-    const positionChangeStarted = new Subject<PositionChange>();
-    const positionChangeFinished = new Subject<PositionChange>();
+    const char1 = createChar("player1");
+    const char2 = createChar("player2");
+    char2.setTilePosition({
+      position: new Vector2(3, 2),
+      layer: "someLayer",
+    });
+    charBlockCache.addCharacter(char1);
+    charBlockCache.addCharacter(char2);
 
-    const char1Mock = <any>{
-      ...createCharMock("player1"),
-      getTilePos: () => ({ position: { x: 3, y: 3 }, layer: "someLayer" }),
+    char2.move(Direction.RIGHT);
+    char2.update(1000);
+    char2.move(Direction.RIGHT);
+    char2.update(1000);
+
+    const oldPos = { position: new Vector2(3, 3), layer: "someLayer" };
+    const oldPosTileWidth = {
+      position: new Vector2(
+        3 + char1.getTileWidth() - 1,
+        3 + char1.getTileHeight() - 1
+      ),
+      layer: "someLayer",
     };
-    const char2Mock = <any>{
-      ...createCharMock("player2"),
-      getTilePos: () => ({ position: { x: 3, y: 2 }, layer: "someLayer" }),
-      positionChangeStarted: () => positionChangeStarted,
-      positionChangeFinished: () => positionChangeFinished,
-    };
 
-    charBlockCache.addCharacter(char1Mock);
-    charBlockCache.addCharacter(char2Mock);
-    positionChangeStarted.next({
-      enterTile: new Vector2(3, 3),
-      exitTile: new Vector2(3, 2),
-      enterLayer: "someLayer",
-      exitLayer: "someLayer",
-    });
-    positionChangeFinished.next({
-      enterTile: new Vector2(3, 3),
-      exitTile: new Vector2(3, 2),
-      enterLayer: "someLayer",
-      exitLayer: "someLayer",
-    });
-    positionChangeStarted.next({
-      enterTile: new Vector2(3, 4),
-      exitTile: new Vector2(3, 3),
-      enterLayer: "someLayer",
-      exitLayer: "someLayer",
-    });
-    positionChangeFinished.next({
-      enterTile: new Vector2(3, 4),
-      exitTile: new Vector2(3, 3),
-      enterLayer: "someLayer",
-      exitLayer: "someLayer",
-    });
-
-    expect(
-      charBlockCache.isCharBlockingAt(new Vector2(3, 3), "someLayer", [
-        "cGroup1",
-      ])
-    ).toBe(true);
+    expect(isCharBlockingAt(oldPos)).toBe(true);
+    expect(isCharBlockingAt(oldPosTileWidth)).toBe(true);
   });
 
   it("should consider several chars for blocking", () => {
-    const char1Mock = <any>{
-      ...createCharMock("player1"),
-      getTilePos: () => ({ position: { x: 3, y: 3 }, layer: "someLayer" }),
+    const char1 = createChar("player1");
+    const char2 = createChar("player2");
+    charBlockCache.addCharacter(char1);
+    charBlockCache.addCharacter(char2);
+
+    charBlockCache.removeCharacter(char2);
+
+    const oldPos = { position: new Vector2(3, 3), layer: "someLayer" };
+    const oldPosTileWidth = {
+      position: new Vector2(
+        3 + char1.getTileWidth() - 1,
+        3 + char1.getTileHeight() - 1
+      ),
+      layer: "someLayer",
     };
-    const char2Mock = <any>{
-      ...createCharMock("player2"),
-      getTilePos: () => ({ position: { x: 3, y: 3 }, layer: "someLayer" }),
-    };
 
-    charBlockCache.addCharacter(char1Mock);
-    charBlockCache.addCharacter(char2Mock);
-
-    charBlockCache.removeCharacter(char2Mock);
-
-    const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
-      new Vector2(3, 3),
-      "someLayer",
-      ["cGroup1"]
-    );
-    expect(hasBlockingCharOnOldPos).toBe(true);
+    expect(isCharBlockingAt(oldPos)).toBe(true);
+    expect(isCharBlockingAt(oldPosTileWidth)).toBe(true);
   });
 
   it("should find all characters", () => {
-    const charMock1 = <any>{
-      ...createCharMock("charMock1"),
-      getTilePos: () => ({ position: { x: 0, y: 1 }, layer: "someLayer" }),
-    };
-    const charMock2 = <any>{
-      ...createCharMock("charMock2"),
-      getTilePos: () => ({ position: { x: 0, y: 1 }, layer: "someLayer" }),
-    };
-    const charMockDifferentLayer = <any>{
-      ...createCharMock("charMockDifferentLayer"),
-      getTilePos: () => ({ position: { x: 0, y: 1 }, layer: "otherLayer" }),
-    };
+    const char1 = createChar("player1");
+    const char2 = createChar("player2");
+    const charDifferentLayer = createChar("charDifferentLayer");
+    charDifferentLayer.setTilePosition({
+      position: new Vector2(3, 3),
+      layer: "otherLayer",
+    });
+    charBlockCache.addCharacter(char1);
+    charBlockCache.addCharacter(char2);
+    charBlockCache.addCharacter(charDifferentLayer);
 
-    charBlockCache.addCharacter(charMock1);
-    charBlockCache.addCharacter(charMock2);
-    charBlockCache.addCharacter(charMockDifferentLayer);
     expect(
-      charBlockCache.getCharactersAt(new Vector2(0, 1), "someLayer")
-    ).toContain(charMock1);
+      charBlockCache.getCharactersAt(new Vector2(3, 3), "someLayer")
+    ).toContain(char1);
     expect(
-      charBlockCache.getCharactersAt(new Vector2(0, 1), "someLayer")
-    ).toContain(charMock2);
+      charBlockCache.getCharactersAt(new Vector2(3, 3), "someLayer")
+    ).toContain(char2);
     expect(
-      charBlockCache.getCharactersAt(new Vector2(0, 1), "otherLayer")
-    ).toContain(charMockDifferentLayer);
+      charBlockCache.getCharactersAt(new Vector2(3, 3), "otherLayer")
+    ).toContain(charDifferentLayer);
     expect(
-      charBlockCache.getCharactersAt(new Vector2(1, 1), "someLayer").size
+      charBlockCache.getCharactersAt(new Vector2(5, 5), "someLayer").size
     ).toBe(0);
   });
 
   it("should remove a character", () => {
-    const positionChangeStartedSub = { unsubscribe: jest.fn() };
-    const positionChangeStarted = {
-      subscribe: () => positionChangeStartedSub,
-    };
-    const positionChangeFinishedSub = { unsubscribe: jest.fn() };
-    const positionChangeFinished = {
-      subscribe: () => positionChangeFinishedSub,
-    };
-    const tilePosChangedSub = { unsubscribe: jest.fn() };
-    const tilePosSet = {
-      subscribe: () => tilePosChangedSub,
-    };
-    const charMock1 = <any>{
-      ...createCharMock("player"),
-      getTilePos: () => ({ position: { x: 0, y: 1 }, layer: "someLayer" }),
-      getNextTilePos: () => ({ position: { x: 1, y: 1 }, layer: "someLayer" }),
-      positionChangeStarted: () => positionChangeStarted,
-      positionChangeFinished: () => positionChangeFinished,
-      tilePositionSet: () => tilePosSet,
-    };
-    const charMock2 = <any>{
-      ...createCharMock("player2"),
-      getTilePos: () => ({ position: { x: 2, y: 2 }, layer: "someLayer" }),
-      getNextTilePos: () => ({ position: { x: 2, y: 2 }, layer: "someLayer" }),
-    };
-    charBlockCache.addCharacter(charMock1);
-    charBlockCache.addCharacter(charMock2);
-    charBlockCache.removeCharacter(charMock1);
+    const char1 = createChar("player1");
+    const char1Pos = { position: new Vector2(0, 1), layer: "someLayer" };
+    char1.setTilePosition(char1Pos);
+    char1.move(Direction.RIGHT);
+    char1.update(1);
+    const char2 = createChar("player2");
+    const char2Pos = { position: new Vector2(10, 2), layer: "someLayer" };
+    char2.setTilePosition(char2Pos);
 
-    expect(positionChangeStartedSub.unsubscribe).toHaveBeenCalled();
-    expect(positionChangeFinishedSub.unsubscribe).toHaveBeenCalled();
-    expect(tilePosChangedSub.unsubscribe).toHaveBeenCalled();
+    charBlockCache.addCharacter(char1);
+    charBlockCache.addCharacter(char2);
+    charBlockCache.removeCharacter(char1);
+
+    const char1PosTileWidth = {
+      position: new Vector2(
+        0 + char1.getTileWidth() - 1,
+        1 + char1.getTileHeight() - 1
+      ),
+      layer: "someLayer",
+    };
+    const char2PosTileWidth = {
+      position: new Vector2(
+        10 + char1.getTileWidth() - 1,
+        2 + char1.getTileHeight() - 1
+      ),
+      layer: "someLayer",
+    };
+
+    expect(isCharBlockingAt(char1Pos)).toBe(false);
+    expect(isCharBlockingAt(char1PosTileWidth)).toBe(false);
+    expect(isCharBlockingAt(char2Pos)).toBe(true);
+    expect(isCharBlockingAt(char2PosTileWidth)).toBe(true);
+  });
+
+  it("should unsubscribe from position change started of removed char", () => {
+    const char = createChar("player");
+    charBlockCache.addCharacter(char);
+    charBlockCache.removeCharacter(char);
+
+    char.move(Direction.RIGHT);
+    char.update(1);
+
     expect(
-      charBlockCache.isCharBlockingAt(new Vector2(0, 1), "someLayer", [
-        "cGroup1",
-      ])
-    ).toBe(false);
-    expect(
-      charBlockCache.isCharBlockingAt(new Vector2(1, 1), "someLayer", [
+      charBlockCache.isCharBlockingAt(new Vector2(4, 3), "enterLayer", [
         "cGroup1",
       ])
     ).toBe(false);
   });
 
-  it("should remove both positions of a walking char", () => {
-    const positionChangeStartedSub = { unsubscribe: jest.fn() };
-    const positionChangeStarted = {
-      subscribe: () => positionChangeStartedSub,
-    };
-    const positionChangeFinishedSub = { unsubscribe: jest.fn() };
-    const positionChangeFinished = {
-      subscribe: () => positionChangeFinishedSub,
-    };
-    const charMock1 = <any>{
-      ...createCharMock("player"),
-      getTilePos: () => ({ position: { x: 0, y: 1 }, layer: "someLayer" }),
-      getNextTilePos: () => ({ position: { x: 1, y: 1 }, layer: "someLayer" }),
-      positionChangeStarted: () => positionChangeStarted,
-      positionChangeFinished: () => positionChangeFinished,
-    };
-    charBlockCache.addCharacter(charMock1);
-    charBlockCache.removeCharacter(charMock1);
+  it("should unsibscribe from position change finished of removed char", () => {
+    const char = createChar("player");
+    char.move(Direction.RIGHT);
+    char.update(1);
+    charBlockCache.addCharacter(char);
+    charBlockCache.removeCharacter(char);
+    char.update(1000);
 
-    expect(positionChangeStartedSub.unsubscribe).toHaveBeenCalled();
-    expect(positionChangeFinishedSub.unsubscribe).toHaveBeenCalled();
     expect(
-      charBlockCache.isCharBlockingAt(new Vector2(0, 1), "someLayer", [
-        "cGroup1",
-      ])
-    ).toBe(false);
-    expect(
-      charBlockCache.isCharBlockingAt(new Vector2(1, 1), "someLayer", [
+      charBlockCache.isCharBlockingAt(new Vector2(4, 3), "enterLayer", [
         "cGroup1",
       ])
     ).toBe(false);
   });
 
-  function createCharMock(id = "player"): GridCharacter {
-    return <any>{
-      getId: () => id,
-      isBlockingTile: () => false,
-      getTilePos: () => ({ position: { x: 1, y: 1 }, layer: "someLayer" }),
-      getNextTilePos: () => ({ position: { x: 1, y: 1 }, layer: "someLayer" }),
-      positionChangeStarted: () => of([]),
-      positionChangeFinished: () => of([]),
-      tilePositionSet: () => of([]),
-      getCollisionGroups: () => ["cGroup1"],
+  it("should respect excluded chars", () => {
+    const char = createChar("player");
+    char.move(Direction.RIGHT);
+    char.update(1);
+
+    charBlockCache.addCharacter(char);
+    const oldPos = { position: new Vector2(3, 3), layer: "someLayer" };
+    const oldPosTileWidth = {
+      position: new Vector2(
+        3 + char.getTileWidth() - 1,
+        3 + char.getTileHeight() - 1
+      ),
+      layer: "someLayer",
     };
+    expect(isCharBlockingAt(oldPos, ["player"])).toBe(false);
+    expect(isCharBlockingAt(oldPosTileWidth, ["player"])).toBe(false);
+  });
+
+  function createChar(id = "player"): GridCharacter {
+    const char = new GridCharacter(id, {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: false,
+      numberOfDirections: NumberOfDirections.FOUR,
+      collisionGroups: ["cGroup1"],
+      tileWidth: 5,
+      tileHeight: 2,
+    });
+    char.setTilePosition({
+      position: new Vector2(3, 3),
+      layer: "someLayer",
+    });
+    return char;
+  }
+
+  function isCharBlockingAt(pos: LayerPosition, exclude?: string[]): boolean {
+    return charBlockCache.isCharBlockingAt(
+      pos.position,
+      pos.layer,
+      ["cGroup1"],
+      new Set(exclude)
+    );
   }
 
   function createMockConf(): Concrete<GridEngineConfig> {

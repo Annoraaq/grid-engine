@@ -399,12 +399,10 @@ describe("GridTilemap", () => {
     });
     gridTilemap = new GridTilemap(tilemapMock);
     const isBlockingTile = gridTilemap.hasBlockingTile(
-      undefined,
-      new Vector2(3, 4)
+      new Vector2(3, 4),
+      undefined
     );
-    const isBlocking = gridTilemap.isBlocking(undefined, new Vector2(3, 4), []);
     expect(isBlockingTile).toBe(true);
-    expect(isBlocking).toBe(true);
     expect(tilemapMock.getTileAt).toHaveBeenCalledWith(3, 4, false, "layer1");
     expect(tilemapMock.getTileAt).not.toHaveBeenCalledWith(
       3,
@@ -428,12 +426,10 @@ describe("GridTilemap", () => {
     }));
     gridTilemap = new GridTilemap(tilemapMock);
     const isBlockingTile = gridTilemap.hasBlockingTile(
-      undefined,
-      new Vector2(3, 4)
+      new Vector2(3, 4),
+      undefined
     );
-    const isBlocking = gridTilemap.isBlocking(undefined, new Vector2(3, 4), []);
     expect(isBlockingTile).toBe(true);
-    expect(isBlocking).toBe(true);
   });
 
   it("should detect one-way blocking tiles left", () => {
@@ -442,28 +438,24 @@ describe("GridTilemap", () => {
       properties: { ge_collide_left: true, ge_collide_right: false },
     });
     gridTilemap = new GridTilemap(tilemapMock);
-    const isBlockingLeft = gridTilemap.isBlocking(
-      undefined,
+    const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      [],
+      undefined,
       Direction.LEFT
     );
-    const isBlockingRight = gridTilemap.isBlocking(
-      undefined,
+    const isBlockingRight = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      [],
+      undefined,
       Direction.RIGHT
     );
-    const isBlockingUp = gridTilemap.isBlocking(
-      undefined,
+    const isBlockingUp = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      [],
+      undefined,
       Direction.UP
     );
-    const isBlockingDown = gridTilemap.isBlocking(
-      undefined,
+    const isBlockingDown = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      [],
+      undefined,
       Direction.DOWN
     );
     expect(isBlockingLeft).toBe(true);
@@ -478,28 +470,24 @@ describe("GridTilemap", () => {
       properties: { ge_collide_right: true },
     });
     gridTilemap = new GridTilemap(tilemapMock);
-    const isBlockingLeft = gridTilemap.isBlocking(
-      undefined,
+    const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      [],
+      undefined,
       Direction.LEFT
     );
-    const isBlockingRight = gridTilemap.isBlocking(
-      undefined,
+    const isBlockingRight = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      [],
+      undefined,
       Direction.RIGHT
     );
-    const isBlockingUp = gridTilemap.isBlocking(
-      undefined,
+    const isBlockingUp = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      [],
+      undefined,
       Direction.UP
     );
-    const isBlockingDown = gridTilemap.isBlocking(
-      undefined,
+    const isBlockingDown = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      [],
+      undefined,
       Direction.DOWN
     );
     expect(isBlockingLeft).toBe(false);
@@ -514,28 +502,24 @@ describe("GridTilemap", () => {
       properties: { ge_collide_up: true },
     });
     gridTilemap = new GridTilemap(tilemapMock);
-    const isBlockingLeft = gridTilemap.isBlocking(
-      undefined,
+    const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      [],
+      undefined,
       Direction.LEFT
     );
-    const isBlockingRight = gridTilemap.isBlocking(
-      undefined,
+    const isBlockingRight = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      [],
+      undefined,
       Direction.RIGHT
     );
-    const isBlockingUp = gridTilemap.isBlocking(
-      undefined,
+    const isBlockingUp = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      [],
+      undefined,
       Direction.UP
     );
-    const isBlockingDown = gridTilemap.isBlocking(
-      undefined,
+    const isBlockingDown = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      [],
+      undefined,
       Direction.DOWN
     );
     expect(isBlockingLeft).toBe(false);
@@ -550,28 +534,24 @@ describe("GridTilemap", () => {
       properties: { ge_collide_down: true },
     });
     gridTilemap = new GridTilemap(tilemapMock);
-    const isBlockingLeft = gridTilemap.isBlocking(
-      undefined,
+    const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      [],
+      undefined,
       Direction.LEFT
     );
-    const isBlockingRight = gridTilemap.isBlocking(
-      undefined,
+    const isBlockingRight = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      [],
+      undefined,
       Direction.RIGHT
     );
-    const isBlockingUp = gridTilemap.isBlocking(
-      undefined,
+    const isBlockingUp = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      [],
+      undefined,
       Direction.UP
     );
-    const isBlockingDown = gridTilemap.isBlocking(
-      undefined,
+    const isBlockingDown = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      [],
+      undefined,
       Direction.DOWN
     );
     expect(isBlockingLeft).toBe(false);
@@ -648,28 +628,16 @@ describe("GridTilemap", () => {
 
     gridTilemap = new GridTilemap(tilemapMock);
     const isBlockingTile = gridTilemap.hasBlockingTile(
-      "charLayer1",
-      new Vector2(3, 4)
-    );
-    const isBlocking = gridTilemap.isBlocking(
-      "charLayer1",
       new Vector2(3, 4),
-      []
+      "charLayer1"
     );
     expect(isBlockingTile).toBe(true);
-    expect(isBlocking).toBe(true);
 
     const isBlockingTileUpperLayer = gridTilemap.hasBlockingTile(
-      "charLayer2",
-      new Vector2(3, 4)
-    );
-    const isBlockingUpperLayer = gridTilemap.isBlocking(
-      "charLayer2",
       new Vector2(3, 4),
-      []
+      "charLayer2"
     );
     expect(isBlockingTileUpperLayer).toBe(false);
-    expect(isBlockingUpperLayer).toBe(false);
   });
 
   it("should return true if nothing blocks", () => {
@@ -677,12 +645,10 @@ describe("GridTilemap", () => {
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
     gridTilemap = new GridTilemap(tilemapMock);
     const isBlockingTile = gridTilemap.hasBlockingTile(
-      undefined,
-      new Vector2(3, 4)
+      new Vector2(3, 4),
+      undefined
     );
-    const isBlocking = gridTilemap.isBlocking(undefined, new Vector2(3, 4), []);
     expect(isBlockingTile).toBe(false);
-    expect(isBlocking).toBe(false);
     expect(tilemapMock.getTileAt).toHaveBeenCalledWith(3, 4, false, "layer1");
     expect(tilemapMock.getTileAt).toHaveBeenCalledWith(3, 4, false, "layer2");
   });
@@ -692,8 +658,8 @@ describe("GridTilemap", () => {
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
     gridTilemap = new GridTilemap(tilemapMock);
     const isBlocking = gridTilemap.hasBlockingTile(
-      undefined,
-      new Vector2(3, 4)
+      new Vector2(3, 4),
+      undefined
     );
     expect(isBlocking).toBe(true);
     expect(tilemapMock.getTileAt).not.toHaveBeenCalled();
@@ -704,9 +670,7 @@ describe("GridTilemap", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     gridTilemap = new GridTilemap(tilemapMock);
     const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
-    const isBlocking = gridTilemap.isBlocking(undefined, new Vector2(3, 4), []);
     expect(hasNoTile).toBe(true);
-    expect(isBlocking).toBe(true);
   });
 
   it("should block if no tile present on char layer", () => {
@@ -716,13 +680,7 @@ describe("GridTilemap", () => {
     });
     gridTilemap = new GridTilemap(tilemapMock);
     const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
-    const isBlocking = gridTilemap.isBlocking(
-      "charLayer1",
-      new Vector2(3, 4),
-      []
-    );
     expect(hasNoTile).toBe(true);
-    expect(isBlocking).toBe(true);
   });
 
   it("should not block if tile present on char layer", () => {
@@ -732,13 +690,7 @@ describe("GridTilemap", () => {
     });
     gridTilemap = new GridTilemap(tilemapMock);
     const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
-    const isBlocking = gridTilemap.isBlocking(
-      "charLayer1",
-      new Vector2(3, 4),
-      []
-    );
     expect(hasNoTile).toBe(false);
-    expect(isBlocking).toBe(false);
   });
 
   it("should detect blocking char", () => {
@@ -749,13 +701,11 @@ describe("GridTilemap", () => {
     expect(
       gridTilemap.hasBlockingChar(new Vector2(3, 3), undefined, ["cGroup"])
     ).toBe(true);
-    expect(
-      gridTilemap.isBlocking(undefined, new Vector2(3, 3), ["cGroup"])
-    ).toBe(true);
     expect(mockCharBlockCache.isCharBlockingAt).toHaveBeenCalledWith(
       new Vector2(3, 3),
       undefined,
-      ["cGroup"]
+      ["cGroup"],
+      new Set()
     );
   });
 
