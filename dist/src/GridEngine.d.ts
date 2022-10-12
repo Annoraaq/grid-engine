@@ -182,6 +182,20 @@ export interface CharacterData {
      * in the GridEngine configuration for specific characters.
      */
     numberOfDirections?: NumberOfDirections;
+    /**
+     * With of the character in tiles. This allows to specify character that span
+     * more than just one tile.
+     *
+     * @defaultValue 1
+     */
+    tileWidth?: number;
+    /**
+     * Height of the character in tiles. This allows to specify character that span
+     * more than just one tile.
+     *
+     * @defaultValue 1
+     */
+    tileHeight?: number;
 }
 /**
  * Result of a modification of the internal characters array

@@ -1,3 +1,4 @@
+import { Position } from "../GridEngine";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 export declare enum Direction {
     NONE = "none",
@@ -15,6 +16,7 @@ export declare function isDiagonal(direction: Direction): boolean;
 export declare function turnCounterClockwise(direction: Direction): Direction;
 export declare function directionVector(direction: Direction): Vector2;
 export declare function oppositeDirection(direction: Direction): Direction;
+export declare function directionFromPos(src: Position, dest: Position): Direction;
 export declare enum NumberOfDirections {
     FOUR = 4,
     EIGHT = 8

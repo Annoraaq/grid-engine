@@ -7,6 +7,7 @@ import { Position } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
+export declare type CharId = string;
 export declare type GameObject = Phaser.GameObjects.Container | Phaser.GameObjects.Sprite;
 export interface PositionChange {
     exitTile: Position;
@@ -23,6 +24,8 @@ export interface CharConfig {
     collisionGroups?: string[];
     facingDirection?: Direction;
     labels?: string[];
+    tileWidth?: number;
+    tileHeight?: number;
 }
 export declare class GridCharacter {
     private id;
@@ -46,6 +49,8 @@ export declare class GridCharacter {
     private movementProgress;
     private labels;
     private numberOfDirections;
+    private tileWidth;
+    private tileHeight;
     constructor(id: string, config: CharConfig);
     getId(): string;
     getSpeed(): number;
@@ -56,10 +61,14 @@ export declare class GridCharacter {
     setTilePosition(tilePosition: LayerPosition): void;
     getTilePos(): LayerPosition;
     getNextTilePos(): LayerPosition;
+    getTileWidth(): number;
+    getTileHeight(): number;
     move(direction: Direction): void;
     update(delta: number): void;
     getMovementDirection(): Direction;
     isBlockingDirection(direction: Direction): boolean;
+    isTileBlocking(direction: Direction, layerInDirection: LayerName): boolean;
+    private isCharBlocking;
     isMoving(): boolean;
     turnTowards(direction: Direction): void;
     getFacingDirection(): Direction;
@@ -94,4 +103,5 @@ export declare class GridCharacter {
     private shouldContinueMoving;
     private stopMoving;
     private fire;
+    private someCharTile;
 }

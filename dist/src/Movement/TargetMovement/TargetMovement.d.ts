@@ -133,4 +133,5 @@ export declare class TargetMovement implements Movement {
     private isBlocking;
     private getShortestPath;
     private getDir;
+    private hasBlockingTileForChar;
 }

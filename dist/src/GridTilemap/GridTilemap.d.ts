@@ -18,13 +18,12 @@ export declare class GridTilemap {
     removeCharacter(charId: string): void;
     getCharacters(): GridCharacter[];
     getCharactersAt(position: Vector2, layer: string): Set<GridCharacter>;
-    isBlocking(charLayer: string | undefined, pos: Vector2, collisionGroups: string[], direction?: Direction): boolean;
-    hasBlockingTile(charLayer: string | undefined, pos: Vector2, direction?: Direction): boolean;
+    hasBlockingTile(pos: Vector2, charLayer: string | undefined, direction?: Direction): boolean;
     getTransition(pos: Vector2, fromLayer?: string): string | undefined;
     setTransition(pos: Vector2, fromLayer: LayerName, toLayer: LayerName): void;
     getTransitions(): Map<LayerName, Map<LayerName, LayerName>>;
     hasNoTile(pos: Vector2, charLayer?: string): boolean;
-    hasBlockingChar(pos: Vector2, layer: string | undefined, collisionGroups: string[]): boolean;
+    hasBlockingChar(pos: Vector2, layer: string | undefined, collisionGroups: string[], exclude?: Set<string>): boolean;
     getTileWidth(): number;
     getTileHeight(): number;
     getDepthOfCharLayer(layerName: LayerName): number;
