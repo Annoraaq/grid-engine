@@ -28,6 +28,8 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
 
 ➡️ You can try/download [a list of examples](https://annoraaq.github.io/grid-engine/examples/).
 
+👾 Join our [discord](https://discord.gg/PEg2Y3qD).
+
 🛠 Also check out the [Chrome DevTools plugin](https://github.com/zewa666/grid-engine-devtools).
 
 <p align="center">
