@@ -122,6 +122,7 @@ export interface Options {
   distance?: number;
   config?: MoveToConfig;
   ignoreBlockedTarget?: boolean;
+  shortestPathAlgorithm?: ShortestPathAlgorithm;
 }
 
 export class TargetMovement implements Movement {
@@ -140,15 +141,22 @@ export class TargetMovement implements Movement {
   private ignoreBlockedTarget: boolean;
   private distance: number;
   private isPositionAllowed: IsPositionAllowedFn = () => true;
+  private shortestPathAlgorithm: ShortestPathAlgorithm;
 
   constructor(
     private character: GridCharacter,
     private tilemap: GridTilemap,
     private targetPos: LayerPosition,
-    { config, ignoreBlockedTarget = false, distance = 0 }: Options = {}
+    {
+      config,
+      ignoreBlockedTarget = false,
+      distance = 0,
+      shortestPathAlgorithm = new BidirectionalSearch(),
+    }: Options = {}
   ) {
     this.ignoreBlockedTarget = ignoreBlockedTarget;
     this.distance = distance;
+    this.shortestPathAlgorithm = shortestPathAlgorithm;
     this.noPathFoundStrategy =
       config?.noPathFoundStrategy || NoPathFoundStrategy.STOP;
     this.pathBlockedStrategy =
@@ -416,9 +424,8 @@ export class TargetMovement implements Movement {
   };
 
   private getShortestPath(): ShortestPath {
-    const shortestPathAlgo: ShortestPathAlgorithm = new BidirectionalSearch();
     const { path: shortestPath, closestToTarget } =
-      shortestPathAlgo.getShortestPath(
+      this.shortestPathAlgorithm.getShortestPath(
         this.character.getNextTilePos(),
         this.targetPos,
         this.getNeighbors
@@ -430,11 +437,12 @@ export class TargetMovement implements Movement {
       noPathFound &&
       this.noPathFoundStrategy === NoPathFoundStrategy.CLOSEST_REACHABLE
     ) {
-      const shortestPathToClosestPoint = shortestPathAlgo.getShortestPath(
-        this.character.getNextTilePos(),
-        closestToTarget,
-        this.getNeighbors
-      ).path;
+      const shortestPathToClosestPoint =
+        this.shortestPathAlgorithm.getShortestPath(
+          this.character.getNextTilePos(),
+          closestToTarget,
+          this.getNeighbors
+        ).path;
       const distOffset = this.distanceUtils.distance(
         closestToTarget.position,
         this.targetPos.position
