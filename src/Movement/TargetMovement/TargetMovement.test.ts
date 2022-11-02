@@ -11,6 +11,8 @@ import * as Phaser from "phaser";
 import {
   createBlankLayerMock,
   createTilemapMock,
+  mockBlockMap,
+  layerPos,
 } from "../../Utils/MockFactory/MockFactory";
 import { BidirectionalSearch } from "../../Pathfinding/BidirectionalSearch/BidirectionalSearch";
 
@@ -40,19 +42,6 @@ describe("TargetMovement", () => {
     const mockChar = new GridCharacter(id, charConfig);
     mockChar.setTilePosition(pos);
     return mockChar;
-  }
-  function layerPos(vec: Vector2): LayerPosition {
-    return {
-      position: vec,
-      layer: "lowerCharLayer",
-    };
-  }
-  function mockBlockMap(blockMap: string[]) {
-    tilemapMock.hasTileAt.mockImplementation((x, y, _layerName) => {
-      if (x < 0 || x >= blockMap[0].length) return false;
-      if (y < 0 || y >= blockMap.length) return false;
-      return blockMap[y][x] != "#";
-    });
   }
 
   beforeEach(() => {
@@ -190,7 +179,7 @@ describe("TargetMovement", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p..",
       "....",
       "####",
@@ -222,7 +211,7 @@ describe("TargetMovement", () => {
     const mockChar = createMockChar("char", charPos);
 
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p..",
       "....",
       "####",
@@ -246,7 +235,7 @@ describe("TargetMovement", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p..",
       "....",
       "....",
@@ -274,7 +263,7 @@ describe("TargetMovement", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p..",
       "....",
       "####",
@@ -304,7 +293,7 @@ describe("TargetMovement", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p..",
       "....",
       "....",
@@ -337,7 +326,7 @@ describe("TargetMovement", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p..",
       "....",
       "####",
@@ -361,7 +350,7 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const mockChar = createMockChar("char", charPos);
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "####",
@@ -385,7 +374,7 @@ describe("TargetMovement", () => {
       expect(mockChar.getTilePos()).toEqual(charPos);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "#.##",
@@ -407,7 +396,7 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const mockChar = createMockChar("char", charPos);
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "####",
@@ -432,7 +421,7 @@ describe("TargetMovement", () => {
       expect(mockChar.isMoving()).toBe(false);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "#.##",
@@ -453,7 +442,7 @@ describe("TargetMovement", () => {
       const mockChar = createMockChar("char", charPos);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "####",
@@ -488,7 +477,7 @@ describe("TargetMovement", () => {
       mockChar.update(1);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "#.##",
@@ -513,7 +502,7 @@ describe("TargetMovement", () => {
       const mockChar = createMockChar("char", charPos);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "####",
@@ -542,7 +531,7 @@ describe("TargetMovement", () => {
       mockChar.update(1);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "#.##",
@@ -580,7 +569,7 @@ describe("TargetMovement", () => {
       mockChar.update(1);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "#.##",
@@ -600,7 +589,7 @@ describe("TargetMovement", () => {
       const mockChar = createMockChar("char", charPos);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "####",
@@ -629,7 +618,7 @@ describe("TargetMovement", () => {
       expect(mockChar.isMoving()).toBe(false);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "#.##",
@@ -723,7 +712,7 @@ describe("TargetMovement", () => {
       throw "TargetPos needs to be (1,2)";
     }
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p..",
       "####",
       ".t..",
@@ -738,7 +727,7 @@ describe("TargetMovement", () => {
       throw "TargetPos needs to be (1,2)";
     }
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p..",
       "#.##",
       ".t..",
@@ -822,7 +811,7 @@ describe("TargetMovement", () => {
       const mockChar = createMockChar("char", charPos);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "#.##",
@@ -836,7 +825,7 @@ describe("TargetMovement", () => {
       });
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         "....",
         ".p..",
         "####",
@@ -852,7 +841,7 @@ describe("TargetMovement", () => {
 
       expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         "....",
         ".p..",
         "##.#",
@@ -883,7 +872,7 @@ describe("TargetMovement", () => {
 
       expect(mockChar.isMoving()).toBe(false);
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "##.#",
         ".t..",
@@ -915,7 +904,7 @@ describe("TargetMovement", () => {
       mockChar.update(100);
       expect(mockChar.isMoving()).toBe(false);
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "##.#",
         ".t..",
@@ -1015,7 +1004,7 @@ describe("TargetMovement", () => {
       tileHeight: 2,
     });
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".pp.",
       ".pp.",
       ".t..",
@@ -1062,7 +1051,7 @@ describe("TargetMovement", () => {
     mockChar.setTilePosition(charPos);
 
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       "....",
       ".pp.",
       ".pp#",
@@ -1091,7 +1080,7 @@ describe("TargetMovement", () => {
     });
 
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p",
       ".#",
     ]);
@@ -1320,7 +1309,7 @@ describe("TargetMovement", () => {
       });
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "####",
@@ -1429,7 +1418,7 @@ describe("TargetMovement", () => {
 
     it("should get no neighbors for completely blocked chars", () => {
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         "..#.",
         ".pp.",
         "#pp#",

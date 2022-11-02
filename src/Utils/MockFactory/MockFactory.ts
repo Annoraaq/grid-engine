@@ -1,3 +1,9 @@
+import { LayerPosition } from "../../Pathfinding/ShortestPathAlgorithm";
+import { Vector2 } from "../Vector2/Vector2";
+
+const LOWER_CHAR_LAYER = "lowerCharLayer";
+const HIGHER_CHAR_LAYER = "testCharLayer";
+
 export function createSpriteMock() {
   return {
     x: 10,
@@ -45,7 +51,7 @@ export function createTilemapMock(blankLayerMock?) {
         properties: [
           {
             name: "ge_charLayer",
-            value: "lowerCharLayer",
+            value: LOWER_CHAR_LAYER,
           },
         ],
       },
@@ -59,7 +65,7 @@ export function createTilemapMock(blankLayerMock?) {
         properties: [
           {
             name: "ge_charLayer",
-            value: "testCharLayer",
+            value: HIGHER_CHAR_LAYER,
           },
         ],
       },
@@ -72,4 +78,74 @@ export function createTilemapMock(blankLayerMock?) {
     hasTileAt: jest.fn().mockReturnValue(true),
     createBlankLayer: jest.fn().mockReturnValue(blankLayerMock),
   };
+}
+
+export function layerPos(vec: Vector2, layer?: string): LayerPosition {
+  return {
+    position: vec,
+    layer: layer ?? LOWER_CHAR_LAYER,
+  };
+}
+
+export function mockBlockMap(
+  tilemapMock: any, // TODO: replace when we have a Tilemap interface
+  blockMap: string[]
+) {
+  tilemapMock.hasTileAt.mockImplementation((x, y, _layerName) => {
+    if (x < 0 || x >= blockMap[0].length) return false;
+    if (y < 0 || y >= blockMap.length) return false;
+    return blockMap[y][x] != "#";
+  });
+
+  tilemapMock.getTileAt.mockImplementation((x, y, _layerName) => {
+    if (x < 0 || x >= blockMap[0].length) return undefined;
+    if (y < 0 || y >= blockMap.length) return undefined;
+    switch (blockMap[y][x]) {
+      case "→":
+        return {
+          properties: {
+            ge_collide_up: true,
+            ge_collide_right: true,
+            ge_collide_down: true,
+          },
+        };
+      case "←":
+        return {
+          properties: {
+            ge_collide_up: true,
+            ge_collide_down: true,
+            ge_collide_left: true,
+          },
+        };
+      case "↑":
+        return {
+          properties: {
+            ge_collide_up: true,
+            ge_collide_right: true,
+            ge_collide_left: true,
+          },
+        };
+      case "↓":
+        return {
+          properties: {
+            ge_collide_right: true,
+            ge_collide_down: true,
+            ge_collide_left: true,
+          },
+        };
+    }
+    return {};
+  });
+}
+export function mockLayeredMap(
+  tilemapMock: any, // TODO: replace when we have a Tilemap interface
+  blockMap: Map<string, string[]>
+) {
+  tilemapMock.hasTileAt.mockImplementation((x, y, layerName) => {
+    const layer = blockMap.get(layerName);
+    if (!layer) return false;
+    if (x < 0 || x >= layer[0].length) return false;
+    if (y < 0 || y >= layer.length) return false;
+    return layer[y][x] != "#";
+  });
 }
