@@ -22,6 +22,7 @@ import { ShortestPathAlgorithm } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Position } from "../../GridEngine";
 import { filter, Subject, take } from "rxjs";
 import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils";
+import { IsPositionAllowedFn } from "../../Pathfinding/Pathfinding";
 
 export interface MoveToConfig {
   /**
@@ -95,11 +96,6 @@ export interface MoveToConfig {
    */
   isPositionAllowedFn?: IsPositionAllowedFn;
 }
-
-export type IsPositionAllowedFn = (
-  pos: Position,
-  charLayer?: string
-) => boolean;
 
 export enum MoveToResult {
   SUCCESS = "SUCCESS",

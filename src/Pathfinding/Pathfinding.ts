@@ -3,6 +3,7 @@ import {
   NumberOfDirections,
   oppositeDirection,
 } from "../Direction/Direction";
+import { Position } from "../GridEngine";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { DistanceUtilsFactory } from "../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
 import { Vector2 } from "../Utils/Vector2/Vector2";
@@ -18,7 +19,13 @@ interface PathfindingOptions {
   pathWidth?: number;
   pathHeight?: number;
   numberOfDirections?: NumberOfDirections;
+  isPositionAllowed?: IsPositionAllowedFn;
 }
+
+export type IsPositionAllowedFn = (
+  pos: Position,
+  charLayer?: string
+) => boolean;
 
 export class Pathfinding {
   // TODO: replace by enum
@@ -34,13 +41,16 @@ export class Pathfinding {
       shortestPathAlgorithm,
       pathWidth = 1,
       pathHeight = 1,
-    }: // numberOfDirections = NumberOfDirections.FOUR,
-    PathfindingOptions = {}
+      numberOfDirections,
+      isPositionAllowed = (_pos, _charLayer) => true,
+    }: PathfindingOptions = {}
   ): ShortestPath {
     if (!shortestPathAlgorithm) {
       shortestPathAlgorithm = this.shortestPathAlgo;
     }
-    const distanceUtils = DistanceUtilsFactory.create(NumberOfDirections.FOUR);
+    const distanceUtils = DistanceUtilsFactory.create(
+      numberOfDirections ?? NumberOfDirections.FOUR
+    );
 
     const getNeighbors: GetNeighbors = (pos: LayerPosition) => {
       const neighbours = distanceUtils.neighbors(pos.position);
@@ -57,6 +67,7 @@ export class Pathfinding {
 
       return transitionMappedNeighbors.filter(
         (neighborPos) =>
+          isPositionAllowed(neighborPos.position, neighborPos.layer) &&
           !this.isBlockingFrom(pos, neighborPos, pathWidth, pathHeight)
       );
     };
