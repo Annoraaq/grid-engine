@@ -1,8 +1,12 @@
+import { GridCharacter } from "../../GridCharacter/GridCharacter";
+import { NumberOfDirections } from "../../GridEngine";
+import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { LayerPosition } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Vector2 } from "../Vector2/Vector2";
 
-const LOWER_CHAR_LAYER = "lowerCharLayer";
-const HIGHER_CHAR_LAYER = "testCharLayer";
+export const LOWER_CHAR_LAYER = "lowerCharLayer";
+export const HIGHER_CHAR_LAYER = "testCharLayer";
+export const COLLISION_GROUP = "testCollisionGroup";
 
 export function createSpriteMock() {
   return {
@@ -85,6 +89,35 @@ export function layerPos(vec: Vector2, layer?: string): LayerPosition {
     position: vec,
     layer: layer ?? LOWER_CHAR_LAYER,
   };
+}
+
+export function mockCharMap(
+  tilemapMock: any, // TODO: replace when we have a Tilemap interface
+  gridTilemap: GridTilemap,
+  blockMap: string[]
+) {
+  let charCounter = 0;
+  for (let row = 0; row < blockMap.length; row++) {
+    for (let col = 0; col < blockMap[row].length; col++) {
+      if (blockMap[row][col] === "c") {
+        const gridCharacter = new GridCharacter(`mock_char_${charCounter}`, {
+          tilemap: gridTilemap,
+          speed: 3,
+          collidesWithTiles: true,
+          numberOfDirections: NumberOfDirections.FOUR,
+          collisionGroups: [COLLISION_GROUP],
+        });
+        gridCharacter.setTilePosition({
+          position: new Vector2(col, row),
+          layer: LOWER_CHAR_LAYER,
+        });
+        gridTilemap.addCharacter(gridCharacter);
+        charCounter++;
+      }
+    }
+  }
+
+  mockBlockMap(tilemapMock, blockMap);
 }
 
 export function mockBlockMap(

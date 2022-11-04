@@ -9,6 +9,8 @@ import {
   createBlankLayerMock,
   createTilemapMock,
   mockBlockMap,
+  mockCharMap,
+  COLLISION_GROUP,
   mockLayeredMap,
   layerPos,
 } from "../Utils/MockFactory/MockFactory";
@@ -276,5 +278,111 @@ describe("Pathfinding", () => {
       layerPos(new Vector2(2, 2)),
       layerPos(new Vector2(1, 2)),
     ]);
+  });
+
+  it("should consider blocking chars", () => {
+    const pathfinding = new Pathfinding(pathfindingAlgo, gridTilemap);
+
+    // prettier-ignore
+    mockCharMap(tilemapMock, gridTilemap, [
+      ".s..",
+      "ccc.",
+      ".t..",
+    ]);
+
+    const shortestPath = pathfinding.findShortestPath(
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(1, 2)),
+      {
+        collisionGroups: [COLLISION_GROUP],
+      }
+    );
+
+    expect(shortestPath.path).toEqual([
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(2, 0)),
+      layerPos(new Vector2(3, 0)),
+      layerPos(new Vector2(3, 1)),
+      layerPos(new Vector2(3, 2)),
+      layerPos(new Vector2(2, 2)),
+      layerPos(new Vector2(1, 2)),
+    ]);
+  });
+
+  it("should not consider blocking chars when no collision group is given", () => {
+    const pathfinding = new Pathfinding(pathfindingAlgo, gridTilemap);
+
+    // prettier-ignore
+    mockCharMap(tilemapMock, gridTilemap, [
+      ".s..",
+      "ccc.",
+      ".t..",
+    ]);
+
+    const shortestPath = pathfinding.findShortestPath(
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(1, 2))
+    );
+
+    expect(shortestPath.path).toEqual([
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(1, 1)),
+      layerPos(new Vector2(1, 2)),
+    ]);
+  });
+
+  it("should not consider blocking chars of different collision groups", () => {
+    const pathfinding = new Pathfinding(pathfindingAlgo, gridTilemap);
+
+    // prettier-ignore
+    mockCharMap(tilemapMock, gridTilemap, [
+      ".s..",
+      "ccc.",
+      ".t..",
+    ]);
+
+    const shortestPath = pathfinding.findShortestPath(
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(1, 2)),
+      {
+        collisionGroups: ["someOtherCollisionGroup"],
+      }
+    );
+
+    expect(shortestPath.path).toEqual([
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(1, 1)),
+      layerPos(new Vector2(1, 2)),
+    ]);
+  });
+
+  it("should not consider chars in ignoreList", () => {
+    const pathfinding = new Pathfinding(pathfindingAlgo, gridTilemap);
+
+    // prettier-ignore
+    mockCharMap(tilemapMock, gridTilemap, [
+      ".s..",
+      "ccc.",
+      ".t..",
+    ]);
+
+    const shortestPath = pathfinding.findShortestPath(
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(1, 2)),
+      {
+        collisionGroups: [COLLISION_GROUP],
+        ignoredChars: ["mock_char_1"],
+      }
+    );
+
+    expect(shortestPath.path).toEqual([
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(1, 1)),
+      layerPos(new Vector2(1, 2)),
+    ]);
+  });
+
+  it("should ignore tiles", () => {
+    // TODO
   });
 });

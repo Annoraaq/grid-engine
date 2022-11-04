@@ -3,6 +3,7 @@ import {
   NumberOfDirections,
   oppositeDirection,
 } from "../Direction/Direction";
+import { CharId } from "../GridCharacter/GridCharacter";
 import { Position } from "../GridEngine";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { DistanceUtilsFactory } from "../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
@@ -20,6 +21,8 @@ interface PathfindingOptions {
   pathHeight?: number;
   numberOfDirections?: NumberOfDirections;
   isPositionAllowed?: IsPositionAllowedFn;
+  collisionGroups?: string[];
+  ignoredChars?: CharId[];
 }
 
 export type IsPositionAllowedFn = (
@@ -43,6 +46,8 @@ export class Pathfinding {
       pathHeight = 1,
       numberOfDirections,
       isPositionAllowed = (_pos, _charLayer) => true,
+      collisionGroups = [],
+      ignoredChars = [],
     }: PathfindingOptions = {}
   ): ShortestPath {
     if (!shortestPathAlgorithm) {
@@ -68,7 +73,13 @@ export class Pathfinding {
       return transitionMappedNeighbors.filter(
         (neighborPos) =>
           isPositionAllowed(neighborPos.position, neighborPos.layer) &&
-          !this.isBlockingFrom(pos, neighborPos, pathWidth, pathHeight)
+          !this.isBlockingFrom(pos, neighborPos, pathWidth, pathHeight) &&
+          !this.gridTilemap.hasBlockingChar(
+            neighborPos.position,
+            neighborPos.layer,
+            collisionGroups,
+            new Set(ignoredChars)
+          )
       );
     };
 
