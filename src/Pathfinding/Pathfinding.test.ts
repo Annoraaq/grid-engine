@@ -383,6 +383,38 @@ describe("Pathfinding", () => {
   });
 
   it("should ignore tiles", () => {
-    // TODO
+    const pathfinding = new Pathfinding(pathfindingAlgo, gridTilemap);
+    // prettier-ignore
+    mockBlockMap(tilemapMock, [
+      ".s..",
+      "###.",
+      ".t..",
+    ]);
+
+    const shortestPath = pathfinding.findShortestPath(
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(1, 2)),
+      { ignoreTiles: true }
+    );
+
+    expect(shortestPath.path.length).toEqual(3);
+  });
+
+  it("should ignore map bounds", () => {
+    const pathfinding = new Pathfinding(pathfindingAlgo, gridTilemap);
+    // prettier-ignore
+    mockBlockMap(tilemapMock, [
+      ".s..",
+      "####",
+      ".t..",
+    ]);
+
+    const shortestPath = pathfinding.findShortestPath(
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(1, 2)),
+      { ignoreMapBounds: true }
+    );
+
+    expect(shortestPath.path.length).toEqual(7);
   });
 });

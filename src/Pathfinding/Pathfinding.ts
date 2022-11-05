@@ -23,6 +23,8 @@ interface PathfindingOptions {
   isPositionAllowed?: IsPositionAllowedFn;
   collisionGroups?: string[];
   ignoredChars?: CharId[];
+  ignoreTiles?: boolean;
+  ignoreMapBounds?: boolean;
 }
 
 export type IsPositionAllowedFn = (
@@ -48,6 +50,8 @@ export class Pathfinding {
       isPositionAllowed = (_pos, _charLayer) => true,
       collisionGroups = [],
       ignoredChars = [],
+      ignoreTiles = false,
+      ignoreMapBounds = false,
     }: PathfindingOptions = {}
   ): ShortestPath {
     if (!shortestPathAlgorithm) {
@@ -70,17 +74,32 @@ export class Pathfinding {
         };
       });
 
-      return transitionMappedNeighbors.filter(
-        (neighborPos) =>
-          isPositionAllowed(neighborPos.position, neighborPos.layer) &&
-          !this.isBlockingFrom(pos, neighborPos, pathWidth, pathHeight) &&
-          !this.gridTilemap.hasBlockingChar(
-            neighborPos.position,
-            neighborPos.layer,
-            collisionGroups,
-            new Set(ignoredChars)
-          )
-      );
+      return transitionMappedNeighbors.filter((neighborPos) => {
+        const positionAllowed = isPositionAllowed(
+          neighborPos.position,
+          neighborPos.layer
+        );
+        const tileBlocking =
+          !ignoreTiles &&
+          this.hasBlockingTileFrom(
+            pos,
+            neighborPos,
+            pathWidth,
+            pathHeight,
+            ignoreMapBounds
+          );
+        const inRange =
+          ignoreMapBounds || this.gridTilemap.isInRange(neighborPos.position);
+
+        const charBlocking = this.gridTilemap.hasBlockingChar(
+          neighborPos.position,
+          neighborPos.layer,
+          collisionGroups,
+          new Set(ignoredChars)
+        );
+
+        return positionAllowed && !tileBlocking && inRange && !charBlocking;
+      });
     };
 
     const { path: shortestPath } = shortestPathAlgorithm.getShortestPath(
@@ -94,29 +113,20 @@ export class Pathfinding {
     };
   }
 
-  private isBlockingFrom = (
-    srcPos: LayerPosition,
-    destPos: LayerPosition,
-    pathWidth: number,
-    pathHeight: number
-  ): boolean => {
-    if (!this.gridTilemap.isInRange(destPos.position)) return true;
-
-    return this.hasBlockingTileFrom(srcPos, destPos, pathWidth, pathHeight);
-  };
-
   private hasBlockingTileFrom(
     src: LayerPosition,
     dest: LayerPosition,
     pathWidth: number,
-    pathHeight: number
+    pathHeight: number,
+    ignoreMapBounds: boolean
   ): boolean {
     for (let x = dest.position.x; x < dest.position.x + pathWidth; x++) {
       for (let y = dest.position.y; y < dest.position.y + pathHeight; y++) {
         const res = this.gridTilemap.hasBlockingTile(
           new Vector2(x, y),
           dest.layer,
-          oppositeDirection(directionFromPos(src.position, dest.position))
+          oppositeDirection(directionFromPos(src.position, dest.position)),
+          ignoreMapBounds
         );
 
         if (res) return true;

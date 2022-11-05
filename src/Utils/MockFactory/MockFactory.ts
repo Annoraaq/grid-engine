@@ -127,13 +127,19 @@ export function mockBlockMap(
   tilemapMock.hasTileAt.mockImplementation((x, y, _layerName) => {
     if (x < 0 || x >= blockMap[0].length) return false;
     if (y < 0 || y >= blockMap.length) return false;
-    return blockMap[y][x] != "#";
+    return true;
   });
 
   tilemapMock.getTileAt.mockImplementation((x, y, _layerName) => {
     if (x < 0 || x >= blockMap[0].length) return undefined;
     if (y < 0 || y >= blockMap.length) return undefined;
     switch (blockMap[y][x]) {
+      case "#":
+        return {
+          properties: {
+            ge_collides: true,
+          },
+        };
       case "→":
         return {
           properties: {
