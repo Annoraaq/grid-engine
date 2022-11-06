@@ -7,11 +7,11 @@ import { CharId } from "../GridCharacter/GridCharacter";
 import { Position } from "../GridEngine";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { DistanceUtilsFactory } from "../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
+import { LayerPositionUtils } from "../Utils/LayerPositionUtils/LayerPositionUtils";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import {
   GetNeighbors,
   LayerPosition,
-  ShortestPath,
   ShortestPathAlgorithm,
 } from "./ShortestPathAlgorithm";
 
@@ -25,6 +25,7 @@ interface PathfindingOptions {
   ignoredChars?: CharId[];
   ignoreTiles?: boolean;
   ignoreMapBounds?: boolean;
+  ignoreBlockedTarget?: boolean;
 }
 
 export type IsPositionAllowedFn = (
@@ -52,11 +53,13 @@ export class Pathfinding {
       ignoredChars = [],
       ignoreTiles = false,
       ignoreMapBounds = false,
+      ignoreBlockedTarget = false,
     }: PathfindingOptions = {}
-  ): ShortestPath {
+  ): { path: LayerPosition[]; closestToTarget: LayerPosition } {
     if (!shortestPathAlgorithm) {
       shortestPathAlgorithm = this.shortestPathAlgo;
     }
+    console.log("numofdirs:", numberOfDirections);
     const distanceUtils = DistanceUtilsFactory.create(
       numberOfDirections ?? NumberOfDirections.FOUR
     );
@@ -98,19 +101,17 @@ export class Pathfinding {
           new Set(ignoredChars)
         );
 
-        return positionAllowed && !tileBlocking && inRange && !charBlocking;
+        const isBlocking =
+          positionAllowed && !tileBlocking && inRange && !charBlocking;
+
+        return (
+          isBlocking ||
+          (ignoreBlockedTarget && LayerPositionUtils.equal(neighborPos, dest))
+        );
       });
     };
 
-    const { path: shortestPath } = shortestPathAlgorithm.getShortestPath(
-      source,
-      dest,
-      getNeighbors
-    );
-    return {
-      path: shortestPath,
-      distOffset: 0,
-    };
+    return shortestPathAlgorithm.getShortestPath(source, dest, getNeighbors);
   }
 
   private hasBlockingTileFrom(

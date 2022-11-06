@@ -417,4 +417,22 @@ describe("Pathfinding", () => {
 
     expect(shortestPath.path.length).toEqual(7);
   });
+
+  it("should ignore blocked target", () => {
+    const pathfinding = new Pathfinding(pathfindingAlgo, gridTilemap);
+    // prettier-ignore
+    mockBlockMap(tilemapMock, [
+      ".s..",
+      "....",
+      ".#..",
+    ]);
+
+    const shortestPath = pathfinding.findShortestPath(
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(1, 2)),
+      { ignoreBlockedTarget: true }
+    );
+
+    expect(shortestPath.path.length).toEqual(3);
+  });
 });

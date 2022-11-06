@@ -22,7 +22,11 @@ import { ShortestPathAlgorithm } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Position } from "../../GridEngine";
 import { filter, Subject, take } from "rxjs";
 import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils";
-import { IsPositionAllowedFn } from "../../Pathfinding/Pathfinding";
+import {
+  IsPositionAllowedFn,
+  Pathfinding,
+} from "../../Pathfinding/Pathfinding";
+import { Bfs } from "../../Pathfinding/Bfs/Bfs";
 
 export interface MoveToConfig {
   /**
@@ -420,15 +424,32 @@ export class TargetMovement implements Movement {
   };
 
   private getShortestPath(): ShortestPath {
+    const pathfinding = new Pathfinding(new Bfs(), this.tilemap);
     const { path: shortestPath, closestToTarget } =
-      this.shortestPathAlgorithm.getShortestPath(
+      pathfinding.findShortestPath(
         this.character.getNextTilePos(),
         this.targetPos,
-        this.getNeighbors
+        {
+          pathWidth: this.character.getTileWidth(),
+          pathHeight: this.character.getTileHeight(),
+          numberOfDirections: this.character.getNumberOfDirections(),
+          isPositionAllowed: this.isPositionAllowed,
+          collisionGroups: this.character.getCollisionGroups(),
+          ignoredChars: [this.character.getId()],
+          ignoreTiles: !this.character.collidesWithTiles(),
+          ignoreBlockedTarget: this.ignoreBlockedTarget,
+        }
       );
+    // this.shortestPathAlgorithm.getShortestPath(
+    //   this.character.getNextTilePos(),
+    //   this.targetPos,
+    //   this.getNeighbors
+    // );
 
     const noPathFound = shortestPath.length == 0;
 
+    console.log("nopathfoundstrat", this.noPathFoundStrategy);
+    console.log("npPathFound", noPathFound);
     if (
       noPathFound &&
       this.noPathFoundStrategy === NoPathFoundStrategy.CLOSEST_REACHABLE
@@ -443,6 +464,7 @@ export class TargetMovement implements Movement {
         closestToTarget.position,
         this.targetPos.position
       );
+      console.log("path", shortestPathToClosestPoint, distOffset);
       return { path: shortestPathToClosestPoint, distOffset };
     }
 
