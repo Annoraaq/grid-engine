@@ -59,7 +59,6 @@ export class Pathfinding {
     if (!shortestPathAlgorithm) {
       shortestPathAlgorithm = this.shortestPathAlgo;
     }
-    console.log("numofdirs:", numberOfDirections);
     const distanceUtils = DistanceUtilsFactory.create(
       numberOfDirections ?? NumberOfDirections.FOUR
     );

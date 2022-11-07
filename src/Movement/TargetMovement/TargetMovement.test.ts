@@ -242,8 +242,8 @@ describe("TargetMovement", () => {
       },
       shortestPathAlgorithm: shortestPathAlgo,
     });
-    targetMovement.update(1000);
-    mockChar.update(1000);
+    targetMovement.update(100);
+    mockChar.update(100);
 
     expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 0)));
   });
@@ -1316,9 +1316,9 @@ describe("TargetMovement", () => {
       expect(mockChar.getMovementDirection()).toEqual(Direction.DOWN_RIGHT);
     });
 
-    fit("should not move towards closest reachable point if distance is reached", () => {
+    it("should not move towards closest reachable point if distance is reached", () => {
       const charPos = layerPos(new Vector2(1, 0));
-      const targetPos = layerPos(new Vector2(3, 3));
+      const targetPos = layerPos(new Vector2(1, 3));
       const mockChar = createMockChar("char", charPos, {
         ...TEST_CHAR_CONFIG,
         tilemap: gridTilemap,
