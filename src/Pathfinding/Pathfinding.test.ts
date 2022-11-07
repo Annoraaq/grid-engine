@@ -13,20 +13,13 @@ import {
   COLLISION_GROUP,
   mockLayeredMap,
   layerPos,
+  createAllowedFn,
 } from "../Utils/MockFactory/MockFactory";
 import { Concrete } from "../Utils/TypeUtils";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { Bfs } from "./Bfs/Bfs";
 import { Pathfinding } from "./Pathfinding";
 import { ShortestPathAlgorithm } from "./ShortestPathAlgorithm";
-
-function createAllowedFn(map: string[]) {
-  return ({ x, y }, _charLayer) => {
-    if (x < 0 || x >= map[0].length) return false;
-    if (y < 0 || y >= map.length) return false;
-    return map[y][x] != "#";
-  };
-}
 
 describe("Pathfinding", () => {
   let blankLayerMock;

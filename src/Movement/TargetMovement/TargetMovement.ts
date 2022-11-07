@@ -21,8 +21,11 @@ import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
 import { ShortestPathAlgorithm } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Position } from "../../GridEngine";
 import { filter, Subject, take } from "rxjs";
-import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils";
-import { IsPositionAllowedFn } from "../../Pathfinding/Pathfinding";
+import {
+  IsPositionAllowedFn,
+  Pathfinding,
+} from "../../Pathfinding/Pathfinding";
+import { Bfs } from "../../Pathfinding/Bfs/Bfs";
 
 export interface MoveToConfig {
   /**
@@ -247,28 +250,6 @@ export class TargetMovement implements Movement {
     }
   }
 
-  getNeighbors = (pos: LayerPosition): LayerPosition[] => {
-    const neighbours = this.distanceUtils.neighbors(pos.position);
-    const transitionMappedNeighbors = neighbours.map((unblockedNeighbor) => {
-      const transition = this.tilemap.getTransition(
-        unblockedNeighbor,
-        pos.layer
-      );
-      return {
-        position: unblockedNeighbor,
-        layer: transition || pos.layer,
-      };
-    });
-
-    return transitionMappedNeighbors.filter(
-      (neighbor) =>
-        (this.isPositionAllowed(neighbor.position, neighbor.layer) &&
-          !this.isBlocking(neighbor.position, neighbor.layer)) ||
-        (this.ignoreBlockedTarget &&
-          LayerPositionUtils.equal(neighbor, this.targetPos))
-    );
-  };
-
   finishedObs(): Subject<Finished> {
     return this.finished$;
   }
@@ -420,11 +401,22 @@ export class TargetMovement implements Movement {
   };
 
   private getShortestPath(): ShortestPath {
+    const pathfinding = new Pathfinding(new Bfs(), this.tilemap);
+    // TODO make sure this is tested
     const { path: shortestPath, closestToTarget } =
-      this.shortestPathAlgorithm.getShortestPath(
+      pathfinding.findShortestPath(
         this.character.getNextTilePos(),
         this.targetPos,
-        this.getNeighbors
+        {
+          pathWidth: this.character.getTileWidth(),
+          pathHeight: this.character.getTileHeight(),
+          numberOfDirections: this.character.getNumberOfDirections(),
+          // isPositionAllowed: this.isPositionAllowed,
+          collisionGroups: this.character.getCollisionGroups(),
+          ignoredChars: [this.character.getId()],
+          ignoreTiles: !this.character.collidesWithTiles(),
+          ignoreBlockedTarget: this.ignoreBlockedTarget,
+        }
       );
 
     const noPathFound = shortestPath.length == 0;
@@ -433,12 +425,20 @@ export class TargetMovement implements Movement {
       noPathFound &&
       this.noPathFoundStrategy === NoPathFoundStrategy.CLOSEST_REACHABLE
     ) {
-      const shortestPathToClosestPoint =
-        this.shortestPathAlgorithm.getShortestPath(
-          this.character.getNextTilePos(),
-          closestToTarget,
-          this.getNeighbors
-        ).path;
+      const shortestPathToClosestPoint = pathfinding.findShortestPath(
+        this.character.getNextTilePos(),
+        closestToTarget,
+        {
+          pathWidth: this.character.getTileWidth(),
+          pathHeight: this.character.getTileHeight(),
+          numberOfDirections: this.character.getNumberOfDirections(),
+          isPositionAllowed: this.isPositionAllowed,
+          collisionGroups: this.character.getCollisionGroups(),
+          ignoredChars: [this.character.getId()],
+          ignoreTiles: !this.character.collidesWithTiles(),
+          ignoreBlockedTarget: this.ignoreBlockedTarget,
+        }
+      ).path;
       const distOffset = this.distanceUtils.distance(
         closestToTarget.position,
         this.targetPos.position

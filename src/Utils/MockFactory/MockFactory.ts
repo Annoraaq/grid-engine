@@ -188,3 +188,11 @@ export function mockLayeredMap(
     return layer[y][x] != "#";
   });
 }
+
+export function createAllowedFn(map: string[]) {
+  return ({ x, y }, _charLayer) => {
+    if (x < 0 || x >= map[0].length) return false;
+    if (y < 0 || y >= map.length) return false;
+    return map[y][x] != "#";
+  };
+}
