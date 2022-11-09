@@ -411,9 +411,9 @@ export class TargetMovement implements Movement {
           pathWidth: this.character.getTileWidth(),
           pathHeight: this.character.getTileHeight(),
           numberOfDirections: this.character.getNumberOfDirections(),
-          // isPositionAllowed: this.isPositionAllowed,
+          isPositionAllowed: this.isPositionAllowed,
           collisionGroups: this.character.getCollisionGroups(),
-          ignoredChars: [this.character.getId()],
+          // ignoredChars: [this.character.getId()],
           ignoreTiles: !this.character.collidesWithTiles(),
           ignoreBlockedTarget: this.ignoreBlockedTarget,
         }
@@ -425,6 +425,7 @@ export class TargetMovement implements Movement {
       noPathFound &&
       this.noPathFoundStrategy === NoPathFoundStrategy.CLOSEST_REACHABLE
     ) {
+      console.log("retry", closestToTarget);
       const shortestPathToClosestPoint = pathfinding.findShortestPath(
         this.character.getNextTilePos(),
         closestToTarget,
@@ -439,6 +440,7 @@ export class TargetMovement implements Movement {
           ignoreBlockedTarget: this.ignoreBlockedTarget,
         }
       ).path;
+      console.log(shortestPathToClosestPoint);
       const distOffset = this.distanceUtils.distance(
         closestToTarget.position,
         this.targetPos.position
