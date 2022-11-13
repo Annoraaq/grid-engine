@@ -170,7 +170,8 @@ GridEngine are called.</p>
 <div class="tsd-comment tsd-typography">
 <h3>Returns</h3><p>Observable that will notify about every change of direction that
  is not part of a movement. This is the case if the character tries to walk
- towards a blocked tile. The character will turn but not move.</p>
+ towards a blocked tile. The character will turn but not move.
+ It also emits when you call <a href="GridEngine.html#turnTowards">turnTowards</a>.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>charId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>direction<span class="tsd-signature-symbol">: </span><a href="../enums/Direction.html" class="tsd-signature-type" data-tsd-kind="Enumeration">Direction</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span></h4></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="follow" class="tsd-anchor"></a>
