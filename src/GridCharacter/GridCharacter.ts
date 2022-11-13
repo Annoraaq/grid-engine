@@ -248,6 +248,7 @@ export class GridCharacter {
     if (this.isMoving()) return;
     if (direction == Direction.NONE) return;
     this.facingDirection = direction;
+    this.directionChanged$.next(direction);
   }
 
   getFacingDirection(): Direction {

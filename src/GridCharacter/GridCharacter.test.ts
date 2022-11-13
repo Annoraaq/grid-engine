@@ -848,9 +848,13 @@ describe("GridCharacter", () => {
   });
 
   describe("turnTowards", () => {
-    it("should turn towards left", () => {
+    it("should turn towards left", (done) => {
+      gridCharacter.directionChanged().subscribe((direction) => {
+        expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
+        expect(direction).toEqual(Direction.LEFT);
+        done();
+      });
       gridCharacter.turnTowards(Direction.LEFT);
-      expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
     });
 
     it("should not turn if moving", () => {
