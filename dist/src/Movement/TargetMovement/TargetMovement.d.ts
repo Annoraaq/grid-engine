@@ -5,6 +5,7 @@ import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Movement, MovementInfo } from "../Movement";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
+import { ShortestPathAlgorithm } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Position } from "../../GridEngine";
 import { Subject } from "rxjs";
 export interface MoveToConfig {
@@ -91,6 +92,7 @@ export interface Options {
     distance?: number;
     config?: MoveToConfig;
     ignoreBlockedTarget?: boolean;
+    shortestPathAlgorithm?: ShortestPathAlgorithm;
 }
 export declare class TargetMovement implements Movement {
     private character;
@@ -111,7 +113,8 @@ export declare class TargetMovement implements Movement {
     private ignoreBlockedTarget;
     private distance;
     private isPositionAllowed;
-    constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerPosition, { config, ignoreBlockedTarget, distance }?: Options);
+    private shortestPathAlgorithm;
+    constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerPosition, { config, ignoreBlockedTarget, distance, shortestPathAlgorithm, }?: Options);
     setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void;
     getPathBlockedStrategy(): PathBlockedStrategy;
     private setCharacter;
