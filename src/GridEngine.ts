@@ -1026,6 +1026,7 @@ export class GridEngine {
    * @returns Observable that will notify about every change of direction that
    *  is not part of a movement. This is the case if the character tries to walk
    *  towards a blocked tile. The character will turn but not move.
+   *  It also emits when you call {@link GridEngine.turnTowards}.
    */
   directionChanged(): Observable<{ charId: string; direction: Direction }> {
     if (!this.directionChanged$) throw this.createUninitializedErr();
