@@ -6,7 +6,7 @@ parent: Examples (8 directions)
 
 # Basic Player Movement
 
-**Press the arrow keys to move.** This is a basic demo of isometric maps with 8 direction. Only four directions are supported yet.
+**Press the arrow keys to move.** This is a basic demo of isometric maps with 8 directions.
 
 <div id="game"></div>
 
