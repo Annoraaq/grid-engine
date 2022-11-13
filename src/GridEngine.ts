@@ -831,7 +831,7 @@ export class GridEngine {
    */
   turnTowards(charId: string, direction: Direction): void {
     this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
+    const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.turnTowards(direction);
   }
