@@ -141,6 +141,7 @@ describe("GridEngine", () => {
         {
           id: "player",
           sprite: playerSpriteMock,
+          walkingAnimationMapping: 0,
         },
       ],
     });
@@ -609,7 +610,12 @@ describe("GridEngine", () => {
   });
 
   it("should get facing position", () => {
+    const rightStandingFrameNo = 25;
+    playerSpriteMock.setFrame.mockClear();
     gridEngine.turnTowards("player", Direction.RIGHT);
+    expect(playerSpriteMock.setFrame).toHaveBeenCalledWith(
+      rightStandingFrameNo
+    );
     expect(gridEngine.getFacingPosition("player")).toEqual({ x: 1, y: 0 });
   });
 
