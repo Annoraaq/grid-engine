@@ -493,6 +493,12 @@ export declare class GridEngine {
      *  is not part of a movement. This is the case if the character tries to walk
      *  towards a blocked tile. The character will turn but not move.
      *  It also emits when you call {@link GridEngine.turnTowards}.
+     *
+     * This obsersable never emits more than one time in a row for the same
+     * direction.
+     * So for instance, if {@link GridEngine.turnTowards} is called multiple times
+     * in a row (without any facing direction change occurring inbetween) with the
+     * same direction, this observable would only emit once.
      */
     directionChanged(): Observable<{
         charId: string;

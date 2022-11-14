@@ -71,6 +71,7 @@ export declare class GridCharacter {
     private isCharBlocking;
     isMoving(): boolean;
     turnTowards(direction: Direction): void;
+    private changeFacingDirection;
     getFacingDirection(): Direction;
     getFacingPosition(): Vector2;
     addCollisionGroup(collisionGroup: string): void;
