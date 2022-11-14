@@ -169,8 +169,7 @@ export class GridCharacter {
     if (direction == Direction.NONE) return;
     if (this.isMoving()) return;
     if (this.isBlockingDirection(direction)) {
-      this.facingDirection = direction;
-      this.directionChanged$.next(direction);
+      this.changeFacingDirection(direction);
     } else {
       this.startMoving(direction);
     }
@@ -247,8 +246,13 @@ export class GridCharacter {
   turnTowards(direction: Direction): void {
     if (this.isMoving()) return;
     if (direction == Direction.NONE) return;
-    this.facingDirection = direction;
-    this.directionChanged$.next(direction);
+    this.changeFacingDirection(direction);
+  }
+
+  private changeFacingDirection(newDirection: Direction): void {
+    if (this.facingDirection === newDirection) return;
+    this.facingDirection = newDirection;
+    this.directionChanged$.next(newDirection);
   }
 
   getFacingDirection(): Direction {
