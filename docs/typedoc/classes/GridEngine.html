@@ -172,6 +172,11 @@ GridEngine are called.</p>
  is not part of a movement. This is the case if the character tries to walk
  towards a blocked tile. The character will turn but not move.
  It also emits when you call <a href="GridEngine.html#turnTowards">turnTowards</a>.</p>
+<p>This obsersable never emits more than one time in a row for the same
+direction.
+So for instance, if <a href="GridEngine.html#turnTowards">turnTowards</a> is called multiple times
+in a row (without any facing direction change occurring inbetween) with the
+same direction, this observable would only emit once.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>charId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>direction<span class="tsd-signature-symbol">: </span><a href="../enums/Direction.html" class="tsd-signature-type" data-tsd-kind="Enumeration">Direction</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span></h4></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="follow" class="tsd-anchor"></a>
