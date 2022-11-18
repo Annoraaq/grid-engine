@@ -1,5 +1,9 @@
 import { GlobalConfig } from "./../GlobalConfig/GlobalConfig";
-import { Direction, turnCounterClockwise } from "./../Direction/Direction";
+import {
+  Direction,
+  turnClockwise,
+  turnCounterClockwise,
+} from "./../Direction/Direction";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache/CharBlockCache";
 import { Rect } from "../Utils/Rect/Rect";
@@ -155,6 +159,13 @@ export class GridTilemap {
   toMapDirection(direction: Direction): Direction {
     if (this.isIsometric()) {
       return turnCounterClockwise(direction);
+    }
+    return direction;
+  }
+
+  fromMapDirection(direction: Direction): Direction {
+    if (this.isIsometric()) {
+      return turnClockwise(direction);
     }
     return direction;
   }

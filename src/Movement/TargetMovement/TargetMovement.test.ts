@@ -1441,4 +1441,45 @@ describe("TargetMovement", () => {
       );
     });
   });
+
+  describe("isometric maps", () => {
+    beforeEach(() => {
+      tilemapMock = createTilemapMock(blankLayerMock);
+      tilemapMock.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC;
+      gridTilemap = new GridTilemap(tilemapMock as any);
+    });
+
+    it("should get no neighbors for completely blocked chars", () => {
+      const playerPos = layerPos(new Vector2(0, 0));
+      const targetPos = layerPos(new Vector2(2, 2));
+      const mockChar = createMockChar("char", playerPos, {
+        ...TEST_CHAR_CONFIG,
+        tilemap: gridTilemap,
+        tileWidth: 2,
+        tileHeight: 2,
+      });
+
+      // prettier-ignore
+      mockBlockMap([
+        "s...",
+        "....",
+        "..t.",
+        "....",
+      ]);
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        shortestPathAlgorithm: bidirectionalSearch,
+      });
+
+      targetMovement.update(1000);
+      mockChar.update(1000);
+      targetMovement.update(1000);
+      mockChar.update(1000);
+      targetMovement.update(1000);
+      mockChar.update(1000);
+      targetMovement.update(1000);
+      mockChar.update(1000);
+
+      expect(mockChar.getTilePos()).toEqual(targetPos);
+    });
+  });
 });
