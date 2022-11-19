@@ -32,6 +32,7 @@ export declare class GridTilemap {
     tilePosToPixelPos(tilePosition: Vector2): Vector2;
     getTileDistance(direction: Direction): Vector2;
     toMapDirection(direction: Direction): Direction;
+    fromMapDirection(direction: Direction): Direction;
     isIsometric(): boolean;
     private isLayerBlockingAt;
     private getCharLayerIndexes;
