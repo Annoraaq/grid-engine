@@ -52,6 +52,21 @@ export function turnCounterClockwise(direction: Direction): Direction {
   return mapping[direction];
 }
 
+export function turnClockwise(direction: Direction): Direction {
+  const mapping = {
+    [Direction.LEFT]: Direction.UP_LEFT,
+    [Direction.UP_LEFT]: Direction.UP,
+    [Direction.UP]: Direction.UP_RIGHT,
+    [Direction.UP_RIGHT]: Direction.RIGHT,
+    [Direction.RIGHT]: Direction.DOWN_RIGHT,
+    [Direction.DOWN_RIGHT]: Direction.DOWN,
+    [Direction.DOWN]: Direction.DOWN_LEFT,
+    [Direction.DOWN_LEFT]: Direction.LEFT,
+    [Direction.NONE]: Direction.NONE,
+  };
+  return mapping[direction];
+}
+
 export function directionVector(direction: Direction): Vector2 {
   const directionVectors = {
     [Direction.UP]: Vector2.UP,

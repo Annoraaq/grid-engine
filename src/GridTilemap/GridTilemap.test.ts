@@ -792,6 +792,9 @@ describe("GridTilemap", () => {
 
   it("should provide map direction", () => {
     expect(gridTilemap.toMapDirection(Direction.DOWN)).toEqual(Direction.DOWN);
+    expect(gridTilemap.fromMapDirection(Direction.DOWN)).toEqual(
+      Direction.DOWN
+    );
   });
 
   it("should detect non-isometric maps", () => {
@@ -832,6 +835,9 @@ describe("GridTilemap", () => {
     it("should provide map direction", () => {
       expect(gridTilemap.toMapDirection(Direction.DOWN)).toEqual(
         Direction.DOWN_RIGHT
+      );
+      expect(gridTilemap.fromMapDirection(Direction.DOWN_RIGHT)).toEqual(
+        Direction.DOWN
       );
     });
   });

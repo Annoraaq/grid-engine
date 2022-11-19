@@ -454,7 +454,9 @@ export class TargetMovement implements Movement {
   }
 
   private getDir(from: Vector2, to: Vector2): Direction {
-    return this.distanceUtils.direction(from, to);
+    return this.tilemap.fromMapDirection(
+      this.distanceUtils.direction(from, to)
+    );
   }
 
   private hasBlockingTileForChar(pos: Position, layer: LayerName): boolean {
