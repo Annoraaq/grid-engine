@@ -1396,22 +1396,6 @@ describe("TargetMovement", () => {
   });
 
   describe("Closest reachable", () => {
-    // it("should ignore a blocked target", () => {
-    //   const charPos = layerPos(new Vector2(1, 0));
-    //   const targetPos = layerPos(new Vector2(1, 2));
-    //   const mockChar = createMockChar("char", charPos);
-    //   // prettier-ignore
-    //   mockBlockMap(tilemapMock, [
-    //     ".s..",
-    //     "....",
-    //     ".#..",
-    //   ]);
-    //   targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-    //     shortestPathAlgorithm: shortestPathAlgo,
-    //     ignoreBlockedTarget: true,
-    //   });
-    //   expectWalkedPath(mockChar, createPath([[1, 1]]));
-    // });
     it("should move towards closest reachable point if path is blocked", () => {
       const charPos = layerPos(new Vector2(2, 5));
       const targetPos = layerPos(new Vector2(2, 0));
@@ -1497,12 +1481,12 @@ describe("TargetMovement", () => {
 
       // prettier-ignore
       const allowedFn = createAllowedFn([
-      ".s..",
-      "##..",
-      "....",
-      "####",
-      ".t..",
-    ]);
+        ".s..",
+        "##..",
+        "....",
+        "####",
+        ".t..",
+      ]);
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         shortestPathAlgorithm: shortestPathAlgo,
@@ -1522,35 +1506,105 @@ describe("TargetMovement", () => {
         ])
       );
     });
+
+    it("should consider blocking chars", () => {
+      const charPos = layerPos(new Vector2(1, 0));
+      const targetPos = layerPos(new Vector2(1, 4));
+      const mockChar = createMockChar("char", charPos, {
+        ...TEST_CHAR_CONFIG,
+        tilemap: gridTilemap,
+        collisionGroups: [COLLISION_GROUP],
+      });
+
+      // prettier-ignore
+      mockCharMap(tilemapMock, gridTilemap, [
+        ".s..",
+        "ccc.",
+        "....",
+        "####",
+        ".t..",
+      ]);
+
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        shortestPathAlgorithm: shortestPathAlgo,
+        config: {
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        },
+      });
+
+      expectWalkedPath(
+        mockChar,
+        createPath([
+          [2, 0],
+          [3, 0],
+          [3, 1],
+          [3, 2],
+          [2, 2],
+          [1, 2],
+        ])
+      );
+    });
+
+    it("should not consider blocking chars of different collision groups", () => {
+      const charPos = layerPos(new Vector2(1, 0));
+      const targetPos = layerPos(new Vector2(1, 4));
+      const mockChar = createMockChar("char", charPos, {
+        ...TEST_CHAR_CONFIG,
+        tilemap: gridTilemap,
+        collisionGroups: ["someOtherCollisionGroup"],
+      });
+
+      // prettier-ignore
+      mockCharMap(tilemapMock, gridTilemap, [
+        ".s..",
+        "ccc.",
+        "....",
+        "####",
+        ".t..",
+      ]);
+
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        shortestPathAlgorithm: shortestPathAlgo,
+        config: {
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        },
+      });
+
+      expectWalkedPath(
+        mockChar,
+        createPath([
+          [1, 1],
+          [1, 2],
+        ])
+      );
+    });
+
+    it("should not collide with tiles", () => {
+      const charPos = layerPos(new Vector2(1, 0));
+      const targetPos = layerPos(new Vector2(1, 3));
+      const mockChar = createMockChar("char", charPos, {
+        ...TEST_CHAR_CONFIG,
+        tilemap: gridTilemap,
+        collidesWithTiles: false,
+        collisionGroups: [COLLISION_GROUP],
+      });
+
+      // prettier-ignore
+      mockCharMap(tilemapMock, gridTilemap, [
+        ".s..",
+        ".#..",
+        "cccc",
+        ".t..",
+      ]);
+
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        shortestPathAlgorithm: shortestPathAlgo,
+        config: {
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        },
+      });
+
+      expectWalkedPath(mockChar, createPath([[1, 1]]));
+    });
   });
-
-  // it("should not block itself for pathfinding", () => {
-  //   const charPos = layerPos(new Vector2(1, 0));
-  //   const targetPos = layerPos(new Vector2(1, 2));
-  //   const mockChar = createMockChar("char", charPos, {
-  //     ...TEST_CHAR_CONFIG,
-  //     tilemap: gridTilemap,
-  //     collisionGroups: [COLLISION_GROUP],
-  //   });
-  //   gridTilemap.addCharacter(mockChar);
-
-  //   // prettier-ignore
-  //   mockCharMap(tilemapMock, gridTilemap, [
-  //     ".s..",
-  //     "....",
-  //     ".t..",
-  //   ]);
-
-  //   targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-  //     shortestPathAlgorithm: shortestPathAlgo,
-  //   });
-
-  //   expectWalkedPath(
-  //     mockChar,
-  //     createPath([
-  //       [1, 1],
-  //       [1, 2],
-  //     ])
-  //   );
-  // });
 });

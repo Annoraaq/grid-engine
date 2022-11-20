@@ -402,7 +402,6 @@ export class TargetMovement implements Movement {
 
   private getShortestPath(): ShortestPath {
     const pathfinding = new Pathfinding(new Bfs(), this.tilemap);
-    // TODO make sure this is tested
     const { path: shortestPath, closestToTarget } =
       pathfinding.findShortestPath(
         this.character.getNextTilePos(),
@@ -413,7 +412,6 @@ export class TargetMovement implements Movement {
           numberOfDirections: this.character.getNumberOfDirections(),
           isPositionAllowed: this.isPositionAllowed,
           collisionGroups: this.character.getCollisionGroups(),
-          // ignoredChars: [this.character.getId()],
           ignoreTiles: !this.character.collidesWithTiles(),
           ignoreBlockedTarget: this.ignoreBlockedTarget,
         }
@@ -425,7 +423,6 @@ export class TargetMovement implements Movement {
       noPathFound &&
       this.noPathFoundStrategy === NoPathFoundStrategy.CLOSEST_REACHABLE
     ) {
-      console.log("retry", closestToTarget);
       const shortestPathToClosestPoint = pathfinding.findShortestPath(
         this.character.getNextTilePos(),
         closestToTarget,
@@ -435,12 +432,10 @@ export class TargetMovement implements Movement {
           numberOfDirections: this.character.getNumberOfDirections(),
           isPositionAllowed: this.isPositionAllowed,
           collisionGroups: this.character.getCollisionGroups(),
-          ignoredChars: [this.character.getId()],
+          // ignoredChars: [this.character.getId()],
           ignoreTiles: !this.character.collidesWithTiles(),
-          ignoreBlockedTarget: this.ignoreBlockedTarget,
         }
       ).path;
-      console.log(shortestPathToClosestPoint);
       const distOffset = this.distanceUtils.distance(
         closestToTarget.position,
         this.targetPos.position

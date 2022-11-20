@@ -96,6 +96,8 @@ export function mockCharMap(
   gridTilemap: GridTilemap,
   blockMap: string[]
 ) {
+  tilemapMock.height = blockMap.length;
+  tilemapMock.width = blockMap[0].length;
   let charCounter = 0;
   for (let row = 0; row < blockMap.length; row++) {
     for (let col = 0; col < blockMap[row].length; col++) {
