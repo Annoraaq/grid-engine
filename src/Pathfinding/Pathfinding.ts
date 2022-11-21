@@ -65,6 +65,7 @@ export class Pathfinding {
 
     const getNeighbors: GetNeighbors = (pos: LayerPosition) => {
       const neighbours = distanceUtils.neighbors(pos.position);
+      console.log("urneighs", pos, neighbours);
       const transitionMappedNeighbors = neighbours.map((unblockedNeighbor) => {
         const transition = this.gridTilemap.getTransition(
           unblockedNeighbor,
@@ -83,6 +84,8 @@ export class Pathfinding {
         );
         const tileBlocking =
           !ignoreTiles &&
+          // TODO: the problem lies here. The reverseNeighbors funktion assumes that the getNeighbors function returns all neighbors.
+          // Maybe the reverseNeighbors function should use the general neighbors function and then check via getNeigbors.
           this.hasBlockingTileFrom(
             pos,
             neighborPos,

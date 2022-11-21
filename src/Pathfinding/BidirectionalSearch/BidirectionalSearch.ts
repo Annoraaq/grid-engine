@@ -6,6 +6,9 @@ import {
 } from "../ShortestPathAlgorithm";
 import { VectorUtils } from "../../Utils/VectorUtils";
 import { Queue } from "../../Datastructures/Queue/Queue";
+import { NumberOfDirections } from "../../GridEngine";
+import { DistanceUtilsFactory } from "../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
+import { Vector2 } from "../../Utils/Vector2/Vector2";
 
 interface ShortestPathTuple {
   shortestDistance: number;
@@ -31,15 +34,20 @@ class Bfs {
   step(neighbors: LayerPosition[], node: LayerPosition, dist: number) {
     for (const neighbor of neighbors) {
       if (!this.visited.has(LayerPositionUtils.toString(neighbor))) {
+        console.log("not visited", LayerPositionUtils.toString(neighbor), node);
         this.previous.set(LayerPositionUtils.toString(neighbor), node);
         this.queue.enqueue({ node: neighbor, dist: dist + 1 });
         this.visited.set(LayerPositionUtils.toString(neighbor), dist + 1);
+      } else {
+        console.log("visited");
       }
     }
   }
 }
 
 export class BidirectionalSearch implements ShortestPathAlgorithm {
+  constructor(private numberOfDirections: NumberOfDirections) {}
+
   getShortestPath(
     startPos: LayerPosition,
     targetPos: LayerPosition,
@@ -77,6 +85,7 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
       if (cached) return cached;
 
       const neighbors = getNeighbors(pos);
+      // console.log("cached neighbors of", pos, neighbors);
       cache.set(strPos, neighbors);
       return neighbors;
     };
@@ -94,12 +103,20 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
 
   private createReverseNeighbors(getNeighbors: GetNeighbors) {
     return (pos: LayerPosition) => {
-      const neighbors = getNeighbors(pos);
-      return neighbors.filter((neighbor: LayerPosition) => {
-        return !!getNeighbors(neighbor).find((n: LayerPosition) => {
-          return LayerPositionUtils.equal(n, pos);
+      // const neighbors = getNeighbors(pos);
+      // TODO: use unfiltered neighbors here
+      const distanceUtils = DistanceUtilsFactory.create(
+        this.numberOfDirections
+      );
+      const neighbors = distanceUtils.neighbors(pos.position);
+      console.log("create reverse neighbours of ", pos, neighbors);
+      return neighbors
+        .map((p: Vector2) => ({ layer: pos.layer, position: p }))
+        .filter((neighbor: LayerPosition) => {
+          return !!getNeighbors(neighbor).find((n: LayerPosition) => {
+            return LayerPositionUtils.equal(n, pos);
+          });
         });
-      });
     };
   }
 
@@ -116,16 +133,19 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
 
     let closestToTarget: LayerPosition = startNode;
     let smallestDistToTarget: number = this.distance(startNode, stopNode);
+    console.log("smallestDist", smallestDistToTarget);
     startBfs.queue.enqueue({ node: startNode, dist: 0 });
     stopBfs.queue.enqueue({ node: stopNode, dist: 0 });
     startBfs.visited.set(LayerPositionUtils.toString(startNode), 0);
     stopBfs.visited.set(LayerPositionUtils.toString(stopNode), 0);
 
     while (startBfs.queue.size() > 0 && stopBfs.queue.size() > 0) {
+      console.log("run loop");
       const startDequeued = startBfs.queue.dequeue();
       if (!startDequeued) break;
       const { node, dist } = startDequeued;
       const distToTarget = this.distance(node, stopNode);
+      console.log("dist", distToTarget, node, stopNode);
       if (distToTarget < smallestDistToTarget) {
         smallestDistToTarget = distToTarget;
         closestToTarget = node;
@@ -143,11 +163,13 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
         };
       }
 
+      console.log("start step", node, getNeighbors(node));
       startBfs.step(getNeighbors(node), node, dist);
       const stopDequeued = stopBfs.queue.dequeue();
       if (!stopDequeued) break;
       const { node: stopBfsNode, dist: stopBfsDist } = stopDequeued;
       if (startBfs.visited.has(LayerPositionUtils.toString(stopBfsNode))) {
+        console.log("a2");
         return {
           shortestDistance:
             stopBfsDist +
@@ -160,8 +182,11 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
         };
       }
 
+      console.log("stopBfs", reverseNeighbors(stopBfsNode), stopBfsNode);
       stopBfs.step(reverseNeighbors(stopBfsNode), stopBfsNode, stopBfsDist);
+      console.log("queueLenghts", startBfs.queue.size(), stopBfs.queue.size());
     }
+    console.log("a0");
     return {
       shortestDistance: -1,
       previous: startBfs.previous,
@@ -189,6 +214,7 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
         matchingPos
       );
       startPath.pop();
+      console.log("matching pios", startPath, startPathPrev);
       return [...startPath, ...stopPath];
     } else {
       return this.getPathFromPrev(startPathPrev, startNode, stopNode).reverse();

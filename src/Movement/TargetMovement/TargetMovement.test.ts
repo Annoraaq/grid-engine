@@ -1436,7 +1436,7 @@ describe("TargetMovement", () => {
       );
     });
 
-    it("should user correct number of directions", () => {
+    fit("should use correct number of directions", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const targetPos = layerPos(new Vector2(3, 2));
       const mockChar = createMockChar("char", charPos, {

@@ -150,7 +150,7 @@ export class TargetMovement implements Movement {
       config,
       ignoreBlockedTarget = false,
       distance = 0,
-      shortestPathAlgorithm = new BidirectionalSearch(),
+      shortestPathAlgorithm = new Bfs(),
     }: Options = {}
   ) {
     this.ignoreBlockedTarget = ignoreBlockedTarget;
@@ -401,7 +401,10 @@ export class TargetMovement implements Movement {
   };
 
   private getShortestPath(): ShortestPath {
-    const pathfinding = new Pathfinding(new Bfs(), this.tilemap);
+    const pathfinding = new Pathfinding(
+      new BidirectionalSearch(this.character.getNumberOfDirections()),
+      this.tilemap
+    );
     const { path: shortestPath, closestToTarget } =
       pathfinding.findShortestPath(
         this.character.getNextTilePos(),
@@ -412,12 +415,14 @@ export class TargetMovement implements Movement {
           numberOfDirections: this.character.getNumberOfDirections(),
           isPositionAllowed: this.isPositionAllowed,
           collisionGroups: this.character.getCollisionGroups(),
+          ignoredChars: [this.character.getId()],
           ignoreTiles: !this.character.collidesWithTiles(),
           ignoreBlockedTarget: this.ignoreBlockedTarget,
         }
       );
 
     const noPathFound = shortestPath.length == 0;
+    console.log("shortest", shortestPath, closestToTarget);
 
     if (
       noPathFound &&
@@ -432,8 +437,9 @@ export class TargetMovement implements Movement {
           numberOfDirections: this.character.getNumberOfDirections(),
           isPositionAllowed: this.isPositionAllowed,
           collisionGroups: this.character.getCollisionGroups(),
-          // ignoredChars: [this.character.getId()],
+          ignoredChars: [this.character.getId()],
           ignoreTiles: !this.character.collidesWithTiles(),
+          ignoreBlockedTarget: this.ignoreBlockedTarget,
         }
       ).path;
       const distOffset = this.distanceUtils.distance(
