@@ -11,6 +11,7 @@ import {
 import { GridCharacter, PositionChange } from "./GridCharacter/GridCharacter";
 import {
   Direction,
+  directionVector,
   isDiagonal,
   NumberOfDirections,
 } from "./Direction/Direction";
@@ -33,6 +34,7 @@ import {
 } from "./GridCharacter/CharacterFilter/CharacterFilter";
 
 import { version as VERSION } from "../package.json";
+import { LayerPosition } from "./Pathfinding/ShortestPathAlgorithm";
 
 export {
   CollisionStrategy,
@@ -954,6 +956,26 @@ export class GridEngine {
     const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     gridChar.setCollisionGroups(collisionGroups);
+  }
+
+  // TODO write docs
+  getTilePosInDirection(
+    position: Position,
+    charLayer: string | undefined,
+    direction: Direction
+  ): { position: Position; charLayer?: string } | undefined {
+    // TODO write test
+    if (!this.gridTilemap) return undefined;
+    const pos = new Vector2(position);
+    const posInDir = pos.add(
+      directionVector(this.gridTilemap.toMapDirection(direction))
+    );
+
+    const transition = this.gridTilemap.getTransition(posInDir, charLayer);
+    return {
+      position: { x: posInDir.x, y: posInDir.y },
+      charLayer: transition,
+    };
   }
 
   /**
