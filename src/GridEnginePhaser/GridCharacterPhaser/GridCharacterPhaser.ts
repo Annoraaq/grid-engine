@@ -1,13 +1,17 @@
-import { GridTilemap, LayerName } from "./../../GridTilemap/GridTilemap";
+import { GridTilemap } from "./../../GridTilemap/GridTilemap";
 import {
   CharConfig,
   GameObject,
   GridCharacter,
 } from "../../GridCharacter/GridCharacter";
-import { CharacterData, WalkingAnimationMapping } from "../../GridEngine";
+import {
+  CharacterData,
+  CharLayer,
+  WalkingAnimationMapping,
+} from "../../GridEngine";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CharacterAnimation } from "../../GridCharacter/CharacterAnimation/CharacterAnimation";
-import { LayerPosition } from "../../Pathfinding/ShortestPathAlgorithm";
+import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Utils } from "../../Utils/Utils/Utils";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
@@ -294,7 +298,7 @@ export class GridCharacterPhaser {
     }
   }
 
-  private setDepth(gameObject: GameObject, position: LayerPosition): void {
+  private setDepth(gameObject: GameObject, position: LayerVecPos): void {
     gameObject.setDepth(
       this.tilemap.getDepthOfCharLayer(this.getTransitionLayer(position)) +
         this.getPaddedPixelDepth(gameObject)
@@ -305,7 +309,7 @@ export class GridCharacterPhaser {
     return Utils.shiftPad(gameObject.y + gameObject.displayHeight, 7);
   }
 
-  private getTransitionLayer(position: LayerPosition): LayerName {
+  private getTransitionLayer(position: LayerVecPos): CharLayer {
     return (
       this.tilemap.getTransition(position.position, position.layer) ||
       position.layer

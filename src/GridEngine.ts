@@ -11,11 +11,10 @@ import {
 import { GridCharacter, PositionChange } from "./GridCharacter/GridCharacter";
 import {
   Direction,
-  directionVector,
   isDiagonal,
   NumberOfDirections,
 } from "./Direction/Direction";
-import { GridTilemap, LayerName } from "./GridTilemap/GridTilemap";
+import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
 import { take, takeUntil, filter, map, mergeWith } from "rxjs/operators";
@@ -34,7 +33,6 @@ import {
 } from "./GridCharacter/CharacterFilter/CharacterFilter";
 
 import { version as VERSION } from "../package.json";
-import { LayerPosition } from "./Pathfinding/ShortestPathAlgorithm";
 
 export {
   CollisionStrategy,
@@ -47,7 +45,6 @@ export {
   NumberOfDirections,
   NoPathFoundStrategy,
   PathBlockedStrategy,
-  LayerName,
   MovementInfo,
   PositionChange,
 };
@@ -58,6 +55,16 @@ export interface Position {
   x: number;
   y: number;
 }
+
+/**
+ * Specifies a tile position along with a character layer.
+ */
+export interface LayerPosition {
+  position: Position;
+  charLayer: CharLayer;
+}
+
+export type CharLayer = string | undefined;
 
 /**
  * Configuration object for initializing GridEngine.
@@ -958,23 +965,28 @@ export class GridEngine {
     gridChar.setCollisionGroups(collisionGroups);
   }
 
-  // TODO write docs
+  /**
+   * Gets the tile position and character layer adjacent to the given
+   * position in the given direction.
+   */
   getTilePosInDirection(
     position: Position,
     charLayer: string | undefined,
     direction: Direction
-  ): { position: Position; charLayer?: string } | undefined {
-    // TODO write test
-    if (!this.gridTilemap) return undefined;
-    const pos = new Vector2(position);
-    const posInDir = pos.add(
-      directionVector(this.gridTilemap.toMapDirection(direction))
+  ): LayerPosition {
+    this.initGuard();
+    // This can't actually happen, but TypeScript can't know.
+    if (!this.gridTilemap) throw this.createUninitializedErr();
+    const posInDirection = this.gridTilemap.getTilePosInDirection(
+      {
+        position: new Vector2(position),
+        layer: charLayer,
+      },
+      direction
     );
-
-    const transition = this.gridTilemap.getTransition(posInDir, charLayer);
     return {
-      position: { x: posInDir.x, y: posInDir.y },
-      charLayer: transition,
+      position: posInDirection.position.toPosition(),
+      charLayer: posInDirection.layer,
     };
   }
 
@@ -985,7 +997,7 @@ export class GridEngine {
   steppedOn(
     charIds: string[],
     tiles: Position[],
-    layer?: LayerName[]
+    layer?: CharLayer[]
   ): Observable<
     {
       charId: string;

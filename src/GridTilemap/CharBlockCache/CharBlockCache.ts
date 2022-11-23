@@ -14,11 +14,10 @@ import {
   GridCharacter,
   PositionChange,
 } from "../../GridCharacter/GridCharacter";
-import { Position } from "../../GridEngine";
+import { CharLayer, Position } from "../../GridEngine";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
-import { LayerName } from "../GridTilemap";
-import { LayerPosition } from "../../Pathfinding/ShortestPathAlgorithm";
+import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
 
 export class CharBlockCache {
   private tilePosToCharacters: Map<string, Set<GridCharacter>> = new Map();
@@ -26,7 +25,7 @@ export class CharBlockCache {
 
   isCharBlockingAt(
     pos: Vector2,
-    layer: LayerName,
+    layer: CharLayer,
     collisionGroups: string[],
     exclude = new Set<CharId>()
   ): boolean {
@@ -121,14 +120,14 @@ export class CharBlockCache {
       });
   }
 
-  private addTilePositions(pos: LayerPosition, character: GridCharacter): void {
+  private addTilePositions(pos: LayerVecPos, character: GridCharacter): void {
     this.forEachCharTile(pos, character, (x, y) => {
       this.add(this.posToString(new Vector2(x, y), pos.layer), character);
     });
   }
 
   private deleteTilePositions(
-    pos: LayerPosition,
+    pos: LayerVecPos,
     character: GridCharacter
   ): void {
     this.forEachCharTile(pos, character, (x, y) => {
@@ -139,7 +138,7 @@ export class CharBlockCache {
   }
 
   private forEachCharTile(
-    pos: LayerPosition,
+    pos: LayerVecPos,
     character: GridCharacter,
     fn: (x: number, y: number) => void
   ): void {
@@ -154,8 +153,8 @@ export class CharBlockCache {
   private posChangeToLayerPos(): OperatorFunction<
     PositionChange,
     {
-      enter: LayerPosition;
-      exit: LayerPosition;
+      enter: LayerVecPos;
+      exit: LayerVecPos;
     }
   > {
     return pipe(
@@ -174,7 +173,7 @@ export class CharBlockCache {
     );
   }
 
-  private posToString(pos: Position, layer: LayerName): string {
+  private posToString(pos: Position, layer: CharLayer): string {
     return `${pos.x}#${pos.y}#${layer}`;
   }
 }

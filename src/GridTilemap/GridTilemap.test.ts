@@ -7,6 +7,7 @@ import { Direction, NumberOfDirections } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
 import { Rect } from "../Utils/Rect/Rect";
 import * as Phaser from "phaser";
+import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
 
 const mockCharBlockCache = {
   addCharacter: jest.fn(),
@@ -799,6 +800,26 @@ describe("GridTilemap", () => {
 
   it("should detect non-isometric maps", () => {
     expect(gridTilemap.isIsometric()).toEqual(false);
+  });
+
+  it("should get tile pos in direction", () => {
+    const pos: LayerVecPos = {
+      position: new Vector2(5, 5),
+      layer: "charLayer1",
+    };
+    gridTilemap.setTransition(new Vector2(6, 5), "charLayer1", "charLayer2");
+    expect(gridTilemap.getTilePosInDirection(pos, Direction.DOWN)).toEqual({
+      position: new Vector2(5, 6),
+      layer: "charLayer1",
+    });
+    expect(gridTilemap.getTilePosInDirection(pos, Direction.UP_LEFT)).toEqual({
+      position: new Vector2(4, 4),
+      layer: "charLayer1",
+    });
+    expect(gridTilemap.getTilePosInDirection(pos, Direction.RIGHT)).toEqual({
+      position: new Vector2(6, 5),
+      layer: "charLayer2",
+    });
   });
 
   describe("isometric", () => {

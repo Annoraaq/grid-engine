@@ -1,14 +1,14 @@
 import { LayerPositionUtils } from "./../Utils/LayerPositionUtils/LayerPositionUtils";
-import { LayerPosition } from "./../Pathfinding/ShortestPathAlgorithm";
+import { LayerVecPos } from "./../Pathfinding/ShortestPathAlgorithm";
 import {
   directionVector,
   NumberOfDirections,
   oppositeDirection,
 } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
-import { GridTilemap, LayerName } from "../GridTilemap/GridTilemap";
+import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
-import { Position } from "../GridEngine";
+import { CharLayer, Position } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
@@ -24,8 +24,8 @@ export type GameObject =
 export interface PositionChange {
   exitTile: Position;
   enterTile: Position;
-  exitLayer: LayerName;
-  enterLayer: LayerName;
+  exitLayer: CharLayer;
+  enterLayer: CharLayer;
 }
 
 export interface CharConfig {
@@ -45,7 +45,7 @@ export class GridCharacter {
   protected tilemap: GridTilemap;
 
   private movementDirection = Direction.NONE;
-  private _tilePos: LayerPosition = {
+  private _tilePos: LayerVecPos = {
     position: new Vector2(0, 0),
     layer: undefined,
   };
@@ -55,14 +55,14 @@ export class GridCharacter {
   private directionChanged$ = new Subject<Direction>();
   private positionChangeStarted$ = new Subject<PositionChange>();
   private positionChangeFinished$ = new Subject<PositionChange>();
-  private tilePositionSet$ = new Subject<LayerPosition>();
+  private tilePositionSet$ = new Subject<LayerVecPos>();
   private autoMovementSet$ = new Subject<Movement | undefined>();
   private lastMovementImpulse = Direction.NONE;
   private facingDirection: Direction = Direction.DOWN;
   private movement?: Movement;
   private collidesWithTilesInternal: boolean;
   private collisionGroups: Set<string>;
-  private depthChanged$ = new Subject<LayerPosition>();
+  private depthChanged$ = new Subject<LayerVecPos>();
   private movementProgress = 0;
   private labels: Set<string>;
   private numberOfDirections: NumberOfDirections;
@@ -113,7 +113,7 @@ export class GridCharacter {
     return this.collidesWithTilesInternal;
   }
 
-  setTilePosition(tilePosition: LayerPosition): void {
+  setTilePosition(tilePosition: LayerVecPos): void {
     if (this.isMoving()) {
       this.movementStopped$.next(this.movementDirection);
     }
@@ -128,13 +128,13 @@ export class GridCharacter {
     this.movementProgress = 0;
   }
 
-  getTilePos(): LayerPosition {
+  getTilePos(): LayerVecPos {
     return this.tilePos;
   }
 
-  getNextTilePos(): LayerPosition {
+  getNextTilePos(): LayerVecPos {
     if (!this.isMoving()) return this.tilePos;
-    let layer: LayerName = this.tilePos.layer;
+    let layer: CharLayer = this.tilePos.layer;
     const nextPos = this.tilePosInDirection(
       this.tilePos.position,
       this.movementDirection
@@ -207,7 +207,7 @@ export class GridCharacter {
     return this.isCharBlocking(direction, layerInDirection);
   }
 
-  isTileBlocking(direction: Direction, layerInDirection: LayerName): boolean {
+  isTileBlocking(direction: Direction, layerInDirection: CharLayer): boolean {
     return this.someCharTile((x, y) => {
       const tilePosInDir = this.tilePosInDirection(
         new Vector2(x, y),
@@ -223,7 +223,7 @@ export class GridCharacter {
 
   private isCharBlocking(
     direction: Direction,
-    layerInDirection: LayerName
+    layerInDirection: CharLayer
   ): boolean {
     return this.someCharTile((x, y) => {
       const tilePosInDir = this.tilePosInDirection(
@@ -327,7 +327,7 @@ export class GridCharacter {
     return this.directionChanged$;
   }
 
-  tilePositionSet(): Subject<LayerPosition> {
+  tilePositionSet(): Subject<LayerVecPos> {
     return this.tilePositionSet$;
   }
 
@@ -343,7 +343,7 @@ export class GridCharacter {
     return this.autoMovementSet$;
   }
 
-  depthChanged(): Subject<LayerPosition> {
+  depthChanged(): Subject<LayerVecPos> {
     return this.depthChanged$;
   }
 
@@ -394,11 +394,11 @@ export class GridCharacter {
     }
   }
 
-  private get tilePos(): LayerPosition {
+  private get tilePos(): LayerVecPos {
     return LayerPositionUtils.clone(this._tilePos);
   }
 
-  private set tilePos(newTilePos: LayerPosition) {
+  private set tilePos(newTilePos: LayerVecPos) {
     LayerPositionUtils.copyOver(newTilePos, this._tilePos);
   }
 
@@ -436,8 +436,8 @@ export class GridCharacter {
 
   private fire(
     subject: Subject<PositionChange>,
-    { position: exitTile, layer: exitLayer }: LayerPosition,
-    { position: enterTile, layer: enterLayer }: LayerPosition
+    { position: exitTile, layer: exitLayer }: LayerVecPos,
+    { position: enterTile, layer: enterLayer }: LayerVecPos
   ): void {
     subject.next({ exitTile, enterTile, exitLayer, enterLayer });
   }

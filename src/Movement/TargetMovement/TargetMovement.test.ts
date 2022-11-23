@@ -1,4 +1,4 @@
-import { LayerPosition } from "./../../Pathfinding/ShortestPathAlgorithm";
+import { LayerVecPos } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
 import { MoveToResult, TargetMovement } from "./TargetMovement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
@@ -34,14 +34,14 @@ describe("TargetMovement", () => {
 
   function createMockChar(
     id: string,
-    pos: LayerPosition,
+    pos: LayerVecPos,
     charConfig: CharConfig = { ...TEST_CHAR_CONFIG, tilemap: gridTilemap }
   ): GridCharacter {
     const mockChar = new GridCharacter(id, charConfig);
     mockChar.setTilePosition(pos);
     return mockChar;
   }
-  function layerPos(vec: Vector2): LayerPosition {
+  function layerPos(vec: Vector2): LayerVecPos {
     return {
       position: vec,
       layer: "lowerCharLayer",
@@ -715,7 +715,7 @@ describe("TargetMovement", () => {
     });
   });
 
-  function blockPath(charPos: LayerPosition, targetPos: LayerPosition) {
+  function blockPath(charPos: LayerVecPos, targetPos: LayerVecPos) {
     if (charPos.position.x != 1 || charPos.position.y != 0) {
       throw "CharPos needs to be (1,0)";
     }
@@ -730,7 +730,7 @@ describe("TargetMovement", () => {
     ]);
   }
 
-  function unblockPath(charPos: LayerPosition, targetPos: LayerPosition) {
+  function unblockPath(charPos: LayerVecPos, targetPos: LayerVecPos) {
     if (charPos.position.x != 1 || charPos.position.y != 0) {
       throw "CharPos needs to be (1,0)";
     }
@@ -1102,7 +1102,7 @@ describe("TargetMovement", () => {
 
   describe("finished observable", () => {
     let mockChar;
-    let charPos: LayerPosition;
+    let charPos: LayerVecPos;
 
     beforeEach(() => {
       charPos = layerPos(new Vector2(1, 0));

@@ -1,12 +1,12 @@
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { VectorUtils } from "../../Utils/VectorUtils";
-import { LayerPosition } from "../ShortestPathAlgorithm";
+import { LayerVecPos } from "../ShortestPathAlgorithm";
 import { BidirectionalSearch } from "./BidirectionalSearch";
 
 describe("BidirectionalSearch", () => {
   let bidirectionalSearch: BidirectionalSearch;
 
-  const getNeighbors = (pos: LayerPosition) => [
+  const getNeighbors = (pos: LayerVecPos) => [
     {
       position: new Vector2(pos.position.x, pos.position.y + 1),
       layer: pos.layer,
@@ -96,10 +96,10 @@ describe("BidirectionalSearch", () => {
     const { path, closestToTarget } = bidirectionalSearch.getShortestPath(
       startPos,
       targetPos,
-      (pos: LayerPosition) => {
+      (pos: LayerVecPos) => {
         const positions = getNeighbors(pos);
 
-        const filtered = positions.filter((pos: LayerPosition) => {
+        const filtered = positions.filter((pos: LayerVecPos) => {
           return !(
             pos.position.x == targetPos.position.x &&
             pos.position.y == targetPos.position.y

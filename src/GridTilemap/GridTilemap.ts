@@ -1,6 +1,7 @@
 import { GlobalConfig } from "./../GlobalConfig/GlobalConfig";
 import {
   Direction,
+  directionVector,
   turnClockwise,
   turnCounterClockwise,
 } from "./../Direction/Direction";
@@ -10,8 +11,8 @@ import { Rect } from "../Utils/Rect/Rect";
 import { VectorUtils } from "../Utils/VectorUtils";
 import { Utils } from "../Utils/Utils/Utils";
 import { CharId, GridCharacter } from "../GridCharacter/GridCharacter";
-
-export type LayerName = string | undefined;
+import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
+import { CharLayer } from "../GridEngine";
 
 export class GridTilemap {
   private static readonly ALWAYS_TOP_PROP_NAME = "ge_alwaysTop";
@@ -21,8 +22,8 @@ export class GridTilemap {
   private static readonly Z_INDEX_PADDING = 7;
   private characters = new Map<string, GridCharacter>();
   private charBlockCache: CharBlockCache = new CharBlockCache();
-  private charLayerDepths = new Map<LayerName, number>();
-  private transitions: Map<LayerName, Map<LayerName, LayerName>> = new Map();
+  private charLayerDepths = new Map<CharLayer, number>();
+  private transitions: Map<CharLayer, Map<CharLayer, CharLayer>> = new Map();
 
   constructor(private tilemap: Phaser.Tilemaps.Tilemap) {
     this.setLayerDepths();
@@ -73,14 +74,14 @@ export class GridTilemap {
     }
   }
 
-  setTransition(pos: Vector2, fromLayer: LayerName, toLayer: LayerName): void {
+  setTransition(pos: Vector2, fromLayer: CharLayer, toLayer: CharLayer): void {
     if (!this.transitions.has(pos.toString())) {
       this.transitions.set(pos.toString(), new Map());
     }
     this.transitions.get(pos.toString())?.set(fromLayer, toLayer);
   }
 
-  getTransitions(): Map<LayerName, Map<LayerName, LayerName>> {
+  getTransitions(): Map<CharLayer, Map<CharLayer, CharLayer>> {
     return new Map(
       [...this.transitions].map(([pos, map]) => [pos, new Map(map)])
     );
@@ -116,7 +117,7 @@ export class GridTilemap {
     return this.tilemap.tileHeight * tilemapScale;
   }
 
-  getDepthOfCharLayer(layerName: LayerName): number {
+  getDepthOfCharLayer(layerName: CharLayer): number {
     return this.charLayerDepths.get(layerName) ?? 0;
   }
 
@@ -177,6 +178,22 @@ export class GridTilemap {
       this.tilemap.orientation ==
       Phaser.Tilemaps.Orientation.ISOMETRIC.toString()
     );
+  }
+
+  getTilePosInDirection(
+    position: LayerVecPos,
+    direction: Direction
+  ): LayerVecPos {
+    const posInDir = position.position.add(
+      directionVector(this.toMapDirection(direction))
+    );
+
+    const transition =
+      this.getTransition(posInDir, position.layer) || position.layer;
+    return {
+      position: posInDir,
+      layer: transition,
+    };
   }
 
   private isLayerBlockingAt(

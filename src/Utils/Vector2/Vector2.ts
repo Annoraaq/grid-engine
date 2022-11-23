@@ -100,6 +100,10 @@ export class Vector2 {
     return new Vector2(this.x * scalar, this.y * scalar);
   }
 
+  toPosition(): Position {
+    return { x: this.x, y: this.y };
+  }
+
   toString(): string {
     return `${this.x}#${this.y}`;
   }
