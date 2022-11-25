@@ -1,9 +1,9 @@
-import { LayerName } from "../GridTilemap/GridTilemap";
+import { CharLayer } from "../GridEngine";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 
 export interface LayerVecPos {
   position: Vector2;
-  layer: LayerName;
+  layer: CharLayer;
 }
 
 export type GetNeighbors = (pos: LayerVecPos) => LayerVecPos[];
