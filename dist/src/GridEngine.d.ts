@@ -2,19 +2,26 @@ import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { Finished, MoveToConfig, MoveToResult } from "./Movement/TargetMovement/TargetMovement";
 import { PositionChange } from "./GridCharacter/GridCharacter";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
-import { LayerName } from "./GridTilemap/GridTilemap";
 import { Observable } from "rxjs";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { MovementInfo } from "./Movement/Movement";
 import { CharacterIndex, FrameRow } from "./GridCharacter/CharacterAnimation/CharacterAnimation";
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter";
-export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, LayerName, MovementInfo, PositionChange, };
+export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, MovementInfo, PositionChange, };
 export declare type TileSizePerSecond = number;
 export interface Position {
     x: number;
     y: number;
 }
+/**
+ * Specifies a tile position along with a character layer.
+ */
+export interface LayerPosition {
+    position: Position;
+    charLayer: CharLayer;
+}
+export declare type CharLayer = string | undefined;
 /**
  * Configuration object for initializing GridEngine.
  */
@@ -462,10 +469,15 @@ export declare class GridEngine {
      */
     setCollisionGroups(charId: string, collisionGroups: string[]): void;
     /**
+     * Gets the tile position and character layer adjacent to the given
+     * position in the given direction.
+     */
+    getTilePosInDirection(position: Position, charLayer: string | undefined, direction: Direction): LayerPosition;
+    /**
      * @returns Observable that, whenever a specified position is entered on optionally provided layers,
      *  will notify with the target characters position change
      */
-    steppedOn(charIds: string[], tiles: Position[], layer?: LayerName[]): Observable<{
+    steppedOn(charIds: string[], tiles: Position[], layer?: CharLayer[]): Observable<{
         charId: string;
     } & PositionChange>;
     /**

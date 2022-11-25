@@ -1,9 +1,9 @@
-import { LayerPosition } from "./../Pathfinding/ShortestPathAlgorithm";
+import { LayerVecPos } from "./../Pathfinding/ShortestPathAlgorithm";
 import { NumberOfDirections } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
-import { GridTilemap, LayerName } from "../GridTilemap/GridTilemap";
+import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
-import { Position } from "../GridEngine";
+import { CharLayer, Position } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
@@ -12,8 +12,8 @@ export declare type GameObject = Phaser.GameObjects.Container | Phaser.GameObjec
 export interface PositionChange {
     exitTile: Position;
     enterTile: Position;
-    exitLayer: LayerName;
-    enterLayer: LayerName;
+    exitLayer: CharLayer;
+    enterLayer: CharLayer;
 }
 export interface CharConfig {
     tilemap: GridTilemap;
@@ -58,16 +58,16 @@ export declare class GridCharacter {
     setMovement(movement?: Movement): void;
     getMovement(): Movement | undefined;
     collidesWithTiles(): boolean;
-    setTilePosition(tilePosition: LayerPosition): void;
-    getTilePos(): LayerPosition;
-    getNextTilePos(): LayerPosition;
+    setTilePosition(tilePosition: LayerVecPos): void;
+    getTilePos(): LayerVecPos;
+    getNextTilePos(): LayerVecPos;
     getTileWidth(): number;
     getTileHeight(): number;
     move(direction: Direction): void;
     update(delta: number): void;
     getMovementDirection(): Direction;
     isBlockingDirection(direction: Direction): boolean;
-    isTileBlocking(direction: Direction, layerInDirection: LayerName): boolean;
+    isTileBlocking(direction: Direction, layerInDirection: CharLayer): boolean;
     private isCharBlocking;
     isMoving(): boolean;
     turnTowards(direction: Direction): void;
@@ -89,11 +89,11 @@ export declare class GridCharacter {
     movementStarted(): Subject<Direction>;
     movementStopped(): Subject<Direction>;
     directionChanged(): Subject<Direction>;
-    tilePositionSet(): Subject<LayerPosition>;
+    tilePositionSet(): Subject<LayerVecPos>;
     positionChangeStarted(): Subject<PositionChange>;
     positionChangeFinished(): Subject<PositionChange>;
     autoMovementSet(): Subject<Movement | undefined>;
-    depthChanged(): Subject<LayerPosition>;
+    depthChanged(): Subject<LayerVecPos>;
     getMovementProgress(): number;
     hasWalkedHalfATile(): boolean;
     private updateCharacterPosition;

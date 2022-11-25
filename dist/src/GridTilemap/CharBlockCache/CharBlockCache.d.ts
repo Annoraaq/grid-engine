@@ -1,10 +1,10 @@
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
+import { CharLayer } from "../../GridEngine";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { LayerName } from "../GridTilemap";
 export declare class CharBlockCache {
     private tilePosToCharacters;
     private charRemoved$;
-    isCharBlockingAt(pos: Vector2, layer: LayerName, collisionGroups: string[], exclude?: Set<string>): boolean;
+    isCharBlockingAt(pos: Vector2, layer: CharLayer, collisionGroups: string[], exclude?: Set<string>): boolean;
     getCharactersAt(pos: Vector2, layer: string): Set<GridCharacter>;
     addCharacter(character: GridCharacter): void;
     removeCharacter(character: GridCharacter): void;
