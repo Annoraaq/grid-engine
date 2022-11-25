@@ -1,7 +1,8 @@
 import { Direction } from "./../Direction/Direction";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { GridCharacter } from "../GridCharacter/GridCharacter";
-export declare type LayerName = string | undefined;
+import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
+import { CharLayer } from "../GridEngine";
 export declare class GridTilemap {
     private tilemap;
     private static readonly ALWAYS_TOP_PROP_NAME;
@@ -20,13 +21,13 @@ export declare class GridTilemap {
     getCharactersAt(position: Vector2, layer: string): Set<GridCharacter>;
     hasBlockingTile(pos: Vector2, charLayer: string | undefined, direction?: Direction): boolean;
     getTransition(pos: Vector2, fromLayer?: string): string | undefined;
-    setTransition(pos: Vector2, fromLayer: LayerName, toLayer: LayerName): void;
-    getTransitions(): Map<LayerName, Map<LayerName, LayerName>>;
+    setTransition(pos: Vector2, fromLayer: CharLayer, toLayer: CharLayer): void;
+    getTransitions(): Map<CharLayer, Map<CharLayer, CharLayer>>;
     hasNoTile(pos: Vector2, charLayer?: string): boolean;
     hasBlockingChar(pos: Vector2, layer: string | undefined, collisionGroups: string[], exclude?: Set<string>): boolean;
     getTileWidth(): number;
     getTileHeight(): number;
-    getDepthOfCharLayer(layerName: LayerName): number;
+    getDepthOfCharLayer(layerName: CharLayer): number;
     isInRange(pos: Vector2): boolean;
     getTileSize(): Vector2;
     tilePosToPixelPos(tilePosition: Vector2): Vector2;
@@ -34,6 +35,7 @@ export declare class GridTilemap {
     toMapDirection(direction: Direction): Direction;
     fromMapDirection(direction: Direction): Direction;
     isIsometric(): boolean;
+    getTilePosInDirection(position: LayerVecPos, direction: Direction): LayerVecPos;
     private isLayerBlockingAt;
     private getCharLayerIndexes;
     private findPrevAndCharLayer;

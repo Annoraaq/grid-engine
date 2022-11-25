@@ -1,12 +1,11 @@
-import { LayerName } from "./../../GridTilemap/GridTilemap";
 import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy";
-import { LayerPosition } from "./../../Pathfinding/ShortestPathAlgorithm";
+import { LayerVecPos } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Movement, MovementInfo } from "../Movement";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
 import { ShortestPathAlgorithm } from "../../Pathfinding/ShortestPathAlgorithm";
-import { Position } from "../../GridEngine";
+import { CharLayer, Position } from "../../GridEngine";
 import { Subject } from "rxjs";
 export interface MoveToConfig {
     /**
@@ -86,7 +85,7 @@ export interface Finished {
     position: Position;
     result?: MoveToResult;
     description?: string;
-    layer: LayerName;
+    layer: CharLayer;
 }
 export interface Options {
     distance?: number;
@@ -114,12 +113,12 @@ export declare class TargetMovement implements Movement {
     private distance;
     private isPositionAllowed;
     private shortestPathAlgorithm;
-    constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerPosition, { config, ignoreBlockedTarget, distance, shortestPathAlgorithm, }?: Options);
+    constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerVecPos, { config, ignoreBlockedTarget, distance, shortestPathAlgorithm, }?: Options);
     setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void;
     getPathBlockedStrategy(): PathBlockedStrategy;
     private setCharacter;
     update(delta: number): void;
-    getNeighbors: (pos: LayerPosition) => LayerPosition[];
+    getNeighbors: (pos: LayerVecPos) => LayerVecPos[];
     finishedObs(): Subject<Finished>;
     getInfo(): MovementInfo;
     private resultToReason;

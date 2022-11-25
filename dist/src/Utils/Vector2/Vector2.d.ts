@@ -25,5 +25,6 @@ export declare class Vector2 {
     modulo(vector: Vector2): Vector2;
     scalarModulo(scalar: number): Vector2;
     scalarMult(scalar: number): Vector2;
+    toPosition(): Position;
     toString(): string;
 }
