@@ -4,6 +4,7 @@ import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import {
   Finished,
+  IsPositionAllowedFn,
   MoveToConfig,
   MoveToResult,
   TargetMovement,
@@ -47,6 +48,7 @@ export {
   PathBlockedStrategy,
   MovementInfo,
   PositionChange,
+  IsPositionAllowedFn,
 };
 
 export type TileSizePerSecond = number;
@@ -862,7 +864,7 @@ export class GridEngine {
   /**
    * Places the character with the given id to the provided tile position. If
    * that character is moving, the movement is stopped. The
-   * {@link positionChanged} and {@link positionChangeFinished} observables will
+   * {@link positionChangeStarted} and {@link positionChangeFinished} observables will
    * emit. If the character was moving, the {@link movementStopped} observable
    * will also emit.
    */
