@@ -29,7 +29,7 @@
     "@types/jest": "^29.2.3",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
-    "canvas": "^2.9.3",
+    "canvas": "^2.10.2",
     "esbuild": "^0.15.15",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
