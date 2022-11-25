@@ -1,10 +1,10 @@
 import { filter, takeUntil, take } from "rxjs/operators";
-import { GridTilemap, LayerName } from "../../GridTilemap/GridTilemap";
+import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
 import { Movement, MovementInfo } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { Position } from "../../GridEngine";
+import { CharLayer, Position } from "../../GridEngine";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 
 export class FollowMovement implements Movement {
@@ -52,7 +52,7 @@ export class FollowMovement implements Movement {
     };
   }
 
-  private updateTarget(targetPos: Position, targetLayer: LayerName): void {
+  private updateTarget(targetPos: Position, targetLayer: CharLayer): void {
     this.targetMovement = new TargetMovement(
       this.character,
       this.gridTilemap,

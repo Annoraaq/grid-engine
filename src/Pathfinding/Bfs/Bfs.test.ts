@@ -1,12 +1,12 @@
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { VectorUtils } from "../../Utils/VectorUtils";
-import { LayerPosition } from "../ShortestPathAlgorithm";
+import { LayerVecPos } from "../ShortestPathAlgorithm";
 import { Bfs } from "./Bfs";
 
 describe("Bfs", () => {
   let bfs: Bfs;
 
-  const getNeighbors = (pos: LayerPosition) => [
+  const getNeighbors = (pos: LayerVecPos) => [
     {
       position: new Vector2(pos.position.x, pos.position.y + 1),
       layer: pos.layer,

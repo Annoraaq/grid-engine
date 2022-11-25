@@ -1,4 +1,4 @@
-import { LayerPosition } from "./../../Pathfinding/ShortestPathAlgorithm";
+import { LayerVecPos } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { NumberOfDirections } from "./../../Direction/Direction";
 import { FollowMovement } from "./FollowMovement";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
@@ -21,10 +21,10 @@ describe("FollowMovement", () => {
   let followMovement: FollowMovement;
   let gridTilemapMock;
   let mockChar;
-  let targetCharPos: LayerPosition;
+  let targetCharPos: LayerVecPos;
   let targetChar;
 
-  function createMockChar(id: string, pos: LayerPosition) {
+  function createMockChar(id: string, pos: LayerVecPos) {
     return <any>{
       positionChangeStartedSubject$: new Subject(),
       autoMovementSetSubject$: new Subject(),

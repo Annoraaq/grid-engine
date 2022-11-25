@@ -14,7 +14,7 @@ import {
   isDiagonal,
   NumberOfDirections,
 } from "./Direction/Direction";
-import { GridTilemap, LayerName } from "./GridTilemap/GridTilemap";
+import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
 import { take, takeUntil, filter, map, mergeWith } from "rxjs/operators";
@@ -45,7 +45,6 @@ export {
   NumberOfDirections,
   NoPathFoundStrategy,
   PathBlockedStrategy,
-  LayerName,
   MovementInfo,
   PositionChange,
 };
@@ -56,6 +55,16 @@ export interface Position {
   x: number;
   y: number;
 }
+
+/**
+ * Specifies a tile position along with a character layer.
+ */
+export interface LayerPosition {
+  position: Position;
+  charLayer: CharLayer;
+}
+
+export type CharLayer = string | undefined;
 
 /**
  * Configuration object for initializing GridEngine.
@@ -957,13 +966,38 @@ export class GridEngine {
   }
 
   /**
+   * Gets the tile position and character layer adjacent to the given
+   * position in the given direction.
+   */
+  getTilePosInDirection(
+    position: Position,
+    charLayer: string | undefined,
+    direction: Direction
+  ): LayerPosition {
+    this.initGuard();
+    // This can't actually happen, but TypeScript can't know.
+    if (!this.gridTilemap) throw this.createUninitializedErr();
+    const posInDirection = this.gridTilemap.getTilePosInDirection(
+      {
+        position: new Vector2(position),
+        layer: charLayer,
+      },
+      direction
+    );
+    return {
+      position: posInDirection.position.toPosition(),
+      charLayer: posInDirection.layer,
+    };
+  }
+
+  /**
    * @returns Observable that, whenever a specified position is entered on optionally provided layers,
    *  will notify with the target characters position change
    */
   steppedOn(
     charIds: string[],
     tiles: Position[],
-    layer?: LayerName[]
+    layer?: CharLayer[]
   ): Observable<
     {
       charId: string;

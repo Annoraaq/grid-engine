@@ -27,6 +27,7 @@ const mockGridTileMap = {
   getDepthOfCharLayer: jest.fn().mockReturnValue(0),
   getTileDistance: jest.fn().mockReturnValue(new Vector2(1, 1)),
   isInRange: jest.fn(),
+  getTilePosInDirection: jest.fn(),
 };
 const mockGridTilemapConstructor = jest.fn(function (
   _tilemap,
@@ -1065,6 +1066,31 @@ describe("GridEngine", () => {
     expect(gridEngine.getCollisionGroups("player")).toEqual(collisionGroups);
   });
 
+  it("should get tile pos in direction", () => {
+    const pos = { x: 5, y: 6 };
+    const layer = "charLayer1";
+    const mockedTileInPos = {
+      position: new Vector2(10, 10),
+      layer: "someLayer",
+    };
+    mockGridTileMap.getTilePosInDirection.mockReturnValue(mockedTileInPos);
+
+    const tilePosInDir = gridEngine.getTilePosInDirection(
+      pos,
+      layer,
+      Direction.LEFT
+    );
+
+    expect(tilePosInDir).toEqual({
+      position: { x: 10, y: 10 },
+      charLayer: "someLayer",
+    });
+    expect(mockGridTileMap.getTilePosInDirection).toHaveBeenCalledWith(
+      { position: new Vector2(5, 6), layer: "charLayer1" },
+      Direction.LEFT
+    );
+  });
+
   describe("Observables", () => {
     it("should get chars movementStarted observable", async () => {
       gridEngine.create(tileMapMock, {
@@ -1676,6 +1702,13 @@ describe("GridEngine", () => {
         gridEngine.removeLabels(SOME_CHAR_ID, ["label"])
       );
       expectUninitializedException(() => gridEngine.clearLabels(SOME_CHAR_ID));
+      expectUninitializedException(() =>
+        gridEngine.getTilePosInDirection(
+          { x: 2, y: 2 },
+          undefined,
+          Direction.DOWN
+        )
+      );
     });
   });
 

@@ -1,6 +1,6 @@
 import {
   GetNeighbors,
-  LayerPosition,
+  LayerVecPos,
   ShortestPathAlgorithm,
 } from "./../ShortestPathAlgorithm";
 import { VectorUtils } from "../../Utils/VectorUtils";
@@ -8,21 +8,21 @@ import { Queue } from "../../Datastructures/Queue/Queue";
 
 interface ShortestPathTuple {
   shortestDistance: number;
-  previous: Map<string, LayerPosition>;
-  closestToTarget: LayerPosition;
+  previous: Map<string, LayerVecPos>;
+  closestToTarget: LayerVecPos;
 }
 
 interface QueueEntry {
-  node: LayerPosition;
+  node: LayerVecPos;
   dist: number;
 }
 
 export class Bfs implements ShortestPathAlgorithm {
   getShortestPath(
-    startPos: LayerPosition,
-    targetPos: LayerPosition,
+    startPos: LayerVecPos,
+    targetPos: LayerVecPos,
     getNeighbors: GetNeighbors
-  ): { path: LayerPosition[]; closestToTarget: LayerPosition } {
+  ): { path: LayerVecPos[]; closestToTarget: LayerVecPos } {
     const shortestPath = this.shortestPathBfs(
       startPos,
       targetPos,
@@ -34,29 +34,29 @@ export class Bfs implements ShortestPathAlgorithm {
     };
   }
 
-  private distance(fromNode: LayerPosition, toNode: LayerPosition): number {
+  private distance(fromNode: LayerVecPos, toNode: LayerVecPos): number {
     return VectorUtils.manhattanDistance(fromNode.position, toNode.position);
   }
 
-  private pos2Str(layerPos: LayerPosition): string {
+  private pos2Str(layerPos: LayerVecPos): string {
     return `${layerPos.position.toString()}#${layerPos.layer}`;
   }
 
-  private equal(layerPos1: LayerPosition, layerPos2: LayerPosition): boolean {
+  private equal(layerPos1: LayerVecPos, layerPos2: LayerVecPos): boolean {
     if (!VectorUtils.equal(layerPos1.position, layerPos2.position))
       return false;
     return layerPos1.layer === layerPos2.layer;
   }
 
   private shortestPathBfs(
-    startNode: LayerPosition,
-    stopNode: LayerPosition,
+    startNode: LayerVecPos,
+    stopNode: LayerVecPos,
     getNeighbors: GetNeighbors
   ): ShortestPathTuple {
-    const previous = new Map<string, LayerPosition>();
+    const previous = new Map<string, LayerVecPos>();
     const visited = new Set<string>();
     const queue: Queue<QueueEntry> = new Queue();
-    let closestToTarget: LayerPosition = startNode;
+    let closestToTarget: LayerVecPos = startNode;
     let smallestDistToTarget: number = this.distance(startNode, stopNode);
     queue.enqueue({ node: startNode, dist: 0 });
     visited.add(this.pos2Str(startNode));
@@ -87,12 +87,12 @@ export class Bfs implements ShortestPathAlgorithm {
   }
 
   private returnPath(
-    previous: Map<string, LayerPosition>,
-    startNode: LayerPosition,
-    stopNode: LayerPosition
-  ): LayerPosition[] {
-    const ret: LayerPosition[] = [];
-    let currentNode: LayerPosition | undefined = stopNode;
+    previous: Map<string, LayerVecPos>,
+    startNode: LayerVecPos,
+    stopNode: LayerVecPos
+  ): LayerVecPos[] {
+    const ret: LayerVecPos[] = [];
+    let currentNode: LayerVecPos | undefined = stopNode;
     ret.push(currentNode);
     while (!this.equal(currentNode, startNode)) {
       currentNode = previous.get(this.pos2Str(currentNode));

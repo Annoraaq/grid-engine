@@ -11,7 +11,7 @@ import {
   createTilemapMock,
 } from "../Utils/MockFactory/MockFactory";
 import { CollisionStrategy } from "../GridEngine";
-import { LayerPosition } from "../Pathfinding/ShortestPathAlgorithm";
+import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
 import { GlobalConfig } from "../GlobalConfig/GlobalConfig";
 
 // Hack to get Phaser included at runtime
@@ -33,7 +33,7 @@ describe("GridCharacter", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
   }
 
-  function mockBlockingTile(blockingPositions?: LayerPosition[]) {
+  function mockBlockingTile(blockingPositions?: LayerVecPos[]) {
     if (!blockingPositions) {
       tilemapMock.hasTileAt.mockReturnValue(false);
     } else {
