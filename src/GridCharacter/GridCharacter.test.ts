@@ -11,7 +11,7 @@ import {
   createTilemapMock,
 } from "../Utils/MockFactory/MockFactory";
 import { CollisionStrategy } from "../GridEngine";
-import { LayerPosition } from "../Pathfinding/ShortestPathAlgorithm";
+import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
 import { GlobalConfig } from "../GlobalConfig/GlobalConfig";
 
 // Hack to get Phaser included at runtime
@@ -33,7 +33,7 @@ describe("GridCharacter", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
   }
 
-  function mockBlockingTile(blockingPositions?: LayerPosition[]) {
+  function mockBlockingTile(blockingPositions?: LayerVecPos[]) {
     if (!blockingPositions) {
       tilemapMock.hasTileAt.mockReturnValue(false);
     } else {
@@ -848,9 +848,24 @@ describe("GridCharacter", () => {
   });
 
   describe("turnTowards", () => {
-    it("should turn towards left", () => {
+    it("should turn towards left", (done) => {
+      gridCharacter.directionChanged().subscribe((direction) => {
+        expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
+        expect(direction).toEqual(Direction.LEFT);
+        done();
+      });
       gridCharacter.turnTowards(Direction.LEFT);
-      expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
+    });
+
+    it("should emit directioChanged only once on turning", () => {
+      const dirChangedMock = jest.fn();
+      gridCharacter.directionChanged().subscribe(dirChangedMock);
+
+      gridCharacter.turnTowards(Direction.LEFT);
+      gridCharacter.turnTowards(Direction.LEFT);
+
+      expect(dirChangedMock).toHaveBeenCalledWith(Direction.LEFT);
+      expect(dirChangedMock).toHaveBeenCalledTimes(1);
     });
 
     it("should not turn if moving", () => {
@@ -865,15 +880,29 @@ describe("GridCharacter", () => {
     });
   });
 
-  it("should turn player if direction blocked", (done) => {
+  it("should turn player if direction blocked", () => {
     mockBlockingTile([{ position: new Vector2(0, -1), layer: undefined }]);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
-    gridCharacter.directionChanged().subscribe((direction) => {
-      expect(direction).toEqual(Direction.UP);
-      done();
-    });
+
+    const dirChangedMock = jest.fn();
+    gridCharacter.directionChanged().subscribe(dirChangedMock);
     gridCharacter.move(Direction.UP);
+
+    expect(dirChangedMock).toHaveBeenCalledWith(Direction.UP);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+  });
+
+  it("should emit directionChanged once on player turn", () => {
+    mockBlockingTile([{ position: new Vector2(0, -1), layer: undefined }]);
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+
+    const dirChangedMock = jest.fn();
+    gridCharacter.directionChanged().subscribe(dirChangedMock);
+    gridCharacter.move(Direction.UP);
+    gridCharacter.move(Direction.UP);
+
+    expect(dirChangedMock).toHaveBeenCalledWith(Direction.UP);
+    expect(dirChangedMock).toHaveBeenCalledTimes(1);
   });
 
   describe("collision groups", () => {

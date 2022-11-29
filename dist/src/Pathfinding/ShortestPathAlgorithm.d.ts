@@ -1,17 +1,17 @@
-import { LayerName } from "../GridTilemap/GridTilemap";
+import { CharLayer } from "../GridEngine";
 import { Vector2 } from "../Utils/Vector2/Vector2";
-export interface LayerPosition {
+export interface LayerVecPos {
     position: Vector2;
-    layer: LayerName;
+    layer: CharLayer;
 }
-export declare type GetNeighbors = (pos: LayerPosition) => LayerPosition[];
+export declare type GetNeighbors = (pos: LayerVecPos) => LayerVecPos[];
 export interface ShortestPath {
-    path: LayerPosition[];
+    path: LayerVecPos[];
     distOffset: number;
 }
 export interface ShortestPathAlgorithm {
-    getShortestPath(startPos: LayerPosition, targetPos: LayerPosition, getNeighbors: GetNeighbors): {
-        path: LayerPosition[];
-        closestToTarget: LayerPosition;
+    getShortestPath(startPos: LayerVecPos, targetPos: LayerVecPos, getNeighbors: GetNeighbors): {
+        path: LayerVecPos[];
+        closestToTarget: LayerVecPos;
     };
 }

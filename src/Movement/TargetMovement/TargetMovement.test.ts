@@ -1,5 +1,5 @@
 import {
-  LayerPosition,
+  LayerVecPos,
   ShortestPathAlgorithm,
 } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
@@ -16,7 +16,6 @@ import {
   createTilemapMock,
   mockBlockMap,
   mockCharMap,
-  layerPos,
   createAllowedFn,
   COLLISION_GROUP,
 } from "../../Utils/MockFactory/MockFactory";
@@ -44,19 +43,21 @@ describe("TargetMovement", () => {
 
   function createMockChar(
     id: string,
-    pos: LayerPosition,
+    pos: LayerVecPos,
     charConfig: CharConfig = { ...TEST_CHAR_CONFIG, tilemap: gridTilemap }
   ): GridCharacter {
     const mockChar = new GridCharacter(id, charConfig);
     mockChar.setTilePosition(pos);
     return mockChar;
   }
-
-  function createPath(path: Array<[number, number]>): LayerPosition[] {
-    return path.map(([x, y]) => layerPos(new Vector2(x, y)));
+  function layerPos(vec: Vector2): LayerVecPos {
+    return {
+      position: vec,
+      layer: "lowerCharLayer",
+    };
   }
 
-  function expectWalkedPath(mockChar: GridCharacter, path: LayerPosition[]) {
+  function expectWalkedPath(mockChar: GridCharacter, path: LayerVecPos[]) {
     for (const pos of path) {
       targetMovement.update(1000);
       mockChar.update(1000);
@@ -667,7 +668,72 @@ describe("TargetMovement", () => {
     });
   });
 
-  function blockPath(charPos: LayerPosition, targetPos: LayerPosition) {
+  describe("non-colliding char", () => {
+    it("should ignore blocked tiles with non tile-colliding char", () => {
+      const charPos = layerPos(new Vector2(3, 1));
+      const targetPos = layerPos(new Vector2(1, 1));
+      const mockChar = createMockChar("char1", charPos, {
+        ...TEST_CHAR_CONFIG,
+        tilemap: gridTilemap,
+        collidesWithTiles: false,
+      });
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        shortestPathAlgorithm: bidirectionalSearch,
+      });
+
+      tilemapMock.hasTileAt.mockReturnValue(false);
+      const getNeighbors = targetMovement.getNeighbors(charPos);
+
+      expect(getNeighbors).toEqual([
+        {
+          position: new Vector2(charPos.position.x, charPos.position.y + 1),
+          layer: "lowerCharLayer",
+        },
+        {
+          position: new Vector2(charPos.position.x + 1, charPos.position.y),
+          layer: "lowerCharLayer",
+        },
+        {
+          position: new Vector2(charPos.position.x - 1, charPos.position.y),
+          layer: "lowerCharLayer",
+        },
+        {
+          position: new Vector2(charPos.position.x, charPos.position.y - 1),
+          layer: "lowerCharLayer",
+        },
+      ]);
+    });
+
+    it("should not list tiles out of range", () => {
+      const charPos = layerPos(new Vector2(0, 0));
+      const charPos2 = layerPos(new Vector2(19, 29));
+      const targetPos = layerPos(new Vector2(1, 1));
+      const mockChar = createMockChar("char1", charPos, {
+        ...TEST_CHAR_CONFIG,
+        tilemap: gridTilemap,
+        collidesWithTiles: false,
+      });
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        shortestPathAlgorithm: bidirectionalSearch,
+      });
+
+      const neighbors = targetMovement.getNeighbors(charPos);
+
+      expect(neighbors).toEqual([
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+
+      const neighbors2 = targetMovement.getNeighbors(charPos2);
+
+      expect(neighbors2).toEqual([
+        layerPos(new Vector2(18, 29)),
+        layerPos(new Vector2(19, 28)),
+      ]);
+    });
+  });
+
+  function blockPath(charPos: LayerVecPos, targetPos: LayerVecPos) {
     if (charPos.position.x != 1 || charPos.position.y != 0) {
       throw "CharPos needs to be (1,0)";
     }
@@ -682,7 +748,7 @@ describe("TargetMovement", () => {
     ]);
   }
 
-  function unblockPath(charPos: LayerPosition, targetPos: LayerPosition) {
+  function unblockPath(charPos: LayerVecPos, targetPos: LayerVecPos) {
     if (charPos.position.x != 1 || charPos.position.y != 0) {
       throw "CharPos needs to be (1,0)";
     }
@@ -1004,7 +1070,7 @@ describe("TargetMovement", () => {
 
   describe("finished observable", () => {
     let mockChar;
-    let charPos: LayerPosition;
+    let charPos: LayerVecPos;
 
     beforeEach(() => {
       charPos = layerPos(new Vector2(1, 0));
@@ -1506,31 +1572,8 @@ describe("TargetMovement", () => {
         ])
       );
     });
-
-    it("should consider blocking chars", () => {
-      const charPos = layerPos(new Vector2(1, 0));
-      const targetPos = layerPos(new Vector2(1, 4));
-      const mockChar = createMockChar("char", charPos, {
-        ...TEST_CHAR_CONFIG,
-        tilemap: gridTilemap,
-        collisionGroups: [COLLISION_GROUP],
-      });
-
-      // prettier-ignore
-      mockCharMap(tilemapMock, gridTilemap, [
-        ".s..",
-        "ccc.",
-        "....",
-        "####",
-        ".t..",
-      ]);
-
-      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-        shortestPathAlgorithm: shortestPathAlgo,
-        config: {
-          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
-        },
-      });
+  });
+});
 
       expectWalkedPath(
         mockChar,

@@ -1,7 +1,7 @@
-import { LayerPosition } from "./../../Pathfinding/ShortestPathAlgorithm";
+import { LayerVecPos } from "./../../Pathfinding/ShortestPathAlgorithm";
 export declare class LayerPositionUtils {
-    static equal(position: LayerPosition, otherPosition: LayerPosition): boolean;
-    static copyOver(source: LayerPosition, target: LayerPosition): void;
-    static clone(layerPosition: LayerPosition): LayerPosition;
-    static toString(layerPosition: LayerPosition): string;
+    static equal(position: LayerVecPos, otherPosition: LayerVecPos): boolean;
+    static copyOver(source: LayerVecPos, target: LayerVecPos): void;
+    static clone(layerPosition: LayerVecPos): LayerVecPos;
+    static toString(layerPosition: LayerVecPos): string;
 }

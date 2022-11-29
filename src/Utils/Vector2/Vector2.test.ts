@@ -104,4 +104,9 @@ describe("Vector2", () => {
     const mod = 5;
     expect(v.scalarModulo(mod)).toEqual(new Vector2(0, 4));
   });
+
+  it("should convert to position", () => {
+    const v = new Vector2({ x: 5, y: 9 });
+    expect(v.toPosition()).toEqual({ x: 5, y: 9 });
+  });
 });

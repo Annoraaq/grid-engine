@@ -6,12 +6,12 @@ parent: Examples (8 directions)
 
 # Basic Player Movement
 
-**Press the arrow keys to move.** This is a basic demo of isometric maps with 8 direction. Only four directions are supported yet.
+**Press the arrow keys to move.** This is a basic demo of isometric maps with 8 directions.
 
 <div id="game"></div>
 
 <script src="js/phaser.min.js"></script>
-<script src="js/grid-engine-2.21.0.min.js"></script>
+<script src="js/grid-engine-2.22.1.min.js"></script>
 <script src="js/getBasicConfig.js"></script>
 
 <script>

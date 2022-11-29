@@ -9,7 +9,7 @@ import { Concrete } from "../../Utils/TypeUtils";
 import { GridTilemap } from "../GridTilemap";
 import { createTilemapMock } from "../../Utils/MockFactory/MockFactory";
 import * as Phaser from "phaser";
-import { LayerPosition } from "../../Pathfinding/ShortestPathAlgorithm";
+import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -383,7 +383,7 @@ describe("CharBlockCache", () => {
     return char;
   }
 
-  function isCharBlockingAt(pos: LayerPosition, exclude?: string[]): boolean {
+  function isCharBlockingAt(pos: LayerVecPos, exclude?: string[]): boolean {
     return charBlockCache.isCharBlockingAt(
       pos.position,
       pos.layer,

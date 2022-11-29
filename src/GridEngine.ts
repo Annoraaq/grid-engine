@@ -4,6 +4,7 @@ import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import {
   Finished,
+  IsPositionAllowedFn,
   MoveToConfig,
   MoveToResult,
   TargetMovement,
@@ -14,7 +15,7 @@ import {
   isDiagonal,
   NumberOfDirections,
 } from "./Direction/Direction";
-import { GridTilemap, LayerName } from "./GridTilemap/GridTilemap";
+import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
 import { take, takeUntil, filter, map, mergeWith } from "rxjs/operators";
@@ -45,9 +46,9 @@ export {
   NumberOfDirections,
   NoPathFoundStrategy,
   PathBlockedStrategy,
-  LayerName,
   MovementInfo,
   PositionChange,
+  IsPositionAllowedFn,
 };
 
 export type TileSizePerSecond = number;
@@ -56,6 +57,16 @@ export interface Position {
   x: number;
   y: number;
 }
+
+/**
+ * Specifies a tile position along with a character layer.
+ */
+export interface LayerPosition {
+  position: Position;
+  charLayer: CharLayer;
+}
+
+export type CharLayer = string | undefined;
 
 /**
  * Configuration object for initializing GridEngine.
@@ -831,7 +842,7 @@ export class GridEngine {
    */
   turnTowards(charId: string, direction: Direction): void {
     this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
+    const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.turnTowards(direction);
   }
@@ -853,7 +864,7 @@ export class GridEngine {
   /**
    * Places the character with the given id to the provided tile position. If
    * that character is moving, the movement is stopped. The
-   * {@link positionChanged} and {@link positionChangeFinished} observables will
+   * {@link positionChangeStarted} and {@link positionChangeFinished} observables will
    * emit. If the character was moving, the {@link movementStopped} observable
    * will also emit.
    */
@@ -957,13 +968,38 @@ export class GridEngine {
   }
 
   /**
+   * Gets the tile position and character layer adjacent to the given
+   * position in the given direction.
+   */
+  getTilePosInDirection(
+    position: Position,
+    charLayer: string | undefined,
+    direction: Direction
+  ): LayerPosition {
+    this.initGuard();
+    // This can't actually happen, but TypeScript can't know.
+    if (!this.gridTilemap) throw this.createUninitializedErr();
+    const posInDirection = this.gridTilemap.getTilePosInDirection(
+      {
+        position: new Vector2(position),
+        layer: charLayer,
+      },
+      direction
+    );
+    return {
+      position: posInDirection.position.toPosition(),
+      charLayer: posInDirection.layer,
+    };
+  }
+
+  /**
    * @returns Observable that, whenever a specified position is entered on optionally provided layers,
    *  will notify with the target characters position change
    */
   steppedOn(
     charIds: string[],
     tiles: Position[],
-    layer?: LayerName[]
+    layer?: CharLayer[]
   ): Observable<
     {
       charId: string;
@@ -1026,6 +1062,13 @@ export class GridEngine {
    * @returns Observable that will notify about every change of direction that
    *  is not part of a movement. This is the case if the character tries to walk
    *  towards a blocked tile. The character will turn but not move.
+   *  It also emits when you call {@link GridEngine.turnTowards}.
+   *
+   * This obsersable never emits more than one time in a row for the same
+   * direction.
+   * So for instance, if {@link GridEngine.turnTowards} is called multiple times
+   * in a row (without any facing direction change occurring inbetween) with the
+   * same direction, this observable would only emit once.
    */
   directionChanged(): Observable<{ charId: string; direction: Direction }> {
     if (!this.directionChanged$) throw this.createUninitializedErr();

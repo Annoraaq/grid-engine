@@ -1,9 +1,8 @@
-import { LayerName } from "./../../GridTilemap/GridTilemap";
 import { BidirectionalSearch } from "./../../Pathfinding/BidirectionalSearch/BidirectionalSearch";
 import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy";
 import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
 import {
-  LayerPosition,
+  LayerVecPos,
   ShortestPath,
 } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { DistanceUtils } from "./../../Utils/DistanceUtils";
@@ -19,7 +18,7 @@ import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Retryable } from "./Retryable/Retryable";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
 import { ShortestPathAlgorithm } from "../../Pathfinding/ShortestPathAlgorithm";
-import { Position } from "../../GridEngine";
+import { CharLayer, Position } from "../../GridEngine";
 import { filter, Subject, take } from "rxjs";
 import {
   IsPositionAllowedFn,
@@ -114,7 +113,7 @@ export interface Finished {
   position: Position;
   result?: MoveToResult;
   description?: string;
-  layer: LayerName;
+  layer: CharLayer;
 }
 
 export interface Options {
@@ -125,7 +124,7 @@ export interface Options {
 }
 
 export class TargetMovement implements Movement {
-  private shortestPath: LayerPosition[] = [];
+  private shortestPath: LayerVecPos[] = [];
   private distOffset = 0;
   private posOnPath = 0;
   private pathBlockedStrategy: PathBlockedStrategy;
@@ -145,7 +144,7 @@ export class TargetMovement implements Movement {
   constructor(
     private character: GridCharacter,
     private tilemap: GridTilemap,
-    private targetPos: LayerPosition,
+    private targetPos: LayerVecPos,
     {
       config,
       ignoreBlockedTarget = false,
@@ -318,7 +317,7 @@ export class TargetMovement implements Movement {
     this.character.move(dir);
   }
 
-  private nextTileOnPath(): LayerPosition | undefined {
+  private nextTileOnPath(): LayerVecPos | undefined {
     return this.shortestPath[this.posOnPath + 1];
   }
 
@@ -453,10 +452,12 @@ export class TargetMovement implements Movement {
   }
 
   private getDir(from: Vector2, to: Vector2): Direction {
-    return this.distanceUtils.direction(from, to);
+    return this.tilemap.fromMapDirection(
+      this.distanceUtils.direction(from, to)
+    );
   }
 
-  private hasBlockingTileForChar(pos: Position, layer: LayerName): boolean {
+  private hasBlockingTileForChar(pos: Position, layer: CharLayer): boolean {
     for (let x = pos.x; x < pos.x + this.character.getTileWidth(); x++) {
       for (let y = pos.y; y < pos.y + this.character.getTileHeight(); y++) {
         const res = this.tilemap.hasBlockingTile(

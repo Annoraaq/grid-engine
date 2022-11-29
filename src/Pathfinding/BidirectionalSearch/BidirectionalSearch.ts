@@ -1,7 +1,7 @@
 import { LayerPositionUtils } from "./../../Utils/LayerPositionUtils/LayerPositionUtils";
 import {
   GetNeighbors,
-  LayerPosition,
+  LayerVecPos,
   ShortestPathAlgorithm,
 } from "../ShortestPathAlgorithm";
 import { VectorUtils } from "../../Utils/VectorUtils";
@@ -12,26 +12,26 @@ import { Vector2 } from "../../Utils/Vector2/Vector2";
 
 interface ShortestPathTuple {
   shortestDistance: number;
-  previous: Map<string, LayerPosition>;
-  previous2: Map<string, LayerPosition>;
-  closestToTarget: LayerPosition;
-  matchingPos?: LayerPosition;
+  previous: Map<string, LayerVecPos>;
+  previous2: Map<string, LayerVecPos>;
+  closestToTarget: LayerVecPos;
+  matchingPos?: LayerVecPos;
 }
 
 interface QueueEntry {
-  node: LayerPosition;
+  node: LayerVecPos;
   dist: number;
 }
 
-type Previous = Map<string, LayerPosition>;
+type Previous = Map<string, LayerVecPos>;
 
 class Bfs {
-  previous = new Map<string, LayerPosition>();
+  previous = new Map<string, LayerVecPos>();
   visited = new Map<string, number>();
   queue = new Queue<QueueEntry>();
   otherBfs?: Bfs;
 
-  step(neighbors: LayerPosition[], node: LayerPosition, dist: number) {
+  step(neighbors: LayerVecPos[], node: LayerVecPos, dist: number) {
     for (const neighbor of neighbors) {
       if (!this.visited.has(LayerPositionUtils.toString(neighbor))) {
         console.log("not visited", LayerPositionUtils.toString(neighbor), node);
@@ -49,10 +49,10 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
   constructor(private numberOfDirections: NumberOfDirections) {}
 
   getShortestPath(
-    startPos: LayerPosition,
-    targetPos: LayerPosition,
+    startPos: LayerVecPos,
+    targetPos: LayerVecPos,
     getNeighbors: GetNeighbors
-  ): { path: LayerPosition[]; closestToTarget: LayerPosition } {
+  ): { path: LayerVecPos[]; closestToTarget: LayerVecPos } {
     const shortestPath = this.shortestPathBfs(
       startPos,
       targetPos,
@@ -77,9 +77,9 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
    * involves 4 further getNeighbors calls.
    */
   private createCachedGetNeighbors(getNeighbors: GetNeighbors): GetNeighbors {
-    const cache = new Map<string, LayerPosition[]>();
+    const cache = new Map<string, LayerVecPos[]>();
 
-    return (pos: LayerPosition) => {
+    return (pos: LayerVecPos) => {
       const strPos = LayerPositionUtils.toString(pos);
       const cached = cache.get(strPos);
       if (cached) return cached;
@@ -91,18 +91,18 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
     };
   }
 
-  private distance(fromNode: LayerPosition, toNode: LayerPosition): number {
+  private distance(fromNode: LayerVecPos, toNode: LayerVecPos): number {
     return VectorUtils.manhattanDistance(fromNode.position, toNode.position);
   }
 
-  private equal(layerPos1: LayerPosition, layerPos2: LayerPosition): boolean {
+  private equal(layerPos1: LayerVecPos, layerPos2: LayerVecPos): boolean {
     if (!VectorUtils.equal(layerPos1.position, layerPos2.position))
       return false;
     return layerPos1.layer === layerPos2.layer;
   }
 
   private createReverseNeighbors(getNeighbors: GetNeighbors) {
-    return (pos: LayerPosition) => {
+    return (pos: LayerVecPos) => {
       // const neighbors = getNeighbors(pos);
       // TODO: use unfiltered neighbors here
       const distanceUtils = DistanceUtilsFactory.create(
@@ -112,8 +112,8 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
       console.log("create reverse neighbours of ", pos, neighbors);
       return neighbors
         .map((p: Vector2) => ({ layer: pos.layer, position: p }))
-        .filter((neighbor: LayerPosition) => {
-          return !!getNeighbors(neighbor).find((n: LayerPosition) => {
+        .filter((neighbor: LayerVecPos) => {
+          return !!getNeighbors(neighbor).find((n: LayerVecPos) => {
             return LayerPositionUtils.equal(n, pos);
           });
         });
@@ -121,8 +121,8 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
   }
 
   private shortestPathBfs(
-    startNode: LayerPosition,
-    stopNode: LayerPosition,
+    startNode: LayerVecPos,
+    stopNode: LayerVecPos,
     getNeighbors: GetNeighbors
   ): ShortestPathTuple {
     const startBfs = new Bfs();
@@ -131,7 +131,7 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
     stopBfs.otherBfs = startBfs;
     const reverseNeighbors = this.createReverseNeighbors(getNeighbors);
 
-    let closestToTarget: LayerPosition = startNode;
+    let closestToTarget: LayerVecPos = startNode;
     let smallestDistToTarget: number = this.distance(startNode, stopNode);
     console.log("smallestDist", smallestDistToTarget);
     startBfs.queue.enqueue({ node: startNode, dist: 0 });
@@ -198,10 +198,10 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
   private returnPath(
     startPathPrev: Previous,
     stopPathPrev: Previous,
-    matchingPos: LayerPosition | undefined,
-    startNode: LayerPosition,
-    stopNode: LayerPosition
-  ): LayerPosition[] {
+    matchingPos: LayerVecPos | undefined,
+    startNode: LayerVecPos,
+    stopNode: LayerVecPos
+  ): LayerVecPos[] {
     if (matchingPos) {
       const startPath = this.getPathFromPrev(
         startPathPrev,
@@ -223,11 +223,11 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
 
   private getPathFromPrev(
     previous: Previous,
-    startNode: LayerPosition,
-    stopNode: LayerPosition
-  ): LayerPosition[] {
-    const ret: LayerPosition[] = [];
-    let currentNode: LayerPosition | undefined = stopNode;
+    startNode: LayerVecPos,
+    stopNode: LayerVecPos
+  ): LayerVecPos[] {
+    const ret: LayerVecPos[] = [];
+    let currentNode: LayerVecPos | undefined = stopNode;
     ret.push(currentNode);
     while (!this.equal(currentNode, startNode)) {
       currentNode = previous.get(LayerPositionUtils.toString(currentNode));

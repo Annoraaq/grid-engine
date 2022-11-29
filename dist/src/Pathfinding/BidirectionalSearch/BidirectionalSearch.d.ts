@@ -1,8 +1,8 @@
-import { GetNeighbors, LayerPosition, ShortestPathAlgorithm } from "../ShortestPathAlgorithm";
+import { GetNeighbors, LayerVecPos, ShortestPathAlgorithm } from "../ShortestPathAlgorithm";
 export declare class BidirectionalSearch implements ShortestPathAlgorithm {
-    getShortestPath(startPos: LayerPosition, targetPos: LayerPosition, getNeighbors: GetNeighbors): {
-        path: LayerPosition[];
-        closestToTarget: LayerPosition;
+    getShortestPath(startPos: LayerVecPos, targetPos: LayerVecPos, getNeighbors: GetNeighbors): {
+        path: LayerVecPos[];
+        closestToTarget: LayerVecPos;
     };
     /**
      * @returns A memoized version of getNeighbors to improve speed.
