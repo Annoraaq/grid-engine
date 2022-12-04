@@ -6,9 +6,6 @@ import {
 } from "../ShortestPathAlgorithm";
 import { VectorUtils } from "../../Utils/VectorUtils";
 import { Queue } from "../../Datastructures/Queue/Queue";
-import { NumberOfDirections } from "../../GridEngine";
-import { DistanceUtilsFactory } from "../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
 
 interface ShortestPathTuple {
   shortestDistance: number;
@@ -16,6 +13,7 @@ interface ShortestPathTuple {
   previous2: Map<string, LayerVecPos>;
   closestToTarget: LayerVecPos;
   matchingPos?: LayerVecPos;
+  steps: number;
 }
 
 interface QueueEntry {
@@ -34,29 +32,26 @@ class Bfs {
   step(neighbors: LayerVecPos[], node: LayerVecPos, dist: number) {
     for (const neighbor of neighbors) {
       if (!this.visited.has(LayerPositionUtils.toString(neighbor))) {
-        console.log("not visited", LayerPositionUtils.toString(neighbor), node);
         this.previous.set(LayerPositionUtils.toString(neighbor), node);
         this.queue.enqueue({ node: neighbor, dist: dist + 1 });
         this.visited.set(LayerPositionUtils.toString(neighbor), dist + 1);
-      } else {
-        console.log("visited");
       }
     }
   }
 }
 
 export class BidirectionalSearch implements ShortestPathAlgorithm {
-  constructor(private numberOfDirections: NumberOfDirections) {}
-
   getShortestPath(
     startPos: LayerVecPos,
     targetPos: LayerVecPos,
-    getNeighbors: GetNeighbors
-  ): { path: LayerVecPos[]; closestToTarget: LayerVecPos } {
+    getNeighbors: GetNeighbors,
+    getReverseNeighbors: GetNeighbors
+  ): { path: LayerVecPos[]; closestToTarget: LayerVecPos; steps: number } {
     const shortestPath = this.shortestPathBfs(
       startPos,
       targetPos,
-      this.createCachedGetNeighbors(getNeighbors)
+      getNeighbors,
+      getReverseNeighbors
     );
     return {
       path: this.returnPath(
@@ -67,27 +62,7 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
         targetPos
       ),
       closestToTarget: shortestPath.closestToTarget,
-    };
-  }
-
-  /**
-   * @returns A memoized version of getNeighbors to improve speed.
-   * The main reason for this is that Bidirectional Search needs to check
-   * reverse neighborhood for the BFS that comes from the target node. This
-   * involves 4 further getNeighbors calls.
-   */
-  private createCachedGetNeighbors(getNeighbors: GetNeighbors): GetNeighbors {
-    const cache = new Map<string, LayerVecPos[]>();
-
-    return (pos: LayerVecPos) => {
-      const strPos = LayerPositionUtils.toString(pos);
-      const cached = cache.get(strPos);
-      if (cached) return cached;
-
-      const neighbors = getNeighbors(pos);
-      // console.log("cached neighbors of", pos, neighbors);
-      cache.set(strPos, neighbors);
-      return neighbors;
+      steps: shortestPath.steps,
     };
   }
 
@@ -101,51 +76,30 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
     return layerPos1.layer === layerPos2.layer;
   }
 
-  private createReverseNeighbors(getNeighbors: GetNeighbors) {
-    return (pos: LayerVecPos) => {
-      // const neighbors = getNeighbors(pos);
-      // TODO: use unfiltered neighbors here
-      const distanceUtils = DistanceUtilsFactory.create(
-        this.numberOfDirections
-      );
-      const neighbors = distanceUtils.neighbors(pos.position);
-      console.log("create reverse neighbours of ", pos, neighbors);
-      return neighbors
-        .map((p: Vector2) => ({ layer: pos.layer, position: p }))
-        .filter((neighbor: LayerVecPos) => {
-          return !!getNeighbors(neighbor).find((n: LayerVecPos) => {
-            return LayerPositionUtils.equal(n, pos);
-          });
-        });
-    };
-  }
-
   private shortestPathBfs(
     startNode: LayerVecPos,
     stopNode: LayerVecPos,
-    getNeighbors: GetNeighbors
+    getNeighbors: GetNeighbors,
+    getReverseNeighbors: GetNeighbors
   ): ShortestPathTuple {
     const startBfs = new Bfs();
     const stopBfs = new Bfs();
+    let steps = 0;
     startBfs.otherBfs = stopBfs;
     stopBfs.otherBfs = startBfs;
-    const reverseNeighbors = this.createReverseNeighbors(getNeighbors);
 
     let closestToTarget: LayerVecPos = startNode;
     let smallestDistToTarget: number = this.distance(startNode, stopNode);
-    console.log("smallestDist", smallestDistToTarget);
     startBfs.queue.enqueue({ node: startNode, dist: 0 });
     stopBfs.queue.enqueue({ node: stopNode, dist: 0 });
     startBfs.visited.set(LayerPositionUtils.toString(startNode), 0);
     stopBfs.visited.set(LayerPositionUtils.toString(stopNode), 0);
 
-    while (startBfs.queue.size() > 0 && stopBfs.queue.size() > 0) {
-      console.log("run loop");
+    while (startBfs.queue.size() > 0 || stopBfs.queue.size() > 0) {
       const startDequeued = startBfs.queue.dequeue();
       if (!startDequeued) break;
       const { node, dist } = startDequeued;
       const distToTarget = this.distance(node, stopNode);
-      console.log("dist", distToTarget, node, stopNode);
       if (distToTarget < smallestDistToTarget) {
         smallestDistToTarget = distToTarget;
         closestToTarget = node;
@@ -160,16 +114,16 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
           previous2: stopBfs.previous,
           closestToTarget: stopNode,
           matchingPos: node,
+          steps,
         };
       }
 
-      console.log("start step", node, getNeighbors(node));
+      steps++;
       startBfs.step(getNeighbors(node), node, dist);
       const stopDequeued = stopBfs.queue.dequeue();
-      if (!stopDequeued) break;
+      if (!stopDequeued) continue;
       const { node: stopBfsNode, dist: stopBfsDist } = stopDequeued;
       if (startBfs.visited.has(LayerPositionUtils.toString(stopBfsNode))) {
-        console.log("a2");
         return {
           shortestDistance:
             stopBfsDist +
@@ -179,19 +133,19 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
           previous2: stopBfs.previous,
           closestToTarget: stopNode,
           matchingPos: stopBfsNode,
+          steps,
         };
       }
 
-      console.log("stopBfs", reverseNeighbors(stopBfsNode), stopBfsNode);
-      stopBfs.step(reverseNeighbors(stopBfsNode), stopBfsNode, stopBfsDist);
-      console.log("queueLenghts", startBfs.queue.size(), stopBfs.queue.size());
+      steps++;
+      stopBfs.step(getReverseNeighbors(stopBfsNode), stopBfsNode, stopBfsDist);
     }
-    console.log("a0");
     return {
       shortestDistance: -1,
       previous: startBfs.previous,
       previous2: stopBfs.previous,
       closestToTarget,
+      steps,
     };
   }
 
@@ -214,7 +168,6 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
         matchingPos
       );
       startPath.pop();
-      console.log("matching pios", startPath, startPathPrev);
       return [...startPath, ...stopPath];
     } else {
       return this.getPathFromPrev(startPathPrev, startNode, stopNode).reverse();

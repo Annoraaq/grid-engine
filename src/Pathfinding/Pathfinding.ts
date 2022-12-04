@@ -1,3 +1,4 @@
+import { Vector } from "matter";
 import {
   directionFromPos,
   NumberOfDirections,
@@ -8,15 +9,17 @@ import { Position } from "../GridEngine";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { DistanceUtilsFactory } from "../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
 import { LayerPositionUtils } from "../Utils/LayerPositionUtils/LayerPositionUtils";
+import { Concrete } from "../Utils/TypeUtils";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import {
   GetNeighbors,
-  LayerPosition,
-  ShortestPathAlgorithm,
+  LayerVecPos,
+  shortestPathAlgorithmFactory,
+  ShortestPathAlgorithmType,
 } from "./ShortestPathAlgorithm";
 
-interface PathfindingOptions {
-  shortestPathAlgorithm?: ShortestPathAlgorithm;
+export interface PathfindingOptions {
+  shortestPathAlgorithm?: ShortestPathAlgorithmType;
   pathWidth?: number;
   pathHeight?: number;
   numberOfDirections?: NumberOfDirections;
@@ -34,20 +37,19 @@ export type IsPositionAllowedFn = (
 ) => boolean;
 
 export class Pathfinding {
-  // TODO: replace by enum
   constructor(
-    private shortestPathAlgo: ShortestPathAlgorithm,
+    private shortestPathAlgorithm: ShortestPathAlgorithmType,
     private gridTilemap: GridTilemap
   ) {}
 
   findShortestPath(
-    source: LayerPosition,
-    dest: LayerPosition,
+    source: LayerVecPos,
+    dest: LayerVecPos,
     {
       shortestPathAlgorithm,
       pathWidth = 1,
       pathHeight = 1,
-      numberOfDirections,
+      numberOfDirections = NumberOfDirections.FOUR,
       isPositionAllowed = (_pos, _charLayer) => true,
       collisionGroups = [],
       ignoredChars = [],
@@ -55,86 +57,198 @@ export class Pathfinding {
       ignoreMapBounds = false,
       ignoreBlockedTarget = false,
     }: PathfindingOptions = {}
-  ): { path: LayerPosition[]; closestToTarget: LayerPosition } {
-    if (!shortestPathAlgorithm) {
-      shortestPathAlgorithm = this.shortestPathAlgo;
-    }
-    const distanceUtils = DistanceUtilsFactory.create(
-      numberOfDirections ?? NumberOfDirections.FOUR
+  ): { path: LayerVecPos[]; closestToTarget: LayerVecPos; steps: number } {
+    const shortestPathAlgo = shortestPathAlgorithmFactory(
+      shortestPathAlgorithm ?? this.shortestPathAlgorithm
     );
 
-    const getNeighbors: GetNeighbors = (pos: LayerPosition) => {
-      const neighbours = distanceUtils.neighbors(pos.position);
-      console.log("urneighs", pos, neighbours);
-      const transitionMappedNeighbors = neighbours.map((unblockedNeighbor) => {
-        const transition = this.gridTilemap.getTransition(
-          unblockedNeighbor,
-          pos.layer
-        );
-        return {
-          position: unblockedNeighbor,
-          layer: transition || pos.layer,
-        };
-      });
-
-      return transitionMappedNeighbors.filter((neighborPos) => {
-        const positionAllowed = isPositionAllowed(
-          neighborPos.position,
-          neighborPos.layer
-        );
-        const tileBlocking =
-          !ignoreTiles &&
-          // TODO: the problem lies here. The reverseNeighbors funktion assumes that the getNeighbors function returns all neighbors.
-          // Maybe the reverseNeighbors function should use the general neighbors function and then check via getNeigbors.
-          this.hasBlockingTileFrom(
-            pos,
-            neighborPos,
-            pathWidth,
-            pathHeight,
-            ignoreMapBounds
-          );
-        const inRange =
-          ignoreMapBounds || this.gridTilemap.isInRange(neighborPos.position);
-
-        const charBlocking = this.gridTilemap.hasBlockingChar(
-          neighborPos.position,
-          neighborPos.layer,
-          collisionGroups,
-          new Set(ignoredChars)
-        );
-
-        const isBlocking =
-          positionAllowed && !tileBlocking && inRange && !charBlocking;
-
-        return (
-          isBlocking ||
-          (ignoreBlockedTarget && LayerPositionUtils.equal(neighborPos, dest))
-        );
-      });
+    const ops: Concrete<PathfindingOptions> = {
+      shortestPathAlgorithm:
+        shortestPathAlgorithm || this.shortestPathAlgorithm,
+      pathWidth,
+      pathHeight,
+      numberOfDirections,
+      isPositionAllowed,
+      collisionGroups,
+      ignoredChars,
+      ignoreTiles,
+      ignoreMapBounds,
+      ignoreBlockedTarget,
     };
 
-    return shortestPathAlgorithm.getShortestPath(source, dest, getNeighbors);
-  }
+    const getNeighbors = createGetNeighbors(ops, dest, this.gridTilemap);
+    const getReverseNeighbors = createReverseNeighbors(
+      ops,
+      dest,
+      getNeighbors,
+      this.gridTilemap
+    );
 
-  private hasBlockingTileFrom(
-    src: LayerPosition,
-    dest: LayerPosition,
-    pathWidth: number,
-    pathHeight: number,
-    ignoreMapBounds: boolean
-  ): boolean {
-    for (let x = dest.position.x; x < dest.position.x + pathWidth; x++) {
-      for (let y = dest.position.y; y < dest.position.y + pathHeight; y++) {
-        const res = this.gridTilemap.hasBlockingTile(
-          new Vector2(x, y),
-          dest.layer,
-          oppositeDirection(directionFromPos(src.position, dest.position)),
-          ignoreMapBounds
+    const b = shortestPathAlgo.getShortestPath(
+      source,
+      dest,
+      getNeighbors,
+      getReverseNeighbors
+    );
+
+    return b;
+  }
+}
+
+export function createGetNeighbors(
+  options: Concrete<PathfindingOptions>,
+  dest: LayerVecPos,
+  gridTilemap: GridTilemap
+): GetNeighbors {
+  const distanceUtils = DistanceUtilsFactory.create(
+    options.numberOfDirections ?? NumberOfDirections.FOUR
+  );
+  const getNeighbors: GetNeighbors = (pos: LayerVecPos) => {
+    const neighbours = distanceUtils.neighbors(pos.position);
+    const transitionMappedNeighbors = neighbours.map((unblockedNeighbor) => {
+      const transition = gridTilemap.getTransition(
+        unblockedNeighbor,
+        pos.layer
+      );
+      return {
+        position: unblockedNeighbor,
+        layer: transition || pos.layer,
+      };
+    });
+
+    return transitionMappedNeighbors.filter((neighborPos) => {
+      const positionAllowed = options.isPositionAllowed(
+        neighborPos.position,
+        neighborPos.layer
+      );
+      const tileBlocking =
+        !options.ignoreTiles &&
+        hasBlockingTileFrom(
+          pos,
+          neighborPos,
+          options.pathWidth,
+          options.pathHeight,
+          options.ignoreMapBounds,
+          gridTilemap
+        );
+      const inRange =
+        options.ignoreMapBounds || gridTilemap.isInRange(neighborPos.position);
+
+      const charBlocking = gridTilemap.hasBlockingChar(
+        neighborPos.position,
+        neighborPos.layer,
+        options.collisionGroups,
+        new Set(options.ignoredChars)
+      );
+
+      const isBlocking =
+        charBlocking || tileBlocking || !inRange || !positionAllowed;
+
+      return (
+        !isBlocking ||
+        (options.ignoreBlockedTarget &&
+          LayerPositionUtils.equal(neighborPos, dest))
+      );
+    });
+  };
+
+  return getNeighbors;
+}
+
+export function createReverseNeighbors(
+  options: Concrete<PathfindingOptions>,
+  dest: LayerVecPos,
+  getNeighbors: GetNeighbors,
+  gridTilemap: GridTilemap
+): GetNeighbors {
+  const distanceUtils = DistanceUtilsFactory.create(
+    options.numberOfDirections ?? NumberOfDirections.FOUR
+  );
+  const getReverseNeighbors: GetNeighbors = (pos: LayerVecPos) => {
+    const neighbours = distanceUtils.neighbors(pos.position);
+    const transitions = gridTilemap.getTransitions();
+    const toCurrentLayer = [...transitions.keys()]
+      .filter((key) => key === pos.position.toString())
+      .map((k) => transitions.get(k))
+      .map((v) => {
+        if (!v) return [];
+        return [...v.keys()].filter((k) => v.get(k) === pos.layer);
+      })
+      .flat();
+
+    const transFromLayer = gridTilemap.getTransition(pos.position, pos.layer);
+    if (!(transFromLayer && transFromLayer !== pos.layer)) {
+      toCurrentLayer.push(pos.layer);
+    }
+
+    const transitionMappedNeighbors = neighbours
+      .map((unblockedNeighbor) => {
+        return toCurrentLayer.map((lay) => {
+          return {
+            position: unblockedNeighbor,
+            layer: lay || pos.layer,
+          };
+        });
+      })
+      .flat();
+
+    const inRange =
+      options.ignoreMapBounds || gridTilemap.isInRange(pos.position);
+
+    const positionAllowed = options.isPositionAllowed(pos.position, pos.layer);
+
+    return transitionMappedNeighbors.filter((neighborPos) => {
+      // TODO(#270): check performance in theory and benchmarks
+      const tileBlocking =
+        !options.ignoreTiles &&
+        hasBlockingTileFrom(
+          neighborPos,
+          pos,
+          options.pathWidth,
+          options.pathHeight,
+          options.ignoreMapBounds,
+          gridTilemap
         );
 
-        if (res) return true;
-      }
+      const charBlocking = gridTilemap.hasBlockingChar(
+        neighborPos.position,
+        neighborPos.layer,
+        options.collisionGroups,
+        new Set(options.ignoredChars)
+      );
+
+      const isBlocking =
+        charBlocking || tileBlocking || !inRange || !positionAllowed;
+
+      return (
+        !isBlocking ||
+        (options.ignoreBlockedTarget && LayerPositionUtils.equal(pos, dest))
+      );
+    });
+  };
+
+  return getReverseNeighbors;
+}
+
+function hasBlockingTileFrom(
+  src: LayerVecPos,
+  dest: LayerVecPos,
+  pathWidth: number,
+  pathHeight: number,
+  ignoreMapBounds: boolean,
+  gridTilemap: GridTilemap
+): boolean {
+  for (let x = dest.position.x; x < dest.position.x + pathWidth; x++) {
+    for (let y = dest.position.y; y < dest.position.y + pathHeight; y++) {
+      const res = gridTilemap.hasBlockingTile(
+        new Vector2(x, y),
+        dest.layer,
+        oppositeDirection(directionFromPos(src.position, dest.position)),
+        ignoreMapBounds
+      );
+
+      if (res) return true;
     }
-    return false;
   }
+  return false;
 }

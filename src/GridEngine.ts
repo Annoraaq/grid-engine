@@ -4,7 +4,6 @@ import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import {
   Finished,
-  IsPositionAllowedFn,
   MoveToConfig,
   MoveToResult,
   TargetMovement,
@@ -34,6 +33,7 @@ import {
 } from "./GridCharacter/CharacterFilter/CharacterFilter";
 
 import { version as VERSION } from "../package.json";
+import { IsPositionAllowedFn } from "./Pathfinding/Pathfinding";
 
 export {
   CollisionStrategy,

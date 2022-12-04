@@ -1,6 +1,6 @@
 import {
   LayerVecPos,
-  ShortestPathAlgorithm,
+  ShortestPathAlgorithmType,
 } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
 import { MoveToResult, TargetMovement } from "./TargetMovement";
@@ -21,7 +21,6 @@ import {
 } from "../../Utils/MockFactory/MockFactory";
 import { Concrete } from "../../Utils/TypeUtils";
 import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
-import { Bfs } from "../../Pathfinding/Bfs/Bfs";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -39,7 +38,7 @@ describe("TargetMovement", () => {
   let blankLayerMock;
   let tilemapMock;
   let gridTilemap;
-  let shortestPathAlgo: ShortestPathAlgorithm;
+  let shortestPathAlgo: ShortestPathAlgorithmType;
 
   function createMockChar(
     id: string,
@@ -57,6 +56,10 @@ describe("TargetMovement", () => {
     };
   }
 
+  function createPath(path: [number, number][]): LayerVecPos[] {
+    return path.map(([x, y]) => layerPos(new Vector2(x, y)));
+  }
+
   function expectWalkedPath(mockChar: GridCharacter, path: LayerVecPos[]) {
     for (const pos of path) {
       targetMovement.update(1000);
@@ -69,7 +72,7 @@ describe("TargetMovement", () => {
     blankLayerMock = createBlankLayerMock();
     tilemapMock = createTilemapMock(blankLayerMock);
     gridTilemap = new GridTilemap(tilemapMock as any);
-    shortestPathAlgo = new Bfs();
+    shortestPathAlgo = "BIDIRECTIONAL_SEARCH";
     const config: Concrete<GridEngineConfig> = {
       characters: [],
       collisionTilePropertyName: "ge_collides",
@@ -91,7 +94,7 @@ describe("TargetMovement", () => {
         position: new Vector2(3, 1),
         layer: "lowerCharLayer",
       },
-      { shortestPathAlgorithm: shortestPathAlgo }
+      { config: { algorithm: shortestPathAlgo } }
     );
     targetMovement.update(100);
 
@@ -111,6 +114,7 @@ describe("TargetMovement", () => {
       },
       {
         config: {
+          algorithm: shortestPathAlgo,
           noPathFoundMaxRetries: 3,
           noPathFoundRetryBackoffMs: 200,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
@@ -118,13 +122,13 @@ describe("TargetMovement", () => {
         },
         ignoreBlockedTarget: true,
         distance: 12,
-        shortestPathAlgorithm: shortestPathAlgo,
       }
     );
 
     expect(targetMovement.getInfo()).toEqual({
       type: "Target",
       config: {
+        algorithm: shortestPathAlgo,
         ignoreBlockedTarget: true,
         distance: 12,
         targetPos: {
@@ -146,7 +150,7 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemap,
       layerPos(new Vector2(3, 3)),
-      { shortestPathAlgorithm: shortestPathAlgo }
+      { config: { algorithm: shortestPathAlgo } }
     );
     targetMovement.update(1000);
     mockChar.update(1000);
@@ -172,7 +176,7 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemap,
       layerPos(new Vector2(1, 1)),
-      { shortestPathAlgorithm: shortestPathAlgo }
+      { config: { algorithm: shortestPathAlgo } }
     );
     targetMovement.update(1000);
     mockChar.update(1000);
@@ -198,7 +202,7 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemap,
       layerPos(new Vector2(3, 1)),
-      { shortestPathAlgorithm: shortestPathAlgo }
+      { config: { algorithm: shortestPathAlgo } }
     );
     targetMovement.update(100);
     expect(mockChar.isMoving()).toBe(false);
@@ -221,9 +225,9 @@ describe("TargetMovement", () => {
       layerPos(new Vector2(1, 3)),
       {
         config: {
+          algorithm: shortestPathAlgo,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
-        shortestPathAlgorithm: shortestPathAlgo,
       }
     );
     targetMovement.update(1000);
@@ -250,9 +254,9 @@ describe("TargetMovement", () => {
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       distance: 3,
       config: {
+        algorithm: shortestPathAlgo,
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
       },
-      shortestPathAlgorithm: shortestPathAlgo,
     });
     targetMovement.update(100);
     mockChar.update(100);
@@ -275,7 +279,12 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemap,
       layerPos(new Vector2(1, 3)),
-      { distance: 2, shortestPathAlgorithm: shortestPathAlgo }
+      {
+        distance: 2,
+        config: {
+          algorithm: shortestPathAlgo,
+        },
+      }
     );
     targetMovement.update(1000);
     mockChar.update(1000);
@@ -306,9 +315,9 @@ describe("TargetMovement", () => {
       {
         distance: 2,
         config: {
+          algorithm: shortestPathAlgo,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
-        shortestPathAlgorithm: shortestPathAlgo,
       }
     );
 
@@ -337,9 +346,9 @@ describe("TargetMovement", () => {
       {
         distance: 3,
         config: {
+          algorithm: shortestPathAlgo,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
-        shortestPathAlgorithm: shortestPathAlgo,
       }
     );
 
@@ -366,7 +375,7 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemap,
       layerPos(new Vector2(1, 3)),
-      { shortestPathAlgorithm: shortestPathAlgo }
+      { config: { algorithm: shortestPathAlgo } }
     );
     targetMovement.update(1000);
     mockChar.update(1000);
@@ -391,9 +400,9 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(1, 3)),
         {
           config: {
+            algorithm: shortestPathAlgo,
             noPathFoundStrategy: NoPathFoundStrategy.RETRY,
           },
-          shortestPathAlgorithm: shortestPathAlgo,
         }
       );
       targetMovement.update(100);
@@ -438,10 +447,10 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(1, 3)),
         {
           config: {
+            algorithm: shortestPathAlgo,
             noPathFoundStrategy: NoPathFoundStrategy.RETRY,
             noPathFoundRetryBackoffMs: 150,
           },
-          shortestPathAlgorithm: shortestPathAlgo,
         }
       );
       targetMovement.update(100);
@@ -484,11 +493,11 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(1, 3)),
         {
           config: {
+            algorithm: shortestPathAlgo,
             noPathFoundStrategy: NoPathFoundStrategy.RETRY,
             noPathFoundRetryBackoffMs: 1,
             noPathFoundMaxRetries: 2,
           },
-          shortestPathAlgorithm: shortestPathAlgo,
         }
       );
       const finishedObsCallbackMock = jest.fn();
@@ -546,10 +555,10 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(1, 3)),
         {
           config: {
+            algorithm: shortestPathAlgo,
             noPathFoundStrategy: NoPathFoundStrategy.RETRY,
             noPathFoundRetryBackoffMs: 1,
           },
-          shortestPathAlgorithm: shortestPathAlgo,
         }
       );
       targetMovement.update(1);
@@ -583,11 +592,11 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(1, 3)),
         {
           config: {
+            algorithm: shortestPathAlgo,
             noPathFoundStrategy: NoPathFoundStrategy.RETRY,
             noPathFoundRetryBackoffMs: 1,
             noPathFoundMaxRetries: -1,
           },
-          shortestPathAlgorithm: shortestPathAlgo,
         }
       );
       targetMovement.update(1);
@@ -631,9 +640,9 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(1, 3)),
         {
           config: {
+            algorithm: shortestPathAlgo,
             noPathFoundStrategy: NoPathFoundStrategy.STOP,
           },
-          shortestPathAlgorithm: shortestPathAlgo,
         }
       );
       const finishedObsCallbackMock = jest.fn();
@@ -665,71 +674,6 @@ describe("TargetMovement", () => {
         layer: "lowerCharLayer",
       });
       expect(finishedObsCompleteMock).toHaveBeenCalled();
-    });
-  });
-
-  describe("non-colliding char", () => {
-    it("should ignore blocked tiles with non tile-colliding char", () => {
-      const charPos = layerPos(new Vector2(3, 1));
-      const targetPos = layerPos(new Vector2(1, 1));
-      const mockChar = createMockChar("char1", charPos, {
-        ...TEST_CHAR_CONFIG,
-        tilemap: gridTilemap,
-        collidesWithTiles: false,
-      });
-      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-        shortestPathAlgorithm: bidirectionalSearch,
-      });
-
-      tilemapMock.hasTileAt.mockReturnValue(false);
-      const getNeighbors = targetMovement.getNeighbors(charPos);
-
-      expect(getNeighbors).toEqual([
-        {
-          position: new Vector2(charPos.position.x, charPos.position.y + 1),
-          layer: "lowerCharLayer",
-        },
-        {
-          position: new Vector2(charPos.position.x + 1, charPos.position.y),
-          layer: "lowerCharLayer",
-        },
-        {
-          position: new Vector2(charPos.position.x - 1, charPos.position.y),
-          layer: "lowerCharLayer",
-        },
-        {
-          position: new Vector2(charPos.position.x, charPos.position.y - 1),
-          layer: "lowerCharLayer",
-        },
-      ]);
-    });
-
-    it("should not list tiles out of range", () => {
-      const charPos = layerPos(new Vector2(0, 0));
-      const charPos2 = layerPos(new Vector2(19, 29));
-      const targetPos = layerPos(new Vector2(1, 1));
-      const mockChar = createMockChar("char1", charPos, {
-        ...TEST_CHAR_CONFIG,
-        tilemap: gridTilemap,
-        collidesWithTiles: false,
-      });
-      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-        shortestPathAlgorithm: bidirectionalSearch,
-      });
-
-      const neighbors = targetMovement.getNeighbors(charPos);
-
-      expect(neighbors).toEqual([
-        layerPos(new Vector2(0, 1)),
-        layerPos(new Vector2(1, 0)),
-      ]);
-
-      const neighbors2 = targetMovement.getNeighbors(charPos2);
-
-      expect(neighbors2).toEqual([
-        layerPos(new Vector2(18, 29)),
-        layerPos(new Vector2(19, 28)),
-      ]);
     });
   });
 
@@ -772,9 +716,9 @@ describe("TargetMovement", () => {
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: {
+        algorithm: shortestPathAlgo,
         pathBlockedWaitTimeoutMs: 2000,
       },
-      shortestPathAlgorithm: shortestPathAlgo,
     });
 
     blockPath(charPos, targetPos);
@@ -810,9 +754,9 @@ describe("TargetMovement", () => {
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: {
+        algorithm: shortestPathAlgo,
         pathBlockedWaitTimeoutMs: 2000,
       },
-      shortestPathAlgorithm: shortestPathAlgo,
     });
 
     blockPath(charPos, targetPos);
@@ -848,9 +792,9 @@ describe("TargetMovement", () => {
       ]);
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
+          algorithm: shortestPathAlgo,
           pathBlockedStrategy: PathBlockedStrategy.RETRY,
         },
-        shortestPathAlgorithm: shortestPathAlgo,
       });
 
       // prettier-ignore
@@ -892,9 +836,9 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
+          algorithm: shortestPathAlgo,
           pathBlockedStrategy: PathBlockedStrategy.RETRY,
         },
-        shortestPathAlgorithm: shortestPathAlgo,
       });
 
       blockPath(charPos, targetPos);
@@ -922,10 +866,10 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
+          algorithm: shortestPathAlgo,
           pathBlockedStrategy: PathBlockedStrategy.RETRY,
           pathBlockedRetryBackoffMs: 150,
         },
-        shortestPathAlgorithm: shortestPathAlgo,
       });
       blockPath(charPos, targetPos);
 
@@ -956,10 +900,10 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
+          algorithm: shortestPathAlgo,
           pathBlockedStrategy: PathBlockedStrategy.RETRY,
           pathBlockedMaxRetries: 2,
         },
-        shortestPathAlgorithm: shortestPathAlgo,
       });
       blockPath(charPos, targetPos);
 
@@ -996,7 +940,7 @@ describe("TargetMovement", () => {
 
     unblockPath(charPos, targetPos);
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-      shortestPathAlgorithm: shortestPathAlgo,
+      config: { algorithm: shortestPathAlgo },
     });
     targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
     blockPath(charPos, targetPos);
@@ -1041,7 +985,7 @@ describe("TargetMovement", () => {
     ]);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-      shortestPathAlgorithm: shortestPathAlgo,
+      config: { algorithm: shortestPathAlgo },
     });
     targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
 
@@ -1058,7 +1002,7 @@ describe("TargetMovement", () => {
 
     unblockPath(charPos, targetPos);
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-      shortestPathAlgorithm: shortestPathAlgo,
+      config: { algorithm: shortestPathAlgo },
     });
     targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
 
@@ -1082,9 +1026,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(0, 0)),
-        {
-          shortestPathAlgorithm: shortestPathAlgo,
-        }
+        { config: { algorithm: shortestPathAlgo } }
       );
       const mockCall = jest.fn();
       targetMovement.finishedObs().subscribe(mockCall);
@@ -1104,9 +1046,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(0, 0)),
-        {
-          shortestPathAlgorithm: shortestPathAlgo,
-        }
+        { config: { algorithm: shortestPathAlgo } }
       );
       const mockCall = jest.fn();
       targetMovement.finishedObs().subscribe(mockCall);
@@ -1121,9 +1061,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(0, 0)),
-        {
-          shortestPathAlgorithm: shortestPathAlgo,
-        }
+        { config: { algorithm: shortestPathAlgo } }
       );
       targetMovement.finishedObs().subscribe({ complete: mockCall });
       mockChar.setMovement(undefined);
@@ -1134,7 +1072,7 @@ describe("TargetMovement", () => {
       const mockCall = jest.fn();
       const targetPos = charPos;
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-        shortestPathAlgorithm: shortestPathAlgo,
+        config: { algorithm: shortestPathAlgo },
       });
       targetMovement.finishedObs().subscribe(mockCall);
 
@@ -1176,7 +1114,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(1, 1)),
-        { shortestPathAlgorithm: shortestPathAlgo }
+        { config: { algorithm: shortestPathAlgo } }
       );
       targetMovement.update(100);
       mockChar.update(100);
@@ -1197,7 +1135,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(3, 1)),
-        { shortestPathAlgorithm: shortestPathAlgo }
+        { config: { algorithm: shortestPathAlgo } }
       );
       targetMovement.update(100);
       mockChar.update(100);
@@ -1218,7 +1156,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(1, 3)),
-        { shortestPathAlgorithm: shortestPathAlgo }
+        { config: { algorithm: shortestPathAlgo } }
       );
       targetMovement.update(100);
       mockChar.update(100);
@@ -1239,7 +1177,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(3, 3)),
-        { shortestPathAlgorithm: shortestPathAlgo }
+        { config: { algorithm: shortestPathAlgo } }
       );
       targetMovement.update(100);
       mockChar.update(100);
@@ -1267,9 +1205,9 @@ describe("TargetMovement", () => {
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         distance: 3,
         config: {
+          algorithm: shortestPathAlgo,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
-        shortestPathAlgorithm: shortestPathAlgo,
       });
       targetMovement.update(100);
       mockChar.update(100);
@@ -1298,7 +1236,9 @@ describe("TargetMovement", () => {
     ]);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-      shortestPathAlgorithm: shortestPathAlgo,
+      config: {
+        algorithm: shortestPathAlgo,
+      },
     });
 
     expectWalkedPath(
@@ -1331,8 +1271,8 @@ describe("TargetMovement", () => {
     ]);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-      shortestPathAlgorithm: shortestPathAlgo,
       config: {
+        algorithm: shortestPathAlgo,
         isPositionAllowedFn: allowedFn,
       },
     });
@@ -1367,7 +1307,9 @@ describe("TargetMovement", () => {
     ]);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-      shortestPathAlgorithm: shortestPathAlgo,
+      config: {
+        algorithm: shortestPathAlgo,
+      },
     });
 
     expectWalkedPath(
@@ -1400,7 +1342,9 @@ describe("TargetMovement", () => {
     ]);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-      shortestPathAlgorithm: shortestPathAlgo,
+      config: {
+        algorithm: shortestPathAlgo,
+      },
     });
 
     expectWalkedPath(
@@ -1429,7 +1373,9 @@ describe("TargetMovement", () => {
     ]);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-      shortestPathAlgorithm: shortestPathAlgo,
+      config: {
+        algorithm: shortestPathAlgo,
+      },
     });
 
     expectWalkedPath(
@@ -1454,7 +1400,9 @@ describe("TargetMovement", () => {
     ]);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-      shortestPathAlgorithm: shortestPathAlgo,
+      config: {
+        algorithm: shortestPathAlgo,
+      },
       ignoreBlockedTarget: true,
     });
 
@@ -1485,9 +1433,9 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
+          algorithm: shortestPathAlgo,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
-        shortestPathAlgorithm: shortestPathAlgo,
       });
 
       expectWalkedPath(
@@ -1502,7 +1450,7 @@ describe("TargetMovement", () => {
       );
     });
 
-    fit("should use correct number of directions", () => {
+    it("should use correct number of directions", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const targetPos = layerPos(new Vector2(3, 2));
       const mockChar = createMockChar("char", charPos, {
@@ -1521,9 +1469,9 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
+          algorithm: shortestPathAlgo,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
-        shortestPathAlgorithm: shortestPathAlgo,
       });
 
       // This is only one possible shortest path. When the shortest path
@@ -1555,8 +1503,8 @@ describe("TargetMovement", () => {
       ]);
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-        shortestPathAlgorithm: shortestPathAlgo,
         config: {
+          algorithm: shortestPathAlgo,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
           isPositionAllowedFn: allowedFn,
         },
@@ -1572,8 +1520,31 @@ describe("TargetMovement", () => {
         ])
       );
     });
-  });
-});
+
+    it("should consider blocking chars", () => {
+      const charPos = layerPos(new Vector2(1, 0));
+      const targetPos = layerPos(new Vector2(1, 4));
+      const mockChar = createMockChar("char", charPos, {
+        ...TEST_CHAR_CONFIG,
+        tilemap: gridTilemap,
+        collisionGroups: [COLLISION_GROUP],
+      });
+
+      // prettier-ignore
+      mockCharMap(tilemapMock, gridTilemap, [
+        ".s..",
+        "ccc.",
+        "....",
+        "####",
+        ".t..",
+      ]);
+
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        config: {
+          algorithm: shortestPathAlgo,
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        },
+      });
 
       expectWalkedPath(
         mockChar,
@@ -1607,8 +1578,8 @@ describe("TargetMovement", () => {
       ]);
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-        shortestPathAlgorithm: shortestPathAlgo,
         config: {
+          algorithm: shortestPathAlgo,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
       });
@@ -1641,8 +1612,8 @@ describe("TargetMovement", () => {
       ]);
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-        shortestPathAlgorithm: shortestPathAlgo,
         config: {
+          algorithm: shortestPathAlgo,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
       });

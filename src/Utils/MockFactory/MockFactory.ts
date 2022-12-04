@@ -1,8 +1,9 @@
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { NumberOfDirections } from "../../GridEngine";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
-import { LayerPosition } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Vector2 } from "../Vector2/Vector2";
+import { Random, MersenneTwister19937 } from "random-js";
+import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
 
 export const LOWER_CHAR_LAYER = "lowerCharLayer";
 export const HIGHER_CHAR_LAYER = "testCharLayer";
@@ -84,7 +85,7 @@ export function createTilemapMock(blankLayerMock?) {
   };
 }
 
-export function layerPos(vec: Vector2, layer?: string): LayerPosition {
+export function layerPos(vec: Vector2, layer?: string): LayerVecPos {
   return {
     position: vec,
     layer: layer ?? LOWER_CHAR_LAYER,
@@ -120,6 +121,29 @@ export function mockCharMap(
   }
 
   mockBlockMap(tilemapMock, blockMap);
+}
+
+export function mockRandomMap(
+  tilemapMock: any,
+  width: number,
+  height: number,
+  density = 0.1,
+  seed = 12345
+) {
+  tilemapMock.width = width;
+  tilemapMock.height = height;
+  const random = new Random(MersenneTwister19937.seedWithArray([seed]));
+
+  const map: string[] = [];
+  for (let row = 0; row < height; row++) {
+    const rowStr: string[] = [];
+    for (let col = 0; col < height; col++) {
+      const c = random.integer(0, 100) / 100 <= density ? "#" : ".";
+      rowStr.push(c);
+    }
+    map[row] = rowStr.join("");
+  }
+  mockBlockMap(tilemapMock, map);
 }
 
 export function mockBlockMap(

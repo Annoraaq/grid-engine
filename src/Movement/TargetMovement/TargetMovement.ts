@@ -1,9 +1,9 @@
-import { BidirectionalSearch } from "./../../Pathfinding/BidirectionalSearch/BidirectionalSearch";
 import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy";
 import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
 import {
   LayerVecPos,
   ShortestPath,
+  ShortestPathAlgorithmType,
 } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
@@ -17,14 +17,12 @@ import { Movement, MovementInfo } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Retryable } from "./Retryable/Retryable";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
-import { ShortestPathAlgorithm } from "../../Pathfinding/ShortestPathAlgorithm";
 import { CharLayer, Position } from "../../GridEngine";
 import { filter, Subject, take } from "rxjs";
 import {
   IsPositionAllowedFn,
   Pathfinding,
 } from "../../Pathfinding/Pathfinding";
-import { Bfs } from "../../Pathfinding/Bfs/Bfs";
 
 export interface MoveToConfig {
   /**
@@ -97,6 +95,11 @@ export interface MoveToConfig {
    * complexity of O(1) is recommended.
    */
   isPositionAllowedFn?: IsPositionAllowedFn;
+
+  /**
+   * Algorithm to use for pathfinding.
+   */
+  algorithm?: ShortestPathAlgorithmType;
 }
 
 export enum MoveToResult {
@@ -120,7 +123,6 @@ export interface Options {
   distance?: number;
   config?: MoveToConfig;
   ignoreBlockedTarget?: boolean;
-  shortestPathAlgorithm?: ShortestPathAlgorithm;
 }
 
 export class TargetMovement implements Movement {
@@ -139,22 +141,17 @@ export class TargetMovement implements Movement {
   private ignoreBlockedTarget: boolean;
   private distance: number;
   private isPositionAllowed: IsPositionAllowedFn = () => true;
-  private shortestPathAlgorithm: ShortestPathAlgorithm;
+  private shortestPathAlgorithm?: ShortestPathAlgorithmType;
 
   constructor(
     private character: GridCharacter,
     private tilemap: GridTilemap,
     private targetPos: LayerVecPos,
-    {
-      config,
-      ignoreBlockedTarget = false,
-      distance = 0,
-      shortestPathAlgorithm = new Bfs(),
-    }: Options = {}
+    { config, ignoreBlockedTarget = false, distance = 0 }: Options = {}
   ) {
+    this.shortestPathAlgorithm = config?.algorithm;
     this.ignoreBlockedTarget = ignoreBlockedTarget;
     this.distance = distance;
-    this.shortestPathAlgorithm = shortestPathAlgorithm;
     this.noPathFoundStrategy =
       config?.noPathFoundStrategy || NoPathFoundStrategy.STOP;
     this.pathBlockedStrategy =
@@ -257,6 +254,7 @@ export class TargetMovement implements Movement {
     return {
       type: "Target",
       config: {
+        algorithm: this.shortestPathAlgorithm,
         ignoreBlockedTarget: this.ignoreBlockedTarget,
         distance: this.distance,
         targetPos: this.targetPos,
@@ -401,7 +399,7 @@ export class TargetMovement implements Movement {
 
   private getShortestPath(): ShortestPath {
     const pathfinding = new Pathfinding(
-      new BidirectionalSearch(this.character.getNumberOfDirections()),
+      this.shortestPathAlgorithm || "BIDIRECTIONAL_SEARCH",
       this.tilemap
     );
     const { path: shortestPath, closestToTarget } =
@@ -421,7 +419,7 @@ export class TargetMovement implements Movement {
       );
 
     const noPathFound = shortestPath.length == 0;
-    console.log("shortest", shortestPath, closestToTarget);
+    // console.log("shortest", shortestPath, closestToTarget);
 
     if (
       noPathFound &&

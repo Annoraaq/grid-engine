@@ -1,3 +1,25 @@
+const emptyAlgo: ShortestPathAlgorithm = {
+  getShortestPath: (startPos, _targetPos, _getNeighbors) => ({
+    path: [],
+    closestToTarget: startPos,
+    steps: 0,
+  }),
+};
+const shortestPathAlgorithmFactoryMock = {
+  shortestPathAlgorithmFactory: jest.fn((type) => {
+    switch (type) {
+      case "BIDIRECTIONAL_SEARCH":
+        return new BidirectionalSearch();
+      case "TEST":
+        return emptyAlgo;
+    }
+    return new Bfs();
+  }),
+};
+jest.mock("./ShortestPathAlgorithm", function () {
+  return shortestPathAlgorithmFactoryMock;
+});
+
 import { GlobalConfig } from "../GlobalConfig/GlobalConfig";
 import {
   CollisionStrategy,
@@ -14,18 +36,28 @@ import {
   mockLayeredMap,
   layerPos,
   createAllowedFn,
+  mockRandomMap,
 } from "../Utils/MockFactory/MockFactory";
 import { Concrete } from "../Utils/TypeUtils";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { Bfs } from "./Bfs/Bfs";
-import { Pathfinding } from "./Pathfinding";
-import { ShortestPathAlgorithm } from "./ShortestPathAlgorithm";
+import { BidirectionalSearch } from "./BidirectionalSearch/BidirectionalSearch";
+import {
+  createGetNeighbors,
+  createReverseNeighbors,
+  Pathfinding,
+  PathfindingOptions,
+} from "./Pathfinding";
+import {
+  ShortestPathAlgorithm,
+  ShortestPathAlgorithmType,
+} from "./ShortestPathAlgorithm";
 
 describe("Pathfinding", () => {
   let blankLayerMock;
   let tilemapMock;
   let gridTilemap;
-  let pathfindingAlgo: ShortestPathAlgorithm;
+  let pathfindingAlgo: ShortestPathAlgorithmType;
 
   beforeEach(() => {
     const config: Concrete<GridEngineConfig> = {
@@ -39,7 +71,7 @@ describe("Pathfinding", () => {
     blankLayerMock = createBlankLayerMock();
     tilemapMock = createTilemapMock(blankLayerMock);
     gridTilemap = new GridTilemap(tilemapMock as any);
-    pathfindingAlgo = new Bfs();
+    pathfindingAlgo = "BIDIRECTIONAL_SEARCH";
   });
 
   it("should find blocked path", () => {
@@ -203,13 +235,6 @@ describe("Pathfinding", () => {
   });
 
   it("should use pathfinding algo", () => {
-    const mockAlgo: ShortestPathAlgorithm = {
-      getShortestPath: (startPos, _targetPos, _getNeighbors) => ({
-        path: [],
-        closestToTarget: startPos,
-      }),
-    };
-
     const pathfinding = new Pathfinding(pathfindingAlgo, gridTilemap);
     // prettier-ignore
     mockBlockMap(tilemapMock, [
@@ -221,7 +246,7 @@ describe("Pathfinding", () => {
     const shortestPath = pathfinding.findShortestPath(
       layerPos(new Vector2(1, 0)),
       layerPos(new Vector2(1, 2)),
-      { shortestPathAlgorithm: mockAlgo }
+      { shortestPathAlgorithm: "TEST" as ShortestPathAlgorithmType }
     );
 
     expect(shortestPath.path).toEqual([]);
@@ -427,5 +452,827 @@ describe("Pathfinding", () => {
     );
 
     expect(shortestPath.path.length).toEqual(3);
+  });
+
+  xit("should test performance", () => {
+    const strat = "BFS";
+    const pathfinding = new Pathfinding(strat, gridTilemap);
+    mockRandomMap(tilemapMock, 500, 500, 0.3, 12323);
+    const shortestPath = pathfinding.findShortestPath(
+      layerPos(new Vector2(150, 150)),
+      layerPos(new Vector2(250, 250))
+    );
+
+    expect(shortestPath.steps).toEqual(0);
+    expect(shortestPath.path.length).toEqual(3);
+  });
+
+  describe("getNeighbors", () => {
+    let options: Concrete<PathfindingOptions>;
+
+    beforeEach(() => {
+      options = {
+        shortestPathAlgorithm: "BFS",
+        pathWidth: 1,
+        pathHeight: 1,
+        numberOfDirections: NumberOfDirections.FOUR,
+        isPositionAllowed: (_pos, _charLayer) => true,
+        collisionGroups: [],
+        ignoredChars: [],
+        ignoreTiles: false,
+        ignoreMapBounds: false,
+        ignoreBlockedTarget: false,
+      };
+    });
+
+    it("should return all adjacent positions", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(options, dest, gridTilemap);
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        ".s.",
+        "...",
+      ]);
+
+      expect(getNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+
+    it("should return all adjacent positions for 8 dirs", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(
+        { ...options, numberOfDirections: NumberOfDirections.EIGHT },
+        dest,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        ".s.",
+        "...",
+      ]);
+
+      expect(getNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(1, 0)),
+        layerPos(new Vector2(2, 2)),
+        layerPos(new Vector2(2, 0)),
+        layerPos(new Vector2(0, 2)),
+        layerPos(new Vector2(0, 0)),
+      ]);
+    });
+
+    it("should return all adjacent positions considering transitions", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(options, dest, gridTilemap);
+
+      mockLayeredMap(
+        tilemapMock,
+        new Map([
+          [
+            "layer1",
+            [
+              // prettier-ignore
+              "...",
+              ".s.",
+              "...",
+            ],
+          ],
+          [
+            "layer2",
+            [
+              // prettier-ignore
+              "...",
+              ".s.",
+              "...",
+            ],
+          ],
+        ])
+      );
+
+      gridTilemap.setTransition(
+        new Vector2(2, 1),
+        "lowerCharLayer",
+        "testCharLayer"
+      );
+
+      expect(getNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        { position: new Vector2(2, 1), layer: "testCharLayer" },
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+
+    it("should withhold unallowed positions", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      // prettier-ignore
+      const allowedFn = createAllowedFn([
+        "...",
+        "#s.",
+        "...",
+      ]);
+      const getNeighbors = createGetNeighbors(
+        { ...options, isPositionAllowed: allowedFn },
+        dest,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        ".s.",
+        "...",
+      ]);
+
+      expect(getNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+
+    it("should withhold blocked tiles", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(options, dest, gridTilemap);
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        "#s.",
+        "...",
+      ]);
+
+      expect(getNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+
+    it("should withhold blocked tiles unidirectionally", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(options, dest, gridTilemap);
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        "→s→",
+        "...",
+      ]);
+
+      expect(getNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+
+    it("should withhold tiles out of map", () => {
+      const pos = layerPos(new Vector2(0, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(options, dest, gridTilemap);
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        "s..",
+        "...",
+      ]);
+
+      expect(getNeighbors(pos)).toEqual([
+        layerPos(new Vector2(0, 2)),
+        layerPos(new Vector2(1, 1)),
+        layerPos(new Vector2(0, 0)),
+      ]);
+    });
+
+    it("should not withhold tiles out of map", () => {
+      const pos = layerPos(new Vector2(0, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(
+        { ...options, ignoreMapBounds: true },
+        dest,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        "s..",
+        "...",
+      ]);
+
+      expect(getNeighbors(pos)).toEqual([
+        layerPos(new Vector2(0, 2)),
+        layerPos(new Vector2(1, 1)),
+        layerPos(new Vector2(-1, 1)),
+        layerPos(new Vector2(0, 0)),
+      ]);
+    });
+
+    it("should not withhold blocked tiles", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(
+        { ...options, ignoreTiles: true },
+        dest,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        "#s.",
+        "...",
+      ]);
+
+      expect(getNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+
+    it("should not withhold chars with other collision group", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(options, dest, gridTilemap);
+
+      // prettier-ignore
+      mockCharMap(tilemapMock, gridTilemap, [
+        "...",
+        "cs.",
+        "...",
+      ]);
+
+      expect(getNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+
+    it("should withhold chars with other collision group", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(
+        { ...options, collisionGroups: [COLLISION_GROUP] },
+        dest,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockCharMap(tilemapMock, gridTilemap, [
+        "...",
+        "cs.",
+        "...",
+      ]);
+
+      expect(getNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+
+    it("should not withhold ignored chars", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(
+        {
+          ...options,
+          collisionGroups: [COLLISION_GROUP],
+          ignoredChars: ["mock_char_1"],
+        },
+        dest,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockCharMap(tilemapMock, gridTilemap, [
+        "...",
+        "cs.",
+        "...",
+      ]);
+
+      expect(getNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+
+    it("should not withhold blocked target", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = layerPos(new Vector2(0, 1));
+      const getNeighbors = createGetNeighbors(
+        {
+          ...options,
+          ignoreBlockedTarget: true,
+        },
+        dest,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        "#s.",
+        "...",
+      ]);
+
+      expect(getNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+
+    it("should withhold for larger tile size", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(
+        {
+          ...options,
+          pathWidth: 2,
+          pathHeight: 2,
+        },
+        dest,
+        gridTilemap
+      );
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+      "....",
+      ".ss#",
+      ".ss.",
+      "..#.",
+    ]);
+
+      expect(getNeighbors(pos)).toEqual([
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+  });
+  describe("getReverse Neighbors", () => {
+    let options: Concrete<PathfindingOptions>;
+
+    beforeEach(() => {
+      options = {
+        shortestPathAlgorithm: "BFS",
+        pathWidth: 1,
+        pathHeight: 1,
+        numberOfDirections: NumberOfDirections.FOUR,
+        isPositionAllowed: (_pos, _charLayer) => true,
+        collisionGroups: [],
+        ignoredChars: [],
+        ignoreTiles: false,
+        ignoreMapBounds: false,
+        ignoreBlockedTarget: false,
+      };
+    });
+
+    it("should return all adjacent positions", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(
+        {
+          ...options,
+          pathWidth: 2,
+          pathHeight: 2,
+        },
+        dest,
+        gridTilemap
+      );
+      const getReverseNeighbors = createReverseNeighbors(
+        options,
+        dest,
+        getNeighbors,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        ".s.",
+        "...",
+      ]);
+
+      expect(getReverseNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+
+    it("should return all adjacent positions for 8 dirs", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const opts = { ...options, numberOfDirections: NumberOfDirections.EIGHT };
+      const getNeighbors = createGetNeighbors(opts, dest, gridTilemap);
+      const getReverseNeighbors = createReverseNeighbors(
+        opts,
+        dest,
+        getNeighbors,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        ".s.",
+        "...",
+      ]);
+
+      expect(getReverseNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(1, 0)),
+        layerPos(new Vector2(2, 2)),
+        layerPos(new Vector2(2, 0)),
+        layerPos(new Vector2(0, 2)),
+        layerPos(new Vector2(0, 0)),
+      ]);
+    });
+
+    it("should return all adjacent positions considering transitions", () => {
+      const pos = { position: new Vector2(1, 1), layer: "testCharLayer" };
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(options, dest, gridTilemap);
+      const getReverseNeighbors = createReverseNeighbors(
+        options,
+        dest,
+        getNeighbors,
+        gridTilemap
+      );
+
+      mockLayeredMap(
+        tilemapMock,
+        new Map([
+          [
+            "layer1",
+            [
+              // prettier-ignore
+              "...",
+              ".s.",
+              "...",
+            ],
+          ],
+          [
+            "layer2",
+            [
+              // prettier-ignore
+              "...",
+              ".s.",
+              "...",
+            ],
+          ],
+        ])
+      );
+
+      gridTilemap.setTransition(
+        pos.position,
+        "lowerCharLayer",
+        "testCharLayer"
+      );
+
+      expect(getReverseNeighbors(pos)).toEqual([
+        { position: new Vector2(1, 2), layer: "lowerCharLayer" },
+        { position: new Vector2(1, 2), layer: "testCharLayer" },
+        { position: new Vector2(2, 1), layer: "lowerCharLayer" },
+        { position: new Vector2(2, 1), layer: "testCharLayer" },
+        { position: new Vector2(0, 1), layer: "lowerCharLayer" },
+        { position: new Vector2(0, 1), layer: "testCharLayer" },
+        { position: new Vector2(1, 0), layer: "lowerCharLayer" },
+        { position: new Vector2(1, 0), layer: "testCharLayer" },
+      ]);
+
+      expect(
+        getReverseNeighbors({ position: pos.position, layer: "lowerCharLayer" })
+      ).toEqual([]);
+    });
+
+    it("should withhold unallowed positions", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+
+      // prettier-ignore
+      const allowedFn = createAllowedFn([
+        "...",
+        ".#.",
+        "...",
+      ]);
+      const opts = { ...options, isPositionAllowed: allowedFn };
+      const getNeighbors = createGetNeighbors(opts, dest, gridTilemap);
+      const getReverseNeighbors = createReverseNeighbors(
+        opts,
+        dest,
+        getNeighbors,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        ".s.",
+        "...",
+      ]);
+
+      expect(getReverseNeighbors(pos)).toEqual([]);
+    });
+
+    it("should withhold all if tile is blocked", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(options, dest, gridTilemap);
+      const getReverseNeighbors = createReverseNeighbors(
+        options,
+        dest,
+        getNeighbors,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        ".#.",
+        "...",
+      ]);
+
+      expect(getReverseNeighbors(pos)).toEqual([]);
+    });
+
+    it("should withhold blocked tiles unidirectionally", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(options, dest, gridTilemap);
+      const getReverseNeighbors = createReverseNeighbors(
+        options,
+        dest,
+        getNeighbors,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        ".→.",
+        "...",
+      ]);
+
+      expect(getReverseNeighbors(pos)).toEqual([layerPos(new Vector2(0, 1))]);
+    });
+
+    it("should withhold tiles out of map", () => {
+      const pos = layerPos(new Vector2(-1, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(options, dest, gridTilemap);
+      const getReverseNeighbors = createReverseNeighbors(
+        options,
+        dest,
+        getNeighbors,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        "...",
+        "...",
+      ]);
+
+      expect(getReverseNeighbors(pos)).toEqual([]);
+    });
+
+    it("should not withhold tiles out of map", () => {
+      const pos = layerPos(new Vector2(-1, 1));
+      const dest = pos;
+      const opts = { ...options, ignoreMapBounds: true };
+      const getNeighbors = createGetNeighbors(opts, dest, gridTilemap);
+      const getReverseNeighbors = createReverseNeighbors(
+        opts,
+        dest,
+        getNeighbors,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        "...",
+        "...",
+      ]);
+
+      expect(getReverseNeighbors(pos)).toEqual([
+        layerPos(new Vector2(-1, 2)),
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(-2, 1)),
+        layerPos(new Vector2(-1, 0)),
+      ]);
+    });
+
+    it("should not withhold blocked tiles", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const opts = { ...options, ignoreTiles: true };
+      const getNeighbors = createGetNeighbors(opts, dest, gridTilemap);
+      const getReverseNeighbors = createReverseNeighbors(
+        opts,
+        dest,
+        getNeighbors,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        ".#.",
+        "...",
+      ]);
+
+      expect(getReverseNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+
+    it("should not withhold chars with other collision group", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const getNeighbors = createGetNeighbors(options, dest, gridTilemap);
+      const getReverseNeighbors = createReverseNeighbors(
+        options,
+        dest,
+        getNeighbors,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockCharMap(tilemapMock, gridTilemap, [
+        "...",
+        "cs.",
+        "...",
+      ]);
+
+      expect(getReverseNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+
+    it("should withhold chars with other collision group", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const opts = { ...options, collisionGroups: [COLLISION_GROUP] };
+      const getNeighbors = createGetNeighbors(opts, dest, gridTilemap);
+      const getReverseNeighbors = createReverseNeighbors(
+        opts,
+        dest,
+        getNeighbors,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockCharMap(tilemapMock, gridTilemap, [
+        "...",
+        "cs.",
+        "...",
+      ]);
+
+      expect(getReverseNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+
+    it("should not withhold ignored chars", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const opts = {
+        ...options,
+        collisionGroups: [COLLISION_GROUP],
+        ignoredChars: ["mock_char_1"],
+      };
+      const getNeighbors = createGetNeighbors(opts, dest, gridTilemap);
+      const getReverseNeighbors = createReverseNeighbors(
+        opts,
+        dest,
+        getNeighbors,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockCharMap(tilemapMock, gridTilemap, [
+        "...",
+        "cs.",
+        "...",
+      ]);
+
+      expect(getReverseNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+
+    it("should not withhold blocked target", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const opts = {
+        ...options,
+        ignoreBlockedTarget: true,
+      };
+      const getNeighbors = createGetNeighbors(opts, dest, gridTilemap);
+      const getReverseNeighbors = createReverseNeighbors(
+        opts,
+        dest,
+        getNeighbors,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        ".#.",
+        "...",
+      ]);
+
+      expect(getReverseNeighbors(pos)).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(1, 0)),
+      ]);
+    });
+
+    it("should withhold for larger tile width", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const opts = { ...options, pathWidth: 2 };
+      const getNeighbors = createGetNeighbors(opts, dest, gridTilemap);
+      const getReverseNeighbors = createReverseNeighbors(
+        opts,
+        dest,
+        getNeighbors,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        "..#",
+        "...",
+      ]);
+
+      expect(getReverseNeighbors(pos)).toEqual([]);
+    });
+
+    it("should withhold for larger tile height", () => {
+      const pos = layerPos(new Vector2(1, 1));
+      const dest = pos;
+      const opts = { ...options, pathHeight: 2 };
+      const getNeighbors = createGetNeighbors(opts, dest, gridTilemap);
+      const getReverseNeighbors = createReverseNeighbors(
+        opts,
+        dest,
+        getNeighbors,
+        gridTilemap
+      );
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        "...",
+        "...",
+        ".#.",
+      ]);
+
+      expect(getReverseNeighbors(pos)).toEqual([]);
+    });
   });
 });

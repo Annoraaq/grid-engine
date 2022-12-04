@@ -18,6 +18,7 @@ const mockGridTileMap = {
   getTileSize: jest.fn().mockReturnValue(new Vector2(32, 32)),
   getTileHeight: () => 32,
   getTransition: jest.fn(),
+  getTransitions: jest.fn().mockReturnValue(new Map()),
   setTransition: jest.fn(),
   isIsometric: jest.fn().mockReturnValue(false),
   hasBlockingTile: jest.fn().mockReturnValue(false),

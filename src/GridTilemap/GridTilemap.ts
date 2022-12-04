@@ -23,7 +23,7 @@ export class GridTilemap {
   private characters = new Map<string, GridCharacter>();
   private charBlockCache: CharBlockCache = new CharBlockCache();
   private charLayerDepths = new Map<CharLayer, number>();
-  private transitions: Map<CharLayer, Map<CharLayer, CharLayer>> = new Map();
+  private transitions: Map<string, Map<CharLayer, CharLayer>> = new Map();
 
   constructor(private tilemap: Phaser.Tilemaps.Tilemap) {
     this.setLayerDepths();
@@ -83,7 +83,7 @@ export class GridTilemap {
     this.transitions.get(pos.toString())?.set(fromLayer, toLayer);
   }
 
-  getTransitions(): Map<CharLayer, Map<CharLayer, CharLayer>> {
+  getTransitions(): Map<string, Map<CharLayer, CharLayer>> {
     return new Map(
       [...this.transitions].map(([pos, map]) => [pos, new Map(map)])
     );
