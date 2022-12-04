@@ -33,7 +33,12 @@ import {
 } from "./GridCharacter/CharacterFilter/CharacterFilter";
 
 import { version as VERSION } from "../package.json";
-import { IsPositionAllowedFn } from "./Pathfinding/Pathfinding";
+import {
+  IsPositionAllowedFn,
+  Pathfinding,
+  PathfindingOptions,
+} from "./Pathfinding/Pathfinding";
+import { LayerPositionUtils } from "./Utils/LayerPositionUtils/LayerPositionUtils";
 
 export {
   CollisionStrategy,
@@ -989,6 +994,37 @@ export class GridEngine {
     return {
       position: posInDirection.position.toPosition(),
       charLayer: posInDirection.layer,
+    };
+  }
+
+  /**
+   * Returns the shortest path from source to destination.
+   *
+   * @param source Source position
+   * @param dest Destination position
+   * @param options Pathfinding options
+   * @returns Shortest path. In case that no path could be found,
+   * `closestToTarget` is a position with a minimum distance to the target.
+   *
+   * @alpha
+   */
+  findShortestPath(
+    source: LayerPosition,
+    dest: LayerPosition,
+    options: PathfindingOptions = {}
+  ): { path: LayerPosition[]; closestToTarget: LayerPosition } {
+    this.initGuard();
+    // This can't actually happen, but TypeScript can't know.
+    if (!this.gridTilemap) throw this.createUninitializedErr();
+    const pathfinding = new Pathfinding("BFS", this.gridTilemap);
+    const res = pathfinding.findShortestPath(
+      LayerPositionUtils.toInternal(source),
+      LayerPositionUtils.toInternal(dest),
+      options
+    );
+    return {
+      path: res.path.map(LayerPositionUtils.fromInternal),
+      closestToTarget: LayerPositionUtils.fromInternal(res.closestToTarget),
     };
   }
 

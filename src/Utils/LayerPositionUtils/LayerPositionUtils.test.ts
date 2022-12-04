@@ -1,3 +1,5 @@
+import { LayerPosition } from "../../GridEngine";
+import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Vector2 } from "../Vector2/Vector2";
 import { LayerPositionUtils } from "./LayerPositionUtils";
 
@@ -36,5 +38,18 @@ describe("LayerPositionUtils", () => {
   it("should convert to string", () => {
     const pos = { position: new Vector2(5, 6), layer: "sourceLayer" };
     expect(LayerPositionUtils.toString(pos)).toEqual("5#6#sourceLayer");
+  });
+
+  it("should convert from and to internal", () => {
+    const internal: LayerVecPos = {
+      position: new Vector2(1, 2),
+      layer: "someCharLayer",
+    };
+    const external: LayerPosition = {
+      position: { x: 1, y: 2 },
+      charLayer: "someCharLayer",
+    };
+    expect(LayerPositionUtils.fromInternal(internal)).toEqual(external);
+    expect(LayerPositionUtils.toInternal(external)).toEqual(internal);
   });
 });

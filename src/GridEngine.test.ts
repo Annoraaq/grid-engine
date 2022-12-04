@@ -37,6 +37,20 @@ const mockGridTilemapConstructor = jest.fn(function (
   return mockGridTileMap;
 });
 
+const mockPathfinding = {
+  findShortestPath: jest.fn().mockReturnValue({
+    path: [],
+    closestToTarget: { position: { x: 0, y: 0 }, charLayer: undefined },
+  }),
+};
+
+const mockPathfindingConstructor = jest.fn(function (
+  _shortestPathAlgorithm,
+  _gridTilemap
+) {
+  return mockPathfinding;
+});
+
 const mockNewSprite = {
   setCrop: jest.fn(),
   setOrigin: jest.fn(),
@@ -69,7 +83,11 @@ jest.mock("./GridTilemap/GridTilemap", function () {
   };
 });
 
-jest.mock("./GridTilemap/GridTilemap");
+jest.mock("./Pathfinding/Pathfinding", function () {
+  return {
+    Pathfinding: mockPathfindingConstructor,
+  };
+});
 
 jest.mock("../package.json", () => ({
   version: "GRID.ENGINE.VERSION",
@@ -1513,6 +1531,41 @@ describe("GridEngine", () => {
     });
   });
 
+  describe("pathfinding", () => {
+    it("should delegate to pathfinding", () => {
+      gridEngine.create(tileMapMock, {
+        characters: [
+          {
+            id: "player",
+          },
+        ],
+      });
+      const source = { position: { x: 1, y: 2 }, charLayer: "sourceCharLayer" };
+      const dest = { position: { x: 10, y: 20 }, charLayer: "destCharLayer" };
+      const options = { pathWidth: 2 };
+
+      const mockRes = {
+        path: [{ position: new Vector2(1, 2), layer: "sourceCharLayer" }],
+        closestToTarget: {
+          position: new Vector2(1, 2),
+          layer: "sourceCharLayer",
+        },
+      };
+      mockPathfinding.findShortestPath.mockReturnValue(mockRes);
+      const res = gridEngine.findShortestPath(source, dest, options);
+      expect(mockPathfinding.findShortestPath).toHaveBeenCalledWith(
+        { position: new Vector2(1, 2), layer: "sourceCharLayer" },
+        { position: new Vector2(10, 20), layer: "destCharLayer" },
+        options
+      );
+
+      expect(res).toEqual({
+        path: [source],
+        closestToTarget: source,
+      });
+    });
+  });
+
   describe("Error Handling unknown char id", () => {
     const UNKNOWN_CHAR_ID = "unknownCharId";
 
@@ -1708,6 +1761,12 @@ describe("GridEngine", () => {
           { x: 2, y: 2 },
           undefined,
           Direction.DOWN
+        )
+      );
+      expectUninitializedException(() =>
+        gridEngine.findShortestPath(
+          { position: { x: 2, y: 2 }, charLayer: undefined },
+          { position: { x: 2, y: 2 }, charLayer: undefined }
         )
       );
     });
