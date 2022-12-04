@@ -454,7 +454,7 @@ describe("Pathfinding", () => {
     expect(shortestPath.path.length).toEqual(3);
   });
 
-  xit("should test performance", () => {
+  it("should keep performance of BFS", () => {
     const strat = "BFS";
     const pathfinding = new Pathfinding(strat, gridTilemap);
     mockRandomMap(tilemapMock, 500, 500, 0.3, 12323);
@@ -463,8 +463,21 @@ describe("Pathfinding", () => {
       layerPos(new Vector2(250, 250))
     );
 
-    expect(shortestPath.steps).toEqual(0);
-    expect(shortestPath.path.length).toEqual(3);
+    expect(shortestPath.steps).toEqual(42363);
+    expect(shortestPath.path.length).toEqual(203);
+  });
+
+  it("should keep performance of bidirectional search", () => {
+    const strat = "BIDIRECTIONAL_SEARCH";
+    const pathfinding = new Pathfinding(strat, gridTilemap);
+    mockRandomMap(tilemapMock, 500, 500, 0.3, 12323);
+    const shortestPath = pathfinding.findShortestPath(
+      layerPos(new Vector2(150, 150)),
+      layerPos(new Vector2(250, 250))
+    );
+
+    expect(shortestPath.steps).toEqual(24620);
+    expect(shortestPath.path.length).toEqual(203);
   });
 
   describe("getNeighbors", () => {

@@ -1,4 +1,3 @@
-import { Vector } from "matter";
 import {
   directionFromPos,
   NumberOfDirections,
@@ -198,7 +197,6 @@ export function createReverseNeighbors(
     const positionAllowed = options.isPositionAllowed(pos.position, pos.layer);
 
     return transitionMappedNeighbors.filter((neighborPos) => {
-      // TODO(#270): check performance in theory and benchmarks
       const tileBlocking =
         !options.ignoreTiles &&
         hasBlockingTileFrom(
