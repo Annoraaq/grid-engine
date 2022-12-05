@@ -39,6 +39,7 @@ import {
   PathfindingOptions,
 } from "./Pathfinding/Pathfinding";
 import { LayerPositionUtils } from "./Utils/LayerPositionUtils/LayerPositionUtils";
+import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
 
 export {
   CollisionStrategy,
@@ -54,6 +55,8 @@ export {
   MovementInfo,
   PositionChange,
   IsPositionAllowedFn,
+  PathfindingOptions,
+  ShortestPathAlgorithmType,
 };
 
 export type TileSizePerSecond = number;
