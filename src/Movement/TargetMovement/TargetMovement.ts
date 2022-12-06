@@ -141,7 +141,8 @@ export class TargetMovement implements Movement {
   private ignoreBlockedTarget: boolean;
   private distance: number;
   private isPositionAllowed: IsPositionAllowedFn = () => true;
-  private shortestPathAlgorithm?: ShortestPathAlgorithmType;
+  private shortestPathAlgorithm: ShortestPathAlgorithmType =
+    "BIDIRECTIONAL_SEARCH";
 
   constructor(
     private character: GridCharacter,
@@ -149,7 +150,8 @@ export class TargetMovement implements Movement {
     private targetPos: LayerVecPos,
     { config, ignoreBlockedTarget = false, distance = 0 }: Options = {}
   ) {
-    this.shortestPathAlgorithm = config?.algorithm;
+    this.shortestPathAlgorithm =
+      config?.algorithm ?? this.shortestPathAlgorithm;
     this.ignoreBlockedTarget = ignoreBlockedTarget;
     this.distance = distance;
     this.noPathFoundStrategy =
@@ -399,7 +401,7 @@ export class TargetMovement implements Movement {
 
   private getShortestPath(): ShortestPath {
     const pathfinding = new Pathfinding(
-      this.shortestPathAlgorithm || "BIDIRECTIONAL_SEARCH",
+      this.shortestPathAlgorithm,
       this.tilemap
     );
     const { path: shortestPath, closestToTarget } =
@@ -419,7 +421,6 @@ export class TargetMovement implements Movement {
       );
 
     const noPathFound = shortestPath.length == 0;
-    // console.log("shortest", shortestPath, closestToTarget);
 
     if (
       noPathFound &&
