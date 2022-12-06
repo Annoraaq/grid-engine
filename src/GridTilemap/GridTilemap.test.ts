@@ -413,6 +413,30 @@ describe("GridTilemap", () => {
     );
   });
 
+  it("should not consider missing tiles as blocking", () => {
+    tilemapMock.hasTileAt.mockReturnValue(false);
+    tilemapMock.getTileAt.mockReturnValue(undefined);
+    gridTilemap = new GridTilemap(tilemapMock);
+    const isBlockingTile = gridTilemap.hasBlockingTile(
+      new Vector2(3, 4),
+      undefined,
+      undefined,
+      true
+    );
+    expect(isBlockingTile).toBe(false);
+  });
+
+  it("should consider missing tiles as blocking", () => {
+    tilemapMock.hasTileAt.mockReturnValue(false);
+    tilemapMock.getTileAt.mockReturnValue(undefined);
+    gridTilemap = new GridTilemap(tilemapMock);
+    const isBlockingTile = gridTilemap.hasBlockingTile(
+      new Vector2(3, 4),
+      undefined
+    );
+    expect(isBlockingTile).toBe(true);
+  });
+
   it("should detect blocking tiles with custom property", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({

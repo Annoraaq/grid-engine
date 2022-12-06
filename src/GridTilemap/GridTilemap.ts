@@ -55,7 +55,6 @@ export class GridTilemap {
     return this.charBlockCache.getCharactersAt(position, layer);
   }
 
-  // TODO: add test for ignoreHasTile
   hasBlockingTile(
     pos: Vector2,
     charLayer: string | undefined,
@@ -64,7 +63,7 @@ export class GridTilemap {
   ): boolean {
     if (!ignoreHasTile && this.hasNoTile(pos, charLayer)) return true;
     return this.getCollisionRelevantLayers(charLayer).some((layer) =>
-      this.isLayerBlockingAt(layer, pos, direction, ignoreHasTile)
+      this.isLayerBlockingAt(layer, pos, direction)
     );
   }
 
@@ -198,18 +197,15 @@ export class GridTilemap {
     };
   }
 
-  // TODO: test ignoreHasTile
   private isLayerBlockingAt(
     layer: Phaser.Tilemaps.LayerData,
     pos: Vector2,
-    direction?: Direction,
-    ignoreHasTile?: boolean
+    direction?: Direction
   ): boolean {
     const collidesPropName =
       GridTilemap.ONE_WAY_COLLIDE_PROP_PREFIX + direction;
 
     const tile = this.tilemap.getTileAt(pos.x, pos.y, false, layer.name);
-    if (!tile && ignoreHasTile) return false;
     return Boolean(
       tile?.properties &&
         (tile.properties[GlobalConfig.get().collisionTilePropertyName] ||
