@@ -710,6 +710,7 @@ describe("GridEngine", () => {
       expect(gridEngine.getMovement("player")).toEqual({
         type: "Target",
         config: {
+          algorithm: "BIDIRECTIONAL_SEARCH",
           distance: 0,
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
