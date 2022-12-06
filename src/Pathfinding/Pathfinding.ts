@@ -236,7 +236,7 @@ export function createReverseNeighbors(
   return getReverseNeighbors;
 }
 
-function isBlocking(
+export function isBlocking(
   src: LayerVecPos,
   dest: LayerVecPos,
   gridTilemap: GridTilemap,
@@ -256,14 +256,39 @@ function isBlocking(
   const inRange =
     options.ignoreMapBounds || gridTilemap.isInRange(dest.position);
 
-  const charBlocking = gridTilemap.hasBlockingChar(
-    dest.position,
-    dest.layer,
+  const charBlocking = hasBlockingCharFrom(
+    dest,
+    options.pathWidth,
+    options.pathHeight,
     options.collisionGroups,
-    new Set(options.ignoredChars)
+    options.ignoredChars,
+    gridTilemap
   );
 
   return charBlocking || tileBlocking || !inRange || !positionAllowed;
+}
+
+function hasBlockingCharFrom(
+  pos: LayerVecPos,
+  pathWidth: number,
+  pathHeight: number,
+  collisionGroups: string[],
+  ignoredChars: CharId[],
+  gridTilemap: GridTilemap
+): boolean {
+  for (let x = pos.position.x; x < pos.position.x + pathWidth; x++) {
+    for (let y = pos.position.y; y < pos.position.y + pathHeight; y++) {
+      const res = gridTilemap.hasBlockingChar(
+        new Vector2(x, y),
+        pos.layer,
+        collisionGroups,
+        new Set(ignoredChars)
+      );
+
+      if (res) return true;
+    }
+  }
+  return false;
 }
 
 function hasBlockingTileFrom(
