@@ -8,11 +8,7 @@ import {
 import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import {
-  Direction,
-  directionFromPos,
-  oppositeDirection,
-} from "../../Direction/Direction";
+import { Direction } from "../../Direction/Direction";
 import { Movement, MovementInfo } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Retryable } from "./Retryable/Retryable";
@@ -20,9 +16,12 @@ import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
 import { CharLayer, Position } from "../../GridEngine";
 import { filter, Subject, take } from "rxjs";
 import {
+  isBlocking,
   IsPositionAllowedFn,
   Pathfinding,
+  PathfindingOptions,
 } from "../../Pathfinding/Pathfinding";
+import { Concrete } from "../../Utils/TypeUtils";
 
 export interface MoveToConfig {
   /**
@@ -210,6 +209,21 @@ export class TargetMovement implements Movement {
       });
   }
 
+  private getPathfindingOptions(): Concrete<PathfindingOptions> {
+    return {
+      shortestPathAlgorithm: this.shortestPathAlgorithm,
+      pathWidth: this.character.getTileWidth(),
+      pathHeight: this.character.getTileHeight(),
+      numberOfDirections: this.character.getNumberOfDirections(),
+      isPositionAllowed: this.isPositionAllowed,
+      collisionGroups: this.character.getCollisionGroups(),
+      ignoredChars: [this.character.getId()],
+      ignoreTiles: !this.character.collidesWithTiles(),
+      ignoreMapBounds: false,
+      ignoreBlockedTarget: this.ignoreBlockedTarget,
+    };
+  }
+
   update(delta: number): void {
     if (this.stopped) return;
 
@@ -377,25 +391,13 @@ export class TargetMovement implements Movement {
   }
 
   private isBlocking = (pos?: Vector2, charLayer?: string): boolean => {
-    if (!pos || !this.tilemap.isInRange(pos)) return true;
+    if (!pos) return true;
 
-    if (!this.character?.collidesWithTiles()) {
-      return this.tilemap.hasBlockingChar(
-        pos,
-        charLayer,
-        this.character.getCollisionGroups(),
-        new Set([this.character.getId()])
-      );
-    }
-
-    return (
-      this.hasBlockingTileForChar(pos, charLayer) ||
-      this.tilemap.hasBlockingChar(
-        pos,
-        charLayer,
-        this.character.getCollisionGroups(),
-        new Set([this.character.getId()])
-      )
+    return isBlocking(
+      this.character.getTilePos(),
+      { position: pos, layer: charLayer },
+      this.tilemap,
+      this.getPathfindingOptions()
     );
   };
 
@@ -408,16 +410,7 @@ export class TargetMovement implements Movement {
       pathfinding.findShortestPath(
         this.character.getNextTilePos(),
         this.targetPos,
-        {
-          pathWidth: this.character.getTileWidth(),
-          pathHeight: this.character.getTileHeight(),
-          numberOfDirections: this.character.getNumberOfDirections(),
-          isPositionAllowed: this.isPositionAllowed,
-          collisionGroups: this.character.getCollisionGroups(),
-          ignoredChars: [this.character.getId()],
-          ignoreTiles: !this.character.collidesWithTiles(),
-          ignoreBlockedTarget: this.ignoreBlockedTarget,
-        }
+        this.getPathfindingOptions()
       );
 
     const noPathFound = shortestPath.length == 0;
@@ -429,16 +422,7 @@ export class TargetMovement implements Movement {
       const shortestPathToClosestPoint = pathfinding.findShortestPath(
         this.character.getNextTilePos(),
         closestToTarget,
-        {
-          pathWidth: this.character.getTileWidth(),
-          pathHeight: this.character.getTileHeight(),
-          numberOfDirections: this.character.getNumberOfDirections(),
-          isPositionAllowed: this.isPositionAllowed,
-          collisionGroups: this.character.getCollisionGroups(),
-          ignoredChars: [this.character.getId()],
-          ignoreTiles: !this.character.collidesWithTiles(),
-          ignoreBlockedTarget: this.ignoreBlockedTarget,
-        }
+        this.getPathfindingOptions()
       ).path;
       const distOffset = this.distanceUtils.distance(
         closestToTarget.position,
@@ -454,20 +438,5 @@ export class TargetMovement implements Movement {
     return this.tilemap.fromMapDirection(
       this.distanceUtils.direction(from, to)
     );
-  }
-
-  private hasBlockingTileForChar(pos: Position, layer: CharLayer): boolean {
-    for (let x = pos.x; x < pos.x + this.character.getTileWidth(); x++) {
-      for (let y = pos.y; y < pos.y + this.character.getTileHeight(); y++) {
-        const res = this.tilemap.hasBlockingTile(
-          new Vector2(x, y),
-          layer,
-          oppositeDirection(directionFromPos(pos, new Vector2(x, y)))
-        );
-
-        if (res) return true;
-      }
-    }
-    return false;
   }
 }
