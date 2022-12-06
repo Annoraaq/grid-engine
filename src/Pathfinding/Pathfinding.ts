@@ -142,7 +142,6 @@ export class Pathfinding {
     const getReverseNeighbors = createReverseNeighbors(
       ops,
       dest,
-      getNeighbors,
       this.gridTilemap
     );
 
@@ -179,35 +178,8 @@ export function createGetNeighbors(
     });
 
     return transitionMappedNeighbors.filter((neighborPos) => {
-      const positionAllowed = options.isPositionAllowed(
-        neighborPos.position,
-        neighborPos.layer
-      );
-      const tileBlocking =
-        !options.ignoreTiles &&
-        hasBlockingTileFrom(
-          pos,
-          neighborPos,
-          options.pathWidth,
-          options.pathHeight,
-          options.ignoreMapBounds,
-          gridTilemap
-        );
-      const inRange =
-        options.ignoreMapBounds || gridTilemap.isInRange(neighborPos.position);
-
-      const charBlocking = gridTilemap.hasBlockingChar(
-        neighborPos.position,
-        neighborPos.layer,
-        options.collisionGroups,
-        new Set(options.ignoredChars)
-      );
-
-      const isBlocking =
-        charBlocking || tileBlocking || !inRange || !positionAllowed;
-
       return (
-        !isBlocking ||
+        !isBlocking(pos, neighborPos, gridTilemap, options) ||
         (options.ignoreBlockedTarget &&
           LayerPositionUtils.equal(neighborPos, dest))
       );
@@ -220,7 +192,6 @@ export function createGetNeighbors(
 export function createReverseNeighbors(
   options: Concrete<PathfindingOptions>,
   dest: LayerVecPos,
-  getNeighbors: GetNeighbors,
   gridTilemap: GridTilemap
 ): GetNeighbors {
   const distanceUtils = DistanceUtilsFactory.create(
@@ -254,41 +225,45 @@ export function createReverseNeighbors(
       })
       .flat();
 
-    const inRange =
-      options.ignoreMapBounds || gridTilemap.isInRange(pos.position);
-
-    const positionAllowed = options.isPositionAllowed(pos.position, pos.layer);
-
     return transitionMappedNeighbors.filter((neighborPos) => {
-      const tileBlocking =
-        !options.ignoreTiles &&
-        hasBlockingTileFrom(
-          neighborPos,
-          pos,
-          options.pathWidth,
-          options.pathHeight,
-          options.ignoreMapBounds,
-          gridTilemap
-        );
-
-      const charBlocking = gridTilemap.hasBlockingChar(
-        neighborPos.position,
-        neighborPos.layer,
-        options.collisionGroups,
-        new Set(options.ignoredChars)
-      );
-
-      const isBlocking =
-        charBlocking || tileBlocking || !inRange || !positionAllowed;
-
       return (
-        !isBlocking ||
+        !isBlocking(neighborPos, pos, gridTilemap, options) ||
         (options.ignoreBlockedTarget && LayerPositionUtils.equal(pos, dest))
       );
     });
   };
 
   return getReverseNeighbors;
+}
+
+function isBlocking(
+  src: LayerVecPos,
+  dest: LayerVecPos,
+  gridTilemap: GridTilemap,
+  options: Concrete<PathfindingOptions>
+): boolean {
+  const positionAllowed = options.isPositionAllowed(dest.position, dest.layer);
+  const tileBlocking =
+    !options.ignoreTiles &&
+    hasBlockingTileFrom(
+      src,
+      dest,
+      options.pathWidth,
+      options.pathHeight,
+      options.ignoreMapBounds,
+      gridTilemap
+    );
+  const inRange =
+    options.ignoreMapBounds || gridTilemap.isInRange(dest.position);
+
+  const charBlocking = gridTilemap.hasBlockingChar(
+    dest.position,
+    dest.layer,
+    options.collisionGroups,
+    new Set(options.ignoredChars)
+  );
+
+  return charBlocking || tileBlocking || !inRange || !positionAllowed;
 }
 
 function hasBlockingTileFrom(
