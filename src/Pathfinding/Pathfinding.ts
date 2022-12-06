@@ -145,14 +145,12 @@ export class Pathfinding {
       this.gridTilemap
     );
 
-    const b = shortestPathAlgo.getShortestPath(
+    return shortestPathAlgo.getShortestPath(
       source,
       dest,
       getNeighbors,
       getReverseNeighbors
     );
-
-    return b;
   }
 }
 
