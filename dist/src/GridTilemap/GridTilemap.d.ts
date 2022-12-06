@@ -19,7 +19,7 @@ export declare class GridTilemap {
     removeCharacter(charId: string): void;
     getCharacters(): GridCharacter[];
     getCharactersAt(position: Vector2, layer: string): Set<GridCharacter>;
-    hasBlockingTile(pos: Vector2, charLayer: string | undefined, direction?: Direction): boolean;
+    hasBlockingTile(pos: Vector2, charLayer: string | undefined, direction?: Direction, ignoreHasTile?: boolean): boolean;
     getTransition(pos: Vector2, fromLayer?: string): string | undefined;
     setTransition(pos: Vector2, fromLayer: CharLayer, toLayer: CharLayer): void;
     getTransitions(): Map<CharLayer, Map<CharLayer, CharLayer>>;

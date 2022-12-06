@@ -8,8 +8,10 @@ import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { MovementInfo } from "./Movement/Movement";
 import { CharacterIndex, FrameRow } from "./GridCharacter/CharacterAnimation/CharacterAnimation";
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter";
-export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, MovementInfo, PositionChange, };
-export declare type TileSizePerSecond = number;
+import { IsPositionAllowedFn, PathfindingOptions } from "./Pathfinding/Pathfinding";
+import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
+export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, MovementInfo, PositionChange, IsPositionAllowedFn, PathfindingOptions, ShortestPathAlgorithmType, };
+export type TileSizePerSecond = number;
 export interface Position {
     x: number;
     y: number;
@@ -21,7 +23,7 @@ export interface LayerPosition {
     position: Position;
     charLayer: CharLayer;
 }
-export declare type CharLayer = string | undefined;
+export type CharLayer = string | undefined;
 /**
  * Configuration object for initializing GridEngine.
  */
@@ -426,7 +428,7 @@ export declare class GridEngine {
     /**
      * Places the character with the given id to the provided tile position. If
      * that character is moving, the movement is stopped. The
-     * {@link positionChanged} and {@link positionChangeFinished} observables will
+     * {@link positionChangeStarted} and {@link positionChangeFinished} observables will
      * emit. If the character was moving, the {@link movementStopped} observable
      * will also emit.
      */
@@ -473,6 +475,21 @@ export declare class GridEngine {
      * position in the given direction.
      */
     getTilePosInDirection(position: Position, charLayer: string | undefined, direction: Direction): LayerPosition;
+    /**
+     * Returns the shortest path from source to destination.
+     *
+     * @param source Source position
+     * @param dest Destination position
+     * @param options Pathfinding options
+     * @returns Shortest path. In case that no path could be found,
+     * `closestToTarget` is a position with a minimum distance to the target.
+     *
+     * @alpha
+     */
+    findShortestPath(source: LayerPosition, dest: LayerPosition, options?: PathfindingOptions): {
+        path: LayerPosition[];
+        closestToTarget: LayerPosition;
+    };
     /**
      * @returns Observable that, whenever a specified position is entered on optionally provided layers,
      *  will notify with the target characters position change
