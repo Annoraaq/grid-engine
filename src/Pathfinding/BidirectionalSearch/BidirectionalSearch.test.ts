@@ -36,6 +36,7 @@ describe("BidirectionalSearch", () => {
     const { path, closestToTarget } = bidirectionalSearch.getShortestPath(
       startPos,
       targetPos,
+      getNeighbors,
       getNeighbors
     );
     expect(path).toEqual([
@@ -52,6 +53,7 @@ describe("BidirectionalSearch", () => {
     const { path, closestToTarget } = bidirectionalSearch.getShortestPath(
       startPos,
       targetPos,
+      getNeighbors,
       getNeighbors
     );
     expect(path).toEqual([
@@ -72,6 +74,7 @@ describe("BidirectionalSearch", () => {
     const { path, closestToTarget } = bidirectionalSearch.getShortestPath(
       startPos,
       targetPos,
+      getNeighbors,
       getNeighbors
     );
     expect(path).toEqual([{ position: new Vector2(3, 3), layer: "layer1" }]);
@@ -84,6 +87,7 @@ describe("BidirectionalSearch", () => {
     const { path, closestToTarget } = bidirectionalSearch.getShortestPath(
       startPos,
       targetPos,
+      () => [],
       () => []
     );
     expect(path).toEqual([]);
@@ -93,20 +97,37 @@ describe("BidirectionalSearch", () => {
   it("should not find a path if target is blocked", () => {
     const startPos = { position: new Vector2(3, 3), layer: "layer1" };
     const targetPos = { position: new Vector2(3, 4), layer: "layer1" };
+    const isTargetPos = (pos) =>
+      pos.position.x == targetPos.position.x &&
+      pos.position.y == targetPos.position.y;
+    const isInRange = (pos) =>
+      !(
+        pos.position.x < 0 ||
+        pos.position.y < 0 ||
+        pos.position.x > 5 ||
+        pos.position.y > 5
+      );
+    const getNeighborsModified = (pos: LayerVecPos) => {
+      const positions = getNeighbors(pos);
+
+      const filtered = positions.filter(
+        (pos: LayerVecPos) => !isTargetPos(pos) && isInRange(pos)
+      );
+      return filtered;
+    };
+
+    const getReverseNeighborsModified = (pos: LayerVecPos) => {
+      if (isTargetPos(pos) || !isInRange(pos)) {
+        return [];
+      }
+      return getNeighbors(pos);
+    };
+    bidirectionalSearch = new BidirectionalSearch();
     const { path, closestToTarget } = bidirectionalSearch.getShortestPath(
       startPos,
       targetPos,
-      (pos: LayerVecPos) => {
-        const positions = getNeighbors(pos);
-
-        const filtered = positions.filter((pos: LayerVecPos) => {
-          return !(
-            pos.position.x == targetPos.position.x &&
-            pos.position.y == targetPos.position.y
-          );
-        });
-        return filtered;
-      }
+      getNeighborsModified,
+      getReverseNeighborsModified
     );
     expect(path).toEqual([]);
     expect(closestToTarget).toEqual(startPos);
@@ -142,7 +163,14 @@ describe("BidirectionalSearch", () => {
       (pos) =>
         getNeighbors(pos).filter((n) =>
           unblockedTiles.includes(VectorUtils.vec2str(n.position))
-        )
+        ),
+      (pos) => {
+        if (unblockedTiles.includes(VectorUtils.vec2str(pos.position)))
+          return [];
+        return getNeighbors(pos).filter((n) =>
+          unblockedTiles.includes(VectorUtils.vec2str(n.position))
+        );
+      }
     );
 
     expect(path).toEqual([
@@ -186,7 +214,14 @@ describe("BidirectionalSearch", () => {
       (pos) =>
         getNeighbors(pos).filter((n) =>
           unblockedTiles.includes(VectorUtils.vec2str(n.position))
-        )
+        ),
+      (pos) => {
+        if (unblockedTiles.includes(VectorUtils.vec2str(pos.position)))
+          return [];
+        return getNeighbors(pos).filter((n) =>
+          unblockedTiles.includes(VectorUtils.vec2str(n.position))
+        );
+      }
     );
 
     expect(path).toEqual([]);

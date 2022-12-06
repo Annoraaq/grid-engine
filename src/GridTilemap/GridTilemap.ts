@@ -58,9 +58,10 @@ export class GridTilemap {
   hasBlockingTile(
     pos: Vector2,
     charLayer: string | undefined,
-    direction?: Direction
+    direction?: Direction,
+    ignoreHasTile?: boolean
   ): boolean {
-    if (this.hasNoTile(pos, charLayer)) return true;
+    if (!ignoreHasTile && this.hasNoTile(pos, charLayer)) return true;
     return this.getCollisionRelevantLayers(charLayer).some((layer) =>
       this.isLayerBlockingAt(layer, pos, direction)
     );

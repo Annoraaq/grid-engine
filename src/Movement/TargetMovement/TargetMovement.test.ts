@@ -1,18 +1,26 @@
-import { LayerVecPos } from "./../../Pathfinding/ShortestPathAlgorithm";
+import {
+  LayerVecPos,
+  ShortestPathAlgorithmType,
+} from "./../../Pathfinding/ShortestPathAlgorithm";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
 import { MoveToResult, TargetMovement } from "./TargetMovement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
-import { Position } from "../../GridEngine";
+import { CollisionStrategy, GridEngineConfig } from "../../GridEngine";
 import { CharConfig, GridCharacter } from "../../GridCharacter/GridCharacter";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import * as Phaser from "phaser";
 import {
   createBlankLayerMock,
   createTilemapMock,
+  mockBlockMap,
+  mockCharMap,
+  createAllowedFn,
+  COLLISION_GROUP,
 } from "../../Utils/MockFactory/MockFactory";
-import { BidirectionalSearch } from "../../Pathfinding/BidirectionalSearch/BidirectionalSearch";
+import { Concrete } from "../../Utils/TypeUtils";
+import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -30,7 +38,7 @@ describe("TargetMovement", () => {
   let blankLayerMock;
   let tilemapMock;
   let gridTilemap;
-  let bidirectionalSearch: BidirectionalSearch;
+  let shortestPathAlgo: ShortestPathAlgorithmType;
 
   function createMockChar(
     id: string,
@@ -47,19 +55,32 @@ describe("TargetMovement", () => {
       layer: "lowerCharLayer",
     };
   }
-  function mockBlockMap(blockMap: string[]) {
-    tilemapMock.hasTileAt.mockImplementation((x, y, _layerName) => {
-      if (x < 0 || x >= blockMap[0].length) return false;
-      if (y < 0 || y >= blockMap.length) return false;
-      return blockMap[y][x] != "#";
-    });
+
+  function createPath(path: [number, number][]): LayerVecPos[] {
+    return path.map(([x, y]) => layerPos(new Vector2(x, y)));
+  }
+
+  function expectWalkedPath(mockChar: GridCharacter, path: LayerVecPos[]) {
+    for (const pos of path) {
+      targetMovement.update(1000);
+      mockChar.update(1000);
+      expect(mockChar.getTilePos()).toEqual(pos);
+    }
   }
 
   beforeEach(() => {
     blankLayerMock = createBlankLayerMock();
     tilemapMock = createTilemapMock(blankLayerMock);
     gridTilemap = new GridTilemap(tilemapMock as any);
-    bidirectionalSearch = new BidirectionalSearch();
+    shortestPathAlgo = "BIDIRECTIONAL_SEARCH";
+    const config: Concrete<GridEngineConfig> = {
+      characters: [],
+      collisionTilePropertyName: "ge_collides",
+      numberOfDirections: NumberOfDirections.FOUR,
+      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
+      layerOverlay: false,
+    };
+    GlobalConfig.set(config);
   });
 
   it("should move char in correct direction", () => {
@@ -73,7 +94,7 @@ describe("TargetMovement", () => {
         position: new Vector2(3, 1),
         layer: "lowerCharLayer",
       },
-      { shortestPathAlgorithm: bidirectionalSearch }
+      { config: { algorithm: shortestPathAlgo } }
     );
     targetMovement.update(100);
 
@@ -93,6 +114,7 @@ describe("TargetMovement", () => {
       },
       {
         config: {
+          algorithm: shortestPathAlgo,
           noPathFoundMaxRetries: 3,
           noPathFoundRetryBackoffMs: 200,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
@@ -100,13 +122,13 @@ describe("TargetMovement", () => {
         },
         ignoreBlockedTarget: true,
         distance: 12,
-        shortestPathAlgorithm: bidirectionalSearch,
       }
     );
 
     expect(targetMovement.getInfo()).toEqual({
       type: "Target",
       config: {
+        algorithm: shortestPathAlgo,
         ignoreBlockedTarget: true,
         distance: 12,
         targetPos: {
@@ -128,7 +150,7 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemap,
       layerPos(new Vector2(3, 3)),
-      { shortestPathAlgorithm: bidirectionalSearch }
+      { config: { algorithm: shortestPathAlgo } }
     );
     targetMovement.update(1000);
     mockChar.update(1000);
@@ -154,7 +176,7 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemap,
       layerPos(new Vector2(1, 1)),
-      { shortestPathAlgorithm: bidirectionalSearch }
+      { config: { algorithm: shortestPathAlgo } }
     );
     targetMovement.update(1000);
     mockChar.update(1000);
@@ -180,7 +202,7 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemap,
       layerPos(new Vector2(3, 1)),
-      { shortestPathAlgorithm: bidirectionalSearch }
+      { config: { algorithm: shortestPathAlgo } }
     );
     targetMovement.update(100);
     expect(mockChar.isMoving()).toBe(false);
@@ -190,7 +212,7 @@ describe("TargetMovement", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p..",
       "....",
       "####",
@@ -203,9 +225,9 @@ describe("TargetMovement", () => {
       layerPos(new Vector2(1, 3)),
       {
         config: {
+          algorithm: shortestPathAlgo,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
-        shortestPathAlgorithm: bidirectionalSearch,
       }
     );
     targetMovement.update(1000);
@@ -222,7 +244,7 @@ describe("TargetMovement", () => {
     const mockChar = createMockChar("char", charPos);
 
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p..",
       "....",
       "####",
@@ -232,12 +254,12 @@ describe("TargetMovement", () => {
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       distance: 3,
       config: {
+        algorithm: shortestPathAlgo,
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
       },
-      shortestPathAlgorithm: bidirectionalSearch,
     });
-    targetMovement.update(1000);
-    mockChar.update(1000);
+    targetMovement.update(100);
+    mockChar.update(100);
 
     expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 0)));
   });
@@ -246,7 +268,7 @@ describe("TargetMovement", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p..",
       "....",
       "....",
@@ -257,7 +279,12 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemap,
       layerPos(new Vector2(1, 3)),
-      { distance: 2, shortestPathAlgorithm: bidirectionalSearch }
+      {
+        distance: 2,
+        config: {
+          algorithm: shortestPathAlgo,
+        },
+      }
     );
     targetMovement.update(1000);
     mockChar.update(1000);
@@ -274,7 +301,7 @@ describe("TargetMovement", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p..",
       "....",
       "####",
@@ -288,9 +315,9 @@ describe("TargetMovement", () => {
       {
         distance: 2,
         config: {
+          algorithm: shortestPathAlgo,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
-        shortestPathAlgorithm: bidirectionalSearch,
       }
     );
 
@@ -304,7 +331,7 @@ describe("TargetMovement", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p..",
       "....",
       "....",
@@ -319,9 +346,9 @@ describe("TargetMovement", () => {
       {
         distance: 3,
         config: {
+          algorithm: shortestPathAlgo,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
-        shortestPathAlgorithm: bidirectionalSearch,
       }
     );
 
@@ -337,7 +364,7 @@ describe("TargetMovement", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p..",
       "....",
       "####",
@@ -348,7 +375,7 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemap,
       layerPos(new Vector2(1, 3)),
-      { shortestPathAlgorithm: bidirectionalSearch }
+      { config: { algorithm: shortestPathAlgo } }
     );
     targetMovement.update(1000);
     mockChar.update(1000);
@@ -361,7 +388,7 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const mockChar = createMockChar("char", charPos);
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "####",
@@ -373,9 +400,9 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(1, 3)),
         {
           config: {
+            algorithm: shortestPathAlgo,
             noPathFoundStrategy: NoPathFoundStrategy.RETRY,
           },
-          shortestPathAlgorithm: bidirectionalSearch,
         }
       );
       targetMovement.update(100);
@@ -385,7 +412,7 @@ describe("TargetMovement", () => {
       expect(mockChar.getTilePos()).toEqual(charPos);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "#.##",
@@ -407,7 +434,7 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const mockChar = createMockChar("char", charPos);
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "####",
@@ -420,10 +447,10 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(1, 3)),
         {
           config: {
+            algorithm: shortestPathAlgo,
             noPathFoundStrategy: NoPathFoundStrategy.RETRY,
             noPathFoundRetryBackoffMs: 150,
           },
-          shortestPathAlgorithm: bidirectionalSearch,
         }
       );
       targetMovement.update(100);
@@ -432,7 +459,7 @@ describe("TargetMovement", () => {
       expect(mockChar.isMoving()).toBe(false);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "#.##",
@@ -453,7 +480,7 @@ describe("TargetMovement", () => {
       const mockChar = createMockChar("char", charPos);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "####",
@@ -466,11 +493,11 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(1, 3)),
         {
           config: {
+            algorithm: shortestPathAlgo,
             noPathFoundStrategy: NoPathFoundStrategy.RETRY,
             noPathFoundRetryBackoffMs: 1,
             noPathFoundMaxRetries: 2,
           },
-          shortestPathAlgorithm: bidirectionalSearch,
         }
       );
       const finishedObsCallbackMock = jest.fn();
@@ -488,7 +515,7 @@ describe("TargetMovement", () => {
       mockChar.update(1);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "#.##",
@@ -513,7 +540,7 @@ describe("TargetMovement", () => {
       const mockChar = createMockChar("char", charPos);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "####",
@@ -528,10 +555,10 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(1, 3)),
         {
           config: {
+            algorithm: shortestPathAlgo,
             noPathFoundStrategy: NoPathFoundStrategy.RETRY,
             noPathFoundRetryBackoffMs: 1,
           },
-          shortestPathAlgorithm: bidirectionalSearch,
         }
       );
       targetMovement.update(1);
@@ -542,7 +569,7 @@ describe("TargetMovement", () => {
       mockChar.update(1);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "#.##",
@@ -565,11 +592,11 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(1, 3)),
         {
           config: {
+            algorithm: shortestPathAlgo,
             noPathFoundStrategy: NoPathFoundStrategy.RETRY,
             noPathFoundRetryBackoffMs: 1,
             noPathFoundMaxRetries: -1,
           },
-          shortestPathAlgorithm: bidirectionalSearch,
         }
       );
       targetMovement.update(1);
@@ -580,7 +607,7 @@ describe("TargetMovement", () => {
       mockChar.update(1);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "#.##",
@@ -600,7 +627,7 @@ describe("TargetMovement", () => {
       const mockChar = createMockChar("char", charPos);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "####",
@@ -613,9 +640,9 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(1, 3)),
         {
           config: {
+            algorithm: shortestPathAlgo,
             noPathFoundStrategy: NoPathFoundStrategy.STOP,
           },
-          shortestPathAlgorithm: bidirectionalSearch,
         }
       );
       const finishedObsCallbackMock = jest.fn();
@@ -629,7 +656,7 @@ describe("TargetMovement", () => {
       expect(mockChar.isMoving()).toBe(false);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "#.##",
@@ -650,71 +677,6 @@ describe("TargetMovement", () => {
     });
   });
 
-  describe("non-colliding char", () => {
-    it("should ignore blocked tiles with non tile-colliding char", () => {
-      const charPos = layerPos(new Vector2(3, 1));
-      const targetPos = layerPos(new Vector2(1, 1));
-      const mockChar = createMockChar("char1", charPos, {
-        ...TEST_CHAR_CONFIG,
-        tilemap: gridTilemap,
-        collidesWithTiles: false,
-      });
-      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-        shortestPathAlgorithm: bidirectionalSearch,
-      });
-
-      tilemapMock.hasTileAt.mockReturnValue(false);
-      const getNeighbors = targetMovement.getNeighbors(charPos);
-
-      expect(getNeighbors).toEqual([
-        {
-          position: new Vector2(charPos.position.x, charPos.position.y + 1),
-          layer: "lowerCharLayer",
-        },
-        {
-          position: new Vector2(charPos.position.x + 1, charPos.position.y),
-          layer: "lowerCharLayer",
-        },
-        {
-          position: new Vector2(charPos.position.x - 1, charPos.position.y),
-          layer: "lowerCharLayer",
-        },
-        {
-          position: new Vector2(charPos.position.x, charPos.position.y - 1),
-          layer: "lowerCharLayer",
-        },
-      ]);
-    });
-
-    it("should not list tiles out of range", () => {
-      const charPos = layerPos(new Vector2(0, 0));
-      const charPos2 = layerPos(new Vector2(19, 29));
-      const targetPos = layerPos(new Vector2(1, 1));
-      const mockChar = createMockChar("char1", charPos, {
-        ...TEST_CHAR_CONFIG,
-        tilemap: gridTilemap,
-        collidesWithTiles: false,
-      });
-      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-        shortestPathAlgorithm: bidirectionalSearch,
-      });
-
-      const neighbors = targetMovement.getNeighbors(charPos);
-
-      expect(neighbors).toEqual([
-        layerPos(new Vector2(0, 1)),
-        layerPos(new Vector2(1, 0)),
-      ]);
-
-      const neighbors2 = targetMovement.getNeighbors(charPos2);
-
-      expect(neighbors2).toEqual([
-        layerPos(new Vector2(18, 29)),
-        layerPos(new Vector2(19, 28)),
-      ]);
-    });
-  });
-
   function blockPath(charPos: LayerVecPos, targetPos: LayerVecPos) {
     if (charPos.position.x != 1 || charPos.position.y != 0) {
       throw "CharPos needs to be (1,0)";
@@ -723,7 +685,7 @@ describe("TargetMovement", () => {
       throw "TargetPos needs to be (1,2)";
     }
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p..",
       "####",
       ".t..",
@@ -738,7 +700,7 @@ describe("TargetMovement", () => {
       throw "TargetPos needs to be (1,2)";
     }
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".p..",
       "#.##",
       ".t..",
@@ -754,9 +716,9 @@ describe("TargetMovement", () => {
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: {
+        algorithm: shortestPathAlgo,
         pathBlockedWaitTimeoutMs: 2000,
       },
-      shortestPathAlgorithm: bidirectionalSearch,
     });
 
     blockPath(charPos, targetPos);
@@ -792,9 +754,9 @@ describe("TargetMovement", () => {
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: {
+        algorithm: shortestPathAlgo,
         pathBlockedWaitTimeoutMs: 2000,
       },
-      shortestPathAlgorithm: bidirectionalSearch,
     });
 
     blockPath(charPos, targetPos);
@@ -822,7 +784,7 @@ describe("TargetMovement", () => {
       const mockChar = createMockChar("char", charPos);
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "#.##",
@@ -830,13 +792,13 @@ describe("TargetMovement", () => {
       ]);
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
+          algorithm: shortestPathAlgo,
           pathBlockedStrategy: PathBlockedStrategy.RETRY,
         },
-        shortestPathAlgorithm: bidirectionalSearch,
       });
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         "....",
         ".p..",
         "####",
@@ -852,7 +814,7 @@ describe("TargetMovement", () => {
 
       expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         "....",
         ".p..",
         "##.#",
@@ -874,16 +836,16 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
+          algorithm: shortestPathAlgo,
           pathBlockedStrategy: PathBlockedStrategy.RETRY,
         },
-        shortestPathAlgorithm: bidirectionalSearch,
       });
 
       blockPath(charPos, targetPos);
 
       expect(mockChar.isMoving()).toBe(false);
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "##.#",
         ".t..",
@@ -904,10 +866,10 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
+          algorithm: shortestPathAlgo,
           pathBlockedStrategy: PathBlockedStrategy.RETRY,
           pathBlockedRetryBackoffMs: 150,
         },
-        shortestPathAlgorithm: bidirectionalSearch,
       });
       blockPath(charPos, targetPos);
 
@@ -915,7 +877,7 @@ describe("TargetMovement", () => {
       mockChar.update(100);
       expect(mockChar.isMoving()).toBe(false);
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "##.#",
         ".t..",
@@ -938,10 +900,10 @@ describe("TargetMovement", () => {
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
+          algorithm: shortestPathAlgo,
           pathBlockedStrategy: PathBlockedStrategy.RETRY,
           pathBlockedMaxRetries: 2,
         },
-        shortestPathAlgorithm: bidirectionalSearch,
       });
       blockPath(charPos, targetPos);
 
@@ -978,7 +940,7 @@ describe("TargetMovement", () => {
 
     unblockPath(charPos, targetPos);
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-      shortestPathAlgorithm: bidirectionalSearch,
+      config: { algorithm: shortestPathAlgo },
     });
     targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
     blockPath(charPos, targetPos);
@@ -1015,7 +977,7 @@ describe("TargetMovement", () => {
       tileHeight: 2,
     });
     // prettier-ignore
-    mockBlockMap([
+    mockBlockMap(tilemapMock, [
       ".pp.",
       ".pp.",
       ".t..",
@@ -1023,7 +985,7 @@ describe("TargetMovement", () => {
     ]);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-      shortestPathAlgorithm: bidirectionalSearch,
+      config: { algorithm: shortestPathAlgo },
     });
     targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
 
@@ -1040,7 +1002,7 @@ describe("TargetMovement", () => {
 
     unblockPath(charPos, targetPos);
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-      shortestPathAlgorithm: bidirectionalSearch,
+      config: { algorithm: shortestPathAlgo },
     });
     targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
 
@@ -1048,56 +1010,6 @@ describe("TargetMovement", () => {
     targetMovement.update(1);
     mockChar.update(1);
     expect(mockChar.isMoving()).toBe(true);
-  });
-
-  it("should consider multi-tile chars", () => {
-    const charPos = layerPos(new Vector2(1, 1));
-    const targetPos = layerPos(new Vector2(1, 2));
-    const mockChar = createMockChar("char", charPos, {
-      ...TEST_CHAR_CONFIG,
-      tilemap: gridTilemap,
-      tileWidth: 2,
-      tileHeight: 2,
-    });
-    mockChar.setTilePosition(charPos);
-
-    // prettier-ignore
-    mockBlockMap([
-      "....",
-      ".pp.",
-      ".pp#",
-      ".#..",
-    ]);
-
-    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-      shortestPathAlgorithm: bidirectionalSearch,
-    });
-    targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
-
-    const unblockedNeigbors = targetMovement.getNeighbors(charPos);
-    expect(unblockedNeigbors).toEqual([
-      layerPos(new Vector2(0, 1)), // left
-      layerPos(new Vector2(1, 0)), // up
-    ]);
-  });
-
-  it("should not block on target", () => {
-    const charPos = layerPos(new Vector2(1, 0));
-    const targetPos = layerPos(new Vector2(1, 1));
-    const mockChar = createMockChar("char1", charPos);
-    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-      ignoreBlockedTarget: true,
-      shortestPathAlgorithm: bidirectionalSearch,
-    });
-
-    // prettier-ignore
-    mockBlockMap([
-      ".p",
-      ".#",
-    ]);
-
-    const getNeighbors = targetMovement.getNeighbors(charPos);
-    expect(getNeighbors).toEqual(expect.arrayContaining([targetPos]));
   });
 
   describe("finished observable", () => {
@@ -1114,9 +1026,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(0, 0)),
-        {
-          shortestPathAlgorithm: bidirectionalSearch,
-        }
+        { config: { algorithm: shortestPathAlgo } }
       );
       const mockCall = jest.fn();
       targetMovement.finishedObs().subscribe(mockCall);
@@ -1136,9 +1046,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(0, 0)),
-        {
-          shortestPathAlgorithm: bidirectionalSearch,
-        }
+        { config: { algorithm: shortestPathAlgo } }
       );
       const mockCall = jest.fn();
       targetMovement.finishedObs().subscribe(mockCall);
@@ -1153,9 +1061,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(0, 0)),
-        {
-          shortestPathAlgorithm: bidirectionalSearch,
-        }
+        { config: { algorithm: shortestPathAlgo } }
       );
       targetMovement.finishedObs().subscribe({ complete: mockCall });
       mockChar.setMovement(undefined);
@@ -1166,7 +1072,7 @@ describe("TargetMovement", () => {
       const mockCall = jest.fn();
       const targetPos = charPos;
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-        shortestPathAlgorithm: bidirectionalSearch,
+        config: { algorithm: shortestPathAlgo },
       });
       targetMovement.finishedObs().subscribe(mockCall);
 
@@ -1195,36 +1101,6 @@ describe("TargetMovement", () => {
   });
 
   describe("8 directions", () => {
-    it("should get 8 neighbors", () => {
-      const charPos = layerPos(new Vector2(3, 1));
-      const targetPos = layerPos(new Vector2(1, 1));
-      const mockChar = createMockChar("char", charPos, {
-        ...TEST_CHAR_CONFIG,
-        tilemap: gridTilemap,
-        numberOfDirections: NumberOfDirections.EIGHT,
-      });
-
-      tilemapMock.hasTileAt.mockReturnValue(false);
-      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-        shortestPathAlgorithm: bidirectionalSearch,
-      });
-      let getNeighbors = targetMovement.getNeighbors(charPos);
-      expect(getNeighbors).toEqual([]);
-
-      tilemapMock.hasTileAt.mockReturnValue(true);
-      getNeighbors = targetMovement.getNeighbors(charPos);
-      expect(getNeighbors).toEqual([
-        layerPos(new Vector2(charPos.position.x, charPos.position.y + 1)),
-        layerPos(new Vector2(charPos.position.x + 1, charPos.position.y)),
-        layerPos(new Vector2(charPos.position.x - 1, charPos.position.y)),
-        layerPos(new Vector2(charPos.position.x, charPos.position.y - 1)),
-        layerPos(new Vector2(charPos.position.x + 1, charPos.position.y + 1)),
-        layerPos(new Vector2(charPos.position.x + 1, charPos.position.y - 1)),
-        layerPos(new Vector2(charPos.position.x - 1, charPos.position.y + 1)),
-        layerPos(new Vector2(charPos.position.x - 1, charPos.position.y - 1)),
-      ]);
-    });
-
     it("should move up-left along path", () => {
       const charPos = layerPos(new Vector2(2, 2));
       const mockChar = createMockChar("char", charPos, {
@@ -1238,7 +1114,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(1, 1)),
-        { shortestPathAlgorithm: bidirectionalSearch }
+        { config: { algorithm: shortestPathAlgo } }
       );
       targetMovement.update(100);
       mockChar.update(100);
@@ -1259,7 +1135,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(3, 1)),
-        { shortestPathAlgorithm: bidirectionalSearch }
+        { config: { algorithm: shortestPathAlgo } }
       );
       targetMovement.update(100);
       mockChar.update(100);
@@ -1280,7 +1156,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(1, 3)),
-        { shortestPathAlgorithm: bidirectionalSearch }
+        { config: { algorithm: shortestPathAlgo } }
       );
       targetMovement.update(100);
       mockChar.update(100);
@@ -1301,7 +1177,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(3, 3)),
-        { shortestPathAlgorithm: bidirectionalSearch }
+        { config: { algorithm: shortestPathAlgo } }
       );
       targetMovement.update(100);
       mockChar.update(100);
@@ -1312,7 +1188,7 @@ describe("TargetMovement", () => {
 
     it("should not move towards closest reachable point if distance is reached", () => {
       const charPos = layerPos(new Vector2(1, 0));
-      const targetPos = layerPos(new Vector2(3, 3));
+      const targetPos = layerPos(new Vector2(1, 3));
       const mockChar = createMockChar("char", charPos, {
         ...TEST_CHAR_CONFIG,
         tilemap: gridTilemap,
@@ -1320,7 +1196,7 @@ describe("TargetMovement", () => {
       });
 
       // prettier-ignore
-      mockBlockMap([
+      mockBlockMap(tilemapMock, [
         ".p..",
         "....",
         "####",
@@ -1329,9 +1205,9 @@ describe("TargetMovement", () => {
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         distance: 3,
         config: {
+          algorithm: shortestPathAlgo,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
-        shortestPathAlgorithm: bidirectionalSearch,
       });
       targetMovement.update(100);
       mockChar.update(100);
@@ -1340,146 +1216,409 @@ describe("TargetMovement", () => {
     });
   });
 
-  it("should not consider forbidden positions as neighbors", () => {
-    function posToStr(pos: Position, charLayer?: string): string {
-      return `${pos.x}#${pos.y}#${charLayer}`;
-    }
-    const playerPos = { position: new Vector2(5, 5), layer: "lowerCharLayer" };
-    const targetPos = {
-      position: new Vector2(10, 10),
-      layer: "lowerCharLayer",
-    };
-    const leftOfPlayer = {
-      position: new Vector2(4, 5),
-      layer: "lowerCharLayer",
-    };
-    const topOfPlayer = {
-      position: new Vector2(5, 4),
-      layer: "lowerCharLayer",
-    };
-    const rightOfPlayer = {
-      position: new Vector2(6, 5),
-      layer: "lowerCharLayer",
-    };
-    const bottomOfPlayer = {
-      position: new Vector2(5, 6),
-      layer: "lowerCharLayer",
-    };
-    const rightOfPlayerOtherLayer = {
-      position: new Vector2(4, 5),
-      layer: "unknownCharLayer",
-    };
-    const forbiddenPositions = new Set<string>();
-    forbiddenPositions.add(posToStr(leftOfPlayer.position, leftOfPlayer.layer));
-    forbiddenPositions.add(
-      posToStr(rightOfPlayerOtherLayer.position, rightOfPlayerOtherLayer.layer)
-    );
+  it("should find path for larger tile size", () => {
+    const charPos = layerPos(new Vector2(1, 0));
+    const targetPos = layerPos(new Vector2(1, 3));
+    const mockChar = createMockChar("char", charPos, {
+      ...TEST_CHAR_CONFIG,
+      tilemap: gridTilemap,
+      tileWidth: 2,
+      tileHeight: 2,
+    });
 
-    const mockChar = createMockChar("char", playerPos);
+    // prettier-ignore
+    mockBlockMap(tilemapMock, [
+      ".ss.",
+      ".ss.",
+      "##..",
+      ".t..",
+      "....",
+    ]);
+
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: {
-        isPositionAllowedFn: (pos, charLayer) =>
-          !forbiddenPositions.has(posToStr(pos, charLayer)),
+        algorithm: shortestPathAlgo,
       },
-      shortestPathAlgorithm: bidirectionalSearch,
     });
 
-    expect(targetMovement.getNeighbors(playerPos)).toEqual([
-      bottomOfPlayer,
-      rightOfPlayer,
-      topOfPlayer,
+    expectWalkedPath(
+      mockChar,
+      createPath([
+        [2, 0],
+        [2, 1],
+        [2, 2],
+        [2, 3],
+        [1, 3],
+      ])
+    );
+  });
+
+  it("should find the shortest path for allowed positions", () => {
+    const charPos = layerPos(new Vector2(1, 0));
+    const targetPos = layerPos(new Vector2(1, 2));
+    const mockChar = createMockChar("char", charPos, {
+      ...TEST_CHAR_CONFIG,
+      tilemap: gridTilemap,
+      tileWidth: 2,
+      tileHeight: 2,
+    });
+
+    // prettier-ignore
+    const allowedFn = createAllowedFn([
+      ".s..",
+      "###.",
+      ".t..",
     ]);
+
+    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+      config: {
+        algorithm: shortestPathAlgo,
+        isPositionAllowedFn: allowedFn,
+      },
+    });
+
+    expectWalkedPath(
+      mockChar,
+      createPath([
+        [2, 0],
+        [3, 0],
+        [3, 1],
+        [3, 2],
+        [2, 2],
+        [1, 2],
+      ])
+    );
   });
 
-  describe("multi-tile chars neighbors", () => {
-    let playerPos;
-    let mockChar;
-    let left, right, top, bottom;
+  it("should consider blocking chars", () => {
+    const charPos = layerPos(new Vector2(1, 0));
+    const targetPos = layerPos(new Vector2(1, 2));
+    const mockChar = createMockChar("char", charPos, {
+      ...TEST_CHAR_CONFIG,
+      tilemap: gridTilemap,
+      collisionGroups: [COLLISION_GROUP],
+    });
 
-    beforeEach(() => {
-      playerPos = layerPos(new Vector2(10, 10));
-      mockChar = createMockChar("char", playerPos, {
+    // prettier-ignore
+    mockCharMap(tilemapMock, gridTilemap, [
+      ".s..",
+      "ccc.",
+      ".t..",
+    ]);
+
+    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+      config: {
+        algorithm: shortestPathAlgo,
+      },
+    });
+
+    expectWalkedPath(
+      mockChar,
+      createPath([
+        [2, 0],
+        [3, 0],
+        [3, 1],
+        [3, 2],
+        [2, 2],
+        [1, 2],
+      ])
+    );
+  });
+
+  it("should not consider blocking chars of different collision groups", () => {
+    const charPos = layerPos(new Vector2(1, 0));
+    const targetPos = layerPos(new Vector2(1, 2));
+    const mockChar = createMockChar("char", charPos, {
+      ...TEST_CHAR_CONFIG,
+      tilemap: gridTilemap,
+      collisionGroups: ["someOtherCollisionGroup"],
+    });
+
+    // prettier-ignore
+    mockCharMap(tilemapMock, gridTilemap, [
+      ".s..",
+      "ccc.",
+      ".t..",
+    ]);
+
+    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+      config: {
+        algorithm: shortestPathAlgo,
+      },
+    });
+
+    expectWalkedPath(
+      mockChar,
+      createPath([
+        [1, 1],
+        [1, 2],
+      ])
+    );
+  });
+
+  it("should not collide with tiles", () => {
+    const charPos = layerPos(new Vector2(1, 0));
+    const targetPos = layerPos(new Vector2(1, 2));
+    const mockChar = createMockChar("char", charPos, {
+      ...TEST_CHAR_CONFIG,
+      tilemap: gridTilemap,
+      collidesWithTiles: false,
+    });
+
+    // prettier-ignore
+    mockBlockMap(tilemapMock, [
+      ".s..",
+      "###.",
+      ".t..",
+    ]);
+
+    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+      config: {
+        algorithm: shortestPathAlgo,
+      },
+    });
+
+    expectWalkedPath(
+      mockChar,
+      createPath([
+        [1, 1],
+        [1, 2],
+      ])
+    );
+  });
+
+  it("should ignore a blocked target", () => {
+    const charPos = layerPos(new Vector2(1, 0));
+    const targetPos = layerPos(new Vector2(1, 2));
+    const mockChar = createMockChar("char", charPos);
+
+    // prettier-ignore
+    mockBlockMap(tilemapMock, [
+      ".s..",
+      "....",
+      ".#..",
+    ]);
+
+    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+      config: {
+        algorithm: shortestPathAlgo,
+      },
+      ignoreBlockedTarget: true,
+    });
+
+    expectWalkedPath(mockChar, createPath([[1, 1]]));
+  });
+
+  describe("Closest reachable", () => {
+    it("should move towards closest reachable point if path is blocked", () => {
+      const charPos = layerPos(new Vector2(2, 5));
+      const targetPos = layerPos(new Vector2(2, 0));
+      const mockChar = createMockChar("char", charPos, {
         ...TEST_CHAR_CONFIG,
         tilemap: gridTilemap,
         tileWidth: 2,
         tileHeight: 2,
       });
-      left = layerPos(new Vector2(0, 1));
-      right = layerPos(new Vector2(2, 1));
-      top = layerPos(new Vector2(1, 0));
-      bottom = layerPos(new Vector2(1, 2));
-      targetMovement = new TargetMovement(
-        mockChar,
-        gridTilemap,
-        layerPos(new Vector2(3, 3)),
-        { shortestPathAlgorithm: bidirectionalSearch }
-      );
-    });
-
-    it("should get all neighbors for unblocked chars", () => {
-      tilemapMock.hasTileAt.mockReturnValue(true);
-
-      expect(targetMovement.getNeighbors(layerPos(new Vector2(1, 1)))).toEqual([
-        bottom,
-        right,
-        left,
-        top,
-      ]);
-    });
-
-    it("should get no neighbors for completely blocked chars", () => {
-      // prettier-ignore
-      mockBlockMap([
-        "..#.",
-        ".pp.",
-        "#pp#",
-        "..#.",
-      ]);
-
-      expect(targetMovement.getNeighbors(layerPos(new Vector2(1, 1)))).toEqual(
-        []
-      );
-    });
-  });
-
-  describe("isometric maps", () => {
-    beforeEach(() => {
-      tilemapMock = createTilemapMock(blankLayerMock);
-      tilemapMock.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC;
-      gridTilemap = new GridTilemap(tilemapMock as any);
-    });
-
-    it("should get no neighbors for completely blocked chars", () => {
-      const playerPos = layerPos(new Vector2(0, 0));
-      const targetPos = layerPos(new Vector2(2, 2));
-      const mockChar = createMockChar("char", playerPos, {
-        ...TEST_CHAR_CONFIG,
-        tilemap: gridTilemap,
-        tileWidth: 2,
-        tileHeight: 2,
-      });
 
       // prettier-ignore
-      mockBlockMap([
-        "s...",
-        "....",
+      mockBlockMap(tilemapMock, [
         "..t.",
+        "####",
         "....",
+        "....",
+        "...#",
+        "..ss",
+        "..ss",
       ]);
+
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
-        shortestPathAlgorithm: bidirectionalSearch,
+        config: {
+          algorithm: shortestPathAlgo,
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        },
       });
 
-      targetMovement.update(1000);
-      mockChar.update(1000);
-      targetMovement.update(1000);
-      mockChar.update(1000);
-      targetMovement.update(1000);
-      mockChar.update(1000);
-      targetMovement.update(1000);
-      mockChar.update(1000);
+      expectWalkedPath(
+        mockChar,
+        createPath([
+          [1, 5],
+          [1, 4],
+          [1, 3],
+          [1, 2],
+          [2, 2],
+        ])
+      );
+    });
 
-      expect(mockChar.getTilePos()).toEqual(targetPos);
+    it("should use correct number of directions", () => {
+      const charPos = layerPos(new Vector2(1, 0));
+      const targetPos = layerPos(new Vector2(3, 2));
+      const mockChar = createMockChar("char", charPos, {
+        ...TEST_CHAR_CONFIG,
+        tilemap: gridTilemap,
+        numberOfDirections: NumberOfDirections.EIGHT,
+      });
+
+      // prettier-ignore
+      mockBlockMap(tilemapMock, [
+        ".s..",
+        "....",
+        "####",
+        "...t",
+      ]);
+
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        config: {
+          algorithm: shortestPathAlgo,
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        },
+      });
+
+      // This is only one possible shortest path. When the shortest path
+      // algorithm changes, this test could break.
+      expectWalkedPath(
+        mockChar,
+        createPath([
+          [2, 0],
+          [3, 1],
+        ])
+      );
+    });
+
+    it("should find the shortest path for allowed positions", () => {
+      const charPos = layerPos(new Vector2(1, 0));
+      const targetPos = layerPos(new Vector2(1, 4));
+      const mockChar = createMockChar("char", charPos, {
+        ...TEST_CHAR_CONFIG,
+        tilemap: gridTilemap,
+      });
+
+      // prettier-ignore
+      const allowedFn = createAllowedFn([
+        ".s..",
+        "##..",
+        "....",
+        "####",
+        ".t..",
+      ]);
+
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        config: {
+          algorithm: shortestPathAlgo,
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+          isPositionAllowedFn: allowedFn,
+        },
+      });
+
+      expectWalkedPath(
+        mockChar,
+        createPath([
+          [2, 0],
+          [2, 1],
+          [2, 2],
+          [1, 2],
+        ])
+      );
+    });
+
+    it("should consider blocking chars", () => {
+      const charPos = layerPos(new Vector2(1, 0));
+      const targetPos = layerPos(new Vector2(1, 4));
+      const mockChar = createMockChar("char", charPos, {
+        ...TEST_CHAR_CONFIG,
+        tilemap: gridTilemap,
+        collisionGroups: [COLLISION_GROUP],
+      });
+
+      // prettier-ignore
+      mockCharMap(tilemapMock, gridTilemap, [
+        ".s..",
+        "ccc.",
+        "....",
+        "####",
+        ".t..",
+      ]);
+
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        config: {
+          algorithm: shortestPathAlgo,
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        },
+      });
+
+      expectWalkedPath(
+        mockChar,
+        createPath([
+          [2, 0],
+          [3, 0],
+          [3, 1],
+          [3, 2],
+          [2, 2],
+          [1, 2],
+        ])
+      );
+    });
+
+    it("should not consider blocking chars of different collision groups", () => {
+      const charPos = layerPos(new Vector2(1, 0));
+      const targetPos = layerPos(new Vector2(1, 4));
+      const mockChar = createMockChar("char", charPos, {
+        ...TEST_CHAR_CONFIG,
+        tilemap: gridTilemap,
+        collisionGroups: ["someOtherCollisionGroup"],
+      });
+
+      // prettier-ignore
+      mockCharMap(tilemapMock, gridTilemap, [
+        ".s..",
+        "ccc.",
+        "....",
+        "####",
+        ".t..",
+      ]);
+
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        config: {
+          algorithm: shortestPathAlgo,
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        },
+      });
+
+      expectWalkedPath(
+        mockChar,
+        createPath([
+          [1, 1],
+          [1, 2],
+        ])
+      );
+    });
+
+    it("should not collide with tiles", () => {
+      const charPos = layerPos(new Vector2(1, 0));
+      const targetPos = layerPos(new Vector2(1, 3));
+      const mockChar = createMockChar("char", charPos, {
+        ...TEST_CHAR_CONFIG,
+        tilemap: gridTilemap,
+        collidesWithTiles: false,
+        collisionGroups: [COLLISION_GROUP],
+      });
+
+      // prettier-ignore
+      mockCharMap(tilemapMock, gridTilemap, [
+        ".s..",
+        ".#..",
+        "cccc",
+        ".t..",
+      ]);
+
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        config: {
+          algorithm: shortestPathAlgo,
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        },
+      });
+
+      expectWalkedPath(mockChar, createPath([[1, 1]]));
     });
   });
 });

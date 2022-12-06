@@ -1,3 +1,14 @@
+import { GridCharacter } from "../../GridCharacter/GridCharacter";
+import { NumberOfDirections } from "../../GridEngine";
+import { GridTilemap } from "../../GridTilemap/GridTilemap";
+import { Vector2 } from "../Vector2/Vector2";
+import { Random, MersenneTwister19937 } from "random-js";
+import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
+
+export const LOWER_CHAR_LAYER = "lowerCharLayer";
+export const HIGHER_CHAR_LAYER = "testCharLayer";
+export const COLLISION_GROUP = "testCollisionGroup";
+
 export function createSpriteMock() {
   return {
     x: 10,
@@ -45,7 +56,7 @@ export function createTilemapMock(blankLayerMock?) {
         properties: [
           {
             name: "ge_charLayer",
-            value: "lowerCharLayer",
+            value: LOWER_CHAR_LAYER,
           },
         ],
       },
@@ -59,7 +70,7 @@ export function createTilemapMock(blankLayerMock?) {
         properties: [
           {
             name: "ge_charLayer",
-            value: "testCharLayer",
+            value: HIGHER_CHAR_LAYER,
           },
         ],
       },
@@ -71,5 +82,143 @@ export function createTilemapMock(blankLayerMock?) {
     getTileAt: jest.fn().mockReturnValue({}),
     hasTileAt: jest.fn().mockReturnValue(true),
     createBlankLayer: jest.fn().mockReturnValue(blankLayerMock),
+  };
+}
+
+export function layerPos(vec: Vector2, layer?: string): LayerVecPos {
+  return {
+    position: vec,
+    layer: layer ?? LOWER_CHAR_LAYER,
+  };
+}
+
+export function mockCharMap(
+  tilemapMock: any, // TODO: replace when we have a Tilemap interface
+  gridTilemap: GridTilemap,
+  blockMap: string[]
+) {
+  tilemapMock.height = blockMap.length;
+  tilemapMock.width = blockMap[0].length;
+  let charCounter = 0;
+  for (let row = 0; row < blockMap.length; row++) {
+    for (let col = 0; col < blockMap[row].length; col++) {
+      if (blockMap[row][col] === "c") {
+        const gridCharacter = new GridCharacter(`mock_char_${charCounter}`, {
+          tilemap: gridTilemap,
+          speed: 3,
+          collidesWithTiles: true,
+          numberOfDirections: NumberOfDirections.FOUR,
+          collisionGroups: [COLLISION_GROUP],
+        });
+        gridCharacter.setTilePosition({
+          position: new Vector2(col, row),
+          layer: LOWER_CHAR_LAYER,
+        });
+        gridTilemap.addCharacter(gridCharacter);
+        charCounter++;
+      }
+    }
+  }
+
+  mockBlockMap(tilemapMock, blockMap);
+}
+
+export function mockRandomMap(
+  tilemapMock: any,
+  width: number,
+  height: number,
+  density = 0.1,
+  seed = 12345
+) {
+  tilemapMock.width = width;
+  tilemapMock.height = height;
+  const random = new Random(MersenneTwister19937.seedWithArray([seed]));
+
+  const map: string[] = [];
+  for (let row = 0; row < height; row++) {
+    const rowStr: string[] = [];
+    for (let col = 0; col < height; col++) {
+      const c = random.integer(0, 100) / 100 <= density ? "#" : ".";
+      rowStr.push(c);
+    }
+    map[row] = rowStr.join("");
+  }
+  mockBlockMap(tilemapMock, map);
+}
+
+export function mockBlockMap(
+  tilemapMock: any, // TODO: replace when we have a Tilemap interface
+  blockMap: string[]
+) {
+  tilemapMock.hasTileAt.mockImplementation((x, y, _layerName) => {
+    if (x < 0 || x >= blockMap[0].length) return false;
+    if (y < 0 || y >= blockMap.length) return false;
+    return true;
+  });
+
+  tilemapMock.getTileAt.mockImplementation((x, y, _layerName) => {
+    if (x < 0 || x >= blockMap[0].length) return undefined;
+    if (y < 0 || y >= blockMap.length) return undefined;
+    switch (blockMap[y][x]) {
+      case "#":
+        return {
+          properties: {
+            ge_collides: true,
+          },
+        };
+      case "→":
+        return {
+          properties: {
+            ge_collide_up: true,
+            ge_collide_right: true,
+            ge_collide_down: true,
+          },
+        };
+      case "←":
+        return {
+          properties: {
+            ge_collide_up: true,
+            ge_collide_down: true,
+            ge_collide_left: true,
+          },
+        };
+      case "↑":
+        return {
+          properties: {
+            ge_collide_up: true,
+            ge_collide_right: true,
+            ge_collide_left: true,
+          },
+        };
+      case "↓":
+        return {
+          properties: {
+            ge_collide_right: true,
+            ge_collide_down: true,
+            ge_collide_left: true,
+          },
+        };
+    }
+    return {};
+  });
+}
+export function mockLayeredMap(
+  tilemapMock: any, // TODO: replace when we have a Tilemap interface
+  blockMap: Map<string, string[]>
+) {
+  tilemapMock.hasTileAt.mockImplementation((x, y, layerName) => {
+    const layer = blockMap.get(layerName);
+    if (!layer) return false;
+    if (x < 0 || x >= layer[0].length) return false;
+    if (y < 0 || y >= layer.length) return false;
+    return layer[y][x] != "#";
+  });
+}
+
+export function createAllowedFn(map: string[]) {
+  return ({ x, y }, _charLayer) => {
+    if (x < 0 || x >= map[0].length) return false;
+    if (y < 0 || y >= map.length) return false;
+    return map[y][x] != "#";
   };
 }

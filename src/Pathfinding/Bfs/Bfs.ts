@@ -10,6 +10,7 @@ interface ShortestPathTuple {
   shortestDistance: number;
   previous: Map<string, LayerVecPos>;
   closestToTarget: LayerVecPos;
+  steps: number;
 }
 
 interface QueueEntry {
@@ -22,7 +23,7 @@ export class Bfs implements ShortestPathAlgorithm {
     startPos: LayerVecPos,
     targetPos: LayerVecPos,
     getNeighbors: GetNeighbors
-  ): { path: LayerVecPos[]; closestToTarget: LayerVecPos } {
+  ): { path: LayerVecPos[]; closestToTarget: LayerVecPos; steps: number } {
     const shortestPath = this.shortestPathBfs(
       startPos,
       targetPos,
@@ -31,6 +32,7 @@ export class Bfs implements ShortestPathAlgorithm {
     return {
       path: this.returnPath(shortestPath.previous, startPos, targetPos),
       closestToTarget: shortestPath.closestToTarget,
+      steps: shortestPath.steps,
     };
   }
 
@@ -58,11 +60,13 @@ export class Bfs implements ShortestPathAlgorithm {
     const queue: Queue<QueueEntry> = new Queue();
     let closestToTarget: LayerVecPos = startNode;
     let smallestDistToTarget: number = this.distance(startNode, stopNode);
+    let steps = 0;
     queue.enqueue({ node: startNode, dist: 0 });
     visited.add(this.pos2Str(startNode));
 
     while (queue.size() > 0) {
       const dequeued = queue.dequeue();
+      steps++;
       if (!dequeued) break;
       const { node, dist } = dequeued;
 
@@ -72,7 +76,7 @@ export class Bfs implements ShortestPathAlgorithm {
         closestToTarget = node;
       }
       if (this.equal(node, stopNode)) {
-        return { shortestDistance: dist, previous, closestToTarget };
+        return { shortestDistance: dist, previous, closestToTarget, steps };
       }
 
       for (const neighbor of getNeighbors(node)) {
@@ -83,7 +87,7 @@ export class Bfs implements ShortestPathAlgorithm {
         }
       }
     }
-    return { shortestDistance: -1, previous, closestToTarget };
+    return { shortestDistance: -1, previous, closestToTarget, steps };
   }
 
   private returnPath(
