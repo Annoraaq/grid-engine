@@ -7,8 +7,8 @@ import { CharLayer, Position } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
-export declare type CharId = string;
-export declare type GameObject = Phaser.GameObjects.Container | Phaser.GameObjects.Sprite;
+export type CharId = string;
+export type GameObject = Phaser.GameObjects.Container | Phaser.GameObjects.Sprite;
 export interface PositionChange {
     exitTile: Position;
     enterTile: Position;

@@ -1,26 +1,27 @@
-import { BidirectionalSearch } from "./../../Pathfinding/BidirectionalSearch/BidirectionalSearch";
 import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy";
 import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
 import {
   LayerVecPos,
   ShortestPath,
+  ShortestPathAlgorithmType,
 } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { DistanceUtils } from "./../../Utils/DistanceUtils";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import {
-  Direction,
-  directionFromPos,
-  oppositeDirection,
-} from "../../Direction/Direction";
+import { Direction } from "../../Direction/Direction";
 import { Movement, MovementInfo } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Retryable } from "./Retryable/Retryable";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
-import { ShortestPathAlgorithm } from "../../Pathfinding/ShortestPathAlgorithm";
 import { CharLayer, Position } from "../../GridEngine";
 import { filter, Subject, take } from "rxjs";
-import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils";
+import {
+  isBlocking,
+  IsPositionAllowedFn,
+  Pathfinding,
+  PathfindingOptions,
+} from "../../Pathfinding/Pathfinding";
+import { Concrete } from "../../Utils/TypeUtils";
 
 export interface MoveToConfig {
   /**
@@ -93,12 +94,12 @@ export interface MoveToConfig {
    * complexity of O(1) is recommended.
    */
   isPositionAllowedFn?: IsPositionAllowedFn;
-}
 
-export type IsPositionAllowedFn = (
-  pos: Position,
-  charLayer?: string
-) => boolean;
+  /**
+   * Algorithm to use for pathfinding.
+   */
+  algorithm?: ShortestPathAlgorithmType;
+}
 
 export enum MoveToResult {
   SUCCESS = "SUCCESS",
@@ -121,7 +122,6 @@ export interface Options {
   distance?: number;
   config?: MoveToConfig;
   ignoreBlockedTarget?: boolean;
-  shortestPathAlgorithm?: ShortestPathAlgorithm;
 }
 
 export class TargetMovement implements Movement {
@@ -140,22 +140,19 @@ export class TargetMovement implements Movement {
   private ignoreBlockedTarget: boolean;
   private distance: number;
   private isPositionAllowed: IsPositionAllowedFn = () => true;
-  private shortestPathAlgorithm: ShortestPathAlgorithm;
+  private shortestPathAlgorithm: ShortestPathAlgorithmType =
+    "BIDIRECTIONAL_SEARCH";
 
   constructor(
     private character: GridCharacter,
     private tilemap: GridTilemap,
     private targetPos: LayerVecPos,
-    {
-      config,
-      ignoreBlockedTarget = false,
-      distance = 0,
-      shortestPathAlgorithm = new BidirectionalSearch(),
-    }: Options = {}
+    { config, ignoreBlockedTarget = false, distance = 0 }: Options = {}
   ) {
+    this.shortestPathAlgorithm =
+      config?.algorithm ?? this.shortestPathAlgorithm;
     this.ignoreBlockedTarget = ignoreBlockedTarget;
     this.distance = distance;
-    this.shortestPathAlgorithm = shortestPathAlgorithm;
     this.noPathFoundStrategy =
       config?.noPathFoundStrategy || NoPathFoundStrategy.STOP;
     this.pathBlockedStrategy =
@@ -212,6 +209,21 @@ export class TargetMovement implements Movement {
       });
   }
 
+  private getPathfindingOptions(): Concrete<PathfindingOptions> {
+    return {
+      shortestPathAlgorithm: this.shortestPathAlgorithm,
+      pathWidth: this.character.getTileWidth(),
+      pathHeight: this.character.getTileHeight(),
+      numberOfDirections: this.character.getNumberOfDirections(),
+      isPositionAllowed: this.isPositionAllowed,
+      collisionGroups: this.character.getCollisionGroups(),
+      ignoredChars: [this.character.getId()],
+      ignoreTiles: !this.character.collidesWithTiles(),
+      ignoreMapBounds: false,
+      ignoreBlockedTarget: this.ignoreBlockedTarget,
+    };
+  }
+
   update(delta: number): void {
     if (this.stopped) return;
 
@@ -250,28 +262,6 @@ export class TargetMovement implements Movement {
     }
   }
 
-  getNeighbors = (pos: LayerVecPos): LayerVecPos[] => {
-    const neighbours = this.distanceUtils.neighbors(pos.position);
-    const transitionMappedNeighbors = neighbours.map((unblockedNeighbor) => {
-      const transition = this.tilemap.getTransition(
-        unblockedNeighbor,
-        pos.layer
-      );
-      return {
-        position: unblockedNeighbor,
-        layer: transition || pos.layer,
-      };
-    });
-
-    return transitionMappedNeighbors.filter(
-      (neighbor) =>
-        (this.isPositionAllowed(neighbor.position, neighbor.layer) &&
-          !this.isBlocking(neighbor.position, neighbor.layer)) ||
-        (this.ignoreBlockedTarget &&
-          LayerPositionUtils.equal(neighbor, this.targetPos))
-    );
-  };
-
   finishedObs(): Subject<Finished> {
     return this.finished$;
   }
@@ -280,6 +270,7 @@ export class TargetMovement implements Movement {
     return {
       type: "Target",
       config: {
+        algorithm: this.shortestPathAlgorithm,
         ignoreBlockedTarget: this.ignoreBlockedTarget,
         distance: this.distance,
         targetPos: this.targetPos,
@@ -400,34 +391,26 @@ export class TargetMovement implements Movement {
   }
 
   private isBlocking = (pos?: Vector2, charLayer?: string): boolean => {
-    if (!pos || !this.tilemap.isInRange(pos)) return true;
+    if (!pos) return true;
 
-    if (!this.character?.collidesWithTiles()) {
-      return this.tilemap.hasBlockingChar(
-        pos,
-        charLayer,
-        this.character.getCollisionGroups(),
-        new Set([this.character.getId()])
-      );
-    }
-
-    return (
-      this.hasBlockingTileForChar(pos, charLayer) ||
-      this.tilemap.hasBlockingChar(
-        pos,
-        charLayer,
-        this.character.getCollisionGroups(),
-        new Set([this.character.getId()])
-      )
+    return isBlocking(
+      this.character.getTilePos(),
+      { position: pos, layer: charLayer },
+      this.tilemap,
+      this.getPathfindingOptions()
     );
   };
 
   private getShortestPath(): ShortestPath {
+    const pathfinding = new Pathfinding(
+      this.shortestPathAlgorithm,
+      this.tilemap
+    );
     const { path: shortestPath, closestToTarget } =
-      this.shortestPathAlgorithm.getShortestPath(
+      pathfinding.findShortestPath(
         this.character.getNextTilePos(),
         this.targetPos,
-        this.getNeighbors
+        this.getPathfindingOptions()
       );
 
     const noPathFound = shortestPath.length == 0;
@@ -436,12 +419,11 @@ export class TargetMovement implements Movement {
       noPathFound &&
       this.noPathFoundStrategy === NoPathFoundStrategy.CLOSEST_REACHABLE
     ) {
-      const shortestPathToClosestPoint =
-        this.shortestPathAlgorithm.getShortestPath(
-          this.character.getNextTilePos(),
-          closestToTarget,
-          this.getNeighbors
-        ).path;
+      const shortestPathToClosestPoint = pathfinding.findShortestPath(
+        this.character.getNextTilePos(),
+        closestToTarget,
+        this.getPathfindingOptions()
+      ).path;
       const distOffset = this.distanceUtils.distance(
         closestToTarget.position,
         this.targetPos.position
@@ -456,20 +438,5 @@ export class TargetMovement implements Movement {
     return this.tilemap.fromMapDirection(
       this.distanceUtils.direction(from, to)
     );
-  }
-
-  private hasBlockingTileForChar(pos: Position, layer: CharLayer): boolean {
-    for (let x = pos.x; x < pos.x + this.character.getTileWidth(); x++) {
-      for (let y = pos.y; y < pos.y + this.character.getTileHeight(); y++) {
-        const res = this.tilemap.hasBlockingTile(
-          new Vector2(x, y),
-          layer,
-          oppositeDirection(directionFromPos(pos, new Vector2(x, y)))
-        );
-
-        if (res) return true;
-      }
-    }
-    return false;
   }
 }

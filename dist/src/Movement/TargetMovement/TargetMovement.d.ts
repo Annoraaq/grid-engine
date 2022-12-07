@@ -1,12 +1,12 @@
 import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy";
-import { LayerVecPos } from "./../../Pathfinding/ShortestPathAlgorithm";
+import { LayerVecPos, ShortestPathAlgorithmType } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Movement, MovementInfo } from "../Movement";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
-import { ShortestPathAlgorithm } from "../../Pathfinding/ShortestPathAlgorithm";
 import { CharLayer, Position } from "../../GridEngine";
 import { Subject } from "rxjs";
+import { IsPositionAllowedFn } from "../../Pathfinding/Pathfinding";
 export interface MoveToConfig {
     /**
      * Determines what happens if no path could be found. For the different
@@ -70,8 +70,11 @@ export interface MoveToConfig {
      * complexity of O(1) is recommended.
      */
     isPositionAllowedFn?: IsPositionAllowedFn;
+    /**
+     * Algorithm to use for pathfinding.
+     */
+    algorithm?: ShortestPathAlgorithmType;
 }
-export declare type IsPositionAllowedFn = (pos: Position, charLayer?: string) => boolean;
 export declare enum MoveToResult {
     SUCCESS = "SUCCESS",
     NO_PATH_FOUND_MAX_RETRIES_EXCEEDED = "NO_PATH_FOUND_MAX_RETRIES_EXCEEDED",
@@ -91,7 +94,6 @@ export interface Options {
     distance?: number;
     config?: MoveToConfig;
     ignoreBlockedTarget?: boolean;
-    shortestPathAlgorithm?: ShortestPathAlgorithm;
 }
 export declare class TargetMovement implements Movement {
     private character;
@@ -113,12 +115,12 @@ export declare class TargetMovement implements Movement {
     private distance;
     private isPositionAllowed;
     private shortestPathAlgorithm;
-    constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerVecPos, { config, ignoreBlockedTarget, distance, shortestPathAlgorithm, }?: Options);
+    constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerVecPos, { config, ignoreBlockedTarget, distance }?: Options);
     setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void;
     getPathBlockedStrategy(): PathBlockedStrategy;
     private setCharacter;
+    private getPathfindingOptions;
     update(delta: number): void;
-    getNeighbors: (pos: LayerVecPos) => LayerVecPos[];
     finishedObs(): Subject<Finished>;
     getInfo(): MovementInfo;
     private resultToReason;
@@ -135,5 +137,4 @@ export declare class TargetMovement implements Movement {
     private isBlocking;
     private getShortestPath;
     private getDir;
-    private hasBlockingTileForChar;
 }

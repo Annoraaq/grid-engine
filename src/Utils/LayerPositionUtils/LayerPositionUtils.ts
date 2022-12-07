@@ -1,3 +1,5 @@
+import { LayerPosition } from "../../GridEngine";
+import { Vector2 } from "../Vector2/Vector2";
 import { LayerVecPos } from "./../../Pathfinding/ShortestPathAlgorithm";
 export class LayerPositionUtils {
   static equal(position: LayerVecPos, otherPosition: LayerVecPos): boolean {
@@ -23,5 +25,19 @@ export class LayerPositionUtils {
 
   static toString(layerPosition: LayerVecPos): string {
     return `${layerPosition.position.toString()}#${layerPosition.layer}`;
+  }
+
+  static toInternal(layerPosition: LayerPosition): LayerVecPos {
+    return {
+      position: new Vector2(layerPosition.position.x, layerPosition.position.y),
+      layer: layerPosition.charLayer,
+    };
+  }
+
+  static fromInternal(layerPosition: LayerVecPos): LayerPosition {
+    return {
+      position: layerPosition.position.toPosition(),
+      charLayer: layerPosition.layer,
+    };
   }
 }
