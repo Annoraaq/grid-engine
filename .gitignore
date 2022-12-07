@@ -8,3 +8,6 @@ docs/.jekyll-metadata
 docs/vendor
 docs/node_modules
 docs/**/*.d.ts
+
+# stryker temp files
+.stryker-tmp
