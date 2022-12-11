@@ -4581,6 +4581,14 @@
     "section-matter" "^1.0.0"
     "strip-bom-string" "^1.0.0"
 
+"gridsome-remark-embed-snippet@^1.0.3":
+  "integrity" "sha512-uBaLa0cHaAelhAGajpmp6spFP1ZnaaXp7qtRoIJgGIWGJLHB8XAw2q4q+W4Gfg6PpqPcq3V+EVgVMSZNtsd4eA=="
+  "resolved" "https://registry.npmjs.org/gridsome-remark-embed-snippet/-/gridsome-remark-embed-snippet-1.0.3.tgz"
+  "version" "1.0.3"
+  dependencies:
+    "normalize-path" "^3.0.0"
+    "unist-util-visit" "^2.0.3"
+
 "gridsome@^0.7.0", "gridsome@0.x":
   "integrity" "sha512-2/koBt4YWoTKRQR+7Gy84EHbNTa9y6JgRjBO84wOpZjEWglwxDh0cFAq8QbhHnf13mXbJVRm5aHBESO5iD5BcA=="
   "resolved" "https://registry.npmjs.org/gridsome/-/gridsome-0.7.23.tgz"

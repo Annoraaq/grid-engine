@@ -1,6 +1,6 @@
 <template>
   <Layout>
-		<main v-html="$page.pages.edges[0].node.content"></main>
+		<main class="md-content" v-html="$page.pages.edges[0].node.content"></main>
 
   </Layout>
 </template>

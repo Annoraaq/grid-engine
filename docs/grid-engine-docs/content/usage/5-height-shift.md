@@ -1,5 +1,7 @@
 ---
+layout: default
 title: Height Shift
+nav_order: 5
 ---
 
 # Height Shift
@@ -14,6 +16,4 @@ This can be done by giving the grass layer a `ge_heightShift` of 1; then the dep
 
 This picture is an example of that solution in application.
 
-<div class="center">
-    <img src="../../../img/heightShift.png" alt="Example of a height shift.">
-</div>
+![Example of a height shift.](../../src/assets/img/heightShift.png)

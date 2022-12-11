@@ -1,10 +1,16 @@
 <template>
   <nav>
     <ul>
-      <li v-for="post in $static.pages.edges" :key="post.id" class="post" >
-        <g-link :to="post.node.path">
-          {{ post.node.title }}
-        </g-link>
+      <li v-for="group in groups">
+        {{group.title}}
+        <ul>
+          <li v-for="page in group.pages">
+            <g-link :to="page.path">
+              {{ page.title }}
+              <span class="beta" v-if="page.beta">Beta</span>
+            </g-link>
+          </li>
+        </ul>
       </li>
     </ul>
   </nav>
@@ -19,24 +25,96 @@ query {
         title
         path
         parent
+        beta
+        nav_order
+        fileInfo {
+          directory
+          name
+        }
       }
     }
   }
 }
 </static-query>
 
+<script>
+
+export default {
+  computed: {
+    groups() {
+      function nameToOrder(name) {
+        return Number(name.split('-')[0]) || 0;
+      }
+
+      const groups= [
+        {
+          name: 'getting-started',
+          title: 'Getting Started',
+        },
+        {
+          name: 'usage',
+          title: 'Usage',
+        }
+      ];
+
+      return groups.map(group => {
+        const pages = this.$static.pages.edges.filter(
+          page => page.node.fileInfo.directory.split('/')[2] === group.name
+        ).map(page => page.node);
+        pages.sort((p1, p2) => nameToOrder(p1.fileInfo.name) - nameToOrder(p2.fileInfo.name));
+        return {
+          ...group,
+          pages
+        }
+      });
+    }
+  }
+}
+</script>
 
 <style>
+
+nav ul {
+  padding-left: 0;
+}
+
+nav ul li {
+  color: var(--dark-font-bright);
+  margin-top: 20px;
+}
+
+nav ul ul{
+  padding-left: 20px;
+}
+
+nav ul ul li {
+  margin-top: 0;
+  list-style-type: none;
+}
 
 nav ul li {
   list-style-type: none;
 }
 
 nav ul a {
-  color: var(--dark-font-medium)
+  display: block;
+  width: 100%;
+  color: var(--dark-font-dark)
+}
+
+nav ul .active {
+  color: var(--brand-medium-bright)
 }
 
 nav ul a:hover {
   color: var(--dark-font-bright)
+}
+
+.beta {
+  background: var(--dark-bg-2);
+  color: var(--dark-font-medium);
+  border-radius: 8px;
+  padding: 1px 6px;
+  font-size: 12px;
 }
 </style>

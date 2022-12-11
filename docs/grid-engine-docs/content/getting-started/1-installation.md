@@ -1,6 +1,6 @@
 ---
 title: Installation
-parent: Getting Started
+parent: getting-started
 ---
 
 # Installation

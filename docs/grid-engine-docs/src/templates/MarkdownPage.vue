@@ -1,6 +1,6 @@
 <template>
 	<Layout>
-		<main v-html="$page.page.content"></main>
+		<main class="md-content" v-html="$page.page.content"></main>
 	</Layout>
 </template>
 
@@ -11,6 +11,7 @@
 			title
 			path
       parent
+			beta
 			content
 		}
 	}

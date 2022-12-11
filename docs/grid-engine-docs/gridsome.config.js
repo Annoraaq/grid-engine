@@ -32,9 +32,10 @@ module.exports = {
   transformers: {
     remark: {
       plugins: [
+        'gridsome-remark-embed-snippet',
         '@gridsome/remark-prismjs'
-      ]
+      ],
+      autolinkClassName: 'autolink fa-solid fa-link'
     }
   }
-
 }
