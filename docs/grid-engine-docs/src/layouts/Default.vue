@@ -210,7 +210,10 @@ code {
   color: var(--brand-light);
   border-radius: 5px;
   padding: 3px 6px;
-  /* font-size: 12px; */
+}
+
+code.language-jsx {
+  padding: 0;
 }
 
 
