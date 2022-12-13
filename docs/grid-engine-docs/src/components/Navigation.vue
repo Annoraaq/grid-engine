@@ -24,11 +24,21 @@ query {
         id
         title
         path
-        parent
         beta
-        nav_order
         fileInfo {
           directory
+          name
+        }
+      }
+    }
+  }
+  examples: allExample {
+    edges {
+      node {
+        id
+        title
+        path
+        fileInfo {
           name
         }
       }
@@ -54,10 +64,14 @@ export default {
         {
           name: 'usage',
           title: 'Usage',
+        },
+        {
+          name: 'examples',
+          title: 'Examples',
         }
       ];
 
-      return groups.map(group => {
+      const groupings = groups.map(group => {
         const pages = this.$static.pages.edges.filter(
           page => page.node.fileInfo.directory.split('/')[2] === group.name
         ).map(page => page.node);
@@ -67,6 +81,12 @@ export default {
           pages
         }
       });
+
+      const examples = groupings.find(g => g.name === 'examples');
+      examples.pages = this.$static.examples.edges.map(ex => ex.node);
+      examples.pages.sort((a, b) => nameToOrder(a.fileInfo.name) - nameToOrder(b.fileInfo.name))
+
+      return groupings;
     }
   }
 }

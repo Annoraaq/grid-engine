@@ -13,6 +13,13 @@ module.exports = {
     {
       use: "@gridsome/source-filesystem",
       options: {
+        typeName: "Example",
+        path: "./examples/*.md",
+      },
+    },
+    {
+      use: "@gridsome/source-filesystem",
+      options: {
         typeName: "MarkdownPage",
         path: "./content/**/*.md",
       },
@@ -27,6 +34,7 @@ module.exports = {
   ],
   templates: {
     MarkdownPage: "/p/:title",
+    Example: "/example/:title",
     Readme: "/p/:title",
   },
   transformers: {
