@@ -198,7 +198,7 @@ h6:hover .autolink {
    * This is making space for the header link icon. So it must be enough for an
    * h1.
    */
-  padding-left: calc(1.3 * var(--font-size-title));
+  padding-left: calc(1.2 * var(--font-size-title));
 }
 
 code {
