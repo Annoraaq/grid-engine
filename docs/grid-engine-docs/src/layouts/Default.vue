@@ -141,8 +141,6 @@ a:hover {
   padding-right: 20px;
   margin-left: var(--nav-width);
   width: calc(var(--page-max-width) - var(--nav-width));
-  /* width: 100%; */
-
 }
 
 .sidebar {
