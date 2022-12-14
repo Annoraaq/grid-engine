@@ -149,7 +149,8 @@ a:hover {
   width: var(--nav-width);
   height: 100%;
   position: fixed;
-  overflow: scroll;
+  overflow: auto;
+  border-right: 1px solid var(--dark-bg-2);
 }
 
 .nav__link {

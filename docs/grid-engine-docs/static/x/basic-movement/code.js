@@ -19,10 +19,7 @@ function create() {
   const playerSprite = this.add.sprite(0, 0, "player");
   playerSprite.scale = 1.5;
   this.cameras.main.startFollow(playerSprite, true);
-  this.cameras.main.setFollowOffset(
-    -(playerSprite.width),
-    -(playerSprite.height),
-  );
+  this.cameras.main.setFollowOffset(-playerSprite.width, -playerSprite.height);
 
   const gridEngineConfig = {
     characters: [
