@@ -10,7 +10,7 @@
           <g-link class="nav__link" to="https://github.com/Annoraaq/grid-engine" title="GitHub">
             <i class="fa-brands fa-github" aria-hidden="true"></i>
           </g-link>
-          <g-link class="nav__link" to="https://discord.gg/PEg2Y3qD" title="Discord">
+          <g-link class="nav__link" to="https://discord.gg/C4jNEZJECs" title="Discord">
             <i class="fa-brands fa-discord" aria-hidden="true"></i>
           </g-link>
         </nav>
