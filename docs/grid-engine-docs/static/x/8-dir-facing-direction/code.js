@@ -28,7 +28,7 @@ function create() {
   const container = this.add.container(0, 0, [
     playerSprite,
     facingDirectionText,
-    facingPositionText
+    facingPositionText,
   ]);
 
   this.cameras.main.startFollow(container, true);
@@ -44,6 +44,7 @@ function create() {
         container
       },
     ],
+    numberOfDirections: 8,
   };
 
   this.gridEngine.create(jungleTilemap, gridEngineConfig);
@@ -52,7 +53,15 @@ function create() {
 
 function update() {
   const cursors = this.input.keyboard.createCursorKeys();
-  if (cursors.left.isDown) {
+  if (cursors.left.isDown && cursors.up.isDown) {
+    this.gridEngine.move("player", "up-left");
+  } else if (cursors.left.isDown && cursors.down.isDown) {
+    this.gridEngine.move("player", "down-left");
+  } else if (cursors.right.isDown && cursors.up.isDown) {
+    this.gridEngine.move("player", "up-right");
+  } else if (cursors.right.isDown && cursors.down.isDown) {
+    this.gridEngine.move("player", "down-right");
+  } else if (cursors.left.isDown) {
     this.gridEngine.move("player", "left");
   } else if (cursors.right.isDown) {
     this.gridEngine.move("player", "right");
@@ -61,7 +70,6 @@ function update() {
   } else if (cursors.down.isDown) {
     this.gridEngine.move("player", "down");
   }
-
   facingDirectionText.text = 'facingDirection: '
     + this.gridEngine.getFacingDirection('player');
   facingPositionText.text = 'facingPosition: ('

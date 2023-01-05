@@ -4,7 +4,7 @@ title: Crowd (8 directions)
 parent: Examples
 ---
 
-# Crowd
+# Crowd (8 directions)
 
 **Press the arrow keys to move.** This demo demonstrates movement and collision with other characters in 8 directions. It further demonstrates the efficiency of the plugin.
 
