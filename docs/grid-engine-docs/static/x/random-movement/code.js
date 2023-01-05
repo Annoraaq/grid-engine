@@ -2,7 +2,7 @@ const game = new Phaser.Game(config(preload, create, update));
 
 function preload() {
   this.load.image("tiles", "/assets/cloud_tileset.png");
-  this.load.tilemapTiledJSON("cloud-city-map", "/assets/cloud_city_large.json");
+  this.load.tilemapTiledJSON("cloud-city-map", "/assets/cloud_city.json");
   this.load.spritesheet("player", "/assets/characters.png", {
     frameWidth: 52,
     frameHeight: 72,
@@ -11,12 +11,11 @@ function preload() {
 
 function create() {
   const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
-  cloudCityTilemap.addTilesetImage("cloud_tileset", "tiles");
+  cloudCityTilemap.addTilesetImage("Cloud City", "tiles");
   for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-    const layer = cloudCityTilemap.createLayer(i, "cloud_tileset", 0, 0);
+    const layer = cloudCityTilemap.createLayer(i, "Cloud City", 0, 0);
     layer.scale = 3;
   }
-
   const playerSprite = this.add.sprite(0, 0, "player");
   playerSprite.scale = 1.5;
   this.cameras.main.startFollow(playerSprite, true);
@@ -43,34 +42,29 @@ function create() {
         id: "npc0",
         sprite: npcSprite,
         walkingAnimationMapping: 0,
-        startPosition: { x: 12, y: 5 },
+        startPosition: { x: 5, y: 5 },
         speed: 3,
       },
       {
         id: "npc1",
         sprite: npcSprite1,
         walkingAnimationMapping: 1,
-        startPosition: { x: 14, y: 8 },
+        startPosition: { x: 10, y: 10 },
       },
       {
         id: "npc2",
         sprite: npcSprite2,
         walkingAnimationMapping: 3,
-        startPosition: { x: 6, y: 8 },
+        startPosition: { x: 5, y: 10 },
         speed: 2,
       },
     ],
   };
 
   this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
-
-  this.gridEngine.moveRandomly("npc0", 0, 1);
-  this.gridEngine.moveRandomly("npc1", 500, 2);
-  this.gridEngine.moveRandomly("npc2", 1500, 3);
-
-  tintRadius(cloudCityTilemap, 8, 6, 3, 0xffcc4a);
-  tintRadius(cloudCityTilemap, 5, 12, 1, 0xff7a4a);
-  tintRadius(cloudCityTilemap, 8, 14, 2, 0x6eff94);
+  this.gridEngine.moveRandomly("npc0");
+  this.gridEngine.moveRandomly("npc1", 500);
+  this.gridEngine.moveRandomly("npc2", 1500);
 }
 
 function update() {
@@ -83,38 +77,5 @@ function update() {
     this.gridEngine.move("player", "up");
   } else if (cursors.down.isDown) {
     this.gridEngine.move("player", "down");
-  }
-}
-
-function manhattanDist(x1, y1, x2, y2) {
-  return Math.abs(x1 - x2) + Math.abs(y1 - y2);
-}
-
-function tintRadius(tilemap, posX, posY, radius, color) {
-  for (let i = 0; i < tilemap.layers.length; i++) {
-    for (let x = 0; x <= radius; x++) {
-      for (let y = 0; y <= radius; y++) {
-        if (manhattanDist(posX, posY, posX + x, posY + y) <= radius) {
-          tilemap.layers[i].tilemapLayer.layer.data[posX + x][
-            posY + y
-          ].tint = color;
-        }
-        if (manhattanDist(posX, posY, posX - x, posY + y) <= radius) {
-          tilemap.layers[i].tilemapLayer.layer.data[posX - x][
-            posY + y
-          ].tint = color;
-        }
-        if (manhattanDist(posX, posY, posX + x, posY - y) <= radius) {
-          tilemap.layers[i].tilemapLayer.layer.data[posX + x][
-            posY - y
-          ].tint = color;
-        }
-        if (manhattanDist(posX, posY, posX - x, posY - y) <= radius) {
-          tilemap.layers[i].tilemapLayer.layer.data[posX - x][
-            posY - y
-          ].tint = color;
-        }
-      }
-    }
   }
 }
