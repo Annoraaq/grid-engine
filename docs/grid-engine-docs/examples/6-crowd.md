@@ -2,7 +2,7 @@
 title: Crowd
 ---
 
-# Following
+# Crowd
 
 **Press the arrow keys to move.** This demo demonstrates movement and collision with other characters. It further demonstrates the efficiency of the plugin.
 
