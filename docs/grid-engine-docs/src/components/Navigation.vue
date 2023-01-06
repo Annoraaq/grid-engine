@@ -68,6 +68,14 @@ export default {
         {
           name: 'examples',
           title: 'Examples',
+        },
+        {
+          name: 'migrations',
+          title: 'Migrations',
+        },
+        {
+          name: 'troubleshooting',
+          title: 'Troubleshooting',
         }
       ];
 
