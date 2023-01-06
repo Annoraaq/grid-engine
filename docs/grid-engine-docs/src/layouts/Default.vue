@@ -99,6 +99,7 @@ a {
   text-decoration: none;
   color: var(--brand-medium);
   transition: color 0.4s;
+  transition-timing-function: cubic-bezier(0.0, 1.0, 1.0, 1.0);
 }
 
 a:hover {
