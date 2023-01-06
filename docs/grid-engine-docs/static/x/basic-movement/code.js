@@ -32,8 +32,6 @@ function create() {
     ],
   };
 
-  console.log(this);
-
   this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
 }
 
