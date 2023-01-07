@@ -17,10 +17,10 @@ Once you're in the tileset editor, select the tiles you want to have the custom 
 
 ![Add Property button](../../src/assets/img/add-property-helper.png)
 
-Name it `ge_collide`, or one of the other [supported properties](./tile-properties), make it a `bool` and then set it to `true` if you want the tile to be non-walkable!
+Name it `ge_collide`, or one of the other [supported properties](../tile-properties), make it a `bool` and then set it to `true` if you want the tile to be non-walkable!
 
 ![Add Property context menu](../../src/assets/img/property-helper.png)
 
 ![Collides property](../../src/assets/img/collides-helper.png)
 
-If you have several [character layers](../features/character-layers) or simply like to separate collisions from the graphical tiles, using [collision layers](./collision-layers) is a good practice.
+If you have several [character layers](../character-layers) or simply like to separate collisions from the graphical tiles, using [collision layers](../collision-layers) is a good practice.
