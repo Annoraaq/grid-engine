@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Move To
-parent: Examples
 ---
 
 # Move Character To

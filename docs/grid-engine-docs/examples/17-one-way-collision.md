@@ -1,7 +1,5 @@
 ---
-layout: default
 title: One-Way Collision
-parent: Examples
 ---
 
 # One-Way Collision

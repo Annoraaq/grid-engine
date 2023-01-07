@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Crowd (8 directions)
-parent: Examples
 ---
 
 # Crowd (8 directions)

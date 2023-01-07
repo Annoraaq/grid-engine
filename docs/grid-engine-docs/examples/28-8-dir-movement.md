@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Movement (8 directions)
-parent: Examples
 ---
 
 # Basic Player Movement (8 directions)

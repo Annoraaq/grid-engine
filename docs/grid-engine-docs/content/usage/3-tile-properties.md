@@ -1,6 +1,5 @@
 ---
 title: Tile Properties
-nav_order: 3
 ---
 
 # Tile Properties

@@ -1,7 +1,6 @@
 ---
 title: Character Layers
 beta: true
-nav_order: 6
 ---
 
 # Character Layers (Beta)

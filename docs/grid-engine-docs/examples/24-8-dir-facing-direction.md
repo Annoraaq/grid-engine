@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Facing Direction (8 directions)
-parent: Examples
 ---
 
 # Facing Direction Observable (8 directions)

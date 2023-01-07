@@ -1,6 +1,5 @@
 ---
 title: Layer Properties
-nav_order: 4
 ---
 
 # Layer Properties

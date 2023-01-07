@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Height Shift
-parent: Examples
 ---
 
 # Height Shifting

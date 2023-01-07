@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Position Changed
-parent: Examples
 ---
 
 # Position Changed Observable

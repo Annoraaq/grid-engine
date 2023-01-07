@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Isometric
-parent: Examples
 ---
 
 # Basic Isometric Player Movement

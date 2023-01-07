@@ -1,6 +1,5 @@
 ---
 title: Collision Layers
-nav_order: 2
 ---
 
 # Collision Layers

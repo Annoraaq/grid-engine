@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Following (8 directions)
-parent: Examples
 ---
 
 # Following (8 directions)

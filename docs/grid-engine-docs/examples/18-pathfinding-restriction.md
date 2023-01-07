@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Pathfinding Restriction
-parent: Examples
 ---
 
 # Restrict pathfinding

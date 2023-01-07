@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Isometric (8 directions)
-parent: Examples
 ---
 
 # Isometric (8 directions)

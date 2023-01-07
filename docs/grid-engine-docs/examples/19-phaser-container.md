@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Phaser Containers
-parent: Examples
 ---
 
 # Phaser Containers

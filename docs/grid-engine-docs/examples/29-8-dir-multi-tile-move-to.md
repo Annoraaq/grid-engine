@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Move To (8 directions, multi-tile)
-parent: Examples
 ---
 
 # Move Character To (8 directions, multi-tile)

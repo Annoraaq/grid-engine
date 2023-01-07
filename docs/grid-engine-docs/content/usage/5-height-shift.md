@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Height Shift
-nav_order: 5
 ---
 
 # Height Shift

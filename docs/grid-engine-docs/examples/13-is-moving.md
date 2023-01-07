@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Is Moving
-parent: Examples
 ---
 
 # Is Moving Observable

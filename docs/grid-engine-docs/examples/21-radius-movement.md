@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Radius Movement
-parent: Examples
 ---
 
 # Movement Within a Radius

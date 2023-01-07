@@ -1,7 +1,6 @@
 ---
 title: Layer Overlay
 beta: true
-nav_order: 7
 ---
 
 # Layer Overlay (Beta)

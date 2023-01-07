@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Move To (8 directions)
-parent: Examples
 ---
 
 # Move Character To (8 directions)

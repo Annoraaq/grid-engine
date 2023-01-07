@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Ice Movement
-parent: Examples
 ---
 
 # Ice Movement

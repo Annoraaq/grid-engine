@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Move To (multi-tile)
-parent: Examples
 ---
 
 # Move Multi-Tile Character To

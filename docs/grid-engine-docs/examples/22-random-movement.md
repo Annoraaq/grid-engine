@@ -1,7 +1,5 @@
 ---
-layout: default
 title: Random Movement
-parent: Examples
 ---
 
 # Random Movement

@@ -1,6 +1,5 @@
 ---
 title: Collisions
-nav_order: 1
 ---
 
 # Collisions
