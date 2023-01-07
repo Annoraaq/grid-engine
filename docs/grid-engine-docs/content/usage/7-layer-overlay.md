@@ -7,7 +7,7 @@ beta: true
 
 This feature can be enabled in the GridEngine configuration by setting `layerOverlay` to `true`.
 
-It partially fixes the issue of overlapping characters when using [character layers](./character-layers).
+It partially fixes the issue of overlapping characters when using [character layers](../character-layers).
 When you have a character layer transition upwards and you have character sprites that are larger than one tile, then a lower character might be overlapped by a character that just made the transition up to a higher character layer. Here is an example picture:
 
 ![Overlapping characters issue demonstration](../../src/assets/img/char-layers-char-overlap.png)

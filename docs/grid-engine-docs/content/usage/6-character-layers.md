@@ -76,7 +76,7 @@ We need to give the tilemap layer the property `ge_charLayer` with the value `sk
 
 Now we add the layer property `ge_charLayer` with the value `ground` to the `ground` layer.
 
-Now our two character layers behave as we intended. You can see the live example [here](../examples/char-layers-flying-chars).
+Now our two character layers behave as we intended. You can see the live example [here](../../example/char-layers-flying-chars).
 
 ## Example 2: Layer Transitions
 
@@ -165,7 +165,7 @@ The upper tile will make any character switch from `ground` layer to `bridge` la
 
 Why did we not pick the same tile for both transitions? We could do that but it will allow the character to switch layers in an unintended way: The layer transition happens on entering the tile. So if the player walks on that tile from the `ground` layer she will be transferred to the `bridge` layer. If the character then immediately walks down again she will still be on the `bridge` level but not on the bridge. This is not what we want. By having both transitions on adjacent tiles we ensure that this can't happen.
 
-You can see the live example [here](../examples/char-layers-bridge).
+You can see the live example [here](../../example/char-layers-bridge).
 
 ### What about `ge_alwaysTop`?
 
@@ -175,7 +175,7 @@ The `ge_alwaysTop` layer property is not needed anymore with character layers. I
 
 ### What about shadows for the birds?
 
-If they include a character shadow that is part of the character sprite and are rendered on the `sky` character layer like in example 1, we can observe that this shadow is rendered on top of other characters. One solution for this is shown in [this example](../examples/char-layers-flying-chars-shadows).
+If they include a character shadow that is part of the character sprite and are rendered on the `sky` character layer like in example 1, we can observe that this shadow is rendered on top of other characters. One solution for this is shown in [this example](../../example/char-layers-flying-chars-with-shadows).
 
 ## Unsolved Issues
 
@@ -185,4 +185,4 @@ One example is our bridge example. We create a second character and let it follo
 
 ![Character overlapping issue](../../src/assets/img/char-layers-char-overlap.png)
 
-Under certain conditions you can avoid this overlapping by using the [layer overlay feature](./layer-overlay).
+Under certain conditions you can avoid this overlapping by using the [layer overlay feature](../layer-overlay).
