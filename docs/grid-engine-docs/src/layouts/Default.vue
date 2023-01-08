@@ -7,6 +7,12 @@
           <Logo />
         </g-link>
         <nav class="nav">
+          <a href="/typedoc" class="nav__link">
+            API
+          </a>
+          <g-link class="nav__link" to="https://github.com/zewa666/grid-engine-devtools">
+            Dev Tools Plugin
+          </g-link>
           <g-link class="nav__link" to="https://github.com/Annoraaq/grid-engine" title="GitHub">
             <i class="fa-brands fa-github" aria-hidden="true"></i>
           </g-link>
