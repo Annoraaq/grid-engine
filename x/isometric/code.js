@@ -1,9 +1,9 @@
 const game = new Phaser.Game(config(preload, create, update));
 
 function preload() {
-  this.load.image("tiles", "/assets/iso_tile.png");
-  this.load.tilemapTiledJSON("iso-map", "/assets/isometric.json");
-  this.load.spritesheet("player", "/assets/iso_char.png", {
+  this.load.image("tiles", "../../assets/iso_tile.png");
+  this.load.tilemapTiledJSON("iso-map", "../../assets/isometric.json");
+  this.load.spritesheet("player", "../../assets/iso_char.png", {
     frameWidth: 15,
     frameHeight: 32,
   });

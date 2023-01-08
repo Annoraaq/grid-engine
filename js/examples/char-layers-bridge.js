@@ -4,13 +4,13 @@ export default function (GridEngine, Phaser, config, parent) {
   );
 
   function preload() {
-    this.load.image("tiles", "/assets/cloud_tileset.png");
+    this.load.image("tiles", "../../assets/cloud_tileset.png");
     this.load.tilemapTiledJSON(
       "cloud-city-map",
-      "/assets/cloud_city_bridge_only.json",
+      "../../assets/cloud_city_bridge_only.json",
     );
 
-    this.load.spritesheet("player", "/assets/characters.png", {
+    this.load.spritesheet("player", "../../assets/characters.png", {
       frameWidth: 52,
       frameHeight: 72,
     });
