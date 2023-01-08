@@ -86,11 +86,6 @@ a.logo-link {
 
 .bright {
   background-color: var(--brand-light);
-
-  animation-name: twinkle;
-  animation-duration: 3s;
-  animation-iteration-count: infinite;
-  animation-delay: 4s;
 }
 
 .hide {

@@ -232,8 +232,6 @@ code[class*="language-"], pre[class*="language-"] {
 
 table {
   border-collapse: collapse;
-  /* border-collapse: separate;
-  border-spacing: 10px; */
 
 }
 table td,
