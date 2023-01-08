@@ -333,7 +333,7 @@ export class GridEngine {
   /**
    * Returns the character layer of the given character.
    * You can read more about character layers and transitions
-   * {@link https://annoraaq.github.io/grid-engine/api/features/character-layers.html | here}
+   * {@link https://annoraaq.github.io/grid-engine/p/character-layers | here}
    */
   getCharLayer(charId: string): string | undefined {
     this.initGuard();
@@ -357,7 +357,7 @@ export class GridEngine {
    * Sets the character layer `toLayer` that the transition on position
    * `position` from character layer `fromLayer` should lead to.
    * You can read more about character layers and transitions
-   * {@link https://annoraaq.github.io/grid-engine/api/features/character-layers.html | here}
+   * {@link https://annoraaq.github.io/grid-engine/p/character-layers | here}
    *
    * @param position Position of the new transition
    * @param fromLayer Character layer the new transition should start at
