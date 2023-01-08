@@ -13,7 +13,7 @@
     "build": "npm run build-web && npm run build-esm && tsc --emitDeclarationOnly --outDir dist",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "serve": "esbuild src/main-iife.ts --servedir=serve --outfile=serve/js/GridEngine.js --bundle --target=es2016 --external:phaser --global-name=GridEngine",
-    "docs": "typedoc src/GridEngine.ts --excludePrivate --excludeProtected --excludeInternal --out docs/typedoc"
+    "docs": "typedoc src/GridEngine.ts --excludePrivate --excludeProtected --excludeInternal --out docs/grid-engine-docs/typedoc"
   },
   "files": [
     "dist"
