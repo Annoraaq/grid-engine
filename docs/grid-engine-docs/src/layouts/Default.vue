@@ -222,7 +222,6 @@ code.language-jsx {
   padding: 0;
 }
 
-
 code[class*="language-"], pre[class*="language-"] {
   font-family: var(--font-family-mono);
 }
