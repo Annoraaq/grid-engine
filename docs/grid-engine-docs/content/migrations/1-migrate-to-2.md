@@ -19,7 +19,7 @@ For instance, replace `moveLeft("player")` with `move("player", "left")`;
 
 ## Replace `Phaser.Math.Vector2`
 
-This dependency to phaser was removed. In version 2, all the public methods of GridEngine will take and return [Position](../api/config.html/#position) objects instead of `Phaser.Math.Vector2`. [Position](../api/config.html/#position) objects are simpler and only take x and y coordinates. Please note that a `Phaser.Math.Vector2` is also a `Position` because it has properties `x` and `y`. So you can keep passing these as input if you like.
+This dependency to phaser was removed. In version 2, all the public methods of GridEngine will take and return [Position][position] objects instead of `Phaser.Math.Vector2`. [Position][position] objects are simpler and only take x and y coordinates. Please note that a `Phaser.Math.Vector2` is also a `Position` because it has properties `x` and `y`. So you can keep passing these as input if you like.
 
 ## Rename `positionChanged()` to `positionChangeStarted()`
 
@@ -27,7 +27,7 @@ To keep the observable names consistent, `positionChanged()` has been renamed to
 
 ## Change Observable Return Types
 
-In order to be consistent through all observables, the return types of `movementStarted()`, `movementStopped()` and `directionChanged()` have been changed from an array [string, [Direction](../api/config.html/#direction)] to an object: {charId: string, direction: [Direction](../api/config.html/#direction)}.
+In order to be consistent through all observables, the return types of `movementStarted()`, `movementStopped()` and `directionChanged()` have been changed from an array [string, [Direction][direction]] to an object: {charId: string, direction: [Direction][direction]}.
 
 The following example code needs to be transformed as follows:
 
@@ -62,3 +62,6 @@ The deprecated `characterIndex` character config property has been removed. Use 
 ## Remove `walkingAnimationEnabled`
 
 The character config property `walkingAnimationEnabled` has been removed. Simply don't provide a `walkingAnimationMapping` to disable walking animations.
+
+[position]: /typedoc/interfaces/Position.html
+[direction]: /typedoc/enums/Direction.html
