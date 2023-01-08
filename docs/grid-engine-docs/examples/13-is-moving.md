@@ -6,7 +6,7 @@ title: Is Moving
 
 **Press the arrow keys to move.** This demo demonstrates how to use the `isMoving` observable for characters, allowing you to change behavior depending on whether or not they're in motion! This demo also uses the [Phaser Containers](../phaser-containers) feature.
 
-<iframe src="/x/is-moving"></iframe>
+<iframe src="../../x/is-moving"></iframe>
 
 ## Example Code
 

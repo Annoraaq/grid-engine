@@ -6,7 +6,7 @@ title: Char Layers - Flying Chars
 
 **Press the arrow keys to move.** This demonstrates the usage of character layers as described [here](../../p/character-layers).
 
-<iframe src="/x/char-layers-flying-chars"></iframe>
+<iframe src="../../x/char-layers-flying-chars"></iframe>
 
 ## Example Code
 

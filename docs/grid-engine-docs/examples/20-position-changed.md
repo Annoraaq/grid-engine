@@ -6,7 +6,7 @@ title: Position Changed
 
 **Press the arrow keys to move.** This demo demonstrates how to use the `positionChanged` observable on the tilemap, allowing you to track where the characters have moved to, and further allowing you to add custom features to various tiles if you wish. This demo also uses the [Phaser Containers](../phaser-containers) feature.
 
-<iframe src="/x/position-changed"></iframe>
+<iframe src="../../x/position-changed"></iframe>
 
 ## Example Code
 

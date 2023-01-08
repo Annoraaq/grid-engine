@@ -6,7 +6,7 @@ title: Crowd
 
 **Press the arrow keys to move.** This demo demonstrates movement and collision with other characters. It further demonstrates the efficiency of the plugin.
 
-<iframe src="/x/crowd"></iframe>
+<iframe src="../../x/crowd"></iframe>
 
 ## Example Code
 

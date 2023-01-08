@@ -6,7 +6,7 @@ title: Isometric
 
 **Press the arrow keys to move.** This is a basic demo of isometric maps with four directions.
 
-<iframe src="/x/isometric"></iframe>
+<iframe src="../../x/isometric"></iframe>
 
 ## Example Code
 

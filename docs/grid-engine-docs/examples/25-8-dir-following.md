@@ -6,7 +6,7 @@ title: Following (8 directions)
 
 **Press the arrow keys to move.** This demo demonstrates how you can make a character follow another character using 8 directions.
 
-<iframe src="/x/8-dir-following"></iframe>
+<iframe src="../../x/8-dir-following"></iframe>
 
 ## Example Code
 

@@ -7,7 +7,7 @@
           <Logo />
         </g-link>
         <nav class="nav">
-          <a href="/typedoc" class="nav__link">
+          <a href="https://github.com/Annoraaq/grid-engine/typedoc" class="nav__link">
             API
           </a>
           <g-link class="nav__link" to="https://github.com/zewa666/grid-engine-devtools">

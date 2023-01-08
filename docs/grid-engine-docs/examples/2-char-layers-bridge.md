@@ -6,7 +6,7 @@ title: Char Layers - Bridge
 
 **Press the arrow keys to move.** This demonstrates the usage of character layers as described [here](../../p/character-layers).
 
-<iframe src="/x/char-layers-bridge"></iframe>
+<iframe src="../../x/char-layers-bridge"></iframe>
 
 ## Example Code
 

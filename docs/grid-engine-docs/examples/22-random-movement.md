@@ -6,7 +6,7 @@ title: Random Movement
 
 **Press the arrow keys to move.** This demo demonstrates how to set up random movement for characters (can also be used on the player).
 
-<iframe src="/x/random-movement"></iframe>
+<iframe src="../../x/random-movement"></iframe>
 
 ## Example Code
 

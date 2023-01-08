@@ -6,7 +6,7 @@ title: Basic Movement
 
 **Press the arrow keys to move.** This is a basic demo of player movement, using a test map and basic **Grid Engine** functionality.
 
-<iframe src="/x/basic-movement"></iframe>
+<iframe src="../../x/basic-movement"></iframe>
 
 ## Example Code
 

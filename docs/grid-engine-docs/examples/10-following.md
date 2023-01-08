@@ -6,7 +6,7 @@ title: Following
 
 **Press the arrow keys to move.** This demo demonstrates how you can make a character follow another character.
 
-<iframe src="/x/following"></iframe>
+<iframe src="../../x/following"></iframe>
 
 ## Example Code
 

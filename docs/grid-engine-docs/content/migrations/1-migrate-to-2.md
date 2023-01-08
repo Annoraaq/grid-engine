@@ -49,7 +49,7 @@ this.gridEngine.movementStarted().subscribe(({ charId, direction }) => {
 
 All tile and tile layer properties that previously started with `gm_` have been renamed and now start with `ge_`.
 
-Further, the tile property `collides` is not a default property anymore. You can either rename it in your tilemap to `ge_collide` or you can set it as `collisionTilePropertyName` in the [config](/typedoc/interfaces/GridEngineConfig.html#collisionTilePropertyName).
+Further, the tile property `collides` is not a default property anymore. You can either rename it in your tilemap to `ge_collide` or you can set it as `collisionTilePropertyName` in the [config](../../typedoc/interfaces/GridEngineConfig.html#collisionTilePropertyName).
 
 ## Remove `firstLayerAboveChar` Config Property
 
@@ -63,5 +63,5 @@ The deprecated `characterIndex` character config property has been removed. Use 
 
 The character config property `walkingAnimationEnabled` has been removed. Simply don't provide a `walkingAnimationMapping` to disable walking animations.
 
-[position]: /typedoc/interfaces/Position.html
-[direction]: /typedoc/enums/Direction.html
+[position]: ../../typedoc/interfaces/Position.html
+[direction]: ../../typedoc/enums/Direction.html
