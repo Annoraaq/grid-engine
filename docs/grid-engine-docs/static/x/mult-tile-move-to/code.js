@@ -5,9 +5,9 @@ const COLOR_1 = 0xff7a4a;
 const COLOR_2 = 0x6eff94;
 
 function preload() {
-  this.load.image("tiles", "/assets/cloud_tileset.png");
-  this.load.tilemapTiledJSON("cloud-city-map", "/assets/cloud_city_large.json");
-  this.load.spritesheet("player", "/assets/characters.png", {
+  this.load.image("tiles", "../../assets/cloud_tileset.png");
+  this.load.tilemapTiledJSON("cloud-city-map", "../../assets/cloud_city_large.json");
+  this.load.spritesheet("player", "../../assets/characters.png", {
     frameWidth: 52,
     frameHeight: 72,
   });

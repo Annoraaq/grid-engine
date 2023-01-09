@@ -1,9 +1,9 @@
 const game = new Phaser.Game(config(preload, create, update));
 
 function preload() {
-  this.load.image("tiles", "/assets/tf_jungle_tileset.png");
-  this.load.tilemapTiledJSON("jungle", "/assets/jungle-small.json");
-  this.load.spritesheet("player", "/assets/characters.png", {
+  this.load.image("tiles", "../../assets/tf_jungle_tileset.png");
+  this.load.tilemapTiledJSON("jungle", "../../assets/jungle-small.json");
+  this.load.spritesheet("player", "../../assets/characters.png", {
     frameWidth: 52,
     frameHeight: 72,
   });

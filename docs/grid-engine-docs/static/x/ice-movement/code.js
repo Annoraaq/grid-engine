@@ -3,10 +3,10 @@ const game = new Phaser.Game(config(preload, create, update));
 let slidingDirection = 'none';
 
 function preload() {
-  this.load.image("tiles", "/assets/tf_winter_terrain.png");
-  this.load.tilemapTiledJSON("ice-movement-map", "/assets/ice-movement.json");
+  this.load.image("tiles", "../../assets/tf_winter_terrain.png");
+  this.load.tilemapTiledJSON("ice-movement-map", "../../assets/ice-movement.json");
 
-  this.load.spritesheet("player", "/assets/characters.png", {
+  this.load.spritesheet("player", "../../assets/characters.png", {
     frameWidth: 52,
     frameHeight: 72,
   });
