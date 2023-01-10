@@ -1,9 +1,0 @@
-title: Grid Engine
-remote_theme: pmarsceill/just-the-docs
-color_scheme: pgmp
-search_enabled: true
-aux_links:
-  "API Documentation":
-    - "https://annoraaq.github.io/grid-engine/typedoc/index.html"
-  "Chrome DevTools Plugin":
-    - "https://github.com/zewa666/grid-engine-devtools"

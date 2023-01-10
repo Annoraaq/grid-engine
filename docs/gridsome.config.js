@@ -28,7 +28,7 @@ module.exports = {
       use: "@gridsome/source-filesystem",
       options: {
         typeName: "Readme",
-        path: "../../README.md",
+        path: "../README.md",
       },
     },
   ],
