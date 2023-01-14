@@ -33,6 +33,7 @@ jobs:
         run: npm install
         
       - name: Deploy with gh-pages
+        working-directory: ./docs
         run: |
           git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
           npm run deploy -- -u "github-actions-bot <support+actions@github.com>"
