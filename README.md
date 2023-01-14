@@ -40,7 +40,7 @@ movement to your tilemap game. Your characters will be able to only move in whol
 
 📖 Read our most current [documentation](https://annoraaq.github.io/grid-engine/).
 
-➡️ You can try/download [a list of examples](https://annoraaq.github.io/grid-engine/examples/).
+➡️ You can try/download [a list of examples](https://annoraaq.github.io/grid-engine/).
 
 👾 Join our [discord](https://discord.gg/C4jNEZJECs).
 
