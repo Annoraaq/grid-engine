@@ -109,7 +109,7 @@ function create() {
 
 ## Special Thanks
 
-Raiper34, splashsky, therebelrobot, xLink, 
+Raiper34, splashsky, therebelrobot, xLink,
 
 ## License
 
