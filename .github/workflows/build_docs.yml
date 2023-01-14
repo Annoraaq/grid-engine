@@ -28,6 +28,14 @@ jobs:
 
       - run: npm run docs
       
+      - name: Install deps for Gridsome
+        working-directory: ./docs
+        run: npm install
+        
+      - name: Deploy Gridsome
+        working-directory: ./docs
+        run: npm run deploy
+      
       - uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
         with:
           # Determines the way the action fills missing author name and email. Three options are available:
