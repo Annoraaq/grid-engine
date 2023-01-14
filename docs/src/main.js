@@ -24,17 +24,17 @@ export default function (Vue, { router, head, isClient }) {
 
   head.link.push({
     rel: 'stylesheet',
-    href: '/fontawesome/css/fontawesome.min.css'
+    href: router.options.base + 'fontawesome/css/fontawesome.min.css'
   });
 
   head.link.push({
     rel: 'stylesheet',
-    href: '/fontawesome/css/brands.min.css'
+    href: router.options.base + 'fontawesome/css/brands.min.css'
   });
 
   head.link.push({
     rel: 'stylesheet',
-    href: '/fontawesome/css/solid.min.css'
+    href: router.options.base + 'fontawesome/css/solid.min.css'
   });
 
 }
