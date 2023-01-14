@@ -32,9 +32,12 @@ jobs:
         working-directory: ./docs
         run: npm install
         
-      - name: Deploy Gridsome
-        working-directory: ./docs
-        run: npm run deploy
+      - name: Deploy with gh-pages
+        run: |
+          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          npm run deploy -- -u "github-actions-bot <support+actions@github.com>"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
         with:
