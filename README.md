@@ -4,25 +4,39 @@
     <img src="https://img.shields.io/badge/made%20with-TypeScript-blue?style=for-the-badge">
 </p>
 
-Welcome to the **Grid Engine** plugin! This Phaser 3 plugin adds grid-based movement to your tilemap game. Your characters will be able to only move in whole tile sizes, locked to the x-y grid!
-
-This plugin is also compatible (and written in) TypeScript; enjoy full type support!
-
 <p align="center">
-    <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/features-label.png" alt="Features" />
+  <img
+    src="https://github.com/Annoraaq/grid-engine/raw/master/images/grid-engine-logo.png"
+    alt="Grid Engine Logo"
+  />
 </p>
 
+Welcome to the **Grid Engine** plugin! This Phaser 3 plugin adds grid-based
+movement to your tilemap game. Your characters will be able to only move in whole tile sizes, locked to the x-y grid!
+
+<p align="center">
+  <img
+    src="https://github.com/Annoraaq/grid-engine/raw/master/images/radius-movement-demo.gif"
+    width="400"
+    style="image-rendering: pixelated; display: inline"
+  />
+</p>
+
+## Features
+
 - Grid-based movement, of course!
+- Multiple characters
+- Pathfinding (for both NPCs and the player)
 - Tile-based collision detection
 - One-way collision detection
-- Support for multiple characters
-- Pathfinding (for both NPCs and the player)
 - Random movement (can also limit to a radius)
 - Following other characters
 - Diagonal movement (8 directions)
 - Isometric maps (Beta)
 - Multiple character layers (Beta)
 - Collision groups
+- Multi-tile characters
+- Full TypeScript support
 
 📖 Read our most current [documentation](https://annoraaq.github.io/grid-engine/).
 
@@ -32,9 +46,7 @@ This plugin is also compatible (and written in) TypeScript; enjoy full type supp
 
 🛠 Also check out the [Chrome DevTools plugin](https://github.com/zewa666/grid-engine-devtools).
 
-<p align="center">
-    <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/installation-label.png" alt="Installation" />
-</p>
+## Installation
 
 Installing the Grid Engine plugin is simple.
 
@@ -95,21 +107,10 @@ function create() {
 }
 ```
 
-<p align="center">
-    <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/gifs-label.png" alt="Example GIFs" />
-</p>
-<p align="center">
-    <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/movement.gif" />
-</p>
+## Special Thanks
 
-<p align="center">
-    <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/radius-movement.gif" />
-</p>
+Raiper34, splashsky, therebelrobot, xLink,
 
-# Special Thanks
-
-Raiper34, splashsky, therebelrobot, xLink, 
-
-# License
+## License
 
 Apache 2.0
