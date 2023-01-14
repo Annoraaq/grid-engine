@@ -7,7 +7,7 @@
 <script>
 export default {
   metaInfo: {
-    title: 'Hello, world!'
+    title: 'Grid Engine Documentation'
   }
 }
 </script>
