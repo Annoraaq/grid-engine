@@ -28,6 +28,18 @@ jobs:
 
       - run: npm run docs
       
+      - name: Install deps for Gridsome
+        working-directory: ./docs
+        run: npm install
+        
+      - name: Deploy with gh-pages
+        working-directory: ./docs
+        run: |
+          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          npm run deploy -- -u "github-actions-bot <support+actions@github.com>"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
       - uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
         with:
           # Determines the way the action fills missing author name and email. Three options are available:
