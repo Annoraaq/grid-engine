@@ -18,33 +18,50 @@
     <img src="https://img.shields.io/badge/made%20with-TypeScript-blue?style=for-the-badge">
 </p>
 
-<p>Welcome to the <strong>Grid Engine</strong> plugin! This Phaser 3 plugin adds grid-based movement to your tilemap game. Your characters will be able to only move in whole tile sizes, locked to the x-y grid!</p>
-<p>This plugin is also compatible (and written in) TypeScript; enjoy full type support!</p>
 <p align="center">
-    <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/features-label.png" alt="Features" />
+  <img
+    src="https://github.com/Annoraaq/grid-engine/raw/master/images/grid-engine-logo.png"
+    alt="Grid Engine Logo"
+  />
 </p>
 
+<p>Welcome to the <strong>Grid Engine</strong> plugin! This Phaser 3 plugin adds grid-based
+movement to your tilemap game. Your characters will be able to only move in whole tile sizes, locked to the x-y grid!</p>
+<p align="center">
+  <img
+    src="https://github.com/Annoraaq/grid-engine/raw/master/images/radius-movement-demo.gif"
+    width="400"
+    style="image-rendering: pixelated; display: inline"
+  />
+</p>
+
+
+<a href="#features" id="features" style="color: inherit; text-decoration: none;">
+  <h2>Features</h2>
+</a>
 <ul>
 <li>Grid-based movement, of course!</li>
+<li>Multiple characters</li>
+<li>Pathfinding (for both NPCs and the player)</li>
 <li>Tile-based collision detection</li>
 <li>One-way collision detection</li>
-<li>Support for multiple characters</li>
-<li>Pathfinding (for both NPCs and the player)</li>
 <li>Random movement (can also limit to a radius)</li>
 <li>Following other characters</li>
 <li>Diagonal movement (8 directions)</li>
 <li>Isometric maps (Beta)</li>
 <li>Multiple character layers (Beta)</li>
 <li>Collision groups</li>
+<li>Multi-tile characters</li>
+<li>Full TypeScript support</li>
 </ul>
 <p>📖 Read our most current <a href="https://annoraaq.github.io/grid-engine/">documentation</a>.</p>
 <p>➡️ You can try/download <a href="https://annoraaq.github.io/grid-engine/examples/">a list of examples</a>.</p>
 <p>👾 Join our <a href="https://discord.gg/C4jNEZJECs">discord</a>.</p>
 <p>🛠 Also check out the <a href="https://github.com/zewa666/grid-engine-devtools">Chrome DevTools plugin</a>.</p>
-<p align="center">
-    <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/installation-label.png" alt="Installation" />
-</p>
 
+<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+  <h2>Installation</h2>
+</a>
 <p>Installing the Grid Engine plugin is simple.</p>
 
 <a href="#npm" id="npm" style="color: inherit; text-decoration: none;">
@@ -64,25 +81,14 @@
 <p>Now you&#39;re all set to start using Grid Engine in your scenes!</p>
 <pre><code class="language-javascript"><span class="hl-7">function</span><span class="hl-0"> </span><span class="hl-11">create</span><span class="hl-0">() {</span><br/><span class="hl-0">  </span><span class="hl-1">// ...</span><br/><br/><span class="hl-0">  </span><span class="hl-7">const</span><span class="hl-0"> </span><span class="hl-8">gridEngineConfig</span><span class="hl-0"> = {</span><br/><span class="hl-0">    </span><span class="hl-9">characters:</span><span class="hl-0"> [</span><br/><span class="hl-0">      {</span><br/><span class="hl-0">        </span><span class="hl-9">id:</span><span class="hl-0"> </span><span class="hl-10">&quot;player&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">        </span><span class="hl-9">sprite:</span><span class="hl-0"> </span><span class="hl-9">playerSprite</span><span class="hl-0">,</span><br/><span class="hl-0">        </span><span class="hl-9">walkingAnimationMapping:</span><span class="hl-0"> </span><span class="hl-12">6</span><span class="hl-0">,</span><br/><span class="hl-0">      },</span><br/><span class="hl-0">    ],</span><br/><span class="hl-0">  };</span><br/><br/><span class="hl-0">  </span><span class="hl-7">this</span><span class="hl-0">.</span><span class="hl-9">gridEngine</span><span class="hl-0">.</span><span class="hl-11">create</span><span class="hl-0">(</span><span class="hl-9">tilemap</span><span class="hl-0">, </span><span class="hl-9">gridEngineConfig</span><span class="hl-0">);</span><br/><br/><span class="hl-0">  </span><span class="hl-1">// ...</span><br/><span class="hl-0">}</span>
 </code></pre>
-<p align="center">
-    <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/gifs-label.png" alt="Example GIFs" />
-</p>
-<p align="center">
-    <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/movement.gif" />
-</p>
-
-<p align="center">
-    <img src="https://github.com/Annoraaq/grid-engine/raw/master/images/radius-movement.gif" />
-</p>
-
 
 <a href="#special-thanks" id="special-thanks" style="color: inherit; text-decoration: none;">
-  <h1>Special Thanks</h1>
+  <h2>Special Thanks</h2>
 </a>
-<p>splashsky, therebelrobot, xLink</p>
+<p>Raiper34, splashsky, therebelrobot, xLink,</p>
 
 <a href="#license" id="license" style="color: inherit; text-decoration: none;">
-  <h1>License</h1>
+  <h2>License</h2>
 </a>
 <p>Apache 2.0</p>
 </div></div>
