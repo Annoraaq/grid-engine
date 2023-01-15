@@ -28,9 +28,9 @@
   "devDependencies": {
     "@stryker-mutator/core": "^6.3.1",
     "@stryker-mutator/jest-runner": "^6.3.1",
-    "@types/jest": "^29.2.3",
-    "@typescript-eslint/eslint-plugin": "^5.44.0",
-    "@typescript-eslint/parser": "^5.44.0",
+    "@types/jest": "^29.2.5",
+    "@typescript-eslint/eslint-plugin": "^5.48.1",
+    "@typescript-eslint/parser": "^5.48.1",
     "canvas": "^2.10.2",
     "esbuild": "^0.15.15",
     "eslint": "^8.28.0",
