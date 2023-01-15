@@ -8,6 +8,8 @@ import { GridTilemap } from "./GridTilemap";
 import { Rect } from "../Utils/Rect/Rect";
 import * as Phaser from "phaser";
 import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
+import { PhaserTilemap } from "./Phaser/PhaserTilemap";
+import { createMockLayerData } from "../Utils/MockFactory/MockFactory";
 
 const mockCharBlockCache = {
   addCharacter: jest.fn(),
@@ -17,7 +19,7 @@ const mockCharBlockCache = {
 };
 
 const mockCharLayers = [
-  {
+  createMockLayerData({
     name: "layer1",
     tilemapLayer: {
       setDepth: jest.fn(),
@@ -30,8 +32,8 @@ const mockCharLayers = [
         value: true,
       },
     ],
-  },
-  {
+  }),
+  createMockLayerData({
     name: "layer2",
     tilemapLayer: {
       setDepth: jest.fn(),
@@ -44,8 +46,8 @@ const mockCharLayers = [
         value: "charLayer1",
       },
     ],
-  },
-  {
+  }),
+  createMockLayerData({
     name: "layer3",
     tilemapLayer: {
       setDepth: jest.fn(),
@@ -53,8 +55,8 @@ const mockCharLayers = [
       tileset: "Cloud City",
     },
     properties: [],
-  },
-  {
+  }),
+  createMockLayerData({
     name: "layer4",
     tilemapLayer: {
       setDepth: jest.fn(),
@@ -67,7 +69,7 @@ const mockCharLayers = [
         value: "charLayer2",
       },
     ],
-  },
+  }),
 ];
 
 const mockRect = {
@@ -93,6 +95,7 @@ jest.mock("../Utils/Rect/Rect", function () {
 describe("GridTilemap", () => {
   let gridTilemap: GridTilemap;
   let tilemapMock;
+  let phaserTilemap;
   let blankLayerMock;
 
   beforeEach(() => {
@@ -103,7 +106,7 @@ describe("GridTilemap", () => {
     };
     tilemapMock = {
       layers: [
-        {
+        createMockLayerData({
           name: "layer1",
           tilemapLayer: {
             setDepth: jest.fn(),
@@ -111,8 +114,9 @@ describe("GridTilemap", () => {
             tileset: "Cloud City",
           },
           properties: [],
-        },
-        {
+          data: [[]],
+        }),
+        createMockLayerData({
           name: "layer2",
           tilemapLayer: {
             setDepth: jest.fn(),
@@ -120,7 +124,8 @@ describe("GridTilemap", () => {
             scale: 3,
           },
           properties: [],
-        },
+          data: [[]],
+        }),
       ],
       tileWidth: 16,
       tileHeight: 16,
@@ -129,8 +134,12 @@ describe("GridTilemap", () => {
       getTileAt: jest.fn(),
       hasTileAt: jest.fn(),
       createBlankLayer: jest.fn().mockReturnValue(blankLayerMock),
+      getLayer: jest.fn((name) =>
+        tilemapMock.layers.find((l) => l.name == name)
+      ),
     };
-    gridTilemap = new GridTilemap(tilemapMock);
+    phaserTilemap = new PhaserTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     mockCharBlockCache.addCharacter.mockReset();
     mockCharBlockCache.removeCharacter.mockReset();
     mockCharBlockCache.isCharBlockingAt.mockReset();
@@ -145,14 +154,14 @@ describe("GridTilemap", () => {
   });
 
   it("should set layer depths on construction", () => {
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
     expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(1);
   });
 
   it("should consider legacy 'ge_alwaysTop' flag of tile layer", () => {
     tilemapMock.layers = [
-      {
+      createMockLayerData({
         name: "layer1",
         tilemapLayer: {
           setDepth: jest.fn(),
@@ -160,8 +169,8 @@ describe("GridTilemap", () => {
           tileset: "Cloud City",
         },
         properties: [],
-      },
-      {
+      }),
+      createMockLayerData({
         name: "layer2",
         tilemapLayer: {
           setDepth: jest.fn(),
@@ -174,8 +183,8 @@ describe("GridTilemap", () => {
             value: true,
           },
         ],
-      },
-      {
+      }),
+      createMockLayerData({
         name: "layer3",
         tilemapLayer: {
           setDepth: jest.fn(),
@@ -183,9 +192,9 @@ describe("GridTilemap", () => {
           tileset: "Cloud City",
         },
         properties: [],
-      },
+      }),
     ];
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(new PhaserTilemap(tilemapMock));
 
     expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
     expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(2);
@@ -194,7 +203,7 @@ describe("GridTilemap", () => {
 
   it("should consider charLayers", () => {
     tilemapMock.layers = mockCharLayers;
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
 
     expect(
       tilemapMock.layers[0].tilemapLayer.setDepth
@@ -208,7 +217,7 @@ describe("GridTilemap", () => {
 
   it("should return highest non-char layer for undefined layer", () => {
     tilemapMock.layers = [
-      {
+      createMockLayerData({
         name: "layer1",
         tilemapLayer: {
           setDepth: jest.fn(),
@@ -216,8 +225,8 @@ describe("GridTilemap", () => {
           tileset: "Cloud City",
         },
         properties: [],
-      },
-      {
+      }),
+      createMockLayerData({
         name: "layer2",
         tilemapLayer: {
           setDepth: jest.fn(),
@@ -230,8 +239,8 @@ describe("GridTilemap", () => {
             value: true,
           },
         ],
-      },
-      {
+      }),
+      createMockLayerData({
         name: "layer3",
         tilemapLayer: {
           setDepth: jest.fn(),
@@ -239,7 +248,7 @@ describe("GridTilemap", () => {
           tileset: "Cloud City",
         },
         properties: [],
-      },
+      }),
     ];
 
     expect(gridTilemap.getDepthOfCharLayer(undefined)).toEqual(1);
@@ -247,7 +256,7 @@ describe("GridTilemap", () => {
 
   it("should consider 'heightShift' layer", () => {
     tilemapMock.layers = [
-      {
+      createMockLayerData({
         name: "layer1",
         tilemapLayer: {
           setDepth: jest.fn(),
@@ -256,8 +265,9 @@ describe("GridTilemap", () => {
           tileset: "Cloud City",
         },
         properties: [],
-      },
-      {
+        data: [[]],
+      }),
+      createMockLayerData({
         name: "layer2",
         height: 2,
         width: 2,
@@ -277,19 +287,17 @@ describe("GridTilemap", () => {
             value: 1,
           },
         ],
-      },
+      }),
     ];
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
 
     expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
-    expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith(
-      "layer2#0",
-      "Cloud City"
-    );
-    expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith(
-      "layer2#1",
-      "Cloud City"
-    );
+    expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith("layer2#0", [
+      "Cloud City",
+    ]);
+    expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith("layer2#1", [
+      "Cloud City",
+    ]);
 
     expect(blankLayerMock.putTileAt).toHaveBeenCalledTimes(4);
     expect(blankLayerMock.putTileAt).toHaveBeenNthCalledWith(1, "r0#c0", 0, 0);
@@ -304,7 +312,7 @@ describe("GridTilemap", () => {
   });
 
   it("should add a character", () => {
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const charMock1 = createCharMock("player");
     const charMock2 = createCharMock("player2");
     const charMockSameId = createCharMock("player2");
@@ -317,7 +325,7 @@ describe("GridTilemap", () => {
 
   it("should set the lowest char layer", () => {
     tilemapMock.layers = [
-      {
+      createMockLayerData({
         name: "layer1",
         tilemapLayer: {
           setDepth: jest.fn(),
@@ -331,8 +339,8 @@ describe("GridTilemap", () => {
             value: "layer1",
           },
         ],
-      },
-      {
+      }),
+      createMockLayerData({
         name: "layer2",
         tilemapLayer: {
           setDepth: jest.fn(),
@@ -346,9 +354,9 @@ describe("GridTilemap", () => {
             value: "layer2",
           },
         ],
-      },
+      }),
     ];
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const charMock1 = createCharMock("player");
     charMock1.getNextTilePos = () => ({
       position: new Vector2(1, 2),
@@ -363,7 +371,7 @@ describe("GridTilemap", () => {
   });
 
   it("should remove a character", () => {
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const charMock1 = <any>{
       ...createCharMock("player"),
     };
@@ -379,7 +387,7 @@ describe("GridTilemap", () => {
   });
 
   it("should find characters", () => {
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
 
     const charMocks = new Set<GridCharacter>();
     charMocks.add(createCharMock("player"));
@@ -398,7 +406,7 @@ describe("GridTilemap", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { ge_collide: true },
     });
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined
@@ -416,7 +424,7 @@ describe("GridTilemap", () => {
   it("should not consider missing tiles as blocking", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     tilemapMock.getTileAt.mockReturnValue(undefined);
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined,
@@ -429,7 +437,7 @@ describe("GridTilemap", () => {
   it("should consider missing tiles as blocking", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     tilemapMock.getTileAt.mockReturnValue(undefined);
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined
@@ -449,7 +457,7 @@ describe("GridTilemap", () => {
       collisionTilePropertyName: "custom_collides_prop",
       layerOverlay: false,
     }));
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined
@@ -462,7 +470,7 @@ describe("GridTilemap", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { ge_collide_left: true, ge_collide_right: false },
     });
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined,
@@ -494,7 +502,7 @@ describe("GridTilemap", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { ge_collide_right: true },
     });
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined,
@@ -526,7 +534,7 @@ describe("GridTilemap", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { ge_collide_up: true },
     });
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined,
@@ -558,7 +566,7 @@ describe("GridTilemap", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { ge_collide_down: true },
     });
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined,
@@ -587,7 +595,7 @@ describe("GridTilemap", () => {
 
   it("should only consider tiles on charLayer", () => {
     tilemapMock.layers = [
-      {
+      createMockLayerData({
         name: "layer1",
         tilemapLayer: {
           setDepth: jest.fn(),
@@ -598,8 +606,8 @@ describe("GridTilemap", () => {
             value: true,
           },
         ],
-      },
-      {
+      }),
+      createMockLayerData({
         name: "layer2",
         tilemapLayer: {
           setDepth: jest.fn(),
@@ -610,15 +618,15 @@ describe("GridTilemap", () => {
             value: "charLayer1",
           },
         ],
-      },
-      {
+      }),
+      createMockLayerData({
         name: "layer3",
         tilemapLayer: {
           setDepth: jest.fn(),
         },
         properties: [],
-      },
-      {
+      }),
+      createMockLayerData({
         name: "layer4",
         tilemapLayer: {
           setDepth: jest.fn(),
@@ -629,8 +637,8 @@ describe("GridTilemap", () => {
             value: "charLayer2",
           },
         ],
-      },
-      {
+      }),
+      createMockLayerData({
         name: "transitions",
         tilemapLayer: {
           setDepth: jest.fn(),
@@ -641,7 +649,7 @@ describe("GridTilemap", () => {
             value: "charLayer1",
           },
         ],
-      },
+      }),
     ];
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockImplementation((_x, _y, _, layer) => {
@@ -651,7 +659,7 @@ describe("GridTilemap", () => {
       return { properties: { ge_collide: false } };
     });
 
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       "charLayer1"
@@ -668,7 +676,7 @@ describe("GridTilemap", () => {
   it("should return true if nothing blocks", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined
@@ -681,7 +689,7 @@ describe("GridTilemap", () => {
   it("should return true if no tile", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const isBlocking = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined
@@ -693,7 +701,7 @@ describe("GridTilemap", () => {
   it("should block if no tile present", () => {
     tilemapMock.layers = mockCharLayers;
     tilemapMock.hasTileAt.mockReturnValue(false);
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
     expect(hasNoTile).toBe(true);
   });
@@ -703,7 +711,7 @@ describe("GridTilemap", () => {
     tilemapMock.hasTileAt.mockImplementation((_x, _y, layerName) => {
       return layerName !== "layer1" && layerName !== "layer2";
     });
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
     expect(hasNoTile).toBe(true);
   });
@@ -713,14 +721,14 @@ describe("GridTilemap", () => {
     tilemapMock.hasTileAt.mockImplementation((_x, _y, layerName) => {
       return layerName === "layer2";
     });
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
     expect(hasNoTile).toBe(false);
   });
 
   it("should detect blocking char", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
     mockCharBlockCache.isCharBlockingAt = jest.fn(() => true);
 
     expect(
@@ -736,7 +744,7 @@ describe("GridTilemap", () => {
 
   it("should detect an unblocked tile", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(phaserTilemap);
 
     const char1Mock = <any>{
       ...createCharMock("player1"),
@@ -889,7 +897,7 @@ describe("GridTilemap", () => {
 
   describe("transitions", () => {
     it("should set transitions", () => {
-      gridTilemap = new GridTilemap(tilemapMock);
+      gridTilemap = new GridTilemap(phaserTilemap);
       gridTilemap.setTransition(new Vector2(4, 5), "charLayer2", "charLayer1");
       gridTilemap.setTransition(new Vector2(3, 5), "charLayer2", "charLayer1");
       expect(gridTilemap.getTransition(new Vector2(4, 5), "charLayer2")).toBe(
@@ -906,7 +914,7 @@ describe("GridTilemap", () => {
     it("should get all transitions", () => {
       const pos1 = new Vector2(4, 5);
       const pos2 = new Vector2(3, 5);
-      gridTilemap = new GridTilemap(tilemapMock);
+      gridTilemap = new GridTilemap(phaserTilemap);
       gridTilemap.setTransition(pos1, "charLayer2", "charLayer1");
       gridTilemap.setTransition(pos2, "charLayer2", "charLayer1");
 

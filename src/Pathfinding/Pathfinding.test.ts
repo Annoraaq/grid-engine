@@ -27,6 +27,7 @@ import {
   NumberOfDirections,
 } from "../GridEngine";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
+import { PhaserTilemap } from "../GridTilemap/Phaser/PhaserTilemap";
 import {
   createBlankLayerMock,
   createTilemapMock,
@@ -71,7 +72,7 @@ describe("Pathfinding", () => {
     GlobalConfig.set(config);
     blankLayerMock = createBlankLayerMock();
     tilemapMock = createTilemapMock(blankLayerMock);
-    gridTilemap = new GridTilemap(tilemapMock as any);
+    gridTilemap = new GridTilemap(new PhaserTilemap(tilemapMock as any));
     pathfindingAlgo = "BIDIRECTIONAL_SEARCH";
   });
 
@@ -169,7 +170,7 @@ describe("Pathfinding", () => {
       tilemapMock,
       new Map([
         [
-          "layer1",
+          "Layer 1",
           [
             // prettier-ignore
             ".s#.",
@@ -178,7 +179,7 @@ describe("Pathfinding", () => {
           ],
         ],
         [
-          "layer2",
+          "Layer 2",
           [
             // prettier-ignore
             "..*.",
@@ -556,7 +557,7 @@ describe("Pathfinding", () => {
         tilemapMock,
         new Map([
           [
-            "layer1",
+            "Layer 1",
             [
               // prettier-ignore
               "...",
@@ -565,7 +566,7 @@ describe("Pathfinding", () => {
             ],
           ],
           [
-            "layer2",
+            "Layer 2",
             [
               // prettier-ignore
               "...",
@@ -936,7 +937,7 @@ describe("Pathfinding", () => {
         tilemapMock,
         new Map([
           [
-            "layer1",
+            "Layer 1",
             [
               // prettier-ignore
               "...",
@@ -945,7 +946,7 @@ describe("Pathfinding", () => {
             ],
           ],
           [
-            "layer2",
+            "Layer 2",
             [
               // prettier-ignore
               "...",

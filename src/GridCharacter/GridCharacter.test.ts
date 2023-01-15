@@ -13,6 +13,7 @@ import {
 import { CollisionStrategy } from "../GridEngine";
 import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
 import { GlobalConfig } from "../GlobalConfig/GlobalConfig";
+import { PhaserTilemap } from "../GridTilemap/Phaser/PhaserTilemap";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -52,7 +53,7 @@ describe("GridCharacter", () => {
   beforeEach(() => {
     blankLayerMock = createBlankLayerMock();
     tilemapMock = createTilemapMock(blankLayerMock);
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(new PhaserTilemap(tilemapMock));
     gridCharacter = new GridCharacter("player", {
       tilemap: gridTilemap,
       speed: 3,
@@ -705,7 +706,7 @@ describe("GridCharacter", () => {
           // we need to provide the layer name, not the char layer name for
           // mocking
           mockBlockingTile([
-            { position: new Vector2(charPosX + 1, charPosY), layer: "layer2" },
+            { position: new Vector2(charPosX + 1, charPosY), layer: "Layer 2" },
           ]);
 
           expect(gridCharacter.isBlockingDirection(Direction.RIGHT)).toBe(true);

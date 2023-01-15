@@ -40,6 +40,8 @@ import {
 } from "./Pathfinding/Pathfinding";
 import { LayerPositionUtils } from "./Utils/LayerPositionUtils/LayerPositionUtils";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
+import { GridEngineHeadless } from "./GridEngineHeadless";
+import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
 
 export {
   CollisionStrategy,
@@ -303,6 +305,7 @@ export enum CharacterShiftAction {
 }
 
 export class GridEngine {
+  private geHeadless: GridEngineHeadless = new GridEngineHeadless();
   private gridCharacters?: Map<string, GridCharacterPhaser>;
   private gridTilemap?: GridTilemap;
   private isCreatedInternal = false;
@@ -405,7 +408,7 @@ export class GridEngine {
     >();
     this.charRemoved$ = new Subject<string>();
     this.charAdded$ = new Subject<string>();
-    this.gridTilemap = new GridTilemap(tilemap);
+    this.gridTilemap = new GridTilemap(new PhaserTilemap(tilemap));
 
     this.addCharacters();
   }

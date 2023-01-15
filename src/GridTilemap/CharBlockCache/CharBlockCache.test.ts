@@ -10,6 +10,7 @@ import { GridTilemap } from "../GridTilemap";
 import { createTilemapMock } from "../../Utils/MockFactory/MockFactory";
 import * as Phaser from "phaser";
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
+import { PhaserTilemap } from "../Phaser/PhaserTilemap";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -21,7 +22,9 @@ describe("CharBlockCache", () => {
   let gridTilemap: GridTilemap;
 
   beforeEach(() => {
-    gridTilemap = new GridTilemap(createTilemapMock() as any);
+    gridTilemap = new GridTilemap(
+      new PhaserTilemap(createTilemapMock() as any)
+    );
     gridTilemap.setTransition(new Vector2(4, 3), "someLayer", "enterLayer");
     charBlockCache = new CharBlockCache();
   });

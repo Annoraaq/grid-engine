@@ -96,7 +96,11 @@ jest.mock("../package.json", () => ({
 import { GridEngine } from "./GridEngine";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
-import { createSpriteMock } from "./Utils/MockFactory/MockFactory";
+import {
+  createMockLayerData,
+  createSpriteMock,
+} from "./Utils/MockFactory/MockFactory";
+import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;
@@ -122,9 +126,9 @@ describe("GridEngine", () => {
     };
     tileMapMock = {
       layers: [
-        {
+        createMockLayerData({
           tilemapLayer: { scale: 2, setDepth: jest.fn() },
-        },
+        }),
       ],
       tileWidth: 16,
       tileHeight: 16,
@@ -185,7 +189,9 @@ describe("GridEngine", () => {
         },
       ],
     });
-    expect(mockGridTilemapConstructor).toHaveBeenCalledWith(tileMapMock);
+    expect(mockGridTilemapConstructor).toHaveBeenCalledWith(
+      new PhaserTilemap(tileMapMock)
+    );
   });
 
   it("should init player", () => {

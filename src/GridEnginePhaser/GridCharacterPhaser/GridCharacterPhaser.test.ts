@@ -6,9 +6,13 @@ import { GridCharacterPhaser } from "./GridCharacterPhaser";
 import * as Phaser from "phaser";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
 import { CharacterData, CollisionStrategy } from "../../GridEngine";
-import { createSpriteMock } from "../../Utils/MockFactory/MockFactory";
+import {
+  createMockLayerData,
+  createSpriteMock,
+} from "../../Utils/MockFactory/MockFactory";
 import { take } from "rxjs/operators";
 import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
+import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -32,7 +36,7 @@ describe("GridCharacterPhaser", () => {
     };
     tilemapMock = {
       layers: [
-        {
+        createMockLayerData({
           name: "layer1",
           tilemapLayer: {
             setDepth: jest.fn(),
@@ -45,8 +49,8 @@ describe("GridCharacterPhaser", () => {
               value: "lowerCharLayer",
             },
           ],
-        },
-        {
+        }),
+        createMockLayerData({
           name: "layer2",
           tilemapLayer: {
             setDepth: jest.fn(),
@@ -59,7 +63,7 @@ describe("GridCharacterPhaser", () => {
               value: "testCharLayer",
             },
           ],
-        },
+        }),
       ],
       tileWidth: 16,
       tileHeight: 16,
@@ -89,7 +93,7 @@ describe("GridCharacterPhaser", () => {
       layerOverlay: false,
       characters: [],
     });
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(new PhaserTilemap(tilemapMock));
   });
 
   function createChar(charData: CharacterData, layerOverlay: boolean) {

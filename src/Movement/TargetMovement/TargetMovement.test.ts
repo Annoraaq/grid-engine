@@ -21,6 +21,7 @@ import {
 } from "../../Utils/MockFactory/MockFactory";
 import { Concrete } from "../../Utils/TypeUtils";
 import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
+import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -71,7 +72,7 @@ describe("TargetMovement", () => {
   beforeEach(() => {
     blankLayerMock = createBlankLayerMock();
     tilemapMock = createTilemapMock(blankLayerMock);
-    gridTilemap = new GridTilemap(tilemapMock as any);
+    gridTilemap = new GridTilemap(new PhaserTilemap(tilemapMock as any));
     shortestPathAlgo = "BIDIRECTIONAL_SEARCH";
     const config: Concrete<GridEngineConfig> = {
       characters: [],
