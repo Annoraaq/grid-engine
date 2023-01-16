@@ -3,7 +3,6 @@ import {
   turnClockwise,
   turnCounterClockwise,
 } from "../../Direction/Direction";
-import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
 import { CharId, GridCharacter } from "../../GridCharacter/GridCharacter";
 import { CharLayer, Direction } from "../../GridEngine";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
@@ -54,9 +53,11 @@ export class GridTilemapPhaser {
     direction?: Direction,
     ignoreHasTile?: boolean
   ): boolean {
-    if (!ignoreHasTile && this.hasNoTile(pos, charLayer)) return true;
-    return this.getCollisionRelevantLayers(charLayer).some((layer) =>
-      this.isLayerBlockingAt(layer, pos, direction)
+    return this.gridTilemap.hasBlockingTile(
+      pos,
+      charLayer,
+      direction,
+      ignoreHasTile
     );
   }
 
@@ -73,9 +74,7 @@ export class GridTilemapPhaser {
   }
 
   hasNoTile(pos: Vector2, charLayer?: string): boolean {
-    return !this.getCollisionRelevantLayers(charLayer).some((layer) =>
-      this.tilemap.hasTileAt(pos.x, pos.y, layer.getName())
-    );
+    return this.gridTilemap.hasNoTile(pos, charLayer);
   }
 
   hasBlockingChar(
@@ -181,78 +180,18 @@ export class GridTilemapPhaser {
     };
   }
 
-  private isLayerBlockingAt(
-    layer: TileLayer,
-    pos: Vector2,
-    direction?: Direction
-  ): boolean {
-    const collidesPropName =
-      GridTilemapPhaser.ONE_WAY_COLLIDE_PROP_PREFIX + direction;
-
-    const tile = this.tilemap.getTileAt(pos.x, pos.y, layer.getName());
-    return Boolean(
-      tile?.getProperties() &&
-        (tile.getProperties()[GlobalConfig.get().collisionTilePropertyName] ||
-          tile.getProperties()[collidesPropName])
+  private isLayerAlwaysOnTop(layer: TileLayer): boolean {
+    return this.gridTilemap.hasLayerProp(
+      layer,
+      GridTilemapPhaser.ALWAYS_TOP_PROP_NAME
     );
   }
 
-  private getCharLayerIndexes(): number[] {
-    return this.tilemap
-      .getLayers()
-      .map((layer, index) => ({ layer, index }))
-      .filter(({ layer }) => this.isCharLayer(layer))
-      .map(({ index }) => index);
-  }
-
-  private findPrevAndCharLayer(charLayer: string): {
-    prevIndex: number;
-    charLayerIndex: number;
-  } {
-    const indexes = this.getCharLayerIndexes();
-
-    const charLayerIndex = indexes.findIndex((index) => {
-      return (
-        this.getLayerProp(
-          this.tilemap.getLayers()[index],
-          GridTilemapPhaser.CHAR_LAYER_PROP_NAME
-        ) == charLayer
-      );
-    });
-
-    if (charLayerIndex == 0) {
-      return { prevIndex: -1, charLayerIndex: indexes[charLayerIndex] };
-    }
-
-    return {
-      prevIndex: indexes[charLayerIndex - 1],
-      charLayerIndex: indexes[charLayerIndex],
-    };
-  }
-
-  private getCollisionRelevantLayers(charLayer?: string): TileLayer[] {
-    if (!charLayer) return this.tilemap.getLayers();
-
-    const { prevIndex, charLayerIndex } = this.findPrevAndCharLayer(charLayer);
-
-    return this.tilemap.getLayers().slice(prevIndex + 1, charLayerIndex + 1);
-  }
-
-  private getLayerProp(layer: TileLayer, name: string): string | undefined {
-    const prop = layer.getProperties()[name];
-    return prop;
-  }
-
-  private hasLayerProp(layer: TileLayer, name: string): boolean {
-    return this.getLayerProp(layer, name) != undefined;
-  }
-
-  private isLayerAlwaysOnTop(layer: TileLayer): boolean {
-    return this.hasLayerProp(layer, GridTilemapPhaser.ALWAYS_TOP_PROP_NAME);
-  }
-
   private isCharLayer(layer: TileLayer): boolean {
-    return this.hasLayerProp(layer, GridTilemapPhaser.CHAR_LAYER_PROP_NAME);
+    return this.gridTilemap.hasLayerProp(
+      layer,
+      GridTilemapPhaser.CHAR_LAYER_PROP_NAME
+    );
   }
 
   private setLayerDepths() {
@@ -265,7 +204,12 @@ export class GridTilemapPhaser {
       .getLayers()
       .filter((l) => !this.isLayerAlwaysOnTop(l));
     otherLayers.forEach((layer) => {
-      if (this.hasLayerProp(layer, GridTilemapPhaser.HEIGHT_SHIFT_PROP_NAME)) {
+      if (
+        this.gridTilemap.hasLayerProp(
+          layer,
+          GridTilemapPhaser.HEIGHT_SHIFT_PROP_NAME
+        )
+      ) {
         this.createHeightShiftLayers(layer, offset);
         layersToDelete.push(layer);
       } else {
@@ -284,7 +228,10 @@ export class GridTilemapPhaser {
     layer.setDepth(depth);
     if (this.isCharLayer(layer)) {
       this.charLayerDepths.set(
-        this.getLayerProp(layer, GridTilemapPhaser.CHAR_LAYER_PROP_NAME),
+        this.gridTilemap.getLayerProp(
+          layer,
+          GridTilemapPhaser.CHAR_LAYER_PROP_NAME
+        ),
         depth
       );
     }
@@ -292,7 +239,10 @@ export class GridTilemapPhaser {
 
   private createHeightShiftLayers(layer: TileLayer, offset: number) {
     let heightShift = Number(
-      this.getLayerProp(layer, GridTilemapPhaser.HEIGHT_SHIFT_PROP_NAME)
+      this.gridTilemap.getLayerProp(
+        layer,
+        GridTilemapPhaser.HEIGHT_SHIFT_PROP_NAME
+      )
     );
     if (isNaN(heightShift)) heightShift = 0;
 

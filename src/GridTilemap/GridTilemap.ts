@@ -212,12 +212,12 @@ export class GridTilemap {
     }
   }
 
-  private getLayerProp(layer: TileLayer, name: string): string | undefined {
+  getLayerProp(layer: TileLayer, name: string): string | undefined {
     const prop = layer.getProperties()[name];
     return prop;
   }
 
-  private hasLayerProp(layer: TileLayer, name: string): boolean {
+  hasLayerProp(layer: TileLayer, name: string): boolean {
     return this.getLayerProp(layer, name) != undefined;
   }
 
