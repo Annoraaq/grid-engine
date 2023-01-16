@@ -1,26 +1,40 @@
-import { GlobalConfig } from "./../GlobalConfig/GlobalConfig";
 import {
-  Direction,
   directionVector,
   turnClockwise,
   turnCounterClockwise,
-} from "./../Direction/Direction";
-import { Vector2 } from "../Utils/Vector2/Vector2";
-import { CharBlockCache } from "./CharBlockCache/CharBlockCache";
-import { Rect } from "../Utils/Rect/Rect";
-import { CharId, GridCharacter } from "../GridCharacter/GridCharacter";
-import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
-import { CharLayer } from "../GridEngine";
-import { TileLayer, Tilemap } from "./Tilemap";
+} from "../../Direction/Direction";
+import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
+import { CharId, GridCharacter } from "../../GridCharacter/GridCharacter";
+import { CharLayer, Direction } from "../../GridEngine";
+import { CharBlockCache } from "../../GridTilemap/CharBlockCache/CharBlockCache";
+import { GridTilemap } from "../../GridTilemap/GridTilemap";
+import { TileLayer, Tilemap } from "../../GridTilemap/Tilemap";
+import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
+import { Rect } from "../../Utils/Rect/Rect";
+import { Utils } from "../../Utils/Utils/Utils";
+import { Vector2 } from "../../Utils/Vector2/Vector2";
+import { VectorUtils } from "../../Utils/VectorUtils";
 
-export class GridTilemap {
+export class GridTilemapPhaser {
+  private gridTilemap: GridTilemap;
+  private static readonly ALWAYS_TOP_PROP_NAME = "ge_alwaysTop";
   private static readonly CHAR_LAYER_PROP_NAME = "ge_charLayer";
+  private static readonly HEIGHT_SHIFT_PROP_NAME = "ge_heightShift";
   private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "ge_collide_";
+  private static readonly Z_INDEX_PADDING = 7;
   private characters = new Map<string, GridCharacter>();
   private charBlockCache: CharBlockCache = new CharBlockCache();
+  private charLayerDepths = new Map<CharLayer, number>();
   private transitions: Map<CharLayer, Map<CharLayer, CharLayer>> = new Map();
 
-  constructor(private tilemap: Tilemap) {}
+  constructor(private tilemap: Tilemap) {
+    this.gridTilemap = new GridTilemap(tilemap);
+    this.setLayerDepths();
+  }
+
+  getGridTilemap(): GridTilemap {
+    return this.gridTilemap;
+  }
 
   addCharacter(character: GridCharacter): void {
     this.characters.set(character.getId(), character);
@@ -101,6 +115,20 @@ export class GridTilemap {
     );
   }
 
+  getTileWidth(): number {
+    const tilemapScale = this.tilemap.getLayers()[0].getScale();
+    return this.tilemap.getTileWidth() * tilemapScale;
+  }
+
+  getTileHeight(): number {
+    const tilemapScale = this.tilemap.getLayers()[0].getScale();
+    return this.tilemap.getTileHeight() * tilemapScale;
+  }
+
+  getDepthOfCharLayer(layerName: CharLayer): number {
+    return this.charLayerDepths.get(layerName) ?? 0;
+  }
+
   isInRange(pos: Vector2): boolean {
     const rect = new Rect(
       0,
@@ -109,6 +137,37 @@ export class GridTilemap {
       this.tilemap.getHeight()
     );
     return rect.isInRange(pos);
+  }
+
+  getTileSize(): Vector2 {
+    return new Vector2(this.getTileWidth(), this.getTileHeight());
+  }
+
+  tilePosToPixelPos(tilePosition: Vector2): Vector2 {
+    if (this.isIsometric()) {
+      return VectorUtils.scalarMult(this.getTileSize(), 0.5).multiply(
+        new Vector2(
+          tilePosition.x - tilePosition.y,
+          tilePosition.x + tilePosition.y
+        )
+      );
+    }
+    return tilePosition.clone().multiply(this.getTileSize());
+  }
+
+  getTileDistance(direction: Direction): Vector2 {
+    if (this.isIsometric()) {
+      switch (direction) {
+        case Direction.DOWN_LEFT:
+        case Direction.DOWN_RIGHT:
+        case Direction.UP_LEFT:
+        case Direction.UP_RIGHT:
+          return VectorUtils.scalarMult(this.getTileSize(), 0.5);
+        default:
+          return this.getTileSize();
+      }
+    }
+    return this.getTileSize();
   }
 
   toMapDirection(direction: Direction): Direction {
@@ -151,7 +210,7 @@ export class GridTilemap {
     direction?: Direction
   ): boolean {
     const collidesPropName =
-      GridTilemap.ONE_WAY_COLLIDE_PROP_PREFIX + direction;
+      GridTilemapPhaser.ONE_WAY_COLLIDE_PROP_PREFIX + direction;
 
     const tile = this.tilemap.getTileAt(pos.x, pos.y, layer.getName());
     return Boolean(
@@ -179,7 +238,7 @@ export class GridTilemap {
       return (
         this.getLayerProp(
           this.tilemap.getLayers()[index],
-          GridTilemap.CHAR_LAYER_PROP_NAME
+          GridTilemapPhaser.CHAR_LAYER_PROP_NAME
         ) == charLayer
       );
     });
@@ -204,11 +263,14 @@ export class GridTilemap {
 
   private getLowestCharLayer(): string | undefined {
     const charLayer = this.tilemap.getLayers().find((layer) => {
-      return this.hasLayerProp(layer, GridTilemap.CHAR_LAYER_PROP_NAME);
+      return this.hasLayerProp(layer, GridTilemapPhaser.CHAR_LAYER_PROP_NAME);
     });
 
     if (charLayer) {
-      return this.getLayerProp(charLayer, GridTilemap.CHAR_LAYER_PROP_NAME);
+      return this.getLayerProp(
+        charLayer,
+        GridTilemapPhaser.CHAR_LAYER_PROP_NAME
+      );
     }
   }
 
@@ -221,7 +283,71 @@ export class GridTilemap {
     return this.getLayerProp(layer, name) != undefined;
   }
 
+  private isLayerAlwaysOnTop(layer: TileLayer): boolean {
+    return this.hasLayerProp(layer, GridTilemapPhaser.ALWAYS_TOP_PROP_NAME);
+  }
+
   private isCharLayer(layer: TileLayer): boolean {
-    return this.hasLayerProp(layer, GridTilemap.CHAR_LAYER_PROP_NAME);
+    return this.hasLayerProp(layer, GridTilemapPhaser.CHAR_LAYER_PROP_NAME);
+  }
+
+  private setLayerDepths() {
+    const layersToDelete: TileLayer[] = [];
+    let offset = -1;
+    const alwaysOnTopLayers = this.tilemap
+      .getLayers()
+      .filter((l) => this.isLayerAlwaysOnTop(l));
+    const otherLayers = this.tilemap
+      .getLayers()
+      .filter((l) => !this.isLayerAlwaysOnTop(l));
+    otherLayers.forEach((layer) => {
+      if (this.hasLayerProp(layer, GridTilemapPhaser.HEIGHT_SHIFT_PROP_NAME)) {
+        this.createHeightShiftLayers(layer, offset);
+        layersToDelete.push(layer);
+      } else {
+        this.setDepth(layer, ++offset);
+      }
+    });
+    this.charLayerDepths.set(undefined, offset);
+    alwaysOnTopLayers.forEach((layer, layerIndex) => {
+      layer.setDepth(layerIndex + 1 + offset);
+    });
+
+    layersToDelete.forEach((layer) => layer.destroy());
+  }
+
+  private setDepth(layer: TileLayer, depth: number): void {
+    layer.setDepth(depth);
+    if (this.isCharLayer(layer)) {
+      this.charLayerDepths.set(
+        this.getLayerProp(layer, GridTilemapPhaser.CHAR_LAYER_PROP_NAME),
+        depth
+      );
+    }
+  }
+
+  private createHeightShiftLayers(layer: TileLayer, offset: number) {
+    let heightShift = Number(
+      this.getLayerProp(layer, GridTilemapPhaser.HEIGHT_SHIFT_PROP_NAME)
+    );
+    if (isNaN(heightShift)) heightShift = 0;
+
+    const makeHigherThanCharWhenOnSameLevel = 1;
+    for (let row = 0; row < layer.getHeight(); row++) {
+      const newLayer = this.copyLayer(layer, row);
+      newLayer.setScale(layer.getScale());
+      newLayer.setDepth(
+        offset +
+          Utils.shiftPad(
+            (row + heightShift) * this.getTileHeight() +
+              makeHigherThanCharWhenOnSameLevel,
+            GridTilemapPhaser.Z_INDEX_PADDING
+          )
+      );
+    }
+  }
+
+  private copyLayer(layer: TileLayer, row: number): TileLayer {
+    return this.tilemap.copyLayer(layer, `${layer.getName()}#${row}`, row);
   }
 }

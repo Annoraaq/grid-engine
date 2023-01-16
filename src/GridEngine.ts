@@ -14,7 +14,6 @@ import {
   isDiagonal,
   NumberOfDirections,
 } from "./Direction/Direction";
-import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
 import { Observable, Subject } from "rxjs";
 import { take, takeUntil, filter, map, mergeWith } from "rxjs/operators";
@@ -42,6 +41,8 @@ import { LayerPositionUtils } from "./Utils/LayerPositionUtils/LayerPositionUtil
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
 import { GridEngineHeadless } from "./GridEngineHeadless";
 import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
+import { GridTilemapPhaser } from "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser";
+import { GridTilemap } from "./GridTilemap/GridTilemap";
 
 export {
   CollisionStrategy,
@@ -307,7 +308,7 @@ export enum CharacterShiftAction {
 export class GridEngine {
   private geHeadless: GridEngineHeadless = new GridEngineHeadless();
   private gridCharacters?: Map<string, GridCharacterPhaser>;
-  private gridTilemap?: GridTilemap;
+  private gridTilemap?: GridTilemapPhaser;
   private isCreatedInternal = false;
   private movementStopped$?: Subject<{ charId: string; direction: Direction }>;
   private movementStarted$?: Subject<{ charId: string; direction: Direction }>;
@@ -408,7 +409,7 @@ export class GridEngine {
     >();
     this.charRemoved$ = new Subject<string>();
     this.charAdded$ = new Subject<string>();
-    this.gridTilemap = new GridTilemap(new PhaserTilemap(tilemap));
+    this.gridTilemap = new GridTilemapPhaser(new PhaserTilemap(tilemap));
 
     this.addCharacters();
   }
@@ -495,7 +496,9 @@ export class GridEngine {
     if (!this.gridTilemap) throw this.createUninitializedErr();
     const targetMovement = new TargetMovement(
       gridChar,
-      this.gridTilemap,
+      // TODO remove
+      // @ts-ignore
+      this.gridTilemap as GridTilemap,
       {
         position: new Vector2(targetPos),
         layer: config?.targetLayer || gridChar.getNextTilePos().layer,
@@ -806,7 +809,9 @@ export class GridEngine {
     if (!this.gridTilemap) throw this.createUninitializedErr();
     const followMovement = new FollowMovement(
       gridChar,
-      this.gridTilemap,
+      // TODO remove
+      // @ts-ignore
+      this.gridTilemap as GridTilemap,
       gridCharToFollow,
       distance,
       closestPointIfBlocked
@@ -1022,7 +1027,12 @@ export class GridEngine {
     this.initGuard();
     // This can't actually happen, but TypeScript can't know.
     if (!this.gridTilemap) throw this.createUninitializedErr();
-    const pathfinding = new Pathfinding("BFS", this.gridTilemap);
+    const pathfinding = new Pathfinding(
+      "BFS",
+      // TODO remove
+      // @ts-ignore
+      this.gridTilemap as GridTilemap
+    );
     const res = pathfinding.findShortestPath(
       LayerPositionUtils.toInternal(source),
       LayerPositionUtils.toInternal(dest),

@@ -29,7 +29,9 @@ const mockGridTileMap = {
   getTileDistance: jest.fn().mockReturnValue(new Vector2(1, 1)),
   isInRange: jest.fn(),
   getTilePosInDirection: jest.fn(),
+  getGridTilemap: jest.fn(),
 };
+mockGridTileMap.getGridTilemap.mockReturnValue(mockGridTileMap);
 const mockGridTilemapConstructor = jest.fn(function (
   _tilemap,
   _firstLayerAboveChar?
@@ -77,11 +79,14 @@ expect.extend({
   },
 });
 
-jest.mock("./GridTilemap/GridTilemap", function () {
-  return {
-    GridTilemap: mockGridTilemapConstructor,
-  };
-});
+jest.mock(
+  "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser",
+  function () {
+    return {
+      GridTilemapPhaser: mockGridTilemapConstructor,
+    };
+  }
+);
 
 jest.mock("./Pathfinding/Pathfinding", function () {
   return {

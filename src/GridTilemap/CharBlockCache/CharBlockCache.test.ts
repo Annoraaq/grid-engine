@@ -11,6 +11,7 @@ import { createTilemapMock } from "../../Utils/MockFactory/MockFactory";
 import * as Phaser from "phaser";
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
 import { PhaserTilemap } from "../Phaser/PhaserTilemap";
+import { GridTilemapPhaser } from "../../GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser";
 
 // Hack to get Phaser included at runtime
 ((_a) => {

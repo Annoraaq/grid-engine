@@ -1,7 +1,6 @@
 import { CharacterAnimation } from "./../../GridCharacter/CharacterAnimation/CharacterAnimation";
 import { trackEmit } from "../../Testing/Utils";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { GridTilemap } from "./../../GridTilemap/GridTilemap";
 import { GridCharacterPhaser } from "./GridCharacterPhaser";
 import * as Phaser from "phaser";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
@@ -13,6 +12,7 @@ import {
 import { take } from "rxjs/operators";
 import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
 import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap";
+import { GridTilemapPhaser } from "../GridTilemapPhaser/GridTilemapPhaser";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -20,7 +20,7 @@ import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap";
 })(Phaser);
 
 describe("GridCharacterPhaser", () => {
-  let gridTilemap: GridTilemap;
+  let gridTilemap: GridTilemapPhaser;
   let tilemapMock;
   let overlaySpriteMock;
   let sceneMock;
@@ -93,7 +93,7 @@ describe("GridCharacterPhaser", () => {
       layerOverlay: false,
       characters: [],
     });
-    gridTilemap = new GridTilemap(new PhaserTilemap(tilemapMock));
+    gridTilemap = new GridTilemapPhaser(new PhaserTilemap(tilemapMock));
   });
 
   function createChar(charData: CharacterData, layerOverlay: boolean) {

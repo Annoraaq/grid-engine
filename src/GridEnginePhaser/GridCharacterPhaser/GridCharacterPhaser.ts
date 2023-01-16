@@ -1,4 +1,3 @@
-import { GridTilemap } from "./../../GridTilemap/GridTilemap";
 import {
   CharConfig,
   GameObject,
@@ -17,6 +16,7 @@ import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { Direction, directionVector } from "../../Direction/Direction";
 import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
+import { GridTilemapPhaser } from "../GridTilemapPhaser/GridTilemapPhaser";
 
 export class GridCharacterPhaser {
   private customOffset = new Vector2(0, 0);
@@ -36,7 +36,7 @@ export class GridCharacterPhaser {
   constructor(
     private charData: CharacterData,
     private scene: Phaser.Scene,
-    private tilemap: GridTilemap,
+    private tilemap: GridTilemapPhaser,
     private layerOverlay: boolean
   ) {}
 
@@ -170,7 +170,7 @@ export class GridCharacterPhaser {
 
     const charConfig: CharConfig = {
       speed: charData.speed || 4,
-      tilemap: this.tilemap,
+      tilemap: this.tilemap.getGridTilemap(),
       collidesWithTiles: true,
       collisionGroups: ["geDefault"],
       charLayer: charData.charLayer,
