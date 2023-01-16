@@ -6,7 +6,6 @@ import {
 import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
 import { CharId, GridCharacter } from "../../GridCharacter/GridCharacter";
 import { CharLayer, Direction } from "../../GridEngine";
-import { CharBlockCache } from "../../GridTilemap/CharBlockCache/CharBlockCache";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { TileLayer, Tilemap } from "../../GridTilemap/Tilemap";
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
@@ -22,10 +21,7 @@ export class GridTilemapPhaser {
   private static readonly HEIGHT_SHIFT_PROP_NAME = "ge_heightShift";
   private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "ge_collide_";
   private static readonly Z_INDEX_PADDING = 7;
-  private characters = new Map<string, GridCharacter>();
-  private charBlockCache: CharBlockCache = new CharBlockCache();
   private charLayerDepths = new Map<CharLayer, number>();
-  private transitions: Map<CharLayer, Map<CharLayer, CharLayer>> = new Map();
 
   constructor(private tilemap: Tilemap) {
     this.gridTilemap = new GridTilemap(tilemap);
@@ -37,29 +33,19 @@ export class GridTilemapPhaser {
   }
 
   addCharacter(character: GridCharacter): void {
-    this.characters.set(character.getId(), character);
-    if (character.getNextTilePos().layer === undefined) {
-      character.setTilePosition({
-        ...character.getNextTilePos(),
-        layer: this.getLowestCharLayer(),
-      });
-    }
-    this.charBlockCache.addCharacter(character);
+    this.gridTilemap.addCharacter(character);
   }
 
   removeCharacter(charId: string): void {
-    const gridChar = this.characters.get(charId);
-    if (!gridChar) return;
-    this.charBlockCache.removeCharacter(gridChar);
-    this.characters.delete(charId);
+    this.gridTilemap.removeCharacter(charId);
   }
 
   getCharacters(): GridCharacter[] {
-    return [...this.characters.values()];
+    return this.gridTilemap.getCharacters();
   }
 
   getCharactersAt(position: Vector2, layer: string): Set<GridCharacter> {
-    return this.charBlockCache.getCharactersAt(position, layer);
+    return this.gridTilemap.getCharactersAt(position, layer);
   }
 
   hasBlockingTile(
@@ -75,24 +61,15 @@ export class GridTilemapPhaser {
   }
 
   getTransition(pos: Vector2, fromLayer?: string): string | undefined {
-    const transitions = this.transitions.get(pos.toString());
-
-    if (transitions) {
-      return transitions.get(fromLayer);
-    }
+    return this.gridTilemap.getTransition(pos, fromLayer);
   }
 
   setTransition(pos: Vector2, fromLayer: CharLayer, toLayer: CharLayer): void {
-    if (!this.transitions.has(pos.toString())) {
-      this.transitions.set(pos.toString(), new Map());
-    }
-    this.transitions.get(pos.toString())?.set(fromLayer, toLayer);
+    this.gridTilemap.setTransition(pos, fromLayer, toLayer);
   }
 
   getTransitions(): Map<CharLayer, Map<CharLayer, CharLayer>> {
-    return new Map(
-      [...this.transitions].map(([pos, map]) => [pos, new Map(map)])
-    );
+    return this.gridTilemap.getTransitions();
   }
 
   hasNoTile(pos: Vector2, charLayer?: string): boolean {
@@ -107,7 +84,7 @@ export class GridTilemapPhaser {
     collisionGroups: string[],
     exclude = new Set<CharId>()
   ): boolean {
-    return this.charBlockCache.isCharBlockingAt(
+    return this.gridTilemap.hasBlockingChar(
       pos,
       layer,
       collisionGroups,
@@ -259,19 +236,6 @@ export class GridTilemapPhaser {
     const { prevIndex, charLayerIndex } = this.findPrevAndCharLayer(charLayer);
 
     return this.tilemap.getLayers().slice(prevIndex + 1, charLayerIndex + 1);
-  }
-
-  private getLowestCharLayer(): string | undefined {
-    const charLayer = this.tilemap.getLayers().find((layer) => {
-      return this.hasLayerProp(layer, GridTilemapPhaser.CHAR_LAYER_PROP_NAME);
-    });
-
-    if (charLayer) {
-      return this.getLayerProp(
-        charLayer,
-        GridTilemapPhaser.CHAR_LAYER_PROP_NAME
-      );
-    }
   }
 
   private getLayerProp(layer: TileLayer, name: string): string | undefined {
