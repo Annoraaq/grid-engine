@@ -39,7 +39,18 @@ import {
 } from "./Pathfinding/Pathfinding";
 import { LayerPositionUtils } from "./Utils/LayerPositionUtils/LayerPositionUtils";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
-import { GridEngineHeadless } from "./GridEngineHeadless";
+import {
+  GridEngineHeadless,
+  TileSizePerSecond,
+  Position,
+  LayerPosition,
+  CharLayer,
+  GridEngineConfig as GridEngineConfigHeadless,
+  CollisionConfig,
+  CharacterData as CharacterDataHeadless,
+  CharacterShift,
+  CharacterShiftAction,
+} from "./GridEngineHeadless";
 import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
 import { GridTilemapPhaser } from "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser";
 import { GridTilemap } from "./GridTilemap/GridTilemap";
@@ -60,51 +71,22 @@ export {
   IsPositionAllowedFn,
   PathfindingOptions,
   ShortestPathAlgorithmType,
+  GridEngineHeadless,
+  TileSizePerSecond,
+  Position,
+  LayerPosition,
+  CharLayer,
+  CollisionConfig,
+  CharacterShift,
+  CharacterShiftAction,
 };
-
-export type TileSizePerSecond = number;
-
-export interface Position {
-  x: number;
-  y: number;
-}
-
-/**
- * Specifies a tile position along with a character layer.
- */
-export interface LayerPosition {
-  position: Position;
-  charLayer: CharLayer;
-}
-
-export type CharLayer = string | undefined;
 
 /**
  * Configuration object for initializing GridEngine.
  */
-export interface GridEngineConfig {
+export interface GridEngineConfig extends GridEngineConfigHeadless {
   /** An array of character data. Each describing a character on the map. */
   characters: CharacterData[];
-
-  /** A custom name for the collision tile property of your tilemap. */
-
-  collisionTilePropertyName?: string;
-
-  /**
-   * The possible number of directions for moving a character. Default is 4
-   * (up, down, left, right). If set to 8 it additionaly enables diagonal
-   * movement (up-left, up-right, down-left, down-right).
-   *
-   * @defaultValue {@link NumberOfDirections.FOUR}
-   */
-  numberOfDirections?: NumberOfDirections;
-
-  /**
-   * The character collision strategy.
-   *
-   * @defaultValue {@link CollisionStrategy.BLOCK_TWO_TILES}
-   */
-  characterCollisionStrategy?: CollisionStrategy;
 
   /**
    * Enables experimental
@@ -136,34 +118,8 @@ export interface WalkingAnimationMapping {
   [Direction.DOWN_RIGHT]?: FrameRow;
 }
 
-export interface CollisionConfig {
-  /**
-   * Determines whether the character should collide with the tilemap.
-   *
-   * @defaultValue `true`
-   */
-  collidesWithTiles?: boolean;
-
-  /**
-   * Array with collision groups. Only characters with at least one matching
-   * collision group collide. If omitted it will be initialized with a default
-   * collision group called `'geDefault'`. If you want to keep a character from
-   * colliding with any other character, you can simply provide an empty array
-   * here.
-   *
-   * @defaultValue `['geDefault']`
-   */
-  collisionGroups?: string[];
-}
-
 /** Configuration object used to initialize a new character in GridEngine. */
-export interface CharacterData {
-  /**
-   * A unique identifier for the character on the map. If you provice two
-   * characters with the same id, the last one will override the previous one.
-   */
-  id: string;
-
+export interface CharacterData extends CharacterDataHeadless {
   /** The character’s sprite. */
   sprite?: Phaser.GameObjects.Sprite;
 
@@ -182,20 +138,6 @@ export interface CharacterData {
    * For more details see the {@link https://annoraaq.github.io/grid-engine/examples/custom-walking-animation-mapping.html | custom walking animation mapping example}.
    */
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
-
-  /**
-   * The speed of a player in tiles per second.
-   *
-   * @defaultValue `4`
-   */
-  speed?: TileSizePerSecond;
-
-  /**
-   * Start tile position of the player.
-   *
-   * @defaultValue `{x: 0, y:0}`
-   */
-  startPosition?: Position;
 
   /**
    * A container that holds the character’s sprite. This can be used in order
@@ -225,84 +167,6 @@ export interface CharacterData {
    * @defaultValue `0`
    */
   offsetY?: number;
-
-  /**
-   * Sets the direction the character is initially facing.
-   *
-   * @defaultValue {@link Direction.DOWN}
-   */
-  facingDirection?: Direction;
-
-  /**
-   * Set to false, if character should not collide (neither with the tilemap,
-   * nor with other characters). For more control, pass a
-   * {@link CollisionConfig} object.
-   *
-   * @defaultValue `true`
-   */
-  collides?: boolean | CollisionConfig;
-
-  /**
-   * Sets the
-   * {@link https://annoraaq.github.io/grid-engine/features/character-layers | character layer}
-   * of the character. If omitted the lowest character layer of the tilemap is
-   * taken. If there are no character layers in the tilemap, it will get the
-   * char layer `undefined`.
-   *
-   * @beta
-   */
-  charLayer?: string;
-
-  /**
-   * Sets labels for the character. They can be used to filter and logically
-   * group characters.
-   *
-   * @defaultValue `[]`
-   */
-  labels?: string[];
-
-  /**
-   * The possible number of directions for moving a character. This setting can
-   * be used to override the {@link GridEngineConfig.numberOfDirections | global setting}
-   * in the GridEngine configuration for specific characters.
-   */
-  numberOfDirections?: NumberOfDirections;
-
-  /**
-   * With of the character in tiles. This allows to specify character that span
-   * more than just one tile.
-   *
-   * @defaultValue 1
-   */
-  tileWidth?: number;
-
-  /**
-   * Height of the character in tiles. This allows to specify character that span
-   * more than just one tile.
-   *
-   * @defaultValue 1
-   */
-  tileHeight?: number;
-}
-
-/**
- * Result of a modification of the internal characters array
- */
-export interface CharacterShift {
-  /** the modified character */
-  charId: string;
-  /** The action that was performed when modifying the character */
-  action: CharacterShiftAction;
-}
-
-/**
- * Type of modification of grid engine characters
- */
-export enum CharacterShiftAction {
-  /** removed existing character */
-  REMOVED = "REMOVED",
-  /** added new character */
-  ADDED = "ADDED",
 }
 
 export class GridEngine {
