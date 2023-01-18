@@ -171,6 +171,7 @@ export interface CharacterData extends CharacterDataHeadless {
 
 export class GridEngine {
   private geHeadless: GridEngineHeadless = new GridEngineHeadless();
+  private config?: GridEngineConfig;
   private gridCharacters?: Map<string, GridCharacterPhaser>;
   private gridTilemap?: GridTilemapPhaser;
   private isCreatedInternal = false;
@@ -252,6 +253,7 @@ export class GridEngine {
 
     const concreteConfig = this.setConfigDefaults(config);
 
+    this.config = concreteConfig;
     GlobalConfig.set(concreteConfig);
     this.movementStopped$ = new Subject<{
       charId: string;
@@ -463,7 +465,8 @@ export class GridEngine {
    * is activated.
    */
   hasLayerOverlay(): boolean {
-    return GlobalConfig.get().layerOverlay;
+    this.initGuard();
+    return !!this.config?.layerOverlay;
   }
 
   /**
