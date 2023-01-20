@@ -139,7 +139,7 @@ describe("GridTilemapPhaser", () => {
       ),
     };
     phaserTilemap = new PhaserTilemap(tilemapMock);
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     mockCharBlockCache.addCharacter.mockReset();
     mockCharBlockCache.removeCharacter.mockReset();
     mockCharBlockCache.isCharBlockingAt.mockReset();
@@ -154,7 +154,7 @@ describe("GridTilemapPhaser", () => {
   });
 
   it("should set layer depths on construction", () => {
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
     expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(1);
   });
@@ -194,7 +194,10 @@ describe("GridTilemapPhaser", () => {
         properties: [],
       }),
     ];
-    gridTilemap = new GridTilemapPhaser(new PhaserTilemap(tilemapMock));
+    gridTilemap = new GridTilemapPhaser(
+      new PhaserTilemap(tilemapMock),
+      "ge_collide"
+    );
 
     expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
     expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(2);
@@ -203,7 +206,7 @@ describe("GridTilemapPhaser", () => {
 
   it("should consider charLayers", () => {
     tilemapMock.layers = mockCharLayers;
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
 
     expect(
       tilemapMock.layers[0].tilemapLayer.setDepth
@@ -289,7 +292,7 @@ describe("GridTilemapPhaser", () => {
         ],
       }),
     ];
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
 
     expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
     expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith("layer2#0", [
@@ -312,7 +315,7 @@ describe("GridTilemapPhaser", () => {
   });
 
   it("should add a character", () => {
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     const charMock1 = createCharMock("player");
     const charMock2 = createCharMock("player2");
     const charMockSameId = createCharMock("player2");
@@ -356,7 +359,7 @@ describe("GridTilemapPhaser", () => {
         ],
       }),
     ];
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     const charMock1 = createCharMock("player");
     charMock1.getNextTilePos = () => ({
       position: new Vector2(1, 2),
@@ -371,7 +374,7 @@ describe("GridTilemapPhaser", () => {
   });
 
   it("should remove a character", () => {
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     const charMock1 = <any>{
       ...createCharMock("player"),
     };
@@ -387,7 +390,7 @@ describe("GridTilemapPhaser", () => {
   });
 
   it("should find characters", () => {
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
 
     const charMocks = new Set<GridCharacter>();
     charMocks.add(createCharMock("player"));
@@ -406,7 +409,7 @@ describe("GridTilemapPhaser", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { ge_collide: true },
     });
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined
@@ -424,7 +427,7 @@ describe("GridTilemapPhaser", () => {
   it("should not consider missing tiles as blocking", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     tilemapMock.getTileAt.mockReturnValue(undefined);
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined,
@@ -437,7 +440,7 @@ describe("GridTilemapPhaser", () => {
   it("should consider missing tiles as blocking", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     tilemapMock.getTileAt.mockReturnValue(undefined);
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined
@@ -457,7 +460,7 @@ describe("GridTilemapPhaser", () => {
       collisionTilePropertyName: "custom_collides_prop",
       layerOverlay: false,
     }));
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "custom_collides_prop");
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined
@@ -470,7 +473,7 @@ describe("GridTilemapPhaser", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { ge_collide_left: true, ge_collide_right: false },
     });
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined,
@@ -502,7 +505,7 @@ describe("GridTilemapPhaser", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { ge_collide_right: true },
     });
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined,
@@ -534,7 +537,7 @@ describe("GridTilemapPhaser", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { ge_collide_up: true },
     });
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined,
@@ -566,7 +569,7 @@ describe("GridTilemapPhaser", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { ge_collide_down: true },
     });
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined,
@@ -659,7 +662,7 @@ describe("GridTilemapPhaser", () => {
       return { properties: { ge_collide: false } };
     });
 
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       "charLayer1"
@@ -676,7 +679,7 @@ describe("GridTilemapPhaser", () => {
   it("should return true if nothing blocks", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined
@@ -689,7 +692,7 @@ describe("GridTilemapPhaser", () => {
   it("should return true if no tile", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     const isBlocking = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined
@@ -701,7 +704,7 @@ describe("GridTilemapPhaser", () => {
   it("should block if no tile present", () => {
     tilemapMock.layers = mockCharLayers;
     tilemapMock.hasTileAt.mockReturnValue(false);
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
     expect(hasNoTile).toBe(true);
   });
@@ -711,7 +714,7 @@ describe("GridTilemapPhaser", () => {
     tilemapMock.hasTileAt.mockImplementation((_x, _y, layerName) => {
       return layerName !== "layer1" && layerName !== "layer2";
     });
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
     expect(hasNoTile).toBe(true);
   });
@@ -721,14 +724,14 @@ describe("GridTilemapPhaser", () => {
     tilemapMock.hasTileAt.mockImplementation((_x, _y, layerName) => {
       return layerName === "layer2";
     });
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
     expect(hasNoTile).toBe(false);
   });
 
   it("should detect blocking char", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
     mockCharBlockCache.isCharBlockingAt = jest.fn(() => true);
 
     expect(
@@ -744,7 +747,7 @@ describe("GridTilemapPhaser", () => {
 
   it("should detect an unblocked tile", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
-    gridTilemap = new GridTilemapPhaser(phaserTilemap);
+    gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
 
     const char1Mock = <any>{
       ...createCharMock("player1"),
@@ -897,7 +900,7 @@ describe("GridTilemapPhaser", () => {
 
   describe("transitions", () => {
     it("should set transitions", () => {
-      gridTilemap = new GridTilemapPhaser(phaserTilemap);
+      gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
       gridTilemap.setTransition(new Vector2(4, 5), "charLayer2", "charLayer1");
       gridTilemap.setTransition(new Vector2(3, 5), "charLayer2", "charLayer1");
       expect(gridTilemap.getTransition(new Vector2(4, 5), "charLayer2")).toBe(
@@ -914,7 +917,7 @@ describe("GridTilemapPhaser", () => {
     it("should get all transitions", () => {
       const pos1 = new Vector2(4, 5);
       const pos2 = new Vector2(3, 5);
-      gridTilemap = new GridTilemapPhaser(phaserTilemap);
+      gridTilemap = new GridTilemapPhaser(phaserTilemap, "ge_collide");
       gridTilemap.setTransition(pos1, "charLayer2", "charLayer1");
       gridTilemap.setTransition(pos2, "charLayer2", "charLayer1");
 

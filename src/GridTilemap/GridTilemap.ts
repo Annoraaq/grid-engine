@@ -1,4 +1,3 @@
-import { GlobalConfig } from "./../GlobalConfig/GlobalConfig";
 import {
   Direction,
   directionVector,
@@ -20,7 +19,10 @@ export class GridTilemap {
   private charBlockCache: CharBlockCache = new CharBlockCache();
   private transitions: Map<CharLayer, Map<CharLayer, CharLayer>> = new Map();
 
-  constructor(private tilemap: Tilemap) {}
+  constructor(
+    private tilemap: Tilemap,
+    private collisionTilePropertyName: string
+  ) {}
 
   addCharacter(character: GridCharacter): void {
     this.characters.set(character.getId(), character);
@@ -156,7 +158,7 @@ export class GridTilemap {
     const tile = this.tilemap.getTileAt(pos.x, pos.y, layer.getName());
     return Boolean(
       tile?.getProperties() &&
-        (tile.getProperties()[GlobalConfig.get().collisionTilePropertyName] ||
+        (tile.getProperties()[this.collisionTilePropertyName] ||
           tile.getProperties()[collidesPropName])
     );
   }

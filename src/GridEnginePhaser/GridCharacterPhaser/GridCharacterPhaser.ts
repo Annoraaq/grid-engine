@@ -14,9 +14,21 @@ import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Utils } from "../../Utils/Utils/Utils";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
-import { Direction, directionVector } from "../../Direction/Direction";
-import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
+import {
+  Direction,
+  directionVector,
+  NumberOfDirections,
+} from "../../Direction/Direction";
 import { GridTilemapPhaser } from "../GridTilemapPhaser/GridTilemapPhaser";
+
+export interface PhaserCharacterData extends CharacterData {
+  /**
+   * The possible number of directions for moving a character. This setting can
+   * be used to override the {@link GridEngineConfig.numberOfDirections | global setting}
+   * in the GridEngine configuration for specific characters.
+   */
+  numberOfDirections: NumberOfDirections;
+}
 
 export class GridCharacterPhaser {
   private customOffset = new Vector2(0, 0);
@@ -34,7 +46,7 @@ export class GridCharacterPhaser {
   private animation?: CharacterAnimation;
 
   constructor(
-    private charData: CharacterData,
+    private charData: PhaserCharacterData,
     private scene: Phaser.Scene,
     private tilemap: GridTilemapPhaser,
     private layerOverlay: boolean
@@ -158,7 +170,7 @@ export class GridCharacterPhaser {
   }
 
   private createChar(
-    charData: CharacterData,
+    charData: PhaserCharacterData,
     layerOverlay: boolean
   ): GridCharacter {
     this.layerOverlaySprite =
@@ -176,8 +188,7 @@ export class GridCharacterPhaser {
       charLayer: charData.charLayer,
       facingDirection: charData.facingDirection,
       labels: charData.labels,
-      numberOfDirections:
-        charData.numberOfDirections ?? GlobalConfig.get().numberOfDirections,
+      numberOfDirections: charData.numberOfDirections,
       tileWidth: charData.tileWidth,
       tileHeight: charData.tileHeight,
     };

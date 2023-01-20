@@ -23,7 +23,8 @@ describe("CharBlockCache", () => {
 
   beforeEach(() => {
     gridTilemap = new GridTilemap(
-      new PhaserTilemap(createTilemapMock() as any)
+      new PhaserTilemap(createTilemapMock() as any),
+      "ge_collide"
     );
     gridTilemap.setTransition(new Vector2(4, 3), "someLayer", "enterLayer");
     charBlockCache = new CharBlockCache();

@@ -53,7 +53,7 @@ describe("GridCharacter", () => {
   beforeEach(() => {
     blankLayerMock = createBlankLayerMock();
     tilemapMock = createTilemapMock(blankLayerMock);
-    gridTilemap = new GridTilemap(new PhaserTilemap(tilemapMock));
+    gridTilemap = new GridTilemap(new PhaserTilemap(tilemapMock), "ge_collide");
     gridCharacter = new GridCharacter("player", {
       tilemap: gridTilemap,
       speed: 3,

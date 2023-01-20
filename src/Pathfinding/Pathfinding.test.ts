@@ -72,7 +72,10 @@ describe("Pathfinding", () => {
     GlobalConfig.set(config);
     blankLayerMock = createBlankLayerMock();
     tilemapMock = createTilemapMock(blankLayerMock);
-    gridTilemap = new GridTilemap(new PhaserTilemap(tilemapMock as any));
+    gridTilemap = new GridTilemap(
+      new PhaserTilemap(tilemapMock as any),
+      "ge_collides"
+    );
     pathfindingAlgo = "BIDIRECTIONAL_SEARCH";
   });
 

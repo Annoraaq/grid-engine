@@ -21,8 +21,11 @@ export class GridTilemapPhaser {
   private static readonly Z_INDEX_PADDING = 7;
   private charLayerDepths = new Map<CharLayer, number>();
 
-  constructor(private tilemap: Tilemap) {
-    this.gridTilemap = new GridTilemap(tilemap);
+  constructor(
+    private tilemap: Tilemap,
+    private collisionTilePropertyName: string
+  ) {
+    this.gridTilemap = new GridTilemap(tilemap, collisionTilePropertyName);
     this.setLayerDepths();
   }
 

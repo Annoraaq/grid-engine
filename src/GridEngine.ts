@@ -1,4 +1,7 @@
-import { GridCharacterPhaser } from "./GridEnginePhaser/GridCharacterPhaser/GridCharacterPhaser";
+import {
+  GridCharacterPhaser,
+  PhaserCharacterData,
+} from "./GridEnginePhaser/GridCharacterPhaser/GridCharacterPhaser";
 import { GlobalConfig } from "./GlobalConfig/GlobalConfig";
 import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
@@ -171,7 +174,7 @@ export interface CharacterData extends CharacterDataHeadless {
 
 export class GridEngine {
   private geHeadless: GridEngineHeadless = new GridEngineHeadless();
-  private config?: GridEngineConfig;
+  private config?: Concrete<GridEngineConfig>;
   private gridCharacters?: Map<string, GridCharacterPhaser>;
   private gridTilemap?: GridTilemapPhaser;
   private isCreatedInternal = false;
@@ -275,7 +278,10 @@ export class GridEngine {
     >();
     this.charRemoved$ = new Subject<string>();
     this.charAdded$ = new Subject<string>();
-    this.gridTilemap = new GridTilemapPhaser(new PhaserTilemap(tilemap));
+    this.gridTilemap = new GridTilemapPhaser(
+      new PhaserTilemap(tilemap),
+      this.config.collisionTilePropertyName
+    );
 
     this.addCharacters();
   }
@@ -500,12 +506,22 @@ export class GridEngine {
   addCharacter(charData: CharacterData): void {
     this.initGuard();
     if (!this.gridTilemap) throw this.createUninitializedErr();
+    if (!this.config) throw this.createUninitializedErr();
+
+    const phaserCharData: PhaserCharacterData = {
+      ...charData,
+      numberOfDirections: this.config.numberOfDirections,
+    };
+
+    if (charData.numberOfDirections) {
+      phaserCharData.numberOfDirections = charData.numberOfDirections;
+    }
 
     const gridCharPhaser = new GridCharacterPhaser(
-      charData,
+      phaserCharData,
       this.scene,
       this.gridTilemap,
-      GlobalConfig.get().layerOverlay
+      this.config.layerOverlay
     );
     const gridChar = gridCharPhaser.getGridCharacter();
 
@@ -1043,17 +1059,16 @@ export class GridEngine {
   }
 
   private addCharacters() {
-    GlobalConfig.get().characters.forEach((charData) =>
-      this.addCharacter(charData)
-    );
+    this.config?.characters.forEach((charData) => this.addCharacter(charData));
   }
 
   private moveChar(charId: string, direction: Direction): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
+    if (!this.config) throw this.createUninitializedErr();
 
-    if (GlobalConfig.get().numberOfDirections === NumberOfDirections.FOUR) {
+    if (this.config.numberOfDirections === NumberOfDirections.FOUR) {
       if (!this.gridTilemap?.isIsometric() && isDiagonal(direction)) {
         console.warn(
           `GridEngine: Character '${charId}' can't be moved '${direction}' in 4 direction mode.`

@@ -195,7 +195,8 @@ describe("GridEngine", () => {
       ],
     });
     expect(mockGridTilemapConstructor).toHaveBeenCalledWith(
-      new PhaserTilemap(tileMapMock)
+      new PhaserTilemap(tileMapMock),
+      "ge_collide"
     );
   });
 

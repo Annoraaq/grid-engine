@@ -22,7 +22,8 @@ describe("CharacterFilter", () => {
   it("should get all characters with specific labels", () => {
     const characters: GridCharacter[] = [];
     const gridTilemap = new GridTilemap(
-      new PhaserTilemap(createTilemapMock() as any)
+      new PhaserTilemap(createTilemapMock() as any),
+      "ge_collide"
     );
     const char1 = createChar("player1", gridTilemap, ["label1", "label2"]);
     const char2 = createChar("player2", gridTilemap, ["label2"]);
