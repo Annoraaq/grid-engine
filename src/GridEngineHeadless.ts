@@ -291,7 +291,7 @@ export class GridEngineHeadless {
    * GridEngine are called.
    */
   create(tilemap: Tilemap, config: GridEngineConfig): void {
-    // this.isCreatedInternal = true;
+    this.isCreatedInternal = true;
     this.gridCharacters = new Map();
     const concreteConfig = this.setConfigDefaults(config);
     this.config = concreteConfig;
@@ -341,105 +341,107 @@ export class GridEngineHeadless {
   move(charId: string, direction: Direction): void {
     this.moveChar(charId, direction);
   }
-  // /**
-  //  * Initiates random movement of the character with the given id. The
-  //  * character will randomly pick one of the non-blocking directions.
-  //  * Optionally a `delay` in milliseconds can be provided. This represents the
-  //  * waiting time after a finished movement, before the next is being initiated.
-  //  * If a `radius` other than -1 is provided, the character will not move
-  //  * further than that radius from its initial position (the position it has
-  //  * been, when `moveRandomly` was called). The distance is calculated with the
-  //  * {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
-  //  * . Additionally, if a `radius` other than -1 was given, the character might
-  //  * move more than one tile into a random direction in one run (as long as the
-  //  * route is neither blocked nor outside of the radius).
-  //  */
-  // moveRandomly(charId: string, delay = 0, radius = -1): void {
-  //   this.initGuard();
-  //   const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-  //   if (!gridChar) throw this.createCharUnknownErr(charId);
-  //   const randomMovement = new RandomMovement(gridChar, delay, radius);
-  //   gridChar.setMovement(randomMovement);
-  // }
-  // /**
-  //  * @returns Information about the current automatic movement (including
-  //  * random movement, follow movement and target movement)
-  //  */
-  // getMovement(charId: string): MovementInfo {
-  //   this.initGuard();
-  //   const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-  //   if (!gridChar) throw this.createCharUnknownErr(charId);
-  //   const movement = gridChar.getMovement();
-  //   if (!movement) {
-  //     return {
-  //       type: "None",
-  //     };
-  //   }
-  //   return movement.getInfo();
-  // }
-  // /**
-  //  * Initiates movement toward the specified `targetPos`. The movement will
-  //  * happen along one shortest path. Check out {@link MoveToConfig} for
-  //  * pathfinding configurations.
-  //  *
-  //  * @returns an observable that will fire
-  //  * whenever the moveTo movement is finished or aborted. It will provide a
-  //  * {@link MoveToResult | result code} as well as a description and a character
-  //  * layer.
-  //  */
-  // moveTo(
-  //   charId: string,
-  //   targetPos: Position,
-  //   config?: MoveToConfig
-  // ): Observable<{ charId: string } & Finished> {
-  //   const moveToConfig = this.assembleMoveToConfig(config);
-  //   this.initGuard();
-  //   const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-  //   if (!gridChar) throw this.createCharUnknownErr(charId);
-  //   if (!this.gridTilemap) throw this.createUninitializedErr();
-  //   const targetMovement = new TargetMovement(
-  //     gridChar,
-  //     // TODO remove
-  //     // @ts-ignore
-  //     this.gridTilemap as GridTilemap,
-  //     {
-  //       position: new Vector2(targetPos),
-  //       layer: config?.targetLayer || gridChar.getNextTilePos().layer,
-  //     },
-  //     {
-  //       distance: 0,
-  //       config: moveToConfig,
-  //     }
-  //   );
-  //   gridChar.setMovement(targetMovement);
-  //   return targetMovement.finishedObs().pipe(
-  //     map((finished: Finished) => ({
-  //       charId,
-  //       position: finished.position,
-  //       result: finished.result,
-  //       description: finished.description,
-  //       layer: finished.layer,
-  //     }))
-  //   );
-  // }
-  // /**
-  //  * Stops any automated movement such as random movement
-  //  * ({@link moveRandomly}), following ({@link follow}) or moving to a
-  //  * specified position ({@link moveTo})
-  //  */
-  // stopMovement(charId: string): void {
-  //   this.initGuard();
-  //   const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-  //   if (!gridChar) throw this.createCharUnknownErr(charId);
-  //   gridChar.setMovement(undefined);
-  // }
-  // /** Sets the speed in tiles per second for a character. */
-  // setSpeed(charId: string, speed: number): void {
-  //   this.initGuard();
-  //   const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-  //   if (!gridChar) throw this.createCharUnknownErr(charId);
-  //   gridChar.setSpeed(speed);
-  // }
+
+  /**
+   * Initiates random movement of the character with the given id. The
+   * character will randomly pick one of the non-blocking directions.
+   * Optionally a `delay` in milliseconds can be provided. This represents the
+   * waiting time after a finished movement, before the next is being initiated.
+   * If a `radius` other than -1 is provided, the character will not move
+   * further than that radius from its initial position (the position it has
+   * been, when `moveRandomly` was called). The distance is calculated with the
+   * {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
+   * . Additionally, if a `radius` other than -1 was given, the character might
+   * move more than one tile into a random direction in one run (as long as the
+   * route is neither blocked nor outside of the radius).
+   */
+  moveRandomly(charId: string, delay = 0, radius = -1): void {
+    // this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    const randomMovement = new RandomMovement(gridChar, delay, radius);
+    gridChar.setMovement(randomMovement);
+  }
+
+  /**
+   * @returns Information about the current automatic movement (including
+   * random movement, follow movement and target movement)
+   */
+  getMovement(charId: string): MovementInfo {
+    // this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    const movement = gridChar.getMovement();
+    if (!movement) {
+      return {
+        type: "None",
+      };
+    }
+    return movement.getInfo();
+  }
+  /**
+   * Initiates movement toward the specified `targetPos`. The movement will
+   * happen along one shortest path. Check out {@link MoveToConfig} for
+   * pathfinding configurations.
+   *
+   * @returns an observable that will fire
+   * whenever the moveTo movement is finished or aborted. It will provide a
+   * {@link MoveToResult | result code} as well as a description and a character
+   * layer.
+   */
+  moveTo(
+    charId: string,
+    targetPos: Position,
+    config?: MoveToConfig
+  ): Observable<{ charId: string } & Finished> {
+    const moveToConfig = this.assembleMoveToConfig(config);
+    // this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    if (!this.gridTilemap) throw this.createUninitializedErr();
+    const targetMovement = new TargetMovement(
+      gridChar,
+      this.gridTilemap,
+      {
+        position: new Vector2(targetPos),
+        layer: config?.targetLayer || gridChar.getNextTilePos().layer,
+      },
+      {
+        distance: 0,
+        config: moveToConfig,
+      }
+    );
+    gridChar.setMovement(targetMovement);
+    return targetMovement.finishedObs().pipe(
+      map((finished: Finished) => ({
+        charId,
+        position: finished.position,
+        result: finished.result,
+        description: finished.description,
+        layer: finished.layer,
+      }))
+    );
+  }
+  /**
+   * Stops any automated movement such as random movement
+   * ({@link moveRandomly}), following ({@link follow}) or moving to a
+   * specified position ({@link moveTo})
+   */
+  stopMovement(charId: string): void {
+    // this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.setMovement(undefined);
+  }
+
+  /** Sets the speed in tiles per second for a character. */
+  setSpeed(charId: string, speed: number): void {
+    // this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.setSpeed(speed);
+  }
+
   /** @returns Speed in tiles per second for a character. */
   getSpeed(charId: string): number {
     // this.initGuard();
@@ -455,14 +457,14 @@ export class GridEngineHeadless {
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.collidesWithTiles();
   }
-  // /** @internal */
-  // update(_time: number, delta: number): void {
-  //   if (this.isCreatedInternal && this.gridCharacters) {
-  //     for (const [_key, gridChar] of this.gridCharacters) {
-  //       gridChar.update(delta);
-  //     }
-  //   }
-  // }
+
+  update(_time: number, delta: number): void {
+    if (this.isCreatedInternal && this.gridCharacters) {
+      for (const [_key, gridChar] of this.gridCharacters) {
+        gridChar.update(delta);
+      }
+    }
+  }
 
   /** Adds a character after calling {@link create}. */
   addCharacter(charData: CharacterData): void {
@@ -506,7 +508,7 @@ export class GridEngineHeadless {
       });
     }
     this.gridCharacters?.set(charData.id, gridChar);
-    // this.gridTilemap.addCharacter(gridChar);
+    this.gridTilemap.addCharacter(gridChar);
     // const id = gridChar.getId();
     // gridChar
     //   .movementStopped()
@@ -551,45 +553,46 @@ export class GridEngineHeadless {
     // this.initGuard();
     return !!this.gridCharacters?.has(charId);
   }
-  // /**
-  //  * Removes the character with the given ID from the plugin.
-  //  * Please note that the corresponding sprites need to be remove separately.
-  //  */
-  // removeCharacter(charId: string): void {
-  //   this.initGuard();
-  //   const gridChar = this.gridCharacters?.get(charId);
-  //   if (!gridChar) throw this.createCharUnknownErr(charId);
-  //   gridChar.destroy();
-  //   this.gridTilemap?.removeCharacter(charId);
-  //   this.gridCharacters?.delete(charId);
-  //   this.charRemoved$?.next(charId);
-  // }
-  // /**
-  //  * Removes all characters from the plugin.
-  //  * Please note that the corresponding sprites need to be remove separately.
-  //  */
-  // removeAllCharacters(): void {
-  //   this.initGuard();
-  //   if (!this.gridCharacters) return;
-  //   for (const charId of this.gridCharacters.keys()) {
-  //     this.removeCharacter(charId);
-  //   }
-  // }
-  // /**
-  //  * @returns All character IDs that are registered in the plugin, satisfying
-  //  * the provided filtering options.
-  //  */
-  // getAllCharacters(options?: CharacterFilteringOptions): string[] {
-  //   this.initGuard();
-  //   if (!this.gridCharacters) return [];
-  //   const allChars = [...this.gridCharacters.values()].map((char) =>
-  //     char.getGridCharacter()
-  //   );
-  //   const filteredChars = options
-  //     ? filterCharacters(allChars, options)
-  //     : allChars;
-  //   return filteredChars.map((char: GridCharacter) => char.getId());
-  // }
+  /**
+   * Removes the character with the given ID from the plugin.
+   * Please note that the corresponding sprites need to be remove separately.
+   */
+  removeCharacter(charId: string): void {
+    // this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    // gridChar.destroy();
+    this.gridTilemap?.removeCharacter(charId);
+    this.gridCharacters?.delete(charId);
+    // this.charRemoved$?.next(charId);
+  }
+
+  /**
+   * Removes all characters from the plugin.
+   * Please note that the corresponding sprites need to be remove separately.
+   */
+  removeAllCharacters(): void {
+    // this.initGuard();
+    if (!this.gridCharacters) return;
+    for (const charId of this.gridCharacters.keys()) {
+      this.removeCharacter(charId);
+    }
+  }
+
+  /**
+   * @returns All character IDs that are registered in the plugin, satisfying
+   * the provided filtering options.
+   */
+  getAllCharacters(options?: CharacterFilteringOptions): string[] {
+    // this.initGuard();
+    if (!this.gridCharacters) return [];
+    const allChars = [...this.gridCharacters.values()];
+    const filteredChars = options
+      ? filterCharacters(allChars, options)
+      : allChars;
+    return filteredChars.map((char: GridCharacter) => char.getId());
+  }
+
   /**
    * @returns All labels, attached to the character.
    */
@@ -707,19 +710,20 @@ export class GridEngineHeadless {
     return gridChar.turnTowards(direction);
   }
 
-  // /**
-  //  * Finds the identifiers of all characters at the provided tile position.
-  //  * @returns The identifiers of all characters on this tile.
-  //  */
-  // getCharactersAt(position: Position, layer: string): string[] {
-  //   this.initGuard();
-  //   if (!this.gridTilemap) return [];
-  //   const characters = this.gridTilemap.getCharactersAt(
-  //     new Vector2(position),
-  //     layer
-  //   );
-  //   return Array.from(characters).map((char) => char.getId());
-  // }
+  /**
+   * Finds the identifiers of all characters at the provided tile position.
+   * @returns The identifiers of all characters on this tile.
+   */
+  getCharactersAt(position: Position, layer: string): string[] {
+    // this.initGuard();
+    if (!this.gridTilemap) return [];
+    const characters = this.gridTilemap.getCharactersAt(
+      new Vector2(position),
+      layer
+    );
+    return Array.from(characters).map((char) => char.getId());
+  }
+
   /**
    * Places the character with the given id to the provided tile position. If
    * that character is moving, the movement is stopped. The
@@ -765,26 +769,26 @@ export class GridEngineHeadless {
   // ) {
   //   gridCharPhaser.setSprite(sprite);
   // }
-  // /**
-  //  * Checks whether the given position is blocked by either the tilemap or a
-  //  * blocking character. If you provide no layer, be sure not to use character
-  //  * layers in your tilemap.
-  //  *
-  //  * @returns True if position on given layer is blocked by the tilemap or a
-  //  *  character
-  //  */
-  // isBlocked(
-  //   position: Position,
-  //   layer?: string,
-  //   collisionGroups: string[] = ["geDefault"]
-  // ): boolean {
-  //   this.initGuard();
-  //   const positionVec = new Vector2(position);
-  //   return !!(
-  //     this.gridTilemap?.hasBlockingTile(positionVec, layer) ||
-  //     this.gridTilemap?.hasBlockingChar(positionVec, layer, collisionGroups)
-  //   );
-  // }
+  /**
+   * Checks whether the given position is blocked by either the tilemap or a
+   * blocking character. If you provide no layer, be sure not to use character
+   * layers in your tilemap.
+   *
+   * @returns True if position on given layer is blocked by the tilemap or a
+   *  character
+   */
+  isBlocked(
+    position: Position,
+    layer?: string,
+    collisionGroups: string[] = ["geDefault"]
+  ): boolean {
+    // this.initGuard();
+    const positionVec = new Vector2(position);
+    return !!(
+      this.gridTilemap?.hasBlockingTile(positionVec, layer) ||
+      this.gridTilemap?.hasBlockingChar(positionVec, layer, collisionGroups)
+    );
+  }
   // /**
   //  * Checks whether the given position is blocked by the tilemap. If you provide
   //  * no layer, be sure not to use character layers in your tilemap.
@@ -1026,36 +1030,36 @@ export class GridEngineHeadless {
   private createCharUnknownErr(charId: string): Error {
     return new Error(`Character unknown: ${charId}`);
   }
-  // private assembleMoveToConfig(config: MoveToConfig = {}): MoveToConfig {
-  //   const moveToConfig = {
-  //     ...config,
-  //     noPathFoundStrategy: NoPathFoundStrategy.STOP,
-  //     pathBlockedStrategy: PathBlockedStrategy.WAIT,
-  //   };
-  //   if (config?.noPathFoundStrategy) {
-  //     if (
-  //       Object.values(NoPathFoundStrategy).includes(config.noPathFoundStrategy)
-  //     ) {
-  //       moveToConfig.noPathFoundStrategy = config.noPathFoundStrategy;
-  //     } else {
-  //       console.warn(
-  //         `GridEngine: Unknown NoPathFoundStrategy '${config.noPathFoundStrategy}'. Falling back to '${NoPathFoundStrategy.STOP}'`
-  //       );
-  //     }
-  //   }
-  //   if (config?.pathBlockedStrategy) {
-  //     if (
-  //       Object.values(PathBlockedStrategy).includes(config.pathBlockedStrategy)
-  //     ) {
-  //       moveToConfig.pathBlockedStrategy = config.pathBlockedStrategy;
-  //     } else {
-  //       console.warn(
-  //         `GridEngine: Unknown PathBlockedStrategy '${config.pathBlockedStrategy}'. Falling back to '${PathBlockedStrategy.WAIT}'`
-  //       );
-  //     }
-  //   }
-  //   return moveToConfig;
-  // }
+  private assembleMoveToConfig(config: MoveToConfig = {}): MoveToConfig {
+    const moveToConfig = {
+      ...config,
+      noPathFoundStrategy: NoPathFoundStrategy.STOP,
+      pathBlockedStrategy: PathBlockedStrategy.WAIT,
+    };
+    if (config?.noPathFoundStrategy) {
+      if (
+        Object.values(NoPathFoundStrategy).includes(config.noPathFoundStrategy)
+      ) {
+        moveToConfig.noPathFoundStrategy = config.noPathFoundStrategy;
+      } else {
+        console.warn(
+          `GridEngine: Unknown NoPathFoundStrategy '${config.noPathFoundStrategy}'. Falling back to '${NoPathFoundStrategy.STOP}'`
+        );
+      }
+    }
+    if (config?.pathBlockedStrategy) {
+      if (
+        Object.values(PathBlockedStrategy).includes(config.pathBlockedStrategy)
+      ) {
+        moveToConfig.pathBlockedStrategy = config.pathBlockedStrategy;
+      } else {
+        console.warn(
+          `GridEngine: Unknown PathBlockedStrategy '${config.pathBlockedStrategy}'. Falling back to '${PathBlockedStrategy.WAIT}'`
+        );
+      }
+    }
+    return moveToConfig;
+  }
 
   private setConfigDefaults(
     config: GridEngineConfig
