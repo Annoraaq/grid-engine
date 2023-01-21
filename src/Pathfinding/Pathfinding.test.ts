@@ -20,11 +20,7 @@ jest.mock("./ShortestPathAlgorithm", function () {
   return shortestPathAlgorithmFactoryMock;
 });
 
-import {
-  CollisionStrategy,
-  GridEngineConfig,
-  NumberOfDirections,
-} from "../GridEngine";
+import { CollisionStrategy, NumberOfDirections } from "../GridEngine";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { PhaserTilemap } from "../GridTilemap/Phaser/PhaserTilemap";
 import {

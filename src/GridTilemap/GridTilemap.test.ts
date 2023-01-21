@@ -2,7 +2,7 @@ import { CollisionStrategy } from "./../Collisions/CollisionStrategy";
 import { GridCharacter } from "./../GridCharacter/GridCharacter";
 import { of } from "rxjs";
 import { Vector2 } from "../Utils/Vector2/Vector2";
-import { Direction, NumberOfDirections } from "./../Direction/Direction";
+import { Direction } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
 import { Rect } from "../Utils/Rect/Rect";
 import * as Phaser from "phaser";

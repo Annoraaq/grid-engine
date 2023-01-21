@@ -7,7 +7,7 @@ import { MoveToResult, TargetMovement } from "./TargetMovement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
-import { CollisionStrategy, GridEngineConfig } from "../../GridEngine";
+import { CollisionStrategy } from "../../GridEngine";
 import { CharConfig, GridCharacter } from "../../GridCharacter/GridCharacter";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import * as Phaser from "phaser";
@@ -19,7 +19,6 @@ import {
   createAllowedFn,
   COLLISION_GROUP,
 } from "../../Utils/MockFactory/MockFactory";
-import { Concrete } from "../../Utils/TypeUtils";
 import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap";
 
 // Hack to get Phaser included at runtime

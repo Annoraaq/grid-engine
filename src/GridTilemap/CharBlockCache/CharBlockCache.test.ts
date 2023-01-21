@@ -3,8 +3,6 @@ import { Direction, NumberOfDirections } from "./../../Direction/Direction";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache";
-import { GridEngineConfig } from "../../GridEngine";
-import { Concrete } from "../../Utils/TypeUtils";
 import { GridTilemap } from "../GridTilemap";
 import { createTilemapMock } from "../../Utils/MockFactory/MockFactory";
 import * as Phaser from "phaser";
