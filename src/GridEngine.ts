@@ -280,7 +280,8 @@ export class GridEngine {
     this.charAdded$ = new Subject<string>();
     this.gridTilemap = new GridTilemapPhaser(
       new PhaserTilemap(tilemap),
-      this.config.collisionTilePropertyName
+      this.config.collisionTilePropertyName,
+      this.config.characterCollisionStrategy
     );
 
     this.addCharacters();

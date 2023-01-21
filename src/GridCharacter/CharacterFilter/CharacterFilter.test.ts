@@ -1,4 +1,5 @@
 import { NumberOfDirections } from "../../Direction/Direction";
+import { CollisionStrategy } from "../../GridEngineHeadless";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap";
 import { createTilemapMock } from "../../Utils/MockFactory/MockFactory";
@@ -23,7 +24,8 @@ describe("CharacterFilter", () => {
     const characters: GridCharacter[] = [];
     const gridTilemap = new GridTilemap(
       new PhaserTilemap(createTilemapMock() as any),
-      "ge_collide"
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
     );
     const char1 = createChar("player1", gridTilemap, ["label1", "label2"]);
     const char2 = createChar("player2", gridTilemap, ["label2"]);

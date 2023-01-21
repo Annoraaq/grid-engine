@@ -5,6 +5,7 @@ import {
 } from "../../Direction/Direction";
 import { CharId, GridCharacter } from "../../GridCharacter/GridCharacter";
 import { CharLayer, Direction } from "../../GridEngine";
+import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { TileLayer, Tilemap } from "../../GridTilemap/Tilemap";
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
@@ -23,9 +24,14 @@ export class GridTilemapPhaser {
 
   constructor(
     private tilemap: Tilemap,
-    private collisionTilePropertyName: string
+    collisionTilePropertyName: string,
+    collisionStrategy: CollisionStrategy
   ) {
-    this.gridTilemap = new GridTilemap(tilemap, collisionTilePropertyName);
+    this.gridTilemap = new GridTilemap(
+      tilemap,
+      collisionTilePropertyName,
+      collisionStrategy
+    );
     this.setLayerDepths();
   }
 

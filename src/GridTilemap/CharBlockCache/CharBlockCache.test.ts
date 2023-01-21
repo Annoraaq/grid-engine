@@ -24,10 +24,11 @@ describe("CharBlockCache", () => {
   beforeEach(() => {
     gridTilemap = new GridTilemap(
       new PhaserTilemap(createTilemapMock() as any),
-      "ge_collide"
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
     );
     gridTilemap.setTransition(new Vector2(4, 3), "someLayer", "enterLayer");
-    charBlockCache = new CharBlockCache();
+    charBlockCache = new CharBlockCache(CollisionStrategy.BLOCK_TWO_TILES);
   });
 
   it("should detect blocking char after adding", () => {
@@ -76,10 +77,13 @@ describe("CharBlockCache", () => {
 
   describe("blocking strategy BLOCK_TWO_TILES", () => {
     beforeEach(() => {
-      GlobalConfig.get = jest.fn(() => ({
-        ...createMockConf(),
-        characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      }));
+      gridTilemap = new GridTilemap(
+        new PhaserTilemap(createTilemapMock() as any),
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
+      gridTilemap.setTransition(new Vector2(4, 3), "someLayer", "enterLayer");
+      charBlockCache = new CharBlockCache(CollisionStrategy.BLOCK_TWO_TILES);
     });
 
     it("should block new and old pos on movement", () => {
@@ -176,10 +180,15 @@ describe("CharBlockCache", () => {
 
   describe("blocking strategy BLOCK_ONE_TILE_AHEAD", () => {
     beforeEach(() => {
-      GlobalConfig.get = jest.fn(() => ({
-        ...createMockConf(),
-        characterCollisionStrategy: CollisionStrategy.BLOCK_ONE_TILE_AHEAD,
-      }));
+      gridTilemap = new GridTilemap(
+        new PhaserTilemap(createTilemapMock() as any),
+        "ge_collide",
+        CollisionStrategy.BLOCK_ONE_TILE_AHEAD
+      );
+      gridTilemap.setTransition(new Vector2(4, 3), "someLayer", "enterLayer");
+      charBlockCache = new CharBlockCache(
+        CollisionStrategy.BLOCK_ONE_TILE_AHEAD
+      );
     });
 
     it("should block pos on movement and release old one", () => {

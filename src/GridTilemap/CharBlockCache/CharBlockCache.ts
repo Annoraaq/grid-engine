@@ -1,4 +1,3 @@
-import { GlobalConfig } from "./../../GlobalConfig/GlobalConfig";
 import {
   filter,
   map,
@@ -22,6 +21,8 @@ import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
 export class CharBlockCache {
   private tilePosToCharacters: Map<string, Set<GridCharacter>> = new Map();
   private charRemoved$ = new Subject<string>();
+
+  constructor(private collistionStrategy: CollisionStrategy) {}
 
   isCharBlockingAt(
     pos: Vector2,
@@ -98,8 +99,7 @@ export class CharBlockCache {
       )
       .subscribe((posChange) => {
         if (
-          GlobalConfig.get().characterCollisionStrategy ===
-          CollisionStrategy.BLOCK_ONE_TILE_AHEAD
+          this.collistionStrategy === CollisionStrategy.BLOCK_ONE_TILE_AHEAD
         ) {
           this.deleteTilePositions(posChange.exit, character);
         }

@@ -74,7 +74,8 @@ describe("Pathfinding", () => {
     tilemapMock = createTilemapMock(blankLayerMock);
     gridTilemap = new GridTilemap(
       new PhaserTilemap(tilemapMock as any),
-      "ge_collides"
+      "ge_collides",
+      CollisionStrategy.BLOCK_TWO_TILES
     );
     pathfindingAlgo = "BIDIRECTIONAL_SEARCH";
   });

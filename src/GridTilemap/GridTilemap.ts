@@ -9,6 +9,7 @@ import { CharBlockCache } from "./CharBlockCache/CharBlockCache";
 import { Rect } from "../Utils/Rect/Rect";
 import { CharId, GridCharacter } from "../GridCharacter/GridCharacter";
 import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
+import { CollisionStrategy } from "../Collisions/CollisionStrategy";
 import { CharLayer } from "../GridEngine";
 import { TileLayer, Tilemap } from "./Tilemap";
 
@@ -16,13 +17,16 @@ export class GridTilemap {
   private static readonly CHAR_LAYER_PROP_NAME = "ge_charLayer";
   private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "ge_collide_";
   private characters = new Map<string, GridCharacter>();
-  private charBlockCache: CharBlockCache = new CharBlockCache();
+  private charBlockCache: CharBlockCache;
   private transitions: Map<CharLayer, Map<CharLayer, CharLayer>> = new Map();
 
   constructor(
     private tilemap: Tilemap,
-    private collisionTilePropertyName: string
-  ) {}
+    private collisionTilePropertyName: string,
+    collisionStrategy: CollisionStrategy
+  ) {
+    this.charBlockCache = new CharBlockCache(collisionStrategy);
+  }
 
   addCharacter(character: GridCharacter): void {
     this.characters.set(character.getId(), character);

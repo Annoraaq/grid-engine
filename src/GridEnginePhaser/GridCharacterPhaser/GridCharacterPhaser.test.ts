@@ -98,7 +98,8 @@ describe("GridCharacterPhaser", () => {
     });
     gridTilemap = new GridTilemapPhaser(
       new PhaserTilemap(tilemapMock),
-      "ge_collide"
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
     );
   });
 

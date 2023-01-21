@@ -139,7 +139,11 @@ describe("GridTilemap", () => {
       ),
     };
     phaserTilemap = new PhaserTilemap(tilemapMock);
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     mockCharBlockCache.addCharacter.mockReset();
     mockCharBlockCache.removeCharacter.mockReset();
     mockCharBlockCache.isCharBlockingAt.mockReset();
@@ -154,7 +158,11 @@ describe("GridTilemap", () => {
   });
 
   it("should add a character", () => {
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const charMock1 = createCharMock("player");
     const charMock2 = createCharMock("player2");
     const charMockSameId = createCharMock("player2");
@@ -198,7 +206,11 @@ describe("GridTilemap", () => {
         ],
       }),
     ];
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const charMock1 = createCharMock("player");
     charMock1.getNextTilePos = () => ({
       position: new Vector2(1, 2),
@@ -213,7 +225,11 @@ describe("GridTilemap", () => {
   });
 
   it("should remove a character", () => {
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const charMock1 = <any>{
       ...createCharMock("player"),
     };
@@ -229,7 +245,11 @@ describe("GridTilemap", () => {
   });
 
   it("should find characters", () => {
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
 
     const charMocks = new Set<GridCharacter>();
     charMocks.add(createCharMock("player"));
@@ -248,7 +268,11 @@ describe("GridTilemap", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { ge_collide: true },
     });
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined
@@ -266,7 +290,11 @@ describe("GridTilemap", () => {
   it("should not consider missing tiles as blocking", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     tilemapMock.getTileAt.mockReturnValue(undefined);
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined,
@@ -279,7 +307,11 @@ describe("GridTilemap", () => {
   it("should consider missing tiles as blocking", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     tilemapMock.getTileAt.mockReturnValue(undefined);
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined
@@ -299,7 +331,11 @@ describe("GridTilemap", () => {
       collisionTilePropertyName: "custom_collides_prop",
       layerOverlay: false,
     }));
-    gridTilemap = new GridTilemap(phaserTilemap, "custom_collides_prop");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "custom_collides_prop",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined
@@ -312,7 +348,11 @@ describe("GridTilemap", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { ge_collide_left: true, ge_collide_right: false },
     });
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined,
@@ -344,7 +384,11 @@ describe("GridTilemap", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { ge_collide_right: true },
     });
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined,
@@ -376,7 +420,11 @@ describe("GridTilemap", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { ge_collide_up: true },
     });
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined,
@@ -408,7 +456,11 @@ describe("GridTilemap", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { ge_collide_down: true },
     });
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined,
@@ -501,7 +553,11 @@ describe("GridTilemap", () => {
       return { properties: { ge_collide: false } };
     });
 
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       "charLayer1"
@@ -518,7 +574,11 @@ describe("GridTilemap", () => {
   it("should return true if nothing blocks", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined
@@ -531,7 +591,11 @@ describe("GridTilemap", () => {
   it("should return true if no tile", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlocking = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined
@@ -543,7 +607,11 @@ describe("GridTilemap", () => {
   it("should block if no tile present", () => {
     tilemapMock.layers = mockCharLayers;
     tilemapMock.hasTileAt.mockReturnValue(false);
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
     expect(hasNoTile).toBe(true);
   });
@@ -553,7 +621,11 @@ describe("GridTilemap", () => {
     tilemapMock.hasTileAt.mockImplementation((_x, _y, layerName) => {
       return layerName !== "layer1" && layerName !== "layer2";
     });
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
     expect(hasNoTile).toBe(true);
   });
@@ -563,14 +635,22 @@ describe("GridTilemap", () => {
     tilemapMock.hasTileAt.mockImplementation((_x, _y, layerName) => {
       return layerName === "layer2";
     });
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
     expect(hasNoTile).toBe(false);
   });
 
   it("should detect blocking char", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     mockCharBlockCache.isCharBlockingAt = jest.fn(() => true);
 
     expect(
@@ -586,7 +666,11 @@ describe("GridTilemap", () => {
 
   it("should detect an unblocked tile", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
-    gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
 
     const char1Mock = <any>{
       ...createCharMock("player1"),
@@ -668,7 +752,11 @@ describe("GridTilemap", () => {
 
   describe("transitions", () => {
     it("should set transitions", () => {
-      gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+      gridTilemap = new GridTilemap(
+        phaserTilemap,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
       gridTilemap.setTransition(new Vector2(4, 5), "charLayer2", "charLayer1");
       gridTilemap.setTransition(new Vector2(3, 5), "charLayer2", "charLayer1");
       expect(gridTilemap.getTransition(new Vector2(4, 5), "charLayer2")).toBe(
@@ -685,7 +773,11 @@ describe("GridTilemap", () => {
     it("should get all transitions", () => {
       const pos1 = new Vector2(4, 5);
       const pos2 = new Vector2(3, 5);
-      gridTilemap = new GridTilemap(phaserTilemap, "ge_collide");
+      gridTilemap = new GridTilemap(
+        phaserTilemap,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
       gridTilemap.setTransition(pos1, "charLayer2", "charLayer1");
       gridTilemap.setTransition(pos2, "charLayer2", "charLayer1");
 

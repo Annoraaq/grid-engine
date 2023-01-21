@@ -53,7 +53,11 @@ describe("GridCharacter", () => {
   beforeEach(() => {
     blankLayerMock = createBlankLayerMock();
     tilemapMock = createTilemapMock(blankLayerMock);
-    gridTilemap = new GridTilemap(new PhaserTilemap(tilemapMock), "ge_collide");
+    gridTilemap = new GridTilemap(
+      new PhaserTilemap(tilemapMock),
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     gridCharacter = new GridCharacter("player", {
       tilemap: gridTilemap,
       speed: 3,
