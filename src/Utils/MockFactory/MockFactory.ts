@@ -4,10 +4,96 @@ import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { Vector2 } from "../Vector2/Vector2";
 import { Random, MersenneTwister19937 } from "random-js";
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
+import {
+  Orientation,
+  Tile,
+  TileLayer,
+  Tilemap,
+} from "../../GridTilemap/Tilemap";
 
 export const LOWER_CHAR_LAYER = "lowerCharLayer";
 export const HIGHER_CHAR_LAYER = "testCharLayer";
 export const COLLISION_GROUP = "testCollisionGroup";
+
+export class MockTilemap implements Tilemap {
+  constructor(
+    private layers: TileLayer[] = [],
+    private orientation: Orientation = "orthogonal"
+  ) {}
+
+  getTileWidth(): number {
+    return 10;
+  }
+  getTileHeight(): number {
+    return 10;
+  }
+  getWidth(): number {
+    return 20;
+  }
+  getHeight(): number {
+    return 20;
+  }
+  getOrientation(): Orientation {
+    return this.orientation;
+  }
+  getLayers(): TileLayer[] {
+    return this.layers;
+  }
+  hasTileAt(x: number, y: number, layer?: string): boolean {
+    return true;
+  }
+  getTileAt(x: number, y: number, layer?: string): Tile | undefined {
+    return {
+      getProperties: () => ({}),
+    };
+  }
+  copyLayer(layer: TileLayer, newName: string, row: number): TileLayer {
+    return new MockTileLayer();
+  }
+}
+
+class MockTileLayer implements TileLayer {
+  private depth = 0;
+  constructor(
+    private name: string = "tileLayerName",
+    private properties: Record<string, string> = {},
+    private height: number = 5,
+    private width: number = 5,
+    private scale: number = 1,
+    private tilesets: string[] = [],
+    private data: Tile[][] = []
+  ) {}
+  getProperties(): Record<string, string> {
+    return this.properties;
+  }
+  getName(): string {
+    return this.name;
+  }
+  getHeight(): number {
+    return this.height;
+  }
+  getWidth(): number {
+    return this.width;
+  }
+  getScale(): number {
+    return this.scale;
+  }
+
+  setScale(scale: number): void {
+    this.scale = scale;
+  }
+  setDepth(depth: number): void {
+    this.depth = depth;
+  }
+  destroy(): void {}
+  getTilesets(): string[] {
+    return this.tilesets;
+  }
+  putTileAt(tile: number, x: number, y: number): void {}
+  getData(): Tile[][] {
+    return this.data;
+  }
+}
 
 export function createSpriteMock() {
   return {
@@ -97,6 +183,18 @@ export function createMockLayerData(layerData: any): any {
   };
   tilemapLayer.layer = newLayerData;
   return newLayerData;
+}
+
+export function createMockLayer(layerData: any): TileLayer {
+  return new MockTileLayer(
+    layerData.name,
+    layerData.properties,
+    layerData.height,
+    layerData.width,
+    layerData.scale,
+    layerData.tilesets,
+    layerData.data
+  );
 }
 
 export function layerPos(vec: Vector2, layer?: string): LayerVecPos {
