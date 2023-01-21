@@ -12,7 +12,6 @@ import {
 } from "../Utils/MockFactory/MockFactory";
 import { CollisionStrategy } from "../GridEngine";
 import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
-import { GlobalConfig } from "../GlobalConfig/GlobalConfig";
 import { PhaserTilemap } from "../GridTilemap/Phaser/PhaserTilemap";
 
 // Hack to get Phaser included at runtime
@@ -65,13 +64,6 @@ describe("GridCharacter", () => {
       numberOfDirections: NumberOfDirections.FOUR,
     });
     gridTilemap.addCharacter(gridCharacter);
-    GlobalConfig.set({
-      collisionTilePropertyName: "ge_collide",
-      numberOfDirections: NumberOfDirections.FOUR,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      layerOverlay: false,
-      characters: [],
-    });
   });
 
   it("should get init data", () => {

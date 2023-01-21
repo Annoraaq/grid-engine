@@ -20,7 +20,6 @@ import {
   COLLISION_GROUP,
 } from "../../Utils/MockFactory/MockFactory";
 import { Concrete } from "../../Utils/TypeUtils";
-import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
 import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap";
 
 // Hack to get Phaser included at runtime
@@ -78,14 +77,6 @@ describe("TargetMovement", () => {
       CollisionStrategy.BLOCK_TWO_TILES
     );
     shortestPathAlgo = "BIDIRECTIONAL_SEARCH";
-    const config: Concrete<GridEngineConfig> = {
-      characters: [],
-      collisionTilePropertyName: "ge_collides",
-      numberOfDirections: NumberOfDirections.FOUR,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      layerOverlay: false,
-    };
-    GlobalConfig.set(config);
   });
 
   it("should move char in correct direction", () => {

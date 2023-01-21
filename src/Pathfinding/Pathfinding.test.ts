@@ -20,7 +20,6 @@ jest.mock("./ShortestPathAlgorithm", function () {
   return shortestPathAlgorithmFactoryMock;
 });
 
-import { GlobalConfig } from "../GlobalConfig/GlobalConfig";
 import {
   CollisionStrategy,
   GridEngineConfig,
@@ -62,14 +61,6 @@ describe("Pathfinding", () => {
   let pathfindingAlgo: ShortestPathAlgorithmType;
 
   beforeEach(() => {
-    const config: Concrete<GridEngineConfig> = {
-      characters: [],
-      collisionTilePropertyName: "ge_collides",
-      numberOfDirections: NumberOfDirections.FOUR,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      layerOverlay: false,
-    };
-    GlobalConfig.set(config);
     blankLayerMock = createBlankLayerMock();
     tilemapMock = createTilemapMock(blankLayerMock);
     gridTilemap = new GridTilemap(

@@ -1,5 +1,4 @@
 import { CollisionStrategy } from "./Collisions/CollisionStrategy";
-import { GlobalConfig } from "./GlobalConfig/GlobalConfig";
 import { take } from "rxjs/operators";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { GridCharacter } from "./GridCharacter/GridCharacter";
@@ -311,50 +310,6 @@ describe("GridEngine", () => {
     expect(gridEngine.getWalkingAnimationMapping("player")).toEqual(
       walkingAnimationMapping
     );
-  });
-
-  it("should init GlobalConfig with default values", () => {
-    const setSpy = jest.spyOn(GlobalConfig, "set");
-    const config = {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
-          startPosition: new Vector2(3, 4),
-        },
-      ],
-    };
-    gridEngine.create(tileMapMock, config);
-    expect(setSpy).toHaveBeenCalledWith({
-      ...config,
-      collisionTilePropertyName: "ge_collide",
-      numberOfDirections: NumberOfDirections.FOUR,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      layerOverlay: false,
-    });
-  });
-
-  it("should override GlobalConfig default values", () => {
-    const setSpy = jest.spyOn(GlobalConfig, "set");
-    const config = {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
-          startPosition: new Vector2(3, 4),
-        },
-      ],
-      collisionTilePropertyName: "custom_name",
-      numberOfDirections: NumberOfDirections.EIGHT,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_ONE_TILE_AHEAD,
-      layerOverlay: true,
-    };
-    gridEngine.create(tileMapMock, config);
-    expect(setSpy).toHaveBeenCalledWith({
-      ...config,
-    });
   });
 
   it("should use config startPosition", () => {

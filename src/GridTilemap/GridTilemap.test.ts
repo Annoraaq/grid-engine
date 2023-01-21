@@ -1,5 +1,4 @@
 import { CollisionStrategy } from "./../Collisions/CollisionStrategy";
-import { GlobalConfig } from "./../GlobalConfig/GlobalConfig";
 import { GridCharacter } from "./../GridCharacter/GridCharacter";
 import { of } from "rxjs";
 import { Vector2 } from "../Utils/Vector2/Vector2";
@@ -148,13 +147,6 @@ describe("GridTilemap", () => {
     mockCharBlockCache.removeCharacter.mockReset();
     mockCharBlockCache.isCharBlockingAt.mockReset();
     mockCharBlockCache.isCharBlockingAt = jest.fn(() => false);
-    GlobalConfig.get = jest.fn(() => ({
-      characters: [],
-      numberOfDirections: NumberOfDirections.FOUR,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      collisionTilePropertyName: "ge_collide",
-      layerOverlay: false,
-    }));
   });
 
   it("should add a character", () => {
@@ -324,13 +316,6 @@ describe("GridTilemap", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { custom_collides_prop: true },
     });
-    GlobalConfig.get = jest.fn(() => ({
-      characters: [],
-      numberOfDirections: NumberOfDirections.FOUR,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      collisionTilePropertyName: "custom_collides_prop",
-      layerOverlay: false,
-    }));
     gridTilemap = new GridTilemap(
       phaserTilemap,
       "custom_collides_prop",

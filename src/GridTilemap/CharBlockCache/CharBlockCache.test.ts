@@ -1,6 +1,5 @@
 import { CollisionStrategy } from "./../../Collisions/CollisionStrategy";
 import { Direction, NumberOfDirections } from "./../../Direction/Direction";
-import { GlobalConfig } from "./../../GlobalConfig/GlobalConfig";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache";
@@ -403,15 +402,5 @@ describe("CharBlockCache", () => {
       ["cGroup1"],
       new Set(exclude)
     );
-  }
-
-  function createMockConf(): Concrete<GridEngineConfig> {
-    return {
-      characters: [],
-      collisionTilePropertyName: "ge_collide",
-      numberOfDirections: NumberOfDirections.FOUR,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      layerOverlay: false,
-    };
   }
 });

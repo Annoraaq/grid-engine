@@ -13,7 +13,6 @@ import {
   createSpriteMock,
 } from "../../Utils/MockFactory/MockFactory";
 import { take } from "rxjs/operators";
-import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
 import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap";
 import { GridTilemapPhaser } from "../GridTilemapPhaser/GridTilemapPhaser";
 
@@ -89,13 +88,6 @@ describe("GridCharacterPhaser", () => {
       sys: { events: { once: jest.fn(), on: jest.fn() } },
       add: { sprite: jest.fn().mockReturnValue(overlaySpriteMock) },
     };
-    GlobalConfig.set({
-      collisionTilePropertyName: "ge_collide",
-      numberOfDirections: NumberOfDirections.FOUR,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      layerOverlay: false,
-      characters: [],
-    });
     gridTilemap = new GridTilemapPhaser(
       new PhaserTilemap(tilemapMock),
       "ge_collide",
@@ -113,10 +105,6 @@ describe("GridCharacterPhaser", () => {
   }
 
   describe("On creation", () => {
-    afterEach(() => {
-      GlobalConfig.get().numberOfDirections = NumberOfDirections.FOUR;
-    });
-
     it("should create a grid character", () => {
       const walkingAnimationMock = {} as any;
       const startPos = { x: 5, y: 6 };

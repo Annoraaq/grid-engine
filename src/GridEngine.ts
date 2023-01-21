@@ -2,7 +2,6 @@ import {
   GridCharacterPhaser,
   PhaserCharacterData,
 } from "./GridEnginePhaser/GridCharacterPhaser/GridCharacterPhaser";
-import { GlobalConfig } from "./GlobalConfig/GlobalConfig";
 import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import {
@@ -257,7 +256,6 @@ export class GridEngine {
     const concreteConfig = this.setConfigDefaults(config);
 
     this.config = concreteConfig;
-    GlobalConfig.set(concreteConfig);
     this.movementStopped$ = new Subject<{
       charId: string;
       direction: Direction;

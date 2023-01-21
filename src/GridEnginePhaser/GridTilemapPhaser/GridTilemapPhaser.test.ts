@@ -3,8 +3,7 @@ import * as Phaser from "phaser";
 import { createMockLayerData } from "../../Utils/MockFactory/MockFactory";
 import { GridTilemapPhaser } from "./GridTilemapPhaser";
 import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap";
-import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
-import { Direction, NumberOfDirections } from "../../Direction/Direction";
+import { Direction } from "../../Direction/Direction";
 import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
@@ -148,13 +147,6 @@ describe("GridTilemapPhaser", () => {
     mockCharBlockCache.removeCharacter.mockReset();
     mockCharBlockCache.isCharBlockingAt.mockReset();
     mockCharBlockCache.isCharBlockingAt = jest.fn(() => false);
-    GlobalConfig.get = jest.fn(() => ({
-      characters: [],
-      numberOfDirections: NumberOfDirections.FOUR,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      collisionTilePropertyName: "ge_collide",
-      layerOverlay: false,
-    }));
   });
 
   it("should set layer depths on construction", () => {
@@ -498,13 +490,6 @@ describe("GridTilemapPhaser", () => {
     tilemapMock.getTileAt.mockReturnValue({
       properties: { custom_collides_prop: true },
     });
-    GlobalConfig.get = jest.fn(() => ({
-      characters: [],
-      numberOfDirections: NumberOfDirections.FOUR,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      collisionTilePropertyName: "custom_collides_prop",
-      layerOverlay: false,
-    }));
     gridTilemap = new GridTilemapPhaser(
       phaserTilemap,
       "custom_collides_prop",
