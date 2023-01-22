@@ -1,7 +1,6 @@
 import { Orientation, Tile, TileLayer, Tilemap } from "../Tilemap";
 import { PhaserTile } from "./PhaserTile";
 import { PhaserTileLayer } from "./PhaserTileLayer";
-import * as Phaser from "phaser";
 
 export class PhaserTilemap implements Tilemap {
   constructor(private phaserTilemap: Phaser.Tilemaps.Tilemap) {}
