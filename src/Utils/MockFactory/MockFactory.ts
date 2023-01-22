@@ -47,7 +47,8 @@ export class MockTilemap implements Tilemap {
     return this.layers;
   }
   hasTileAt(x: number, y: number, layer?: string): boolean {
-    return true;
+    const l = this.layers.find((l) => l.getName() === layer);
+    return !!l?.getData()[y]?.[x];
   }
   getTileAt(x: number, y: number, layer?: string): Tile | undefined {
     const l = this.layers.find((l) => l.getName() === layer);
@@ -300,7 +301,8 @@ function getBlockingProps(char: string): Record<string, string> {
 
 export function mockBlockMapNew(
   blockMap: string[],
-  charLayer?: string
+  charLayer?: string,
+  isometric?: boolean
 ): Tilemap {
   const data: Tile[][] = [];
   for (let r = 0; r < blockMap.length; r++) {
@@ -319,7 +321,7 @@ export function mockBlockMapNew(
     [],
     data
   );
-  return new MockTilemap([layer]);
+  return new MockTilemap([layer], isometric ? "isometric" : "orthogonal");
 }
 
 export function mockBlockMap(

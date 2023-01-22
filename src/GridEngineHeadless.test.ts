@@ -201,9 +201,7 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should init player", () => {
-    gridEngineHeadless.create(tileMapMock, {
-      characters: [{ id: "player" }],
-    });
+    createDefaultGridEngine();
     expect(gridEngineHeadless.hasCharacter("player")).toEqual(true);
     expect(gridEngineHeadless.getSpeed("player")).toEqual(4);
     expect(gridEngineHeadless.collidesWithTiles("player")).toEqual(true);
@@ -350,9 +348,15 @@ describe("GridEngineHeadless", () => {
 
   describe("move 4 dirs", () => {
     beforeEach(() => {
-      gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-        characters: [{ id: "player" }],
-      });
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMapNew([
+        "...",
+        "...",
+        "...",
+      ]),
+        { characters: [{ id: "player", startPosition: { x: 1, y: 1 } }] }
+      );
     });
 
     it("should move player orthogonally", () => {
@@ -381,10 +385,18 @@ describe("GridEngineHeadless", () => {
 
   describe("move 8 dirs", () => {
     beforeEach(() => {
-      gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-        characters: [{ id: "player" }],
-        numberOfDirections: NumberOfDirections.EIGHT,
-      });
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMapNew([
+        "...",
+        "...",
+        "...",
+      ]),
+        {
+          characters: [{ id: "player", startPosition: { x: 1, y: 1 } }],
+          numberOfDirections: NumberOfDirections.EIGHT,
+        }
+      );
     });
 
     it("should move player orthogonally", () => {
@@ -409,10 +421,18 @@ describe("GridEngineHeadless", () => {
   describe("move 4 dirs isometric", () => {
     beforeEach(() => {
       gridEngineHeadless.create(
-        new MockTilemap([createMockLayer({})], "isometric"),
-        { characters: [{ id: "player" }] }
+        // prettier-ignore
+        mockBlockMapNew([
+        "...",
+        "...",
+        "...",
+      ], undefined, true),
+        {
+          characters: [{ id: "player", startPosition: { x: 1, y: 1 } }],
+        }
       );
     });
+
     it("should move player vertically", () => {
       gridEngineHeadless.move("player", Direction.UP_LEFT);
 
@@ -437,18 +457,14 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should set tile position", () => {
-    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-      characters: [{ id: "player" }],
-    });
+    createDefaultGridEngine();
     gridEngineHeadless.setPosition("player", { x: 3, y: 4 }, "someOtherLayer");
     expect(gridEngineHeadless.getPosition("player")).toEqual({ x: 3, y: 4 });
     expect(gridEngineHeadless.getCharLayer("player")).toEqual("someOtherLayer");
   });
 
   it("should set tile position without layer", () => {
-    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-      characters: [{ id: "player" }],
-    });
+    createDefaultGridEngine();
     gridEngineHeadless.setPosition("player", { x: 3, y: 4 });
 
     expect(gridEngineHeadless.getPosition("player")).toEqual({ x: 3, y: 4 });
@@ -456,9 +472,7 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should get facing position", () => {
-    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-      characters: [{ id: "player" }],
-    });
+    createDefaultGridEngine();
     gridEngineHeadless.turnTowards("player", Direction.RIGHT);
     expect(gridEngineHeadless.getFacingPosition("player")).toEqual({
       x: 1,
@@ -467,9 +481,7 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should move randomly", () => {
-    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-      characters: [{ id: "player" }],
-    });
+    createDefaultGridEngine();
     gridEngineHeadless.moveRandomly("player", 123, 3);
     expect(gridEngineHeadless.getMovement("player")).toEqual({
       type: "Random",
@@ -482,9 +494,7 @@ describe("GridEngineHeadless", () => {
 
   describe("moveTo", () => {
     beforeEach(() => {
-      gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-        characters: [{ id: "player" }],
-      });
+      createDefaultGridEngine();
     });
     it("should move to coordinates", () => {
       console.warn = jest.fn();
@@ -657,17 +667,13 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should stop moving", () => {
-    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-      characters: [{ id: "player" }],
-    });
+    createDefaultGridEngine();
     gridEngineHeadless.stopMovement("player");
     expect(gridEngineHeadless.getMovement("player")).toEqual({ type: "None" });
   });
 
   it("should set speed", () => {
-    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-      characters: [{ id: "player" }],
-    });
+    createDefaultGridEngine();
     gridEngineHeadless.setSpeed("player", 2);
     expect(gridEngineHeadless.getSpeed("player")).toEqual(2);
   });
@@ -684,9 +690,7 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should remove chars on the go", () => {
-    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-      characters: [{ id: "player" }],
-    });
+    createDefaultGridEngine();
 
     expect(gridEngineHeadless.getPosition("player")).toEqual({ x: 0, y: 0 });
     expect(gridEngineHeadless.isBlocked({ x: 0, y: 0 }, undefined)).toBe(true);
@@ -699,12 +703,21 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should remove all chars", () => {
-    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-      characters: [
-        { id: "player", startPosition: { x: 1, y: 1 } },
-        { id: "player2", startPosition: { x: 2, y: 2 } },
-      ],
-    });
+    gridEngineHeadless.create(
+      // prettier-ignore
+      mockBlockMapNew([
+        "...",
+        "...",
+        "...",
+      ], undefined, true),
+      {
+        characters: [
+          { id: "player", startPosition: { x: 1, y: 1 } },
+          { id: "player2", startPosition: { x: 2, y: 2 } },
+        ],
+        numberOfDirections: NumberOfDirections.EIGHT,
+      }
+    );
     expect(gridEngineHeadless.isBlocked({ x: 1, y: 1 }, undefined)).toBe(true);
     expect(gridEngineHeadless.isBlocked({ x: 2, y: 2 }, undefined)).toBe(true);
 
@@ -739,9 +752,7 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should check if char is registered", () => {
-    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-      characters: [{ id: "player" }],
-    });
+    createDefaultGridEngine();
     gridEngineHeadless.addCharacter({
       id: "player2",
     });
@@ -784,18 +795,14 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should delegate getFacingDirection", () => {
-    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-      characters: [{ id: "player" }],
-    });
+    createDefaultGridEngine();
     gridEngineHeadless.turnTowards("player", Direction.LEFT);
     const facingDirection = gridEngineHeadless.getFacingDirection("player");
     expect(facingDirection).toEqual(Direction.LEFT);
   });
 
   it("should delegate getTransition", () => {
-    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-      characters: [{ id: "player" }],
-    });
+    createDefaultGridEngine();
     gridEngineHeadless.setTransition({ x: 3, y: 4 }, "fromLayer", "toLayer");
     expect(
       gridEngineHeadless.getTransition({ x: 3, y: 4 }, "fromLayer")
@@ -872,9 +879,7 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should delegate getCollisionGroups", () => {
-    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-      characters: [{ id: "player" }],
-    });
+    createDefaultGridEngine();
     const collisionGroups = ["someCG"];
     gridEngineHeadless.setCollisionGroups("player", collisionGroups);
     expect(gridEngineHeadless.getCollisionGroups("player")).toEqual(
@@ -883,9 +888,7 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should get tile pos in direction", () => {
-    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-      characters: [{ id: "player" }],
-    });
+    createDefaultGridEngine();
     const pos = { x: 5, y: 6 };
     const layer = "charLayer1";
 
@@ -901,322 +904,330 @@ describe("GridEngineHeadless", () => {
     });
   });
 
-  // describe("Observables", () => {
-  //   it("should get chars movementStarted observable", async () => {
-  //     gridEngine.create(tileMapMock, {
-  //       characters: [
-  //         {
-  //           id: "player",
-  //           sprite: playerSpriteMock,
-  //         },
-  //       ],
-  //     });
-  //     const prom = gridEngine.movementStarted().pipe(take(1)).toPromise();
+  describe("Observables", () => {
+    it("should get chars movementStarted observable", async () => {
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMapNew([
+          "..",
+          ".."
+        ]),
+        { characters: [{ id: "player" }] }
+      );
+      const prom = gridEngineHeadless
+        .movementStarted()
+        .pipe(take(1))
+        .toPromise();
 
-  //     gridEngine.move("player", Direction.LEFT);
+      gridEngineHeadless.move("player", Direction.RIGHT);
 
-  //     const res = await prom;
-  //     expect(res).toEqual({ charId: "player", direction: Direction.LEFT });
-  //   });
+      const res = await prom;
+      expect(res).toEqual({ charId: "player", direction: Direction.RIGHT });
+    });
 
-  //   it("should unsubscribe from movementStarted if char removed", () => {
-  //     gridEngine.create(tileMapMock, {
-  //       characters: [
-  //         {
-  //           id: "player",
-  //           sprite: playerSpriteMock,
-  //         },
-  //       ],
-  //     });
+    it("should unsubscribe from movementStarted if char removed", () => {
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMapNew([
+          "..",
+          ".."
+        ]),
+        { characters: [{ id: "player" }] }
+      );
 
-  //     const nextMock = jest.fn();
-  //     gridEngine.movementStarted().subscribe({
-  //       complete: jest.fn(),
-  //       next: nextMock,
-  //     });
+      const nextMock = jest.fn();
+      gridEngineHeadless.movementStarted().subscribe({
+        complete: jest.fn(),
+        next: nextMock,
+      });
 
-  //     gridEngine.move("player", Direction.LEFT);
-  //     gridEngine.update(2000, 100);
-  //     gridEngine.move("player", Direction.DOWN);
-  //     gridEngine.removeCharacter("player");
-  //     gridEngine.update(2000, 3000);
+      gridEngineHeadless.move("player", Direction.RIGHT);
+      gridEngineHeadless.update(2000, 100);
+      gridEngineHeadless.move("player", Direction.DOWN);
+      gridEngineHeadless.removeCharacter("player");
+      gridEngineHeadless.update(2000, 3000);
 
-  //     expect(nextMock).toHaveBeenCalledTimes(1);
-  //   });
+      expect(nextMock).toHaveBeenCalledTimes(1);
+    });
 
-  //   it("should get chars movementStopped observable", async () => {
-  //     gridEngine.create(tileMapMock, {
-  //       characters: [
-  //         {
-  //           id: "player",
-  //           sprite: playerSpriteMock,
-  //         },
-  //       ],
-  //     });
+    it("should get chars movementStopped observable", async () => {
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMapNew([
+          "..",
+          ".."
+        ]),
+        { characters: [{ id: "player" }] }
+      );
 
-  //     const prom = gridEngine.movementStopped().pipe(take(1)).toPromise();
-  //     gridEngine.move("player", Direction.LEFT);
-  //     gridEngine.update(2000, 1000);
-  //     gridEngine.update(2000, 1000);
+      const prom = gridEngineHeadless
+        .movementStopped()
+        .pipe(take(1))
+        .toPromise();
+      gridEngineHeadless.move("player", Direction.RIGHT);
+      gridEngineHeadless.update(2000, 1000);
+      gridEngineHeadless.update(2000, 1000);
 
-  //     expect(await prom).toEqual({
-  //       charId: "player",
-  //       direction: Direction.LEFT,
-  //     });
-  //   });
+      expect(await prom).toEqual({
+        charId: "player",
+        direction: Direction.RIGHT,
+      });
+    });
 
-  //   it("should unsubscribe from movementStopped if char removed", () => {
-  //     gridEngine.create(tileMapMock, {
-  //       characters: [
-  //         {
-  //           id: "player",
-  //           sprite: playerSpriteMock,
-  //         },
-  //       ],
-  //     });
+    it("should unsubscribe from movementStopped if char removed", () => {
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMapNew([
+          "..",
+          ".."
+        ]),
+        { characters: [{ id: "player" }] }
+      );
 
-  //     const nextMock = jest.fn();
-  //     gridEngine.movementStopped().subscribe({
-  //       complete: jest.fn(),
-  //       next: nextMock,
-  //     });
+      const nextMock = jest.fn();
+      gridEngineHeadless.movementStopped().subscribe({
+        complete: jest.fn(),
+        next: nextMock,
+      });
 
-  //     gridEngine.move("player", Direction.LEFT);
-  //     gridEngine.removeCharacter("player");
-  //     gridEngine.update(2000, 1000);
-  //     gridEngine.update(2000, 1000);
+      gridEngineHeadless.move("player", Direction.RIGHT);
+      gridEngineHeadless.removeCharacter("player");
+      gridEngineHeadless.update(2000, 1000);
+      gridEngineHeadless.update(2000, 1000);
 
-  //     expect(nextMock).not.toHaveBeenCalled();
-  //   });
+      expect(nextMock).not.toHaveBeenCalled();
+    });
 
-  //   it("should get chars directionChanged observable", async () => {
-  //     gridEngine.create(tileMapMock, {
-  //       characters: [
-  //         {
-  //           id: "player",
-  //           sprite: playerSpriteMock,
-  //         },
-  //       ],
-  //     });
+    it("should get chars directionChanged observable", async () => {
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMapNew([
+          "..",
+          ".."
+        ]),
+        { characters: [{ id: "player" }] }
+      );
 
-  //     const prom = gridEngine.directionChanged().pipe(take(1)).toPromise();
+      const prom = gridEngineHeadless
+        .directionChanged()
+        .pipe(take(1))
+        .toPromise();
 
-  //     mockGridTileMap.hasBlockingTile.mockReturnValue(true);
-  //     gridEngine.move("player", Direction.LEFT);
+      gridEngineHeadless.move("player", Direction.LEFT);
 
-  //     expect(await prom).toEqual({
-  //       charId: "player",
-  //       direction: Direction.LEFT,
-  //     });
-  //   });
+      expect(await prom).toEqual({
+        charId: "player",
+        direction: Direction.LEFT,
+      });
+    });
 
-  //   it("should get chars positionChangeStarted observable", async () => {
-  //     mockGridTileMap.toMapDirection.mockReturnValue(Direction.LEFT);
-  //     gridEngine.create(tileMapMock, {
-  //       characters: [
-  //         {
-  //           id: "player",
-  //           sprite: playerSpriteMock,
-  //         },
-  //       ],
-  //     });
+    // it("should get chars positionChangeStarted observable", async () => {
+    //   mockGridTileMap.toMapDirection.mockReturnValue(Direction.LEFT);
+    //   gridEngine.create(tileMapMock, {
+    //     characters: [
+    //       {
+    //         id: "player",
+    //         sprite: playerSpriteMock,
+    //       },
+    //     ],
+    //   });
 
-  //     const prom = gridEngine.positionChangeStarted().pipe(take(1)).toPromise();
+    //   const prom = gridEngine.positionChangeStarted().pipe(take(1)).toPromise();
 
-  //     gridEngine.move("player", Direction.LEFT);
+    //   gridEngine.move("player", Direction.LEFT);
 
-  //     expect(await prom).toEqual({
-  //       charId: "player",
-  //       exitTile: new Vector2(0, 0),
-  //       enterTile: new Vector2(-1, 0),
-  //       enterLayer: undefined,
-  //       exitLayer: undefined,
-  //     });
-  //   });
+    //   expect(await prom).toEqual({
+    //     charId: "player",
+    //     exitTile: new Vector2(0, 0),
+    //     enterTile: new Vector2(-1, 0),
+    //     enterLayer: undefined,
+    //     exitLayer: undefined,
+    //   });
+    // });
 
-  //   it("should get chars positionChangeFinished observable", async () => {
-  //     mockGridTileMap.toMapDirection.mockReturnValue(Direction.LEFT);
-  //     gridEngine.create(tileMapMock, {
-  //       characters: [
-  //         {
-  //           id: "player",
-  //           sprite: playerSpriteMock,
-  //         },
-  //       ],
-  //     });
+    // it("should get chars positionChangeFinished observable", async () => {
+    //   mockGridTileMap.toMapDirection.mockReturnValue(Direction.LEFT);
+    //   gridEngine.create(tileMapMock, {
+    //     characters: [
+    //       {
+    //         id: "player",
+    //         sprite: playerSpriteMock,
+    //       },
+    //     ],
+    //   });
 
-  //     const prom = gridEngine
-  //       .positionChangeFinished()
-  //       .pipe(take(1))
-  //       .toPromise();
+    //   const prom = gridEngine
+    //     .positionChangeFinished()
+    //     .pipe(take(1))
+    //     .toPromise();
 
-  //     gridEngine.move("player", Direction.LEFT);
-  //     gridEngine.update(2000, 1000);
-  //     gridEngine.update(2000, 1000);
+    //   gridEngine.move("player", Direction.LEFT);
+    //   gridEngine.update(2000, 1000);
+    //   gridEngine.update(2000, 1000);
 
-  //     const res = await prom;
-  //     expect(res).toEqual({
-  //       charId: "player",
-  //       exitTile: new Vector2(0, 0),
-  //       enterTile: new Vector2(-1, 0),
-  //       enterLayer: undefined,
-  //       exitLayer: undefined,
-  //     });
-  //   });
+    //   const res = await prom;
+    //   expect(res).toEqual({
+    //     charId: "player",
+    //     exitTile: new Vector2(0, 0),
+    //     enterTile: new Vector2(-1, 0),
+    //     enterLayer: undefined,
+    //     exitLayer: undefined,
+    //   });
+    // });
 
-  //   it("should emit when a character is added or removed", () => {
-  //     const player1 = "player1";
-  //     const player2 = "player2";
-  //     const nextMock = jest.fn();
+    // it("should emit when a character is added or removed", () => {
+    //   const player1 = "player1";
+    //   const player2 = "player2";
+    //   const nextMock = jest.fn();
 
-  //     gridEngine.create(tileMapMock, {
-  //       characters: [
-  //         {
-  //           id: player1,
-  //           sprite: playerSpriteMock,
-  //         },
-  //       ],
-  //     });
+    //   gridEngine.create(tileMapMock, {
+    //     characters: [
+    //       {
+    //         id: player1,
+    //         sprite: playerSpriteMock,
+    //       },
+    //     ],
+    //   });
 
-  //     gridEngine.characterShifted().subscribe({
-  //       complete: jest.fn(),
-  //       next: nextMock,
-  //     });
+    //   gridEngine.characterShifted().subscribe({
+    //     complete: jest.fn(),
+    //     next: nextMock,
+    //   });
 
-  //     gridEngine.addCharacter({ id: player2, sprite: playerSpriteMock });
-  //     expect(nextMock).toHaveBeenCalledWith(
-  //       expect.objectContaining({
-  //         charId: player2,
-  //         action: "ADDED",
-  //       })
-  //     );
+    //   gridEngine.addCharacter({ id: player2, sprite: playerSpriteMock });
+    //   expect(nextMock).toHaveBeenCalledWith(
+    //     expect.objectContaining({
+    //       charId: player2,
+    //       action: "ADDED",
+    //     })
+    //   );
 
-  //     gridEngine.removeCharacter(player1);
-  //     expect(nextMock).toHaveBeenCalledWith(
-  //       expect.objectContaining({
-  //         charId: player1,
-  //         action: "REMOVED",
-  //       })
-  //     );
+    //   gridEngine.removeCharacter(player1);
+    //   expect(nextMock).toHaveBeenCalledWith(
+    //     expect.objectContaining({
+    //       charId: player1,
+    //       action: "REMOVED",
+    //     })
+    //   );
 
-  //     gridEngine.addCharacter({ id: player1, sprite: playerSpriteMock });
-  //     expect(nextMock).toHaveBeenCalledWith(
-  //       expect.objectContaining({
-  //         charId: player1,
-  //         action: "ADDED",
-  //       })
-  //     );
-  //   });
+    //   gridEngine.addCharacter({ id: player1, sprite: playerSpriteMock });
+    //   expect(nextMock).toHaveBeenCalledWith(
+    //     expect.objectContaining({
+    //       charId: player1,
+    //       action: "ADDED",
+    //     })
+    //   );
+    // });
 
-  //   describe("steppedOn", () => {
-  //     let nextMock;
-  //     const player = "player1";
-  //     const nonMatchingChar = "non matching char";
-  //     const expectedLayer = "anyLayer";
-  //     const expectedTargetPosition = new Vector2(5, 5);
-  //     beforeEach(() => {
-  //       nextMock = jest.fn();
-  //       gridEngine.create(tileMapMock, {
-  //         characters: [
-  //           {
-  //             id: player,
-  //             sprite: playerSpriteMock,
-  //           },
-  //           {
-  //             id: nonMatchingChar,
-  //             sprite: playerSpriteMock,
-  //           },
-  //         ],
-  //       });
-  //       gridEngine
-  //         .steppedOn([player], [expectedTargetPosition], [expectedLayer])
-  //         .subscribe({
-  //           complete: jest.fn(),
-  //           next: nextMock,
-  //         });
-  //     });
+    // describe("steppedOn", () => {
+    //   let nextMock;
+    //   const player = "player1";
+    //   const nonMatchingChar = "non matching char";
+    //   const expectedLayer = "anyLayer";
+    //   const expectedTargetPosition = new Vector2(5, 5);
+    //   beforeEach(() => {
+    //     nextMock = jest.fn();
+    //     gridEngine.create(tileMapMock, {
+    //       characters: [
+    //         {
+    //           id: player,
+    //           sprite: playerSpriteMock,
+    //         },
+    //         {
+    //           id: nonMatchingChar,
+    //           sprite: playerSpriteMock,
+    //         },
+    //       ],
+    //     });
+    //     gridEngine
+    //       .steppedOn([player], [expectedTargetPosition], [expectedLayer])
+    //       .subscribe({
+    //         complete: jest.fn(),
+    //         next: nextMock,
+    //       });
+    //   });
 
-  //     it("should notify if character stepped on tile", () => {
-  //       gridEngine.setPosition(player, new Vector2(4, 5), expectedLayer);
-  //       mockGridTileMap.toMapDirection.mockReturnValue(Direction.RIGHT);
-  //       gridEngine.move(player, Direction.RIGHT);
-  //       gridEngine.update(2000, 300);
+    //   it("should notify if character stepped on tile", () => {
+    //     gridEngine.setPosition(player, new Vector2(4, 5), expectedLayer);
+    //     mockGridTileMap.toMapDirection.mockReturnValue(Direction.RIGHT);
+    //     gridEngine.move(player, Direction.RIGHT);
+    //     gridEngine.update(2000, 300);
 
-  //       expect(nextMock).toHaveBeenCalledWith(
-  //         expect.objectContaining({
-  //           enterTile: expectedTargetPosition,
-  //         })
-  //       );
-  //     });
+    //     expect(nextMock).toHaveBeenCalledWith(
+    //       expect.objectContaining({
+    //         enterTile: expectedTargetPosition,
+    //       })
+    //     );
+    //   });
 
-  //     it("should not notify if character stepped on tile with non matching layer", () => {
-  //       gridEngine.setPosition(player, new Vector2(4, 5), "not matching layer");
-  //       gridEngine.move(player, Direction.RIGHT);
-  //       gridEngine.update(2000, 300);
+    //   it("should not notify if character stepped on tile with non matching layer", () => {
+    //     gridEngine.setPosition(player, new Vector2(4, 5), "not matching layer");
+    //     gridEngine.move(player, Direction.RIGHT);
+    //     gridEngine.update(2000, 300);
 
-  //       expect(nextMock).not.toHaveBeenCalledWith(
-  //         expect.objectContaining({
-  //           enterTile: expectedTargetPosition,
-  //         })
-  //       );
-  //     });
+    //     expect(nextMock).not.toHaveBeenCalledWith(
+    //       expect.objectContaining({
+    //         enterTile: expectedTargetPosition,
+    //       })
+    //     );
+    //   });
 
-  //     it("should not notify if character stepped on tile with non matching char", () => {
-  //       gridEngine.setPosition(
-  //         nonMatchingChar,
-  //         new Vector2(4, 5),
-  //         expectedLayer
-  //       );
-  //       gridEngine.move(nonMatchingChar, Direction.RIGHT);
-  //       gridEngine.update(2000, 300);
+    //   it("should not notify if character stepped on tile with non matching char", () => {
+    //     gridEngine.setPosition(
+    //       nonMatchingChar,
+    //       new Vector2(4, 5),
+    //       expectedLayer
+    //     );
+    //     gridEngine.move(nonMatchingChar, Direction.RIGHT);
+    //     gridEngine.update(2000, 300);
 
-  //       expect(nextMock).not.toHaveBeenCalledWith(
-  //         expect.objectContaining({
-  //           enterTile: expectedTargetPosition,
-  //         })
-  //       );
-  //     });
+    //     expect(nextMock).not.toHaveBeenCalledWith(
+    //       expect.objectContaining({
+    //         enterTile: expectedTargetPosition,
+    //       })
+    //     );
+    //   });
 
-  //     it("should not notify if character stepped on tile with non matching tile", () => {
-  //       gridEngine.setPosition(
-  //         player,
-  //         new Vector2(10, 10), // non matching tile
-  //         expectedLayer
-  //       );
-  //       gridEngine.move(player, Direction.RIGHT);
-  //       gridEngine.update(2000, 300);
+    //   it("should not notify if character stepped on tile with non matching tile", () => {
+    //     gridEngine.setPosition(
+    //       player,
+    //       new Vector2(10, 10), // non matching tile
+    //       expectedLayer
+    //     );
+    //     gridEngine.move(player, Direction.RIGHT);
+    //     gridEngine.update(2000, 300);
 
-  //       expect(nextMock).not.toHaveBeenCalledWith(
-  //         expect.objectContaining({
-  //           enterTile: expectedTargetPosition,
-  //         })
-  //       );
-  //     });
-  //   });
+    //     expect(nextMock).not.toHaveBeenCalledWith(
+    //       expect.objectContaining({
+    //         enterTile: expectedTargetPosition,
+    //       })
+    //     );
+    //   });
+    // });
 
-  //   it("should unsubscribe from positionChangeFinished if char removed", () => {
-  //     gridEngine.create(tileMapMock, {
-  //       characters: [
-  //         {
-  //           id: "player",
-  //           sprite: playerSpriteMock,
-  //         },
-  //       ],
-  //     });
+    // it("should unsubscribe from positionChangeFinished if char removed", () => {
+    //   gridEngine.create(tileMapMock, {
+    //     characters: [
+    //       {
+    //         id: "player",
+    //         sprite: playerSpriteMock,
+    //       },
+    //     ],
+    //   });
 
-  //     const nextMock = jest.fn();
-  //     gridEngine.positionChangeFinished().subscribe({
-  //       complete: jest.fn(),
-  //       next: nextMock,
-  //     });
+    //   const nextMock = jest.fn();
+    //   gridEngine.positionChangeFinished().subscribe({
+    //     complete: jest.fn(),
+    //     next: nextMock,
+    //   });
 
-  //     gridEngine.move("player", Direction.LEFT);
-  //     gridEngine.removeCharacter("player");
-  //     gridEngine.update(2000, 1000);
-  //     gridEngine.update(2000, 1000);
-  //     expect(nextMock).not.toHaveBeenCalled();
-  //   });
-  // });
+    //   gridEngine.move("player", Direction.LEFT);
+    //   gridEngine.removeCharacter("player");
+    //   gridEngine.update(2000, 1000);
+    //   gridEngine.update(2000, 1000);
+    //   expect(nextMock).not.toHaveBeenCalled();
+    // });
+  });
 
   // describe("labels", () => {
   //   it("should add labels on creation", () => {
@@ -1570,4 +1581,15 @@ describe("GridEngineHeadless", () => {
   //     "Using GridEngine vGRID.ENGINE.VERSION"
   //   );
   // });
+
+  function createDefaultGridEngine() {
+    gridEngineHeadless.create(
+      // prettier-ignore
+      mockBlockMapNew([
+        "..",
+        ".."
+      ]),
+      { characters: [{ id: "player" }] }
+    );
+  }
 });

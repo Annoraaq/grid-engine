@@ -233,14 +233,14 @@ export class GridEngineHeadless {
   private config?: Concrete<GridEngineConfig>;
   private gridTilemap?: GridTilemap;
   private isCreatedInternal = false;
-  // private movementStopped$?: Subject<{ charId: string; direction: Direction }>;
-  // private movementStarted$?: Subject<{ charId: string; direction: Direction }>;
-  // private directionChanged$?: Subject<{ charId: string; direction: Direction }>;
+  private movementStopped$?: Subject<{ charId: string; direction: Direction }>;
+  private movementStarted$?: Subject<{ charId: string; direction: Direction }>;
+  private directionChanged$?: Subject<{ charId: string; direction: Direction }>;
   // private positionChangeStarted$?: Subject<{ charId: string } & PositionChange>;
   // private positionChangeFinished$?: Subject<
   //   { charId: string } & PositionChange
   // >;
-  // private charRemoved$?: Subject<string>;
+  private charRemoved$?: Subject<string>;
   // private charAdded$?: Subject<string>;
   // constructor() {
   //   console.log(`Using GridEngine v${VERSION}`);
@@ -298,25 +298,25 @@ export class GridEngineHeadless {
     this.gridCharacters = new Map();
     const concreteConfig = this.setConfigDefaults(config);
     this.config = concreteConfig;
-    // this.movementStopped$ = new Subject<{
-    //   charId: string;
-    //   direction: Direction;
-    // }>();
-    // this.movementStarted$ = new Subject<{
-    //   charId: string;
-    //   direction: Direction;
-    // }>();
-    // this.directionChanged$ = new Subject<{
-    //   charId: string;
-    //   direction: Direction;
-    // }>();
+    this.movementStopped$ = new Subject<{
+      charId: string;
+      direction: Direction;
+    }>();
+    this.movementStarted$ = new Subject<{
+      charId: string;
+      direction: Direction;
+    }>();
+    this.directionChanged$ = new Subject<{
+      charId: string;
+      direction: Direction;
+    }>();
     // this.positionChangeStarted$ = new Subject<
     //   { charId: string } & PositionChange
     // >();
     // this.positionChangeFinished$ = new Subject<
     //   { charId: string } & PositionChange
     // >();
-    // this.charRemoved$ = new Subject<string>();
+    this.charRemoved$ = new Subject<string>();
     // this.charAdded$ = new Subject<string>();
     this.gridTilemap = new GridTilemap(
       tilemap,
@@ -512,25 +512,25 @@ export class GridEngineHeadless {
     }
     this.gridCharacters?.set(charData.id, gridChar);
     this.gridTilemap.addCharacter(gridChar);
-    // const id = gridChar.getId();
-    // gridChar
-    //   .movementStopped()
-    //   .pipe(takeUntil(this.charRemoved(id)))
-    //   .subscribe((direction: Direction) => {
-    //     this.movementStopped$?.next({ charId: id, direction });
-    //   });
-    // gridChar
-    //   .movementStarted()
-    //   .pipe(takeUntil(this.charRemoved(id)))
-    //   .subscribe((direction: Direction) => {
-    //     this.movementStarted$?.next({ charId: id, direction });
-    //   });
-    // gridChar
-    //   .directionChanged()
-    //   .pipe(takeUntil(this.charRemoved(id)))
-    //   .subscribe((direction: Direction) => {
-    //     this.directionChanged$?.next({ charId: id, direction });
-    //   });
+    const id = gridChar.getId();
+    gridChar
+      .movementStopped()
+      .pipe(takeUntil(this.charRemoved(id)))
+      .subscribe((direction: Direction) => {
+        this.movementStopped$?.next({ charId: id, direction });
+      });
+    gridChar
+      .movementStarted()
+      .pipe(takeUntil(this.charRemoved(id)))
+      .subscribe((direction: Direction) => {
+        this.movementStarted$?.next({ charId: id, direction });
+      });
+    gridChar
+      .directionChanged()
+      .pipe(takeUntil(this.charRemoved(id)))
+      .subscribe((direction: Direction) => {
+        this.directionChanged$?.next({ charId: id, direction });
+      });
     // gridChar
     //   .positionChangeStarted()
     //   .pipe(takeUntil(this.charRemoved(id)))
@@ -567,7 +567,7 @@ export class GridEngineHeadless {
     // gridChar.destroy();
     this.gridTilemap?.removeCharacter(charId);
     this.gridCharacters?.delete(charId);
-    // this.charRemoved$?.next(charId);
+    this.charRemoved$?.next(charId);
   }
 
   /**
@@ -930,38 +930,42 @@ export class GridEngineHeadless {
   //     )
   //   );
   // }
-  // /**
-  //  * @returns Observable that on each start of a movement will provide the
-  //  *  character ID and the direction.
-  //  */
-  // movementStarted(): Observable<{ charId: string; direction: Direction }> {
-  //   if (!this.movementStarted$) throw this.createUninitializedErr();
-  //   return this.movementStarted$;
-  // }
-  // /**
-  //  * @returns Observable that on each stopped movement of a character will
-  //  *  provide it’s ID and the direction of that movement.
-  //  */
-  // movementStopped(): Observable<{ charId: string; direction: Direction }> {
-  //   if (!this.movementStopped$) throw this.createUninitializedErr();
-  //   return this.movementStopped$;
-  // }
-  // /**
-  //  * @returns Observable that will notify about every change of direction that
-  //  *  is not part of a movement. This is the case if the character tries to walk
-  //  *  towards a blocked tile. The character will turn but not move.
-  //  *  It also emits when you call {@link GridEngine.turnTowards}.
-  //  *
-  //  * This obsersable never emits more than one time in a row for the same
-  //  * direction.
-  //  * So for instance, if {@link GridEngine.turnTowards} is called multiple times
-  //  * in a row (without any facing direction change occurring inbetween) with the
-  //  * same direction, this observable would only emit once.
-  //  */
-  // directionChanged(): Observable<{ charId: string; direction: Direction }> {
-  //   if (!this.directionChanged$) throw this.createUninitializedErr();
-  //   return this.directionChanged$;
-  // }
+
+  /**
+   * @returns Observable that on each start of a movement will provide the
+   *  character ID and the direction.
+   */
+  movementStarted(): Observable<{ charId: string; direction: Direction }> {
+    if (!this.movementStarted$) throw this.createUninitializedErr();
+    return this.movementStarted$;
+  }
+
+  /**
+   * @returns Observable that on each stopped movement of a character will
+   *  provide it’s ID and the direction of that movement.
+   */
+  movementStopped(): Observable<{ charId: string; direction: Direction }> {
+    if (!this.movementStopped$) throw this.createUninitializedErr();
+    return this.movementStopped$;
+  }
+
+  /**
+   * @returns Observable that will notify about every change of direction that
+   *  is not part of a movement. This is the case if the character tries to walk
+   *  towards a blocked tile. The character will turn but not move.
+   *  It also emits when you call {@link GridEngine.turnTowards}.
+   *
+   * This obsersable never emits more than one time in a row for the same
+   * direction.
+   * So for instance, if {@link GridEngine.turnTowards} is called multiple times
+   * in a row (without any facing direction change occurring inbetween) with the
+   * same direction, this observable would only emit once.
+   */
+  directionChanged(): Observable<{ charId: string; direction: Direction }> {
+    if (!this.directionChanged$) throw this.createUninitializedErr();
+    return this.directionChanged$;
+  }
+
   // /**
   //  * @returns Observable that will notify about every change of tile position.
   //  *  It will notify at the beginning of the movement.
@@ -989,13 +993,13 @@ export class GridEngineHeadless {
   //     ...config,
   //   };
   // }
-  // private charRemoved(charId: string): Observable<string> {
-  //   if (!this.charRemoved$) throw this.createUninitializedErr();
-  //   return this.charRemoved$?.pipe(
-  //     take(1),
-  //     filter((cId) => cId == charId)
-  //   );
-  // }
+  private charRemoved(charId: string): Observable<string> {
+    if (!this.charRemoved$) throw this.createUninitializedErr();
+    return this.charRemoved$?.pipe(
+      take(1),
+      filter((cId) => cId == charId)
+    );
+  }
   // private initGuard() {
   //   if (!this.isCreatedInternal) {
   //     throw this.createUninitializedErr();
