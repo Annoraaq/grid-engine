@@ -104,11 +104,13 @@ import {
   createMockLayer,
   createMockLayerData,
   createSpriteMock,
+  mockBlockMapNew,
   MockTilemap,
 } from "./Utils/MockFactory/MockFactory";
 import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
 import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { Tilemap } from "./GridTilemap/Tilemap";
+import { Tilemaps } from "phaser";
 
 describe("GridEngineHeadless", () => {
   let gridEngineHeadless: GridEngineHeadless;
@@ -748,198 +750,156 @@ describe("GridEngineHeadless", () => {
     expect(gridEngineHeadless.hasCharacter("unknownCharId")).toBe(false);
   });
 
-  // it("should follow a char", () => {
-  //   gridEngine.create(tileMapMock, {
-  //     characters: [
-  //       {
-  //         id: "player",
-  //         sprite: playerSpriteMock,
-  //       },
-  //       {
-  //         id: "player2",
-  //         sprite: playerSpriteMock,
-  //       },
-  //     ],
-  //   });
-  //   gridEngine.follow("player", "player2", 7, true);
+  it("should follow a char", () => {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
+      characters: [{ id: "player" }, { id: "player2" }],
+    });
+    gridEngineHeadless.follow("player", "player2", 7, true);
 
-  //   expect(gridEngine.getMovement("player")).toEqual({
-  //     type: "Follow",
-  //     config: {
-  //       charToFollow: "player2",
-  //       distance: 7,
-  //       noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
-  //     },
-  //   });
-  // });
+    expect(gridEngineHeadless.getMovement("player")).toEqual({
+      type: "Follow",
+      config: {
+        charToFollow: "player2",
+        distance: 7,
+        noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+      },
+    });
+  });
 
-  // it("should follow a char with default distance", () => {
-  //   gridEngine.create(tileMapMock, {
-  //     characters: [
-  //       {
-  //         id: "player",
-  //         sprite: playerSpriteMock,
-  //       },
-  //       {
-  //         id: "player2",
-  //         sprite: playerSpriteMock,
-  //       },
-  //     ],
-  //   });
+  it("should follow a char with default distance", () => {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
+      characters: [{ id: "player" }, { id: "player2" }],
+    });
 
-  //   gridEngine.follow("player", "player2");
+    gridEngineHeadless.follow("player", "player2");
 
-  //   expect(gridEngine.getMovement("player")).toEqual({
-  //     type: "Follow",
-  //     config: {
-  //       charToFollow: "player2",
-  //       distance: 0,
-  //       noPathFoundStrategy: NoPathFoundStrategy.STOP,
-  //     },
-  //   });
-  // });
+    expect(gridEngineHeadless.getMovement("player")).toEqual({
+      type: "Follow",
+      config: {
+        charToFollow: "player2",
+        distance: 0,
+        noPathFoundStrategy: NoPathFoundStrategy.STOP,
+      },
+    });
+  });
 
-  // it("should set walkingAnimationMapping", () => {
-  //   const walkingAnimationMappingMock = <any>{};
-  //   gridEngine.setWalkingAnimationMapping(
-  //     "player",
-  //     walkingAnimationMappingMock
-  //   );
+  it("should delegate getFacingDirection", () => {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
+      characters: [{ id: "player" }],
+    });
+    gridEngineHeadless.turnTowards("player", Direction.LEFT);
+    const facingDirection = gridEngineHeadless.getFacingDirection("player");
+    expect(facingDirection).toEqual(Direction.LEFT);
+  });
 
-  //   expect(gridEngine.getWalkingAnimationMapping("player")).toEqual(
-  //     walkingAnimationMappingMock
-  //   );
-  // });
+  it("should delegate getTransition", () => {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
+      characters: [{ id: "player" }],
+    });
+    gridEngineHeadless.setTransition({ x: 3, y: 4 }, "fromLayer", "toLayer");
+    expect(
+      gridEngineHeadless.getTransition({ x: 3, y: 4 }, "fromLayer")
+    ).toEqual("toLayer");
+  });
 
-  // it("should set walkingAnimationMapping after setting char index", () => {
-  //   const walkingAnimationMappingMock = <any>{};
-  //   gridEngine.setWalkingAnimationMapping("player", 1);
-  //   gridEngine.setWalkingAnimationMapping(
-  //     "player",
-  //     walkingAnimationMappingMock
-  //   );
+  it("should block if tile is blocking", () => {
+    gridEngineHeadless.create(
+      // prettier-ignore
+      mockBlockMapNew([
+        "....",
+        "....",
+        "....",
+        "....",
+        "...#"
+      ], 'someLayer'),
+      { characters: [{ id: "player" }] }
+    );
+    expect(
+      gridEngineHeadless.isBlocked({ x: 3, y: 4 }, "someLayer", ["cGroup"])
+    ).toBe(true);
+    expect(gridEngineHeadless.isTileBlocked({ x: 3, y: 4 }, "someLayer")).toBe(
+      true
+    );
+  });
 
-  //   expect(gridEngine.getWalkingAnimationMapping("player")).toEqual(
-  //     walkingAnimationMappingMock
-  //   );
-  // });
+  it("should block if char is blocking", () => {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
+      characters: [
+        { id: "player", startPosition: { x: 3, y: 4 }, charLayer: "someLayer" },
+      ],
+    });
+    const result = gridEngineHeadless.isBlocked({ x: 3, y: 4 }, "someLayer", [
+      "cGroup",
+    ]);
+    expect(result).toBe(true);
+  });
 
-  // it("should set characterIndex", () => {
-  //   gridEngine.setWalkingAnimationMapping("player", 3);
-  //   expect(gridEngine.getWalkingAnimationMapping("player")).toEqual(3);
-  // });
+  it("should not block", () => {
+    gridEngineHeadless.create(
+      // prettier-ignore
+      mockBlockMapNew([
+        "..",
+        ".."
+      ], 'someLayer'),
+      { characters: [{ id: "player" }] }
+    );
+    const result = gridEngineHeadless.isBlocked({ x: 1, y: 1 }, "someLayer", [
+      "cGroup",
+    ]);
+    expect(result).toBe(false);
+  });
 
-  // it("should delegate getFacingDirection", () => {
-  //   gridEngine.turnTowards("player", Direction.LEFT);
-  //   const facingDirection = gridEngine.getFacingDirection("player");
-  //   expect(facingDirection).toEqual(Direction.LEFT);
-  // });
+  it("should check blocking with default cGroup", () => {
+    gridEngineHeadless.create(
+      // prettier-ignore
+      mockBlockMapNew([
+        "..",
+        ".."
+      ], 'someLayer'),
+      {
+        characters: [
+          {
+            id: "player",
+            charLayer: "someLayer",
+            collides: { collisionGroups: ["geDefault"] },
+          },
+        ],
+      }
+    );
+    expect(gridEngineHeadless.isBlocked({ x: 0, y: 0 }, "someLayer")).toBe(
+      true
+    );
+  });
 
-  // it("should delegate getTransition", () => {
-  //   mockGridTileMap.getTransition.mockReturnValue("someLayer");
-  //   expect(gridEngine.getTransition({ x: 3, y: 4 }, "fromLayer")).toEqual(
-  //     "someLayer"
-  //   );
-  // });
+  it("should delegate getCollisionGroups", () => {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
+      characters: [{ id: "player" }],
+    });
+    const collisionGroups = ["someCG"];
+    gridEngineHeadless.setCollisionGroups("player", collisionGroups);
+    expect(gridEngineHeadless.getCollisionGroups("player")).toEqual(
+      collisionGroups
+    );
+  });
 
-  // it("should delegate setTransition", () => {
-  //   gridEngine.setTransition({ x: 3, y: 4 }, "fromLayer", "toLayer");
-  //   expect(mockGridTileMap.setTransition).toHaveBeenCalledWith(
-  //     { x: 3, y: 4 },
-  //     "fromLayer",
-  //     "toLayer"
-  //   );
-  // });
+  it("should get tile pos in direction", () => {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
+      characters: [{ id: "player" }],
+    });
+    const pos = { x: 5, y: 6 };
+    const layer = "charLayer1";
 
-  // it("should block if tile is blocking", () => {
-  //   mockGridTileMap.hasBlockingTile.mockReturnValue(true);
-  //   mockGridTileMap.hasBlockingChar.mockReturnValue(false);
-  //   const result = gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer", [
-  //     "cGroup",
-  //   ]);
-  //   expect(mockGridTileMap.hasBlockingTile).toHaveBeenCalledWith(
-  //     new Vector2(3, 4),
-  //     "someLayer"
-  //   );
-  //   expect(result).toBe(true);
-  // });
+    const tilePosInDir = gridEngineHeadless.getTilePosInDirection(
+      pos,
+      layer,
+      Direction.LEFT
+    );
 
-  // it("should block if char is blocking", () => {
-  //   mockGridTileMap.hasBlockingTile.mockReturnValue(false);
-  //   mockGridTileMap.hasBlockingChar.mockReturnValue(true);
-  //   const result = gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer", [
-  //     "cGroup",
-  //   ]);
-  //   expect(mockGridTileMap.hasBlockingChar).toHaveBeenCalledWith(
-  //     new Vector2(3, 4),
-  //     "someLayer",
-  //     ["cGroup"]
-  //   );
-  //   expect(result).toBe(true);
-  // });
-
-  // it("should not block", () => {
-  //   mockGridTileMap.hasBlockingTile.mockReturnValue(false);
-  //   mockGridTileMap.hasBlockingChar.mockReturnValue(false);
-  //   const result = gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer", [
-  //     "cGroup",
-  //   ]);
-  //   expect(mockGridTileMap.hasBlockingChar).toHaveBeenCalledWith(
-  //     new Vector2(3, 4),
-  //     "someLayer",
-  //     ["cGroup"]
-  //   );
-  //   expect(result).toBe(false);
-  // });
-
-  // it("should check blocking with default cGroup", () => {
-  //   gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer");
-  //   expect(mockGridTileMap.hasBlockingChar).toHaveBeenCalledWith(
-  //     new Vector2(3, 4),
-  //     "someLayer",
-  //     ["geDefault"]
-  //   );
-  // });
-
-  // it("should delegate isTilemapBlocking", () => {
-  //   const result = gridEngine.isTileBlocked({ x: 3, y: 4 }, "someLayer");
-  //   expect(mockGridTileMap.hasBlockingTile).toHaveBeenCalledWith(
-  //     new Vector2(3, 4),
-  //     "someLayer"
-  //   );
-  //   expect(result).toBe(false);
-  // });
-
-  // it("should delegate getCollisionGroups", () => {
-  //   const collisionGroups = ["someCG"];
-  //   gridEngine.setCollisionGroups("player", collisionGroups);
-  //   expect(gridEngine.getCollisionGroups("player")).toEqual(collisionGroups);
-  // });
-
-  // it("should get tile pos in direction", () => {
-  //   const pos = { x: 5, y: 6 };
-  //   const layer = "charLayer1";
-  //   const mockedTileInPos = {
-  //     position: new Vector2(10, 10),
-  //     layer: "someLayer",
-  //   };
-  //   mockGridTileMap.getTilePosInDirection.mockReturnValue(mockedTileInPos);
-
-  //   const tilePosInDir = gridEngine.getTilePosInDirection(
-  //     pos,
-  //     layer,
-  //     Direction.LEFT
-  //   );
-
-  //   expect(tilePosInDir).toEqual({
-  //     position: { x: 10, y: 10 },
-  //     charLayer: "someLayer",
-  //   });
-  //   expect(mockGridTileMap.getTilePosInDirection).toHaveBeenCalledWith(
-  //     { position: new Vector2(5, 6), layer: "charLayer1" },
-  //     Direction.LEFT
-  //   );
-  // });
+    expect(tilePosInDir).toEqual({
+      position: { x: 4, y: 6 },
+      charLayer: layer,
+    });
+  });
 
   // describe("Observables", () => {
   //   it("should get chars movementStarted observable", async () => {

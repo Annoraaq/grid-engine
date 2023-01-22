@@ -256,36 +256,39 @@ export class GridEngineHeadless {
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getTilePos().layer;
   }
-  // /**
-  //  * @returns The character layer that the transition on the given position and
-  //  * character layer leads to.
-  //  *
-  //  * @beta
-  //  */
-  // getTransition(position: Position, fromLayer: string): string | undefined {
-  //   this.initGuard();
-  //   return this.gridTilemap?.getTransition(new Vector2(position), fromLayer);
-  // }
-  // /**
-  //  * Sets the character layer `toLayer` that the transition on position
-  //  * `position` from character layer `fromLayer` should lead to.
-  //  * You can read more about character layers and transitions
-  //  * {@link https://annoraaq.github.io/grid-engine/p/character-layers | here}
-  //  *
-  //  * @param position Position of the new transition
-  //  * @param fromLayer Character layer the new transition should start at
-  //  * @param toLayer Character layer the new transition should lead to
-  //  *
-  //  * @beta
-  //  */
-  // setTransition(position: Position, fromLayer: string, toLayer: string): void {
-  //   this.initGuard();
-  //   return this.gridTilemap?.setTransition(
-  //     new Vector2(position),
-  //     fromLayer,
-  //     toLayer
-  //   );
-  // }
+
+  /**
+   * @returns The character layer that the transition on the given position and
+   * character layer leads to.
+   *
+   * @beta
+   */
+  getTransition(position: Position, fromLayer: string): string | undefined {
+    // this.initGuard();
+    return this.gridTilemap?.getTransition(new Vector2(position), fromLayer);
+  }
+
+  /**
+   * Sets the character layer `toLayer` that the transition on position
+   * `position` from character layer `fromLayer` should lead to.
+   * You can read more about character layers and transitions
+   * {@link https://annoraaq.github.io/grid-engine/p/character-layers | here}
+   *
+   * @param position Position of the new transition
+   * @param fromLayer Character layer the new transition should start at
+   * @param toLayer Character layer the new transition should lead to
+   *
+   * @beta
+   */
+  setTransition(position: Position, fromLayer: string, toLayer: string): void {
+    // this.initGuard();
+    return this.gridTilemap?.setTransition(
+      new Vector2(position),
+      fromLayer,
+      toLayer
+    );
+  }
+
   /**
    * Initializes GridEngine. Must be called before any other methods of
    * GridEngine are called.
@@ -642,33 +645,29 @@ export class GridEngineHeadless {
   //  * to `charIdToFollow` that is reachable from `charId` in case that there does
   //  * not exist a path between `charId` and `charIdToFollow`.
   //  */
-  // follow(
-  //   charId: string,
-  //   charIdToFollow: string,
-  //   distance = 0,
-  //   closestPointIfBlocked = false
-  // ): void {
-  //   this.initGuard();
-  //   const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-  //   const gridCharToFollow = this.gridCharacters
-  //     ?.get(charIdToFollow)
-  //     ?.getGridCharacter();
-  //   if (!gridChar) throw this.createCharUnknownErr(charId);
-  //   if (!gridCharToFollow) throw this.createCharUnknownErr(charIdToFollow);
-  //   if (!this.gridTilemap) throw this.createUninitializedErr();
-  //   const followMovement = new FollowMovement(
-  //     gridChar,
-  //     // TODO remove
-  //     // @ts-ignore
-  //     this.gridTilemap as GridTilemap,
-  //     gridCharToFollow,
-  //     distance,
-  //     closestPointIfBlocked
-  //       ? NoPathFoundStrategy.CLOSEST_REACHABLE
-  //       : NoPathFoundStrategy.STOP
-  //   );
-  //   gridChar.setMovement(followMovement);
-  // }
+  follow(
+    charId: string,
+    charIdToFollow: string,
+    distance = 0,
+    closestPointIfBlocked = false
+  ): void {
+    // this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    const gridCharToFollow = this.gridCharacters?.get(charIdToFollow);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    if (!gridCharToFollow) throw this.createCharUnknownErr(charIdToFollow);
+    if (!this.gridTilemap) throw this.createUninitializedErr();
+    const followMovement = new FollowMovement(
+      gridChar,
+      this.gridTilemap,
+      gridCharToFollow,
+      distance,
+      closestPointIfBlocked
+        ? NoPathFoundStrategy.CLOSEST_REACHABLE
+        : NoPathFoundStrategy.STOP
+    );
+    gridChar.setMovement(followMovement);
+  }
   /**
    * @returns True if the character is currently moving.
    */
@@ -789,16 +788,18 @@ export class GridEngineHeadless {
       this.gridTilemap?.hasBlockingChar(positionVec, layer, collisionGroups)
     );
   }
-  // /**
-  //  * Checks whether the given position is blocked by the tilemap. If you provide
-  //  * no layer, be sure not to use character layers in your tilemap.
-  //  *
-  //  * @returns True if position on given layer is blocked by the tilemap.
-  //  */
-  // isTileBlocked(position: Position, layer?: string): boolean {
-  //   this.initGuard();
-  //   return !!this.gridTilemap?.hasBlockingTile(new Vector2(position), layer);
-  // }
+
+  /**
+   * Checks whether the given position is blocked by the tilemap. If you provide
+   * no layer, be sure not to use character layers in your tilemap.
+   *
+   * @returns True if position on given layer is blocked by the tilemap.
+   */
+  isTileBlocked(position: Position, layer?: string): boolean {
+    // this.initGuard();
+    return !!this.gridTilemap?.hasBlockingTile(new Vector2(position), layer);
+  }
+
   /**
    * Returns all collision groups of the given character.
    * {@link https://annoraaq.github.io/grid-engine/examples/collision-groups | Collision Groups Example}
@@ -811,40 +812,43 @@ export class GridEngineHeadless {
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getCollisionGroups() || [];
   }
-  // /**
-  //  * Sets collision groups for the given character. Previous collision groups
-  //  * will be overwritten.
-  //  */
-  // setCollisionGroups(charId: string, collisionGroups: string[]): void {
-  //   this.initGuard();
-  //   const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-  //   if (!gridChar) throw this.createCharUnknownErr(charId);
-  //   gridChar.setCollisionGroups(collisionGroups);
-  // }
-  // /**
-  //  * Gets the tile position and character layer adjacent to the given
-  //  * position in the given direction.
-  //  */
-  // getTilePosInDirection(
-  //   position: Position,
-  //   charLayer: string | undefined,
-  //   direction: Direction
-  // ): LayerPosition {
-  //   this.initGuard();
-  //   // This can't actually happen, but TypeScript can't know.
-  //   if (!this.gridTilemap) throw this.createUninitializedErr();
-  //   const posInDirection = this.gridTilemap.getTilePosInDirection(
-  //     {
-  //       position: new Vector2(position),
-  //       layer: charLayer,
-  //     },
-  //     direction
-  //   );
-  //   return {
-  //     position: posInDirection.position.toPosition(),
-  //     charLayer: posInDirection.layer,
-  //   };
-  // }
+
+  /**
+   * Sets collision groups for the given character. Previous collision groups
+   * will be overwritten.
+   */
+  setCollisionGroups(charId: string, collisionGroups: string[]): void {
+    // this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.setCollisionGroups(collisionGroups);
+  }
+
+  /**
+   * Gets the tile position and character layer adjacent to the given
+   * position in the given direction.
+   */
+  getTilePosInDirection(
+    position: Position,
+    charLayer: string | undefined,
+    direction: Direction
+  ): LayerPosition {
+    // this.initGuard();
+    // This can't actually happen, but TypeScript can't know.
+    if (!this.gridTilemap) throw this.createUninitializedErr();
+    const posInDirection = this.gridTilemap.getTilePosInDirection(
+      {
+        position: new Vector2(position),
+        layer: charLayer,
+      },
+      direction
+    );
+    return {
+      position: posInDirection.position.toPosition(),
+      charLayer: posInDirection.layer,
+    };
+  }
+
   // /**
   //  * Returns the shortest path from source to destination.
   //  *

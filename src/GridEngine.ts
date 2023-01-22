@@ -172,7 +172,7 @@ export interface CharacterData extends CharacterDataHeadless {
 }
 
 export class GridEngine {
-  private geHeadless: GridEngineHeadless = new GridEngineHeadless();
+  // private geHeadless: GridEngineHeadless = new GridEngineHeadless();
   private config?: Concrete<GridEngineConfig>;
   private gridCharacters?: Map<string, GridCharacterPhaser>;
   private gridTilemap?: GridTilemapPhaser;

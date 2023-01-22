@@ -15,6 +15,13 @@ export const LOWER_CHAR_LAYER = "lowerCharLayer";
 export const HIGHER_CHAR_LAYER = "testCharLayer";
 export const COLLISION_GROUP = "testCollisionGroup";
 
+export class MockTile implements Tile {
+  constructor(private properties: Record<string, string> = {}) {}
+  getProperties(): Record<string, string> {
+    return this.properties;
+  }
+}
+
 export class MockTilemap implements Tilemap {
   constructor(
     private layers: TileLayer[] = [],
@@ -43,9 +50,8 @@ export class MockTilemap implements Tilemap {
     return true;
   }
   getTileAt(x: number, y: number, layer?: string): Tile | undefined {
-    return {
-      getProperties: () => ({}),
-    };
+    const l = this.layers.find((l) => l.getName() === layer);
+    return l?.getData()[y]?.[x];
   }
   copyLayer(layer: TileLayer, newName: string, row: number): TileLayer {
     return new MockTileLayer();
@@ -61,7 +67,7 @@ class MockTileLayer implements TileLayer {
     private width: number = 5,
     private scale: number = 1,
     private tilesets: string[] = [],
-    private data: Tile[][] = []
+    private data: Tile[][] = [[]]
   ) {}
   getProperties(): Record<string, string> {
     return this.properties;
@@ -256,6 +262,64 @@ export function mockRandomMap(
     map[row] = rowStr.join("");
   }
   mockBlockMap(tilemapMock, map);
+}
+
+function getBlockingProps(char: string): Record<string, string> {
+  switch (char) {
+    case "#":
+      return {
+        ge_collide: "true",
+      };
+    case "→":
+      return {
+        ge_collide_up: "true",
+        ge_collide_right: "true",
+        ge_collide_down: "true",
+      };
+    case "←":
+      return {
+        ge_collide_up: "true",
+        ge_collide_down: "true",
+        ge_collide_left: "true",
+      };
+    case "↑":
+      return {
+        ge_collide_up: "true",
+        ge_collide_right: "true",
+        ge_collide_left: "true",
+      };
+    case "↓":
+      return {
+        ge_collide_right: "true",
+        ge_collide_down: "true",
+        ge_collide_left: "true",
+      };
+  }
+  return {};
+}
+
+export function mockBlockMapNew(
+  blockMap: string[],
+  charLayer?: string
+): Tilemap {
+  const data: Tile[][] = [];
+  for (let r = 0; r < blockMap.length; r++) {
+    const row: Tile[] = [];
+    for (let c = 0; c < blockMap[r].length; c++) {
+      row.push(new MockTile(getBlockingProps(blockMap[r][c])));
+    }
+    data.push(row);
+  }
+  const layer = new MockTileLayer(
+    "default",
+    charLayer ? { ge_charLayer: charLayer } : {},
+    blockMap.length,
+    blockMap[0].length,
+    1,
+    [],
+    data
+  );
+  return new MockTilemap([layer]);
 }
 
 export function mockBlockMap(
