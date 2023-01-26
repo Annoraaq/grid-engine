@@ -1,63 +1,7 @@
-import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { take } from "rxjs/operators";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { GridCharacter } from "./GridCharacter/GridCharacter";
 import { Vector2 } from "./Utils/Vector2/Vector2";
-
-const mockFollowMovement = {
-  setCharacter: jest.fn(),
-  update: jest.fn(),
-  getInfo: jest.fn(),
-};
-const mockGridTileMap = {
-  addCharacter: jest.fn(),
-  removeCharacter: jest.fn(),
-  getCharactersAt: jest.fn(),
-  getTileWidth: () => 32,
-  getTileSize: jest.fn().mockReturnValue(new Vector2(32, 32)),
-  getTileHeight: () => 32,
-  getTransition: jest.fn(),
-  getTransitions: jest.fn().mockReturnValue(new Map()),
-  setTransition: jest.fn(),
-  isIsometric: jest.fn().mockReturnValue(false),
-  hasBlockingTile: jest.fn().mockReturnValue(false),
-  tilePosToPixelPos: jest.fn().mockReturnValue(new Vector2(0, 0)),
-  toMapDirection: jest.fn(),
-  hasBlockingChar: jest.fn().mockReturnValue(false),
-  getDepthOfCharLayer: jest.fn().mockReturnValue(0),
-  getTileDistance: jest.fn().mockReturnValue(new Vector2(1, 1)),
-  isInRange: jest.fn(),
-  getTilePosInDirection: jest.fn(),
-  getGridTilemap: jest.fn(),
-};
-mockGridTileMap.getGridTilemap.mockReturnValue(mockGridTileMap);
-const mockGridTilemapConstructor = jest.fn(function (
-  _tilemap,
-  _firstLayerAboveChar?
-) {
-  return mockGridTileMap;
-});
-
-const mockPathfinding = {
-  findShortestPath: jest.fn().mockReturnValue({
-    path: [],
-    closestToTarget: { position: { x: 0, y: 0 }, charLayer: undefined },
-  }),
-};
-
-const mockPathfindingConstructor = jest.fn(function (
-  _shortestPathAlgorithm,
-  _gridTilemap
-) {
-  return mockPathfinding;
-});
-
-const mockNewSprite = {
-  setCrop: jest.fn(),
-  setOrigin: jest.fn(),
-  setDepth: jest.fn(),
-  scale: 1,
-};
 
 expect.extend({
   toBeCharacter(receivedChar: GridCharacter, expectedCharId: string) {
@@ -78,45 +22,21 @@ expect.extend({
   },
 });
 
-jest.mock(
-  "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser",
-  function () {
-    return {
-      GridTilemapPhaser: mockGridTilemapConstructor,
-    };
-  }
-);
-
-jest.mock("./Pathfinding/Pathfinding", function () {
-  return {
-    Pathfinding: mockPathfindingConstructor,
-  };
-});
-
 jest.mock("../package.json", () => ({
   version: "GRID.ENGINE.VERSION",
 }));
 
-import { GridEngine, GridEngineHeadless } from "./GridEngine";
+import { GridEngineHeadless } from "./GridEngine";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import {
   createMockLayer,
-  createMockLayerData,
-  createSpriteMock,
   mockBlockMapNew,
   MockTilemap,
 } from "./Utils/MockFactory/MockFactory";
-import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
-import { GridTilemap } from "./GridTilemap/GridTilemap";
-import { Tilemap } from "./GridTilemap/Tilemap";
-import { Tilemaps } from "phaser";
 
 describe("GridEngineHeadless", () => {
   let gridEngineHeadless: GridEngineHeadless;
-  let sceneMock;
-  let tileMapMock;
-  let playerSpriteMock;
   let consoleLogBackup;
 
   afterEach(() => {
@@ -126,78 +46,7 @@ describe("GridEngineHeadless", () => {
 
   beforeEach(() => {
     consoleLogBackup = console.log;
-    console.log = jest.fn();
-
-    // hacky way of avoiding errors in Plugin Initialization because Phaser
-    // is not mockable by jest
-    sceneMock = {
-      sys: { events: { once: jest.fn(), on: jest.fn() } },
-      add: { sprite: jest.fn().mockReturnValue(mockNewSprite) },
-    };
-    tileMapMock = {
-      getLayers: jest.fn(() => [
-        createMockLayer({
-          tilemapLayer: { scale: 2, setDepth: jest.fn() },
-        }),
-      ]),
-      hasTileAt: jest.fn().mockReturnValue(true),
-      getTileAt: jest.fn().mockReturnValue(true),
-      tileWidth: 16,
-      tileHeight: 16,
-      getOrientation: jest.fn(() => "orthogonal"),
-    };
-    playerSpriteMock = {
-      x: 10,
-      y: 12,
-      displayWidth: 20,
-      displayHeight: 40,
-      width: 20,
-      setOrigin: jest.fn(),
-      texture: {
-        source: [{ width: 240 }],
-      },
-      setFrame: jest.fn(function (name) {
-        this.frame.name = name;
-      }),
-      setDepth: jest.fn(),
-      scale: 2,
-      frame: {
-        name: "1",
-      },
-    } as any;
-    mockFollowMovement.setCharacter.mockReset();
-    mockFollowMovement.update.mockReset();
-    mockGridTileMap.hasBlockingTile.mockReturnValue(false);
-    mockGridTileMap.toMapDirection.mockReturnValue(Direction.LEFT);
-    mockGridTileMap.getTransition.mockReturnValue(undefined);
-    mockGridTileMap.isIsometric.mockReturnValue(false);
-
     gridEngineHeadless = new GridEngineHeadless();
-    // gridEngineHeadless.create(tileMapMock, {
-    //   characters: [
-    //     {
-    //       id: "player",
-    //       sprite: playerSpriteMock,
-    //       walkingAnimationMapping: 0,
-    //     },
-    //   ],
-    // });
-  });
-
-  xit("should init tilemap", () => {
-    //   gridEngineHeadless.create(tileMapMock, {
-    //     characters: [
-    //       {
-    //         id: "player",
-    //         sprite: playerSpriteMock,
-    //       },
-    //     ],
-    //   });
-    //   expect(mockGridTilemapConstructor).toHaveBeenCalledWith(
-    //     new PhaserTilemap(tileMapMock),
-    //     "ge_collide",
-    //     CollisionStrategy.BLOCK_TWO_TILES
-    //   );
   });
 
   it("should init player", () => {
@@ -213,7 +62,7 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should init player with collisionGroups", () => {
-    gridEngineHeadless.create(tileMapMock, {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
       characters: [
         {
           id: "player",
@@ -232,7 +81,7 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should init player with facingDirection", () => {
-    gridEngineHeadless.create(tileMapMock, {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
       characters: [
         {
           id: "player",
@@ -246,7 +95,7 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should use config startPosition", () => {
-    gridEngineHeadless.create(tileMapMock, {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
       characters: [
         {
           id: "player",
@@ -258,7 +107,7 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should use config speed", () => {
-    gridEngineHeadless.create(tileMapMock, {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
       characters: [
         {
           id: "player",
@@ -271,7 +120,7 @@ describe("GridEngineHeadless", () => {
 
   describe("collision config", () => {
     it("should use config collides", () => {
-      gridEngineHeadless.create(tileMapMock, {
+      gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
         characters: [
           {
             id: "player",
@@ -284,7 +133,7 @@ describe("GridEngineHeadless", () => {
     });
 
     it("should use config collidesWithTiles true", () => {
-      gridEngineHeadless.create(tileMapMock, {
+      gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
         characters: [
           {
             id: "player",
@@ -301,7 +150,7 @@ describe("GridEngineHeadless", () => {
     });
 
     it("should use config collidesWithTiles false", () => {
-      gridEngineHeadless.create(tileMapMock, {
+      gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
         characters: [
           {
             id: "player",
@@ -318,7 +167,7 @@ describe("GridEngineHeadless", () => {
     });
 
     it("should use config collisionGroups", () => {
-      gridEngineHeadless.create(tileMapMock, {
+      gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
         characters: [
           {
             id: "player",
@@ -334,7 +183,7 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should use config char layer", () => {
-    gridEngineHeadless.create(tileMapMock, {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
       characters: [
         {
           id: "player",
@@ -679,7 +528,7 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should add chars on the go", () => {
-    gridEngineHeadless.create(tileMapMock, {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
       characters: [],
     });
     gridEngineHeadless.addCharacter({
@@ -738,7 +587,7 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should get all chars at position", () => {
-    gridEngineHeadless.create(tileMapMock, {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
       characters: [
         {
           id: "player",
@@ -906,14 +755,7 @@ describe("GridEngineHeadless", () => {
 
   describe("Observables", () => {
     it("should get chars movementStarted observable", async () => {
-      gridEngineHeadless.create(
-        // prettier-ignore
-        mockBlockMapNew([
-          "..",
-          ".."
-        ]),
-        { characters: [{ id: "player" }] }
-      );
+      createDefaultGridEngine();
       const prom = gridEngineHeadless
         .movementStarted()
         .pipe(take(1))
@@ -926,14 +768,7 @@ describe("GridEngineHeadless", () => {
     });
 
     it("should unsubscribe from movementStarted if char removed", () => {
-      gridEngineHeadless.create(
-        // prettier-ignore
-        mockBlockMapNew([
-          "..",
-          ".."
-        ]),
-        { characters: [{ id: "player" }] }
-      );
+      createDefaultGridEngine();
 
       const nextMock = jest.fn();
       gridEngineHeadless.movementStarted().subscribe({
@@ -951,14 +786,7 @@ describe("GridEngineHeadless", () => {
     });
 
     it("should get chars movementStopped observable", async () => {
-      gridEngineHeadless.create(
-        // prettier-ignore
-        mockBlockMapNew([
-          "..",
-          ".."
-        ]),
-        { characters: [{ id: "player" }] }
-      );
+      createDefaultGridEngine();
 
       const prom = gridEngineHeadless
         .movementStopped()
@@ -975,14 +803,7 @@ describe("GridEngineHeadless", () => {
     });
 
     it("should unsubscribe from movementStopped if char removed", () => {
-      gridEngineHeadless.create(
-        // prettier-ignore
-        mockBlockMapNew([
-          "..",
-          ".."
-        ]),
-        { characters: [{ id: "player" }] }
-      );
+      createDefaultGridEngine();
 
       const nextMock = jest.fn();
       gridEngineHeadless.movementStopped().subscribe({
@@ -999,14 +820,7 @@ describe("GridEngineHeadless", () => {
     });
 
     it("should get chars directionChanged observable", async () => {
-      gridEngineHeadless.create(
-        // prettier-ignore
-        mockBlockMapNew([
-          "..",
-          ".."
-        ]),
-        { characters: [{ id: "player" }] }
-      );
+      createDefaultGridEngine();
 
       const prom = gridEngineHeadless
         .directionChanged()
@@ -1021,566 +835,579 @@ describe("GridEngineHeadless", () => {
       });
     });
 
-    // it("should get chars positionChangeStarted observable", async () => {
-    //   mockGridTileMap.toMapDirection.mockReturnValue(Direction.LEFT);
-    //   gridEngine.create(tileMapMock, {
-    //     characters: [
-    //       {
-    //         id: "player",
-    //         sprite: playerSpriteMock,
-    //       },
-    //     ],
-    //   });
+    it("should get chars positionChangeStarted observable", async () => {
+      createDefaultGridEngine();
 
-    //   const prom = gridEngine.positionChangeStarted().pipe(take(1)).toPromise();
+      const prom = gridEngineHeadless
+        .positionChangeStarted()
+        .pipe(take(1))
+        .toPromise();
 
-    //   gridEngine.move("player", Direction.LEFT);
+      gridEngineHeadless.move("player", Direction.RIGHT);
 
-    //   expect(await prom).toEqual({
-    //     charId: "player",
-    //     exitTile: new Vector2(0, 0),
-    //     enterTile: new Vector2(-1, 0),
-    //     enterLayer: undefined,
-    //     exitLayer: undefined,
-    //   });
-    // });
+      expect(await prom).toEqual({
+        charId: "player",
+        exitTile: new Vector2(0, 0),
+        enterTile: new Vector2(1, 0),
+        enterLayer: undefined,
+        exitLayer: undefined,
+      });
+    });
 
-    // it("should get chars positionChangeFinished observable", async () => {
-    //   mockGridTileMap.toMapDirection.mockReturnValue(Direction.LEFT);
-    //   gridEngine.create(tileMapMock, {
-    //     characters: [
-    //       {
-    //         id: "player",
-    //         sprite: playerSpriteMock,
-    //       },
-    //     ],
-    //   });
+    it("should get chars positionChangeFinished observable", async () => {
+      createDefaultGridEngine();
 
-    //   const prom = gridEngine
-    //     .positionChangeFinished()
-    //     .pipe(take(1))
-    //     .toPromise();
+      const prom = gridEngineHeadless
+        .positionChangeFinished()
+        .pipe(take(1))
+        .toPromise();
 
-    //   gridEngine.move("player", Direction.LEFT);
-    //   gridEngine.update(2000, 1000);
-    //   gridEngine.update(2000, 1000);
+      gridEngineHeadless.move("player", Direction.RIGHT);
+      gridEngineHeadless.update(2000, 1000);
+      gridEngineHeadless.update(2000, 1000);
 
-    //   const res = await prom;
-    //   expect(res).toEqual({
-    //     charId: "player",
-    //     exitTile: new Vector2(0, 0),
-    //     enterTile: new Vector2(-1, 0),
-    //     enterLayer: undefined,
-    //     exitLayer: undefined,
-    //   });
-    // });
+      const res = await prom;
+      expect(res).toEqual({
+        charId: "player",
+        exitTile: new Vector2(0, 0),
+        enterTile: new Vector2(1, 0),
+        enterLayer: undefined,
+        exitLayer: undefined,
+      });
+    });
 
-    // it("should emit when a character is added or removed", () => {
-    //   const player1 = "player1";
-    //   const player2 = "player2";
-    //   const nextMock = jest.fn();
+    it("should emit when a character is added or removed", () => {
+      const player1 = "player1";
+      const player2 = "player2";
+      const nextMock = jest.fn();
 
-    //   gridEngine.create(tileMapMock, {
-    //     characters: [
-    //       {
-    //         id: player1,
-    //         sprite: playerSpriteMock,
-    //       },
-    //     ],
-    //   });
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMapNew([
+            "..",
+            ".."
+          ]),
+        {
+          characters: [{ id: player1 }, { id: player2 }],
+        }
+      );
 
-    //   gridEngine.characterShifted().subscribe({
-    //     complete: jest.fn(),
-    //     next: nextMock,
-    //   });
+      gridEngineHeadless.characterShifted().subscribe({
+        complete: jest.fn(),
+        next: nextMock,
+      });
 
-    //   gridEngine.addCharacter({ id: player2, sprite: playerSpriteMock });
-    //   expect(nextMock).toHaveBeenCalledWith(
-    //     expect.objectContaining({
-    //       charId: player2,
-    //       action: "ADDED",
-    //     })
-    //   );
+      gridEngineHeadless.addCharacter({ id: player2 });
+      expect(nextMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          charId: player2,
+          action: "ADDED",
+        })
+      );
 
-    //   gridEngine.removeCharacter(player1);
-    //   expect(nextMock).toHaveBeenCalledWith(
-    //     expect.objectContaining({
-    //       charId: player1,
-    //       action: "REMOVED",
-    //     })
-    //   );
+      gridEngineHeadless.removeCharacter(player1);
+      expect(nextMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          charId: player1,
+          action: "REMOVED",
+        })
+      );
 
-    //   gridEngine.addCharacter({ id: player1, sprite: playerSpriteMock });
-    //   expect(nextMock).toHaveBeenCalledWith(
-    //     expect.objectContaining({
-    //       charId: player1,
-    //       action: "ADDED",
-    //     })
-    //   );
-    // });
+      gridEngineHeadless.addCharacter({ id: player1 });
+      expect(nextMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          charId: player1,
+          action: "ADDED",
+        })
+      );
+    });
 
-    // describe("steppedOn", () => {
-    //   let nextMock;
-    //   const player = "player1";
-    //   const nonMatchingChar = "non matching char";
-    //   const expectedLayer = "anyLayer";
-    //   const expectedTargetPosition = new Vector2(5, 5);
-    //   beforeEach(() => {
-    //     nextMock = jest.fn();
-    //     gridEngine.create(tileMapMock, {
-    //       characters: [
-    //         {
-    //           id: player,
-    //           sprite: playerSpriteMock,
-    //         },
-    //         {
-    //           id: nonMatchingChar,
-    //           sprite: playerSpriteMock,
-    //         },
-    //       ],
-    //     });
-    //     gridEngine
-    //       .steppedOn([player], [expectedTargetPosition], [expectedLayer])
-    //       .subscribe({
-    //         complete: jest.fn(),
-    //         next: nextMock,
-    //       });
-    //   });
+    describe("steppedOn", () => {
+      let nextMock;
+      const player = "player1";
+      const nonMatchingChar = "non matching char";
+      const expectedLayer = "anyLayer";
+      const expectedTargetPosition = new Vector2(1, 1);
+      beforeEach(() => {
+        nextMock = jest.fn();
+        gridEngineHeadless.create(
+          // prettier-ignore
+          mockBlockMapNew([
+            "..",
+            ".."
+          ], "anyLayer"),
+          {
+            characters: [{ id: player }, { id: nonMatchingChar }],
+          }
+        );
+        gridEngineHeadless
+          .steppedOn([player], [expectedTargetPosition], [expectedLayer])
+          .subscribe({
+            complete: jest.fn(),
+            next: nextMock,
+          });
+      });
 
-    //   it("should notify if character stepped on tile", () => {
-    //     gridEngine.setPosition(player, new Vector2(4, 5), expectedLayer);
-    //     mockGridTileMap.toMapDirection.mockReturnValue(Direction.RIGHT);
-    //     gridEngine.move(player, Direction.RIGHT);
-    //     gridEngine.update(2000, 300);
+      it("should notify if character stepped on tile", () => {
+        gridEngineHeadless.setPosition(
+          player,
+          new Vector2(0, 1),
+          expectedLayer
+        );
 
-    //     expect(nextMock).toHaveBeenCalledWith(
-    //       expect.objectContaining({
-    //         enterTile: expectedTargetPosition,
-    //       })
-    //     );
-    //   });
+        gridEngineHeadless.move(player, Direction.RIGHT);
+        gridEngineHeadless.update(2000, 300);
+        console.warn(gridEngineHeadless.isMoving(player));
 
-    //   it("should not notify if character stepped on tile with non matching layer", () => {
-    //     gridEngine.setPosition(player, new Vector2(4, 5), "not matching layer");
-    //     gridEngine.move(player, Direction.RIGHT);
-    //     gridEngine.update(2000, 300);
+        expect(nextMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            enterTile: expectedTargetPosition,
+          })
+        );
+      });
 
-    //     expect(nextMock).not.toHaveBeenCalledWith(
-    //       expect.objectContaining({
-    //         enterTile: expectedTargetPosition,
-    //       })
-    //     );
-    //   });
+      it("should not notify if character stepped on tile with non matching layer", () => {
+        gridEngineHeadless.setPosition(
+          player,
+          new Vector2(0, 1),
+          "not matching layer"
+        );
+        gridEngineHeadless.move(player, Direction.RIGHT);
+        gridEngineHeadless.update(2000, 300);
 
-    //   it("should not notify if character stepped on tile with non matching char", () => {
-    //     gridEngine.setPosition(
-    //       nonMatchingChar,
-    //       new Vector2(4, 5),
-    //       expectedLayer
-    //     );
-    //     gridEngine.move(nonMatchingChar, Direction.RIGHT);
-    //     gridEngine.update(2000, 300);
+        expect(nextMock).not.toHaveBeenCalledWith(
+          expect.objectContaining({
+            enterTile: expectedTargetPosition,
+          })
+        );
+      });
 
-    //     expect(nextMock).not.toHaveBeenCalledWith(
-    //       expect.objectContaining({
-    //         enterTile: expectedTargetPosition,
-    //       })
-    //     );
-    //   });
+      it("should not notify if character stepped on tile with non matching char", () => {
+        gridEngineHeadless.setPosition(
+          nonMatchingChar,
+          new Vector2(0, 1),
+          expectedLayer
+        );
+        gridEngineHeadless.move(nonMatchingChar, Direction.RIGHT);
+        gridEngineHeadless.update(2000, 300);
 
-    //   it("should not notify if character stepped on tile with non matching tile", () => {
-    //     gridEngine.setPosition(
-    //       player,
-    //       new Vector2(10, 10), // non matching tile
-    //       expectedLayer
-    //     );
-    //     gridEngine.move(player, Direction.RIGHT);
-    //     gridEngine.update(2000, 300);
+        expect(nextMock).not.toHaveBeenCalledWith(
+          expect.objectContaining({
+            enterTile: expectedTargetPosition,
+          })
+        );
+      });
 
-    //     expect(nextMock).not.toHaveBeenCalledWith(
-    //       expect.objectContaining({
-    //         enterTile: expectedTargetPosition,
-    //       })
-    //     );
-    //   });
-    // });
+      it("should not notify if character stepped on tile with non matching tile", () => {
+        gridEngineHeadless.setPosition(
+          player,
+          new Vector2(1, 0), // non matching tile
+          expectedLayer
+        );
+        gridEngineHeadless.move(player, Direction.RIGHT);
+        gridEngineHeadless.update(2000, 300);
 
-    // it("should unsubscribe from positionChangeFinished if char removed", () => {
-    //   gridEngine.create(tileMapMock, {
-    //     characters: [
-    //       {
-    //         id: "player",
-    //         sprite: playerSpriteMock,
-    //       },
-    //     ],
-    //   });
+        expect(nextMock).not.toHaveBeenCalledWith(
+          expect.objectContaining({
+            enterTile: expectedTargetPosition,
+          })
+        );
+      });
+    });
 
-    //   const nextMock = jest.fn();
-    //   gridEngine.positionChangeFinished().subscribe({
-    //     complete: jest.fn(),
-    //     next: nextMock,
-    //   });
+    it("should unsubscribe from positionChangeFinished if char removed", () => {
+      createDefaultGridEngine();
+      const nextMock = jest.fn();
+      gridEngineHeadless.positionChangeFinished().subscribe({
+        complete: jest.fn(),
+        next: nextMock,
+      });
 
-    //   gridEngine.move("player", Direction.LEFT);
-    //   gridEngine.removeCharacter("player");
-    //   gridEngine.update(2000, 1000);
-    //   gridEngine.update(2000, 1000);
-    //   expect(nextMock).not.toHaveBeenCalled();
-    // });
+      gridEngineHeadless.move("player", Direction.LEFT);
+      gridEngineHeadless.removeCharacter("player");
+      gridEngineHeadless.update(2000, 1000);
+      gridEngineHeadless.update(2000, 1000);
+      expect(nextMock).not.toHaveBeenCalled();
+    });
   });
 
-  // describe("labels", () => {
-  //   it("should add labels on creation", () => {
-  //     gridEngine.create(tileMapMock, {
-  //       characters: [
-  //         {
-  //           id: "player",
-  //           labels: ["someLabel", "someOtherLabel"],
-  //         },
-  //       ],
-  //     });
-  //     expect(gridEngine.getLabels("player")).toEqual([
-  //       "someLabel",
-  //       "someOtherLabel",
-  //     ]);
-  //   });
+  describe("labels", () => {
+    it("should add labels on creation", () => {
+      gridEngineHeadless.create(mockBlockMapNew(["."]), {
+        characters: [
+          {
+            id: "player",
+            labels: ["someLabel", "someOtherLabel"],
+          },
+        ],
+      });
+      expect(gridEngineHeadless.getLabels("player")).toEqual([
+        "someLabel",
+        "someOtherLabel",
+      ]);
+    });
 
-  //   it("should add labels", () => {
-  //     expect(gridEngine.getLabels("player")).toEqual([]);
-  //     gridEngine.addLabels("player", ["someLabel", "someOtherLabel"]);
-  //     expect(gridEngine.getLabels("player")).toEqual([
-  //       "someLabel",
-  //       "someOtherLabel",
-  //     ]);
-  //   });
+    it("should add labels", () => {
+      createDefaultGridEngine();
+      expect(gridEngineHeadless.getLabels("player")).toEqual([]);
+      gridEngineHeadless.addLabels("player", ["someLabel", "someOtherLabel"]);
+      expect(gridEngineHeadless.getLabels("player")).toEqual([
+        "someLabel",
+        "someOtherLabel",
+      ]);
+    });
 
-  //   it("should remove labels", () => {
-  //     expect(gridEngine.getLabels("player")).toEqual([]);
-  //     gridEngine.addLabels("player", ["label1", "label2", "label3"]);
-  //     gridEngine.removeLabels("player", ["label1", "label3"]);
-  //     expect(gridEngine.getLabels("player")).toEqual(["label2"]);
-  //   });
+    it("should remove labels", () => {
+      createDefaultGridEngine();
+      expect(gridEngineHeadless.getLabels("player")).toEqual([]);
+      gridEngineHeadless.addLabels("player", ["label1", "label2", "label3"]);
+      gridEngineHeadless.removeLabels("player", ["label1", "label3"]);
+      expect(gridEngineHeadless.getLabels("player")).toEqual(["label2"]);
+    });
 
-  //   it("should clear labels", () => {
-  //     gridEngine.addLabels("player", ["label1", "label2", "label3"]);
-  //     gridEngine.clearLabels("player");
-  //     expect(gridEngine.getLabels("player")).toEqual([]);
-  //   });
+    it("should clear labels", () => {
+      createDefaultGridEngine();
+      gridEngineHeadless.addLabels("player", ["label1", "label2", "label3"]);
+      gridEngineHeadless.clearLabels("player");
+      expect(gridEngineHeadless.getLabels("player")).toEqual([]);
+    });
 
-  //   it("should get all characters with specific labels", () => {
-  //     gridEngine.create(tileMapMock, {
-  //       characters: [
-  //         {
-  //           id: "player1",
-  //           labels: ["label1", "label2"],
-  //         },
-  //         {
-  //           id: "player2",
-  //           labels: ["label2"],
-  //         },
-  //         {
-  //           id: "player3",
-  //           labels: [],
-  //         },
-  //       ],
-  //     });
+    it("should get all characters with specific labels", () => {
+      gridEngineHeadless.create(mockBlockMapNew(["."]), {
+        characters: [
+          {
+            id: "player1",
+            labels: ["label1", "label2"],
+          },
+          {
+            id: "player2",
+            labels: ["label2"],
+          },
+          {
+            id: "player3",
+            labels: [],
+          },
+        ],
+      });
 
-  //     expect(
-  //       gridEngine.getAllCharacters({
-  //         labels: { withOneOfLabels: ["label1", "label2"] },
-  //       })
-  //     ).toEqual(["player1", "player2"]);
+      expect(
+        gridEngineHeadless.getAllCharacters({
+          labels: { withOneOfLabels: ["label1", "label2"] },
+        })
+      ).toEqual(["player1", "player2"]);
 
-  //     expect(
-  //       gridEngine.getAllCharacters({
-  //         labels: { withAllLabels: ["label1", "label2"] },
-  //       })
-  //     ).toEqual(["player1"]);
+      expect(
+        gridEngineHeadless.getAllCharacters({
+          labels: { withAllLabels: ["label1", "label2"] },
+        })
+      ).toEqual(["player1"]);
 
-  //     expect(
-  //       gridEngine.getAllCharacters({
-  //         labels: { withNoneLabels: ["label1", "label2"] },
-  //       })
-  //     ).toEqual(["player3"]);
+      expect(
+        gridEngineHeadless.getAllCharacters({
+          labels: { withNoneLabels: ["label1", "label2"] },
+        })
+      ).toEqual(["player3"]);
 
-  //     expect(
-  //       gridEngine.getAllCharacters({
-  //         labels: {
-  //           withAllLabels: ["label1", "label2"],
-  //           withOneOfLabels: ["label1", "label2"],
-  //           withNoneLabels: ["label1", "label2"],
-  //         },
-  //       })
-  //     ).toEqual(["player1"]);
+      expect(
+        gridEngineHeadless.getAllCharacters({
+          labels: {
+            withAllLabels: ["label1", "label2"],
+            withOneOfLabels: ["label1", "label2"],
+            withNoneLabels: ["label1", "label2"],
+          },
+        })
+      ).toEqual(["player1"]);
 
-  //     expect(
-  //       gridEngine.getAllCharacters({
-  //         labels: {
-  //           withOneOfLabels: ["label1", "label2"],
-  //           withNoneLabels: ["label1", "label2"],
-  //         },
-  //       })
-  //     ).toEqual(["player1", "player2"]);
+      expect(
+        gridEngineHeadless.getAllCharacters({
+          labels: {
+            withOneOfLabels: ["label1", "label2"],
+            withNoneLabels: ["label1", "label2"],
+          },
+        })
+      ).toEqual(["player1", "player2"]);
 
-  //     expect(
-  //       gridEngine.getAllCharacters({
-  //         labels: {
-  //           withAllLabels: ["label1", "label2"],
-  //           withNoneLabels: ["label1", "label2"],
-  //         },
-  //       })
-  //     ).toEqual(["player1"]);
-  //   });
-  // });
+      expect(
+        gridEngineHeadless.getAllCharacters({
+          labels: {
+            withAllLabels: ["label1", "label2"],
+            withNoneLabels: ["label1", "label2"],
+          },
+        })
+      ).toEqual(["player1"]);
+    });
+  });
 
-  // describe("pathfinding", () => {
-  //   it("should delegate to pathfinding", () => {
-  //     gridEngine.create(tileMapMock, {
-  //       characters: [
-  //         {
-  //           id: "player",
-  //         },
-  //       ],
-  //     });
-  //     const source = { position: { x: 1, y: 2 }, charLayer: "sourceCharLayer" };
-  //     const dest = { position: { x: 10, y: 20 }, charLayer: "destCharLayer" };
-  //     const options = { pathWidth: 2 };
+  describe("pathfinding", () => {
+    it("should delegate to pathfinding", () => {
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMapNew([
+        ".####",
+        ".####",
+        ".....",
+        "####.",
+        "####.",
+      ], "charLayer"),
+        { characters: [{ id: "player" }] }
+      );
+      const source = layerPos(0, 0, "charLayer");
+      const dest = layerPos(4, 4, "charLayer");
+      const options = { pathWidth: 1 };
 
-  //     const mockRes = {
-  //       path: [{ position: new Vector2(1, 2), layer: "sourceCharLayer" }],
-  //       closestToTarget: {
-  //         position: new Vector2(1, 2),
-  //         layer: "sourceCharLayer",
-  //       },
-  //     };
-  //     mockPathfinding.findShortestPath.mockReturnValue(mockRes);
-  //     const res = gridEngine.findShortestPath(source, dest, options);
-  //     expect(mockPathfinding.findShortestPath).toHaveBeenCalledWith(
-  //       { position: new Vector2(1, 2), layer: "sourceCharLayer" },
-  //       { position: new Vector2(10, 20), layer: "destCharLayer" },
-  //       options
-  //     );
+      const res = gridEngineHeadless.findShortestPath(source, dest, options);
 
-  //     expect(res).toEqual({
-  //       path: [source],
-  //       closestToTarget: source,
-  //     });
-  //   });
-  // });
+      expect(res).toEqual({
+        path: [
+          layerPos(0, 0, "charLayer"),
+          layerPos(0, 1, "charLayer"),
+          layerPos(0, 2, "charLayer"),
+          layerPos(1, 2, "charLayer"),
+          layerPos(2, 2, "charLayer"),
+          layerPos(3, 2, "charLayer"),
+          layerPos(4, 2, "charLayer"),
+          layerPos(4, 3, "charLayer"),
+          layerPos(4, 4, "charLayer"),
+        ],
+        closestToTarget: layerPos(4, 4, "charLayer"),
+      });
+    });
 
-  // describe("Error Handling unknown char id", () => {
-  //   const UNKNOWN_CHAR_ID = "unknownCharId";
+    function layerPos(x: number, y: number, charLayer: string) {
+      return {
+        position: { x, y },
+        charLayer,
+      };
+    }
+  });
 
-  //   function expectCharUnknownException(fn: () => any) {
-  //     expect(() => fn()).toThrow("Character unknown");
-  //   }
+  describe("Error Handling unknown char id", () => {
+    const UNKNOWN_CHAR_ID = "unknownCharId";
+    beforeEach(() => {
+      createDefaultGridEngine();
+    });
 
-  //   it("should throw error if char id unknown", () => {
-  //     expectCharUnknownException(() => gridEngine.getPosition(UNKNOWN_CHAR_ID));
-  //     expectCharUnknownException(() =>
-  //       gridEngine.setPosition(UNKNOWN_CHAR_ID, new Vector2(1, 2))
-  //     );
-  //     expectCharUnknownException(() =>
-  //       gridEngine.move(UNKNOWN_CHAR_ID, Direction.LEFT)
-  //     );
-  //     expectCharUnknownException(() =>
-  //       gridEngine.moveRandomly(UNKNOWN_CHAR_ID)
-  //     );
-  //     expectCharUnknownException(() =>
-  //       gridEngine.stopMovement(UNKNOWN_CHAR_ID)
-  //     );
-  //     expectCharUnknownException(() => gridEngine.setSpeed(UNKNOWN_CHAR_ID, 4));
-  //     expectCharUnknownException(() =>
-  //       gridEngine.moveTo(UNKNOWN_CHAR_ID, new Vector2(3, 4))
-  //     );
-  //     expectCharUnknownException(() =>
-  //       gridEngine.removeCharacter(UNKNOWN_CHAR_ID)
-  //     );
+    function expectCharUnknownException(fn: () => any) {
+      expect(() => fn()).toThrow("Character unknown");
+    }
 
-  //     expectCharUnknownException(() =>
-  //       gridEngine.setWalkingAnimationMapping(UNKNOWN_CHAR_ID, <any>{})
-  //     );
-  //     expectCharUnknownException(() => gridEngine.isMoving(UNKNOWN_CHAR_ID));
-  //     expectCharUnknownException(() =>
-  //       gridEngine.getFacingDirection(UNKNOWN_CHAR_ID)
-  //     );
-  //     expectCharUnknownException(() =>
-  //       gridEngine.turnTowards(UNKNOWN_CHAR_ID, Direction.LEFT)
-  //     );
-  //     expectCharUnknownException(() =>
-  //       gridEngine.setSprite(UNKNOWN_CHAR_ID, playerSpriteMock)
-  //     );
-  //     expectCharUnknownException(() => gridEngine.getSprite(UNKNOWN_CHAR_ID));
-  //     expectCharUnknownException(() =>
-  //       gridEngine.getFacingPosition(UNKNOWN_CHAR_ID)
-  //     );
-  //     expectCharUnknownException(() =>
-  //       gridEngine.getCharLayer(UNKNOWN_CHAR_ID)
-  //     );
-  //     expectCharUnknownException(() =>
-  //       gridEngine.getCollisionGroups(UNKNOWN_CHAR_ID)
-  //     );
-  //     expectCharUnknownException(() =>
-  //       gridEngine.setCollisionGroups(UNKNOWN_CHAR_ID, ["cGroup"])
-  //     );
-  //     expectCharUnknownException(() =>
-  //       gridEngine.getWalkingAnimationMapping(UNKNOWN_CHAR_ID)
-  //     );
-  //     expectCharUnknownException(() =>
-  //       gridEngine.collidesWithTiles(UNKNOWN_CHAR_ID)
-  //     );
-  //     expectCharUnknownException(() => gridEngine.getOffsetY(UNKNOWN_CHAR_ID));
-  //     expectCharUnknownException(() => gridEngine.getOffsetX(UNKNOWN_CHAR_ID));
-  //     expectCharUnknownException(() =>
-  //       gridEngine.getContainer(UNKNOWN_CHAR_ID)
-  //     );
-  //     expectCharUnknownException(() => gridEngine.getSpeed(UNKNOWN_CHAR_ID));
-  //     expectCharUnknownException(() => gridEngine.getMovement(UNKNOWN_CHAR_ID));
-  //     expectCharUnknownException(() => gridEngine.getLabels(UNKNOWN_CHAR_ID));
-  //     expectCharUnknownException(() =>
-  //       gridEngine.addLabels(UNKNOWN_CHAR_ID, ["label"])
-  //     );
-  //     expectCharUnknownException(() =>
-  //       gridEngine.removeLabels(UNKNOWN_CHAR_ID, ["label"])
-  //     );
-  //     expectCharUnknownException(() => gridEngine.clearLabels(UNKNOWN_CHAR_ID));
-  //   });
+    it("should throw error if char id unknown", () => {
+      expectCharUnknownException(() =>
+        gridEngineHeadless.getPosition(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.setPosition(UNKNOWN_CHAR_ID, new Vector2(1, 2))
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.move(UNKNOWN_CHAR_ID, Direction.LEFT)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.moveRandomly(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.stopMovement(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.setSpeed(UNKNOWN_CHAR_ID, 4)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.moveTo(UNKNOWN_CHAR_ID, new Vector2(3, 4))
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.removeCharacter(UNKNOWN_CHAR_ID)
+      );
 
-  //   it("should throw error if follow is invoked", () => {
-  //     expect(() => gridEngine.follow("unknownCharId", "player")).toThrow(
-  //       "Character unknown"
-  //     );
-  //     expect(() => gridEngine.follow("player", "unknownCharId")).toThrow(
-  //       "Character unknown"
-  //     );
-  //     expect(() => gridEngine.follow("unknownCharId", "unknownCharId")).toThrow(
-  //       "Character unknown"
-  //     );
-  //   });
-  // });
+      expectCharUnknownException(() =>
+        gridEngineHeadless.isMoving(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.getFacingDirection(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.turnTowards(UNKNOWN_CHAR_ID, Direction.LEFT)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.getFacingPosition(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.getCharLayer(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.getCollisionGroups(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.setCollisionGroups(UNKNOWN_CHAR_ID, ["cGroup"])
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.collidesWithTiles(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.getSpeed(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.getMovement(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.getLabels(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.addLabels(UNKNOWN_CHAR_ID, ["label"])
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.removeLabels(UNKNOWN_CHAR_ID, ["label"])
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.clearLabels(UNKNOWN_CHAR_ID)
+      );
+    });
 
-  // describe("invokation of methods if not created properly", () => {
-  //   const SOME_CHAR_ID = "someCharId";
+    it("should throw error if follow is invoked", () => {
+      expect(() =>
+        gridEngineHeadless.follow("unknownCharId", "player")
+      ).toThrow("Character unknown");
+      expect(() =>
+        gridEngineHeadless.follow("player", "unknownCharId")
+      ).toThrow("Character unknown");
+      expect(() =>
+        gridEngineHeadless.follow("unknownCharId", "unknownCharId")
+      ).toThrow("Character unknown");
+    });
+  });
 
-  //   beforeEach(() => {
-  //     gridEngine = new GridEngine(sceneMock);
-  //   });
+  describe("invokation of methods if not created properly", () => {
+    const SOME_CHAR_ID = "someCharId";
 
-  //   function expectUninitializedException(fn: () => any) {
-  //     expect(() => fn()).toThrow("Plugin not initialized");
-  //   }
+    beforeEach(() => {
+      gridEngineHeadless = new GridEngineHeadless();
+    });
 
-  //   it("should throw error if plugin not created", () => {
-  //     expectUninitializedException(() => gridEngine.getPosition(SOME_CHAR_ID));
-  //     expectUninitializedException(() =>
-  //       gridEngine.setPosition(SOME_CHAR_ID, new Vector2(1, 2))
-  //     );
-  //     expectUninitializedException(() =>
-  //       gridEngine.move(SOME_CHAR_ID, Direction.LEFT)
-  //     );
-  //     expectUninitializedException(() => gridEngine.moveRandomly(SOME_CHAR_ID));
-  //     expectUninitializedException(() =>
-  //       gridEngine.moveTo(SOME_CHAR_ID, new Vector2(2, 3))
-  //     );
-  //     expectUninitializedException(() => gridEngine.stopMovement(SOME_CHAR_ID));
-  //     expectUninitializedException(() => gridEngine.setSpeed(SOME_CHAR_ID, 3));
-  //     expectUninitializedException(() =>
-  //       gridEngine.addCharacter({
-  //         id: "player",
-  //         sprite: playerSpriteMock,
-  //       })
-  //     );
-  //     expectUninitializedException(() => gridEngine.hasCharacter(SOME_CHAR_ID));
-  //     expectUninitializedException(() =>
-  //       gridEngine.removeCharacter(SOME_CHAR_ID)
-  //     );
-  //     expectUninitializedException(() => gridEngine.removeAllCharacters());
-  //     expectUninitializedException(() =>
-  //       gridEngine.follow(SOME_CHAR_ID, "someOtherCharId")
-  //     );
-  //     expectUninitializedException(() =>
-  //       gridEngine.setWalkingAnimationMapping(SOME_CHAR_ID, <any>{})
-  //     );
-  //     expectUninitializedException(() => gridEngine.isMoving(SOME_CHAR_ID));
-  //     expectUninitializedException(() =>
-  //       gridEngine.getFacingDirection(SOME_CHAR_ID)
-  //     );
-  //     expectUninitializedException(() =>
-  //       gridEngine.turnTowards(SOME_CHAR_ID, Direction.LEFT)
-  //     );
-  //     expectUninitializedException(() => gridEngine.getAllCharacters());
-  //     expectUninitializedException(() =>
-  //       gridEngine.setSprite(SOME_CHAR_ID, playerSpriteMock)
-  //     );
-  //     expectUninitializedException(() => gridEngine.getSprite(SOME_CHAR_ID));
-  //     expectUninitializedException(() =>
-  //       gridEngine.getFacingPosition(SOME_CHAR_ID)
-  //     );
-  //     expectUninitializedException(() => gridEngine.getCharLayer(SOME_CHAR_ID));
-  //     expectUninitializedException(() =>
-  //       gridEngine.getTransition(new Vector2({ x: 2, y: 2 }), "someLayer")
-  //     );
-  //     expectUninitializedException(() =>
-  //       gridEngine.setTransition(
-  //         new Vector2({ x: 2, y: 2 }),
-  //         "fromLayer",
-  //         "toLayer"
-  //       )
-  //     );
-  //     expectUninitializedException(() =>
-  //       gridEngine.isBlocked({ x: 2, y: 2 }, "someLayer")
-  //     );
-  //     expectUninitializedException(() =>
-  //       gridEngine.isTileBlocked({ x: 2, y: 2 }, "someLayer")
-  //     );
-  //     expectUninitializedException(() =>
-  //       gridEngine.getCollisionGroups(SOME_CHAR_ID)
-  //     );
-  //     expectUninitializedException(() =>
-  //       gridEngine.setCollisionGroups(SOME_CHAR_ID, ["cGroup"])
-  //     );
-  //     expectUninitializedException(() =>
-  //       gridEngine.getWalkingAnimationMapping(SOME_CHAR_ID)
-  //     );
-  //     expectUninitializedException(() =>
-  //       gridEngine.collidesWithTiles(SOME_CHAR_ID)
-  //     );
-  //     expectUninitializedException(() => gridEngine.getOffsetY(SOME_CHAR_ID));
-  //     expectUninitializedException(() => gridEngine.getOffsetX(SOME_CHAR_ID));
-  //     expectUninitializedException(() => gridEngine.getContainer(SOME_CHAR_ID));
-  //     expectUninitializedException(() => gridEngine.getSpeed(SOME_CHAR_ID));
-  //     expectUninitializedException(() => gridEngine.getMovement(SOME_CHAR_ID));
-  //     expectUninitializedException(() => gridEngine.getLabels(SOME_CHAR_ID));
-  //     expectUninitializedException(() =>
-  //       gridEngine.addLabels(SOME_CHAR_ID, ["label"])
-  //     );
-  //     expectUninitializedException(() =>
-  //       gridEngine.removeLabels(SOME_CHAR_ID, ["label"])
-  //     );
-  //     expectUninitializedException(() => gridEngine.clearLabels(SOME_CHAR_ID));
-  //     expectUninitializedException(() =>
-  //       gridEngine.getTilePosInDirection(
-  //         { x: 2, y: 2 },
-  //         undefined,
-  //         Direction.DOWN
-  //       )
-  //     );
-  //     expectUninitializedException(() =>
-  //       gridEngine.findShortestPath(
-  //         { position: { x: 2, y: 2 }, charLayer: undefined },
-  //         { position: { x: 2, y: 2 }, charLayer: undefined }
-  //       )
-  //     );
-  //   });
-  // });
+    function expectUninitializedException(fn: () => any) {
+      expect(() => fn()).toThrow("GridEngine not initialized");
+    }
 
-  // it("logs version", () => {
-  //   gridEngine = new GridEngine(sceneMock);
+    it("should throw error if plugin not created", () => {
+      expectUninitializedException(() =>
+        gridEngineHeadless.getPosition(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.setPosition(SOME_CHAR_ID, new Vector2(1, 2))
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.move(SOME_CHAR_ID, Direction.LEFT)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.moveRandomly(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.moveTo(SOME_CHAR_ID, new Vector2(2, 3))
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.stopMovement(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.setSpeed(SOME_CHAR_ID, 3)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.addCharacter({ id: "player" })
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.hasCharacter(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.removeCharacter(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.removeAllCharacters()
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.follow(SOME_CHAR_ID, "someOtherCharId")
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.isMoving(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.getFacingDirection(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.turnTowards(SOME_CHAR_ID, Direction.LEFT)
+      );
+      expectUninitializedException(() => gridEngineHeadless.getAllCharacters());
+      expectUninitializedException(() =>
+        gridEngineHeadless.getFacingPosition(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.getCharLayer(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.getTransition(
+          new Vector2({ x: 2, y: 2 }),
+          "someLayer"
+        )
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.setTransition(
+          new Vector2({ x: 2, y: 2 }),
+          "fromLayer",
+          "toLayer"
+        )
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.isBlocked({ x: 2, y: 2 }, "someLayer")
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.isTileBlocked({ x: 2, y: 2 }, "someLayer")
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.getCollisionGroups(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.setCollisionGroups(SOME_CHAR_ID, ["cGroup"])
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.collidesWithTiles(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.getSpeed(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.getMovement(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.getLabels(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.addLabels(SOME_CHAR_ID, ["label"])
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.removeLabels(SOME_CHAR_ID, ["label"])
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.clearLabels(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.getTilePosInDirection(
+          { x: 2, y: 2 },
+          undefined,
+          Direction.DOWN
+        )
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.findShortestPath(
+          { position: { x: 2, y: 2 }, charLayer: undefined },
+          { position: { x: 2, y: 2 }, charLayer: undefined }
+        )
+      );
+    });
+  });
 
-  //   expect(console.log).toHaveBeenCalledWith(
-  //     "Using GridEngine vGRID.ENGINE.VERSION"
-  //   );
-  // });
+  it("logs version", () => {
+    console.log = jest.fn();
+    gridEngineHeadless = new GridEngineHeadless();
+
+    expect(console.log).toHaveBeenCalledWith(
+      "Using GridEngine vGRID.ENGINE.VERSION"
+    );
+  });
 
   function createDefaultGridEngine() {
     gridEngineHeadless.create(

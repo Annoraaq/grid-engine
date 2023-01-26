@@ -1,4 +1,3 @@
-import { GridCharacterPhaser } from "./GridEnginePhaser/GridCharacterPhaser/GridCharacterPhaser";
 import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import {
@@ -39,8 +38,6 @@ import {
 } from "./Pathfinding/Pathfinding";
 import { LayerPositionUtils } from "./Utils/LayerPositionUtils/LayerPositionUtils";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
-import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
-import { GridTilemapPhaser } from "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser";
 import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { Tilemap } from "./GridTilemap/Tilemap";
 
@@ -236,22 +233,24 @@ export class GridEngineHeadless {
   private movementStopped$?: Subject<{ charId: string; direction: Direction }>;
   private movementStarted$?: Subject<{ charId: string; direction: Direction }>;
   private directionChanged$?: Subject<{ charId: string; direction: Direction }>;
-  // private positionChangeStarted$?: Subject<{ charId: string } & PositionChange>;
-  // private positionChangeFinished$?: Subject<
-  //   { charId: string } & PositionChange
-  // >;
+  private positionChangeStarted$?: Subject<{ charId: string } & PositionChange>;
+  private positionChangeFinished$?: Subject<
+    { charId: string } & PositionChange
+  >;
   private charRemoved$?: Subject<string>;
-  // private charAdded$?: Subject<string>;
-  // constructor() {
-  //   console.log(`Using GridEngine v${VERSION}`);
-  // }
+  private charAdded$?: Subject<string>;
+
+  constructor() {
+    console.log(`Using GridEngine v${VERSION}`);
+  }
+
   /**
    * Returns the character layer of the given character.
    * You can read more about character layers and transitions
    * {@link https://annoraaq.github.io/grid-engine/p/character-layers | here}
    */
   getCharLayer(charId: string): string | undefined {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getTilePos().layer;
@@ -264,7 +263,7 @@ export class GridEngineHeadless {
    * @beta
    */
   getTransition(position: Position, fromLayer: string): string | undefined {
-    // this.initGuard();
+    this.initGuard();
     return this.gridTilemap?.getTransition(new Vector2(position), fromLayer);
   }
 
@@ -281,7 +280,7 @@ export class GridEngineHeadless {
    * @beta
    */
   setTransition(position: Position, fromLayer: string, toLayer: string): void {
-    // this.initGuard();
+    this.initGuard();
     return this.gridTilemap?.setTransition(
       new Vector2(position),
       fromLayer,
@@ -310,14 +309,14 @@ export class GridEngineHeadless {
       charId: string;
       direction: Direction;
     }>();
-    // this.positionChangeStarted$ = new Subject<
-    //   { charId: string } & PositionChange
-    // >();
-    // this.positionChangeFinished$ = new Subject<
-    //   { charId: string } & PositionChange
-    // >();
+    this.positionChangeStarted$ = new Subject<
+      { charId: string } & PositionChange
+    >();
+    this.positionChangeFinished$ = new Subject<
+      { charId: string } & PositionChange
+    >();
     this.charRemoved$ = new Subject<string>();
-    // this.charAdded$ = new Subject<string>();
+    this.charAdded$ = new Subject<string>();
     this.gridTilemap = new GridTilemap(
       tilemap,
       this.config.collisionTilePropertyName,
@@ -330,7 +329,7 @@ export class GridEngineHeadless {
    * @returns The tile position of the character with the given id
    */
   getPosition(charId: string): Position {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getTilePos().position;
@@ -359,7 +358,7 @@ export class GridEngineHeadless {
    * route is neither blocked nor outside of the radius).
    */
   moveRandomly(charId: string, delay = 0, radius = -1): void {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     const randomMovement = new RandomMovement(gridChar, delay, radius);
@@ -371,7 +370,7 @@ export class GridEngineHeadless {
    * random movement, follow movement and target movement)
    */
   getMovement(charId: string): MovementInfo {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     const movement = gridChar.getMovement();
@@ -398,7 +397,7 @@ export class GridEngineHeadless {
     config?: MoveToConfig
   ): Observable<{ charId: string } & Finished> {
     const moveToConfig = this.assembleMoveToConfig(config);
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     if (!this.gridTilemap) throw this.createUninitializedErr();
@@ -431,7 +430,7 @@ export class GridEngineHeadless {
    * specified position ({@link moveTo})
    */
   stopMovement(charId: string): void {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     gridChar.setMovement(undefined);
@@ -439,7 +438,7 @@ export class GridEngineHeadless {
 
   /** Sets the speed in tiles per second for a character. */
   setSpeed(charId: string, speed: number): void {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     gridChar.setSpeed(speed);
@@ -447,7 +446,7 @@ export class GridEngineHeadless {
 
   /** @returns Speed in tiles per second for a character. */
   getSpeed(charId: string): number {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getSpeed();
@@ -455,7 +454,7 @@ export class GridEngineHeadless {
 
   /** @returns Whether character collides with tiles */
   collidesWithTiles(charId: string): boolean {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.collidesWithTiles();
@@ -471,7 +470,6 @@ export class GridEngineHeadless {
 
   /** Adds a character after calling {@link create}. */
   addCharacter(charData: CharacterData): void {
-    // this.initGuard();
     if (!this.gridTilemap) throw this.createUninitializedErr();
     if (!this.config) throw this.createUninitializedErr();
 
@@ -531,29 +529,29 @@ export class GridEngineHeadless {
       .subscribe((direction: Direction) => {
         this.directionChanged$?.next({ charId: id, direction });
       });
-    // gridChar
-    //   .positionChangeStarted()
-    //   .pipe(takeUntil(this.charRemoved(id)))
-    //   .subscribe((positionChange: PositionChange) => {
-    //     this.positionChangeStarted$?.next({
-    //       charId: id,
-    //       ...positionChange,
-    //     });
-    //   });
-    // gridChar
-    //   .positionChangeFinished()
-    //   .pipe(takeUntil(this.charRemoved(id)))
-    //   .subscribe((positionChange: PositionChange) => {
-    //     this.positionChangeFinished$?.next({
-    //       charId: id,
-    //       ...positionChange,
-    //     });
-    //   });
-    // this.charAdded$?.next(id);
+    gridChar
+      .positionChangeStarted()
+      .pipe(takeUntil(this.charRemoved(id)))
+      .subscribe((positionChange: PositionChange) => {
+        this.positionChangeStarted$?.next({
+          charId: id,
+          ...positionChange,
+        });
+      });
+    gridChar
+      .positionChangeFinished()
+      .pipe(takeUntil(this.charRemoved(id)))
+      .subscribe((positionChange: PositionChange) => {
+        this.positionChangeFinished$?.next({
+          charId: id,
+          ...positionChange,
+        });
+      });
+    this.charAdded$?.next(id);
   }
   /** Checks whether a character with the given ID is registered. */
   hasCharacter(charId: string): boolean {
-    // this.initGuard();
+    this.initGuard();
     return !!this.gridCharacters?.has(charId);
   }
   /**
@@ -561,10 +559,9 @@ export class GridEngineHeadless {
    * Please note that the corresponding sprites need to be remove separately.
    */
   removeCharacter(charId: string): void {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
-    // gridChar.destroy();
     this.gridTilemap?.removeCharacter(charId);
     this.gridCharacters?.delete(charId);
     this.charRemoved$?.next(charId);
@@ -575,7 +572,7 @@ export class GridEngineHeadless {
    * Please note that the corresponding sprites need to be remove separately.
    */
   removeAllCharacters(): void {
-    // this.initGuard();
+    this.initGuard();
     if (!this.gridCharacters) return;
     for (const charId of this.gridCharacters.keys()) {
       this.removeCharacter(charId);
@@ -587,7 +584,7 @@ export class GridEngineHeadless {
    * the provided filtering options.
    */
   getAllCharacters(options?: CharacterFilteringOptions): string[] {
-    // this.initGuard();
+    this.initGuard();
     if (!this.gridCharacters) return [];
     const allChars = [...this.gridCharacters.values()];
     const filteredChars = options
@@ -600,38 +597,42 @@ export class GridEngineHeadless {
    * @returns All labels, attached to the character.
    */
   getLabels(charId: string): string[] {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getLabels();
   }
-  // /**
-  //  * Add labels to the character.
-  //  */
-  // addLabels(charId: string, labels: string[]): void {
-  //   this.initGuard();
-  //   const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-  //   if (!gridChar) throw this.createCharUnknownErr(charId);
-  //   gridChar.addLabels(labels);
-  // }
-  // /**
-  //  * Remove labels from the character.
-  //  */
-  // removeLabels(charId: string, labels: string[]): void {
-  //   this.initGuard();
-  //   const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-  //   if (!gridChar) throw this.createCharUnknownErr(charId);
-  //   gridChar.removeLabels(labels);
-  // }
-  // /**
-  //  * Removes all labels from the character.
-  //  */
-  // clearLabels(charId: string): void {
-  //   this.initGuard();
-  //   const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-  //   if (!gridChar) throw this.createCharUnknownErr(charId);
-  //   gridChar.clearLabels();
-  // }
+
+  /**
+   * Add labels to the character.
+   */
+  addLabels(charId: string, labels: string[]): void {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.addLabels(labels);
+  }
+
+  /**
+   * Remove labels from the character.
+   */
+  removeLabels(charId: string, labels: string[]): void {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.removeLabels(labels);
+  }
+
+  /**
+   * Removes all labels from the character.
+   */
+  clearLabels(charId: string): void {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.clearLabels();
+  }
+
   // /**
   //  * Character `charId` will start to walk towards `charIdToFollow` on a
   //  * shortest path until it reaches the specified `distance`.
@@ -651,7 +652,7 @@ export class GridEngineHeadless {
     distance = 0,
     closestPointIfBlocked = false
   ): void {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     const gridCharToFollow = this.gridCharacters?.get(charIdToFollow);
     if (!gridChar) throw this.createCharUnknownErr(charId);
@@ -672,7 +673,7 @@ export class GridEngineHeadless {
    * @returns True if the character is currently moving.
    */
   isMoving(charId: string): boolean {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.isMoving();
@@ -682,7 +683,7 @@ export class GridEngineHeadless {
    *  this is `down`.
    */
   getFacingDirection(charId: string): Direction {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getFacingDirection();
@@ -692,7 +693,7 @@ export class GridEngineHeadless {
    * @returns Position the character is currently facing.
    */
   getFacingPosition(charId: string): Position {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     const vectorPos = gridChar.getFacingPosition();
@@ -703,7 +704,7 @@ export class GridEngineHeadless {
    * Turns the character towards the given direction without moving it.
    */
   turnTowards(charId: string, direction: Direction): void {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.turnTowards(direction);
@@ -731,7 +732,7 @@ export class GridEngineHeadless {
    * will also emit.
    */
   setPosition(charId: string, pos: Position, layer?: string): void {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     if (!layer) {
@@ -742,32 +743,7 @@ export class GridEngineHeadless {
     }
     gridChar.setTilePosition({ position: new Vector2(pos), layer });
   }
-  // /**
-  //  * @returns Sprite of given character
-  //  */
-  // getSprite(charId: string): Phaser.GameObjects.Sprite | undefined {
-  //   this.initGuard();
-  //   const gridCharPhaser = this.gridCharacters?.get(charId);
-  //   const gridChar = gridCharPhaser?.getGridCharacter();
-  //   if (!gridChar) throw this.createCharUnknownErr(charId);
-  //   return gridCharPhaser?.getSprite();
-  // }
-  // /**
-  //  * Sets the sprite for a character.
-  //  */
-  // setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void {
-  //   this.initGuard();
-  //   const gridCharPhaser = this.gridCharacters?.get(charId);
-  //   if (!gridCharPhaser) throw this.createCharUnknownErr(charId);
-  //   sprite.setOrigin(0, 0);
-  //   this.setCharSprite(sprite, gridCharPhaser);
-  // }
-  // private setCharSprite(
-  //   sprite: Phaser.GameObjects.Sprite,
-  //   gridCharPhaser: GridCharacterPhaser
-  // ) {
-  //   gridCharPhaser.setSprite(sprite);
-  // }
+
   /**
    * Checks whether the given position is blocked by either the tilemap or a
    * blocking character. If you provide no layer, be sure not to use character
@@ -781,7 +757,7 @@ export class GridEngineHeadless {
     layer?: string,
     collisionGroups: string[] = ["geDefault"]
   ): boolean {
-    // this.initGuard();
+    this.initGuard();
     const positionVec = new Vector2(position);
     return !!(
       this.gridTilemap?.hasBlockingTile(positionVec, layer) ||
@@ -796,7 +772,7 @@ export class GridEngineHeadless {
    * @returns True if position on given layer is blocked by the tilemap.
    */
   isTileBlocked(position: Position, layer?: string): boolean {
-    // this.initGuard();
+    this.initGuard();
     return !!this.gridTilemap?.hasBlockingTile(new Vector2(position), layer);
   }
 
@@ -807,7 +783,7 @@ export class GridEngineHeadless {
    * @returns All collision groups of the given character.
    */
   getCollisionGroups(charId: string): string[] {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getCollisionGroups() || [];
@@ -818,7 +794,7 @@ export class GridEngineHeadless {
    * will be overwritten.
    */
   setCollisionGroups(charId: string, collisionGroups: string[]): void {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     gridChar.setCollisionGroups(collisionGroups);
@@ -833,8 +809,6 @@ export class GridEngineHeadless {
     charLayer: string | undefined,
     direction: Direction
   ): LayerPosition {
-    // this.initGuard();
-    // This can't actually happen, but TypeScript can't know.
     if (!this.gridTilemap) throw this.createUninitializedErr();
     const posInDirection = this.gridTilemap.getTilePosInDirection(
       {
@@ -849,87 +823,82 @@ export class GridEngineHeadless {
     };
   }
 
-  // /**
-  //  * Returns the shortest path from source to destination.
-  //  *
-  //  * @param source Source position
-  //  * @param dest Destination position
-  //  * @param options Pathfinding options
-  //  * @returns Shortest path. In case that no path could be found,
-  //  * `closestToTarget` is a position with a minimum distance to the target.
-  //  *
-  //  * @alpha
-  //  */
-  // findShortestPath(
-  //   source: LayerPosition,
-  //   dest: LayerPosition,
-  //   options: PathfindingOptions = {}
-  // ): { path: LayerPosition[]; closestToTarget: LayerPosition } {
-  //   this.initGuard();
-  //   // This can't actually happen, but TypeScript can't know.
-  //   if (!this.gridTilemap) throw this.createUninitializedErr();
-  //   const pathfinding = new Pathfinding(
-  //     "BFS",
-  //     // TODO remove
-  //     // @ts-ignore
-  //     this.gridTilemap as GridTilemap
-  //   );
-  //   const res = pathfinding.findShortestPath(
-  //     LayerPositionUtils.toInternal(source),
-  //     LayerPositionUtils.toInternal(dest),
-  //     options
-  //   );
-  //   return {
-  //     path: res.path.map(LayerPositionUtils.fromInternal),
-  //     closestToTarget: LayerPositionUtils.fromInternal(res.closestToTarget),
-  //   };
-  // }
-  // /**
-  //  * @returns Observable that, whenever a specified position is entered on optionally provided layers,
-  //  *  will notify with the target characters position change
-  //  */
-  // steppedOn(
-  //   charIds: string[],
-  //   tiles: Position[],
-  //   layer?: CharLayer[]
-  // ): Observable<
-  //   {
-  //     charId: string;
-  //   } & PositionChange
-  // > {
-  //   return this.positionChangeFinished().pipe(
-  //     filter(
-  //       (t) =>
-  //         charIds.includes(t.charId) &&
-  //         tiles.some(
-  //           (target) => target.x === t.enterTile.x && target.y === t.enterTile.y
-  //         ) &&
-  //         (layer === undefined || layer.includes(t.enterLayer))
-  //     )
-  //   );
-  // }
-  // /**
-  //  * @returns Observable that emits when a new character is added or an existing is removed.
-  //  */
-  // characterShifted(): Observable<CharacterShift> {
-  //   if (!this.charAdded$ || !this.charRemoved$) {
-  //     throw this.createUninitializedErr();
-  //   }
-  //   return this.charAdded$.pipe(
-  //     map((c) => ({
-  //       charId: c,
-  //       action: CharacterShiftAction.ADDED,
-  //     })),
-  //     mergeWith(
-  //       this.charRemoved$.pipe(
-  //         map((c) => ({
-  //           charId: c,
-  //           action: CharacterShiftAction.REMOVED,
-  //         }))
-  //       )
-  //     )
-  //   );
-  // }
+  /**
+   * Returns the shortest path from source to destination.
+   *
+   * @param source Source position
+   * @param dest Destination position
+   * @param options Pathfinding options
+   * @returns Shortest path. In case that no path could be found,
+   * `closestToTarget` is a position with a minimum distance to the target.
+   *
+   * @alpha
+   */
+  findShortestPath(
+    source: LayerPosition,
+    dest: LayerPosition,
+    options: PathfindingOptions = {}
+  ): { path: LayerPosition[]; closestToTarget: LayerPosition } {
+    if (!this.gridTilemap) throw this.createUninitializedErr();
+    const pathfinding = new Pathfinding("BFS", this.gridTilemap);
+    const res = pathfinding.findShortestPath(
+      LayerPositionUtils.toInternal(source),
+      LayerPositionUtils.toInternal(dest),
+      options
+    );
+    return {
+      path: res.path.map(LayerPositionUtils.fromInternal),
+      closestToTarget: LayerPositionUtils.fromInternal(res.closestToTarget),
+    };
+  }
+
+  /**
+   * @returns Observable that, whenever a specified position is entered on optionally provided layers,
+   *  will notify with the target characters position change
+   */
+  steppedOn(
+    charIds: string[],
+    tiles: Position[],
+    layer?: CharLayer[]
+  ): Observable<
+    {
+      charId: string;
+    } & PositionChange
+  > {
+    return this.positionChangeFinished().pipe(
+      filter(
+        (t) =>
+          charIds.includes(t.charId) &&
+          tiles.some(
+            (target) => target.x === t.enterTile.x && target.y === t.enterTile.y
+          ) &&
+          (layer === undefined || layer.includes(t.enterLayer))
+      )
+    );
+  }
+
+  /**
+   * @returns Observable that emits when a new character is added or an existing is removed.
+   */
+  characterShifted(): Observable<CharacterShift> {
+    if (!this.charAdded$ || !this.charRemoved$) {
+      throw this.createUninitializedErr();
+    }
+    return this.charAdded$.pipe(
+      map((c) => ({
+        charId: c,
+        action: CharacterShiftAction.ADDED,
+      })),
+      mergeWith(
+        this.charRemoved$.pipe(
+          map((c) => ({
+            charId: c,
+            action: CharacterShiftAction.REMOVED,
+          }))
+        )
+      )
+    );
+  }
 
   /**
    * @returns Observable that on each start of a movement will provide the
@@ -966,33 +935,24 @@ export class GridEngineHeadless {
     return this.directionChanged$;
   }
 
-  // /**
-  //  * @returns Observable that will notify about every change of tile position.
-  //  *  It will notify at the beginning of the movement.
-  //  */
-  // positionChangeStarted(): Observable<{ charId: string } & PositionChange> {
-  //   if (!this.positionChangeStarted$) throw this.createUninitializedErr();
-  //   return this.positionChangeStarted$;
-  // }
-  // /**
-  //  * @returns Observable that will notify about every change of tile position.
-  //  *  It will notify at the end of the movement.
-  //  */
-  // positionChangeFinished(): Observable<{ charId: string } & PositionChange> {
-  //   if (!this.positionChangeFinished$) throw this.createUninitializedErr();
-  //   return this.positionChangeFinished$;
-  // }
-  // private setConfigDefaults(
-  //   config: GridEngineConfig
-  // ): Concrete<GridEngineConfig> {
-  //   return {
-  //     collisionTilePropertyName: "ge_collide",
-  //     numberOfDirections: NumberOfDirections.FOUR,
-  //     characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-  //     layerOverlay: false,
-  //     ...config,
-  //   };
-  // }
+  /**
+   * @returns Observable that will notify about every change of tile position.
+   *  It will notify at the beginning of the movement.
+   */
+  positionChangeStarted(): Observable<{ charId: string } & PositionChange> {
+    if (!this.positionChangeStarted$) throw this.createUninitializedErr();
+    return this.positionChangeStarted$;
+  }
+
+  /**
+   * @returns Observable that will notify about every change of tile position.
+   *  It will notify at the end of the movement.
+   */
+  positionChangeFinished(): Observable<{ charId: string } & PositionChange> {
+    if (!this.positionChangeFinished$) throw this.createUninitializedErr();
+    return this.positionChangeFinished$;
+  }
+
   private charRemoved(charId: string): Observable<string> {
     if (!this.charRemoved$) throw this.createUninitializedErr();
     return this.charRemoved$?.pipe(
@@ -1000,11 +960,12 @@ export class GridEngineHeadless {
       filter((cId) => cId == charId)
     );
   }
-  // private initGuard() {
-  //   if (!this.isCreatedInternal) {
-  //     throw this.createUninitializedErr();
-  //   }
-  // }
+  private initGuard() {
+    if (!this.isCreatedInternal) {
+      throw this.createUninitializedErr();
+    }
+  }
+
   private createUninitializedErr() {
     throw new Error(
       "GridEngine not initialized. You need to call create() first."
@@ -1016,7 +977,7 @@ export class GridEngineHeadless {
   }
 
   private moveChar(charId: string, direction: Direction): void {
-    // this.initGuard();
+    this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     if (gridChar.getNumberOfDirections() === NumberOfDirections.FOUR) {
