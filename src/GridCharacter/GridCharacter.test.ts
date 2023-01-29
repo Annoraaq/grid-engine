@@ -639,6 +639,23 @@ describe("GridCharacter", () => {
       expect(result).toBe(false);
     });
 
+    it("should not block with ignoreMissingTiles", () => {
+      gridCharacter = new GridCharacter("player", {
+        tilemap: gridTilemap,
+        speed: 3,
+        collidesWithTiles: true,
+        ignoreMissingTiles: true,
+        numberOfDirections: NumberOfDirections.FOUR,
+      });
+      gridCharacter.setTilePosition({
+        position: new Vector2(-10, -10),
+        layer: undefined,
+      });
+      mockBlockingTile();
+
+      expect(gridCharacter.isBlockingDirection(Direction.RIGHT)).toBe(false);
+    });
+
     describe("collides with tiles", () => {
       const charPosX = 0;
       const charPosY = 0;
@@ -783,7 +800,7 @@ describe("GridCharacter", () => {
         const blockingChar = new GridCharacter("blocker", {
           tilemap: gridTilemap,
           speed: 3,
-          collidesWithTiles: true,
+          collidesWithTiles: false,
           collisionGroups: ["cGroup1"],
           numberOfDirections: NumberOfDirections.FOUR,
         });

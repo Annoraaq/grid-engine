@@ -250,6 +250,7 @@ describe("GridCharacterPhaser", () => {
       expect(gridCharPhaser.getOffsetX()).toBe(0);
       expect(gridCharPhaser.getOffsetY()).toBe(0);
       expect(gridChar.collidesWithTiles()).toBe(true);
+      expect(gridChar.getIgnoreMissingTiles()).toBe(false);
       expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
       expect(gridChar.getTilePos().layer).toBe(undefined);
       expect(gridChar.getLabels()).toEqual([]);
@@ -311,6 +312,20 @@ describe("GridCharacterPhaser", () => {
 
       expect(gridChar.collidesWithTiles()).toBe(false);
       expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
+    });
+
+    it("should create a grid character with ignoreMissingTiles=true", () => {
+      const charData = {
+        id: "charID",
+        collides: {
+          ignoreMissingTiles: true,
+        },
+      };
+
+      const gridCharPhaser = createChar(charData, false);
+      const gridChar = gridCharPhaser.getGridCharacter();
+
+      expect(gridChar.getIgnoreMissingTiles()).toBe(true);
     });
 
     it("should create a grid character with collisionGroups", () => {

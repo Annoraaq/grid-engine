@@ -29,16 +29,17 @@ export interface PositionChange {
 }
 
 export interface CharConfig {
-  tilemap: GridTilemap;
-  speed: number;
-  collidesWithTiles: boolean;
-  numberOfDirections: NumberOfDirections;
   charLayer?: string;
+  collidesWithTiles: boolean;
   collisionGroups?: string[];
   facingDirection?: Direction;
+  ignoreMissingTiles?: boolean;
   labels?: string[];
-  tileWidth?: number;
+  numberOfDirections: NumberOfDirections;
+  speed: number;
   tileHeight?: number;
+  tilemap: GridTilemap;
+  tileWidth?: number;
 }
 
 export class GridCharacter {
@@ -62,6 +63,7 @@ export class GridCharacter {
   private movement?: Movement;
   private collidesWithTilesInternal: boolean;
   private collisionGroups: Set<string>;
+  private ignoreMissingTiles: boolean;
   private depthChanged$ = new Subject<LayerVecPos>();
   private movementProgress = 0;
   private labels: Set<string>;
@@ -75,6 +77,7 @@ export class GridCharacter {
     this.collidesWithTilesInternal = config.collidesWithTiles;
     this._tilePos.layer = config.charLayer;
 
+    this.ignoreMissingTiles = config.ignoreMissingTiles ?? false;
     this.collisionGroups = new Set<string>(config.collisionGroups || []);
     this.labels = new Set<string>(config.labels || []);
 
@@ -111,6 +114,10 @@ export class GridCharacter {
 
   collidesWithTiles(): boolean {
     return this.collidesWithTilesInternal;
+  }
+
+  getIgnoreMissingTiles(): boolean {
+    return this.ignoreMissingTiles;
   }
 
   setTilePosition(tilePosition: LayerVecPos): void {
@@ -216,7 +223,8 @@ export class GridCharacter {
       return this.tilemap.hasBlockingTile(
         tilePosInDir,
         layerInDirection,
-        oppositeDirection(direction)
+        oppositeDirection(direction),
+        this.ignoreMissingTiles
       );
     });
   }
