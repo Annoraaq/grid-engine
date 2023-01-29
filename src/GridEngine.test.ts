@@ -415,6 +415,14 @@ describe("GridEngine", () => {
       expect(gridEngine.getFacingDirection("player")).toBe(Direction.LEFT);
     });
 
+    it("should return the movement progress", () => {
+      const speed = 4;
+      const halfWayMs = 1000 / speed / 2;
+      gridEngine.move("player", Direction.LEFT);
+      gridEngine.update(1000, halfWayMs);
+      expect(gridEngine.getMovementProgress("player")).toEqual(500);
+    });
+
     test.each([
       Direction.DOWN_LEFT,
       Direction.DOWN_RIGHT,
@@ -1436,6 +1444,9 @@ describe("GridEngine", () => {
       );
       expectCharUnknownException(() => gridEngine.isMoving(UNKNOWN_CHAR_ID));
       expectCharUnknownException(() =>
+        gridEngine.getMovementProgress(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
         gridEngine.getFacingDirection(UNKNOWN_CHAR_ID)
       );
       expectCharUnknownException(() =>
@@ -1536,6 +1547,9 @@ describe("GridEngine", () => {
         gridEngine.setWalkingAnimationMapping(SOME_CHAR_ID, <any>{})
       );
       expectUninitializedException(() => gridEngine.isMoving(SOME_CHAR_ID));
+      expectUninitializedException(() =>
+        gridEngine.getMovementProgress(SOME_CHAR_ID)
+      );
       expectUninitializedException(() =>
         gridEngine.getFacingDirection(SOME_CHAR_ID)
       );

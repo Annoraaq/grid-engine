@@ -755,6 +755,15 @@ export class GridEngine {
     return this.geHeadless.positionChangeFinished();
   }
 
+  /**
+   * Returns the movement progress (0-1000) of a character to the next tile. For
+   * example, if a character has movement progress 400 that means that it has
+   * moved 400/1000th of the distance to the next tile already.
+   */
+  getMovementProgress(charId: string): number {
+    return this.geHeadless.getMovementProgress(charId);
+  }
+
   private setConfigDefaults(
     config: GridEngineConfig
   ): Concrete<GridEngineConfig> {

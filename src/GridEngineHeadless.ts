@@ -953,6 +953,18 @@ export class GridEngineHeadless {
     return this.positionChangeFinished$;
   }
 
+  /**
+   * Returns the movement progress (0-1000) of a character to the next tile. For
+   * example, if a character has movement progress 400 that means that it has
+   * moved 400/1000th of the distance to the next tile already.
+   */
+  getMovementProgress(charId: string): number {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.getMovementProgress();
+  }
+
   private charRemoved(charId: string): Observable<string> {
     if (!this.charRemoved$) throw this.createUninitializedErr();
     return this.charRemoved$?.pipe(
@@ -960,6 +972,7 @@ export class GridEngineHeadless {
       filter((cId) => cId == charId)
     );
   }
+
   private initGuard() {
     if (!this.isCreatedInternal) {
       throw this.createUninitializedErr();

@@ -59,6 +59,7 @@ describe("GridEngineHeadless", () => {
       "geDefault",
     ]);
     expect(gridEngineHeadless.getLabels("player")).toEqual([]);
+    expect(gridEngineHeadless.getMovementProgress("player")).toEqual(0);
   });
 
   it("should init player with collisionGroups", () => {
@@ -206,6 +207,14 @@ describe("GridEngineHeadless", () => {
       ]),
         { characters: [{ id: "player", startPosition: { x: 1, y: 1 } }] }
       );
+    });
+
+    it("should return the movement progress", () => {
+      const speed = 4;
+      const halfWayMs = 1000 / speed / 2;
+      gridEngineHeadless.move("player", Direction.LEFT);
+      gridEngineHeadless.update(1000, halfWayMs);
+      expect(gridEngineHeadless.getMovementProgress("player")).toEqual(500);
     });
 
     it("should move player orthogonally", () => {
@@ -957,7 +966,6 @@ describe("GridEngineHeadless", () => {
 
         gridEngineHeadless.move(player, Direction.RIGHT);
         gridEngineHeadless.update(2000, 300);
-        console.warn(gridEngineHeadless.isMoving(player));
 
         expect(nextMock).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -1216,9 +1224,11 @@ describe("GridEngineHeadless", () => {
       expectCharUnknownException(() =>
         gridEngineHeadless.removeCharacter(UNKNOWN_CHAR_ID)
       );
-
       expectCharUnknownException(() =>
         gridEngineHeadless.isMoving(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.getMovementProgress(UNKNOWN_CHAR_ID)
       );
       expectCharUnknownException(() =>
         gridEngineHeadless.getFacingDirection(UNKNOWN_CHAR_ID)
@@ -1324,6 +1334,9 @@ describe("GridEngineHeadless", () => {
       );
       expectUninitializedException(() =>
         gridEngineHeadless.isMoving(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.getMovementProgress(SOME_CHAR_ID)
       );
       expectUninitializedException(() =>
         gridEngineHeadless.getFacingDirection(SOME_CHAR_ID)
