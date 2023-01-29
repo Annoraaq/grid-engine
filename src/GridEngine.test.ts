@@ -1,4 +1,3 @@
-import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { take } from "rxjs/operators";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { GridCharacter } from "./GridCharacter/GridCharacter";
@@ -9,35 +8,6 @@ import * as Phaser from "phaser";
 ((_a) => {
   // do nothing
 })(Phaser);
-
-const mockGridTileMap = {
-  addCharacter: jest.fn(),
-  removeCharacter: jest.fn(),
-  getCharactersAt: jest.fn(),
-  getTileWidth: () => 32,
-  getTileSize: jest.fn().mockReturnValue(new Vector2(32, 32)),
-  getTileHeight: () => 32,
-  getTransition: jest.fn(),
-  getTransitions: jest.fn().mockReturnValue(new Map()),
-  setTransition: jest.fn(),
-  isIsometric: jest.fn().mockReturnValue(false),
-  hasBlockingTile: jest.fn().mockReturnValue(false),
-  tilePosToPixelPos: jest.fn().mockReturnValue(new Vector2(0, 0)),
-  toMapDirection: jest.fn(),
-  hasBlockingChar: jest.fn().mockReturnValue(false),
-  getDepthOfCharLayer: jest.fn().mockReturnValue(0),
-  getTileDistance: jest.fn().mockReturnValue(new Vector2(1, 1)),
-  isInRange: jest.fn(),
-  getTilePosInDirection: jest.fn(),
-  getGridTilemap: jest.fn(),
-};
-mockGridTileMap.getGridTilemap.mockReturnValue(mockGridTileMap);
-const mockGridTilemapConstructor = jest.fn(function (
-  _tilemap,
-  _firstLayerAboveChar?
-) {
-  return mockGridTileMap;
-});
 
 const mockPathfinding = {
   findShortestPath: jest.fn().mockReturnValue({
@@ -79,15 +49,6 @@ expect.extend({
   },
 });
 
-// jest.mock(
-//   "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser",
-//   function () {
-//     return {
-//       GridTilemapPhaser: mockGridTilemapConstructor,
-//     };
-//   }
-// );
-
 jest.mock("./Pathfinding/Pathfinding", function () {
   return {
     Pathfinding: mockPathfindingConstructor,
@@ -102,18 +63,13 @@ import { GridEngine } from "./GridEngine";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import {
-  createMockLayerData,
   createPhaserTilemapStub,
   createSpriteMock,
-  createTilemapMock,
-  mockBlockMap,
-  mockLayeredMap,
 } from "./Utils/MockFactory/MockFactory";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;
   let sceneMock;
-  let tileMapMock;
   let playerSpriteMock;
   let consoleLogBackup;
 
@@ -121,10 +77,6 @@ describe("GridEngine", () => {
     console.log = consoleLogBackup;
     jest.clearAllMocks();
   });
-
-  function createDefaultMock() {
-    return createDefaultMockWithLayer("someLayer");
-  }
 
   function createDefaultMockWithLayer(layer?: string) {
     return createPhaserTilemapStub(
@@ -151,15 +103,6 @@ describe("GridEngine", () => {
       sys: { events: { once: jest.fn(), on: jest.fn() } },
       add: { sprite: jest.fn().mockReturnValue(mockNewSprite) },
     };
-    tileMapMock = {
-      layers: [
-        createMockLayerData({
-          tilemapLayer: { scale: 2, setDepth: jest.fn() },
-        }),
-      ],
-      tileWidth: 16,
-      tileHeight: 16,
-    };
 
     playerSpriteMock = {
       x: 10,
@@ -180,13 +123,9 @@ describe("GridEngine", () => {
         name: "1",
       },
     } as any;
-    mockGridTileMap.hasBlockingTile.mockReturnValue(false);
-    mockGridTileMap.toMapDirection.mockReturnValue(Direction.LEFT);
-    mockGridTileMap.getTransition.mockReturnValue(undefined);
-    mockGridTileMap.isIsometric.mockReturnValue(false);
 
     gridEngine = new GridEngine(sceneMock);
-    gridEngine.create(tileMapMock, {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
           id: "player",
@@ -205,22 +144,6 @@ describe("GridEngine", () => {
       gridEngine
     );
   });
-
-  // it("should init tilemap", () => {
-  //   gridEngine.create(tileMapMock, {
-  //     characters: [
-  //       {
-  //         id: "player",
-  //         sprite: playerSpriteMock,
-  //       },
-  //     ],
-  //   });
-  //   expect(mockGridTilemapConstructor).toHaveBeenCalledWith(
-  //     new PhaserTilemap(tileMapMock),
-  //     "ge_collide",
-  //     CollisionStrategy.BLOCK_TWO_TILES
-  //   );
-  // });
 
   it("should init player", () => {
     const containerMock = {};
@@ -1072,12 +995,7 @@ describe("GridEngine", () => {
   describe("Observables", () => {
     it("should get chars movementStarted observable", async () => {
       gridEngine.create(createDefaultMockWithLayer("someLayer"), {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
+        characters: [{ id: "player", sprite: playerSpriteMock }],
       });
       const prom = gridEngine.movementStarted().pipe(take(1)).toPromise();
 
@@ -1089,12 +1007,7 @@ describe("GridEngine", () => {
 
     it("should unsubscribe from movementStarted if char removed", () => {
       gridEngine.create(createDefaultMockWithLayer("someLayer"), {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
+        characters: [{ id: "player", sprite: playerSpriteMock }],
       });
 
       const nextMock = jest.fn();
@@ -1114,12 +1027,7 @@ describe("GridEngine", () => {
 
     it("should get chars movementStopped observable", async () => {
       gridEngine.create(createDefaultMockWithLayer("someLayer"), {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
+        characters: [{ id: "player", sprite: playerSpriteMock }],
       });
 
       const prom = gridEngine.movementStopped().pipe(take(1)).toPromise();
@@ -1135,12 +1043,7 @@ describe("GridEngine", () => {
 
     it("should unsubscribe from movementStopped if char removed", () => {
       gridEngine.create(createDefaultMockWithLayer("someLayer"), {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
+        characters: [{ id: "player", sprite: playerSpriteMock }],
       });
 
       const nextMock = jest.fn();
@@ -1158,26 +1061,8 @@ describe("GridEngine", () => {
     });
 
     it("should get chars directionChanged observable", async () => {
-      const mock = createPhaserTilemapStub(
-        new Map([
-          [
-            "someLayer",
-            [
-              // prettier-ignore
-              "..",
-              "..",
-            ],
-          ],
-        ])
-      );
-
-      gridEngine.create(mock, {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
+      gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+        characters: [{ id: "player", sprite: playerSpriteMock }],
       });
 
       const prom = gridEngine.directionChanged().pipe(take(1)).toPromise();
@@ -1191,26 +1076,8 @@ describe("GridEngine", () => {
     });
 
     it("should get chars positionChangeStarted observable", async () => {
-      const mock = createPhaserTilemapStub(
-        new Map([
-          [
-            "someLayer",
-            [
-              // prettier-ignore
-              "..",
-              "..",
-            ],
-          ],
-        ])
-      );
-
-      gridEngine.create(mock, {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
+      gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+        characters: [{ id: "player", sprite: playerSpriteMock }],
       });
 
       const prom = gridEngine.positionChangeStarted().pipe(take(1)).toPromise();
@@ -1227,26 +1094,8 @@ describe("GridEngine", () => {
     });
 
     it("should get chars positionChangeFinished observable", async () => {
-      const mock = createPhaserTilemapStub(
-        new Map([
-          [
-            "someLayer",
-            [
-              // prettier-ignore
-              "..",
-              "..",
-            ],
-          ],
-        ])
-      );
-
-      gridEngine.create(mock, {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
+      gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+        characters: [{ id: "player", sprite: playerSpriteMock }],
       });
 
       const prom = gridEngine
@@ -1273,13 +1122,8 @@ describe("GridEngine", () => {
       const player2 = "player2";
       const nextMock = jest.fn();
 
-      gridEngine.create(tileMapMock, {
-        characters: [
-          {
-            id: player1,
-            sprite: playerSpriteMock,
-          },
-        ],
+      gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+        characters: [{ id: player1, sprite: playerSpriteMock }],
       });
 
       gridEngine.characterShifted().subscribe({
@@ -1320,20 +1164,7 @@ describe("GridEngine", () => {
       const expectedTargetPosition = new Vector2(1, 1);
       beforeEach(() => {
         nextMock = jest.fn();
-        const mock = createPhaserTilemapStub(
-          new Map([
-            [
-              expectedLayer,
-              [
-                // prettier-ignore
-                "..",
-                "..",
-              ],
-            ],
-          ])
-        );
-
-        gridEngine.create(mock, {
+        gridEngine.create(createDefaultMockWithLayer(expectedLayer), {
           characters: [
             {
               id: player,
@@ -1411,20 +1242,7 @@ describe("GridEngine", () => {
     });
 
     it("should unsubscribe from positionChangeFinished if char removed", () => {
-      const mock = createPhaserTilemapStub(
-        new Map([
-          [
-            "someLayer",
-            [
-              // prettier-ignore
-              "..",
-              "..",
-            ],
-          ],
-        ])
-      );
-
-      gridEngine.create(mock, {
+      gridEngine.create(createDefaultMockWithLayer("someLayer"), {
         characters: [
           {
             id: "player",
@@ -1449,7 +1267,7 @@ describe("GridEngine", () => {
 
   describe("labels", () => {
     it("should add labels on creation", () => {
-      gridEngine.create(tileMapMock, {
+      gridEngine.create(createDefaultMockWithLayer(undefined), {
         characters: [
           {
             id: "player",
@@ -1486,7 +1304,7 @@ describe("GridEngine", () => {
     });
 
     it("should get all characters with specific labels", () => {
-      gridEngine.create(tileMapMock, {
+      gridEngine.create(createDefaultMockWithLayer(undefined), {
         characters: [
           {
             id: "player1",
@@ -1553,7 +1371,7 @@ describe("GridEngine", () => {
 
   describe("pathfinding", () => {
     it("should delegate to pathfinding", () => {
-      gridEngine.create(tileMapMock, {
+      gridEngine.create(createDefaultMockWithLayer(undefined), {
         characters: [
           {
             id: "player",
