@@ -116,6 +116,10 @@ export class GridCharacter {
     return this.collidesWithTilesInternal;
   }
 
+  getIgnoreMissingTiles(): boolean {
+    return this.ignoreMissingTiles;
+  }
+
   setTilePosition(tilePosition: LayerVecPos): void {
     if (this.isMoving()) {
       this.movementStopped$.next(this.movementDirection);
