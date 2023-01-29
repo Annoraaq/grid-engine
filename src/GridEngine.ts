@@ -172,7 +172,7 @@ export interface CharacterData extends CharacterDataHeadless {
 }
 
 export class GridEngine {
-  // private geHeadless: GridEngineHeadless = new GridEngineHeadless();
+  private geHeadless: GridEngineHeadless = new GridEngineHeadless();
   private config?: Concrete<GridEngineConfig>;
   private gridCharacters?: Map<string, GridCharacterPhaser>;
   private gridTilemap?: GridTilemapPhaser;
@@ -192,7 +192,7 @@ export class GridEngine {
    * @internal
    */
   constructor(private scene: Phaser.Scene) {
-    console.log(`Using GridEngine v${VERSION}`);
+    console.log(`Using GridEngine Phaser Plugin v${VERSION}`);
     this.scene.sys.events.once("boot", this.boot, this);
   }
 
@@ -207,10 +207,11 @@ export class GridEngine {
    * {@link https://annoraaq.github.io/grid-engine/p/character-layers | here}
    */
   getCharLayer(charId: string): string | undefined {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    return gridChar.getTilePos().layer;
+    // this.initGuard();
+    // const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
+    // if (!gridChar) throw this.createCharUnknownErr(charId);
+    // return gridChar.getTilePos().layer;
+    return this.geHeadless.getCharLayer(charId);
   }
 
   /**
@@ -220,8 +221,9 @@ export class GridEngine {
    * @beta
    */
   getTransition(position: Position, fromLayer: string): string | undefined {
-    this.initGuard();
-    return this.gridTilemap?.getTransition(new Vector2(position), fromLayer);
+    // this.initGuard();
+    // return this.gridTilemap?.getTransition(new Vector2(position), fromLayer);
+    return this.geHeadless.getTransition(position, fromLayer);
   }
 
   /**
@@ -238,11 +240,8 @@ export class GridEngine {
    */
   setTransition(position: Position, fromLayer: string, toLayer: string): void {
     this.initGuard();
-    return this.gridTilemap?.setTransition(
-      new Vector2(position),
-      fromLayer,
-      toLayer
-    );
+    this.gridTilemap?.setTransition(new Vector2(position), fromLayer, toLayer);
+    this.geHeadless.setTransition(position, fromLayer, toLayer);
   }
 
   /**
@@ -250,6 +249,7 @@ export class GridEngine {
    * GridEngine are called.
    */
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
+    this.geHeadless.create(new PhaserTilemap(tilemap), config);
     this.isCreatedInternal = true;
     this.gridCharacters = new Map();
 
@@ -493,12 +493,13 @@ export class GridEngine {
   }
 
   /** @internal */
-  update(_time: number, delta: number): void {
+  update(time: number, delta: number): void {
     if (this.isCreatedInternal && this.gridCharacters) {
       for (const [_key, gridChar] of this.gridCharacters) {
         gridChar.update(delta);
       }
     }
+    this.geHeadless.update(time, delta);
   }
 
   /** Adds a character after calling {@link create}. */
@@ -571,6 +572,8 @@ export class GridEngine {
       });
 
     this.charAdded$?.next(id);
+
+    this.geHeadless.addCharacter(charData);
   }
 
   /** Checks whether a character with the given ID is registered. */
@@ -591,6 +594,8 @@ export class GridEngine {
     this.gridTilemap?.removeCharacter(charId);
     this.gridCharacters?.delete(charId);
     this.charRemoved$?.next(charId);
+
+    this.geHeadless.removeCharacter(charId);
   }
 
   /**
@@ -603,6 +608,8 @@ export class GridEngine {
     for (const charId of this.gridCharacters.keys()) {
       this.removeCharacter(charId);
     }
+
+    this.geHeadless.removeAllCharacters();
   }
 
   /**
@@ -640,6 +647,7 @@ export class GridEngine {
     const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     gridChar.addLabels(labels);
+    this.geHeadless.addLabels(charId, labels);
   }
 
   /**
@@ -650,6 +658,8 @@ export class GridEngine {
     const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     gridChar.removeLabels(labels);
+
+    this.geHeadless.removeLabels(charId, labels);
   }
 
   /**
@@ -660,6 +670,7 @@ export class GridEngine {
     const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     gridChar.clearLabels();
+    this.geHeadless.clearLabels(charId);
   }
 
   /**
@@ -777,6 +788,7 @@ export class GridEngine {
       });
     }
     gridChar.setTilePosition({ position: new Vector2(pos), layer });
+    this.geHeadless.setPosition(charId, pos, layer);
   }
 
   /**
@@ -824,6 +836,10 @@ export class GridEngine {
   ): boolean {
     this.initGuard();
     const positionVec = new Vector2(position);
+    console.warn(
+      "tile: ",
+      this.gridTilemap?.hasBlockingTile(positionVec, layer)
+    );
     return !!(
       this.gridTilemap?.hasBlockingTile(positionVec, layer) ||
       this.gridTilemap?.hasBlockingChar(positionVec, layer, collisionGroups)
@@ -863,6 +879,7 @@ export class GridEngine {
     const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
     if (!gridChar) throw this.createCharUnknownErr(charId);
     gridChar.setCollisionGroups(collisionGroups);
+    this.geHeadless.setCollisionGroups(charId, collisionGroups);
   }
 
   /**
@@ -1054,7 +1071,9 @@ export class GridEngine {
   }
 
   private createUninitializedErr() {
-    throw new Error("Plugin not initialized. You need to call create() first.");
+    throw new Error(
+      "GridEngine not initialized. You need to call create() first."
+    );
   }
 
   private addCharacters() {

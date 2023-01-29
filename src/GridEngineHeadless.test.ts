@@ -697,11 +697,11 @@ describe("GridEngineHeadless", () => {
         "..",
         ".."
       ], 'someLayer'),
-      { characters: [{ id: "player" }] }
+      {
+        characters: [{ id: "player" }],
+      }
     );
-    const result = gridEngineHeadless.isBlocked({ x: 1, y: 1 }, "someLayer", [
-      "cGroup",
-    ]);
+    const result = gridEngineHeadless.isBlocked({ x: 1, y: 1 }, "someLayer");
     expect(result).toBe(false);
   });
 

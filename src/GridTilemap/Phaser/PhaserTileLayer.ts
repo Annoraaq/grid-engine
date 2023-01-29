@@ -24,7 +24,6 @@ export class PhaserTileLayer implements TileLayer {
   getWidth(): number {
     return this.phaserTilemapLayer.layer.width;
   }
-
   getScale(): number {
     return this.phaserTilemapLayer.scale;
   }
@@ -33,6 +32,9 @@ export class PhaserTileLayer implements TileLayer {
   }
   setDepth(depth: number): void {
     this.phaserTilemapLayer.setDepth(depth);
+  }
+  getDepth(): number {
+    return this.phaserTilemapLayer.depth;
   }
   destroy(): void {
     this.phaserTilemapLayer.destroy();

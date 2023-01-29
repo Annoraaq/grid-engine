@@ -11,6 +11,7 @@ export interface TileLayer {
   getScale(): number;
   setScale(scale: number): void;
   setDepth(depth: number): void;
+  getDepth(): number;
   destroy(): void;
   getTilesets(): string[];
   putTileAt(tile: number, x: number, y: number): void;

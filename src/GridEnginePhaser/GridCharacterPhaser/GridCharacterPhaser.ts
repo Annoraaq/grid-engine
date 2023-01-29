@@ -227,12 +227,15 @@ export class GridCharacterPhaser {
       this.resetAnimation(gridChar, this.sprite);
 
       this.updateOverlaySprite();
+    }
 
-      if (charData.startPosition) {
-        gridChar.setTilePosition({
-          position: new Vector2(charData.startPosition),
-          layer: gridChar.getTilePos().layer,
-        });
+    if (charData.startPosition) {
+      gridChar.setTilePosition({
+        position: new Vector2(charData.startPosition),
+        layer: gridChar.getTilePos().layer,
+      });
+
+      if (this.sprite) {
         this.updateGridChar(gridChar);
       }
     }
