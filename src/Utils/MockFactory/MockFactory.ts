@@ -4,106 +4,12 @@ import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { Vector2 } from "../Vector2/Vector2";
 import { Random, MersenneTwister19937 } from "random-js";
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
-import {
-  Orientation,
-  Tile,
-  TileLayer,
-  Tilemap,
-} from "../../GridTilemap/Tilemap";
+import { Tile, TileLayer, Tilemap } from "../../GridTilemap/Tilemap";
+import { MockTile, MockTileLayer, MockTilemap } from "./MockTilemap";
 
 export const LOWER_CHAR_LAYER = "lowerCharLayer";
 export const HIGHER_CHAR_LAYER = "testCharLayer";
 export const COLLISION_GROUP = "testCollisionGroup";
-
-export class MockTile implements Tile {
-  constructor(private properties: Record<string, string> = {}) {}
-  getProperties(): Record<string, string> {
-    return this.properties;
-  }
-}
-
-export class MockTilemap implements Tilemap {
-  constructor(
-    private layers: TileLayer[] = [],
-    private orientation: Orientation = "orthogonal"
-  ) {}
-
-  getTileWidth(): number {
-    return 10;
-  }
-  getTileHeight(): number {
-    return 10;
-  }
-  getWidth(): number {
-    return 20;
-  }
-  getHeight(): number {
-    return 20;
-  }
-  getOrientation(): Orientation {
-    return this.orientation;
-  }
-  getLayers(): TileLayer[] {
-    return this.layers;
-  }
-  hasTileAt(x: number, y: number, layer?: string): boolean {
-    const l = this.layers.find((l) => l.getName() === layer);
-    return !!l?.getData()[y]?.[x];
-  }
-  getTileAt(x: number, y: number, layer?: string): Tile | undefined {
-    const l = this.layers.find((l) => l.getName() === layer);
-    return l?.getData()[y]?.[x];
-  }
-  copyLayer(layer: TileLayer, newName: string, row: number): TileLayer {
-    return new MockTileLayer();
-  }
-}
-
-class MockTileLayer implements TileLayer {
-  private depth = 0;
-  constructor(
-    private name: string = "tileLayerName",
-    private properties: Record<string, string> = {},
-    private height: number = 5,
-    private width: number = 5,
-    private scale: number = 1,
-    private tilesets: string[] = [],
-    private data: Tile[][] = [[]]
-  ) {}
-  getProperties(): Record<string, string> {
-    return this.properties;
-  }
-  getName(): string {
-    return this.name;
-  }
-  getHeight(): number {
-    return this.height;
-  }
-  getWidth(): number {
-    return this.width;
-  }
-  getScale(): number {
-    return this.scale;
-  }
-
-  setScale(scale: number): void {
-    this.scale = scale;
-  }
-  setDepth(depth: number): void {
-    this.depth = depth;
-  }
-  getDepth(): number {
-    return this.depth;
-  }
-  destroy(): void {}
-  getTilesets(): string[] {
-    return this.tilesets;
-  }
-  putTileAt(tile: number, x: number, y: number): void {}
-  getData(): Tile[][] {
-    return this.data;
-  }
-}
 
 export function createSpriteMock() {
   return {
@@ -389,111 +295,11 @@ export function mockLayeredMap(
 ) {
   tilemapMock.hasTileAt.mockImplementation((x, y, layerName) => {
     const layer = blockMap.get(layerName);
-    console.warn("habe layer", layer);
     if (!layer) return false;
     if (x < 0 || x >= layer[0].length) return false;
     if (y < 0 || y >= layer.length) return false;
     return layer[y][x] != "#";
   });
-}
-
-export function createPhaserTilemapLayerStub(
-  name?: string
-): Phaser.Tilemaps.TilemapLayer {
-  const layer = {
-    depth: 0,
-    setDepth(d: number): Phaser.Tilemaps.TilemapLayer {
-      this.depth = d;
-      return this;
-    },
-    scale: 3,
-    tileset: [createPhaserTilesetStub("Cloud City")],
-  } as Phaser.Tilemaps.TilemapLayer;
-  layer.layer = createPhaserTilemapLayerDataStub(layer, name, []);
-  return layer;
-}
-
-function createPhaserTilemapLayerDataStub(
-  tilemapLayer: Phaser.Tilemaps.TilemapLayer,
-  name: string | undefined,
-  properties: Array<{ name: string; value: string }>
-): Phaser.Tilemaps.LayerData {
-  return {
-    name: name,
-    tilemapLayer,
-    properties: [
-      ...properties,
-      {
-        name: "ge_charLayer",
-        value: name,
-      },
-    ],
-  } as Phaser.Tilemaps.LayerData;
-}
-
-function createPhaserTilesetStub(name: string): Phaser.Tilemaps.Tileset {
-  return { name } as Phaser.Tilemaps.Tileset;
-}
-
-export function createPhaserTilemapStub(
-  blockMap: Map<string | undefined, string[]>
-): Phaser.Tilemaps.Tilemap {
-  const layers: Phaser.Tilemaps.TilemapLayer[] = [];
-  for (const [layerName, allRows] of blockMap.entries()) {
-    const layer = createPhaserTilemapLayerStub(layerName);
-    layer.layer.data = allRows.map((r) => {
-      return [...r].map((c) => {
-        if (c === "#") {
-          return {
-            properties: {
-              ge_collide: "true",
-            },
-          } as Phaser.Tilemaps.Tile;
-        }
-
-        return {} as Phaser.Tilemaps.Tile;
-      });
-    });
-    layers.push(layer);
-  }
-
-  const tilemap: Phaser.Tilemaps.Tilemap = {
-    orientation: Phaser.Tilemaps.Orientation.ORTHOGONAL.toString(),
-    layers: layers.map((l) => l.layer),
-    hasTileAt(tileX: number, tileY: number, layer?: string) {
-      const l = layers.find((l) => l.layer.name === layer);
-      if (!l) return false;
-      const row = l.layer.data[tileY];
-      if (!row) return false;
-      return !!l.layer.data[tileY][tileX];
-    },
-    getTileAt(tileX: number, tileY: number, nonNull?: boolean, layer?: string) {
-      const l = layers.find((l) => l.layer.name === layer);
-      if (!l) return undefined;
-      const row = l.layer.data[tileY];
-      if (!row) return undefined;
-      return l.layer.data[tileY][tileX];
-    },
-
-    createBlankLayer(
-      name,
-      tileset,
-      x,
-      y,
-      width,
-      height,
-      tileWidth,
-      tileHeight
-    ) {
-      return {} as Phaser.Tilemaps.TilemapLayer;
-    },
-
-    getLayer(layer?: string | number | Phaser.Tilemaps.TilemapLayer) {
-      return layers.find((l) => l.name == layer);
-    },
-  } as unknown as Phaser.Tilemaps.Tilemap;
-
-  return tilemap;
 }
 
 export function createAllowedFn(map: string[]) {

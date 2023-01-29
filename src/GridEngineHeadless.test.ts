@@ -32,8 +32,8 @@ import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import {
   createMockLayer,
   mockBlockMapNew,
-  MockTilemap,
 } from "./Utils/MockFactory/MockFactory";
+import { MockTilemap } from "./Utils/MockFactory/MockTilemap";
 
 describe("GridEngineHeadless", () => {
   let gridEngineHeadless: GridEngineHeadless;

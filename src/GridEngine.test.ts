@@ -62,10 +62,8 @@ jest.mock("../package.json", () => ({
 import { GridEngine } from "./GridEngine";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
-import {
-  createPhaserTilemapStub,
-  createSpriteMock,
-} from "./Utils/MockFactory/MockFactory";
+import { createSpriteMock } from "./Utils/MockFactory/MockFactory";
+import { createPhaserTilemapStub } from "./Utils/MockFactory/MockPhaserTilemap";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;
