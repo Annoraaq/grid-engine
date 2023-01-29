@@ -77,14 +77,14 @@ export function createPhaserTilemapStub(
     },
 
     createBlankLayer(
-      name,
-      tileset,
-      x,
-      y,
-      width,
-      height,
-      tileWidth,
-      tileHeight
+      _name,
+      _tileset,
+      _x,
+      _y,
+      _width,
+      _height,
+      _tileWidth,
+      _tileHeight
     ) {
       return {} as Phaser.Tilemaps.TilemapLayer;
     },
