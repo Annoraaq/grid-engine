@@ -199,6 +199,8 @@ export class GridCharacterPhaser {
       if (charData.collides.collisionGroups) {
         charConfig.collisionGroups = charData.collides.collisionGroups;
       }
+      charConfig.ignoreMissingTiles =
+        charData.collides?.ignoreMissingTiles ?? false;
     }
 
     this.sprite = charData.sprite;
