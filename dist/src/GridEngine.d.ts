@@ -82,6 +82,14 @@ export interface CollisionConfig {
      */
     collidesWithTiles?: boolean;
     /**
+     * If set to `true`, the character will not collide with a position that has
+     * no tile on any layer. This is especially useful if you want the character
+     * to be able to move outside of the map boundaries.
+     *
+     * @defaultValue `false`
+     */
+    ignoreMissingTiles?: boolean;
+    /**
      * Array with collision groups. Only characters with at least one matching
      * collision group collide. If omitted it will be initialized with a default
      * collision group called `'geDefault'`. If you want to keep a character from
@@ -246,7 +254,7 @@ export declare class GridEngine {
     /**
      * Returns the character layer of the given character.
      * You can read more about character layers and transitions
-     * {@link https://annoraaq.github.io/grid-engine/api/features/character-layers.html | here}
+     * {@link https://annoraaq.github.io/grid-engine/p/character-layers | here}
      */
     getCharLayer(charId: string): string | undefined;
     /**
@@ -260,7 +268,7 @@ export declare class GridEngine {
      * Sets the character layer `toLayer` that the transition on position
      * `position` from character layer `fromLayer` should lead to.
      * You can read more about character layers and transitions
-     * {@link https://annoraaq.github.io/grid-engine/api/features/character-layers.html | here}
+     * {@link https://annoraaq.github.io/grid-engine/p/character-layers | here}
      *
      * @param position Position of the new transition
      * @param fromLayer Character layer the new transition should start at
