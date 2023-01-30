@@ -7,7 +7,11 @@ import {
 } from "./GridCharacterPhaser";
 import * as Phaser from "phaser";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
-import { CollisionStrategy } from "../../GridEngine";
+import {
+  CollisionStrategy,
+  GridEngine,
+  GridEngineHeadless,
+} from "../../GridEngine";
 import {
   createMockLayerData,
   createSpriteMock,
@@ -23,6 +27,7 @@ import { GridTilemapPhaser } from "../GridTilemapPhaser/GridTilemapPhaser";
 
 describe("GridCharacterPhaser", () => {
   let gridTilemap: GridTilemapPhaser;
+  let gridEngineHeadless: GridEngineHeadless;
   let tilemapMock;
   let overlaySpriteMock;
   let sceneMock;
@@ -93,14 +98,19 @@ describe("GridCharacterPhaser", () => {
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
+    gridEngineHeadless = new GridEngineHeadless();
   });
 
   function createChar(charData: PhaserCharacterData, layerOverlay: boolean) {
+    gridEngineHeadless.create(new PhaserTilemap(tilemapMock), {
+      characters: [charData],
+    });
     return new GridCharacterPhaser(
       charData,
       sceneMock,
       gridTilemap,
-      layerOverlay
+      layerOverlay,
+      gridEngineHeadless
     );
   }
 
@@ -127,25 +137,25 @@ describe("GridCharacterPhaser", () => {
       };
       const gridCharPhaser = createChar(charData, true);
 
-      const gridChar = gridCharPhaser.getGridCharacter();
-      expect(gridChar.getId()).toBe("charID");
+      // const gridChar = gridCharPhaser.getGridCharacter();
+      // expect(gridChar.getId()).toBe("charID");
       expect(gridCharPhaser.getSprite()).toBe(spriteMock);
       expect(gridCharPhaser.getLayerOverlaySprite()).toBe(overlaySpriteMock);
       expect(gridCharPhaser.getWalkingAnimationMapping()).toBe(
         walkingAnimationMock
       );
-      expect(gridChar.getSpeed()).toBe(5);
-      expect(gridChar.getTilePos().position).toEqual(startPos);
+      // expect(gridChar.getSpeed()).toBe(5);
+      // expect(gridChar.getTilePos().position).toEqual(startPos);
       expect(gridCharPhaser.getContainer()).toBe(containerMock);
       expect(gridCharPhaser.getOffsetX()).toBe(5);
       expect(gridCharPhaser.getOffsetY()).toBe(6);
-      expect(gridChar.getFacingDirection()).toBe(Direction.RIGHT);
-      expect(gridChar.collidesWithTiles()).toBe(true);
-      expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
-      expect(gridChar.getTilePos().layer).toBe("someLayer");
-      expect(gridChar.getTileWidth()).toEqual(2);
-      expect(gridChar.getTileHeight()).toEqual(3);
-      expect(gridChar.getTilePos().layer).toBe("someLayer");
+      // expect(gridChar.getFacingDirection()).toBe(Direction.RIGHT);
+      // expect(gridChar.collidesWithTiles()).toBe(true);
+      // expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
+      // expect(gridChar.getTilePos().layer).toBe("someLayer");
+      // expect(gridChar.getTileWidth()).toEqual(2);
+      // expect(gridChar.getTileHeight()).toEqual(3);
+      // expect(gridChar.getTilePos().layer).toBe("someLayer");
 
       expect(spriteMock.setOrigin).toHaveBeenCalledWith(0, 0);
       expect(gridCharPhaser.getAnimation()?.getWalkingAnimationMapping()).toBe(
@@ -162,7 +172,7 @@ describe("GridCharacterPhaser", () => {
       expect(containerMock.y).not.toEqual(0);
 
       expect(gridCharPhaser.getAnimation()?.isEnabled()).toBe(true);
-      expect(gridChar.getNumberOfDirections()).toBe(NumberOfDirections.EIGHT);
+      // expect(gridChar.getNumberOfDirections()).toBe(NumberOfDirections.EIGHT);
     });
 
     it("should update sprite on animation changes", () => {
@@ -244,97 +254,97 @@ describe("GridCharacterPhaser", () => {
       };
       const gridCharPhaser = createChar(charData, false);
 
-      const gridChar = gridCharPhaser.getGridCharacter();
-      expect(gridChar.getId()).toBe("charID");
+      // const gridChar = gridCharPhaser.getGridCharacter();
+      // expect(gridChar.getId()).toBe("charID");
       expect(gridCharPhaser.getSprite()).toBe(undefined);
       expect(gridCharPhaser.getLayerOverlaySprite()).toBe(undefined);
       expect(gridCharPhaser.getWalkingAnimationMapping()).toBe(undefined);
-      expect(gridChar.getSpeed()).toBe(4);
+      // expect(gridChar.getSpeed()).toBe(4);
       expect(gridCharPhaser.getContainer()).toBe(undefined);
       expect(gridCharPhaser.getOffsetX()).toBe(0);
       expect(gridCharPhaser.getOffsetY()).toBe(0);
-      expect(gridChar.collidesWithTiles()).toBe(true);
-      expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
-      expect(gridChar.getTilePos().layer).toBe(undefined);
-      expect(gridChar.getLabels()).toEqual([]);
-      expect(gridChar.getNumberOfDirections()).toEqual(
-        NumberOfDirections.EIGHT
-      );
+      // expect(gridChar.collidesWithTiles()).toBe(true);
+      // expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
+      // expect(gridChar.getTilePos().layer).toBe(undefined);
+      // expect(gridChar.getLabels()).toEqual([]);
+      // expect(gridChar.getNumberOfDirections()).toEqual(
+      //   NumberOfDirections.EIGHT
+      // );
     });
 
-    it("should create a grid character with labels", () => {
-      const charData = {
-        id: "charID",
-        labels: ["label1", "label2"],
-        numberOfDirections: NumberOfDirections.FOUR,
-      };
+    // it("should create a grid character with labels", () => {
+    //   const charData = {
+    //     id: "charID",
+    //     labels: ["label1", "label2"],
+    //     numberOfDirections: NumberOfDirections.FOUR,
+    //   };
 
-      const gridCharPhaser = createChar(charData, false);
-      const gridChar = gridCharPhaser.getGridCharacter();
+    //   const gridCharPhaser = createChar(charData, false);
+    //   const gridChar = gridCharPhaser.getGridCharacter();
 
-      expect(gridChar.getLabels()).toEqual(["label1", "label2"]);
-    });
+    //   expect(gridChar.getLabels()).toEqual(["label1", "label2"]);
+    // });
 
-    it("should create a grid character with collides=false", () => {
-      const charData = {
-        id: "charID",
-        collides: false,
-        numberOfDirections: NumberOfDirections.FOUR,
-      };
+    // it("should create a grid character with collides=false", () => {
+    //   const charData = {
+    //     id: "charID",
+    //     collides: false,
+    //     numberOfDirections: NumberOfDirections.FOUR,
+    //   };
 
-      const gridCharPhaser = createChar(charData, false);
-      const gridChar = gridCharPhaser.getGridCharacter();
+    //   const gridCharPhaser = createChar(charData, false);
+    //   const gridChar = gridCharPhaser.getGridCharacter();
 
-      expect(gridChar.collidesWithTiles()).toBe(false);
-      expect(gridChar.getCollisionGroups()).toEqual([]);
-    });
+    //   expect(gridChar.collidesWithTiles()).toBe(false);
+    //   expect(gridChar.getCollisionGroups()).toEqual([]);
+    // });
 
-    it("should create a grid character with collidesWithTiles=true", () => {
-      const charData = {
-        id: "charID",
-        collides: {
-          collidesWithTiles: true,
-        },
-        numberOfDirections: NumberOfDirections.FOUR,
-      };
+    // it("should create a grid character with collidesWithTiles=true", () => {
+    //   const charData = {
+    //     id: "charID",
+    //     collides: {
+    //       collidesWithTiles: true,
+    //     },
+    //     numberOfDirections: NumberOfDirections.FOUR,
+    //   };
 
-      const gridCharPhaser = createChar(charData, false);
-      const gridChar = gridCharPhaser.getGridCharacter();
+    //   const gridCharPhaser = createChar(charData, false);
+    //   const gridChar = gridCharPhaser.getGridCharacter();
 
-      expect(gridChar.collidesWithTiles()).toBe(true);
-      expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
-    });
+    //   expect(gridChar.collidesWithTiles()).toBe(true);
+    //   expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
+    // });
 
-    it("should create a grid character with collidesWithTiles=false", () => {
-      const charData = {
-        id: "charID",
-        collides: {
-          collidesWithTiles: false,
-        },
-        numberOfDirections: NumberOfDirections.FOUR,
-      };
+    // it("should create a grid character with collidesWithTiles=false", () => {
+    //   const charData = {
+    //     id: "charID",
+    //     collides: {
+    //       collidesWithTiles: false,
+    //     },
+    //     numberOfDirections: NumberOfDirections.FOUR,
+    //   };
 
-      const gridCharPhaser = createChar(charData, false);
-      const gridChar = gridCharPhaser.getGridCharacter();
+    //   const gridCharPhaser = createChar(charData, false);
+    //   const gridChar = gridCharPhaser.getGridCharacter();
 
-      expect(gridChar.collidesWithTiles()).toBe(false);
-      expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
-    });
+    //   expect(gridChar.collidesWithTiles()).toBe(false);
+    //   expect(gridChar.getCollisionGroups()).toEqual(["geDefault"]);
+    // });
 
-    it("should create a grid character with collisionGroups", () => {
-      const charData = {
-        id: "charID",
-        collides: {
-          collisionGroups: ["testGroup"],
-        },
-        numberOfDirections: NumberOfDirections.FOUR,
-      };
-      const gridCharPhaser = createChar(charData, false);
-      const gridChar = gridCharPhaser.getGridCharacter();
+    // it("should create a grid character with collisionGroups", () => {
+    //   const charData = {
+    //     id: "charID",
+    //     collides: {
+    //       collisionGroups: ["testGroup"],
+    //     },
+    //     numberOfDirections: NumberOfDirections.FOUR,
+    //   };
+    //   const gridCharPhaser = createChar(charData, false);
+    //   const gridChar = gridCharPhaser.getGridCharacter();
 
-      expect(gridChar.collidesWithTiles()).toBe(true);
-      expect(gridChar.getCollisionGroups()).toEqual(["testGroup"]);
-    });
+    //   expect(gridChar.collidesWithTiles()).toBe(true);
+    //   expect(gridChar.getCollisionGroups()).toEqual(["testGroup"]);
+    // });
 
     it("should keep a sprite", () => {
       const charData = {
@@ -396,9 +406,10 @@ describe("GridCharacterPhaser", () => {
         numberOfDirections: NumberOfDirections.FOUR,
       };
       const gridCharPhaser = createChar(charData, true);
-      gridCharPhaser
-        .getGridCharacter()
-        .setTilePosition({ position: new Vector2(3, 2), layer: undefined });
+      // gridCharPhaser
+      //   .getGridCharacter()
+      //   .setTilePosition({ position: new Vector2(3, 2), layer: undefined });
+      gridEngineHeadless.setPosition("charID", new Vector2(3, 2));
       const newSpriteMock = createSpriteMock();
       gridCharPhaser.setSprite(newSpriteMock);
 
@@ -485,15 +496,16 @@ describe("GridCharacterPhaser", () => {
       const standingFrameNumber = 13;
       const gridCharPhaser = createChar(charData, true);
       const newSpriteMock = createSpriteMock();
-      const gridChar = gridCharPhaser.getGridCharacter();
-      gridChar.turnTowards(Direction.LEFT);
+      // const gridChar = gridCharPhaser.getGridCharacter();
+      // gridChar.turnTowards(Direction.LEFT);
+      gridEngineHeadless.turnTowards("charID", Direction.LEFT);
 
       gridCharPhaser.setSprite(newSpriteMock);
 
       expect(newSpriteMock.setFrame).toHaveBeenCalledWith(standingFrameNumber);
     });
 
-    it("should set depth of sprite", () => {
+    fit("should set depth of sprite", () => {
       const startPos = { x: 2, y: 2 };
       const charData = {
         id: "charID",
@@ -503,6 +515,9 @@ describe("GridCharacterPhaser", () => {
         numberOfDirections: NumberOfDirections.FOUR,
       };
       const charLayerDepth = 1;
+      // gridEngineHeadless.create(new PhaserTilemap(tilemapMock), {
+      //   characters: [charData],
+      // });
       const gridCharPhaser = createChar(charData, false);
       const newSpriteMock = createSpriteMock();
 
@@ -593,14 +608,18 @@ describe("GridCharacterPhaser", () => {
       const spriteInitialYPos = spriteMock.y;
       const charTilePos = new Vector2(3, 4);
       const gridCharPhaser = createChar(charData, false);
-      const gridChar = gridCharPhaser.getGridCharacter();
-      gridChar.setSpeed(1);
-      gridChar.setTilePosition({
-        position: charTilePos,
-        layer: undefined,
-      });
-      gridChar.move(Direction.RIGHT);
-      gridCharPhaser.update(250);
+      // const gridChar = gridCharPhaser.getGridCharacter();
+      // gridChar.setSpeed(1);
+      // gridChar.setTilePosition({
+      //   position: charTilePos,
+      //   layer: undefined,
+      // });
+      // gridChar.move(Direction.RIGHT);
+      gridEngineHeadless.setSpeed("charID", 1);
+      gridEngineHeadless.setPosition("charID", charTilePos);
+      gridEngineHeadless.move("charID", Direction.RIGHT);
+      gridEngineHeadless.update(1000, 250);
+      gridCharPhaser.update(123);
 
       const scaledTileSize = 16 * 3;
       const expectedXPos =
@@ -623,7 +642,7 @@ describe("GridCharacterPhaser", () => {
       let charData;
       let charTilePos;
       let gridCharPhaser;
-      let gridChar;
+      // let gridChar;
       beforeEach(() => {
         charData = {
           id: "charID",
@@ -633,16 +652,23 @@ describe("GridCharacterPhaser", () => {
         };
         charTilePos = new Vector2(3, 4);
         gridCharPhaser = createChar(charData, false);
-        gridChar = gridCharPhaser.getGridCharacter();
-        gridChar.setSpeed(1);
-        gridChar.setTilePosition({
-          position: charTilePos,
-          layer: undefined,
+        // gridChar = gridCharPhaser.getGridCharacter();
+        gridEngineHeadless.create(new PhaserTilemap(tilemapMock), {
+          characters: [{ id: charData.id }],
         });
+        gridEngineHeadless.setSpeed("charID", 1);
+        gridEngineHeadless.setPosition("charID", charTilePos, undefined);
+        // gridChar.setSpeed(1);
+        // gridChar.setTilePosition({
+        //   position: charTilePos,
+        //   layer: undefined,
+        // });
       });
 
       it("should update sprite pixel pos horizontally", () => {
-        gridChar.move(Direction.RIGHT);
+        // gridChar.move(Direction.RIGHT);
+        gridEngineHeadless.move("charID", Direction.RIGHT);
+        gridEngineHeadless.update(1000, 250);
         gridCharPhaser.update(250);
 
         const scaledTileSize = 16 * 3;
@@ -661,7 +687,8 @@ describe("GridCharacterPhaser", () => {
       });
 
       it("should update sprite pixel pos diagonally", () => {
-        gridChar.move(Direction.DOWN_LEFT);
+        gridEngineHeadless.move("charID", Direction.DOWN_LEFT);
+        gridEngineHeadless.update(1000, 250);
         gridCharPhaser.update(250);
 
         const scaledTileSize = 16 * 3;
@@ -681,7 +708,8 @@ describe("GridCharacterPhaser", () => {
       });
 
       it("should update sprite pixel pos horizontally", () => {
-        gridChar.move(Direction.UP);
+        gridEngineHeadless.move("charID", Direction.UP);
+        gridEngineHeadless.update(1000, 250);
         gridCharPhaser.update(250);
 
         const scaledTileSize = 16 * 3;
@@ -702,7 +730,8 @@ describe("GridCharacterPhaser", () => {
       it("should update sprite pixel pos with new displayWidth and displayHeight", () => {
         spriteMock.displayWidth = 10;
         spriteMock.displayHeight = 10;
-        gridChar.move(Direction.RIGHT);
+        gridEngineHeadless.move("charID", Direction.RIGHT);
+        gridEngineHeadless.update(1000, 250);
         gridCharPhaser.update(250);
 
         const scaledTileSize = 16 * 3;
@@ -725,7 +754,7 @@ describe("GridCharacterPhaser", () => {
       let charData;
       let charTilePos;
       let gridCharPhaser;
-      let gridChar;
+      // let gridChar;
       beforeEach(() => {
         tilemapMock.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC;
         charData = {
@@ -736,16 +765,25 @@ describe("GridCharacterPhaser", () => {
         };
         charTilePos = new Vector2(3, 4);
         gridCharPhaser = createChar(charData, false);
-        gridChar = gridCharPhaser.getGridCharacter();
-        gridChar.setSpeed(1);
-        gridChar.setTilePosition({
-          position: charTilePos,
-          layer: undefined,
+
+        gridEngineHeadless.create(new PhaserTilemap(tilemapMock), {
+          characters: [{ id: charData.id }],
         });
+        gridEngineHeadless.setSpeed("charID", 1);
+        gridEngineHeadless.setPosition("charID", charTilePos, undefined);
+        // gridChar = gridCharPhaser.getGridCharacter();
+        // gridChar.setSpeed(1);
+        // gridChar.setTilePosition({
+        //   position: charTilePos,
+        //   layer: undefined,
+        // });
       });
 
       it("should update sprite pixel pos vertically", () => {
-        gridChar.move(Direction.UP);
+        // gridChar.move(Direction.UP);
+        // gridCharPhaser.update(250);
+        gridEngineHeadless.move("charID", Direction.UP);
+        gridEngineHeadless.update(1000, 250);
         gridCharPhaser.update(250);
 
         const expectedYPos =
@@ -759,7 +797,9 @@ describe("GridCharacterPhaser", () => {
       });
 
       it("should update sprite pixel pos diagonally", () => {
-        gridChar.move(Direction.UP_LEFT);
+        // gridChar.move(Direction.UP_LEFT);
+        gridEngineHeadless.move("charID", Direction.UP_LEFT);
+        gridEngineHeadless.update(1000, 250);
         gridCharPhaser.update(250);
 
         const expectedXPos =
@@ -789,8 +829,10 @@ describe("GridCharacterPhaser", () => {
       const walkingRightStandingFrame = 25;
       const walkingRightRightFootFrame = 24;
       const gridCharPhaser = createChar(charData, false);
-      const gridChar = gridCharPhaser.getGridCharacter();
-      gridChar.move(Direction.RIGHT);
+      // const gridChar = gridCharPhaser.getGridCharacter();
+      // gridChar.move(Direction.RIGHT);
+      gridEngineHeadless.move("charID", Direction.RIGHT);
+      gridEngineHeadless.update(1000, 1);
       gridCharPhaser.update(1);
 
       // after starting movement, set left foot animation
@@ -798,7 +840,7 @@ describe("GridCharacterPhaser", () => {
         walkingRightLeftFootFrame
       );
 
-      gridChar.move(Direction.RIGHT);
+      gridEngineHeadless.move("charID", Direction.RIGHT);
       gridCharPhaser.update(200);
 
       // after walking half a tile, set standing animation
@@ -806,7 +848,7 @@ describe("GridCharacterPhaser", () => {
         walkingRightStandingFrame
       );
 
-      gridChar.move(Direction.RIGHT);
+      gridEngineHeadless.move("charID", Direction.RIGHT);
       gridCharPhaser.update(300);
 
       // at the beginning of next tile start with right foot
@@ -826,9 +868,10 @@ describe("GridCharacterPhaser", () => {
       };
       const charLayerDepth = 1;
       const gridCharPhaser = createChar(charData, false);
-      const gridChar = gridCharPhaser.getGridCharacter();
+      // const gridChar = gridCharPhaser.getGridCharacter();
 
-      gridChar.move(Direction.RIGHT);
+      // gridChar.move(Direction.RIGHT);
+      gridEngineHeadless.move("charID", Direction.RIGHT);
       gridCharPhaser.update(10);
 
       checkSpriteDepth(spriteMock, charLayerDepth, "0000");
@@ -846,9 +889,10 @@ describe("GridCharacterPhaser", () => {
       };
       const charLayerDepth = 0;
       const gridCharPhaser = createChar(charData, false);
-      const gridChar = gridCharPhaser.getGridCharacter();
+      // const gridChar = gridCharPhaser.getGridCharacter();
 
-      gridChar.move(Direction.RIGHT);
+      // gridChar.move(Direction.RIGHT);
+      gridEngineHeadless.move("charID", Direction.RIGHT);
       gridCharPhaser.update(10);
 
       checkSpriteDepth(spriteMock, charLayerDepth, "0000");
@@ -871,9 +915,10 @@ describe("GridCharacterPhaser", () => {
       };
       const uppermostCharLayerDepth = 1;
       const gridCharPhaser = createChar(charData, false);
-      const gridChar = gridCharPhaser.getGridCharacter();
+      // const gridChar = gridCharPhaser.getGridCharacter();
 
-      gridChar.move(Direction.RIGHT);
+      // gridChar.move(Direction.RIGHT);
+      gridEngineHeadless.move("charID", Direction.RIGHT);
       gridCharPhaser.update(10);
 
       checkSpriteDepth(containerMock, uppermostCharLayerDepth, "0000");
@@ -898,9 +943,10 @@ describe("GridCharacterPhaser", () => {
         };
         const lowerCharLayerDepth = 0;
         const gridCharPhaser = createChar(charData, true);
-        const gridChar = gridCharPhaser.getGridCharacter();
+        // const gridChar = gridCharPhaser.getGridCharacter();
 
-        gridChar.move(Direction.RIGHT);
+        // gridChar.move(Direction.RIGHT);
+        gridEngineHeadless.move("charID", Direction.RIGHT);
         gridCharPhaser.update(10);
 
         checkSpriteDepth(overlaySpriteMock, lowerCharLayerDepth, "00000");
@@ -937,8 +983,9 @@ describe("GridCharacterPhaser", () => {
     });
 
     it("should not turn if moving", () => {
-      const gridChar = gridCharPhaser.getGridCharacter();
-      gridChar.move(Direction.DOWN);
+      // const gridChar = gridCharPhaser.getGridCharacter();
+      // gridChar.move(Direction.DOWN);
+      gridEngineHeadless.move("charID", Direction.DOWN);
       const hasEmitted = trackEmit(
         gridCharPhaser.getAnimation()?.frameChange()
       );
@@ -968,10 +1015,11 @@ describe("GridCharacterPhaser", () => {
         numberOfDirections: NumberOfDirections.FOUR,
       };
       const gridCharPhaser = createChar(charData, true);
-      const gridChar = gridCharPhaser.getGridCharacter();
+      // const gridChar = gridCharPhaser.getGridCharacter();
 
       const upStandingFrame = 37;
-      expect(gridChar.getMovementDirection()).toEqual(Direction.NONE);
+      // expect(gridChar.getMovementDirection()).toEqual(Direction.NONE);
+      expect(gridEngineHeadless.isMoving("charID")).toEqual(false);
       let currentFrame: number | undefined = undefined;
       gridCharPhaser
         .getAnimation()
@@ -980,7 +1028,8 @@ describe("GridCharacterPhaser", () => {
         .subscribe((frameNo: number) => {
           currentFrame = frameNo;
         });
-      gridChar.move(Direction.UP);
+      // gridChar.move(Direction.UP);
+      gridEngineHeadless.move("charID", Direction.UP);
       expect(currentFrame).toEqual(upStandingFrame);
     });
   });

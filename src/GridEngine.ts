@@ -394,9 +394,8 @@ export class GridEngine {
 
   /** Adds a character after calling {@link create}. */
   addCharacter(charData: CharacterData): void {
-    this.addCharacterInternal(charData);
-
     this.geHeadless.addCharacter(charData);
+    this.addCharacterInternal(charData);
   }
 
   private addCharacterInternal(charData: CharacterData): void {
@@ -417,13 +416,14 @@ export class GridEngine {
       phaserCharData,
       this.scene,
       this.gridTilemap,
-      this.config.layerOverlay
+      this.config.layerOverlay,
+      this.geHeadless
     );
-    const gridChar = gridCharPhaser.getGridCharacter();
+    // const gridChar = gridCharPhaser.getGridCharacter();
 
     this.gridCharacters?.set(charData.id, gridCharPhaser);
 
-    this.gridTilemap.addCharacter(gridChar);
+    // this.gridTilemap.addCharacter(gridChar);
   }
 
   /** Checks whether a character with the given ID is registered. */
@@ -581,7 +581,7 @@ export class GridEngine {
   getSprite(charId: string): Phaser.GameObjects.Sprite | undefined {
     this.initGuard();
     const gridCharPhaser = this.gridCharacters?.get(charId);
-    const gridChar = gridCharPhaser?.getGridCharacter();
+    const gridChar = gridCharPhaser;
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridCharPhaser?.getSprite();
   }

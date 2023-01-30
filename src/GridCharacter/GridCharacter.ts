@@ -13,7 +13,7 @@ import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 
-const MAX_MOVEMENT_PROGRESS = 1000;
+export const MAX_MOVEMENT_PROGRESS = 1000;
 
 export type CharId = string;
 
