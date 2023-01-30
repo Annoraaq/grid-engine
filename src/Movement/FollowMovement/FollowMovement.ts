@@ -27,8 +27,8 @@ export class FollowMovement implements Movement {
       .pipe(
         takeUntil(
           this.character.autoMovementSet().pipe(
-            take(1),
-            filter((movement) => movement !== this)
+            filter((movement) => movement !== this),
+            take(1)
           )
         )
       )
