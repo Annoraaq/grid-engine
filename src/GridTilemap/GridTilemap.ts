@@ -109,12 +109,12 @@ export class GridTilemap {
   }
 
   getTileWidth(): number {
-    const tilemapScale = this.tilemap.layers[0].tilemapLayer.scale;
+    const tilemapScale = this.tilemap.layers[0]?.tilemapLayer.scale ?? 1;
     return this.tilemap.tileWidth * tilemapScale;
   }
 
   getTileHeight(): number {
-    const tilemapScale = this.tilemap.layers[0].tilemapLayer.scale;
+    const tilemapScale = this.tilemap.layers[0]?.tilemapLayer.scale ?? 1;
     return this.tilemap.tileHeight * tilemapScale;
   }
 
