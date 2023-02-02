@@ -201,8 +201,8 @@ export class TargetMovement implements Movement {
     this.character
       .autoMovementSet()
       .pipe(
-        take(1),
-        filter((movement) => movement !== this)
+        filter((movement) => movement !== this),
+        take(1)
       )
       .subscribe(() => {
         this.stop(MoveToResult.MOVEMENT_TERMINATED);
