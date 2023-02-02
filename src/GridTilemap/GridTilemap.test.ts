@@ -754,8 +754,18 @@ describe("GridTilemap", () => {
     expect(gridTilemap.getTileWidth()).toEqual(48);
   });
 
+  it("should get scaled tile width from layerless tile map", () => {
+    tilemapMock.layers = [];
+    expect(gridTilemap.getTileWidth()).toEqual(16);
+  });
+
   it("should get scaled tile height", () => {
     expect(gridTilemap.getTileHeight()).toEqual(48);
+  });
+
+  it("should get scaled tile height from layerless tile map", () => {
+    tilemapMock.layers = [];
+    expect(gridTilemap.getTileHeight()).toEqual(16);
   });
 
   it("should get positions in range", () => {
