@@ -104,7 +104,7 @@ export interface GridEngineConfig {
 
   /**
    * Enables experimental
-   * {@link https://annoraaq.github.io/grid-engine/features/layer-overlay | layer overlay feature}.
+   * {@link https://annoraaq.github.io/grid-engine/p/layer-overlay/ | layer overlay feature}.
    *
    * @defaultValue `false`
    *
@@ -176,15 +176,15 @@ export interface CharacterData {
    * If not set, automatic walking animation will be disabed. Do this if you
    * want to use a custom animation. In case of number: The 0-based index of
    * the character on the spritesheet. Here is an
-   * {@link https://annoraaq.github.io/grid-engine/img/charIndex.png | example image showing the character indices}.
+   * {@link https://github.com/Annoraaq/grid-engine/raw/master/images/charIndex.png | example image showing the character indices}.
    * In case of {@link WalkingAnimationMapping}: Alternatively to providing a
    * characterIndex you can also provide a custom frame mapping. This is
    * especially handy if your spritesheet has a different arrangement of frames
-   * than you can see in the {@link https://annoraaq.github.io/grid-engine/img/charIndex.png | example image}
+   * than you can see in the {@link https://github.com/Annoraaq/grid-engine/raw/master/images/charIndex.png  | example image}
    * (4 rows with 3 columns). You can provide the frame number for every state
    * of the character.
    *
-   * For more details see the {@link https://annoraaq.github.io/grid-engine/examples/custom-walking-animation-mapping.html | custom walking animation mapping example}.
+   * For more details see the {@link https://annoraaq.github.io/grid-engine/example/custom-walking-animation-mapping/ | custom walking animation mapping example}.
    */
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
 
@@ -209,14 +209,12 @@ export interface CharacterData {
    * tiles, it is necessary that you position the character’s sprite on
    * position (0, 0) in the container.
    *
-   * For more details see the {@link https://annoraaq.github.io/grid-engine/examples/phaser-container | container example}.
+   * For more details see the {@link https://annoraaq.github.io/grid-engine/example/phaser-containers/ | container example}.
    */
   container?: Phaser.GameObjects.Container;
 
   /**
    * A custom x-offset for the sprite/container.
-   *
-   * For more details see the {@link https://annoraaq.github.io/grid-engine/examples/custom-offset | custom offset example}.
    *
    * @defaultValue `0`
    */
@@ -224,8 +222,6 @@ export interface CharacterData {
 
   /**
    * A custom y-offset for the sprite/container.
-   *
-   * For more details see the {@link https://annoraaq.github.io/grid-engine/examples/custom-offset | custom offset example}.
    *
    * @defaultValue `0`
    */
@@ -249,7 +245,7 @@ export interface CharacterData {
 
   /**
    * Sets the
-   * {@link https://annoraaq.github.io/grid-engine/features/character-layers | character layer}
+   * {@link https://annoraaq.github.io/grid-engine/p/character-layers | character layer}
    * of the character. If omitted the lowest character layer of the tilemap is
    * taken. If there are no character layers in the tilemap, it will get the
    * char layer `undefined`.
@@ -597,7 +593,7 @@ export class GridEngine {
   }
 
   /**
-   * @returns `true` if {@link https://annoraaq.github.io/grid-engine/features/layer-overlay | layer overlay}
+   * @returns `true` if {@link https://annoraaq.github.io/grid-engine/p/layer-overlay/ | layer overlay}
    * is activated.
    */
   hasLayerOverlay(): boolean {
@@ -961,7 +957,7 @@ export class GridEngine {
 
   /**
    * Returns all collision groups of the given character.
-   * {@link https://annoraaq.github.io/grid-engine/examples/collision-groups | Collision Groups Example}
+   * {@link https://annoraaq.github.io/grid-engine/example/collision-groups | Collision Groups Example}
    *
    * @returns All collision groups of the given character.
    */
