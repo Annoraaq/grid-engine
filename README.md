@@ -50,10 +50,18 @@ movement to your tilemap game. Your characters will be able to only move in whol
 
 Installing the Grid Engine plugin is simple.
 
+> **_NOTE:_** For TypeScript check out [this example repository](https://github.com/Annoraaq/grid-engine-ts-example).
+
 ### NPM
 
 ```bash
 npm i --save grid-engine
+```
+
+And then import via:
+
+```javascript
+import { GridEngine } from "grid-engine";
 ```
 
 ### Web
