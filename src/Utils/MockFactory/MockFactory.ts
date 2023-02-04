@@ -213,24 +213,35 @@ export function mockBlockMapNew(
   charLayer?: string,
   isometric?: boolean
 ): Tilemap {
-  const data: Tile[][] = [];
-  for (let r = 0; r < blockMap.length; r++) {
-    const row: Tile[] = [];
-    for (let c = 0; c < blockMap[r].length; c++) {
-      row.push(new MockTile(getBlockingProps(blockMap[r][c])));
+  return mockLayeredBlockMapNew([{ layer: charLayer, blockMap }], isometric);
+}
+
+export function mockLayeredBlockMapNew(
+  blockMaps: Array<{ layer: string | undefined; blockMap: string[] }>,
+  isometric?: boolean
+): Tilemap {
+  const layers: MockTileLayer[] = [];
+  for (const bm of blockMaps) {
+    const data: Tile[][] = [];
+    for (let r = 0; r < bm.blockMap.length; r++) {
+      const row: Tile[] = [];
+      for (let c = 0; c < bm.blockMap[r].length; c++) {
+        row.push(new MockTile(getBlockingProps(bm.blockMap[r][c])));
+      }
+      data.push(row);
     }
-    data.push(row);
+    const layer = new MockTileLayer(
+      bm.layer,
+      bm.layer ? { ge_charLayer: bm.layer } : {},
+      bm.blockMap.length,
+      bm.blockMap[0].length,
+      1,
+      [],
+      data
+    );
+    layers.push(layer);
   }
-  const layer = new MockTileLayer(
-    "default",
-    charLayer ? { ge_charLayer: charLayer } : {},
-    blockMap.length,
-    blockMap[0].length,
-    1,
-    [],
-    data
-  );
-  return new MockTilemap([layer], isometric ? "isometric" : "orthogonal");
+  return new MockTilemap(layers, isometric ? "isometric" : "orthogonal");
 }
 
 export function mockBlockMap(
