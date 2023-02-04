@@ -144,7 +144,7 @@ describe("GridEngine", () => {
   });
 
   it("should init player", () => {
-    const containerMock = {};
+    const containerMock = { setDepth: jest.fn() };
     gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
@@ -204,7 +204,7 @@ describe("GridEngine", () => {
   });
 
   it("should init player with facingDirection", () => {
-    const containerMock = {};
+    const containerMock = { setDepth: jest.fn() };
     gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {

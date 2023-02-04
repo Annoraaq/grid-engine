@@ -230,7 +230,6 @@ export class GridTilemapPhaser {
     });
 
     layersToDelete.forEach((layer) => layer.destroy());
-    console.log(this.charLayerDepths);
   }
 
   private setDepth(layer: TileLayer, depth: number): void {

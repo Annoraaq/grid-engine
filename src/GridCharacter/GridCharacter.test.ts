@@ -9,6 +9,7 @@ import * as Phaser from "phaser";
 import {
   createBlankLayerMock,
   createTilemapMock,
+  mockBlockMapNew,
 } from "../Utils/MockFactory/MockFactory";
 import { CollisionStrategy } from "../GridEngine";
 import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
@@ -49,6 +50,21 @@ describe("GridCharacter", () => {
     }
   }
 
+  function createDefaultTilemapMock(layer?: string) {
+    return new GridTilemap(
+      mockBlockMapNew(
+        [
+          // prettier-ignore
+          "..",
+          "..",
+        ],
+        layer
+      ),
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+  }
+
   beforeEach(() => {
     blankLayerMock = createBlankLayerMock();
     tilemapMock = createTilemapMock(blankLayerMock);
@@ -67,6 +83,7 @@ describe("GridCharacter", () => {
   });
 
   it("should get init data", () => {
+    const gridTilemap = createDefaultTilemapMock();
     gridCharacter = new GridCharacter("player", {
       tilemap: gridTilemap,
       speed: 3,
@@ -79,6 +96,7 @@ describe("GridCharacter", () => {
       tileWidth: 2,
       tileHeight: 3,
     });
+    gridTilemap.addCharacter(gridCharacter);
     expect(gridCharacter.getId()).toEqual("player");
     expect(gridCharacter.getSpeed()).toEqual(3);
     expect(gridCharacter.getTilePos().layer).toEqual("someLayer");
@@ -94,12 +112,14 @@ describe("GridCharacter", () => {
   });
 
   it("should set default init data", () => {
+    const gridTilemap = createDefaultTilemapMock();
     gridCharacter = new GridCharacter("player", {
       tilemap: gridTilemap,
       speed: 3,
       collidesWithTiles: true,
       numberOfDirections: NumberOfDirections.EIGHT,
     });
+    gridTilemap.addCharacter(gridCharacter);
     expect(gridCharacter.getTilePos().layer).toEqual(undefined);
     expect(gridCharacter.getCollisionGroups()).toEqual([]);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
@@ -113,7 +133,15 @@ describe("GridCharacter", () => {
   });
 
   it("should start movement", async () => {
-    mockNonBlockingTile();
+    // mockNonBlockingTile();
+    const gridTilemap = createDefaultTilemapMock("lowerCharLayer");
+    gridCharacter = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    gridTilemap.addCharacter(gridCharacter);
     expect(gridCharacter.getTilePos()).toEqual({
       position: new Vector2(0, 0),
       layer: "lowerCharLayer",
@@ -128,37 +156,45 @@ describe("GridCharacter", () => {
       .pipe(take(1))
       .toPromise();
 
-    gridCharacter.move(Direction.UP);
-    expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
-    expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
+    gridCharacter.move(Direction.DOWN);
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN);
+    expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
     expect(gridCharacter.getTilePos()).toEqual({
       position: new Vector2(0, 0),
       layer: "lowerCharLayer",
     });
     expect(gridCharacter.getNextTilePos()).toEqual({
-      position: new Vector2(0, -1),
+      position: new Vector2(0, 1),
       layer: "lowerCharLayer",
     });
     const dir = await movementStartedProm;
-    expect(dir).toEqual(Direction.UP);
+    expect(dir).toEqual(Direction.DOWN);
 
-    gridCharacter.move(Direction.DOWN);
-    expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+    gridCharacter.move(Direction.UP);
+    expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN);
     expect(gridCharacter.getTilePos()).toEqual({
       position: new Vector2(0, 0),
       layer: "lowerCharLayer",
     });
     expect(gridCharacter.getNextTilePos()).toEqual({
-      position: new Vector2(0, -1),
+      position: new Vector2(0, 1),
       layer: "lowerCharLayer",
     });
 
     const posChanged = await posChangedProm;
     expect(posChanged?.exitTile).toEqual(new Vector2(0, 0));
-    expect(posChanged?.enterTile).toEqual(new Vector2(0, -1));
+    expect(posChanged?.enterTile).toEqual(new Vector2(0, 1));
   });
 
   it("should not update if not moving", () => {
+    const gridTilemap = createDefaultTilemapMock();
+    gridCharacter = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    gridTilemap.addCharacter(gridCharacter);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
     expect(gridCharacter.getMovementProgress()).toEqual(0);
 
@@ -167,13 +203,27 @@ describe("GridCharacter", () => {
   });
 
   it("should not move if no direction", () => {
-    mockNonBlockingTile();
+    const gridTilemap = createDefaultTilemapMock();
+    gridCharacter = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    gridTilemap.addCharacter(gridCharacter);
     gridCharacter.move(Direction.NONE);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
   });
 
   it("should update speed", () => {
-    mockNonBlockingTile();
+    const gridTilemap = createDefaultTilemapMock();
+    gridCharacter = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    gridTilemap.addCharacter(gridCharacter);
 
     gridCharacter.move(Direction.UP);
     gridCharacter.update(QUARTER_SECOND / 2);
@@ -190,7 +240,14 @@ describe("GridCharacter", () => {
   });
 
   it("should update vertically", () => {
-    mockNonBlockingTile();
+    const gridTilemap = createDefaultTilemapMock();
+    gridCharacter = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    gridTilemap.addCharacter(gridCharacter);
 
     gridCharacter.move(Direction.UP);
     gridCharacter.update(QUARTER_SECOND);
@@ -203,7 +260,14 @@ describe("GridCharacter", () => {
   });
 
   it("should update horizontally", () => {
-    mockNonBlockingTile();
+    const gridTilemap = createDefaultTilemapMock();
+    gridCharacter = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    gridTilemap.addCharacter(gridCharacter);
 
     gridCharacter.move(Direction.RIGHT);
     gridCharacter.update(QUARTER_SECOND);
@@ -216,7 +280,14 @@ describe("GridCharacter", () => {
   });
 
   it("should update diagonally", () => {
-    mockNonBlockingTile();
+    const gridTilemap = createDefaultTilemapMock();
+    gridCharacter = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    gridTilemap.addCharacter(gridCharacter);
 
     gridCharacter.move(Direction.DOWN_LEFT);
     gridCharacter.update(QUARTER_SECOND);
@@ -229,7 +300,14 @@ describe("GridCharacter", () => {
   });
 
   it("should update only till tile border", () => {
-    mockNonBlockingTile();
+    const gridTilemap = createDefaultTilemapMock();
+    gridCharacter = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    gridTilemap.addCharacter(gridCharacter);
 
     gridCharacter.move(Direction.UP);
     gridCharacter.update(QUARTER_SECOND);
@@ -244,12 +322,14 @@ describe("GridCharacter", () => {
   it("should set tile position", () => {
     const newTilePos = new Vector2(3, 4);
     const expectedTilePos = { position: new Vector2(3, 4), layer: "someLayer" };
+    const gridTilemap = createDefaultTilemapMock();
     gridCharacter = new GridCharacter("player", {
       tilemap: gridTilemap,
       speed: 3,
       collidesWithTiles: true,
       numberOfDirections: NumberOfDirections.FOUR,
     });
+    gridTilemap.addCharacter(gridCharacter);
     gridCharacter.setTilePosition({
       position: newTilePos,
       layer: "someLayer",
@@ -263,6 +343,14 @@ describe("GridCharacter", () => {
   });
 
   it("should set tile position with custom offset", async () => {
+    const gridTilemap = createDefaultTilemapMock();
+    gridCharacter = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    gridTilemap.addCharacter(gridCharacter);
     const movementStoppedObs = gridCharacter.movementStopped();
     const newTilePos = new Vector2(3, 4);
     jest.spyOn(movementStoppedObs, "next");
@@ -302,7 +390,14 @@ describe("GridCharacter", () => {
   });
 
   it("should stop ongoing movement when stopping on positionChangeFinish", () => {
-    mockNonBlockingTile();
+    const gridTilemap = createDefaultTilemapMock();
+    gridCharacter = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    gridTilemap.addCharacter(gridCharacter);
     const posChangeFinishedCb = jest.fn();
     const posChangeStartedCb = jest.fn();
 
@@ -328,7 +423,14 @@ describe("GridCharacter", () => {
 
   it("should stop moving on set tile pos", async () => {
     const newTilePos = new Vector2(3, 4);
-    mockNonBlockingTile();
+    const gridTilemap = createDefaultTilemapMock();
+    gridCharacter = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    gridTilemap.addCharacter(gridCharacter);
     gridCharacter.move(Direction.DOWN);
 
     const movementStoppedProm = gridCharacter
@@ -384,7 +486,14 @@ describe("GridCharacter", () => {
   });
 
   it("should stop moving if no movementImpuls", async () => {
-    mockNonBlockingTile();
+    const gridTilemap = createDefaultTilemapMock();
+    gridCharacter = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    gridTilemap.addCharacter(gridCharacter);
     gridCharacter.move(Direction.DOWN);
     gridCharacter.update(1);
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN);
