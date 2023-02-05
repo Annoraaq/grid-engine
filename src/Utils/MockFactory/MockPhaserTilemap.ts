@@ -61,6 +61,8 @@ export function createPhaserTilemapStub(
   const tilemap: Phaser.Tilemaps.Tilemap = {
     orientation: Phaser.Tilemaps.Orientation.ORTHOGONAL.toString(),
     layers: layers.map((l) => l.layer),
+    tileWidth: 16,
+    tileHeight: 16,
     hasTileAt(tileX: number, tileY: number, layer?: string) {
       const l = layers.find((l) => l.layer.name === layer);
       if (!l) return false;
