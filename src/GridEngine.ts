@@ -225,7 +225,7 @@ export class GridEngine {
 
     this.config = concreteConfig;
     this.gridTilemap = new GridTilemapPhaser(
-      new PhaserTilemap(tilemap),
+      tilemap,
       this.config.collisionTilePropertyName,
       this.config.characterCollisionStrategy
     );

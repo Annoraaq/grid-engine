@@ -2,7 +2,6 @@ import { of } from "rxjs";
 import * as Phaser from "phaser";
 import { createMockLayerData } from "../../Utils/MockFactory/MockFactory";
 import { GridTilemapPhaser } from "./GridTilemapPhaser";
-import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap";
 import { Direction } from "../../Direction/Direction";
 import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
@@ -94,7 +93,6 @@ jest.mock("../../Utils/Rect/Rect", function () {
 describe("GridTilemapPhaser", () => {
   let gridTilemap: GridTilemapPhaser;
   let tilemapMock;
-  let phaserTilemap;
   let blankLayerMock;
 
   beforeEach(() => {
@@ -137,9 +135,8 @@ describe("GridTilemapPhaser", () => {
         tilemapMock.layers.find((l) => l.name == name)
       ),
     };
-    phaserTilemap = new PhaserTilemap(tilemapMock);
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -151,7 +148,7 @@ describe("GridTilemapPhaser", () => {
 
   it("should set layer depths on construction", () => {
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -195,7 +192,7 @@ describe("GridTilemapPhaser", () => {
       }),
     ];
     gridTilemap = new GridTilemapPhaser(
-      new PhaserTilemap(tilemapMock),
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -208,7 +205,7 @@ describe("GridTilemapPhaser", () => {
   it("should consider charLayers", () => {
     tilemapMock.layers = mockCharLayers;
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -298,18 +295,20 @@ describe("GridTilemapPhaser", () => {
       }),
     ];
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
 
     expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
-    expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith("layer2#0", [
-      "Cloud City",
-    ]);
-    expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith("layer2#1", [
-      "Cloud City",
-    ]);
+    expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith(
+      "layer2#0",
+      "Cloud City"
+    );
+    expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith(
+      "layer2#1",
+      "Cloud City"
+    );
 
     expect(blankLayerMock.putTileAt).toHaveBeenCalledTimes(4);
     expect(blankLayerMock.putTileAt).toHaveBeenNthCalledWith(1, "r0#c0", 0, 0);
@@ -325,7 +324,7 @@ describe("GridTilemapPhaser", () => {
 
   it("should add a character", () => {
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -373,7 +372,7 @@ describe("GridTilemapPhaser", () => {
       }),
     ];
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -392,7 +391,7 @@ describe("GridTilemapPhaser", () => {
 
   it("should remove a character", () => {
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -412,7 +411,7 @@ describe("GridTilemapPhaser", () => {
 
   it("should find characters", () => {
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -435,7 +434,7 @@ describe("GridTilemapPhaser", () => {
       properties: { ge_collide: true },
     });
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -457,7 +456,7 @@ describe("GridTilemapPhaser", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     tilemapMock.getTileAt.mockReturnValue(undefined);
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -474,7 +473,7 @@ describe("GridTilemapPhaser", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     tilemapMock.getTileAt.mockReturnValue(undefined);
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -491,7 +490,7 @@ describe("GridTilemapPhaser", () => {
       properties: { custom_collides_prop: true },
     });
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "custom_collides_prop",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -508,7 +507,7 @@ describe("GridTilemapPhaser", () => {
       properties: { ge_collide_left: true, ge_collide_right: false },
     });
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -544,7 +543,7 @@ describe("GridTilemapPhaser", () => {
       properties: { ge_collide_right: true },
     });
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -580,7 +579,7 @@ describe("GridTilemapPhaser", () => {
       properties: { ge_collide_up: true },
     });
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -616,7 +615,7 @@ describe("GridTilemapPhaser", () => {
       properties: { ge_collide_down: true },
     });
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -713,7 +712,7 @@ describe("GridTilemapPhaser", () => {
     });
 
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -734,7 +733,7 @@ describe("GridTilemapPhaser", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -751,7 +750,7 @@ describe("GridTilemapPhaser", () => {
     tilemapMock.hasTileAt.mockReturnValue(false);
     tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -767,7 +766,7 @@ describe("GridTilemapPhaser", () => {
     tilemapMock.layers = mockCharLayers;
     tilemapMock.hasTileAt.mockReturnValue(false);
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -781,7 +780,7 @@ describe("GridTilemapPhaser", () => {
       return layerName !== "layer1" && layerName !== "layer2";
     });
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -795,7 +794,7 @@ describe("GridTilemapPhaser", () => {
       return layerName === "layer2";
     });
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -806,7 +805,7 @@ describe("GridTilemapPhaser", () => {
   it("should detect blocking char", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -826,7 +825,7 @@ describe("GridTilemapPhaser", () => {
   it("should detect an unblocked tile", () => {
     tilemapMock.hasTileAt.mockReturnValue(true);
     gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -983,7 +982,7 @@ describe("GridTilemapPhaser", () => {
   describe("transitions", () => {
     it("should set transitions", () => {
       gridTilemap = new GridTilemapPhaser(
-        phaserTilemap,
+        tilemapMock,
         "ge_collide",
         CollisionStrategy.BLOCK_TWO_TILES
       );
@@ -1004,7 +1003,7 @@ describe("GridTilemapPhaser", () => {
       const pos1 = new Vector2(4, 5);
       const pos2 = new Vector2(3, 5);
       gridTilemap = new GridTilemapPhaser(
-        phaserTilemap,
+        tilemapMock,
         "ge_collide",
         CollisionStrategy.BLOCK_TWO_TILES
       );

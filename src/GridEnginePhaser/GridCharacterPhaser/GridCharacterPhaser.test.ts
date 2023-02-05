@@ -95,7 +95,7 @@ describe("GridCharacterPhaser", () => {
     });
 
     const gridTilemap = new GridTilemapPhaser(
-      phaserTilemap,
+      tm,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -760,7 +760,7 @@ describe("GridCharacterPhaser", () => {
       };
       const tilemapPhaser = new PhaserTilemap(tm);
       const gridTilemap = new GridTilemapPhaser(
-        tilemapPhaser,
+        tm,
         "ge_collide",
         CollisionStrategy.BLOCK_TWO_TILES
       );
