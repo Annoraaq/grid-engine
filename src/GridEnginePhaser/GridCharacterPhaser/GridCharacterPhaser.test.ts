@@ -44,13 +44,20 @@ describe("GridCharacterPhaser", () => {
   });
 
   function createChar(
-    charData: PhaserCharacterData,
+    charData: Partial<PhaserCharacterData>,
     layerOverlay: boolean,
     isometric?: boolean
   ): {
     gridCharPhaser: GridCharacterPhaser;
     gridTilemapPhaser: GridTilemapPhaser;
   } {
+    const enrichedCharData = {
+      id: "charID",
+      sprite: spriteMock,
+      walkingAnimationMapping: 3,
+      numberOfDirections: NumberOfDirections.FOUR,
+      ...charData,
+    };
     const tm = createPhaserTilemapStub(
       new Map([
         [
@@ -84,7 +91,7 @@ describe("GridCharacterPhaser", () => {
     }
     const phaserTilemap = new PhaserTilemap(tm);
     gridEngineHeadless.create(phaserTilemap, {
-      characters: [charData],
+      characters: [enrichedCharData],
     });
 
     const gridTilemap = new GridTilemapPhaser(
@@ -94,7 +101,7 @@ describe("GridCharacterPhaser", () => {
     );
     return {
       gridCharPhaser: new GridCharacterPhaser(
-        charData,
+        enrichedCharData,
         sceneMock,
         gridTilemap,
         layerOverlay,
@@ -154,41 +161,23 @@ describe("GridCharacterPhaser", () => {
     });
 
     it("should update sprite on animation changes", () => {
-      const charData = {
-        id: "charID",
-        sprite: spriteMock,
-        walkingAnimationMapping: 3,
-        numberOfDirections: NumberOfDirections.FOUR,
-      };
-      const { gridCharPhaser } = createChar(charData, true);
+      const { gridCharPhaser } = createChar({}, true);
 
       (gridCharPhaser.getAnimation()?.frameChange() as any).next(13);
       expect(spriteMock.setFrame).toHaveBeenCalledWith(13);
     });
 
     it("should enable animation for charIndex", () => {
-      const charData = {
-        id: "charID",
-        sprite: spriteMock,
-        walkingAnimationMapping: 3,
-        numberOfDirections: NumberOfDirections.FOUR,
-      };
-      const { gridCharPhaser } = createChar(charData, true);
+      const { gridCharPhaser } = createChar({}, true);
 
       expect(gridCharPhaser.getWalkingAnimationMapping()).toBe(3);
       expect(gridCharPhaser.getAnimation()?.isEnabled()).toBe(true);
     });
 
     it("should set overlay sprite properties on creation", () => {
-      const charData = {
-        id: "charID",
-        sprite: spriteMock,
-        walkingAnimationMapping: 3,
-        numberOfDirections: NumberOfDirections.FOUR,
-      };
       const tileHeight = 16;
       const scale = 3;
-      createChar(charData, true);
+      createChar({}, true);
       expect(overlaySpriteMock.scale).toEqual(spriteMock.scale);
       expect(overlaySpriteMock.setCrop).toHaveBeenCalledWith(
         0,
@@ -201,10 +190,7 @@ describe("GridCharacterPhaser", () => {
 
     it("should disable animation", () => {
       const charData = {
-        id: "charID",
-        sprite: spriteMock,
         walkingAnimationMapping: undefined,
-        numberOfDirections: NumberOfDirections.FOUR,
       };
       const { gridCharPhaser } = createChar(charData, true);
 
@@ -213,10 +199,7 @@ describe("GridCharacterPhaser", () => {
 
     it("should set standing frame on creation", () => {
       const charData = {
-        id: "charID",
-        sprite: spriteMock,
         walkingAnimationMapping: 0,
-        numberOfDirections: NumberOfDirections.FOUR,
       };
 
       const standingFrameNumber = 1;
@@ -227,8 +210,9 @@ describe("GridCharacterPhaser", () => {
 
     it("should create a grid character with default values", () => {
       const charData = {
-        id: "charID",
         numberOfDirections: NumberOfDirections.EIGHT,
+        sprite: undefined,
+        walkingAnimationMapping: undefined,
       };
       const { gridCharPhaser } = createChar(charData, false);
 
@@ -241,12 +225,7 @@ describe("GridCharacterPhaser", () => {
     });
 
     it("should keep a sprite", () => {
-      const charData = {
-        id: "charID",
-        numberOfDirections: NumberOfDirections.FOUR,
-      };
-
-      const { gridCharPhaser } = createChar(charData, false);
+      const { gridCharPhaser } = createChar({}, false);
       const spriteMock = createSpriteMock();
       gridCharPhaser.setSprite(spriteMock);
 
@@ -254,11 +233,7 @@ describe("GridCharacterPhaser", () => {
     });
 
     it("should keep a container", () => {
-      const charData = {
-        id: "charID",
-        numberOfDirections: NumberOfDirections.FOUR,
-      };
-      const { gridCharPhaser } = createChar(charData, false);
+      const { gridCharPhaser } = createChar({}, false);
       const containerMock = {} as any;
       gridCharPhaser.setContainer(containerMock);
 
@@ -268,13 +243,7 @@ describe("GridCharacterPhaser", () => {
 
   describe("set new sprite", () => {
     it("should set overlay sprite properties", () => {
-      const charData = {
-        id: "charID",
-        sprite: spriteMock,
-        walkingAnimationMapping: 3,
-        numberOfDirections: NumberOfDirections.FOUR,
-      };
-      const { gridCharPhaser } = createChar(charData, true);
+      const { gridCharPhaser } = createChar({}, true);
       const newSpriteMock = createSpriteMock();
       newSpriteMock.scale = 20;
       newSpriteMock.height = 200;
@@ -293,13 +262,7 @@ describe("GridCharacterPhaser", () => {
     });
 
     it("should set old sprite position", () => {
-      const charData = {
-        id: "charID",
-        sprite: spriteMock,
-        walkingAnimationMapping: 3,
-        numberOfDirections: NumberOfDirections.FOUR,
-      };
-      const { gridCharPhaser } = createChar(charData, true);
+      const { gridCharPhaser } = createChar({}, true);
       gridEngineHeadless.setPosition("charID", new Vector2(3, 2));
       const newSpriteMock = createSpriteMock();
       gridCharPhaser.setSprite(newSpriteMock);
@@ -309,26 +272,14 @@ describe("GridCharacterPhaser", () => {
     });
 
     it("should unset sprite", () => {
-      const charData = {
-        id: "charID",
-        sprite: spriteMock,
-        walkingAnimationMapping: 3,
-        numberOfDirections: NumberOfDirections.FOUR,
-      };
-      const { gridCharPhaser } = createChar(charData, true);
+      const { gridCharPhaser } = createChar({}, true);
       gridCharPhaser.setSprite(undefined);
       expect(gridCharPhaser.getSprite()).toBeUndefined();
       expect(gridCharPhaser.getLayerOverlaySprite()).toBeUndefined();
     });
 
     it("should create new animation", () => {
-      const charData = {
-        id: "charID",
-        sprite: spriteMock,
-        walkingAnimationMapping: 3,
-        numberOfDirections: NumberOfDirections.FOUR,
-      };
-      const { gridCharPhaser } = createChar(charData, true);
+      const { gridCharPhaser } = createChar({}, true);
       const newSpriteMock = createSpriteMock();
       const oldAnimation = gridCharPhaser.getAnimation();
       gridCharPhaser.setSprite(newSpriteMock);
@@ -343,13 +294,7 @@ describe("GridCharacterPhaser", () => {
     });
 
     it("should unsubscribe from old animation", () => {
-      const charData = {
-        id: "charID",
-        sprite: spriteMock,
-        walkingAnimationMapping: 3,
-        numberOfDirections: NumberOfDirections.FOUR,
-      };
-      const { gridCharPhaser } = createChar(charData, true);
+      const { gridCharPhaser } = createChar({}, true);
       const newSpriteMock = createSpriteMock();
       gridCharPhaser.setSprite(newSpriteMock);
       const oldAnimation = gridCharPhaser.getAnimation();
@@ -365,9 +310,7 @@ describe("GridCharacterPhaser", () => {
 
     it("should disable animation", () => {
       const charData = {
-        id: "charID",
-        sprite: spriteMock,
-        numberOfDirections: NumberOfDirections.FOUR,
+        walkingAnimationMapping: undefined,
       };
       const { gridCharPhaser } = createChar(charData, true);
       const newSpriteMock = createSpriteMock();
@@ -379,10 +322,7 @@ describe("GridCharacterPhaser", () => {
 
     it("should set standing frame", () => {
       const charData = {
-        id: "charID",
-        sprite: spriteMock,
         walkingAnimationMapping: 0,
-        numberOfDirections: NumberOfDirections.FOUR,
       };
       const standingFrameNumber = 13;
       const { gridCharPhaser } = createChar(charData, true);
@@ -397,13 +337,8 @@ describe("GridCharacterPhaser", () => {
     it("should set depth of sprite", () => {
       const startPos = { x: 2, y: 2 };
       const charData = {
-        id: "charID",
-        sprite: spriteMock,
-        walkingAnimationMapping: 0,
         startPosition: startPos,
         charLayer: "testCharLayer",
-
-        numberOfDirections: NumberOfDirections.FOUR,
       };
       const charLayerDepth = 1;
       const { gridCharPhaser } = createChar(charData, false);
@@ -417,12 +352,8 @@ describe("GridCharacterPhaser", () => {
     it("should set depth of sprite on char layer", () => {
       const startPos = { x: 2, y: 2 };
       const charData = {
-        id: "charID",
-        sprite: spriteMock,
-        walkingAnimationMapping: 0,
         startPosition: startPos,
         charLayer: "lowerCharLayer",
-        numberOfDirections: NumberOfDirections.FOUR,
       };
       const charLayerDepth = 0;
       const { gridCharPhaser } = createChar(charData, false);
@@ -441,12 +372,8 @@ describe("GridCharacterPhaser", () => {
       } as any;
       const startPos = { x: 2, y: 2 };
       const charData = {
-        id: "charID",
-        sprite: spriteMock,
         container: containerMock,
-        walkingAnimationMapping: 0,
         startPosition: startPos,
-        numberOfDirections: NumberOfDirections.FOUR,
         charLayer: "testCharLayer",
       };
       const uppermostCharLayerDepth = 1;
@@ -461,12 +388,8 @@ describe("GridCharacterPhaser", () => {
     it("should set depth of pos above for overlay sprite", () => {
       const startPos = { x: 2, y: 2 };
       const charData = {
-        id: "charID",
-        sprite: spriteMock,
-        walkingAnimationMapping: 0,
         startPosition: startPos,
         charLayer: "testCharLayer",
-        numberOfDirections: NumberOfDirections.FOUR,
       };
       const charLayerDepth = 1;
       const { gridCharPhaser } = createChar(charData, true);
@@ -486,12 +409,9 @@ describe("GridCharacterPhaser", () => {
         setDepth: jest.fn(),
       } as any;
       const charData = {
-        id: "charID",
-        sprite: spriteMock,
         container: containerMock,
         offsetX: 10,
         offsetY: 15,
-        numberOfDirections: NumberOfDirections.FOUR,
       };
       const spriteInitialXPos = spriteMock.x;
       const spriteInitialYPos = spriteMock.y;
@@ -523,11 +443,8 @@ describe("GridCharacterPhaser", () => {
     describe("update sprite pixel pos", () => {
       let charData;
       let charTilePos;
-      // let gridCharPhaser;
       beforeEach(() => {
         charData = {
-          id: "charID",
-          sprite: spriteMock,
           offsetX: 10,
           offsetY: 15,
         };
@@ -636,23 +553,12 @@ describe("GridCharacterPhaser", () => {
     describe("update sprite pixel pos isometric", () => {
       let charData;
       let charTilePos;
-      // let gridCharPhaser;
       beforeEach(() => {
-        // tilemapMock.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC;
         charData = {
-          id: "charID",
-          sprite: spriteMock,
           offsetX: 10,
           offsetY: 15,
         };
         charTilePos = new Vector2(3, 4);
-        // gridCharPhaser = createChar(charData, false);
-
-        // gridEngineHeadless.create(new PhaserTilemap(tilemapMock), {
-        //   characters: [{ id: charData.id }],
-        // });
-        // gridEngineHeadless.setSpeed("charID", 1);
-        // gridEngineHeadless.setPosition("charID", charTilePos, undefined);
       });
 
       it("should update sprite pixel pos vertically", () => {
@@ -708,11 +614,7 @@ describe("GridCharacterPhaser", () => {
     it("should set depth of sprite", () => {
       const startPos = { x: 2, y: 2 };
       const charData = {
-        id: "charID",
-        sprite: spriteMock,
-        walkingAnimationMapping: 0,
         startPosition: startPos,
-        numberOfDirections: NumberOfDirections.FOUR,
         charLayer: "testCharLayer",
       };
       const charLayerDepth = 1;
@@ -729,12 +631,8 @@ describe("GridCharacterPhaser", () => {
     it("should set depth of sprite on char layer", () => {
       const startPos = { x: 2, y: 2 };
       const charData = {
-        id: "charID",
-        sprite: spriteMock,
-        walkingAnimationMapping: 0,
         startPosition: startPos,
         charLayer: "lowerCharLayer",
-        numberOfDirections: NumberOfDirections.FOUR,
       };
       const charLayerDepth = 0;
       const { gridCharPhaser } = createChar(charData, false);
@@ -754,12 +652,8 @@ describe("GridCharacterPhaser", () => {
       } as any;
       const startPos = { x: 2, y: 2 };
       const charData = {
-        id: "charID",
-        sprite: spriteMock,
         container: containerMock,
-        walkingAnimationMapping: 0,
         startPosition: startPos,
-        numberOfDirections: NumberOfDirections.FOUR,
         charLayer: "testCharLayer",
       };
       const uppermostCharLayerDepth = 1;
@@ -776,12 +670,8 @@ describe("GridCharacterPhaser", () => {
         const startPos = { x: 2, y: 2 };
         const posAbove = { x: 2, y: 1 };
         const charData = {
-          id: "charID",
-          sprite: spriteMock,
-          walkingAnimationMapping: 0,
           startPosition: startPos,
           charLayer: "testCharLayer",
-          numberOfDirections: NumberOfDirections.FOUR,
         };
         const lowerCharLayerDepth = 0;
         const { gridCharPhaser, gridTilemapPhaser } = createChar(
@@ -808,12 +698,9 @@ describe("GridCharacterPhaser", () => {
     beforeEach(() => {
       const startPos = { x: 2, y: 2 };
       const charData = {
-        id: "charID",
-        sprite: spriteMock,
-        walkingAnimationMapping: 0,
         startPosition: startPos,
         charLayer: "testCharLayer",
-        numberOfDirections: NumberOfDirections.FOUR,
+        walkingAnimationMapping: 0,
       };
       ({ gridCharPhaser } = createChar(charData, true));
     });
