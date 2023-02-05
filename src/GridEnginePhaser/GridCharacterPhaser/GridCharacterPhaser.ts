@@ -48,7 +48,6 @@ export class GridCharacterPhaser {
     layerOverlay: boolean,
     private geHeadless: GridEngineHeadless
   ) {
-    // this.createChar(charData, layerOverlay);
     this.layerOverlaySprite =
       layerOverlay && charData.sprite
         ? this.scene.add.sprite(0, 0, charData.sprite.texture)

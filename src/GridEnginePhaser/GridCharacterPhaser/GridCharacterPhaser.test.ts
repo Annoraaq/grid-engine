@@ -618,7 +618,6 @@ describe("GridCharacterPhaser", () => {
         charLayer: "testCharLayer",
       };
       const charLayerDepth = 1;
-      // const gridCharPhaser = createChar(charData, false);
       const { gridCharPhaser } = createChar(charData, false, true);
 
       gridEngineHeadless.move("charID", Direction.RIGHT);
@@ -738,7 +737,6 @@ describe("GridCharacterPhaser", () => {
 
   describe("walking frames", () => {
     it("should set players standing frame if direction blocked", () => {
-      // tilemapMock.hasTileAt.mockReturnValue(false);
       const tm = createPhaserTilemapStub(
         new Map([
           [
