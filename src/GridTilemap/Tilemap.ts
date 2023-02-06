@@ -1,7 +1,9 @@
 export type Orientation = "isometric" | "orthogonal";
 
 export interface Tile {
-  getProperties(): Record<string, string>;
+  // getProperties(): Record<string, string>;
+  getProperty(name: string): string | undefined;
+  hasProperty(name: string): boolean;
 }
 export interface TileLayer {
   getProperties(): Record<string, string>;
@@ -15,17 +17,21 @@ export interface TileLayer {
   destroy(): void;
   getTilesets(): string[];
   putTileAt(tile: number, x: number, y: number): void;
-  getData(): Tile[][];
+  getData(): Array<Array<Tile | undefined>>;
+}
+
+export interface CharTileLayer {
+  getName(): string | undefined;
+  getProperty(name: string): string | undefined;
+  hasProperty(name: string): boolean;
+  getData(): Array<Array<Tile | undefined>>;
 }
 
 export interface Tilemap {
-  getTileWidth(): number;
-  getTileHeight(): number;
   getWidth(): number;
   getHeight(): number;
   getOrientation(): Orientation;
-  getLayers(): TileLayer[];
+  getCharLayers(): CharTileLayer[];
   hasTileAt(x: number, y: number, layer?: string): boolean;
   getTileAt(x: number, y: number, layer?: string): Tile | undefined;
-  copyLayer(layer: TileLayer, newName: string, row: number): TileLayer;
 }

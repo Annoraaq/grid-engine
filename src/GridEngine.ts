@@ -39,8 +39,9 @@ import {
   CharacterShift,
   CharacterShiftAction,
 } from "./GridEngineHeadless";
-import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
+// import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
 import { GridTilemapPhaser } from "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser";
+import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
 
 export {
   CollisionStrategy,

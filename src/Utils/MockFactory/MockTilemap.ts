@@ -1,20 +1,23 @@
 import {
+  CharTileLayer,
   Orientation,
   Tile,
-  TileLayer,
   Tilemap,
 } from "../../GridTilemap/Tilemap";
 
 export class MockTile implements Tile {
   constructor(private properties: Record<string, string> = {}) {}
-  getProperties(): Record<string, string> {
-    return this.properties;
+  getProperty(name: string): string | undefined {
+    return this.properties[name];
+  }
+  hasProperty(name: string): boolean {
+    return this.properties[name] != null;
   }
 }
 
 export class MockTilemap implements Tilemap {
   constructor(
-    private layers: TileLayer[] = [],
+    private layers: CharTileLayer[] = [],
     private orientation: Orientation = "orthogonal"
   ) {}
 
@@ -33,7 +36,7 @@ export class MockTilemap implements Tilemap {
   getOrientation(): Orientation {
     return this.orientation;
   }
-  getLayers(): TileLayer[] {
+  getCharLayers(): CharTileLayer[] {
     return this.layers;
   }
   hasTileAt(x: number, y: number, layer?: string): boolean {
@@ -44,26 +47,29 @@ export class MockTilemap implements Tilemap {
     const l = this.layers.find((l) => l.getName() === layer);
     return l?.getData()[y]?.[x];
   }
-  copyLayer(_layer: TileLayer, _newName: string, _row: number): TileLayer {
-    return new MockTileLayer();
-  }
 }
 
-export class MockTileLayer implements TileLayer {
+export class MockTileLayer implements CharTileLayer {
   private depth = 0;
   constructor(
-    private name: string = "tileLayerName",
+    private name: string | undefined,
     private properties: Record<string, string> = {},
     private height: number = 5,
     private width: number = 5,
     private scale: number = 1,
     private tilesets: string[] = [],
-    private data: Tile[][] = [[]]
+    private data: Array<Array<Tile | undefined>> = [[]]
   ) {}
+  getProperty(name: string): string | undefined {
+    return this.properties[name];
+  }
+  hasProperty(name: string): boolean {
+    return this.properties[name] != null;
+  }
   getProperties(): Record<string, string> {
     return this.properties;
   }
-  getName(): string {
+  getName(): string | undefined {
     return this.name;
   }
   getHeight(): number {
@@ -94,7 +100,7 @@ export class MockTileLayer implements TileLayer {
   putTileAt(_tile: number, _x: number, _y: number): void {
     // do nothing
   }
-  getData(): Tile[][] {
+  getData(): Array<Array<Tile | undefined>> {
     return this.data;
   }
 }

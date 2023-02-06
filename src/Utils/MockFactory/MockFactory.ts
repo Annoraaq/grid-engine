@@ -4,7 +4,7 @@ import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { Vector2 } from "../Vector2/Vector2";
 import { Random, MersenneTwister19937 } from "random-js";
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
-import { Tile, TileLayer, Tilemap } from "../../GridTilemap/Tilemap";
+import { CharTileLayer, Tile, Tilemap } from "../../GridTilemap/Tilemap";
 import { MockTile, MockTileLayer, MockTilemap } from "./MockTilemap";
 
 export const LOWER_CHAR_LAYER = "lowerCharLayer";
@@ -101,7 +101,7 @@ export function createMockLayerData(layerData: any): any {
   return newLayerData;
 }
 
-export function createMockLayer(layerData: any): TileLayer {
+export function createMockLayer(layerData: any): CharTileLayer {
   return new MockTileLayer(
     layerData.name,
     layerData.properties,
@@ -151,6 +151,34 @@ export function mockCharMap(
   mockBlockMap(tilemapMock, blockMap);
 }
 
+export function mockCharMapNew(
+  gridTilemap: GridTilemap,
+  blockMaps: Array<{ layer: string | undefined; blockMap: string[] }>
+): void {
+  let charCounter = 0;
+  for (const bm of blockMaps) {
+    for (let row = 0; row < bm.blockMap.length; row++) {
+      for (let col = 0; col < bm.blockMap[row].length; col++) {
+        if (bm.blockMap[row][col] === "c") {
+          const gridCharacter = new GridCharacter(`mock_char_${charCounter}`, {
+            tilemap: gridTilemap,
+            speed: 3,
+            collidesWithTiles: true,
+            numberOfDirections: NumberOfDirections.FOUR,
+            collisionGroups: [COLLISION_GROUP],
+          });
+          gridCharacter.setTilePosition({
+            position: new Vector2(col, row),
+            layer: bm.layer,
+          });
+          gridTilemap.addCharacter(gridCharacter);
+          charCounter++;
+        }
+      }
+    }
+  }
+}
+
 export function mockRandomMap(
   tilemapMock: any,
   width: number,
@@ -174,7 +202,7 @@ export function mockRandomMap(
   mockBlockMap(tilemapMock, map);
 }
 
-function getBlockingProps(char: string): Record<string, string> {
+export function getBlockingProps(char: string): Record<string, string> {
   switch (char) {
     case "#":
       return {
@@ -222,11 +250,15 @@ export function mockLayeredBlockMapNew(
 ): Tilemap {
   const layers: MockTileLayer[] = [];
   for (const bm of blockMaps) {
-    const data: Tile[][] = [];
+    const data: Array<Array<Tile | undefined>> = [];
     for (let r = 0; r < bm.blockMap.length; r++) {
-      const row: Tile[] = [];
+      const row: Array<Tile | undefined> = [];
       for (let c = 0; c < bm.blockMap[r].length; c++) {
-        row.push(new MockTile(getBlockingProps(bm.blockMap[r][c])));
+        if (bm.blockMap[r][c] == "_") {
+          row.push(undefined);
+        } else {
+          row.push(new MockTile(getBlockingProps(bm.blockMap[r][c])));
+        }
       }
       data.push(row);
     }

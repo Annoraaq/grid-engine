@@ -418,7 +418,7 @@ describe("GridCharacterPhaser", () => {
       const charTilePos = new Vector2(3, 4);
       const { gridCharPhaser } = createChar(charData, false);
       gridEngineHeadless.setSpeed("charID", 1);
-      gridEngineHeadless.setPosition("charID", charTilePos);
+      gridEngineHeadless.setPosition("charID", charTilePos, "lowerCharLayer");
       gridEngineHeadless.move("charID", Direction.RIGHT);
       gridEngineHeadless.update(1000, 250);
       gridCharPhaser.update(250);
@@ -568,7 +568,7 @@ describe("GridCharacterPhaser", () => {
           true
         );
         gridEngineHeadless.setSpeed("charID", 1);
-        gridEngineHeadless.setPosition("charID", charTilePos, undefined);
+        gridEngineHeadless.setPosition("charID", charTilePos, "lowerCharLayer");
         gridEngineHeadless.move("charID", Direction.UP);
         gridEngineHeadless.update(1000, 250);
         gridCharPhaser.update(250);
@@ -590,7 +590,7 @@ describe("GridCharacterPhaser", () => {
           true
         );
         gridEngineHeadless.setSpeed("charID", 1);
-        gridEngineHeadless.setPosition("charID", charTilePos, undefined);
+        gridEngineHeadless.setPosition("charID", charTilePos, "lowerCharLayer");
         gridEngineHeadless.move("charID", Direction.UP_LEFT);
         gridEngineHeadless.update(1000, 250);
         gridCharPhaser.update(250);
