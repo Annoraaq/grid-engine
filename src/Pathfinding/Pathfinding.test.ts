@@ -22,10 +22,7 @@ jest.mock("./ShortestPathAlgorithm", function () {
 
 import { CollisionStrategy, NumberOfDirections } from "../GridEngine";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
-import { PhaserTilemap } from "../GridTilemap/Phaser/PhaserTilemap";
 import {
-  createBlankLayerMock,
-  createTilemapMock,
   COLLISION_GROUP,
   layerPos,
   createAllowedFn,
@@ -51,19 +48,9 @@ import {
 } from "./ShortestPathAlgorithm";
 
 describe("Pathfinding", () => {
-  let blankLayerMock;
-  let tilemapMock;
-  let gridTilemap;
   let pathfindingAlgo: ShortestPathAlgorithmType;
 
   beforeEach(() => {
-    blankLayerMock = createBlankLayerMock();
-    tilemapMock = createTilemapMock(blankLayerMock);
-    gridTilemap = new GridTilemap(
-      new PhaserTilemap(tilemapMock as any),
-      "ge_collides",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
     pathfindingAlgo = "BIDIRECTIONAL_SEARCH";
   });
 
@@ -306,6 +293,18 @@ describe("Pathfinding", () => {
   });
 
   it("should find the shortest path for allowed positions", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: LOWER_CHAR_LAYER,
+        blockMap: [
+          // prettier-ignore
+          "....",
+          "....",
+          "....",
+          "....",
+        ],
+      },
+    ]);
     const pathfinding = new Pathfinding(pathfindingAlgo, gridTilemap);
 
     // prettier-ignore
@@ -1475,6 +1474,18 @@ describe("Pathfinding", () => {
       const src = layerPos(new Vector2(1, 1));
       const dest = layerPos(new Vector2(1, 2));
       const allowedFn = () => false;
+      const gridTilemap = createTilemap([
+        {
+          layer: LOWER_CHAR_LAYER,
+          blockMap: [
+            // prettier-ignore
+            "....",
+            "....",
+            "....",
+            "....",
+          ],
+        },
+      ]);
       expect(
         isBlocking(src, dest, gridTilemap, {
           ...options,
