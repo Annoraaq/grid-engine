@@ -180,26 +180,24 @@ export function mockCharMapNew(
 }
 
 export function mockRandomMap(
-  tilemapMock: any,
+  layer: string | undefined,
   width: number,
   height: number,
   density = 0.1,
   seed = 12345
 ) {
-  tilemapMock.width = width;
-  tilemapMock.height = height;
   const random = new Random(MersenneTwister19937.seedWithArray([seed]));
 
   const map: string[] = [];
   for (let row = 0; row < height; row++) {
     const rowStr: string[] = [];
-    for (let col = 0; col < height; col++) {
+    for (let col = 0; col < width; col++) {
       const c = random.integer(0, 100) / 100 <= density ? "#" : ".";
       rowStr.push(c);
     }
     map[row] = rowStr.join("");
   }
-  mockBlockMap(tilemapMock, map);
+  return mockLayeredBlockMapNew([{ layer, blockMap: map }]);
 }
 
 export function getBlockingProps(char: string): Record<string, string> {

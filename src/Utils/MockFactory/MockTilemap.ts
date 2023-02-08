@@ -28,10 +28,10 @@ export class MockTilemap implements Tilemap {
     return 10;
   }
   getWidth(): number {
-    return 20;
+    return this.layers[0]?.getData()[0]?.length || 0;
   }
   getHeight(): number {
-    return 20;
+    return this.layers[0]?.getData()?.length || 0;
   }
   getOrientation(): Orientation {
     return this.orientation;
