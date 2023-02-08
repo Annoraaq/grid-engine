@@ -34,27 +34,6 @@ export function createSpriteMock() {
   } as any;
 }
 
-export function createBlankLayerMock() {
-  return {
-    scale: 0,
-    putTileAt: jest.fn(),
-    setDepth: jest.fn(),
-  };
-}
-
-export function createMockLayerData(layerData: any): any {
-  const tilemapLayer = {
-    ...layerData.tilemapLayer,
-    layer: {},
-  };
-  const newLayerData = {
-    ...layerData,
-    tilemapLayer,
-  };
-  tilemapLayer.layer = newLayerData;
-  return newLayerData;
-}
-
 export function createMockLayer(layerData: any): CharTileLayer {
   return new MockTileLayer(
     layerData.name,
@@ -72,37 +51,6 @@ export function layerPos(vec: Vector2, layer?: string): LayerVecPos {
     position: vec,
     layer: layer ?? LOWER_CHAR_LAYER,
   };
-}
-
-export function mockCharMap(
-  tilemapMock: any, // TODO: replace when we have a Tilemap interface
-  gridTilemap: GridTilemap,
-  blockMap: string[]
-) {
-  tilemapMock.height = blockMap.length;
-  tilemapMock.width = blockMap[0].length;
-  let charCounter = 0;
-  for (let row = 0; row < blockMap.length; row++) {
-    for (let col = 0; col < blockMap[row].length; col++) {
-      if (blockMap[row][col] === "c") {
-        const gridCharacter = new GridCharacter(`mock_char_${charCounter}`, {
-          tilemap: gridTilemap,
-          speed: 3,
-          collidesWithTiles: true,
-          numberOfDirections: NumberOfDirections.FOUR,
-          collisionGroups: [COLLISION_GROUP],
-        });
-        gridCharacter.setTilePosition({
-          position: new Vector2(col, row),
-          layer: LOWER_CHAR_LAYER,
-        });
-        gridTilemap.addCharacter(gridCharacter);
-        charCounter++;
-      }
-    }
-  }
-
-  mockBlockMap(tilemapMock, blockMap);
 }
 
 export function mockCharMapNew(
@@ -226,75 +174,6 @@ export function mockLayeredBlockMapNew(
     layers.push(layer);
   }
   return new MockTilemap(layers, isometric ? "isometric" : "orthogonal");
-}
-
-export function mockBlockMap(
-  tilemapMock: any, // TODO: replace when we have a Tilemap interface
-  blockMap: string[]
-) {
-  tilemapMock.hasTileAt.mockImplementation((x, y, _layerName) => {
-    if (x < 0 || x >= blockMap[0].length) return false;
-    if (y < 0 || y >= blockMap.length) return false;
-    return true;
-  });
-
-  tilemapMock.getTileAt.mockImplementation((x, y, _layerName) => {
-    if (x < 0 || x >= blockMap[0].length) return undefined;
-    if (y < 0 || y >= blockMap.length) return undefined;
-    switch (blockMap[y][x]) {
-      case "#":
-        return {
-          properties: {
-            ge_collides: true,
-          },
-        };
-      case "→":
-        return {
-          properties: {
-            ge_collide_up: true,
-            ge_collide_right: true,
-            ge_collide_down: true,
-          },
-        };
-      case "←":
-        return {
-          properties: {
-            ge_collide_up: true,
-            ge_collide_down: true,
-            ge_collide_left: true,
-          },
-        };
-      case "↑":
-        return {
-          properties: {
-            ge_collide_up: true,
-            ge_collide_right: true,
-            ge_collide_left: true,
-          },
-        };
-      case "↓":
-        return {
-          properties: {
-            ge_collide_right: true,
-            ge_collide_down: true,
-            ge_collide_left: true,
-          },
-        };
-    }
-    return {};
-  });
-}
-export function mockLayeredMap(
-  tilemapMock: any, // TODO: replace when we have a Tilemap interface
-  blockMap: Map<string, string[]>
-) {
-  tilemapMock.hasTileAt.mockImplementation((x, y, layerName) => {
-    const layer = blockMap.get(layerName);
-    if (!layer) return false;
-    if (x < 0 || x >= layer[0].length) return false;
-    if (y < 0 || y >= layer.length) return false;
-    return layer[y][x] != "#";
-  });
 }
 
 export function createAllowedFn(map: string[]) {
