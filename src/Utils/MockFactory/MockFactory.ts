@@ -42,52 +42,6 @@ export function createBlankLayerMock() {
   };
 }
 
-export function createTilemapMock(blankLayerMock?) {
-  if (!blankLayerMock) {
-    blankLayerMock = createBlankLayerMock();
-  }
-  const layerData1 = createMockLayerData({
-    name: "Layer 1",
-    tilemapLayer: {
-      setDepth: jest.fn(),
-      scale: 3,
-      tileset: "Cloud City",
-    },
-    properties: [
-      {
-        name: "ge_charLayer",
-        value: LOWER_CHAR_LAYER,
-      },
-    ],
-  });
-  const layerData2 = createMockLayerData({
-    name: "Layer 2",
-    tilemapLayer: {
-      setDepth: jest.fn(),
-      scale: 3,
-      tileset: "Cloud City",
-    },
-    properties: [
-      {
-        name: "ge_charLayer",
-        value: HIGHER_CHAR_LAYER,
-      },
-    ],
-  });
-  return {
-    layers: [layerData1, layerData2],
-    tileWidth: 16,
-    tileHeight: 16,
-    width: 20,
-    height: 30,
-    getTileAt: jest.fn().mockReturnValue({}),
-    hasTileAt: jest.fn().mockReturnValue(true),
-    createBlankLayer: jest
-      .fn()
-      .mockReturnValue(createMockLayerData(blankLayerMock)),
-  };
-}
-
 export function createMockLayerData(layerData: any): any {
   const tilemapLayer = {
     ...layerData.tilemapLayer,

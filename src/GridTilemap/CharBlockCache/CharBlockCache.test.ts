@@ -4,10 +4,10 @@ import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache";
 import { GridTilemap } from "../GridTilemap";
-import { createTilemapMock } from "../../Utils/MockFactory/MockFactory";
+import { mockLayeredBlockMapNew } from "../../Utils/MockFactory/MockFactory";
 import * as Phaser from "phaser";
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
-import { PhaserTilemap } from "../Phaser/PhaserTilemap";
+import { Tilemap } from "../Tilemap";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -18,9 +18,22 @@ describe("CharBlockCache", () => {
   let charBlockCache: CharBlockCache;
   let gridTilemap: GridTilemap;
 
+  function createTilemap(): Tilemap {
+    return mockLayeredBlockMapNew([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
+        ],
+      },
+    ]);
+  }
+
   beforeEach(() => {
     gridTilemap = new GridTilemap(
-      new PhaserTilemap(createTilemapMock() as any),
+      createTilemap(),
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -75,7 +88,7 @@ describe("CharBlockCache", () => {
   describe("blocking strategy BLOCK_TWO_TILES", () => {
     beforeEach(() => {
       gridTilemap = new GridTilemap(
-        new PhaserTilemap(createTilemapMock() as any),
+        createTilemap(),
         "ge_collide",
         CollisionStrategy.BLOCK_TWO_TILES
       );
@@ -178,7 +191,7 @@ describe("CharBlockCache", () => {
   describe("blocking strategy BLOCK_ONE_TILE_AHEAD", () => {
     beforeEach(() => {
       gridTilemap = new GridTilemap(
-        new PhaserTilemap(createTilemapMock() as any),
+        createTilemap(),
         "ge_collide",
         CollisionStrategy.BLOCK_ONE_TILE_AHEAD
       );

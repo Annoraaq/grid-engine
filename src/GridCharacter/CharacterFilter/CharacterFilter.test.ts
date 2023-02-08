@@ -1,8 +1,7 @@
 import { NumberOfDirections } from "../../Direction/Direction";
 import { CollisionStrategy } from "../../GridEngineHeadless";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
-import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap";
-import { createTilemapMock } from "../../Utils/MockFactory/MockFactory";
+import { mockLayeredBlockMapNew } from "../../Utils/MockFactory/MockFactory";
 import { GridCharacter } from "../GridCharacter";
 import { filterCharacters } from "./CharacterFilter";
 
@@ -22,8 +21,18 @@ describe("CharacterFilter", () => {
   }
   it("should get all characters with specific labels", () => {
     const characters: GridCharacter[] = [];
+    const tm = mockLayeredBlockMapNew([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
+        ],
+      },
+    ]);
     const gridTilemap = new GridTilemap(
-      new PhaserTilemap(createTilemapMock() as any),
+      tm,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
