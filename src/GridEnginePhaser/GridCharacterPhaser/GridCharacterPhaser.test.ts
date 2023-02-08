@@ -615,6 +615,7 @@ describe("GridCharacterPhaser", () => {
       const startPos = { x: 2, y: 2 };
       const charData = {
         startPosition: startPos,
+        numberOfDirections: NumberOfDirections.EIGHT,
         charLayer: "testCharLayer",
       };
       const charLayerDepth = 1;
@@ -631,6 +632,7 @@ describe("GridCharacterPhaser", () => {
       const startPos = { x: 2, y: 2 };
       const charData = {
         startPosition: startPos,
+        numberOfDirections: NumberOfDirections.EIGHT,
         charLayer: "lowerCharLayer",
       };
       const charLayerDepth = 0;
