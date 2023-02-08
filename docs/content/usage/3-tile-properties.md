@@ -24,9 +24,13 @@ For the most basic type of collision, read [the Collision guide](../collisions) 
 
 These flags inform **Grid Engine** about how it should handle collisions from certain directions. When a one-way flag is set to true, it won't allow a character to pass through the tile from that direction. Multiple flags can be true at the same time. For a demo, see [the One-Way Collision demo](../../example/one-way-collision).
 
-| Property           | Type    | Effect                                                               |
-| :----------------- | :------ | :------------------------------------------------------------------- |
-| `ge_collide_up`    | boolean | If set to `true`, characters can not walk over tile from the top.    |
-| `ge_collide_down`  | boolean | If set to `true`, characters can not walk over tile from the bottom. |
-| `ge_collide_left`  | boolean | If set to `true`, characters can not walk over tile from the left.   |
-| `ge_collide_right` | boolean | If set to `true`, characters can not walk over tile from the right.  |
+| Property                | Type    | Effect                                                                    |
+| :---------------------- | :------ | :------------------------------------------------------------------------ |
+| `ge_collide_up`         | boolean | If set to `true`, characters cannot walk over tile from the top.          |
+| `ge_collide_down`       | boolean | If set to `true`, characters cannot walk over tile from the bottom.       |
+| `ge_collide_left`       | boolean | If set to `true`, characters cannot walk over tile from the left.         |
+| `ge_collide_right`      | boolean | If set to `true`, characters cannot walk over tile from the right.        |
+| `ge_collide_up-left`    | boolean | If set to `true`, characters cannot walk over tile from the top-left.     |
+| `ge_collide_up-right`   | boolean | If set to `true`, characters cannot walk over tile from the top-right.    |
+| `ge_collide_down-left`  | boolean | If set to `true`, characters cannot walk over tile from the bottom-left.  |
+| `ge_collide_down-right` | boolean | If set to `true`, characters cannot walk over tile from the bottom-right. |
