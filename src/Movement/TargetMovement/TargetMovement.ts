@@ -219,7 +219,7 @@ export class TargetMovement implements Movement {
       collisionGroups: this.character.getCollisionGroups(),
       ignoredChars: [this.character.getId()],
       ignoreTiles: !this.character.collidesWithTiles(),
-      ignoreMapBounds: false,
+      ignoreMapBounds: this.character.getIgnoreMissingTiles(),
       ignoreBlockedTarget: this.ignoreBlockedTarget,
     };
   }
