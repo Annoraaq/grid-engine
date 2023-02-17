@@ -148,17 +148,23 @@ describe("GridTilemapPhaser", () => {
     );
 
     expect(tm.layers.length).toBe(3);
-    expect(dataToIdArr(tm.layers[1].data)).toEqual([[0], [1]]);
+    expect(dataToIdArr(tm.layers[1].data)).toEqual([
+      [0, 1],
+      [undefined, undefined],
+    ]);
     expect(dataToIdArr(tm.layers[2].data)).toEqual([
-      [undefined, 2],
-      [undefined, 3],
+      [undefined, undefined],
+      [2, 3],
     ]);
     expect(tm.layers[1].tilemapLayer.depth).toBe(0.0000049);
     expect(tm.layers[2].tilemapLayer.depth).toBe(0.0000097);
 
     function dataToIdArr(data: Phaser.Tilemaps.Tile[][]): number[][] {
       return data.map((row) =>
-        row.map((obj) => obj.properties.find((p) => p.name == "id").value)
+        row.map((obj) => {
+          if (!Array.isArray(obj.properties)) return undefined;
+          return obj.properties.find((p) => p.name == "id").value;
+        })
       );
     }
   });
