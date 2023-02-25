@@ -751,11 +751,7 @@ describe("GridCharacterPhaser", () => {
         numberOfDirections: NumberOfDirections.FOUR,
       };
       const tilemapPhaser = new PhaserTilemap(tm);
-      const gridTilemap = new GridTilemapPhaser(
-        tm
-        // "ge_collide",
-        // CollisionStrategy.BLOCK_TWO_TILES
-      );
+      const gridTilemap = new GridTilemapPhaser(tm);
       gridEngineHeadless.create(tilemapPhaser, {
         characters: [charData],
       });

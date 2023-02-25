@@ -4,7 +4,7 @@ import { Vector2 } from "../Utils/Vector2/Vector2";
 import { Direction, NumberOfDirections } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
 import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
-import { mockLayeredBlockMapNew } from "../Utils/MockFactory/MockFactory";
+import { mockLayeredBlockMap } from "../Utils/MockFactory/MockFactory";
 import { MockTilemap } from "../Utils/MockFactory/MockTilemap";
 import { Tilemap } from "./Tilemap";
 
@@ -13,7 +13,7 @@ describe("GridTilemap", () => {
   let phaserTilemap: Tilemap;
 
   beforeEach(() => {
-    phaserTilemap = mockLayeredBlockMapNew([
+    phaserTilemap = mockLayeredBlockMap([
       {
         layer: "charLayer1",
         blockMap: [
@@ -39,7 +39,7 @@ describe("GridTilemap", () => {
   });
 
   it("should consider sub-layers for blocking", () => {
-    const tm = mockLayeredBlockMapNew([
+    const tm = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -90,7 +90,7 @@ describe("GridTilemap", () => {
   });
 
   it("should consider sub-layers for no tile", () => {
-    const tm = mockLayeredBlockMapNew([
+    const tm = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -130,7 +130,7 @@ describe("GridTilemap", () => {
   });
 
   it("should not consider ge_collide: false as blocking", () => {
-    const tm = mockLayeredBlockMapNew([
+    const tm = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: ["."],
@@ -181,7 +181,7 @@ describe("GridTilemap", () => {
   });
 
   it("should set the lowest char layer", () => {
-    phaserTilemap = mockLayeredBlockMapNew([
+    phaserTilemap = mockLayeredBlockMap([
       {
         layer: "noCharLayer",
         isCharLayer: false,
@@ -287,7 +287,7 @@ describe("GridTilemap", () => {
   });
 
   it("should not consider missing tiles as blocking", () => {
-    phaserTilemap = mockLayeredBlockMapNew([
+    phaserTilemap = mockLayeredBlockMap([
       {
         layer: "test",
         blockMap: [
@@ -331,7 +331,7 @@ describe("GridTilemap", () => {
   });
 
   it("should detect one-way blocking tiles left", () => {
-    phaserTilemap = mockLayeredBlockMapNew([
+    phaserTilemap = mockLayeredBlockMap([
       {
         layer: "test",
         blockMap: [
@@ -374,7 +374,7 @@ describe("GridTilemap", () => {
   });
 
   it("should detect one-way blocking tiles right", () => {
-    phaserTilemap = mockLayeredBlockMapNew([
+    phaserTilemap = mockLayeredBlockMap([
       {
         layer: "test",
         blockMap: [
@@ -417,7 +417,7 @@ describe("GridTilemap", () => {
   });
 
   it("should detect one-way blocking tiles up", () => {
-    phaserTilemap = mockLayeredBlockMapNew([
+    phaserTilemap = mockLayeredBlockMap([
       {
         layer: "test",
         blockMap: [
@@ -460,7 +460,7 @@ describe("GridTilemap", () => {
   });
 
   it("should detect one-way blocking tiles down", () => {
-    phaserTilemap = mockLayeredBlockMapNew([
+    phaserTilemap = mockLayeredBlockMap([
       {
         layer: "test",
         blockMap: [
@@ -503,7 +503,7 @@ describe("GridTilemap", () => {
   });
 
   it("should only consider tiles on charLayer", () => {
-    phaserTilemap = mockLayeredBlockMapNew([
+    phaserTilemap = mockLayeredBlockMap([
       {
         layer: "charLayer1",
         blockMap: [
@@ -541,7 +541,7 @@ describe("GridTilemap", () => {
   });
 
   it("should block if no tile", () => {
-    phaserTilemap = mockLayeredBlockMapNew([
+    phaserTilemap = mockLayeredBlockMap([
       {
         layer: "test",
         blockMap: [
@@ -649,7 +649,7 @@ describe("GridTilemap", () => {
 
   describe("isometric", () => {
     beforeEach(() => {
-      const phaserTilemap = mockLayeredBlockMapNew(
+      const phaserTilemap = mockLayeredBlockMap(
         [
           {
             layer: "charLayer1",

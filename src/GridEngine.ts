@@ -561,9 +561,8 @@ export class GridEngine {
   getSprite(charId: string): Phaser.GameObjects.Sprite | undefined {
     this.initGuard();
     const gridCharPhaser = this.gridCharacters?.get(charId);
-    const gridChar = gridCharPhaser;
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    return gridCharPhaser?.getSprite();
+    if (!gridCharPhaser) throw this.createCharUnknownErr(charId);
+    return gridCharPhaser.getSprite();
   }
 
   /**

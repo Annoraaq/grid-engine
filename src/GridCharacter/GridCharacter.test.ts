@@ -5,8 +5,8 @@ import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import {
-  mockBlockMapNew,
-  mockLayeredBlockMapNew,
+  mockBlockMap,
+  mockLayeredBlockMap,
 } from "../Utils/MockFactory/MockFactory";
 import { CollisionStrategy } from "../GridEngine";
 
@@ -20,7 +20,7 @@ describe("GridCharacter", () => {
     config: Partial<CharConfig> = {}
   ): { gridTilemap: GridTilemap; gridCharacter: GridCharacter } {
     const gridTilemap = new GridTilemap(
-      mockBlockMapNew(
+      mockBlockMap(
         [
           // prettier-ignore
           "....",
@@ -476,7 +476,7 @@ describe("GridCharacter", () => {
 
   it("should stop moving on tile border edge case", () => {
     const gridTilemap = new GridTilemap(
-      mockLayeredBlockMapNew([
+      mockLayeredBlockMap([
         {
           layer: "lowerCharLayer",
           blockMap: [
@@ -525,7 +525,7 @@ describe("GridCharacter", () => {
 
   it("should stop moving on tile border edge case in one update", () => {
     const gridTilemap = new GridTilemap(
-      mockLayeredBlockMapNew([
+      mockLayeredBlockMap([
         {
           layer: "lowerCharLayer",
           blockMap: [
@@ -573,7 +573,7 @@ describe("GridCharacter", () => {
 
   it("should stop moving if blocking", () => {
     const gridTilemap = new GridTilemap(
-      mockBlockMapNew([
+      mockBlockMap([
         // prettier-ignore
         "..",
         "#.",
@@ -601,7 +601,7 @@ describe("GridCharacter", () => {
 
   it("should detect non-movement", () => {
     const gridTilemap = new GridTilemap(
-      mockBlockMapNew([
+      mockBlockMap([
         // prettier-ignore
         "..",
         "#.",
@@ -691,7 +691,7 @@ describe("GridCharacter", () => {
     it("direction NONE never blocks", () => {
       const direction = Direction.NONE;
       const gridTilemap = new GridTilemap(
-        mockBlockMapNew([
+        mockBlockMap([
           // prettier-ignore
           "##",
           "##",
@@ -713,7 +713,7 @@ describe("GridCharacter", () => {
 
     it("should create a grid character with ignoreMissingTiles=true", () => {
       const gridTilemap = new GridTilemap(
-        mockBlockMapNew(["."]),
+        mockBlockMap(["."]),
         "ge_collide",
         CollisionStrategy.BLOCK_TWO_TILES
       );
@@ -731,7 +731,7 @@ describe("GridCharacter", () => {
 
     it("should not block with ignoreMissingTiles", () => {
       const gridTilemap = new GridTilemap(
-        mockBlockMapNew([
+        mockBlockMap([
           // prettier-ignore
           "##",
           "##",
@@ -774,7 +774,7 @@ describe("GridCharacter", () => {
 
       it("should block when blocking tiles in multi-tile radius x", () => {
         const gridTilemap = new GridTilemap(
-          mockBlockMapNew([
+          mockBlockMap([
             // prettier-ignore
             "...",
             "..#",
@@ -799,7 +799,7 @@ describe("GridCharacter", () => {
 
       it("should block when blocking tiles in multi-tile radius x when moving", () => {
         const gridTilemap = new GridTilemap(
-          mockBlockMapNew([
+          mockBlockMap([
             // prettier-ignore
             "....",
             "...#",
@@ -829,7 +829,7 @@ describe("GridCharacter", () => {
           "transition of main tile",
         () => {
           const gridTilemap = new GridTilemap(
-            mockLayeredBlockMapNew([
+            mockLayeredBlockMap([
               {
                 layer: "lowerCharLayer",
                 blockMap: [
@@ -878,7 +878,7 @@ describe("GridCharacter", () => {
 
       it("should block when blocking tiles in multi-tile radius y", () => {
         const gridTilemap = new GridTilemap(
-          mockBlockMapNew([
+          mockBlockMap([
             // prettier-ignore
             "....",
             "....",
@@ -903,7 +903,7 @@ describe("GridCharacter", () => {
 
       it("should block when blocking chars in multi-tile radius x", () => {
         const gridTilemap = new GridTilemap(
-          mockBlockMapNew([
+          mockBlockMap([
             // prettier-ignore
             "....",
             "....",
@@ -1091,7 +1091,7 @@ describe("GridCharacter", () => {
 
   it("should turn player if direction blocked", () => {
     const gridTilemap = new GridTilemap(
-      mockBlockMapNew([
+      mockBlockMap([
         // prettier-ignore
         ".#",
         "..",

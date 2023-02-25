@@ -1,7 +1,7 @@
 import { NumberOfDirections } from "../../Direction/Direction";
 import { CollisionStrategy } from "../../GridEngineHeadless";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
-import { mockLayeredBlockMapNew } from "../../Utils/MockFactory/MockFactory";
+import { mockLayeredBlockMap } from "../../Utils/MockFactory/MockFactory";
 import { GridCharacter } from "../GridCharacter";
 import { filterCharacters } from "./CharacterFilter";
 
@@ -21,7 +21,7 @@ describe("CharacterFilter", () => {
   }
   it("should get all characters with specific labels", () => {
     const characters: GridCharacter[] = [];
-    const tm = mockLayeredBlockMapNew([
+    const tm = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [

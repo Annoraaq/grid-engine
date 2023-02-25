@@ -53,7 +53,7 @@ export function layerPos(vec: Vector2, layer?: string): LayerVecPos {
   };
 }
 
-export function mockCharMapNew(
+export function mockCharMap(
   gridTilemap: GridTilemap,
   blockMaps: Array<{ layer: string | undefined; blockMap: string[] }>
 ): void {
@@ -99,7 +99,7 @@ export function mockRandomMap(
     }
     map[row] = rowStr.join("");
   }
-  return mockLayeredBlockMapNew([{ layer, blockMap: map }]);
+  return mockLayeredBlockMap([{ layer, blockMap: map }]);
 }
 
 export function getBlockingProps(char: string): Record<string, string> {
@@ -136,15 +136,15 @@ export function getBlockingProps(char: string): Record<string, string> {
   return {};
 }
 
-export function mockBlockMapNew(
+export function mockBlockMap(
   blockMap: string[],
   charLayer?: string,
   isometric?: boolean
 ): Tilemap {
-  return mockLayeredBlockMapNew([{ layer: charLayer, blockMap }], isometric);
+  return mockLayeredBlockMap([{ layer: charLayer, blockMap }], isometric);
 }
 
-export function mockLayeredBlockMapNew(
+export function mockLayeredBlockMap(
   blockMaps: Array<{
     layer: string | undefined;
     blockMap: string[];

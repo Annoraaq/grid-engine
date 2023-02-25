@@ -4,7 +4,7 @@ import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache";
 import { GridTilemap } from "../GridTilemap";
-import { mockLayeredBlockMapNew } from "../../Utils/MockFactory/MockFactory";
+import { mockLayeredBlockMap } from "../../Utils/MockFactory/MockFactory";
 import * as Phaser from "phaser";
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Tilemap } from "../Tilemap";
@@ -19,7 +19,7 @@ describe("CharBlockCache", () => {
   let gridTilemap: GridTilemap;
 
   function createTilemap(): Tilemap {
-    return mockLayeredBlockMapNew([
+    return mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [

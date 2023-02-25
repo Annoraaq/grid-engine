@@ -27,9 +27,9 @@ import {
   layerPos,
   createAllowedFn,
   mockRandomMap,
-  mockLayeredBlockMapNew,
+  mockLayeredBlockMap,
   LOWER_CHAR_LAYER,
-  mockCharMapNew,
+  mockCharMap,
 } from "../Utils/MockFactory/MockFactory";
 import { Concrete } from "../Utils/TypeUtils";
 import { Vector2 } from "../Utils/Vector2/Vector2";
@@ -57,13 +57,13 @@ describe("Pathfinding", () => {
   function createTilemap(
     layers: Array<{ blockMap: string[]; layer: string | undefined }>
   ) {
-    const tm = mockLayeredBlockMapNew(layers);
+    const tm = mockLayeredBlockMap(layers);
     const gridTilemap = new GridTilemap(
       tm,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
-    mockCharMapNew(gridTilemap, layers);
+    mockCharMap(gridTilemap, layers);
     return gridTilemap;
   }
 

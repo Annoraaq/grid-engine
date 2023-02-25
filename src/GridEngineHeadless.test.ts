@@ -29,10 +29,7 @@ jest.mock("../package.json", () => ({
 import { GridEngineHeadless } from "./GridEngine";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
-import {
-  createMockLayer,
-  mockBlockMapNew,
-} from "./Utils/MockFactory/MockFactory";
+import { createMockLayer, mockBlockMap } from "./Utils/MockFactory/MockFactory";
 import { MockTilemap } from "./Utils/MockFactory/MockTilemap";
 
 describe("GridEngineHeadless", () => {
@@ -200,7 +197,7 @@ describe("GridEngineHeadless", () => {
     beforeEach(() => {
       gridEngineHeadless.create(
         // prettier-ignore
-        mockBlockMapNew([
+        mockBlockMap([
         "...",
         "...",
         "...",
@@ -245,7 +242,7 @@ describe("GridEngineHeadless", () => {
     beforeEach(() => {
       gridEngineHeadless.create(
         // prettier-ignore
-        mockBlockMapNew([
+        mockBlockMap([
         "...",
         "...",
         "...",
@@ -280,7 +277,7 @@ describe("GridEngineHeadless", () => {
     beforeEach(() => {
       gridEngineHeadless.create(
         // prettier-ignore
-        mockBlockMapNew([
+        mockBlockMap([
         "...",
         "...",
         "...",
@@ -563,7 +560,7 @@ describe("GridEngineHeadless", () => {
   it("should remove all chars", () => {
     gridEngineHeadless.create(
       // prettier-ignore
-      mockBlockMapNew([
+      mockBlockMap([
         "...",
         "...",
         "...",
@@ -670,7 +667,7 @@ describe("GridEngineHeadless", () => {
   it("should block if tile is blocking", () => {
     gridEngineHeadless.create(
       // prettier-ignore
-      mockBlockMapNew([
+      mockBlockMap([
         "....",
         "....",
         "....",
@@ -702,7 +699,7 @@ describe("GridEngineHeadless", () => {
   it("should not block", () => {
     gridEngineHeadless.create(
       // prettier-ignore
-      mockBlockMapNew([
+      mockBlockMap([
         "..",
         ".."
       ], 'someLayer'),
@@ -717,7 +714,7 @@ describe("GridEngineHeadless", () => {
   it("should check blocking with default cGroup", () => {
     gridEngineHeadless.create(
       // prettier-ignore
-      mockBlockMapNew([
+      mockBlockMap([
         "..",
         ".."
       ], 'someLayer'),
@@ -892,7 +889,7 @@ describe("GridEngineHeadless", () => {
 
       gridEngineHeadless.create(
         // prettier-ignore
-        mockBlockMapNew([
+        mockBlockMap([
             "..",
             ".."
           ]),
@@ -941,7 +938,7 @@ describe("GridEngineHeadless", () => {
         nextMock = jest.fn();
         gridEngineHeadless.create(
           // prettier-ignore
-          mockBlockMapNew([
+          mockBlockMap([
             "..",
             ".."
           ], "anyLayer"),
@@ -1041,7 +1038,7 @@ describe("GridEngineHeadless", () => {
 
   describe("labels", () => {
     it("should add labels on creation", () => {
-      gridEngineHeadless.create(mockBlockMapNew(["."]), {
+      gridEngineHeadless.create(mockBlockMap(["."]), {
         characters: [
           {
             id: "player",
@@ -1081,7 +1078,7 @@ describe("GridEngineHeadless", () => {
     });
 
     it("should get all characters with specific labels", () => {
-      gridEngineHeadless.create(mockBlockMapNew(["."]), {
+      gridEngineHeadless.create(mockBlockMap(["."]), {
         characters: [
           {
             id: "player1",
@@ -1150,7 +1147,7 @@ describe("GridEngineHeadless", () => {
     it("should delegate to pathfinding", () => {
       gridEngineHeadless.create(
         // prettier-ignore
-        mockBlockMapNew([
+        mockBlockMap([
         ".####",
         ".####",
         ".....",
@@ -1425,7 +1422,7 @@ describe("GridEngineHeadless", () => {
   function createDefaultGridEngine() {
     gridEngineHeadless.create(
       // prettier-ignore
-      mockBlockMapNew([
+      mockBlockMap([
         "..",
         ".."
       ]),

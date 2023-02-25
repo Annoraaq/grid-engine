@@ -13,8 +13,8 @@ import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import {
   createAllowedFn,
   COLLISION_GROUP,
-  mockLayeredBlockMapNew,
-  mockCharMapNew,
+  mockLayeredBlockMap,
+  mockCharMap,
 } from "../../Utils/MockFactory/MockFactory";
 
 const TEST_CHAR_CONFIG = {
@@ -62,7 +62,7 @@ describe("TargetMovement", () => {
   }
 
   beforeEach(() => {
-    tilemapMock = mockLayeredBlockMapNew([
+    tilemapMock = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -224,7 +224,7 @@ describe("TargetMovement", () => {
   it("should move towards closest reachable point if path is blocked", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
-    tilemapMock = mockLayeredBlockMapNew([
+    tilemapMock = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -267,7 +267,7 @@ describe("TargetMovement", () => {
     const targetPos = layerPos(new Vector2(1, 3));
     const mockChar = createMockChar("char", charPos);
 
-    tilemapMock = mockLayeredBlockMapNew([
+    tilemapMock = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -301,7 +301,7 @@ describe("TargetMovement", () => {
   it("should not move if distance reached", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
-    tilemapMock = mockLayeredBlockMapNew([
+    tilemapMock = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -344,7 +344,7 @@ describe("TargetMovement", () => {
   it("should move if closestToTarget is further than distance", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
-    tilemapMock = mockLayeredBlockMapNew([
+    tilemapMock = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -384,7 +384,7 @@ describe("TargetMovement", () => {
   it("should not move if closestToTarget is closer than distance", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
-    tilemapMock = mockLayeredBlockMapNew([
+    tilemapMock = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -427,7 +427,7 @@ describe("TargetMovement", () => {
   it("should not move if no path exists", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
-    tilemapMock = mockLayeredBlockMapNew([
+    tilemapMock = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -465,7 +465,7 @@ describe("TargetMovement", () => {
       ignoreMissingTiles: true,
     });
 
-    tilemapMock = mockLayeredBlockMapNew([
+    tilemapMock = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -509,7 +509,7 @@ describe("TargetMovement", () => {
     it("should move if path exists after backoff", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const mockChar = createMockChar("char", charPos);
-      tilemapMock = mockLayeredBlockMapNew([
+      tilemapMock = mockLayeredBlockMap([
         {
           layer: "lowerCharLayer",
           blockMap: [
@@ -568,7 +568,7 @@ describe("TargetMovement", () => {
     it("should move if path exists after custom backoff", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const mockChar = createMockChar("char", charPos);
-      tilemapMock = mockLayeredBlockMapNew([
+      tilemapMock = mockLayeredBlockMap([
         {
           layer: "lowerCharLayer",
           blockMap: [
@@ -627,7 +627,7 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const mockChar = createMockChar("char", charPos);
 
-      tilemapMock = mockLayeredBlockMapNew([
+      tilemapMock = mockLayeredBlockMap([
         {
           layer: "lowerCharLayer",
           blockMap: [
@@ -700,7 +700,7 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const mockChar = createMockChar("char", charPos);
 
-      tilemapMock = mockLayeredBlockMapNew([
+      tilemapMock = mockLayeredBlockMap([
         {
           layer: "lowerCharLayer",
           blockMap: [
@@ -803,7 +803,7 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const mockChar = createMockChar("char", charPos);
 
-      tilemapMock = mockLayeredBlockMapNew([
+      tilemapMock = mockLayeredBlockMap([
         {
           layer: "lowerCharLayer",
           blockMap: [
@@ -921,7 +921,7 @@ describe("TargetMovement", () => {
     const targetPos = layerPos(new Vector2(1, 2));
     const mockChar = createMockChar("char", charPos);
 
-    tilemapMock = mockLayeredBlockMapNew([
+    tilemapMock = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -976,7 +976,7 @@ describe("TargetMovement", () => {
     const targetPos = layerPos(new Vector2(1, 2));
     const mockChar = createMockChar("char", charPos);
 
-    tilemapMock = mockLayeredBlockMapNew([
+    tilemapMock = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -1025,7 +1025,7 @@ describe("TargetMovement", () => {
       const targetPos = layerPos(new Vector2(1, 3));
       const mockChar = createMockChar("char", charPos);
 
-      tilemapMock = mockLayeredBlockMapNew([
+      tilemapMock = mockLayeredBlockMap([
         {
           layer: "lowerCharLayer",
           blockMap: [
@@ -1092,7 +1092,7 @@ describe("TargetMovement", () => {
       const targetPos = layerPos(new Vector2(1, 2));
       const mockChar = createMockChar("char", charPos);
 
-      tilemapMock = mockLayeredBlockMapNew([
+      tilemapMock = mockLayeredBlockMap([
         {
           layer: "lowerCharLayer",
           blockMap: [
@@ -1141,7 +1141,7 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const targetPos = layerPos(new Vector2(1, 2));
       const mockChar = createMockChar("char", charPos);
-      tilemapMock = mockLayeredBlockMapNew([
+      tilemapMock = mockLayeredBlockMap([
         {
           layer: "lowerCharLayer",
           blockMap: [
@@ -1194,7 +1194,7 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const targetPos = layerPos(new Vector2(1, 2));
       const mockChar = createMockChar("char", charPos);
-      tilemapMock = mockLayeredBlockMapNew([
+      tilemapMock = mockLayeredBlockMap([
         {
           layer: "lowerCharLayer",
           blockMap: [
@@ -1252,7 +1252,7 @@ describe("TargetMovement", () => {
     const targetPos = layerPos(new Vector2(1, 2));
     const mockChar = createMockChar("char", charPos);
 
-    tilemapMock = mockLayeredBlockMapNew([
+    tilemapMock = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -1307,7 +1307,7 @@ describe("TargetMovement", () => {
       tileWidth: 2,
       tileHeight: 2,
     });
-    tilemapMock = mockLayeredBlockMapNew([
+    tilemapMock = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -1536,7 +1536,7 @@ describe("TargetMovement", () => {
         numberOfDirections: NumberOfDirections.EIGHT,
       });
 
-      tilemapMock = mockLayeredBlockMapNew([
+      tilemapMock = mockLayeredBlockMap([
         {
           layer: "lowerCharLayer",
           blockMap: [
@@ -1578,7 +1578,7 @@ describe("TargetMovement", () => {
       tileHeight: 2,
     });
 
-    tilemapMock = mockLayeredBlockMapNew([
+    tilemapMock = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -1674,13 +1674,13 @@ describe("TargetMovement", () => {
         ],
       },
     ];
-    tilemapMock = mockLayeredBlockMapNew(blockMap);
+    tilemapMock = mockLayeredBlockMap(blockMap);
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
-    mockCharMapNew(gridTilemap, blockMap);
+    mockCharMap(gridTilemap, blockMap);
     gridTilemap.addCharacter(mockChar);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
@@ -1723,13 +1723,13 @@ describe("TargetMovement", () => {
         ],
       },
     ];
-    tilemapMock = mockLayeredBlockMapNew(blockMap);
+    tilemapMock = mockLayeredBlockMap(blockMap);
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
-    mockCharMapNew(gridTilemap, blockMap);
+    mockCharMap(gridTilemap, blockMap);
     gridTilemap.addCharacter(mockChar);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
@@ -1757,7 +1757,7 @@ describe("TargetMovement", () => {
       collidesWithTiles: false,
     });
 
-    tilemapMock = mockLayeredBlockMapNew([
+    tilemapMock = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -1795,7 +1795,7 @@ describe("TargetMovement", () => {
     const targetPos = layerPos(new Vector2(1, 2));
     const mockChar = createMockChar("char", charPos);
 
-    tilemapMock = mockLayeredBlockMapNew([
+    tilemapMock = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
         blockMap: [
@@ -1826,7 +1826,7 @@ describe("TargetMovement", () => {
     it("should move towards closest reachable point if path is blocked", () => {
       const charPos = layerPos(new Vector2(2, 5));
       const targetPos = layerPos(new Vector2(2, 0));
-      tilemapMock = mockLayeredBlockMapNew([
+      tilemapMock = mockLayeredBlockMap([
         {
           layer: "lowerCharLayer",
           blockMap: [
@@ -1878,7 +1878,7 @@ describe("TargetMovement", () => {
     it("should use correct number of directions", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const targetPos = layerPos(new Vector2(3, 2));
-      tilemapMock = mockLayeredBlockMapNew([
+      tilemapMock = mockLayeredBlockMap([
         {
           layer: "lowerCharLayer",
           blockMap: [
@@ -1974,7 +1974,7 @@ describe("TargetMovement", () => {
           ],
         },
       ];
-      tilemapMock = mockLayeredBlockMapNew(blockMap);
+      tilemapMock = mockLayeredBlockMap(blockMap);
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
@@ -1986,7 +1986,7 @@ describe("TargetMovement", () => {
         collisionGroups: [COLLISION_GROUP],
       });
       gridTilemap.addCharacter(mockChar);
-      mockCharMapNew(gridTilemap, blockMap);
+      mockCharMap(gridTilemap, blockMap);
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
@@ -2025,7 +2025,7 @@ describe("TargetMovement", () => {
           ],
         },
       ];
-      tilemapMock = mockLayeredBlockMapNew(blockMap);
+      tilemapMock = mockLayeredBlockMap(blockMap);
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
@@ -2037,7 +2037,7 @@ describe("TargetMovement", () => {
         collisionGroups: ["someOtherCollisionGroup"],
       });
       gridTilemap.addCharacter(mockChar);
-      mockCharMapNew(gridTilemap, blockMap);
+      mockCharMap(gridTilemap, blockMap);
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
@@ -2071,7 +2071,7 @@ describe("TargetMovement", () => {
           ],
         },
       ];
-      tilemapMock = mockLayeredBlockMapNew(blockMap);
+      tilemapMock = mockLayeredBlockMap(blockMap);
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
@@ -2084,7 +2084,7 @@ describe("TargetMovement", () => {
         collisionGroups: [COLLISION_GROUP],
       });
       gridTilemap.addCharacter(mockChar);
-      mockCharMapNew(gridTilemap, blockMap);
+      mockCharMap(gridTilemap, blockMap);
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
