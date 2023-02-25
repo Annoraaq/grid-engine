@@ -24,7 +24,6 @@ export class PhaserTileLayer implements TileLayer {
     return this.getProperty(name) != undefined;
   }
 
-  // TODO write test
   isCharLayer(): boolean {
     return this.hasProperty(PhaserTileLayer.CHAR_LAYER_PROP_NAME);
   }
