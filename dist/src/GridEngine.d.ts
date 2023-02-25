@@ -11,8 +11,11 @@ import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/Chara
 import { IsPositionAllowedFn, PathfindingOptions } from "./Pathfinding/Pathfinding";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
 import { GridEngineHeadless, TileSizePerSecond, Position, LayerPosition, CharLayer, GridEngineConfigHeadless, CollisionConfig, CharacterDataHeadless, CharacterShift, CharacterShiftAction } from "./GridEngineHeadless";
+import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
 import { Tilemap } from "./GridTilemap/Tilemap";
-export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, MovementInfo, PositionChange, IsPositionAllowedFn, PathfindingOptions, ShortestPathAlgorithmType, GridEngineHeadless, TileSizePerSecond, Position, LayerPosition, CharLayer, CollisionConfig, CharacterShift, CharacterShiftAction, CharacterDataHeadless, GridEngineConfigHeadless, Tilemap, };
+import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer";
+import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile";
+export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, MovementInfo, PositionChange, IsPositionAllowedFn, PathfindingOptions, ShortestPathAlgorithmType, GridEngineHeadless, TileSizePerSecond, Position, LayerPosition, CharLayer, CollisionConfig, CharacterShift, CharacterShiftAction, CharacterDataHeadless, GridEngineConfigHeadless, Tilemap, PhaserTilemap, PhaserTileLayer, PhaserTile, };
 /**
  * Configuration object for initializing GridEngine.
  */
