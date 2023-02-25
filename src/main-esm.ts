@@ -13,6 +13,7 @@ export {
   CharacterShiftAction,
   PathfindingOptions,
   ShortestPathAlgorithmType,
+  GridEngineHeadless,
 } from "./GridEngine";
 
 export default GridEngine;
