@@ -39,6 +39,8 @@ import {
 import { GridTilemapPhaser } from "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser";
 import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
 import { Tilemap } from "./GridTilemap/Tilemap";
+import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer";
+import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile";
 
 export {
   CollisionStrategy,
@@ -67,6 +69,9 @@ export {
   CharacterDataHeadless,
   GridEngineConfigHeadless,
   Tilemap,
+  PhaserTilemap,
+  PhaserTileLayer,
+  PhaserTile,
 };
 
 /**
