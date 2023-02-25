@@ -39,21 +39,8 @@ export class PhaserTilemap implements Tilemap {
     );
   }
 
-  getLayerProperty(
-    layer: Phaser.Tilemaps.LayerData,
-    name: string
-  ): string | undefined {
-    const layerProps = layer.properties as [{ name: any; value: any }];
-    const prop = layerProps?.find((el) => el.name == name);
-    return prop?.value;
-  }
-
-  hasLayerProperty(layer: Phaser.Tilemaps.LayerData, name: string): boolean {
-    return this.getLayerProperty(layer, name) != undefined;
-  }
-
   hasTileAt(x: number, y: number, layer?: string): boolean {
-    return this.phaserTilemap.hasTileAt(x, y, layer);
+    return !!this.phaserTilemap.hasTileAt(x, y, layer);
   }
 
   getTileAt(x: number, y: number, layer?: string): Tile | undefined {
