@@ -221,11 +221,7 @@ export class GridEngine {
     const concreteConfig = this.setConfigDefaults(config);
 
     this.config = concreteConfig;
-    this.gridTilemap = new GridTilemapPhaser(
-      tilemap,
-      this.config.collisionTilePropertyName,
-      this.config.characterCollisionStrategy
-    );
+    this.gridTilemap = new GridTilemapPhaser(tilemap);
 
     this.addCharacters();
   }

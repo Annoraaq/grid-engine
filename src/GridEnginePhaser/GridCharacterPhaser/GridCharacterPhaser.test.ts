@@ -4,11 +4,7 @@ import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { GridCharacterPhaser } from "./GridCharacterPhaser";
 import * as Phaser from "phaser";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
-import {
-  CharacterData,
-  CollisionStrategy,
-  GridEngineHeadless,
-} from "../../GridEngine";
+import { CharacterData, GridEngineHeadless } from "../../GridEngine";
 import { createSpriteMock } from "../../Utils/MockFactory/MockFactory";
 import { take } from "rxjs/operators";
 import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap";
@@ -95,11 +91,7 @@ describe("GridCharacterPhaser", () => {
       characters: [enrichedCharData],
     });
 
-    const gridTilemap = new GridTilemapPhaser(
-      tm,
-      "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
+    const gridTilemap = new GridTilemapPhaser(tm);
     return {
       gridCharPhaser: new GridCharacterPhaser(
         enrichedCharData,
@@ -676,11 +668,8 @@ describe("GridCharacterPhaser", () => {
           charLayer: "testCharLayer",
         };
         const lowerCharLayerDepth = 0;
-        const { gridCharPhaser, gridTilemapPhaser } = createChar(
-          charData,
-          true
-        );
-        gridTilemapPhaser.setTransition(
+        const { gridCharPhaser } = createChar(charData, true);
+        gridEngineHeadless.setTransition(
           new Vector2(posAbove),
           "testCharLayer",
           "lowerCharLayer"
@@ -763,9 +752,9 @@ describe("GridCharacterPhaser", () => {
       };
       const tilemapPhaser = new PhaserTilemap(tm);
       const gridTilemap = new GridTilemapPhaser(
-        tm,
-        "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        tm
+        // "ge_collide",
+        // CollisionStrategy.BLOCK_TWO_TILES
       );
       gridEngineHeadless.create(tilemapPhaser, {
         characters: [charData],

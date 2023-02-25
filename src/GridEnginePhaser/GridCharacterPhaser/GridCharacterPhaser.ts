@@ -267,8 +267,9 @@ export class GridCharacterPhaser {
   }
 
   private getTransitionLayer(position: LayerVecPos): CharLayer {
+    if (!position.layer) return undefined;
     return (
-      this.tilemap.getTransition(position.position, position.layer) ||
+      this.geHeadless.getTransition(position.position, position.layer) ||
       position.layer
     );
   }

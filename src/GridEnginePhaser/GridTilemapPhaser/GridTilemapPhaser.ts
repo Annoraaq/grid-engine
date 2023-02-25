@@ -1,46 +1,17 @@
 import { CharLayer, Direction } from "../../GridEngine";
-import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
-import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { Utils } from "../../Utils/Utils/Utils";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { VectorUtils } from "../../Utils/VectorUtils";
-import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap";
 
 export class GridTilemapPhaser {
-  private gridTilemap: GridTilemap;
   private static readonly ALWAYS_TOP_PROP_NAME = "ge_alwaysTop";
   private static readonly CHAR_LAYER_PROP_NAME = "ge_charLayer";
   private static readonly HEIGHT_SHIFT_PROP_NAME = "ge_heightShift";
   private static readonly Z_INDEX_PADDING = 7;
   private charLayerDepths = new Map<CharLayer, number>();
 
-  constructor(
-    private tilemap: Phaser.Tilemaps.Tilemap,
-    collisionTilePropertyName: string,
-    collisionStrategy: CollisionStrategy
-  ) {
-    this.gridTilemap = new GridTilemap(
-      new PhaserTilemap(tilemap),
-      collisionTilePropertyName,
-      collisionStrategy
-    );
+  constructor(private tilemap: Phaser.Tilemaps.Tilemap) {
     this.setLayerDepths();
-  }
-
-  getGridTilemap(): GridTilemap {
-    return this.gridTilemap;
-  }
-
-  getTransition(pos: Vector2, fromLayer?: string): string | undefined {
-    return this.gridTilemap.getTransition(pos, fromLayer);
-  }
-
-  setTransition(pos: Vector2, fromLayer: CharLayer, toLayer: CharLayer): void {
-    this.gridTilemap.setTransition(pos, fromLayer, toLayer);
-  }
-
-  getTransitions(): Map<CharLayer, Map<CharLayer, CharLayer>> {
-    return this.gridTilemap.getTransitions();
   }
 
   getTileWidth(): number {

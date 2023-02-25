@@ -1,7 +1,6 @@
 import * as Phaser from "phaser";
 import { GridTilemapPhaser } from "./GridTilemapPhaser";
 import { Direction } from "../../Direction/Direction";
-import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { createPhaserTilemapStub } from "../../Utils/MockFactory/MockPhaserTilemap";
 
@@ -38,11 +37,7 @@ describe("GridTilemapPhaser", () => {
         ],
       ])
     );
-    gridTilemap = new GridTilemapPhaser(
-      tm,
-      "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
+    gridTilemap = new GridTilemapPhaser(tm);
   });
 
   it("should set layer depths on construction", () => {
@@ -59,11 +54,7 @@ describe("GridTilemapPhaser", () => {
       ])
     );
     tm.layers[1].properties.push({ name: "ge_alwaysTop", value: "true" });
-    gridTilemap = new GridTilemapPhaser(
-      tm,
-      "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
+    gridTilemap = new GridTilemapPhaser(tm);
 
     expect(tm.layers[0].tilemapLayer.depth).toBe(0);
     expect(tm.layers[1].tilemapLayer.depth).toBe(2);
@@ -79,11 +70,7 @@ describe("GridTilemapPhaser", () => {
       ])
     );
     tm.layers[1].properties = [];
-    gridTilemap = new GridTilemapPhaser(
-      tm,
-      "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
+    gridTilemap = new GridTilemapPhaser(tm);
 
     expect(tm.layers[0].tilemapLayer.depth).toBe(0);
     expect(tm.layers[1].tilemapLayer.depth).toBe(1);
@@ -102,11 +89,7 @@ describe("GridTilemapPhaser", () => {
     // Make layers non-char-layers
     tm.layers[0].properties = [];
     tm.layers[1].properties = [];
-    gridTilemap = new GridTilemapPhaser(
-      tm,
-      "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
+    gridTilemap = new GridTilemapPhaser(tm);
 
     expect(gridTilemap.getDepthOfCharLayer(undefined)).toEqual(1);
   });
@@ -139,11 +122,7 @@ describe("GridTilemapPhaser", () => {
         value: 1,
       },
     ];
-    gridTilemap = new GridTilemapPhaser(
-      tm,
-      "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
+    gridTilemap = new GridTilemapPhaser(tm);
 
     expect(tm.layers.length).toBe(3);
     expect(tm.layers[0].name).toEqual("lowerCharLayer");
@@ -242,11 +221,7 @@ describe("GridTilemapPhaser", () => {
         ])
       );
       tm.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC.toString();
-      gridTilemap = new GridTilemapPhaser(
-        tm,
-        "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
-      );
+      gridTilemap = new GridTilemapPhaser(tm);
     });
 
     it("should transform tile pos to pixel pos for isometric maps", () => {
@@ -267,40 +242,6 @@ describe("GridTilemapPhaser", () => {
       expect(gridTilemap.getTileDistance(Direction.DOWN_LEFT)).toEqual(
         new Vector2(scaledTileWidth * 0.5, scaledTileHeight * 0.5)
       );
-    });
-  });
-
-  describe("transitions", () => {
-    it("should set transitions", () => {
-      gridTilemap.setTransition(new Vector2(4, 5), "charLayer2", "charLayer1");
-      gridTilemap.setTransition(new Vector2(3, 5), "charLayer2", "charLayer1");
-      expect(gridTilemap.getTransition(new Vector2(4, 5), "charLayer2")).toBe(
-        "charLayer1"
-      );
-      expect(gridTilemap.getTransition(new Vector2(3, 5), "charLayer2")).toBe(
-        "charLayer1"
-      );
-      expect(gridTilemap.getTransition(new Vector2(7, 5), "charLayer2")).toBe(
-        undefined
-      );
-    });
-
-    it("should get all transitions", () => {
-      const pos1 = new Vector2(4, 5);
-      const pos2 = new Vector2(3, 5);
-      gridTilemap.setTransition(pos1, "charLayer2", "charLayer1");
-      gridTilemap.setTransition(pos2, "charLayer2", "charLayer1");
-
-      const expectedTransitions = new Map();
-      expectedTransitions.set(
-        pos1.toString(),
-        new Map([["charLayer2", "charLayer1"]])
-      );
-      expectedTransitions.set(
-        pos2.toString(),
-        new Map([["charLayer2", "charLayer1"]])
-      );
-      expect(gridTilemap.getTransitions()).toEqual(expectedTransitions);
     });
   });
 });
