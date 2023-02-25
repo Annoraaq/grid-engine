@@ -633,19 +633,19 @@ export class GridEngineHeadless {
     gridChar.clearLabels();
   }
 
-  // /**
-  //  * Character `charId` will start to walk towards `charIdToFollow` on a
-  //  * shortest path until it reaches the specified `distance`.
-  //  *
-  //  * @param charId ID of character that should follow
-  //  * @param charIdToFollow ID of character that should be followed
-  //  * @param distance Minimum distance to keep to `charIdToFollow` in
-  //  *  {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
-  //  * @param closestPointIfBlocked `charId` will move to the closest point
-  //  *  ({@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance})
-  //  * to `charIdToFollow` that is reachable from `charId` in case that there does
-  //  * not exist a path between `charId` and `charIdToFollow`.
-  //  */
+  /**
+   * Character `charId` will start to walk towards `charIdToFollow` on a
+   * shortest path until it reaches the specified `distance`.
+   *
+   * @param charId ID of character that should follow
+   * @param charIdToFollow ID of character that should be followed
+   * @param distance Minimum distance to keep to `charIdToFollow` in
+   *  {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
+   * @param closestPointIfBlocked `charId` will move to the closest point
+   *  ({@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance})
+   * to `charIdToFollow` that is reachable from `charId` in case that there does
+   * not exist a path between `charId` and `charIdToFollow`.
+   */
   follow(
     charId: string,
     charIdToFollow: string,

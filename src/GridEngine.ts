@@ -36,7 +36,6 @@ import {
   CharacterShift,
   CharacterShiftAction,
 } from "./GridEngineHeadless";
-// import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
 import { GridTilemapPhaser } from "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser";
 import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
 
@@ -401,15 +400,6 @@ export class GridEngine {
     if (!this.gridTilemap) throw this.createUninitializedErr();
     if (!this.config) throw this.createUninitializedErr();
 
-    // const phaserCharData: CharacterData = {
-    //   // numberOfDirections: this.config.numberOfDirections,
-    //   ...charData,
-    // };
-
-    // if (charData.numberOfDirections) {
-    //   phaserCharData.numberOfDirections = charData.numberOfDirections;
-    // }
-
     const gridCharPhaser = new GridCharacterPhaser(
       charData,
       this.scene,
@@ -417,11 +407,8 @@ export class GridEngine {
       this.config.layerOverlay,
       this.geHeadless
     );
-    // const gridChar = gridCharPhaser.getGridCharacter();
 
     this.gridCharacters?.set(charData.id, gridCharPhaser);
-
-    // this.gridTilemap.addCharacter(gridChar);
   }
 
   /** Checks whether a character with the given ID is registered. */

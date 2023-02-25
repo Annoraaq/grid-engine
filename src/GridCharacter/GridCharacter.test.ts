@@ -413,20 +413,6 @@ describe("GridCharacter", () => {
     gridCharacter.update(500);
   });
 
-  // it("should not stop moving if movementImpuls", () => {
-  //   const gridTilemap = createDefaultTilemapMock("lowerCharLayer");
-  //   gridCharacter = new GridCharacter("player", {
-  //     tilemap: gridTilemap,
-  //     speed: 3,
-  //     collidesWithTiles: true,
-  //     numberOfDirections: NumberOfDirections.FOUR,
-  //   });
-  //   gridTilemap.addCharacter(gridCharacter);
-  //   gridCharacter.move(Direction.DOWN);
-  //   gridCharacter.update(200);
-  //   expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN);
-  // });
-
   it("should continue moving to different dir", async () => {
     const { gridCharacter } = createDefaultTilemapMock("lowerCharLayer");
 
