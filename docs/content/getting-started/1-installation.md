@@ -3,20 +3,28 @@ title: Installation
 parent: getting-started
 ---
 
-# Installation
+## Installation
 
-Installing the **Grid Engine** plugin is simple.
+Installing the Grid Engine plugin is simple.
 
-## NPM
+> **_NOTE:_** For TypeScript check out [this example repository](https://github.com/Annoraaq/grid-engine-ts-example).
+
+### NPM
 
 ```bash
 npm i --save grid-engine
 ```
 
-## Web
+And then import via:
+
+```javascript
+import { GridEngine } from "grid-engine";
+```
+
+### Web
 
 ```html
-<!-- Download the .zip and copy GridEngine.min.js from dist/ -->
+<!-- Download the .zip and copy GridEngine.min.js from dist directory -->
 <script src="GridEngine.min.js"></script>
 ```
 
@@ -42,7 +50,7 @@ const gameConfig = {
 const game = new Phaser.Game(gameConfig);
 ```
 
-Now you're all set to start using **Grid Engine** in your scenes!
+Now you're all set to start using Grid Engine in your scenes!
 
 ```javascript
 function create() {

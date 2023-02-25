@@ -50,10 +50,18 @@ movement to your tilemap game. Your characters will be able to only move in whol
 
 Installing the Grid Engine plugin is simple.
 
+> **_NOTE:_** For TypeScript check out [this example repository](https://github.com/Annoraaq/grid-engine-ts-example).
+
 ### NPM
 
 ```bash
 npm i --save grid-engine
+```
+
+And then import via:
+
+```javascript
+import { GridEngine } from "grid-engine";
 ```
 
 ### Web
@@ -106,6 +114,13 @@ function create() {
   // ...
 }
 ```
+
+## Projects using Grid Engine
+
+- [Build a Snowman](https://play.google.com/store/apps/details?id=com.raiper34.buildasnowman)
+- [Defynia](https://play.definya.com/)
+
+If you have a project that is using Grid Engine and that you would like to see in this list, post it in the #showcase channel on our [Discord](https://discord.gg/C4jNEZJECs).
 
 ## Special Thanks
 

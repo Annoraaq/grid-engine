@@ -84,7 +84,6 @@ export interface GridEngineConfigHeadless {
   characters: CharacterDataHeadless[];
 
   /** A custom name for the collision tile property of your tilemap. */
-
   collisionTilePropertyName?: string;
 
   /**
@@ -111,6 +110,15 @@ export interface CollisionConfig {
    * @defaultValue `true`
    */
   collidesWithTiles?: boolean;
+
+  /**
+   * If set to `true`, the character will not collide with a position that has
+   * no tile on any layer. This is especially useful if you want the character
+   * to be able to move outside of the map boundaries.
+   *
+   * @defaultValue `false`
+   */
+  ignoreMissingTiles?: boolean;
 
   /**
    * Array with collision groups. Only characters with at least one matching
@@ -499,6 +507,8 @@ export class GridEngineHeadless {
       if (charData.collides.collisionGroups) {
         charConfig.collisionGroups = charData.collides.collisionGroups;
       }
+      charConfig.ignoreMissingTiles =
+        charData.collides?.ignoreMissingTiles ?? false;
     }
     const gridChar = new GridCharacter(charData.id, charConfig);
 

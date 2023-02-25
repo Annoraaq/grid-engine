@@ -457,6 +457,54 @@ describe("TargetMovement", () => {
     expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 0)));
   });
 
+  it("should move outside of map", () => {
+    const charPos = layerPos(new Vector2(1, 0));
+    const mockChar = createMockChar("char", charPos, {
+      ...TEST_CHAR_CONFIG,
+      tilemap: gridTilemap,
+      ignoreMissingTiles: true,
+    });
+
+    tilemapMock = mockLayeredBlockMapNew([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".p..",
+          "....",
+          "####",
+          ".t..",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+
+    targetMovement = new TargetMovement(
+      mockChar,
+      gridTilemap,
+      layerPos(new Vector2(1, 3)),
+      { config: { algorithm: shortestPathAlgo } }
+    );
+
+    expectWalkedPath(
+      targetMovement,
+      mockChar,
+      createPath([
+        [1, 1],
+        [0, 1],
+        [-1, 1],
+        [-1, 2],
+        [-1, 3],
+        [0, 3],
+        [1, 3],
+      ])
+    );
+  });
+
   describe("noPathFoundStrategy = RETRY", () => {
     it("should move if path exists after backoff", () => {
       const charPos = layerPos(new Vector2(1, 0));

@@ -188,6 +188,18 @@ describe("GridTilemapPhaser", () => {
     );
   });
 
+  it("should get scaled tile width from layerless tile map", () => {
+    tm = createPhaserTilemapStub(new Map());
+    gridTilemap = new GridTilemapPhaser(tm);
+    expect(gridTilemap.getTileWidth()).toEqual(16);
+  });
+
+  it("should get scaled tile height from layerless tile map", () => {
+    tm = createPhaserTilemapStub(new Map());
+    gridTilemap = new GridTilemapPhaser(tm);
+    expect(gridTilemap.getTileHeight()).toEqual(16);
+  });
+
   describe("isometric", () => {
     const scaleFactor = 3;
 

@@ -201,8 +201,8 @@ export class TargetMovement implements Movement {
     this.character
       .autoMovementSet()
       .pipe(
-        take(1),
-        filter((movement) => movement !== this)
+        filter((movement) => movement !== this),
+        take(1)
       )
       .subscribe(() => {
         this.stop(MoveToResult.MOVEMENT_TERMINATED);
@@ -219,7 +219,7 @@ export class TargetMovement implements Movement {
       collisionGroups: this.character.getCollisionGroups(),
       ignoredChars: [this.character.getId()],
       ignoreTiles: !this.character.collidesWithTiles(),
-      ignoreMapBounds: false,
+      ignoreMapBounds: this.character.getIgnoreMissingTiles(),
       ignoreBlockedTarget: this.ignoreBlockedTarget,
     };
   }

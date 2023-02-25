@@ -61,6 +61,7 @@ describe("GridCharacter", () => {
     expect(gridCharacter.getSpeed()).toEqual(3);
     expect(gridCharacter.getTilePos().layer).toEqual("someLayer");
     expect(gridCharacter.collidesWithTiles()).toEqual(true);
+    expect(gridCharacter.getIgnoreMissingTiles()).toBe(false);
     expect(gridCharacter.getNumberOfDirections()).toEqual(
       NumberOfDirections.EIGHT
     );
@@ -710,6 +711,49 @@ describe("GridCharacter", () => {
       expect(result).toBe(false);
     });
 
+    it("should create a grid character with ignoreMissingTiles=true", () => {
+      const gridTilemap = new GridTilemap(
+        mockBlockMapNew(["."]),
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
+
+      gridCharacter = new GridCharacter("player", {
+        tilemap: gridTilemap,
+        ignoreMissingTiles: true,
+        speed: 3,
+        collidesWithTiles: true,
+        numberOfDirections: NumberOfDirections.FOUR,
+      });
+
+      expect(gridCharacter.getIgnoreMissingTiles()).toBe(true);
+    });
+
+    it("should not block with ignoreMissingTiles", () => {
+      const gridTilemap = new GridTilemap(
+        mockBlockMapNew([
+          // prettier-ignore
+          "##",
+          "##",
+        ]),
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
+      gridCharacter = new GridCharacter("player", {
+        tilemap: gridTilemap,
+        speed: 3,
+        collidesWithTiles: true,
+        ignoreMissingTiles: true,
+        numberOfDirections: NumberOfDirections.FOUR,
+      });
+      gridCharacter.setTilePosition({
+        position: new Vector2(-10, -10),
+        layer: undefined,
+      });
+
+      expect(gridCharacter.isBlockingDirection(Direction.RIGHT)).toBe(false);
+    });
+
     describe("collides with tiles", () => {
       const charPosX = 0;
       const charPosY = 0;
@@ -942,7 +986,7 @@ describe("GridCharacter", () => {
         const blockingChar = new GridCharacter("blocker", {
           tilemap: gridTilemap,
           speed: 3,
-          collidesWithTiles: true,
+          collidesWithTiles: false,
           collisionGroups: ["cGroup1"],
           numberOfDirections: NumberOfDirections.FOUR,
         });

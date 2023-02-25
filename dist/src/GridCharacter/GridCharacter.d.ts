@@ -16,16 +16,17 @@ export interface PositionChange {
     enterLayer: CharLayer;
 }
 export interface CharConfig {
-    tilemap: GridTilemap;
-    speed: number;
-    collidesWithTiles: boolean;
-    numberOfDirections: NumberOfDirections;
     charLayer?: string;
+    collidesWithTiles: boolean;
     collisionGroups?: string[];
     facingDirection?: Direction;
+    ignoreMissingTiles?: boolean;
     labels?: string[];
-    tileWidth?: number;
+    numberOfDirections: NumberOfDirections;
+    speed: number;
     tileHeight?: number;
+    tilemap: GridTilemap;
+    tileWidth?: number;
 }
 export declare class GridCharacter {
     private id;
@@ -45,6 +46,7 @@ export declare class GridCharacter {
     private movement?;
     private collidesWithTilesInternal;
     private collisionGroups;
+    private ignoreMissingTiles;
     private depthChanged$;
     private movementProgress;
     private labels;
@@ -58,6 +60,7 @@ export declare class GridCharacter {
     setMovement(movement?: Movement): void;
     getMovement(): Movement | undefined;
     collidesWithTiles(): boolean;
+    getIgnoreMissingTiles(): boolean;
     setTilePosition(tilePosition: LayerVecPos): void;
     getTilePos(): LayerVecPos;
     getNextTilePos(): LayerVecPos;
