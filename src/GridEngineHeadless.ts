@@ -77,11 +77,11 @@ export interface LayerPosition {
 export type CharLayer = string | undefined;
 
 /**
- * Configuration object for initializing GridEngine.
+ * Configuration object for initializing GridEngineHeadless.
  */
-export interface GridEngineConfig {
+export interface GridEngineConfigHeadless {
   /** An array of character data. Each describing a character on the map. */
-  characters: CharacterData[];
+  characters: CharacterDataHeadless[];
 
   /** A custom name for the collision tile property of your tilemap. */
 
@@ -125,7 +125,7 @@ export interface CollisionConfig {
 }
 
 /** Configuration object used to initialize a new character in GridEngine. */
-export interface CharacterData {
+export interface CharacterDataHeadless {
   /**
    * A unique identifier for the character on the map. If you provice two
    * characters with the same id, the last one will override the previous one.
@@ -227,7 +227,7 @@ export enum CharacterShiftAction {
 
 export class GridEngineHeadless {
   private gridCharacters?: Map<string, GridCharacter>;
-  private config?: Concrete<GridEngineConfig>;
+  private config?: Concrete<GridEngineConfigHeadless>;
   private gridTilemap?: GridTilemap;
   private isCreatedInternal = false;
   private movementStopped$?: Subject<{ charId: string; direction: Direction }>;
@@ -292,7 +292,7 @@ export class GridEngineHeadless {
    * Initializes GridEngine. Must be called before any other methods of
    * GridEngine are called.
    */
-  create(tilemap: Tilemap, config: GridEngineConfig): void {
+  create(tilemap: Tilemap, config: GridEngineConfigHeadless): void {
     this.isCreatedInternal = true;
     this.gridCharacters = new Map();
     const concreteConfig = this.setConfigDefaults(config);
@@ -469,7 +469,7 @@ export class GridEngineHeadless {
   }
 
   /** Adds a character after calling {@link create}. */
-  addCharacter(charData: CharacterData): void {
+  addCharacter(charData: CharacterDataHeadless): void {
     if (!this.gridTilemap) throw this.createUninitializedErr();
     if (!this.config) throw this.createUninitializedErr();
 
@@ -1044,8 +1044,8 @@ export class GridEngineHeadless {
   }
 
   private setConfigDefaults(
-    config: GridEngineConfig
-  ): Concrete<GridEngineConfig> {
+    config: GridEngineConfigHeadless
+  ): Concrete<GridEngineConfigHeadless> {
     return {
       collisionTilePropertyName: "ge_collide",
       numberOfDirections: NumberOfDirections.FOUR,

@@ -30,14 +30,15 @@ import {
   Position,
   LayerPosition,
   CharLayer,
-  GridEngineConfig as GridEngineConfigHeadless,
+  GridEngineConfigHeadless,
   CollisionConfig,
-  CharacterData as CharacterDataHeadless,
+  CharacterDataHeadless,
   CharacterShift,
   CharacterShiftAction,
 } from "./GridEngineHeadless";
 import { GridTilemapPhaser } from "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser";
 import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
+import { Tilemap } from "./GridTilemap/Tilemap";
 
 export {
   CollisionStrategy,
@@ -63,6 +64,9 @@ export {
   CollisionConfig,
   CharacterShift,
   CharacterShiftAction,
+  CharacterDataHeadless,
+  GridEngineConfigHeadless,
+  Tilemap,
 };
 
 /**

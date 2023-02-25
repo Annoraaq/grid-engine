@@ -28,10 +28,6 @@ export class GridTilemapPhaser {
     return this.charLayerDepths.get(layerName) ?? 0;
   }
 
-  private getTileSize(): Vector2 {
-    return new Vector2(this.getTileWidth(), this.getTileHeight());
-  }
-
   tilePosToPixelPos(tilePosition: Vector2): Vector2 {
     if (this.isIsometric()) {
       return VectorUtils.scalarMult(this.getTileSize(), 0.5).multiply(
@@ -57,6 +53,10 @@ export class GridTilemapPhaser {
       }
     }
     return this.getTileSize();
+  }
+
+  private getTileSize(): Vector2 {
+    return new Vector2(this.getTileWidth(), this.getTileHeight());
   }
 
   private isIsometric(): boolean {
