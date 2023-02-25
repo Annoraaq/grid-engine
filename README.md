@@ -27,6 +27,7 @@ movement to your tilemap game. Your characters will be able to only move in whol
 - Grid-based movement, of course!
 - Multiple characters
 - Pathfinding (for both NPCs and the player)
+- NEW - Headless mode (allows running it independently of Phaser)
 - Tile-based collision detection
 - One-way collision detection
 - Random movement (can also limit to a radius)
