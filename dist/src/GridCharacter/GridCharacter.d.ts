@@ -1,12 +1,13 @@
 import { LayerVecPos } from "./../Pathfinding/ShortestPathAlgorithm";
 import { NumberOfDirections } from "./../Direction/Direction";
 import { Direction } from "../Direction/Direction";
-import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { Subject } from "rxjs";
 import { CharLayer, Position } from "../GridEngine";
 import { Movement } from "../Movement/Movement";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import * as Phaser from "phaser";
+import { GridTilemap } from "../GridTilemap/GridTilemap";
+export declare const MAX_MOVEMENT_PROGRESS = 1000;
 export type CharId = string;
 export type GameObject = Phaser.GameObjects.Container | Phaser.GameObjects.Sprite;
 export interface PositionChange {

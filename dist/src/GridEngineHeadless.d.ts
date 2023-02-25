@@ -6,103 +6,176 @@ import { Observable } from "rxjs";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { MovementInfo } from "./Movement/Movement";
-import { CharacterIndex, FrameRow } from "./GridCharacter/CharacterAnimation/CharacterAnimation";
+import { FrameRow } from "./GridCharacter/CharacterAnimation/CharacterAnimation";
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter";
 import { IsPositionAllowedFn, PathfindingOptions } from "./Pathfinding/Pathfinding";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
-import { GridEngineHeadless, TileSizePerSecond, Position, LayerPosition, CharLayer, GridEngineConfigHeadless, CollisionConfig, CharacterDataHeadless, CharacterShift, CharacterShiftAction } from "./GridEngineHeadless";
 import { Tilemap } from "./GridTilemap/Tilemap";
-export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, MovementInfo, PositionChange, IsPositionAllowedFn, PathfindingOptions, ShortestPathAlgorithmType, GridEngineHeadless, TileSizePerSecond, Position, LayerPosition, CharLayer, CollisionConfig, CharacterShift, CharacterShiftAction, CharacterDataHeadless, GridEngineConfigHeadless, Tilemap, };
+export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, MovementInfo, PositionChange, IsPositionAllowedFn, PathfindingOptions, ShortestPathAlgorithmType, };
+export type TileSizePerSecond = number;
+export interface Position {
+    x: number;
+    y: number;
+}
 /**
- * Configuration object for initializing GridEngine.
+ * Specifies a tile position along with a character layer.
  */
-export interface GridEngineConfig extends GridEngineConfigHeadless {
+export interface LayerPosition {
+    position: Position;
+    charLayer: CharLayer;
+}
+export type CharLayer = string | undefined;
+/**
+ * Configuration object for initializing GridEngineHeadless.
+ */
+export interface GridEngineConfigHeadless {
     /** An array of character data. Each describing a character on the map. */
-    characters: CharacterData[];
+    characters: CharacterDataHeadless[];
+    /** A custom name for the collision tile property of your tilemap. */
+    collisionTilePropertyName?: string;
     /**
-     * Enables experimental
-     * {@link https://annoraaq.github.io/grid-engine/p/layer-overlay/ | layer overlay feature}.
+     * The possible number of directions for moving a character. Default is 4
+     * (up, down, left, right). If set to 8 it additionaly enables diagonal
+     * movement (up-left, up-right, down-left, down-right).
+     *
+     * @defaultValue {@link NumberOfDirections.FOUR}
+     */
+    numberOfDirections?: NumberOfDirections;
+    /**
+     * The character collision strategy.
+     *
+     * @defaultValue {@link CollisionStrategy.BLOCK_TWO_TILES}
+     */
+    characterCollisionStrategy?: CollisionStrategy;
+}
+export interface CollisionConfig {
+    /**
+     * Determines whether the character should collide with the tilemap.
+     *
+     * @defaultValue `true`
+     */
+    collidesWithTiles?: boolean;
+    /**
+     * If set to `true`, the character will not collide with a position that has
+     * no tile on any layer. This is especially useful if you want the character
+     * to be able to move outside of the map boundaries.
      *
      * @defaultValue `false`
+     */
+    ignoreMissingTiles?: boolean;
+    /**
+     * Array with collision groups. Only characters with at least one matching
+     * collision group collide. If omitted it will be initialized with a default
+     * collision group called `'geDefault'`. If you want to keep a character from
+     * colliding with any other character, you can simply provide an empty array
+     * here.
+     *
+     * @defaultValue `['geDefault']`
+     */
+    collisionGroups?: string[];
+}
+/** Configuration object used to initialize a new character in GridEngine. */
+export interface CharacterDataHeadless {
+    /**
+     * A unique identifier for the character on the map. If you provice two
+     * characters with the same id, the last one will override the previous one.
+     */
+    id: string;
+    /**
+     * The speed of a player in tiles per second.
+     *
+     * @defaultValue `4`
+     */
+    speed?: TileSizePerSecond;
+    /**
+     * Start tile position of the player.
+     *
+     * @defaultValue `{x: 0, y:0}`
+     */
+    startPosition?: Position;
+    /**
+     * Sets the direction the character is initially facing.
+     *
+     * @defaultValue {@link Direction.DOWN}
+     */
+    facingDirection?: Direction;
+    /**
+     * Set to false, if character should not collide (neither with the tilemap,
+     * nor with other characters). For more control, pass a
+     * {@link CollisionConfig} object.
+     *
+     * @defaultValue `true`
+     */
+    collides?: boolean | CollisionConfig;
+    /**
+     * Sets the
+     * {@link https://annoraaq.github.io/grid-engine/features/character-layers | character layer}
+     * of the character. If omitted the lowest character layer of the tilemap is
+     * taken. If there are no character layers in the tilemap, it will get the
+     * char layer `undefined`.
      *
      * @beta
      */
-    layerOverlay?: boolean;
+    charLayer?: string;
+    /**
+     * Sets labels for the character. They can be used to filter and logically
+     * group characters.
+     *
+     * @defaultValue `[]`
+     */
+    labels?: string[];
+    /**
+     * The possible number of directions for moving a character. This setting can
+     * be used to override the {@link GridEngineConfig.numberOfDirections | global setting}
+     * in the GridEngine configuration for specific characters.
+     */
+    numberOfDirections?: NumberOfDirections;
+    /**
+     * With of the character in tiles. This allows to specify character that span
+     * more than just one tile.
+     *
+     * @defaultValue 1
+     */
+    tileWidth?: number;
+    /**
+     * Height of the character in tiles. This allows to specify character that span
+     * more than just one tile.
+     *
+     * @defaultValue 1
+     */
+    tileHeight?: number;
 }
-export interface WalkingAnimationMapping {
-    /** FrameRow for moving up */
-    [Direction.UP]: FrameRow;
-    /** FrameRow for moving right */
-    [Direction.RIGHT]: FrameRow;
-    /** FrameRow for moving down */
-    [Direction.DOWN]: FrameRow;
-    /** FrameRow for moving left */
-    [Direction.LEFT]: FrameRow;
-    /** FrameRow for moving up-left */
-    [Direction.UP_LEFT]?: FrameRow;
-    /** FrameRow for moving up-right */
-    [Direction.UP_RIGHT]?: FrameRow;
-    /** FrameRow for moving down-left */
-    [Direction.DOWN_LEFT]?: FrameRow;
-    /** FrameRow for moving down-right */
-    [Direction.DOWN_RIGHT]?: FrameRow;
+/**
+ * Result of a modification of the internal characters array
+ */
+export interface CharacterShift {
+    /** the modified character */
+    charId: string;
+    /** The action that was performed when modifying the character */
+    action: CharacterShiftAction;
 }
-/** Configuration object used to initialize a new character in GridEngine. */
-export interface CharacterData extends CharacterDataHeadless {
-    /** The character’s sprite. */
-    sprite?: Phaser.GameObjects.Sprite;
-    /**
-     * If not set, automatic walking animation will be disabed. Do this if you
-     * want to use a custom animation. In case of number: The 0-based index of
-     * the character on the spritesheet. Here is an
-     * {@link https://github.com/Annoraaq/grid-engine/raw/master/images/charIndex.png | example image showing the character indices}.
-     * In case of {@link WalkingAnimationMapping}: Alternatively to providing a
-     * characterIndex you can also provide a custom frame mapping. This is
-     * especially handy if your spritesheet has a different arrangement of frames
-     * than you can see in the {@link https://github.com/Annoraaq/grid-engine/raw/master/images/charIndex.png  | example image}
-     * (4 rows with 3 columns). You can provide the frame number for every state
-     * of the character.
-     *
-     * For more details see the {@link https://annoraaq.github.io/grid-engine/example/custom-walking-animation-mapping/ | custom walking animation mapping example}.
-     */
-    walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
-    /**
-     * A container that holds the character’s sprite. This can be used in order
-     * to move more game objects along with the sprite (for example a character’s
-     * name or health bar). In order to position the container correctly on the
-     * tiles, it is necessary that you position the character’s sprite on
-     * position (0, 0) in the container.
-     *
-     * For more details see the {@link https://annoraaq.github.io/grid-engine/example/phaser-containers/ | container example}.
-     */
-    container?: Phaser.GameObjects.Container;
-    /**
-     * A custom x-offset for the sprite/container.
-     *
-     * @defaultValue `0`
-     */
-    offsetX?: number;
-    /**
-     * A custom y-offset for the sprite/container.
-     *
-     * @defaultValue `0`
-     */
-    offsetY?: number;
+/**
+ * Type of modification of grid engine characters
+ */
+export declare enum CharacterShiftAction {
+    /** removed existing character */
+    REMOVED = "REMOVED",
+    /** added new character */
+    ADDED = "ADDED"
 }
-export declare class GridEngine {
-    private scene;
-    private geHeadless;
-    private config?;
+export declare class GridEngineHeadless {
     private gridCharacters?;
+    private config?;
     private gridTilemap?;
     private isCreatedInternal;
-    /**
-     * Should only be called by Phaser and never directly.
-     * @internal
-     */
-    constructor(scene: Phaser.Scene);
-    /** @internal */
-    boot(): void;
+    private movementStopped$?;
+    private movementStarted$?;
+    private directionChanged$?;
+    private positionChangeStarted$?;
+    private positionChangeFinished$?;
+    private charRemoved$?;
+    private charAdded$?;
+    constructor();
     /**
      * Returns the character layer of the given character.
      * You can read more about character layers and transitions
@@ -133,7 +206,7 @@ export declare class GridEngine {
      * Initializes GridEngine. Must be called before any other methods of
      * GridEngine are called.
      */
-    create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void;
+    create(tilemap: Tilemap, config: GridEngineConfigHeadless): void;
     /**
      * @returns The tile position of the character with the given id
      */
@@ -187,36 +260,11 @@ export declare class GridEngine {
     setSpeed(charId: string, speed: number): void;
     /** @returns Speed in tiles per second for a character. */
     getSpeed(charId: string): number;
-    /** @returns Container for a character. */
-    getContainer(charId: string): Phaser.GameObjects.Container | undefined;
-    /** @returns X-offset for a character. */
-    getOffsetX(charId: string): number;
-    /** @returns Y-offset for a character. */
-    getOffsetY(charId: string): number;
     /** @returns Whether character collides with tiles */
     collidesWithTiles(charId: string): boolean;
-    /**
-     * @returns {@link WalkingAnimationMapping} for a character. If a character
-     * index was set, it will be returned instead.
-     */
-    getWalkingAnimationMapping(charId: string): WalkingAnimationMapping | number | undefined;
-    /**
-     * @returns `true` if {@link https://annoraaq.github.io/grid-engine/p/layer-overlay/ | layer overlay}
-     * is activated.
-     */
-    hasLayerOverlay(): boolean;
-    /**
-     * Sets the {@link WalkingAnimationMapping} for a character. Alternatively you
-     * can provide a number which is the character index (see also
-     * {@link CharacterData | Character Config}). If you provide `undefined`, it
-     * will disable walking animations for the character.
-     */
-    setWalkingAnimationMapping(charId: string, walkingAnimationMapping?: WalkingAnimationMapping | number): void;
-    /** @internal */
-    update(time: number, delta: number): void;
+    update(_time: number, delta: number): void;
     /** Adds a character after calling {@link create}. */
-    addCharacter(charData: CharacterData): void;
-    private addCharacterInternal;
+    addCharacter(charData: CharacterDataHeadless): void;
     /** Checks whether a character with the given ID is registered. */
     hasCharacter(charId: string): boolean;
     /**
@@ -295,15 +343,6 @@ export declare class GridEngine {
      */
     setPosition(charId: string, pos: Position, layer?: string): void;
     /**
-     * @returns Sprite of given character
-     */
-    getSprite(charId: string): Phaser.GameObjects.Sprite | undefined;
-    /**
-     * Sets the sprite for a character.
-     */
-    setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void;
-    private setCharSprite;
-    /**
      * Checks whether the given position is blocked by either the tilemap or a
      * blocking character. If you provide no layer, be sure not to use character
      * layers in your tilemap.
@@ -321,7 +360,7 @@ export declare class GridEngine {
     isTileBlocked(position: Position, layer?: string): boolean;
     /**
      * Returns all collision groups of the given character.
-     * {@link https://annoraaq.github.io/grid-engine/example/collision-groups | Collision Groups Example}
+     * {@link https://annoraaq.github.io/grid-engine/examples/collision-groups | Collision Groups Example}
      *
      * @returns All collision groups of the given character.
      */
@@ -414,9 +453,12 @@ export declare class GridEngine {
      * moved 400/1000th of the distance to the next tile already.
      */
     getMovementProgress(charId: string): number;
-    private setConfigDefaults;
+    private charRemoved;
     private initGuard;
     private createUninitializedErr;
     private addCharacters;
+    private moveChar;
     private createCharUnknownErr;
+    private assembleMoveToConfig;
+    private setConfigDefaults;
 }
