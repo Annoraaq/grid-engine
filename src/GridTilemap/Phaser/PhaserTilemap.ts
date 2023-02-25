@@ -35,7 +35,7 @@ export class PhaserTilemap implements Tilemap {
 
   getLayers(): TileLayer[] {
     return this.phaserTilemap.layers.map(
-      (l) => new PhaserTileLayer(l.name, l.tilemapLayer)
+      (l) => new PhaserTileLayer(l.tilemapLayer)
     );
   }
 

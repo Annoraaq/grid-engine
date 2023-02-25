@@ -1,15 +1,11 @@
-import { TileLayer, Tile } from "../Tilemap";
+import { TileLayer, Tile, CHAR_LAYER_PROP_NAME } from "../Tilemap";
 import { PhaserTile } from "./PhaserTile";
 
 export class PhaserTileLayer implements TileLayer {
-  private static readonly CHAR_LAYER_PROP_NAME = "ge_charLayer";
-  constructor(
-    private name: string,
-    private phaserTilemapLayer: Phaser.Tilemaps.TilemapLayer
-  ) {}
+  constructor(private phaserTilemapLayer: Phaser.Tilemaps.TilemapLayer) {}
 
   getName(): string {
-    return this.name;
+    return this.phaserTilemapLayer.layer.name;
   }
 
   getProperty(name: string): string | undefined {
@@ -25,7 +21,7 @@ export class PhaserTileLayer implements TileLayer {
   }
 
   isCharLayer(): boolean {
-    return this.hasProperty(PhaserTileLayer.CHAR_LAYER_PROP_NAME);
+    return this.hasProperty(CHAR_LAYER_PROP_NAME);
   }
 
   getData(): Tile[][] {
