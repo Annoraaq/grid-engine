@@ -1,15 +1,13 @@
 import { CollisionStrategy } from "./../../Collisions/CollisionStrategy";
 import { Direction, NumberOfDirections } from "./../../Direction/Direction";
-import { GlobalConfig } from "./../../GlobalConfig/GlobalConfig";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache";
-import { GridEngineConfig } from "../../GridEngine";
-import { Concrete } from "../../Utils/TypeUtils";
 import { GridTilemap } from "../GridTilemap";
-import { createTilemapMock } from "../../Utils/MockFactory/MockFactory";
+import { mockLayeredBlockMap } from "../../Utils/MockFactory/MockFactory";
 import * as Phaser from "phaser";
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
+import { Tilemap } from "../Tilemap";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -20,10 +18,27 @@ describe("CharBlockCache", () => {
   let charBlockCache: CharBlockCache;
   let gridTilemap: GridTilemap;
 
+  function createTilemap(): Tilemap {
+    return mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
+        ],
+      },
+    ]);
+  }
+
   beforeEach(() => {
-    gridTilemap = new GridTilemap(createTilemapMock() as any);
+    gridTilemap = new GridTilemap(
+      createTilemap(),
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     gridTilemap.setTransition(new Vector2(4, 3), "someLayer", "enterLayer");
-    charBlockCache = new CharBlockCache();
+    charBlockCache = new CharBlockCache(CollisionStrategy.BLOCK_TWO_TILES);
   });
 
   it("should detect blocking char after adding", () => {
@@ -72,10 +87,13 @@ describe("CharBlockCache", () => {
 
   describe("blocking strategy BLOCK_TWO_TILES", () => {
     beforeEach(() => {
-      GlobalConfig.get = jest.fn(() => ({
-        ...createMockConf(),
-        characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      }));
+      gridTilemap = new GridTilemap(
+        createTilemap(),
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
+      gridTilemap.setTransition(new Vector2(4, 3), "someLayer", "enterLayer");
+      charBlockCache = new CharBlockCache(CollisionStrategy.BLOCK_TWO_TILES);
     });
 
     it("should block new and old pos on movement", () => {
@@ -172,10 +190,15 @@ describe("CharBlockCache", () => {
 
   describe("blocking strategy BLOCK_ONE_TILE_AHEAD", () => {
     beforeEach(() => {
-      GlobalConfig.get = jest.fn(() => ({
-        ...createMockConf(),
-        characterCollisionStrategy: CollisionStrategy.BLOCK_ONE_TILE_AHEAD,
-      }));
+      gridTilemap = new GridTilemap(
+        createTilemap(),
+        "ge_collide",
+        CollisionStrategy.BLOCK_ONE_TILE_AHEAD
+      );
+      gridTilemap.setTransition(new Vector2(4, 3), "someLayer", "enterLayer");
+      charBlockCache = new CharBlockCache(
+        CollisionStrategy.BLOCK_ONE_TILE_AHEAD
+      );
     });
 
     it("should block pos on movement and release old one", () => {
@@ -390,15 +413,5 @@ describe("CharBlockCache", () => {
       ["cGroup1"],
       new Set(exclude)
     );
-  }
-
-  function createMockConf(): Concrete<GridEngineConfig> {
-    return {
-      characters: [],
-      collisionTilePropertyName: "ge_collide",
-      numberOfDirections: NumberOfDirections.FOUR,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      layerOverlay: false,
-    };
   }
 });

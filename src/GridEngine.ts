@@ -1,24 +1,13 @@
 import { GridCharacterPhaser } from "./GridEnginePhaser/GridCharacterPhaser/GridCharacterPhaser";
-import { GlobalConfig } from "./GlobalConfig/GlobalConfig";
 import { CollisionStrategy } from "./Collisions/CollisionStrategy";
-import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
 import {
   Finished,
   MoveToConfig,
   MoveToResult,
-  TargetMovement,
 } from "./Movement/TargetMovement/TargetMovement";
-import { GridCharacter, PositionChange } from "./GridCharacter/GridCharacter";
-import {
-  Direction,
-  isDiagonal,
-  NumberOfDirections,
-} from "./Direction/Direction";
-import { GridTilemap } from "./GridTilemap/GridTilemap";
-import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
-import { Observable, Subject } from "rxjs";
-import { take, takeUntil, filter, map, mergeWith } from "rxjs/operators";
-import { Vector2 } from "./Utils/Vector2/Vector2";
+import { PositionChange } from "./GridCharacter/GridCharacter";
+import { Direction, NumberOfDirections } from "./Direction/Direction";
+import { Observable } from "rxjs";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { Concrete } from "./Utils/TypeUtils";
@@ -27,19 +16,29 @@ import {
   CharacterIndex,
   FrameRow,
 } from "./GridCharacter/CharacterAnimation/CharacterAnimation";
-import {
-  CharacterFilteringOptions,
-  filterCharacters,
-} from "./GridCharacter/CharacterFilter/CharacterFilter";
+import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter";
 
 import { version as VERSION } from "../package.json";
 import {
   IsPositionAllowedFn,
-  Pathfinding,
   PathfindingOptions,
 } from "./Pathfinding/Pathfinding";
-import { LayerPositionUtils } from "./Utils/LayerPositionUtils/LayerPositionUtils";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
+import {
+  GridEngineHeadless,
+  TileSizePerSecond,
+  Position,
+  LayerPosition,
+  CharLayer,
+  GridEngineConfigHeadless,
+  CollisionConfig,
+  CharacterDataHeadless,
+  CharacterShift,
+  CharacterShiftAction,
+} from "./GridEngineHeadless";
+import { GridTilemapPhaser } from "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser";
+import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
+import { Tilemap } from "./GridTilemap/Tilemap";
 
 export {
   CollisionStrategy,
@@ -57,50 +56,25 @@ export {
   IsPositionAllowedFn,
   PathfindingOptions,
   ShortestPathAlgorithmType,
+  GridEngineHeadless,
+  TileSizePerSecond,
+  Position,
+  LayerPosition,
+  CharLayer,
+  CollisionConfig,
+  CharacterShift,
+  CharacterShiftAction,
+  CharacterDataHeadless,
+  GridEngineConfigHeadless,
+  Tilemap,
 };
-
-export type TileSizePerSecond = number;
-
-export interface Position {
-  x: number;
-  y: number;
-}
-
-/**
- * Specifies a tile position along with a character layer.
- */
-export interface LayerPosition {
-  position: Position;
-  charLayer: CharLayer;
-}
-
-export type CharLayer = string | undefined;
 
 /**
  * Configuration object for initializing GridEngine.
  */
-export interface GridEngineConfig {
+export interface GridEngineConfig extends GridEngineConfigHeadless {
   /** An array of character data. Each describing a character on the map. */
   characters: CharacterData[];
-
-  /** A custom name for the collision tile property of your tilemap. */
-  collisionTilePropertyName?: string;
-
-  /**
-   * The possible number of directions for moving a character. Default is 4
-   * (up, down, left, right). If set to 8 it additionaly enables diagonal
-   * movement (up-left, up-right, down-left, down-right).
-   *
-   * @defaultValue {@link NumberOfDirections.FOUR}
-   */
-  numberOfDirections?: NumberOfDirections;
-
-  /**
-   * The character collision strategy.
-   *
-   * @defaultValue {@link CollisionStrategy.BLOCK_TWO_TILES}
-   */
-  characterCollisionStrategy?: CollisionStrategy;
 
   /**
    * Enables experimental
@@ -132,43 +106,8 @@ export interface WalkingAnimationMapping {
   [Direction.DOWN_RIGHT]?: FrameRow;
 }
 
-export interface CollisionConfig {
-  /**
-   * Determines whether the character should collide with the tilemap.
-   *
-   * @defaultValue `true`
-   */
-  collidesWithTiles?: boolean;
-
-  /**
-   * If set to `true`, the character will not collide with a position that has
-   * no tile on any layer. This is especially useful if you want the character
-   * to be able to move outside of the map boundaries.
-   *
-   * @defaultValue `false`
-   */
-  ignoreMissingTiles?: boolean;
-
-  /**
-   * Array with collision groups. Only characters with at least one matching
-   * collision group collide. If omitted it will be initialized with a default
-   * collision group called `'geDefault'`. If you want to keep a character from
-   * colliding with any other character, you can simply provide an empty array
-   * here.
-   *
-   * @defaultValue `['geDefault']`
-   */
-  collisionGroups?: string[];
-}
-
 /** Configuration object used to initialize a new character in GridEngine. */
-export interface CharacterData {
-  /**
-   * A unique identifier for the character on the map. If you provice two
-   * characters with the same id, the last one will override the previous one.
-   */
-  id: string;
-
+export interface CharacterData extends CharacterDataHeadless {
   /** The character’s sprite. */
   sprite?: Phaser.GameObjects.Sprite;
 
@@ -187,20 +126,6 @@ export interface CharacterData {
    * For more details see the {@link https://annoraaq.github.io/grid-engine/example/custom-walking-animation-mapping/ | custom walking animation mapping example}.
    */
   walkingAnimationMapping?: CharacterIndex | WalkingAnimationMapping;
-
-  /**
-   * The speed of a player in tiles per second.
-   *
-   * @defaultValue `4`
-   */
-  speed?: TileSizePerSecond;
-
-  /**
-   * Start tile position of the player.
-   *
-   * @defaultValue `{x: 0, y:0}`
-   */
-  startPosition?: Position;
 
   /**
    * A container that holds the character’s sprite. This can be used in order
@@ -226,106 +151,21 @@ export interface CharacterData {
    * @defaultValue `0`
    */
   offsetY?: number;
-
-  /**
-   * Sets the direction the character is initially facing.
-   *
-   * @defaultValue {@link Direction.DOWN}
-   */
-  facingDirection?: Direction;
-
-  /**
-   * Set to false, if character should not collide (neither with the tilemap,
-   * nor with other characters). For more control, pass a
-   * {@link CollisionConfig} object.
-   *
-   * @defaultValue `true`
-   */
-  collides?: boolean | CollisionConfig;
-
-  /**
-   * Sets the
-   * {@link https://annoraaq.github.io/grid-engine/p/character-layers | character layer}
-   * of the character. If omitted the lowest character layer of the tilemap is
-   * taken. If there are no character layers in the tilemap, it will get the
-   * char layer `undefined`.
-   *
-   * @beta
-   */
-  charLayer?: string;
-
-  /**
-   * Sets labels for the character. They can be used to filter and logically
-   * group characters.
-   *
-   * @defaultValue `[]`
-   */
-  labels?: string[];
-
-  /**
-   * The possible number of directions for moving a character. This setting can
-   * be used to override the {@link GridEngineConfig.numberOfDirections | global setting}
-   * in the GridEngine configuration for specific characters.
-   */
-  numberOfDirections?: NumberOfDirections;
-
-  /**
-   * With of the character in tiles. This allows to specify character that span
-   * more than just one tile.
-   *
-   * @defaultValue 1
-   */
-  tileWidth?: number;
-
-  /**
-   * Height of the character in tiles. This allows to specify character that span
-   * more than just one tile.
-   *
-   * @defaultValue 1
-   */
-  tileHeight?: number;
-}
-
-/**
- * Result of a modification of the internal characters array
- */
-export interface CharacterShift {
-  /** the modified character */
-  charId: string;
-  /** The action that was performed when modifying the character */
-  action: CharacterShiftAction;
-}
-
-/**
- * Type of modification of grid engine characters
- */
-export enum CharacterShiftAction {
-  /** removed existing character */
-  REMOVED = "REMOVED",
-  /** added new character */
-  ADDED = "ADDED",
 }
 
 export class GridEngine {
+  private geHeadless: GridEngineHeadless = new GridEngineHeadless();
+  private config?: Concrete<GridEngineConfig>;
   private gridCharacters?: Map<string, GridCharacterPhaser>;
-  private gridTilemap?: GridTilemap;
+  private gridTilemap?: GridTilemapPhaser;
   private isCreatedInternal = false;
-  private movementStopped$?: Subject<{ charId: string; direction: Direction }>;
-  private movementStarted$?: Subject<{ charId: string; direction: Direction }>;
-  private directionChanged$?: Subject<{ charId: string; direction: Direction }>;
-  private positionChangeStarted$?: Subject<{ charId: string } & PositionChange>;
-  private positionChangeFinished$?: Subject<
-    { charId: string } & PositionChange
-  >;
-  private charRemoved$?: Subject<string>;
-  private charAdded$?: Subject<string>;
 
   /**
    * Should only be called by Phaser and never directly.
    * @internal
    */
   constructor(private scene: Phaser.Scene) {
-    console.log(`Using GridEngine v${VERSION}`);
+    console.log(`Using GridEngine Phaser Plugin v${VERSION}`);
     this.scene.sys.events.once("boot", this.boot, this);
   }
 
@@ -340,10 +180,7 @@ export class GridEngine {
    * {@link https://annoraaq.github.io/grid-engine/p/character-layers | here}
    */
   getCharLayer(charId: string): string | undefined {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    return gridChar.getTilePos().layer;
+    return this.geHeadless.getCharLayer(charId);
   }
 
   /**
@@ -353,8 +190,7 @@ export class GridEngine {
    * @beta
    */
   getTransition(position: Position, fromLayer: string): string | undefined {
-    this.initGuard();
-    return this.gridTilemap?.getTransition(new Vector2(position), fromLayer);
+    return this.geHeadless.getTransition(position, fromLayer);
   }
 
   /**
@@ -370,12 +206,7 @@ export class GridEngine {
    * @beta
    */
   setTransition(position: Position, fromLayer: string, toLayer: string): void {
-    this.initGuard();
-    return this.gridTilemap?.setTransition(
-      new Vector2(position),
-      fromLayer,
-      toLayer
-    );
+    this.geHeadless.setTransition(position, fromLayer, toLayer);
   }
 
   /**
@@ -383,33 +214,14 @@ export class GridEngine {
    * GridEngine are called.
    */
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
+    this.geHeadless.create(new PhaserTilemap(tilemap), config);
     this.isCreatedInternal = true;
     this.gridCharacters = new Map();
 
     const concreteConfig = this.setConfigDefaults(config);
 
-    GlobalConfig.set(concreteConfig);
-    this.movementStopped$ = new Subject<{
-      charId: string;
-      direction: Direction;
-    }>();
-    this.movementStarted$ = new Subject<{
-      charId: string;
-      direction: Direction;
-    }>();
-    this.directionChanged$ = new Subject<{
-      charId: string;
-      direction: Direction;
-    }>();
-    this.positionChangeStarted$ = new Subject<
-      { charId: string } & PositionChange
-    >();
-    this.positionChangeFinished$ = new Subject<
-      { charId: string } & PositionChange
-    >();
-    this.charRemoved$ = new Subject<string>();
-    this.charAdded$ = new Subject<string>();
-    this.gridTilemap = new GridTilemap(tilemap);
+    this.config = concreteConfig;
+    this.gridTilemap = new GridTilemapPhaser(tilemap);
 
     this.addCharacters();
   }
@@ -418,10 +230,7 @@ export class GridEngine {
    * @returns The tile position of the character with the given id
    */
   getPosition(charId: string): Position {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    return gridChar.getTilePos().position;
+    return this.geHeadless.getPosition(charId);
   }
 
   /**
@@ -431,7 +240,7 @@ export class GridEngine {
    * commands are **not** queued.
    */
   move(charId: string, direction: Direction): void {
-    this.moveChar(charId, direction);
+    this.geHeadless.move(charId, direction);
   }
 
   /**
@@ -448,11 +257,7 @@ export class GridEngine {
    * route is neither blocked nor outside of the radius).
    */
   moveRandomly(charId: string, delay = 0, radius = -1): void {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    const randomMovement = new RandomMovement(gridChar, delay, radius);
-    gridChar.setMovement(randomMovement);
+    this.geHeadless.moveRandomly(charId, delay, radius);
   }
 
   /**
@@ -460,17 +265,7 @@ export class GridEngine {
    * random movement, follow movement and target movement)
    */
   getMovement(charId: string): MovementInfo {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-
-    const movement = gridChar.getMovement();
-    if (!movement) {
-      return {
-        type: "None",
-      };
-    }
-    return movement.getInfo();
+    return this.geHeadless.getMovement(charId);
   }
 
   /**
@@ -488,34 +283,7 @@ export class GridEngine {
     targetPos: Position,
     config?: MoveToConfig
   ): Observable<{ charId: string } & Finished> {
-    const moveToConfig = this.assembleMoveToConfig(config);
-
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    if (!this.gridTilemap) throw this.createUninitializedErr();
-    const targetMovement = new TargetMovement(
-      gridChar,
-      this.gridTilemap,
-      {
-        position: new Vector2(targetPos),
-        layer: config?.targetLayer || gridChar.getNextTilePos().layer,
-      },
-      {
-        distance: 0,
-        config: moveToConfig,
-      }
-    );
-    gridChar.setMovement(targetMovement);
-    return targetMovement.finishedObs().pipe(
-      map((finished: Finished) => ({
-        charId,
-        position: finished.position,
-        result: finished.result,
-        description: finished.description,
-        layer: finished.layer,
-      }))
-    );
+    return this.geHeadless.moveTo(charId, targetPos, config);
   }
 
   /**
@@ -524,26 +292,17 @@ export class GridEngine {
    * specified position ({@link moveTo})
    */
   stopMovement(charId: string): void {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    gridChar.setMovement(undefined);
+    this.geHeadless.stopMovement(charId);
   }
 
   /** Sets the speed in tiles per second for a character. */
   setSpeed(charId: string, speed: number): void {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    gridChar.setSpeed(speed);
+    this.geHeadless.setSpeed(charId, speed);
   }
 
   /** @returns Speed in tiles per second for a character. */
   getSpeed(charId: string): number {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    return gridChar.getSpeed();
+    return this.geHeadless.getSpeed(charId);
   }
 
   /** @returns Container for a character. */
@@ -572,10 +331,7 @@ export class GridEngine {
 
   /** @returns Whether character collides with tiles */
   collidesWithTiles(charId: string): boolean {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    return gridChar.collidesWithTiles();
+    return this.geHeadless.collidesWithTiles(charId);
   }
 
   /**
@@ -597,7 +353,8 @@ export class GridEngine {
    * is activated.
    */
   hasLayerOverlay(): boolean {
-    return GlobalConfig.get().layerOverlay;
+    this.initGuard();
+    return !!this.config?.layerOverlay;
   }
 
   /**
@@ -619,80 +376,40 @@ export class GridEngine {
   }
 
   /** @internal */
-  update(_time: number, delta: number): void {
+  update(time: number, delta: number): void {
     if (this.isCreatedInternal && this.gridCharacters) {
       for (const [_key, gridChar] of this.gridCharacters) {
         gridChar.update(delta);
       }
     }
+    this.geHeadless.update(time, delta);
   }
 
   /** Adds a character after calling {@link create}. */
   addCharacter(charData: CharacterData): void {
+    this.geHeadless.addCharacter(charData);
+    this.addCharacterInternal(charData);
+  }
+
+  private addCharacterInternal(charData: CharacterData): void {
     this.initGuard();
     if (!this.gridTilemap) throw this.createUninitializedErr();
+    if (!this.config) throw this.createUninitializedErr();
 
     const gridCharPhaser = new GridCharacterPhaser(
       charData,
       this.scene,
       this.gridTilemap,
-      GlobalConfig.get().layerOverlay
+      this.config.layerOverlay,
+      this.geHeadless
     );
-    const gridChar = gridCharPhaser.getGridCharacter();
 
     this.gridCharacters?.set(charData.id, gridCharPhaser);
-
-    this.gridTilemap.addCharacter(gridChar);
-    const id = gridChar.getId();
-
-    gridChar
-      .movementStopped()
-      .pipe(takeUntil(this.charRemoved(id)))
-      .subscribe((direction: Direction) => {
-        this.movementStopped$?.next({ charId: id, direction });
-      });
-
-    gridChar
-      .movementStarted()
-      .pipe(takeUntil(this.charRemoved(id)))
-      .subscribe((direction: Direction) => {
-        this.movementStarted$?.next({ charId: id, direction });
-      });
-
-    gridChar
-      .directionChanged()
-      .pipe(takeUntil(this.charRemoved(id)))
-      .subscribe((direction: Direction) => {
-        this.directionChanged$?.next({ charId: id, direction });
-      });
-
-    gridChar
-      .positionChangeStarted()
-      .pipe(takeUntil(this.charRemoved(id)))
-      .subscribe((positionChange: PositionChange) => {
-        this.positionChangeStarted$?.next({
-          charId: id,
-          ...positionChange,
-        });
-      });
-
-    gridChar
-      .positionChangeFinished()
-      .pipe(takeUntil(this.charRemoved(id)))
-      .subscribe((positionChange: PositionChange) => {
-        this.positionChangeFinished$?.next({
-          charId: id,
-          ...positionChange,
-        });
-      });
-
-    this.charAdded$?.next(id);
   }
 
   /** Checks whether a character with the given ID is registered. */
   hasCharacter(charId: string): boolean {
-    this.initGuard();
-    return !!this.gridCharacters?.has(charId);
+    return this.geHeadless.hasCharacter(charId);
   }
 
   /**
@@ -704,9 +421,9 @@ export class GridEngine {
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     gridChar.destroy();
-    this.gridTilemap?.removeCharacter(charId);
     this.gridCharacters?.delete(charId);
-    this.charRemoved$?.next(charId);
+
+    this.geHeadless.removeCharacter(charId);
   }
 
   /**
@@ -719,6 +436,8 @@ export class GridEngine {
     for (const charId of this.gridCharacters.keys()) {
       this.removeCharacter(charId);
     }
+
+    this.geHeadless.removeAllCharacters();
   }
 
   /**
@@ -726,56 +445,35 @@ export class GridEngine {
    * the provided filtering options.
    */
   getAllCharacters(options?: CharacterFilteringOptions): string[] {
-    this.initGuard();
-    if (!this.gridCharacters) return [];
-    const allChars = [...this.gridCharacters.values()].map((char) =>
-      char.getGridCharacter()
-    );
-    const filteredChars = options
-      ? filterCharacters(allChars, options)
-      : allChars;
-
-    return filteredChars.map((char: GridCharacter) => char.getId());
+    return this.geHeadless.getAllCharacters(options);
   }
 
   /**
    * @returns All labels, attached to the character.
    */
   getLabels(charId: string): string[] {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    return gridChar.getLabels();
+    return this.geHeadless.getLabels(charId);
   }
 
   /**
    * Add labels to the character.
    */
   addLabels(charId: string, labels: string[]): void {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    gridChar.addLabels(labels);
+    this.geHeadless.addLabels(charId, labels);
   }
 
   /**
    * Remove labels from the character.
    */
   removeLabels(charId: string, labels: string[]): void {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    gridChar.removeLabels(labels);
+    this.geHeadless.removeLabels(charId, labels);
   }
 
   /**
    * Removes all labels from the character.
    */
   clearLabels(charId: string): void {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    gridChar.clearLabels();
+    this.geHeadless.clearLabels(charId);
   }
 
   /**
@@ -797,34 +495,19 @@ export class GridEngine {
     distance = 0,
     closestPointIfBlocked = false
   ): void {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    const gridCharToFollow = this.gridCharacters
-      ?.get(charIdToFollow)
-      ?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    if (!gridCharToFollow) throw this.createCharUnknownErr(charIdToFollow);
-    if (!this.gridTilemap) throw this.createUninitializedErr();
-    const followMovement = new FollowMovement(
-      gridChar,
-      this.gridTilemap,
-      gridCharToFollow,
+    this.geHeadless.follow(
+      charId,
+      charIdToFollow,
       distance,
       closestPointIfBlocked
-        ? NoPathFoundStrategy.CLOSEST_REACHABLE
-        : NoPathFoundStrategy.STOP
     );
-    gridChar.setMovement(followMovement);
   }
 
   /**
    * @returns True if the character is currently moving.
    */
   isMoving(charId: string): boolean {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    return gridChar.isMoving();
+    return this.geHeadless.isMoving(charId);
   }
 
   /**
@@ -832,21 +515,14 @@ export class GridEngine {
    *  this is `down`.
    */
   getFacingDirection(charId: string): Direction {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    return gridChar.getFacingDirection();
+    return this.geHeadless.getFacingDirection(charId);
   }
 
   /**
    * @returns Position the character is currently facing.
    */
   getFacingPosition(charId: string): Position {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    const vectorPos = gridChar.getFacingPosition();
-    return { x: vectorPos.x, y: vectorPos.y };
+    return this.geHeadless.getFacingPosition(charId);
   }
 
   /**
@@ -856,7 +532,8 @@ export class GridEngine {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
-    return gridChar.turnTowards(direction);
+    gridChar.turnTowards(direction);
+    this.geHeadless.turnTowards(charId, direction);
   }
 
   /**
@@ -864,13 +541,7 @@ export class GridEngine {
    * @returns The identifiers of all characters on this tile.
    */
   getCharactersAt(position: Position, layer: string): string[] {
-    this.initGuard();
-    if (!this.gridTilemap) return [];
-    const characters = this.gridTilemap.getCharactersAt(
-      new Vector2(position),
-      layer
-    );
-    return Array.from(characters).map((char) => char.getId());
+    return this.geHeadless.getCharactersAt(position, layer);
   }
 
   /**
@@ -881,16 +552,7 @@ export class GridEngine {
    * will also emit.
    */
   setPosition(charId: string, pos: Position, layer?: string): void {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    if (!layer) {
-      gridChar.setTilePosition({
-        position: new Vector2(pos),
-        layer: gridChar.getTilePos().layer,
-      });
-    }
-    gridChar.setTilePosition({ position: new Vector2(pos), layer });
+    this.geHeadless.setPosition(charId, pos, layer);
   }
 
   /**
@@ -899,9 +561,8 @@ export class GridEngine {
   getSprite(charId: string): Phaser.GameObjects.Sprite | undefined {
     this.initGuard();
     const gridCharPhaser = this.gridCharacters?.get(charId);
-    const gridChar = gridCharPhaser?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    return gridCharPhaser?.getSprite();
+    if (!gridCharPhaser) throw this.createCharUnknownErr(charId);
+    return gridCharPhaser.getSprite();
   }
 
   /**
@@ -936,12 +597,7 @@ export class GridEngine {
     layer?: string,
     collisionGroups: string[] = ["geDefault"]
   ): boolean {
-    this.initGuard();
-    const positionVec = new Vector2(position);
-    return !!(
-      this.gridTilemap?.hasBlockingTile(positionVec, layer) ||
-      this.gridTilemap?.hasBlockingChar(positionVec, layer, collisionGroups)
-    );
+    return this.geHeadless.isBlocked(position, layer, collisionGroups);
   }
 
   /**
@@ -951,8 +607,7 @@ export class GridEngine {
    * @returns True if position on given layer is blocked by the tilemap.
    */
   isTileBlocked(position: Position, layer?: string): boolean {
-    this.initGuard();
-    return !!this.gridTilemap?.hasBlockingTile(new Vector2(position), layer);
+    return this.geHeadless.isTileBlocked(position, layer);
   }
 
   /**
@@ -962,10 +617,7 @@ export class GridEngine {
    * @returns All collision groups of the given character.
    */
   getCollisionGroups(charId: string): string[] {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    return gridChar.getCollisionGroups() || [];
+    return this.geHeadless.getCollisionGroups(charId);
   }
 
   /**
@@ -973,10 +625,7 @@ export class GridEngine {
    * will be overwritten.
    */
   setCollisionGroups(charId: string, collisionGroups: string[]): void {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-    gridChar.setCollisionGroups(collisionGroups);
+    this.geHeadless.setCollisionGroups(charId, collisionGroups);
   }
 
   /**
@@ -988,20 +637,11 @@ export class GridEngine {
     charLayer: string | undefined,
     direction: Direction
   ): LayerPosition {
-    this.initGuard();
-    // This can't actually happen, but TypeScript can't know.
-    if (!this.gridTilemap) throw this.createUninitializedErr();
-    const posInDirection = this.gridTilemap.getTilePosInDirection(
-      {
-        position: new Vector2(position),
-        layer: charLayer,
-      },
+    return this.geHeadless.getTilePosInDirection(
+      position,
+      charLayer,
       direction
     );
-    return {
-      position: posInDirection.position.toPosition(),
-      charLayer: posInDirection.layer,
-    };
   }
 
   /**
@@ -1020,19 +660,7 @@ export class GridEngine {
     dest: LayerPosition,
     options: PathfindingOptions = {}
   ): { path: LayerPosition[]; closestToTarget: LayerPosition } {
-    this.initGuard();
-    // This can't actually happen, but TypeScript can't know.
-    if (!this.gridTilemap) throw this.createUninitializedErr();
-    const pathfinding = new Pathfinding("BFS", this.gridTilemap);
-    const res = pathfinding.findShortestPath(
-      LayerPositionUtils.toInternal(source),
-      LayerPositionUtils.toInternal(dest),
-      options
-    );
-    return {
-      path: res.path.map(LayerPositionUtils.fromInternal),
-      closestToTarget: LayerPositionUtils.fromInternal(res.closestToTarget),
-    };
+    return this.geHeadless.findShortestPath(source, dest, options);
   }
 
   /**
@@ -1048,39 +676,14 @@ export class GridEngine {
       charId: string;
     } & PositionChange
   > {
-    return this.positionChangeFinished().pipe(
-      filter(
-        (t) =>
-          charIds.includes(t.charId) &&
-          tiles.some(
-            (target) => target.x === t.enterTile.x && target.y === t.enterTile.y
-          ) &&
-          (layer === undefined || layer.includes(t.enterLayer))
-      )
-    );
+    return this.geHeadless.steppedOn(charIds, tiles, layer);
   }
 
   /**
    * @returns Observable that emits when a new character is added or an existing is removed.
    */
   characterShifted(): Observable<CharacterShift> {
-    if (!this.charAdded$ || !this.charRemoved$) {
-      throw this.createUninitializedErr();
-    }
-    return this.charAdded$.pipe(
-      map((c) => ({
-        charId: c,
-        action: CharacterShiftAction.ADDED,
-      })),
-      mergeWith(
-        this.charRemoved$.pipe(
-          map((c) => ({
-            charId: c,
-            action: CharacterShiftAction.REMOVED,
-          }))
-        )
-      )
-    );
+    return this.geHeadless.characterShifted();
   }
 
   /**
@@ -1088,8 +691,7 @@ export class GridEngine {
    *  character ID and the direction.
    */
   movementStarted(): Observable<{ charId: string; direction: Direction }> {
-    if (!this.movementStarted$) throw this.createUninitializedErr();
-    return this.movementStarted$;
+    return this.geHeadless.movementStarted();
   }
 
   /**
@@ -1097,8 +699,7 @@ export class GridEngine {
    *  provide it’s ID and the direction of that movement.
    */
   movementStopped(): Observable<{ charId: string; direction: Direction }> {
-    if (!this.movementStopped$) throw this.createUninitializedErr();
-    return this.movementStopped$;
+    return this.geHeadless.movementStopped();
   }
 
   /**
@@ -1114,8 +715,7 @@ export class GridEngine {
    * same direction, this observable would only emit once.
    */
   directionChanged(): Observable<{ charId: string; direction: Direction }> {
-    if (!this.directionChanged$) throw this.createUninitializedErr();
-    return this.directionChanged$;
+    return this.geHeadless.directionChanged();
   }
 
   /**
@@ -1123,8 +723,7 @@ export class GridEngine {
    *  It will notify at the beginning of the movement.
    */
   positionChangeStarted(): Observable<{ charId: string } & PositionChange> {
-    if (!this.positionChangeStarted$) throw this.createUninitializedErr();
-    return this.positionChangeStarted$;
+    return this.geHeadless.positionChangeStarted();
   }
 
   /**
@@ -1132,8 +731,16 @@ export class GridEngine {
    *  It will notify at the end of the movement.
    */
   positionChangeFinished(): Observable<{ charId: string } & PositionChange> {
-    if (!this.positionChangeFinished$) throw this.createUninitializedErr();
-    return this.positionChangeFinished$;
+    return this.geHeadless.positionChangeFinished();
+  }
+
+  /**
+   * Returns the movement progress (0-1000) of a character to the next tile. For
+   * example, if a character has movement progress 400 that means that it has
+   * moved 400/1000th of the distance to the next tile already.
+   */
+  getMovementProgress(charId: string): number {
+    return this.geHeadless.getMovementProgress(charId);
   }
 
   private setConfigDefaults(
@@ -1148,14 +755,6 @@ export class GridEngine {
     };
   }
 
-  private charRemoved(charId: string): Observable<string> {
-    if (!this.charRemoved$) throw this.createUninitializedErr();
-    return this.charRemoved$?.pipe(
-      take(1),
-      filter((cId) => cId == charId)
-    );
-  }
-
   private initGuard() {
     if (!this.isCreatedInternal) {
       throw this.createUninitializedErr();
@@ -1163,70 +762,18 @@ export class GridEngine {
   }
 
   private createUninitializedErr() {
-    throw new Error("Plugin not initialized. You need to call create() first.");
-  }
-
-  private addCharacters() {
-    GlobalConfig.get().characters.forEach((charData) =>
-      this.addCharacter(charData)
+    throw new Error(
+      "GridEngine not initialized. You need to call create() first."
     );
   }
 
-  private moveChar(charId: string, direction: Direction): void {
-    this.initGuard();
-    const gridChar = this.gridCharacters?.get(charId)?.getGridCharacter();
-    if (!gridChar) throw this.createCharUnknownErr(charId);
-
-    if (GlobalConfig.get().numberOfDirections === NumberOfDirections.FOUR) {
-      if (!this.gridTilemap?.isIsometric() && isDiagonal(direction)) {
-        console.warn(
-          `GridEngine: Character '${charId}' can't be moved '${direction}' in 4 direction mode.`
-        );
-        return;
-      } else if (this.gridTilemap?.isIsometric() && !isDiagonal(direction)) {
-        console.warn(
-          `GridEngine: Character '${charId}' can't be moved '${direction}' in 4 direction isometric mode.`
-        );
-        return;
-      }
-    }
-
-    gridChar.move(direction);
+  private addCharacters() {
+    this.config?.characters.forEach((charData) =>
+      this.addCharacterInternal(charData)
+    );
   }
 
   private createCharUnknownErr(charId: string): Error {
     return new Error(`Character unknown: ${charId}`);
-  }
-
-  private assembleMoveToConfig(config: MoveToConfig = {}): MoveToConfig {
-    const moveToConfig = {
-      ...config,
-      noPathFoundStrategy: NoPathFoundStrategy.STOP,
-      pathBlockedStrategy: PathBlockedStrategy.WAIT,
-    };
-    if (config?.noPathFoundStrategy) {
-      if (
-        Object.values(NoPathFoundStrategy).includes(config.noPathFoundStrategy)
-      ) {
-        moveToConfig.noPathFoundStrategy = config.noPathFoundStrategy;
-      } else {
-        console.warn(
-          `GridEngine: Unknown NoPathFoundStrategy '${config.noPathFoundStrategy}'. Falling back to '${NoPathFoundStrategy.STOP}'`
-        );
-      }
-    }
-
-    if (config?.pathBlockedStrategy) {
-      if (
-        Object.values(PathBlockedStrategy).includes(config.pathBlockedStrategy)
-      ) {
-        moveToConfig.pathBlockedStrategy = config.pathBlockedStrategy;
-      } else {
-        console.warn(
-          `GridEngine: Unknown PathBlockedStrategy '${config.pathBlockedStrategy}'. Falling back to '${PathBlockedStrategy.WAIT}'`
-        );
-      }
-    }
-    return moveToConfig;
   }
 }

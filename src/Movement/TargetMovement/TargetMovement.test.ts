@@ -7,25 +7,15 @@ import { MoveToResult, TargetMovement } from "./TargetMovement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
-import { CollisionStrategy, GridEngineConfig } from "../../GridEngine";
+import { CollisionStrategy } from "../../GridEngine";
 import { CharConfig, GridCharacter } from "../../GridCharacter/GridCharacter";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
-import * as Phaser from "phaser";
 import {
-  createBlankLayerMock,
-  createTilemapMock,
-  mockBlockMap,
-  mockCharMap,
   createAllowedFn,
   COLLISION_GROUP,
+  mockLayeredBlockMap,
+  mockCharMap,
 } from "../../Utils/MockFactory/MockFactory";
-import { Concrete } from "../../Utils/TypeUtils";
-import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
-
-// Hack to get Phaser included at runtime
-((_a) => {
-  // do nothing
-})(Phaser);
 
 const TEST_CHAR_CONFIG = {
   speed: 1,
@@ -35,7 +25,6 @@ const TEST_CHAR_CONFIG = {
 
 describe("TargetMovement", () => {
   let targetMovement: TargetMovement;
-  let blankLayerMock;
   let tilemapMock;
   let gridTilemap;
   let shortestPathAlgo: ShortestPathAlgorithmType;
@@ -60,7 +49,11 @@ describe("TargetMovement", () => {
     return path.map(([x, y]) => layerPos(new Vector2(x, y)));
   }
 
-  function expectWalkedPath(mockChar: GridCharacter, path: LayerVecPos[]) {
+  function expectWalkedPath(
+    targetMovement: TargetMovement,
+    mockChar: GridCharacter,
+    path: LayerVecPos[]
+  ) {
     for (const pos of path) {
       targetMovement.update(1000);
       mockChar.update(1000);
@@ -69,18 +62,38 @@ describe("TargetMovement", () => {
   }
 
   beforeEach(() => {
-    blankLayerMock = createBlankLayerMock();
-    tilemapMock = createTilemapMock(blankLayerMock);
-    gridTilemap = new GridTilemap(tilemapMock as any);
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "......",
+          "......",
+          "......",
+          "......",
+          "......",
+          "......",
+        ],
+      },
+      {
+        layer: "testCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "......",
+          "......",
+          "......",
+          "......",
+          "......",
+          "......",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collides",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     shortestPathAlgo = "BIDIRECTIONAL_SEARCH";
-    const config: Concrete<GridEngineConfig> = {
-      characters: [],
-      collisionTilePropertyName: "ge_collides",
-      numberOfDirections: NumberOfDirections.FOUR,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      layerOverlay: false,
-    };
-    GlobalConfig.set(config);
   });
 
   it("should move char in correct direction", () => {
@@ -211,13 +224,24 @@ describe("TargetMovement", () => {
   it("should move towards closest reachable point if path is blocked", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
-    // prettier-ignore
-    mockBlockMap(tilemapMock, [
-      ".p..",
-      "....",
-      "####",
-      ".t..",
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".p..",
+          "....",
+          "####",
+          ".t..",
+        ],
+      },
     ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    gridTilemap.addCharacter(mockChar);
 
     targetMovement = new TargetMovement(
       mockChar,
@@ -243,13 +267,23 @@ describe("TargetMovement", () => {
     const targetPos = layerPos(new Vector2(1, 3));
     const mockChar = createMockChar("char", charPos);
 
-    // prettier-ignore
-    mockBlockMap(tilemapMock, [
-      ".p..",
-      "....",
-      "####",
-      ".t..",
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".p..",
+          "....",
+          "####",
+          ".t..",
+        ],
+      },
     ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collides",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       distance: 3,
@@ -267,13 +301,23 @@ describe("TargetMovement", () => {
   it("should not move if distance reached", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
-    // prettier-ignore
-    mockBlockMap(tilemapMock, [
-      ".p..",
-      "....",
-      "....",
-      ".t..",
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".p..",
+          "....",
+          "....",
+          ".t..",
+        ],
+      },
     ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
 
     targetMovement = new TargetMovement(
       mockChar,
@@ -300,13 +344,23 @@ describe("TargetMovement", () => {
   it("should move if closestToTarget is further than distance", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
-    // prettier-ignore
-    mockBlockMap(tilemapMock, [
-      ".p..",
-      "....",
-      "####",
-      ".t..",
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".p..",
+          "....",
+          "####",
+          ".t..",
+        ],
+      },
     ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
 
     targetMovement = new TargetMovement(
       mockChar,
@@ -330,14 +384,24 @@ describe("TargetMovement", () => {
   it("should not move if closestToTarget is closer than distance", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
-    // prettier-ignore
-    mockBlockMap(tilemapMock, [
-      ".p..",
-      "....",
-      "....",
-      "####",
-      ".t..",
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".p..",
+          "....",
+          "....",
+          "####",
+          ".t..",
+        ],
+      },
     ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
 
     targetMovement = new TargetMovement(
       mockChar,
@@ -363,13 +427,23 @@ describe("TargetMovement", () => {
   it("should not move if no path exists", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
-    // prettier-ignore
-    mockBlockMap(tilemapMock, [
-      ".p..",
-      "....",
-      "####",
-      ".t..",
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".p..",
+          "....",
+          "####",
+          ".t..",
+        ],
+      },
     ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
 
     targetMovement = new TargetMovement(
       mockChar,
@@ -390,13 +464,24 @@ describe("TargetMovement", () => {
       tilemap: gridTilemap,
       ignoreMissingTiles: true,
     });
-    // prettier-ignore
-    mockBlockMap(tilemapMock, [
-      ".p..",
-      "....",
-      "####",
-      ".t..",
+
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".p..",
+          "....",
+          "####",
+          ".t..",
+        ],
+      },
     ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
 
     targetMovement = new TargetMovement(
       mockChar,
@@ -406,6 +491,7 @@ describe("TargetMovement", () => {
     );
 
     expectWalkedPath(
+      targetMovement,
       mockChar,
       createPath([
         [1, 1],
@@ -423,13 +509,23 @@ describe("TargetMovement", () => {
     it("should move if path exists after backoff", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const mockChar = createMockChar("char", charPos);
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        ".p..",
-        "....",
-        "####",
-        ".t..",
+      tilemapMock = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".p..",
+            "....",
+            "####",
+            ".t..",
+          ],
+        },
       ]);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
       targetMovement = new TargetMovement(
         mockChar,
         gridTilemap,
@@ -447,13 +543,16 @@ describe("TargetMovement", () => {
       expect(mockChar.isMoving()).toBe(false);
       expect(mockChar.getTilePos()).toEqual(charPos);
 
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        ".p..",
-        "....",
-        "#.##",
-        ".t..",
-      ]);
+      updateLayer(
+        [
+          // prettier-ignore
+          ".p..",
+          "....",
+          "#.##",
+          ".t..",
+        ],
+        "lowerCharLayer"
+      );
 
       targetMovement.update(99);
       mockChar.update(99);
@@ -469,13 +568,23 @@ describe("TargetMovement", () => {
     it("should move if path exists after custom backoff", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const mockChar = createMockChar("char", charPos);
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        ".p..",
-        "....",
-        "####",
-        ".t..",
+      tilemapMock = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".p..",
+            "....",
+            "####",
+            ".t..",
+          ],
+        },
       ]);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
 
       targetMovement = new TargetMovement(
         mockChar,
@@ -494,13 +603,16 @@ describe("TargetMovement", () => {
 
       expect(mockChar.isMoving()).toBe(false);
 
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        ".p..",
-        "....",
-        "#.##",
-        ".t..",
-      ]);
+      updateLayer(
+        [
+          // prettier-ignore
+          ".p..",
+          "....",
+          "#.##",
+          ".t..",
+        ],
+        "lowerCharLayer"
+      );
 
       targetMovement.update(49);
       mockChar.update(49);
@@ -515,13 +627,23 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const mockChar = createMockChar("char", charPos);
 
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        ".p..",
-        "....",
-        "####",
-        ".t..",
+      tilemapMock = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".p..",
+            "....",
+            "####",
+            ".t..",
+          ],
+        },
       ]);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
 
       targetMovement = new TargetMovement(
         mockChar,
@@ -550,13 +672,16 @@ describe("TargetMovement", () => {
       targetMovement.update(1);
       mockChar.update(1);
 
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        ".p..",
-        "....",
-        "#.##",
-        ".t..",
-      ]);
+      updateLayer(
+        [
+          // prettier-ignore
+          ".p..",
+          "....",
+          "#.##",
+          ".t..",
+        ],
+        "lowerCharLayer"
+      );
       targetMovement.update(1);
       mockChar.update(1);
       expect(mockChar.isMoving()).toBe(false);
@@ -575,13 +700,23 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const mockChar = createMockChar("char", charPos);
 
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        ".p..",
-        "....",
-        "####",
-        ".t..",
+      tilemapMock = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".p..",
+            "....",
+            "####",
+            ".t..",
+          ],
+        },
       ]);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
 
       // expect(mockChar.getMovementDirection()).not.toEqual(Direction.DOWN);
 
@@ -604,13 +739,16 @@ describe("TargetMovement", () => {
       targetMovement.update(1);
       mockChar.update(1);
 
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        ".p..",
-        "....",
-        "#.##",
-        ".t..",
-      ]);
+      updateLayer(
+        [
+          // prettier-ignore
+          ".p..",
+          "....",
+          "#.##",
+          ".t..",
+        ],
+        "lowerCharLayer"
+      );
 
       targetMovement.update(1);
       mockChar.update(1);
@@ -642,13 +780,16 @@ describe("TargetMovement", () => {
       targetMovement.update(1);
       mockChar.update(1);
 
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        ".p..",
-        "....",
-        "#.##",
-        ".t..",
-      ]);
+      updateLayer(
+        [
+          // prettier-ignore
+          ".p..",
+          "....",
+          "#.##",
+          ".t..",
+        ],
+        "lowerCharLayer"
+      );
 
       targetMovement.update(1);
       mockChar.update(1);
@@ -662,13 +803,23 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const mockChar = createMockChar("char", charPos);
 
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        ".p..",
-        "....",
-        "####",
-        ".t..",
+      tilemapMock = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".p..",
+            "....",
+            "####",
+            ".t..",
+          ],
+        },
       ]);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
 
       targetMovement = new TargetMovement(
         mockChar,
@@ -691,13 +842,16 @@ describe("TargetMovement", () => {
       mockChar.update(100);
       expect(mockChar.isMoving()).toBe(false);
 
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        ".p..",
-        "....",
-        "#.##",
-        ".t..",
-      ]);
+      updateLayer(
+        [
+          // prettier-ignore
+          ".p..",
+          "....",
+          "#.##",
+          ".t..",
+        ],
+        "lowerCharLayer"
+      );
 
       targetMovement.update(200);
       mockChar.update(200);
@@ -720,12 +874,13 @@ describe("TargetMovement", () => {
     if (targetPos.position.x != 1 || targetPos.position.y != 2) {
       throw "TargetPos needs to be (1,2)";
     }
-    // prettier-ignore
-    mockBlockMap(tilemapMock, [
-      ".p..",
-      "####",
-      ".t..",
-    ]);
+
+    tilemapMock
+      .getLayers()
+      .find((l) => l.getName() == charPos.layer)
+      .getData()[charPos.position.y + 1][charPos.position.x].properties[
+      "ge_collide"
+    ] = "true";
   }
 
   function unblockPath(charPos: LayerVecPos, targetPos: LayerVecPos) {
@@ -735,12 +890,30 @@ describe("TargetMovement", () => {
     if (targetPos.position.x != 1 || targetPos.position.y != 2) {
       throw "TargetPos needs to be (1,2)";
     }
-    // prettier-ignore
-    mockBlockMap(tilemapMock, [
-      ".p..",
-      "#.##",
-      ".t..",
-    ]);
+    tilemapMock
+      .getLayers()
+      .find((l) => l.getName() == charPos.layer)
+      .getData()[charPos.position.y + 1][charPos.position.x].properties[
+      "ge_collide"
+    ] = undefined;
+  }
+
+  function updateLayer(blockMap: string[], layer?: string) {
+    for (let r = 0; r < blockMap.length; r++) {
+      for (let c = 0; c < blockMap[r].length; c++) {
+        if (blockMap[r][c] == "#") {
+          tilemapMock
+            .getLayers()
+            .find((l) => l.getName() == layer)
+            .getData()[r][c].properties["ge_collide"] = "true";
+        } else {
+          tilemapMock
+            .getLayers()
+            .find((l) => l.getName() == layer)
+            .getData()[r][c].properties["ge_collide"] = undefined;
+        }
+      }
+    }
   }
 
   it("should timeout on strategy WAIT", () => {
@@ -748,7 +921,23 @@ describe("TargetMovement", () => {
     const targetPos = layerPos(new Vector2(1, 2));
     const mockChar = createMockChar("char", charPos);
 
-    unblockPath(charPos, targetPos);
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".p..",
+          "#.##",
+          ".t..",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    gridTilemap.addCharacter(mockChar);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: {
@@ -758,6 +947,7 @@ describe("TargetMovement", () => {
     });
 
     blockPath(charPos, targetPos);
+
     const finishedObsCallbackMock = jest.fn();
     const finishedObsCompleteMock = jest.fn();
     targetMovement.finishedObs().subscribe({
@@ -786,7 +976,23 @@ describe("TargetMovement", () => {
     const targetPos = layerPos(new Vector2(1, 2));
     const mockChar = createMockChar("char", charPos);
 
-    unblockPath(charPos, targetPos);
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".p..",
+          "#.##",
+          ".t..",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    gridTilemap.addCharacter(mockChar);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: {
@@ -819,13 +1025,25 @@ describe("TargetMovement", () => {
       const targetPos = layerPos(new Vector2(1, 3));
       const mockChar = createMockChar("char", charPos);
 
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        ".p..",
-        "....",
-        "#.##",
-        ".t..",
+      tilemapMock = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".p..",
+            "....",
+            "#.##",
+            ".t..",
+          ],
+        },
       ]);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
+      gridTilemap.addCharacter(mockChar);
+
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
           algorithm: shortestPathAlgo,
@@ -833,13 +1051,16 @@ describe("TargetMovement", () => {
         },
       });
 
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        "....",
-        ".p..",
-        "####",
-        ".t..",
-      ]);
+      updateLayer(
+        [
+          // prettier-ignore
+          "....",
+          ".p..",
+          "####",
+          ".t..",
+        ],
+        "lowerCharLayer"
+      );
 
       targetMovement.update(1000);
       mockChar.update(1000);
@@ -849,13 +1070,16 @@ describe("TargetMovement", () => {
       mockChar.update(1000);
 
       expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        "....",
-        ".p..",
-        "##.#",
-        ".t..",
-      ]);
+      updateLayer(
+        [
+          // prettier-ignore
+          "....",
+          ".p..",
+          "##.#",
+          ".t..",
+        ],
+        "lowerCharLayer"
+      );
       targetMovement.update(1000);
       mockChar.update(1000);
 
@@ -868,7 +1092,23 @@ describe("TargetMovement", () => {
       const targetPos = layerPos(new Vector2(1, 2));
       const mockChar = createMockChar("char", charPos);
 
-      unblockPath(charPos, targetPos);
+      tilemapMock = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".p..",
+            "#.##",
+            ".t..",
+          ],
+        },
+      ]);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
+      gridTilemap.addCharacter(mockChar);
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
@@ -880,12 +1120,15 @@ describe("TargetMovement", () => {
       blockPath(charPos, targetPos);
 
       expect(mockChar.isMoving()).toBe(false);
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        ".p..",
-        "##.#",
-        ".t..",
-      ]);
+      updateLayer(
+        [
+          // prettier-ignore
+          ".p..",
+          "##.#",
+          ".t..",
+        ],
+        "lowerCharLayer"
+      );
       targetMovement.update(defaultBackoff - 1);
       mockChar.update(defaultBackoff - 1);
       expect(mockChar.isMoving()).toBe(false);
@@ -898,7 +1141,23 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const targetPos = layerPos(new Vector2(1, 2));
       const mockChar = createMockChar("char", charPos);
-      unblockPath(charPos, targetPos);
+      tilemapMock = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".p..",
+            "#.##",
+            ".t..",
+          ],
+        },
+      ]);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
+      gridTilemap.addCharacter(mockChar);
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
@@ -912,12 +1171,15 @@ describe("TargetMovement", () => {
       targetMovement.update(100);
       mockChar.update(100);
       expect(mockChar.isMoving()).toBe(false);
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        ".p..",
-        "##.#",
-        ".t..",
-      ]);
+      updateLayer(
+        [
+          // prettier-ignore
+          ".p..",
+          "##.#",
+          ".t..",
+        ],
+        "lowerCharLayer"
+      );
 
       targetMovement.update(49);
       mockChar.update(49);
@@ -932,7 +1194,23 @@ describe("TargetMovement", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const targetPos = layerPos(new Vector2(1, 2));
       const mockChar = createMockChar("char", charPos);
-      unblockPath(charPos, targetPos);
+      tilemapMock = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".p..",
+            "#.##",
+            ".t..",
+          ],
+        },
+      ]);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
+      gridTilemap.addCharacter(mockChar);
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
@@ -974,7 +1252,24 @@ describe("TargetMovement", () => {
     const targetPos = layerPos(new Vector2(1, 2));
     const mockChar = createMockChar("char", charPos);
 
-    unblockPath(charPos, targetPos);
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".p..",
+          "#.##",
+          ".t..",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    gridTilemap.addCharacter(mockChar);
+
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: { algorithm: shortestPathAlgo },
     });
@@ -1012,13 +1307,24 @@ describe("TargetMovement", () => {
       tileWidth: 2,
       tileHeight: 2,
     });
-    // prettier-ignore
-    mockBlockMap(tilemapMock, [
-      ".pp.",
-      ".pp.",
-      ".t..",
-      "....",
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".pp.",
+          ".pp.",
+          ".t..",
+          "....",
+        ],
+      },
     ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    gridTilemap.addCharacter(mockChar);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: { algorithm: shortestPathAlgo },
@@ -1145,7 +1451,6 @@ describe("TargetMovement", () => {
         numberOfDirections: NumberOfDirections.EIGHT,
       });
 
-      tilemapMock.hasTileAt.mockReturnValue(true);
       targetMovement = new TargetMovement(
         mockChar,
         gridTilemap,
@@ -1231,13 +1536,24 @@ describe("TargetMovement", () => {
         numberOfDirections: NumberOfDirections.EIGHT,
       });
 
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        ".p..",
-        "....",
-        "####",
-        ".t..",
+      tilemapMock = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".p..",
+            "....",
+            "####",
+            ".t..",
+          ],
+        },
       ]);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
+      gridTilemap.addCharacter(mockChar);
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         distance: 3,
         config: {
@@ -1262,14 +1578,25 @@ describe("TargetMovement", () => {
       tileHeight: 2,
     });
 
-    // prettier-ignore
-    mockBlockMap(tilemapMock, [
-      ".ss.",
-      ".ss.",
-      "##..",
-      ".t..",
-      "....",
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".ss.",
+          ".ss.",
+          "##..",
+          ".t..",
+          "....",
+        ],
+      },
     ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    gridTilemap.addCharacter(mockChar);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: {
@@ -1278,6 +1605,7 @@ describe("TargetMovement", () => {
     });
 
     expectWalkedPath(
+      targetMovement,
       mockChar,
       createPath([
         [2, 0],
@@ -1314,6 +1642,7 @@ describe("TargetMovement", () => {
     });
 
     expectWalkedPath(
+      targetMovement,
       mockChar,
       createPath([
         [2, 0],
@@ -1334,13 +1663,25 @@ describe("TargetMovement", () => {
       tilemap: gridTilemap,
       collisionGroups: [COLLISION_GROUP],
     });
-
-    // prettier-ignore
-    mockCharMap(tilemapMock, gridTilemap, [
-      ".s..",
-      "ccc.",
-      ".t..",
-    ]);
+    const blockMap = [
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".s..",
+          "ccc.",
+          ".t..",
+        ],
+      },
+    ];
+    tilemapMock = mockLayeredBlockMap(blockMap);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    mockCharMap(gridTilemap, blockMap);
+    gridTilemap.addCharacter(mockChar);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: {
@@ -1349,6 +1690,7 @@ describe("TargetMovement", () => {
     });
 
     expectWalkedPath(
+      targetMovement,
       mockChar,
       createPath([
         [2, 0],
@@ -1370,12 +1712,25 @@ describe("TargetMovement", () => {
       collisionGroups: ["someOtherCollisionGroup"],
     });
 
-    // prettier-ignore
-    mockCharMap(tilemapMock, gridTilemap, [
-      ".s..",
-      "ccc.",
-      ".t..",
-    ]);
+    const blockMap = [
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".s..",
+          "ccc.",
+          ".t..",
+        ],
+      },
+    ];
+    tilemapMock = mockLayeredBlockMap(blockMap);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    mockCharMap(gridTilemap, blockMap);
+    gridTilemap.addCharacter(mockChar);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: {
@@ -1384,6 +1739,7 @@ describe("TargetMovement", () => {
     });
 
     expectWalkedPath(
+      targetMovement,
       mockChar,
       createPath([
         [1, 1],
@@ -1401,12 +1757,22 @@ describe("TargetMovement", () => {
       collidesWithTiles: false,
     });
 
-    // prettier-ignore
-    mockBlockMap(tilemapMock, [
-      ".s..",
-      "###.",
-      ".t..",
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".s..",
+          "###.",
+          ".t..",
+        ],
+      },
     ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: {
@@ -1415,6 +1781,7 @@ describe("TargetMovement", () => {
     });
 
     expectWalkedPath(
+      targetMovement,
       mockChar,
       createPath([
         [1, 1],
@@ -1428,12 +1795,22 @@ describe("TargetMovement", () => {
     const targetPos = layerPos(new Vector2(1, 2));
     const mockChar = createMockChar("char", charPos);
 
-    // prettier-ignore
-    mockBlockMap(tilemapMock, [
-      ".s..",
-      "....",
-      ".#..",
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".s..",
+          "....",
+          ".#..",
+        ],
+      },
     ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: {
@@ -1442,13 +1819,33 @@ describe("TargetMovement", () => {
       ignoreBlockedTarget: true,
     });
 
-    expectWalkedPath(mockChar, createPath([[1, 1]]));
+    expectWalkedPath(targetMovement, mockChar, createPath([[1, 1]]));
   });
 
   describe("Closest reachable", () => {
     it("should move towards closest reachable point if path is blocked", () => {
       const charPos = layerPos(new Vector2(2, 5));
       const targetPos = layerPos(new Vector2(2, 0));
+      tilemapMock = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            "..t.",
+            "####",
+            "....",
+            "....",
+            "...#",
+            "..ss",
+            "..ss",
+          ],
+        },
+      ]);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
       const mockChar = createMockChar("char", charPos, {
         ...TEST_CHAR_CONFIG,
         tilemap: gridTilemap,
@@ -1456,16 +1853,7 @@ describe("TargetMovement", () => {
         tileHeight: 2,
       });
 
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        "..t.",
-        "####",
-        "....",
-        "....",
-        "...#",
-        "..ss",
-        "..ss",
-      ]);
+      gridTilemap.addCharacter(mockChar);
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
@@ -1475,6 +1863,7 @@ describe("TargetMovement", () => {
       });
 
       expectWalkedPath(
+        targetMovement,
         mockChar,
         createPath([
           [1, 5],
@@ -1489,19 +1878,29 @@ describe("TargetMovement", () => {
     it("should use correct number of directions", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const targetPos = layerPos(new Vector2(3, 2));
+      tilemapMock = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".s..",
+            "....",
+            "####",
+            "...t",
+          ],
+        },
+      ]);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
       const mockChar = createMockChar("char", charPos, {
         ...TEST_CHAR_CONFIG,
         tilemap: gridTilemap,
         numberOfDirections: NumberOfDirections.EIGHT,
       });
-
-      // prettier-ignore
-      mockBlockMap(tilemapMock, [
-        ".s..",
-        "....",
-        "####",
-        "...t",
-      ]);
+      gridTilemap.addCharacter(mockChar);
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
@@ -1513,6 +1912,7 @@ describe("TargetMovement", () => {
       // This is only one possible shortest path. When the shortest path
       // algorithm changes, this test could break.
       expectWalkedPath(
+        targetMovement,
         mockChar,
         createPath([
           [2, 0],
@@ -1547,6 +1947,7 @@ describe("TargetMovement", () => {
       });
 
       expectWalkedPath(
+        targetMovement,
         mockChar,
         createPath([
           [2, 0],
@@ -1560,20 +1961,32 @@ describe("TargetMovement", () => {
     it("should consider blocking chars", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const targetPos = layerPos(new Vector2(1, 4));
+      const blockMap = [
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".s..",
+            "ccc.",
+            "....",
+            "####",
+            ".t..",
+          ],
+        },
+      ];
+      tilemapMock = mockLayeredBlockMap(blockMap);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
       const mockChar = createMockChar("char", charPos, {
         ...TEST_CHAR_CONFIG,
         tilemap: gridTilemap,
         collisionGroups: [COLLISION_GROUP],
       });
-
-      // prettier-ignore
-      mockCharMap(tilemapMock, gridTilemap, [
-        ".s..",
-        "ccc.",
-        "....",
-        "####",
-        ".t..",
-      ]);
+      gridTilemap.addCharacter(mockChar);
+      mockCharMap(gridTilemap, blockMap);
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
@@ -1583,6 +1996,7 @@ describe("TargetMovement", () => {
       });
 
       expectWalkedPath(
+        targetMovement,
         mockChar,
         createPath([
           [2, 0],
@@ -1598,20 +2012,32 @@ describe("TargetMovement", () => {
     it("should not consider blocking chars of different collision groups", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const targetPos = layerPos(new Vector2(1, 4));
+      const blockMap = [
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".s..",
+            "ccc.",
+            "....",
+            "####",
+            ".t..",
+          ],
+        },
+      ];
+      tilemapMock = mockLayeredBlockMap(blockMap);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
       const mockChar = createMockChar("char", charPos, {
         ...TEST_CHAR_CONFIG,
         tilemap: gridTilemap,
         collisionGroups: ["someOtherCollisionGroup"],
       });
-
-      // prettier-ignore
-      mockCharMap(tilemapMock, gridTilemap, [
-        ".s..",
-        "ccc.",
-        "....",
-        "####",
-        ".t..",
-      ]);
+      gridTilemap.addCharacter(mockChar);
+      mockCharMap(gridTilemap, blockMap);
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
@@ -1621,6 +2047,7 @@ describe("TargetMovement", () => {
       });
 
       expectWalkedPath(
+        targetMovement,
         mockChar,
         createPath([
           [1, 1],
@@ -1632,20 +2059,32 @@ describe("TargetMovement", () => {
     it("should not collide with tiles", () => {
       const charPos = layerPos(new Vector2(1, 0));
       const targetPos = layerPos(new Vector2(1, 3));
+      const blockMap = [
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".s..",
+            ".#..",
+            "cccc",
+            ".t..",
+          ],
+        },
+      ];
+      tilemapMock = mockLayeredBlockMap(blockMap);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
       const mockChar = createMockChar("char", charPos, {
         ...TEST_CHAR_CONFIG,
         tilemap: gridTilemap,
         collidesWithTiles: false,
         collisionGroups: [COLLISION_GROUP],
       });
-
-      // prettier-ignore
-      mockCharMap(tilemapMock, gridTilemap, [
-        ".s..",
-        ".#..",
-        "cccc",
-        ".t..",
-      ]);
+      gridTilemap.addCharacter(mockChar);
+      mockCharMap(gridTilemap, blockMap);
 
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: {
@@ -1654,7 +2093,7 @@ describe("TargetMovement", () => {
         },
       });
 
-      expectWalkedPath(mockChar, createPath([[1, 1]]));
+      expectWalkedPath(targetMovement, mockChar, createPath([[1, 1]]));
     });
   });
 });

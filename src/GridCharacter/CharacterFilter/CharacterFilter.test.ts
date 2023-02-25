@@ -1,6 +1,7 @@
 import { NumberOfDirections } from "../../Direction/Direction";
+import { CollisionStrategy } from "../../GridEngineHeadless";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
-import { createTilemapMock } from "../../Utils/MockFactory/MockFactory";
+import { mockLayeredBlockMap } from "../../Utils/MockFactory/MockFactory";
 import { GridCharacter } from "../GridCharacter";
 import { filterCharacters } from "./CharacterFilter";
 
@@ -20,7 +21,21 @@ describe("CharacterFilter", () => {
   }
   it("should get all characters with specific labels", () => {
     const characters: GridCharacter[] = [];
-    const gridTilemap = new GridTilemap(createTilemapMock() as any);
+    const tm = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
+        ],
+      },
+    ]);
+    const gridTilemap = new GridTilemap(
+      tm,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const char1 = createChar("player1", gridTilemap, ["label1", "label2"]);
     const char2 = createChar("player2", gridTilemap, ["label2"]);
     const char3 = createChar("player3", gridTilemap, []);

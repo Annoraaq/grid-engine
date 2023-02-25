@@ -1,41 +1,13 @@
-import { CollisionStrategy } from "./Collisions/CollisionStrategy";
-import { GlobalConfig } from "./GlobalConfig/GlobalConfig";
 import { take } from "rxjs/operators";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { GridCharacter } from "./GridCharacter/GridCharacter";
 import { Vector2 } from "./Utils/Vector2/Vector2";
+import * as Phaser from "phaser";
 
-const mockFollowMovement = {
-  setCharacter: jest.fn(),
-  update: jest.fn(),
-  getInfo: jest.fn(),
-};
-const mockGridTileMap = {
-  addCharacter: jest.fn(),
-  removeCharacter: jest.fn(),
-  getCharactersAt: jest.fn(),
-  getTileWidth: () => 32,
-  getTileSize: jest.fn().mockReturnValue(new Vector2(32, 32)),
-  getTileHeight: () => 32,
-  getTransition: jest.fn(),
-  getTransitions: jest.fn().mockReturnValue(new Map()),
-  setTransition: jest.fn(),
-  isIsometric: jest.fn().mockReturnValue(false),
-  hasBlockingTile: jest.fn().mockReturnValue(false),
-  tilePosToPixelPos: jest.fn().mockReturnValue(new Vector2(0, 0)),
-  toMapDirection: jest.fn(),
-  hasBlockingChar: jest.fn().mockReturnValue(false),
-  getDepthOfCharLayer: jest.fn().mockReturnValue(0),
-  getTileDistance: jest.fn().mockReturnValue(new Vector2(1, 1)),
-  isInRange: jest.fn(),
-  getTilePosInDirection: jest.fn(),
-};
-const mockGridTilemapConstructor = jest.fn(function (
-  _tilemap,
-  _firstLayerAboveChar?
-) {
-  return mockGridTileMap;
-});
+// Hack to get Phaser included at runtime
+((_a) => {
+  // do nothing
+})(Phaser);
 
 const mockPathfinding = {
   findShortestPath: jest.fn().mockReturnValue({
@@ -77,12 +49,6 @@ expect.extend({
   },
 });
 
-jest.mock("./GridTilemap/GridTilemap", function () {
-  return {
-    GridTilemap: mockGridTilemapConstructor,
-  };
-});
-
 jest.mock("./Pathfinding/Pathfinding", function () {
   return {
     Pathfinding: mockPathfindingConstructor,
@@ -97,11 +63,11 @@ import { GridEngine } from "./GridEngine";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { createSpriteMock } from "./Utils/MockFactory/MockFactory";
+import { createPhaserTilemapStub } from "./Utils/MockFactory/MockPhaserTilemap";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;
   let sceneMock;
-  let tileMapMock;
   let playerSpriteMock;
   let consoleLogBackup;
 
@@ -109,6 +75,21 @@ describe("GridEngine", () => {
     console.log = consoleLogBackup;
     jest.clearAllMocks();
   });
+
+  function createDefaultMockWithLayer(layer?: string) {
+    return createPhaserTilemapStub(
+      new Map([
+        [
+          layer,
+          [
+            // prettier-ignore
+            "..",
+            "..",
+          ],
+        ],
+      ])
+    );
+  }
 
   beforeEach(() => {
     consoleLogBackup = console.log;
@@ -120,15 +101,7 @@ describe("GridEngine", () => {
       sys: { events: { once: jest.fn(), on: jest.fn() } },
       add: { sprite: jest.fn().mockReturnValue(mockNewSprite) },
     };
-    tileMapMock = {
-      layers: [
-        {
-          tilemapLayer: { scale: 2, setDepth: jest.fn() },
-        },
-      ],
-      tileWidth: 16,
-      tileHeight: 16,
-    };
+
     playerSpriteMock = {
       x: 10,
       y: 12,
@@ -148,15 +121,9 @@ describe("GridEngine", () => {
         name: "1",
       },
     } as any;
-    mockFollowMovement.setCharacter.mockReset();
-    mockFollowMovement.update.mockReset();
-    mockGridTileMap.hasBlockingTile.mockReturnValue(false);
-    mockGridTileMap.toMapDirection.mockReturnValue(Direction.LEFT);
-    mockGridTileMap.getTransition.mockReturnValue(undefined);
-    mockGridTileMap.isIsometric.mockReturnValue(false);
 
     gridEngine = new GridEngine(sceneMock);
-    gridEngine.create(tileMapMock, {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
           id: "player",
@@ -176,21 +143,9 @@ describe("GridEngine", () => {
     );
   });
 
-  it("should init tilemap", () => {
-    gridEngine.create(tileMapMock, {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-        },
-      ],
-    });
-    expect(mockGridTilemapConstructor).toHaveBeenCalledWith(tileMapMock);
-  });
-
   it("should init player", () => {
-    const containerMock = {};
-    gridEngine.create(tileMapMock, {
+    const containerMock = { setDepth: jest.fn() };
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
           id: "player",
@@ -214,7 +169,7 @@ describe("GridEngine", () => {
   });
 
   it("should init player with collisionGroups", () => {
-    gridEngine.create(tileMapMock, {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
           id: "player",
@@ -235,7 +190,7 @@ describe("GridEngine", () => {
   });
 
   it("should init with layerOverlay", () => {
-    gridEngine.create(tileMapMock, {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
           id: "player",
@@ -249,8 +204,8 @@ describe("GridEngine", () => {
   });
 
   it("should init player with facingDirection", () => {
-    const containerMock = {};
-    gridEngine.create(tileMapMock, {
+    const containerMock = { setDepth: jest.fn() };
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
           id: "player",
@@ -286,7 +241,7 @@ describe("GridEngine", () => {
         rightFoot: 26,
       },
     };
-    gridEngine.create(tileMapMock, {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
           id: "player",
@@ -300,52 +255,8 @@ describe("GridEngine", () => {
     );
   });
 
-  it("should init GlobalConfig with default values", () => {
-    const setSpy = jest.spyOn(GlobalConfig, "set");
-    const config = {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
-          startPosition: new Vector2(3, 4),
-        },
-      ],
-    };
-    gridEngine.create(tileMapMock, config);
-    expect(setSpy).toHaveBeenCalledWith({
-      ...config,
-      collisionTilePropertyName: "ge_collide",
-      numberOfDirections: NumberOfDirections.FOUR,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      layerOverlay: false,
-    });
-  });
-
-  it("should override GlobalConfig default values", () => {
-    const setSpy = jest.spyOn(GlobalConfig, "set");
-    const config = {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSpriteMock,
-          walkingAnimationMapping: 3,
-          startPosition: new Vector2(3, 4),
-        },
-      ],
-      collisionTilePropertyName: "custom_name",
-      numberOfDirections: NumberOfDirections.EIGHT,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_ONE_TILE_AHEAD,
-      layerOverlay: true,
-    };
-    gridEngine.create(tileMapMock, config);
-    expect(setSpy).toHaveBeenCalledWith({
-      ...config,
-    });
-  });
-
   it("should use config startPosition", () => {
-    gridEngine.create(tileMapMock, {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
           id: "player",
@@ -359,7 +270,7 @@ describe("GridEngine", () => {
   });
 
   it("should use config speed", () => {
-    gridEngine.create(tileMapMock, {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
           id: "player",
@@ -375,7 +286,7 @@ describe("GridEngine", () => {
   it("should use config offset", () => {
     const offsetX = 5;
     const offsetY = 6;
-    gridEngine.create(tileMapMock, {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
           id: "player",
@@ -392,7 +303,7 @@ describe("GridEngine", () => {
 
   describe("collision config", () => {
     it("should use config collides", () => {
-      gridEngine.create(tileMapMock, {
+      gridEngine.create(createDefaultMockWithLayer(undefined), {
         characters: [
           {
             id: "player",
@@ -408,7 +319,7 @@ describe("GridEngine", () => {
     });
 
     it("should use config collidesWithTiles true", () => {
-      gridEngine.create(tileMapMock, {
+      gridEngine.create(createDefaultMockWithLayer(undefined), {
         characters: [
           {
             id: "player",
@@ -426,7 +337,7 @@ describe("GridEngine", () => {
     });
 
     it("should use config collidesWithTiles false", () => {
-      gridEngine.create(tileMapMock, {
+      gridEngine.create(createDefaultMockWithLayer(undefined), {
         characters: [
           {
             id: "player",
@@ -444,7 +355,7 @@ describe("GridEngine", () => {
     });
 
     it("should use config collisionGroups", () => {
-      gridEngine.create(tileMapMock, {
+      gridEngine.create(createDefaultMockWithLayer(undefined), {
         characters: [
           {
             id: "player",
@@ -463,7 +374,7 @@ describe("GridEngine", () => {
   });
 
   it("should use config char layer", () => {
-    gridEngine.create(tileMapMock, {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
           id: "player",
@@ -478,55 +389,77 @@ describe("GridEngine", () => {
   });
 
   describe("move 4 dirs", () => {
+    beforeEach(() => {
+      const mock = createPhaserTilemapStub(
+        new Map([
+          [
+            undefined,
+            [
+              // prettier-ignore
+              "...",
+              "...",
+              "...",
+            ],
+          ],
+        ])
+      );
+      gridEngine.create(mock, {
+        characters: [{ id: "player", startPosition: { x: 1, y: 1 } }],
+      });
+    });
+
     it("should move player orthogonally", () => {
-      mockGridTileMap.toMapDirection.mockReturnValue(Direction.LEFT);
       gridEngine.move("player", Direction.LEFT);
 
       expect(gridEngine.isMoving("player")).toBe(true);
       expect(gridEngine.getFacingDirection("player")).toBe(Direction.LEFT);
     });
 
-    it("should show warn on vertical move", () => {
+    it("should return the movement progress", () => {
+      const speed = 4;
+      const halfWayMs = 1000 / speed / 2;
+      gridEngine.move("player", Direction.LEFT);
+      gridEngine.update(1000, halfWayMs);
+      expect(gridEngine.getMovementProgress("player")).toEqual(500);
+    });
+
+    test.each([
+      Direction.DOWN_LEFT,
+      Direction.DOWN_RIGHT,
+      Direction.UP_RIGHT,
+      Direction.UP_LEFT,
+    ])("should show warn on vertical move", (dir) => {
       console.warn = jest.fn();
-      gridEngine.move("player", Direction.DOWN_LEFT);
+      gridEngine.move("player", dir);
       expect(console.warn).toHaveBeenCalledWith(
-        "GridEngine: Character 'player' can't be moved 'down-left' in 4 direction mode."
-      );
-      expect(gridEngine.isMoving("player")).toBe(false);
-
-      gridEngine.move("player", Direction.DOWN_RIGHT);
-      expect(console.warn).toHaveBeenCalledWith(
-        "GridEngine: Character 'player' can't be moved 'down-right' in 4 direction mode."
-      );
-      expect(gridEngine.isMoving("player")).toBe(false);
-
-      gridEngine.move("player", Direction.UP_RIGHT);
-      expect(console.warn).toHaveBeenCalledWith(
-        "GridEngine: Character 'player' can't be moved 'up-right' in 4 direction mode."
-      );
-      expect(gridEngine.isMoving("player")).toBe(false);
-
-      gridEngine.move("player", Direction.UP_LEFT);
-      expect(console.warn).toHaveBeenCalledWith(
-        "GridEngine: Character 'player' can't be moved 'up-left' in 4 direction mode."
+        `GridEngine: Character 'player' can't be moved '${dir}' in 4 direction mode.`
       );
       expect(gridEngine.isMoving("player")).toBe(false);
     });
   });
 
   describe("move 8 dirs", () => {
-    it("should move player orthogonally", () => {
-      mockGridTileMap.toMapDirection.mockReturnValue(Direction.LEFT);
-      gridEngine.create(tileMapMock, {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
+    beforeEach(() => {
+      const mock = createPhaserTilemapStub(
+        new Map([
+          [
+            undefined,
+            [
+              // prettier-ignore
+              "...",
+              "...",
+              "...",
+            ],
+          ],
+        ])
+      );
+      gridEngine.create(mock, {
+        characters: [{ id: "player", startPosition: { x: 1, y: 1 } }],
         numberOfDirections: NumberOfDirections.EIGHT,
       });
+    });
 
+    it("should move player orthogonally", () => {
       gridEngine.move("player", Direction.LEFT);
 
       expect(gridEngine.isMoving("player")).toBe(true);
@@ -534,17 +467,6 @@ describe("GridEngine", () => {
     });
 
     it("should move player vertically", () => {
-      mockGridTileMap.toMapDirection.mockReturnValue(Direction.UP_LEFT);
-      gridEngine.create(tileMapMock, {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
-        numberOfDirections: NumberOfDirections.EIGHT,
-      });
-
       gridEngine.move("player", Direction.UP_LEFT);
 
       expect(gridEngine.isMoving("player")).toBe(true);
@@ -553,60 +475,45 @@ describe("GridEngine", () => {
   });
 
   describe("move 4 dirs isometric", () => {
-    it("should move player vertically", () => {
-      mockGridTileMap.toMapDirection.mockReturnValue(Direction.LEFT);
-      mockGridTileMap.isIsometric.mockReturnValue(true);
-      gridEngine.create(tileMapMock, {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
+    beforeEach(() => {
+      const mock = createPhaserTilemapStub(
+        new Map([
+          [
+            undefined,
+            [
+              // prettier-ignore
+              "...",
+              "...",
+              "...",
+            ],
+          ],
+        ])
+      );
+      mock.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC.toString();
+      gridEngine.create(mock, {
+        characters: [{ id: "player", startPosition: { x: 1, y: 1 } }],
       });
+    });
 
+    it("should move player vertically", () => {
       gridEngine.move("player", Direction.UP_LEFT);
+
       expect(gridEngine.isMoving("player")).toBe(true);
       expect(gridEngine.getFacingDirection("player")).toBe(Direction.UP_LEFT);
     });
 
-    it("should show warn on orthogonal move", () => {
-      console.warn = jest.fn();
-      mockGridTileMap.toMapDirection.mockReturnValue(Direction.DOWN_RIGHT);
-      mockGridTileMap.isIsometric.mockReturnValue(true);
-      gridEngine.create(tileMapMock, {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
-      });
+    test.each([Direction.DOWN, Direction.LEFT, Direction.RIGHT, Direction.UP])(
+      "should show warn on orthogonal move",
+      (dir) => {
+        console.warn = jest.fn();
 
-      gridEngine.move("player", Direction.DOWN);
-      expect(console.warn).toHaveBeenCalledWith(
-        "GridEngine: Character 'player' can't be moved 'down' in 4 direction isometric mode."
-      );
-      expect(gridEngine.isMoving("player")).toBe(false);
-
-      gridEngine.move("player", Direction.LEFT);
-      expect(console.warn).toHaveBeenCalledWith(
-        "GridEngine: Character 'player' can't be moved 'left' in 4 direction isometric mode."
-      );
-      expect(gridEngine.isMoving("player")).toBe(false);
-
-      gridEngine.move("player", Direction.RIGHT);
-      expect(console.warn).toHaveBeenCalledWith(
-        "GridEngine: Character 'player' can't be moved 'right' in 4 direction isometric mode."
-      );
-      expect(gridEngine.isMoving("player")).toBe(false);
-
-      gridEngine.move("player", Direction.UP);
-      expect(console.warn).toHaveBeenCalledWith(
-        "GridEngine: Character 'player' can't be moved 'up' in 4 direction isometric mode."
-      );
-      expect(gridEngine.isMoving("player")).toBe(false);
-    });
+        gridEngine.move("player", dir);
+        expect(console.warn).toHaveBeenCalledWith(
+          `GridEngine: Character 'player' can't be moved '${dir}' in 4 direction isometric mode.`
+        );
+        expect(gridEngine.isMoving("player")).toBe(false);
+      }
+    );
   });
 
   it("should set tile position", () => {
@@ -832,7 +739,7 @@ describe("GridEngine", () => {
   });
 
   it("should add chars on the go", () => {
-    gridEngine.create(tileMapMock, {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [],
     });
     gridEngine.addCharacter({
@@ -846,12 +753,11 @@ describe("GridEngine", () => {
   it("should remove chars on the go", () => {
     gridEngine.removeCharacter("player");
     gridEngine.update(123, 456);
-    expect(mockGridTileMap.removeCharacter).toHaveBeenCalledWith("player");
     expect(gridEngine.hasCharacter("player")).toBe(false);
   });
 
   it("should remove all chars", () => {
-    gridEngine.create(tileMapMock, {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
           id: "player",
@@ -865,13 +771,12 @@ describe("GridEngine", () => {
     });
     gridEngine.removeAllCharacters();
     gridEngine.update(123, 456);
-    expect(mockGridTileMap.removeCharacter).toHaveBeenCalledWith("player");
-    expect(mockGridTileMap.removeCharacter).toHaveBeenCalledWith("player2");
+
     expect(gridEngine.getAllCharacters().length).toEqual(0);
   });
 
   it("should get all chars", () => {
-    gridEngine.create(tileMapMock, {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
           id: "player",
@@ -888,23 +793,17 @@ describe("GridEngine", () => {
   });
 
   it("should delegate to get all chars at position", () => {
-    mockGridTileMap.getCharactersAt = jest.fn(
-      () => new Set([{ getId: () => "player" }])
-    );
-
-    gridEngine.create(tileMapMock, {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
           id: "player",
+          startPosition: { x: 5, y: 4 },
+          charLayer: "layer",
           sprite: playerSpriteMock,
         },
       ],
     });
     const chars = gridEngine.getCharactersAt(new Vector2(5, 4), "layer");
-    expect(mockGridTileMap.getCharactersAt).toHaveBeenCalledWith(
-      { x: 5, y: 4 },
-      "layer"
-    );
     expect(chars).toEqual(["player"]);
   });
 
@@ -919,7 +818,7 @@ describe("GridEngine", () => {
   });
 
   it("should follow a char", () => {
-    gridEngine.create(tileMapMock, {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
           id: "player",
@@ -944,7 +843,7 @@ describe("GridEngine", () => {
   });
 
   it("should follow a char with default distance", () => {
-    gridEngine.create(tileMapMock, {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
           id: "player",
@@ -1006,78 +905,75 @@ describe("GridEngine", () => {
   });
 
   it("should delegate getTransition", () => {
-    mockGridTileMap.getTransition.mockReturnValue("someLayer");
-    expect(gridEngine.getTransition({ x: 3, y: 4 }, "fromLayer")).toEqual(
-      "someLayer"
-    );
-  });
-
-  it("should delegate setTransition", () => {
     gridEngine.setTransition({ x: 3, y: 4 }, "fromLayer", "toLayer");
-    expect(mockGridTileMap.setTransition).toHaveBeenCalledWith(
-      { x: 3, y: 4 },
-      "fromLayer",
+    expect(gridEngine.getTransition({ x: 3, y: 4 }, "fromLayer")).toEqual(
       "toLayer"
     );
   });
 
   it("should block if tile is blocking", () => {
-    mockGridTileMap.hasBlockingTile.mockReturnValue(true);
-    mockGridTileMap.hasBlockingChar.mockReturnValue(false);
-    const result = gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer", [
-      "cGroup",
-    ]);
-    expect(mockGridTileMap.hasBlockingTile).toHaveBeenCalledWith(
-      new Vector2(3, 4),
-      "someLayer"
+    const mock = createPhaserTilemapStub(
+      new Map([
+        [
+          "someLayer",
+          [
+            // prettier-ignore
+            "....",
+            "....",
+            "....",
+            "....",
+            "...#",
+          ],
+        ],
+      ])
     );
-    expect(result).toBe(true);
+    gridEngine.create(mock, {
+      characters: [{ id: "player" }],
+    });
+
+    expect(gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer", ["cGroup"])).toBe(
+      true
+    );
+    expect(gridEngine.isTileBlocked({ x: 3, y: 4 }, "someLayer")).toBe(true);
   });
 
   it("should block if char is blocking", () => {
-    mockGridTileMap.hasBlockingTile.mockReturnValue(false);
-    mockGridTileMap.hasBlockingChar.mockReturnValue(true);
-    const result = gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer", [
-      "cGroup",
-    ]);
-    expect(mockGridTileMap.hasBlockingChar).toHaveBeenCalledWith(
-      new Vector2(3, 4),
-      "someLayer",
-      ["cGroup"]
+    gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+      characters: [
+        {
+          id: "player",
+          startPosition: { x: 3, y: 4 },
+          charLayer: "someLayer",
+          collides: {
+            collisionGroups: ["cGroup"],
+          },
+        },
+      ],
+    });
+    expect(gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer", ["cGroup"])).toBe(
+      true
     );
-    expect(result).toBe(true);
   });
 
   it("should not block", () => {
-    mockGridTileMap.hasBlockingTile.mockReturnValue(false);
-    mockGridTileMap.hasBlockingChar.mockReturnValue(false);
-    const result = gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer", [
-      "cGroup",
-    ]);
-    expect(mockGridTileMap.hasBlockingChar).toHaveBeenCalledWith(
-      new Vector2(3, 4),
-      "someLayer",
-      ["cGroup"]
-    );
-    expect(result).toBe(false);
+    gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+      characters: [{ id: "player" }],
+    });
+
+    expect(gridEngine.isBlocked({ x: 1, y: 1 }, "someLayer")).toBe(false);
   });
 
   it("should check blocking with default cGroup", () => {
-    gridEngine.isBlocked({ x: 3, y: 4 }, "someLayer");
-    expect(mockGridTileMap.hasBlockingChar).toHaveBeenCalledWith(
-      new Vector2(3, 4),
-      "someLayer",
-      ["geDefault"]
-    );
-  });
-
-  it("should delegate isTilemapBlocking", () => {
-    const result = gridEngine.isTileBlocked({ x: 3, y: 4 }, "someLayer");
-    expect(mockGridTileMap.hasBlockingTile).toHaveBeenCalledWith(
-      new Vector2(3, 4),
-      "someLayer"
-    );
-    expect(result).toBe(false);
+    gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+      characters: [
+        {
+          id: "player",
+          charLayer: "someLayer",
+          collides: { collisionGroups: ["geDefault"] },
+        },
+      ],
+    });
+    expect(gridEngine.isBlocked({ x: 0, y: 0 }, "someLayer")).toBe(true);
   });
 
   it("should delegate getCollisionGroups", () => {
@@ -1089,11 +985,6 @@ describe("GridEngine", () => {
   it("should get tile pos in direction", () => {
     const pos = { x: 5, y: 6 };
     const layer = "charLayer1";
-    const mockedTileInPos = {
-      position: new Vector2(10, 10),
-      layer: "someLayer",
-    };
-    mockGridTileMap.getTilePosInDirection.mockReturnValue(mockedTileInPos);
 
     const tilePosInDir = gridEngine.getTilePosInDirection(
       pos,
@@ -1102,41 +993,27 @@ describe("GridEngine", () => {
     );
 
     expect(tilePosInDir).toEqual({
-      position: { x: 10, y: 10 },
-      charLayer: "someLayer",
+      position: { x: 4, y: 6 },
+      charLayer: layer,
     });
-    expect(mockGridTileMap.getTilePosInDirection).toHaveBeenCalledWith(
-      { position: new Vector2(5, 6), layer: "charLayer1" },
-      Direction.LEFT
-    );
   });
 
   describe("Observables", () => {
     it("should get chars movementStarted observable", async () => {
-      gridEngine.create(tileMapMock, {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
+      gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+        characters: [{ id: "player", sprite: playerSpriteMock }],
       });
       const prom = gridEngine.movementStarted().pipe(take(1)).toPromise();
 
-      gridEngine.move("player", Direction.LEFT);
+      gridEngine.move("player", Direction.RIGHT);
 
       const res = await prom;
-      expect(res).toEqual({ charId: "player", direction: Direction.LEFT });
+      expect(res).toEqual({ charId: "player", direction: Direction.RIGHT });
     });
 
     it("should unsubscribe from movementStarted if char removed", () => {
-      gridEngine.create(tileMapMock, {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
+      gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+        characters: [{ id: "player", sprite: playerSpriteMock }],
       });
 
       const nextMock = jest.fn();
@@ -1145,7 +1022,7 @@ describe("GridEngine", () => {
         next: nextMock,
       });
 
-      gridEngine.move("player", Direction.LEFT);
+      gridEngine.move("player", Direction.RIGHT);
       gridEngine.update(2000, 100);
       gridEngine.move("player", Direction.DOWN);
       gridEngine.removeCharacter("player");
@@ -1155,34 +1032,24 @@ describe("GridEngine", () => {
     });
 
     it("should get chars movementStopped observable", async () => {
-      gridEngine.create(tileMapMock, {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
+      gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+        characters: [{ id: "player", sprite: playerSpriteMock }],
       });
 
       const prom = gridEngine.movementStopped().pipe(take(1)).toPromise();
-      gridEngine.move("player", Direction.LEFT);
+      gridEngine.move("player", Direction.RIGHT);
       gridEngine.update(2000, 1000);
       gridEngine.update(2000, 1000);
 
       expect(await prom).toEqual({
         charId: "player",
-        direction: Direction.LEFT,
+        direction: Direction.RIGHT,
       });
     });
 
     it("should unsubscribe from movementStopped if char removed", () => {
-      gridEngine.create(tileMapMock, {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
+      gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+        characters: [{ id: "player", sprite: playerSpriteMock }],
       });
 
       const nextMock = jest.fn();
@@ -1191,7 +1058,7 @@ describe("GridEngine", () => {
         next: nextMock,
       });
 
-      gridEngine.move("player", Direction.LEFT);
+      gridEngine.move("player", Direction.RIGHT);
       gridEngine.removeCharacter("player");
       gridEngine.update(2000, 1000);
       gridEngine.update(2000, 1000);
@@ -1200,18 +1067,12 @@ describe("GridEngine", () => {
     });
 
     it("should get chars directionChanged observable", async () => {
-      gridEngine.create(tileMapMock, {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
+      gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+        characters: [{ id: "player", sprite: playerSpriteMock }],
       });
 
       const prom = gridEngine.directionChanged().pipe(take(1)).toPromise();
 
-      mockGridTileMap.hasBlockingTile.mockReturnValue(true);
       gridEngine.move("player", Direction.LEFT);
 
       expect(await prom).toEqual({
@@ -1221,38 +1082,26 @@ describe("GridEngine", () => {
     });
 
     it("should get chars positionChangeStarted observable", async () => {
-      mockGridTileMap.toMapDirection.mockReturnValue(Direction.LEFT);
-      gridEngine.create(tileMapMock, {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
+      gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+        characters: [{ id: "player", sprite: playerSpriteMock }],
       });
 
       const prom = gridEngine.positionChangeStarted().pipe(take(1)).toPromise();
 
-      gridEngine.move("player", Direction.LEFT);
+      gridEngine.move("player", Direction.RIGHT);
 
       expect(await prom).toEqual({
         charId: "player",
         exitTile: new Vector2(0, 0),
-        enterTile: new Vector2(-1, 0),
-        enterLayer: undefined,
-        exitLayer: undefined,
+        enterTile: new Vector2(1, 0),
+        enterLayer: "someLayer",
+        exitLayer: "someLayer",
       });
     });
 
     it("should get chars positionChangeFinished observable", async () => {
-      mockGridTileMap.toMapDirection.mockReturnValue(Direction.LEFT);
-      gridEngine.create(tileMapMock, {
-        characters: [
-          {
-            id: "player",
-            sprite: playerSpriteMock,
-          },
-        ],
+      gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+        characters: [{ id: "player", sprite: playerSpriteMock }],
       });
 
       const prom = gridEngine
@@ -1260,7 +1109,7 @@ describe("GridEngine", () => {
         .pipe(take(1))
         .toPromise();
 
-      gridEngine.move("player", Direction.LEFT);
+      gridEngine.move("player", Direction.RIGHT);
       gridEngine.update(2000, 1000);
       gridEngine.update(2000, 1000);
 
@@ -1268,9 +1117,9 @@ describe("GridEngine", () => {
       expect(res).toEqual({
         charId: "player",
         exitTile: new Vector2(0, 0),
-        enterTile: new Vector2(-1, 0),
-        enterLayer: undefined,
-        exitLayer: undefined,
+        enterTile: new Vector2(1, 0),
+        enterLayer: "someLayer",
+        exitLayer: "someLayer",
       });
     });
 
@@ -1279,13 +1128,8 @@ describe("GridEngine", () => {
       const player2 = "player2";
       const nextMock = jest.fn();
 
-      gridEngine.create(tileMapMock, {
-        characters: [
-          {
-            id: player1,
-            sprite: playerSpriteMock,
-          },
-        ],
+      gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+        characters: [{ id: player1, sprite: playerSpriteMock }],
       });
 
       gridEngine.characterShifted().subscribe({
@@ -1323,10 +1167,10 @@ describe("GridEngine", () => {
       const player = "player1";
       const nonMatchingChar = "non matching char";
       const expectedLayer = "anyLayer";
-      const expectedTargetPosition = new Vector2(5, 5);
+      const expectedTargetPosition = new Vector2(1, 1);
       beforeEach(() => {
         nextMock = jest.fn();
-        gridEngine.create(tileMapMock, {
+        gridEngine.create(createDefaultMockWithLayer(expectedLayer), {
           characters: [
             {
               id: player,
@@ -1347,8 +1191,7 @@ describe("GridEngine", () => {
       });
 
       it("should notify if character stepped on tile", () => {
-        gridEngine.setPosition(player, new Vector2(4, 5), expectedLayer);
-        mockGridTileMap.toMapDirection.mockReturnValue(Direction.RIGHT);
+        gridEngine.setPosition(player, new Vector2(0, 1), expectedLayer);
         gridEngine.move(player, Direction.RIGHT);
         gridEngine.update(2000, 300);
 
@@ -1405,7 +1248,7 @@ describe("GridEngine", () => {
     });
 
     it("should unsubscribe from positionChangeFinished if char removed", () => {
-      gridEngine.create(tileMapMock, {
+      gridEngine.create(createDefaultMockWithLayer("someLayer"), {
         characters: [
           {
             id: "player",
@@ -1420,7 +1263,7 @@ describe("GridEngine", () => {
         next: nextMock,
       });
 
-      gridEngine.move("player", Direction.LEFT);
+      gridEngine.move("player", Direction.RIGHT);
       gridEngine.removeCharacter("player");
       gridEngine.update(2000, 1000);
       gridEngine.update(2000, 1000);
@@ -1430,7 +1273,7 @@ describe("GridEngine", () => {
 
   describe("labels", () => {
     it("should add labels on creation", () => {
-      gridEngine.create(tileMapMock, {
+      gridEngine.create(createDefaultMockWithLayer(undefined), {
         characters: [
           {
             id: "player",
@@ -1467,7 +1310,7 @@ describe("GridEngine", () => {
     });
 
     it("should get all characters with specific labels", () => {
-      gridEngine.create(tileMapMock, {
+      gridEngine.create(createDefaultMockWithLayer(undefined), {
         characters: [
           {
             id: "player1",
@@ -1534,7 +1377,7 @@ describe("GridEngine", () => {
 
   describe("pathfinding", () => {
     it("should delegate to pathfinding", () => {
-      gridEngine.create(tileMapMock, {
+      gridEngine.create(createDefaultMockWithLayer(undefined), {
         characters: [
           {
             id: "player",
@@ -1601,6 +1444,9 @@ describe("GridEngine", () => {
       );
       expectCharUnknownException(() => gridEngine.isMoving(UNKNOWN_CHAR_ID));
       expectCharUnknownException(() =>
+        gridEngine.getMovementProgress(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
         gridEngine.getFacingDirection(UNKNOWN_CHAR_ID)
       );
       expectCharUnknownException(() =>
@@ -1666,7 +1512,7 @@ describe("GridEngine", () => {
     });
 
     function expectUninitializedException(fn: () => any) {
-      expect(() => fn()).toThrow("Plugin not initialized");
+      expect(() => fn()).toThrow("GridEngine not initialized");
     }
 
     it("should throw error if plugin not created", () => {
@@ -1701,6 +1547,9 @@ describe("GridEngine", () => {
         gridEngine.setWalkingAnimationMapping(SOME_CHAR_ID, <any>{})
       );
       expectUninitializedException(() => gridEngine.isMoving(SOME_CHAR_ID));
+      expectUninitializedException(() =>
+        gridEngine.getMovementProgress(SOME_CHAR_ID)
+      );
       expectUninitializedException(() =>
         gridEngine.getFacingDirection(SOME_CHAR_ID)
       );

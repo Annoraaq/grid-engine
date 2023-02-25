@@ -1,828 +1,619 @@
 import { CollisionStrategy } from "./../Collisions/CollisionStrategy";
-import { GlobalConfig } from "./../GlobalConfig/GlobalConfig";
 import { GridCharacter } from "./../GridCharacter/GridCharacter";
-import { of } from "rxjs";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { Direction, NumberOfDirections } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
-import { Rect } from "../Utils/Rect/Rect";
-import * as Phaser from "phaser";
 import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
-
-const mockCharBlockCache = {
-  addCharacter: jest.fn(),
-  removeCharacter: jest.fn(),
-  isCharBlockingAt: jest.fn(),
-  getCharactersAt: jest.fn(),
-};
-
-const mockCharLayers = [
-  {
-    name: "layer1",
-    tilemapLayer: {
-      setDepth: jest.fn(),
-      scale: 3,
-      tileset: "Cloud City",
-    },
-    properties: [
-      {
-        name: "ge_alwaysTop",
-        value: true,
-      },
-    ],
-  },
-  {
-    name: "layer2",
-    tilemapLayer: {
-      setDepth: jest.fn(),
-      scale: 3,
-      tileset: "Cloud City",
-    },
-    properties: [
-      {
-        name: "ge_charLayer",
-        value: "charLayer1",
-      },
-    ],
-  },
-  {
-    name: "layer3",
-    tilemapLayer: {
-      setDepth: jest.fn(),
-      scale: 3,
-      tileset: "Cloud City",
-    },
-    properties: [],
-  },
-  {
-    name: "layer4",
-    tilemapLayer: {
-      setDepth: jest.fn(),
-      scale: 3,
-      tileset: "Cloud City",
-    },
-    properties: [
-      {
-        name: "ge_charLayer",
-        value: "charLayer2",
-      },
-    ],
-  },
-];
-
-const mockRect = {
-  isInRange: jest.fn(),
-};
-
-jest.mock("./CharBlockCache/CharBlockCache", function () {
-  return {
-    CharBlockCache: jest.fn().mockImplementation(function () {
-      return mockCharBlockCache;
-    }),
-  };
-});
-
-jest.mock("../Utils/Rect/Rect", function () {
-  return {
-    Rect: jest.fn().mockImplementation(function () {
-      return mockRect;
-    }),
-  };
-});
+import { mockLayeredBlockMap } from "../Utils/MockFactory/MockFactory";
+import { MockTilemap } from "../Utils/MockFactory/MockTilemap";
+import { Tilemap } from "./Tilemap";
 
 describe("GridTilemap", () => {
   let gridTilemap: GridTilemap;
-  let tilemapMock;
-  let blankLayerMock;
+  let phaserTilemap: Tilemap;
 
   beforeEach(() => {
-    blankLayerMock = {
-      scale: 0,
-      putTileAt: jest.fn(),
-      setDepth: jest.fn(),
-    };
-    tilemapMock = {
-      layers: [
-        {
-          name: "layer1",
-          tilemapLayer: {
-            setDepth: jest.fn(),
-            scale: 3,
-            tileset: "Cloud City",
-          },
-          properties: [],
-        },
-        {
-          name: "layer2",
-          tilemapLayer: {
-            setDepth: jest.fn(),
-            tileset: "Cloud City",
-            scale: 3,
-          },
-          properties: [],
-        },
-      ],
-      tileWidth: 16,
-      tileHeight: 16,
-      width: 20,
-      height: 30,
-      getTileAt: jest.fn(),
-      hasTileAt: jest.fn(),
-      createBlankLayer: jest.fn().mockReturnValue(blankLayerMock),
-    };
-    gridTilemap = new GridTilemap(tilemapMock);
-    mockCharBlockCache.addCharacter.mockReset();
-    mockCharBlockCache.removeCharacter.mockReset();
-    mockCharBlockCache.isCharBlockingAt.mockReset();
-    mockCharBlockCache.isCharBlockingAt = jest.fn(() => false);
-    GlobalConfig.get = jest.fn(() => ({
-      characters: [],
-      numberOfDirections: NumberOfDirections.FOUR,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      collisionTilePropertyName: "ge_collide",
-      layerOverlay: false,
-    }));
-  });
-
-  it("should set layer depths on construction", () => {
-    gridTilemap = new GridTilemap(tilemapMock);
-    expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
-    expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(1);
-  });
-
-  it("should consider legacy 'ge_alwaysTop' flag of tile layer", () => {
-    tilemapMock.layers = [
+    phaserTilemap = mockLayeredBlockMap([
       {
-        name: "layer1",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-          scale: 3,
-          tileset: "Cloud City",
-        },
-        properties: [],
-      },
-      {
-        name: "layer2",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-          scale: 3,
-          tileset: "Cloud City",
-        },
-        properties: [
-          {
-            name: "ge_alwaysTop",
-            value: true,
-          },
+        layer: "charLayer1",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
         ],
       },
       {
-        name: "layer3",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-          scale: 3,
-          tileset: "Cloud City",
-        },
-        properties: [],
+        layer: "charLayer2",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
+        ],
       },
-    ];
-    gridTilemap = new GridTilemap(tilemapMock);
-
-    expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
-    expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(2);
-    expect(tilemapMock.layers[2].tilemapLayer.setDepth).toHaveBeenCalledWith(1);
+    ]);
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
   });
 
-  it("should consider charLayers", () => {
-    tilemapMock.layers = mockCharLayers;
-    gridTilemap = new GridTilemap(tilemapMock);
+  it("should consider sub-layers for blocking", () => {
+    const tm = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".#",
+          "..",
+        ],
+      },
+      {
+        layer: "noCharLayer",
+        isCharLayer: false,
+        blockMap: [
+          // prettier-ignore
+          "..",
+          ".#",
+        ],
+      },
+      {
+        layer: "upperCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "#.",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tm,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
 
     expect(
-      tilemapMock.layers[0].tilemapLayer.setDepth
-    ).toHaveBeenLastCalledWith(3);
-    expect(tilemapMock.layers[1].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
-    expect(tilemapMock.layers[2].tilemapLayer.setDepth).toHaveBeenCalledWith(1);
-    expect(tilemapMock.layers[3].tilemapLayer.setDepth).toHaveBeenCalledWith(2);
-    expect(gridTilemap.getDepthOfCharLayer("charLayer1")).toEqual(0);
-    expect(gridTilemap.getDepthOfCharLayer("charLayer2")).toEqual(2);
+      gridTilemap.hasBlockingTile(new Vector2(1, 0), "lowerCharLayer")
+    ).toBe(true);
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(1, 1), "lowerCharLayer")
+    ).toBe(false);
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(1, 1), "upperCharLayer")
+    ).toBe(true);
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(1, 1), "upperCharLayer")
+    ).toBe(true);
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(0, 1), "upperCharLayer")
+    ).toBe(true);
   });
 
-  it("should return highest non-char layer for undefined layer", () => {
-    tilemapMock.layers = [
+  it("should consider sub-layers for no tile", () => {
+    const tm = mockLayeredBlockMap([
       {
-        name: "layer1",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-          scale: 3,
-          tileset: "Cloud City",
-        },
-        properties: [],
-      },
-      {
-        name: "layer2",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-          scale: 3,
-          tileset: "Cloud City",
-        },
-        properties: [
-          {
-            name: "ge_alwaysTop",
-            value: true,
-          },
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..",
         ],
       },
       {
-        name: "layer3",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-          scale: 3,
-          tileset: "Cloud City",
-        },
-        properties: [],
+        layer: "noCharLayer",
+        isCharLayer: false,
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
+        ],
       },
-    ];
+      {
+        layer: "upperCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tm,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
 
-    expect(gridTilemap.getDepthOfCharLayer(undefined)).toEqual(1);
+    expect(gridTilemap.hasNoTile(new Vector2(1, 1), "lowerCharLayer")).toBe(
+      true
+    );
+    expect(gridTilemap.hasNoTile(new Vector2(1, 1), "upperCharLayer")).toBe(
+      false
+    );
   });
 
-  it("should consider 'heightShift' layer", () => {
-    tilemapMock.layers = [
+  it("should not consider ge_collide: false as blocking", () => {
+    const tm = mockLayeredBlockMap([
       {
-        name: "layer1",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-          destroy: jest.fn(),
-          scale: 3,
-          tileset: "Cloud City",
-        },
-        properties: [],
+        layer: "lowerCharLayer",
+        blockMap: ["."],
       },
-      {
-        name: "layer2",
-        height: 2,
-        width: 2,
-        data: [
-          ["r0#c0", "r0#c1"],
-          ["r1#c0", "r1#c1"],
-        ],
-        tilemapLayer: {
-          setDepth: jest.fn(),
-          destroy: jest.fn(),
-          scale: 3,
-          tileset: "Cloud City",
-        },
-        properties: [
-          {
-            name: "ge_heightShift",
-            value: 1,
-          },
-        ],
-      },
-    ];
-    gridTilemap = new GridTilemap(tilemapMock);
-
-    expect(tilemapMock.layers[0].tilemapLayer.setDepth).toHaveBeenCalledWith(0);
-    expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith(
-      "layer2#0",
-      "Cloud City"
-    );
-    expect(tilemapMock.createBlankLayer).toHaveBeenCalledWith(
-      "layer2#1",
-      "Cloud City"
+    ]);
+    // @ts-ignore
+    tm.getLayers()[0].data[0][0].properties["ge_collide"] = false;
+    gridTilemap = new GridTilemap(
+      tm,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
     );
 
-    expect(blankLayerMock.putTileAt).toHaveBeenCalledTimes(4);
-    expect(blankLayerMock.putTileAt).toHaveBeenNthCalledWith(1, "r0#c0", 0, 0);
-    expect(blankLayerMock.putTileAt).toHaveBeenNthCalledWith(2, "r0#c1", 1, 0);
-    expect(blankLayerMock.putTileAt).toHaveBeenNthCalledWith(3, "r1#c0", 0, 1);
-    expect(blankLayerMock.putTileAt).toHaveBeenNthCalledWith(4, "r1#c1", 1, 1);
-    expect(blankLayerMock.scale).toEqual(3);
-    expect(blankLayerMock.setDepth).toHaveBeenCalledTimes(2);
-    expect(blankLayerMock.setDepth).toHaveBeenNthCalledWith(1, 0.0000049);
-    expect(blankLayerMock.setDepth).toHaveBeenNthCalledWith(2, 0.0000097);
-    expect(tilemapMock.layers[1].tilemapLayer.destroy).toHaveBeenCalled();
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(0, 0), "lowerCharLayer")
+    ).toBe(false);
   });
 
   it("should add a character", () => {
-    gridTilemap = new GridTilemap(tilemapMock);
-    const charMock1 = createCharMock("player");
-    const charMock2 = createCharMock("player2");
-    const charMockSameId = createCharMock("player2");
-    gridTilemap.addCharacter(charMock1);
-    gridTilemap.addCharacter(charMock2);
-    gridTilemap.addCharacter(charMockSameId);
+    gridTilemap = new GridTilemap(
+      new MockTilemap(),
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    const char1 = new GridCharacter("player1", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    const char2 = new GridCharacter("player2", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    const charSameId = new GridCharacter("player2", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    gridTilemap.addCharacter(char1);
+    gridTilemap.addCharacter(char2);
+    gridTilemap.addCharacter(charSameId);
 
-    expect(gridTilemap.getCharacters()).toEqual([charMock1, charMockSameId]);
+    expect(gridTilemap.getCharacters()).toEqual([char1, charSameId]);
   });
 
   it("should set the lowest char layer", () => {
-    tilemapMock.layers = [
+    phaserTilemap = mockLayeredBlockMap([
       {
-        name: "layer1",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-          destroy: jest.fn(),
-          scale: 3,
-          tileset: "Cloud City",
-        },
-        properties: [
-          {
-            name: "ge_charLayer",
-            value: "layer1",
-          },
+        layer: "noCharLayer",
+        isCharLayer: false,
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
         ],
       },
       {
-        name: "layer2",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-          destroy: jest.fn(),
-          scale: 3,
-          tileset: "Cloud City",
-        },
-        properties: [
-          {
-            name: "ge_charLayer",
-            value: "layer2",
-          },
+        layer: "charLayer1",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
         ],
       },
-    ];
-    gridTilemap = new GridTilemap(tilemapMock);
-    const charMock1 = createCharMock("player");
-    charMock1.getNextTilePos = () => ({
-      position: new Vector2(1, 2),
-      layer: undefined,
+      {
+        layer: "charLayer2",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    const char1 = new GridCharacter("player1", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
     });
-    gridTilemap.addCharacter(charMock1);
 
-    expect(charMock1.setTilePosition).toBeCalledWith({
-      position: new Vector2(1, 2),
-      layer: "layer1",
+    gridTilemap.addCharacter(char1);
+    expect(char1.getTilePos()).toEqual({
+      position: new Vector2(0, 0),
+      layer: "charLayer1",
     });
   });
 
   it("should remove a character", () => {
-    gridTilemap = new GridTilemap(tilemapMock);
-    const charMock1 = <any>{
-      ...createCharMock("player"),
-    };
-    const charMock2 = <any>{
-      ...createCharMock("player2"),
-    };
-    gridTilemap.addCharacter(charMock1);
-    gridTilemap.addCharacter(charMock2);
-    gridTilemap.removeCharacter("player");
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    const char1 = new GridCharacter("player1", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    const char2 = new GridCharacter("player2", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    gridTilemap.addCharacter(char1);
+    gridTilemap.addCharacter(char2);
+    gridTilemap.removeCharacter("player1");
 
-    expect(gridTilemap.getCharacters()).toEqual([charMock2]);
-    expect(mockCharBlockCache.removeCharacter).toHaveBeenCalledWith(charMock1);
+    expect(gridTilemap.getCharacters().map((c) => c.getId())).toEqual([
+      "player2",
+    ]);
   });
 
   it("should find characters", () => {
-    gridTilemap = new GridTilemap(tilemapMock);
-
-    const charMocks = new Set<GridCharacter>();
-    charMocks.add(createCharMock("player"));
-    mockCharBlockCache.getCharactersAt = jest.fn(() => charMocks);
-
-    const set = gridTilemap.getCharactersAt(new Vector2(1, 1), "layer1");
-    expect(mockCharBlockCache.getCharactersAt).toHaveBeenCalledWith(
-      { x: 1, y: 1 },
-      "layer1"
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
     );
-    expect(set).toBe(charMocks);
+
+    const char1 = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    gridTilemap.addCharacter(char1);
+
+    const set = gridTilemap.getCharactersAt(new Vector2(0, 0), "charLayer1");
+    expect(set).toEqual(new Set([char1]));
   });
 
   it("should detect blocking tiles", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
-    tilemapMock.getTileAt.mockReturnValue({
-      properties: { ge_collide: true },
-    });
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
       undefined
     );
     expect(isBlockingTile).toBe(true);
-    expect(tilemapMock.getTileAt).toHaveBeenCalledWith(3, 4, false, "layer1");
-    expect(tilemapMock.getTileAt).not.toHaveBeenCalledWith(
-      3,
-      4,
-      false,
-      "layer2"
-    );
   });
 
   it("should not consider missing tiles as blocking", () => {
-    tilemapMock.hasTileAt.mockReturnValue(false);
-    tilemapMock.getTileAt.mockReturnValue(undefined);
-    gridTilemap = new GridTilemap(tilemapMock);
+    phaserTilemap = mockLayeredBlockMap([
+      {
+        layer: "test",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "._",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingTile = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       undefined,
       true
     );
     expect(isBlockingTile).toBe(false);
   });
 
-  it("should consider missing tiles as blocking", () => {
-    tilemapMock.hasTileAt.mockReturnValue(false);
-    tilemapMock.getTileAt.mockReturnValue(undefined);
-    gridTilemap = new GridTilemap(tilemapMock);
-    const isBlockingTile = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined
-    );
-    expect(isBlockingTile).toBe(true);
-  });
-
   it("should detect blocking tiles with custom property", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
-    tilemapMock.getTileAt.mockReturnValue({
-      properties: { custom_collides_prop: true },
-    });
-    GlobalConfig.get = jest.fn(() => ({
-      characters: [],
-      numberOfDirections: NumberOfDirections.FOUR,
-      characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
-      collisionTilePropertyName: "custom_collides_prop",
-      layerOverlay: false,
-    }));
-    gridTilemap = new GridTilemap(tilemapMock);
+    // Simplest way to set a property on a tile.
+    // @ts-ignore
+    phaserTilemap.getTileAt(1, 1, "charLayer1").properties[
+      "custom_collides_prop"
+    ] = "true";
+
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "custom_collides_prop",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingTile = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined
+      new Vector2(1, 1),
+      "charLayer1"
     );
     expect(isBlockingTile).toBe(true);
   });
 
   it("should detect one-way blocking tiles left", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
-    tilemapMock.getTileAt.mockReturnValue({
-      properties: { ge_collide_left: true, ge_collide_right: false },
-    });
-    gridTilemap = new GridTilemap(tilemapMock);
+    phaserTilemap = mockLayeredBlockMap([
+      {
+        layer: "test",
+        blockMap: [
+          // prettier-ignore
+          "...",
+          ".←.",
+          "...",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingLeft = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       Direction.LEFT
     );
     const isBlockingRight = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       Direction.RIGHT
     );
     const isBlockingUp = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       Direction.UP
     );
     const isBlockingDown = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       Direction.DOWN
     );
     expect(isBlockingLeft).toBe(true);
     expect(isBlockingRight).toBe(false);
-    expect(isBlockingUp).toBe(false);
-    expect(isBlockingDown).toBe(false);
+    expect(isBlockingUp).toBe(true);
+    expect(isBlockingDown).toBe(true);
   });
 
   it("should detect one-way blocking tiles right", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
-    tilemapMock.getTileAt.mockReturnValue({
-      properties: { ge_collide_right: true },
-    });
-    gridTilemap = new GridTilemap(tilemapMock);
+    phaserTilemap = mockLayeredBlockMap([
+      {
+        layer: "test",
+        blockMap: [
+          // prettier-ignore
+          "...",
+          ".→.",
+          "...",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingLeft = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       Direction.LEFT
     );
     const isBlockingRight = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       Direction.RIGHT
     );
     const isBlockingUp = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       Direction.UP
     );
     const isBlockingDown = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       Direction.DOWN
     );
     expect(isBlockingLeft).toBe(false);
     expect(isBlockingRight).toBe(true);
-    expect(isBlockingUp).toBe(false);
-    expect(isBlockingDown).toBe(false);
+    expect(isBlockingUp).toBe(true);
+    expect(isBlockingDown).toBe(true);
   });
 
   it("should detect one-way blocking tiles up", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
-    tilemapMock.getTileAt.mockReturnValue({
-      properties: { ge_collide_up: true },
-    });
-    gridTilemap = new GridTilemap(tilemapMock);
+    phaserTilemap = mockLayeredBlockMap([
+      {
+        layer: "test",
+        blockMap: [
+          // prettier-ignore
+          "...",
+          ".↑.",
+          "...",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingLeft = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       Direction.LEFT
     );
     const isBlockingRight = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       Direction.RIGHT
     );
     const isBlockingUp = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       Direction.UP
     );
     const isBlockingDown = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       Direction.DOWN
     );
-    expect(isBlockingLeft).toBe(false);
-    expect(isBlockingRight).toBe(false);
+    expect(isBlockingLeft).toBe(true);
+    expect(isBlockingRight).toBe(true);
     expect(isBlockingUp).toBe(true);
     expect(isBlockingDown).toBe(false);
   });
 
   it("should detect one-way blocking tiles down", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
-    tilemapMock.getTileAt.mockReturnValue({
-      properties: { ge_collide_down: true },
-    });
-    gridTilemap = new GridTilemap(tilemapMock);
+    phaserTilemap = mockLayeredBlockMap([
+      {
+        layer: "test",
+        blockMap: [
+          // prettier-ignore
+          "...",
+          ".↓.",
+          "...",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingLeft = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       Direction.LEFT
     );
     const isBlockingRight = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       Direction.RIGHT
     );
     const isBlockingUp = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       Direction.UP
     );
     const isBlockingDown = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined,
+      new Vector2(1, 1),
+      "test",
       Direction.DOWN
     );
-    expect(isBlockingLeft).toBe(false);
-    expect(isBlockingRight).toBe(false);
+    expect(isBlockingLeft).toBe(true);
+    expect(isBlockingRight).toBe(true);
     expect(isBlockingUp).toBe(false);
     expect(isBlockingDown).toBe(true);
   });
 
   it("should only consider tiles on charLayer", () => {
-    tilemapMock.layers = [
+    phaserTilemap = mockLayeredBlockMap([
       {
-        name: "layer1",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-        },
-        properties: [
-          {
-            name: "ge_alwaysTop",
-            value: true,
-          },
+        layer: "charLayer1",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          ".#",
         ],
       },
       {
-        name: "layer2",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-        },
-        properties: [
-          {
-            name: "ge_charLayer",
-            value: "charLayer1",
-          },
+        layer: "charLayer2",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
         ],
       },
-      {
-        name: "layer3",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-        },
-        properties: [],
-      },
-      {
-        name: "layer4",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-        },
-        properties: [
-          {
-            name: "ge_charLayer",
-            value: "charLayer2",
-          },
-        ],
-      },
-      {
-        name: "transitions",
-        tilemapLayer: {
-          setDepth: jest.fn(),
-        },
-        properties: [
-          {
-            name: "ge_layerTransitionFrom",
-            value: "charLayer1",
-          },
-        ],
-      },
-    ];
-    tilemapMock.hasTileAt.mockReturnValue(true);
-    tilemapMock.getTileAt.mockImplementation((_x, _y, _, layer) => {
-      if (layer == "layer1") {
-        return { properties: { ge_collide: true } };
-      }
-      return { properties: { ge_collide: false } };
-    });
+    ]);
 
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
     const isBlockingTile = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
+      new Vector2(1, 1),
       "charLayer1"
     );
     expect(isBlockingTile).toBe(true);
 
     const isBlockingTileUpperLayer = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
+      new Vector2(1, 1),
       "charLayer2"
     );
     expect(isBlockingTileUpperLayer).toBe(false);
   });
 
-  it("should return true if nothing blocks", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
-    tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    gridTilemap = new GridTilemap(tilemapMock);
-    const isBlockingTile = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined
+  it("should block if no tile", () => {
+    phaserTilemap = mockLayeredBlockMap([
+      {
+        layer: "test",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "._",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
     );
-    expect(isBlockingTile).toBe(false);
-    expect(tilemapMock.getTileAt).toHaveBeenCalledWith(3, 4, false, "layer1");
-    expect(tilemapMock.getTileAt).toHaveBeenCalledWith(3, 4, false, "layer2");
-  });
-
-  it("should return true if no tile", () => {
-    tilemapMock.hasTileAt.mockReturnValue(false);
-    tilemapMock.getTileAt.mockReturnValue({ properties: { collides: false } });
-    gridTilemap = new GridTilemap(tilemapMock);
-    const isBlocking = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      undefined
-    );
+    const isBlocking = gridTilemap.hasBlockingTile(new Vector2(1, 1), "test");
+    const hasNoTile = gridTilemap.hasNoTile(new Vector2(1, 1), "test");
     expect(isBlocking).toBe(true);
-    expect(tilemapMock.getTileAt).not.toHaveBeenCalled();
-  });
-
-  it("should block if no tile present", () => {
-    tilemapMock.layers = mockCharLayers;
-    tilemapMock.hasTileAt.mockReturnValue(false);
-    gridTilemap = new GridTilemap(tilemapMock);
-    const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
     expect(hasNoTile).toBe(true);
-  });
-
-  it("should block if no tile present on char layer", () => {
-    tilemapMock.layers = mockCharLayers;
-    tilemapMock.hasTileAt.mockImplementation((_x, _y, layerName) => {
-      return layerName !== "layer1" && layerName !== "layer2";
-    });
-    gridTilemap = new GridTilemap(tilemapMock);
-    const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
-    expect(hasNoTile).toBe(true);
-  });
-
-  it("should not block if tile present on char layer", () => {
-    tilemapMock.layers = mockCharLayers;
-    tilemapMock.hasTileAt.mockImplementation((_x, _y, layerName) => {
-      return layerName === "layer2";
-    });
-    gridTilemap = new GridTilemap(tilemapMock);
-    const hasNoTile = gridTilemap.hasNoTile(new Vector2(3, 4), "charLayer1");
-    expect(hasNoTile).toBe(false);
   });
 
   it("should detect blocking char", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
-    gridTilemap = new GridTilemap(tilemapMock);
-    mockCharBlockCache.isCharBlockingAt = jest.fn(() => true);
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+
+    const char = new GridCharacter("player1", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+      collisionGroups: ["cGroup"],
+    });
+    char.setTilePosition({ position: new Vector2(1, 1), layer: "charLayer1" });
+    gridTilemap.addCharacter(char);
 
     expect(
-      gridTilemap.hasBlockingChar(new Vector2(3, 3), undefined, ["cGroup"])
+      gridTilemap.hasBlockingChar(new Vector2(1, 1), "charLayer1", ["cGroup"])
     ).toBe(true);
-    expect(mockCharBlockCache.isCharBlockingAt).toHaveBeenCalledWith(
-      new Vector2(3, 3),
-      undefined,
-      ["cGroup"],
-      new Set()
-    );
   });
 
   it("should detect an unblocked tile", () => {
-    tilemapMock.hasTileAt.mockReturnValue(true);
-    gridTilemap = new GridTilemap(tilemapMock);
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
 
-    const char1Mock = <any>{
-      ...createCharMock("player1"),
-    };
-    gridTilemap.addCharacter(char1Mock);
+    const char = new GridCharacter("player1", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+      collisionGroups: ["cGroup"],
+    });
+    char.setTilePosition({ position: new Vector2(1, 1), layer: "charLayer1" });
+    gridTilemap.addCharacter(char);
+
     const hasBlockingChar = gridTilemap.hasBlockingChar(
-      new Vector2(3, 3),
-      "layer1",
+      new Vector2(0, 0),
+      "charLayer1",
       ["cGroup"]
     );
     expect(hasBlockingChar).toBe(false);
   });
 
-  it("should get scaled tile width", () => {
-    expect(gridTilemap.getTileWidth()).toEqual(48);
-  });
-
-  it("should get scaled tile width from layerless tile map", () => {
-    tilemapMock.layers = [];
-    expect(gridTilemap.getTileWidth()).toEqual(16);
-  });
-
-  it("should get scaled tile height", () => {
-    expect(gridTilemap.getTileHeight()).toEqual(48);
-  });
-
-  it("should get scaled tile height from layerless tile map", () => {
-    tilemapMock.layers = [];
-    expect(gridTilemap.getTileHeight()).toEqual(16);
-  });
-
   it("should get positions in range", () => {
-    const pos = new Vector2({ x: 10, y: 20 });
-    mockRect.isInRange.mockReturnValue(false);
-    const res = gridTilemap.isInRange(pos);
-
-    expect(Rect).toHaveBeenCalledWith(
-      0,
-      0,
-      tilemapMock.width,
-      tilemapMock.height
-    );
-
-    expect(mockRect.isInRange).toHaveBeenCalledWith(pos);
-    expect(res).toEqual(false);
-  });
-
-  it("should get tileSize", () => {
-    const scaleFactor = 3;
-    const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
-    const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
-    expect(gridTilemap.getTileSize()).toEqual(
-      new Vector2(scaledTileWidth, scaledTileHeight)
-    );
-  });
-
-  it("should transform tile pos to pixel pos", () => {
-    const scaleFactor = 3;
-    const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
-    const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
-    const tilePosition = new Vector2(2, 3);
-    expect(gridTilemap.tilePosToPixelPos(tilePosition)).toEqual(
-      new Vector2(
-        scaledTileWidth * tilePosition.x,
-        scaledTileHeight * tilePosition.y
-      )
-    );
-  });
-
-  it("should provide tile distance", () => {
-    const scaleFactor = 3;
-    const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
-    const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
-    expect(gridTilemap.getTileDistance(Direction.DOWN)).toEqual(
-      new Vector2(scaledTileWidth, scaledTileHeight)
-    );
-  });
-
-  it("should provide tile distance for isometric maps on orthogonal dirs", () => {
-    tilemapMock.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC;
-    const scaleFactor = 3;
-    const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
-    const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
-    expect(gridTilemap.getTileDistance(Direction.DOWN)).toEqual(
-      new Vector2(scaledTileWidth, scaledTileHeight)
-    );
+    expect(gridTilemap.isInRange(new Vector2({ x: 10, y: 20 }))).toBe(false);
+    expect(gridTilemap.isInRange(new Vector2({ x: 0, y: 0 }))).toBe(true);
+    expect(gridTilemap.isInRange(new Vector2({ x: 1, y: 1 }))).toBe(true);
+    expect(gridTilemap.isInRange(new Vector2({ x: -1, y: -1 }))).toBe(false);
   });
 
   it("should provide map direction", () => {
@@ -857,34 +648,29 @@ describe("GridTilemap", () => {
   });
 
   describe("isometric", () => {
-    const scaleFactor = 3;
-
     beforeEach(() => {
-      tilemapMock.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC;
+      const phaserTilemap = mockLayeredBlockMap(
+        [
+          {
+            layer: "charLayer1",
+            blockMap: [
+              // prettier-ignore
+              "..",
+              "..",
+            ],
+          },
+        ],
+        true
+      );
+      gridTilemap = new GridTilemap(
+        phaserTilemap,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
     });
 
     it("should detect isometric maps", () => {
       expect(gridTilemap.isIsometric()).toEqual(true);
-    });
-
-    it("should transform tile pos to pixel pos for isometric maps", () => {
-      const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
-      const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
-      const tilePosition = new Vector2(2, 3);
-      expect(gridTilemap.tilePosToPixelPos(tilePosition)).toEqual(
-        new Vector2(
-          scaledTileWidth * 0.5 * (tilePosition.x - tilePosition.y),
-          scaledTileHeight * 0.5 * (tilePosition.x + tilePosition.y)
-        )
-      );
-    });
-
-    it("should provide tile distance for isometric maps on diagonal dirs", () => {
-      const scaledTileWidth = tilemapMock.tileWidth * scaleFactor;
-      const scaledTileHeight = tilemapMock.tileHeight * scaleFactor;
-      expect(gridTilemap.getTileDistance(Direction.DOWN_LEFT)).toEqual(
-        new Vector2(scaledTileWidth * 0.5, scaledTileHeight * 0.5)
-      );
     });
 
     it("should provide map direction", () => {
@@ -899,7 +685,11 @@ describe("GridTilemap", () => {
 
   describe("transitions", () => {
     it("should set transitions", () => {
-      gridTilemap = new GridTilemap(tilemapMock);
+      gridTilemap = new GridTilemap(
+        phaserTilemap,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
       gridTilemap.setTransition(new Vector2(4, 5), "charLayer2", "charLayer1");
       gridTilemap.setTransition(new Vector2(3, 5), "charLayer2", "charLayer1");
       expect(gridTilemap.getTransition(new Vector2(4, 5), "charLayer2")).toBe(
@@ -916,7 +706,11 @@ describe("GridTilemap", () => {
     it("should get all transitions", () => {
       const pos1 = new Vector2(4, 5);
       const pos2 = new Vector2(3, 5);
-      gridTilemap = new GridTilemap(tilemapMock);
+      gridTilemap = new GridTilemap(
+        phaserTilemap,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES
+      );
       gridTilemap.setTransition(pos1, "charLayer2", "charLayer1");
       gridTilemap.setTransition(pos2, "charLayer2", "charLayer1");
 
@@ -932,17 +726,4 @@ describe("GridTilemap", () => {
       expect(gridTilemap.getTransitions()).toEqual(expectedTransitions);
     });
   });
-
-  function createCharMock(id = "player"): GridCharacter {
-    return <any>{
-      getId: () => id,
-      isBlockingTile: () => false,
-      getTilePos: () => ({ x: 1, y: 1 }),
-      getNextTilePos: () => ({ x: 1, y: 1 }),
-      positionChangeStarted: () => of([]),
-      positionChangeFinished: () => of([]),
-      setTilePosition: jest.fn(),
-      getCollisionGroups: () => ["cGroup"],
-    };
-  }
 });

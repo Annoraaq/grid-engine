@@ -1,12 +1,11 @@
-import { GridTilemap } from "./../../GridTilemap/GridTilemap";
 import {
-  CharConfig,
   GameObject,
-  GridCharacter,
+  MAX_MOVEMENT_PROGRESS,
 } from "../../GridCharacter/GridCharacter";
 import {
   CharacterData,
   CharLayer,
+  GridEngineHeadless,
   WalkingAnimationMapping,
 } from "../../GridEngine";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
@@ -14,9 +13,9 @@ import { CharacterAnimation } from "../../GridCharacter/CharacterAnimation/Chara
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Utils } from "../../Utils/Utils/Utils";
 import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+import { filter, takeUntil } from "rxjs/operators";
 import { Direction, directionVector } from "../../Direction/Direction";
-import { GlobalConfig } from "../../GlobalConfig/GlobalConfig";
+import { GridTilemapPhaser } from "../GridTilemapPhaser/GridTilemapPhaser";
 
 export class GridCharacterPhaser {
   private customOffset = new Vector2(0, 0);
@@ -26,28 +25,52 @@ export class GridCharacterPhaser {
   private container?: Phaser.GameObjects.Container;
   private newSpriteSet$ = new Subject<void>();
   private destroy$ = new Subject<void>();
-  private gridCharacter: GridCharacter = this.createChar(
-    this.charData,
-    this.layerOverlay
-  );
   private walkingAnimationMapping?: WalkingAnimationMapping | number;
   private animation?: CharacterAnimation;
 
   constructor(
     private charData: CharacterData,
     private scene: Phaser.Scene,
-    private tilemap: GridTilemap,
-    private layerOverlay: boolean
-  ) {}
+    private tilemap: GridTilemapPhaser,
+    layerOverlay: boolean,
+    private geHeadless: GridEngineHeadless
+  ) {
+    this.layerOverlaySprite =
+      layerOverlay && charData.sprite
+        ? this.scene.add.sprite(0, 0, charData.sprite.texture)
+        : undefined;
+
+    this.walkingAnimationMapping = charData.walkingAnimationMapping;
+
+    this.customOffset = new Vector2(
+      charData.offsetX || 0,
+      charData.offsetY || 0
+    );
+
+    this.sprite = charData.sprite;
+    this.container = charData.container;
+
+    this.geHeadless
+      .directionChanged()
+      .pipe(filter(({ charId }) => charId === this.charData.id))
+      .subscribe(({ direction }) => {
+        this.animation?.setStandingFrame(direction);
+      });
+
+    if (this.sprite) {
+      this.sprite.setOrigin(0, 0);
+
+      this.resetAnimation(this.sprite);
+
+      this.updateOverlaySprite();
+      this.updateGridChar();
+    }
+  }
 
   destroy() {
     this.destroy$.next();
     this.destroy$.complete();
     this.newSpriteSet$.complete();
-  }
-
-  getGridCharacter(): GridCharacter {
-    return this.gridCharacter;
   }
 
   setSprite(sprite?: Phaser.GameObjects.Sprite): void {
@@ -62,8 +85,8 @@ export class GridCharacterPhaser {
         ? this.scene.add.sprite(0, 0, this.sprite.texture)
         : undefined;
       this.updateOverlaySprite();
-      this.resetAnimation(this.gridCharacter, this.sprite);
-      this.updateDepth(this.gridCharacter);
+      this.resetAnimation(this.sprite);
+      this.updateDepth();
     } else {
       this.layerOverlaySprite = undefined;
       this.sprite = undefined;
@@ -99,9 +122,9 @@ export class GridCharacterPhaser {
   }
 
   turnTowards(direction: Direction): void {
-    if (this.gridCharacter.isMoving()) return;
+    if (this.geHeadless.isMoving(this.charData.id)) return;
     if (direction == Direction.NONE) return;
-    this.gridCharacter.turnTowards(direction);
+    this.geHeadless.turnTowards(this.charData.id, direction);
     this.animation?.setStandingFrame(direction);
   }
 
@@ -113,9 +136,8 @@ export class GridCharacterPhaser {
     this.animation = animation;
   }
 
-  update(delta: number): void {
-    this.gridCharacter.update(delta);
-    this.updateGridChar(this.gridCharacter);
+  update(_delta: number): void {
+    this.updateGridChar();
   }
 
   private getEngineOffset(): Vector2 {
@@ -130,18 +152,21 @@ export class GridCharacterPhaser {
     return new Vector2(offsetX, offsetY);
   }
 
-  private updatePixelPos(gridChar: GridCharacter) {
-    const tp = gridChar.getTilePos().position.clone();
-    const movementProgressProportional = gridChar.getMovementProgress() / 1000;
+  private updatePixelPos() {
+    const tp = new Vector2(this.geHeadless.getPosition(this.charData.id));
+    const movementProgressProportional =
+      this.geHeadless.getMovementProgress(this.charData.id) / 1000;
 
     const basePixelPos = this.tilemap
       .tilePosToPixelPos(tp)
       .add(this.getEngineOffset())
       .add(this.customOffset);
     const newPixelPos = basePixelPos.add(
-      directionVector(gridChar.getMovementDirection()).multiply(
+      directionVector(
+        this.geHeadless.getFacingDirection(this.charData.id)
+      ).multiply(
         this.tilemap
-          .getTileDistance(gridChar.getMovementDirection())
+          .getTileDistance(this.geHeadless.getFacingDirection(this.charData.id))
           .scalarMult(movementProgressProportional)
       )
     );
@@ -157,97 +182,23 @@ export class GridCharacterPhaser {
     return this.container || this.sprite;
   }
 
-  private createChar(
-    charData: CharacterData,
-    layerOverlay: boolean
-  ): GridCharacter {
-    this.layerOverlaySprite =
-      layerOverlay && charData.sprite
-        ? this.scene.add.sprite(0, 0, charData.sprite.texture)
-        : undefined;
-
-    this.walkingAnimationMapping = charData.walkingAnimationMapping;
-
-    const charConfig: CharConfig = {
-      speed: charData.speed || 4,
-      tilemap: this.tilemap,
-      collidesWithTiles: true,
-      collisionGroups: ["geDefault"],
-      charLayer: charData.charLayer,
-      facingDirection: charData.facingDirection,
-      labels: charData.labels,
-      numberOfDirections:
-        charData.numberOfDirections ?? GlobalConfig.get().numberOfDirections,
-      tileWidth: charData.tileWidth,
-      tileHeight: charData.tileHeight,
-    };
-
-    this.customOffset = new Vector2(
-      charData.offsetX || 0,
-      charData.offsetY || 0
-    );
-
-    if (typeof charData.collides === "boolean") {
-      if (charData.collides === false) {
-        charConfig.collidesWithTiles = false;
-        charConfig.collisionGroups = [];
-      }
-    } else if (charData.collides !== undefined) {
-      if (charData.collides.collidesWithTiles === false) {
-        charConfig.collidesWithTiles = false;
-      }
-      if (charData.collides.collisionGroups) {
-        charConfig.collisionGroups = charData.collides.collisionGroups;
-      }
-      charConfig.ignoreMissingTiles =
-        charData.collides?.ignoreMissingTiles ?? false;
-    }
-
-    this.sprite = charData.sprite;
-    this.container = charData.container;
-
-    const gridChar = new GridCharacter(charData.id, charConfig);
-
-    gridChar.directionChanged().subscribe((direction) => {
-      this.animation?.setStandingFrame(direction);
-    });
-
-    if (this.sprite) {
-      this.sprite.setOrigin(0, 0);
-
-      this.resetAnimation(gridChar, this.sprite);
-
-      this.updateOverlaySprite();
-
-      if (charData.startPosition) {
-        gridChar.setTilePosition({
-          position: new Vector2(charData.startPosition),
-          layer: gridChar.getTilePos().layer,
-        });
-        this.updateGridChar(gridChar);
-      }
-    }
-
-    return gridChar;
-  }
-
-  private updateGridChar(gridChar: GridCharacter) {
-    this.updatePixelPos(gridChar);
-    if (this.sprite && gridChar.isMoving()) {
+  private updateGridChar() {
+    this.updatePixelPos();
+    if (this.sprite && this.geHeadless.isMoving(this.charData.id)) {
+      const hasWalkedHalfATile =
+        this.geHeadless.getMovementProgress(this.charData.id) >
+        MAX_MOVEMENT_PROGRESS / 2;
       this.getAnimation()?.updateCharacterFrame(
-        gridChar.getMovementDirection(),
-        gridChar.hasWalkedHalfATile(),
+        this.geHeadless.getFacingDirection(this.charData.id),
+        hasWalkedHalfATile,
         Number(this.sprite.frame.name)
       );
     }
 
-    this.updateDepth(gridChar);
+    this.updateDepth();
   }
 
-  private resetAnimation(
-    gridChar: GridCharacter,
-    sprite: Phaser.GameObjects.Sprite
-  ) {
+  private resetAnimation(sprite: Phaser.GameObjects.Sprite) {
     const animation = new CharacterAnimation(
       this.walkingAnimationMapping,
       sprite.texture.source[0].width /
@@ -263,7 +214,9 @@ export class GridCharacterPhaser {
       });
 
     animation.setIsEnabled(this.walkingAnimationMapping !== undefined);
-    animation.setStandingFrame(gridChar.getFacingDirection());
+    animation.setStandingFrame(
+      this.geHeadless.getFacingDirection(this.charData.id)
+    );
   }
 
   private updateOverlaySprite() {
@@ -281,21 +234,23 @@ export class GridCharacterPhaser {
     this.layerOverlaySprite.setOrigin(0, 0);
   }
 
-  private updateDepth(gridChar: GridCharacter) {
+  private updateDepth() {
     const gameObject = this.getGameObj();
 
     if (!gameObject) return;
-    this.setDepth(gameObject, gridChar.getNextTilePos());
+    const position = new Vector2(this.geHeadless.getPosition(this.charData.id));
+    const layer = this.geHeadless.getCharLayer(this.charData.id);
+    this.setDepth(gameObject, { position, layer });
     const layerOverlaySprite = this.getLayerOverlaySprite();
 
     if (layerOverlaySprite) {
       const posAbove = new Vector2({
-        ...gridChar.getNextTilePos().position,
-        y: gridChar.getNextTilePos().position.y - 1,
+        ...position,
+        y: position.y - 1,
       });
       this.setDepth(layerOverlaySprite, {
         position: posAbove,
-        layer: gridChar.getNextTilePos().layer,
+        layer,
       });
     }
   }
@@ -312,8 +267,9 @@ export class GridCharacterPhaser {
   }
 
   private getTransitionLayer(position: LayerVecPos): CharLayer {
+    if (!position.layer) return undefined;
     return (
-      this.tilemap.getTransition(position.position, position.layer) ||
+      this.geHeadless.getTransition(position.position, position.layer) ||
       position.layer
     );
   }
