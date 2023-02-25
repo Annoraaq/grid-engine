@@ -4,7 +4,7 @@ import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { Vector2 } from "../Vector2/Vector2";
 import { Random, MersenneTwister19937 } from "random-js";
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
-import { CharTileLayer, Tile, Tilemap } from "../../GridTilemap/Tilemap";
+import { TileLayer, Tile, Tilemap } from "../../GridTilemap/Tilemap";
 import { MockTile, MockTileLayer, MockTilemap } from "./MockTilemap";
 
 export const LOWER_CHAR_LAYER = "lowerCharLayer";
@@ -34,7 +34,7 @@ export function createSpriteMock() {
   } as any;
 }
 
-export function createMockLayer(layerData: any): CharTileLayer {
+export function createMockLayer(layerData: any): TileLayer {
   return new MockTileLayer(
     layerData.name,
     layerData.properties,
@@ -145,7 +145,11 @@ export function mockBlockMapNew(
 }
 
 export function mockLayeredBlockMapNew(
-  blockMaps: Array<{ layer: string | undefined; blockMap: string[] }>,
+  blockMaps: Array<{
+    layer: string | undefined;
+    blockMap: string[];
+    isCharLayer?: boolean;
+  }>,
   isometric?: boolean
 ): Tilemap {
   const layers: MockTileLayer[] = [];
@@ -162,9 +166,12 @@ export function mockLayeredBlockMapNew(
       }
       data.push(row);
     }
+    if (bm.isCharLayer === undefined) {
+      bm.isCharLayer = true;
+    }
     const layer = new MockTileLayer(
       bm.layer,
-      bm.layer ? { ge_charLayer: bm.layer } : {},
+      bm.layer && bm.isCharLayer ? { ge_charLayer: bm.layer } : {},
       bm.blockMap.length,
       bm.blockMap[0].length,
       1,

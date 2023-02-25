@@ -1,13 +1,14 @@
 import { CharacterAnimation } from "./../../GridCharacter/CharacterAnimation/CharacterAnimation";
 import { trackEmit } from "../../Testing/Utils";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
-import {
-  GridCharacterPhaser,
-  PhaserCharacterData,
-} from "./GridCharacterPhaser";
+import { GridCharacterPhaser } from "./GridCharacterPhaser";
 import * as Phaser from "phaser";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
-import { CollisionStrategy, GridEngineHeadless } from "../../GridEngine";
+import {
+  CharacterData,
+  CollisionStrategy,
+  GridEngineHeadless,
+} from "../../GridEngine";
 import { createSpriteMock } from "../../Utils/MockFactory/MockFactory";
 import { take } from "rxjs/operators";
 import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap";
@@ -44,7 +45,7 @@ describe("GridCharacterPhaser", () => {
   });
 
   function createChar(
-    charData: Partial<PhaserCharacterData>,
+    charData: Partial<CharacterData>,
     layerOverlay: boolean,
     isometric?: boolean
   ): {

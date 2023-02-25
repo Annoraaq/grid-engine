@@ -168,6 +168,7 @@ describe("GridEngine", () => {
     expect(gridEngine.getLabels("player")).toEqual([]);
   });
 
+  //TODO:test set numberOfDirections from main config is overridden by char config
   it("should init player with collisionGroups", () => {
     gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [

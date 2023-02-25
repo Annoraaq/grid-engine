@@ -828,7 +828,7 @@ describe("TargetMovement", () => {
     }
 
     tilemapMock
-      .getCharLayers()
+      .getLayers()
       .find((l) => l.getName() == charPos.layer)
       .getData()[charPos.position.y + 1][charPos.position.x].properties[
       "ge_collide"
@@ -843,7 +843,7 @@ describe("TargetMovement", () => {
       throw "TargetPos needs to be (1,2)";
     }
     tilemapMock
-      .getCharLayers()
+      .getLayers()
       .find((l) => l.getName() == charPos.layer)
       .getData()[charPos.position.y + 1][charPos.position.x].properties[
       "ge_collide"
@@ -855,12 +855,12 @@ describe("TargetMovement", () => {
       for (let c = 0; c < blockMap[r].length; c++) {
         if (blockMap[r][c] == "#") {
           tilemapMock
-            .getCharLayers()
+            .getLayers()
             .find((l) => l.getName() == layer)
             .getData()[r][c].properties["ge_collide"] = "true";
         } else {
           tilemapMock
-            .getCharLayers()
+            .getLayers()
             .find((l) => l.getName() == layer)
             .getData()[r][c].properties["ge_collide"] = undefined;
         }

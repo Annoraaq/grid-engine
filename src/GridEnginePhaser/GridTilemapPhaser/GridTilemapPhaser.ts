@@ -1,14 +1,6 @@
-import {
-  directionVector,
-  turnClockwise,
-  turnCounterClockwise,
-} from "../../Direction/Direction";
-import { CharId, GridCharacter } from "../../GridCharacter/GridCharacter";
 import { CharLayer, Direction } from "../../GridEngine";
 import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
-import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
-import { Rect } from "../../Utils/Rect/Rect";
 import { Utils } from "../../Utils/Utils/Utils";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { VectorUtils } from "../../Utils/VectorUtils";
@@ -39,36 +31,6 @@ export class GridTilemapPhaser {
     return this.gridTilemap;
   }
 
-  addCharacter(character: GridCharacter): void {
-    this.gridTilemap.addCharacter(character);
-  }
-
-  removeCharacter(charId: string): void {
-    this.gridTilemap.removeCharacter(charId);
-  }
-
-  getCharacters(): GridCharacter[] {
-    return this.gridTilemap.getCharacters();
-  }
-
-  getCharactersAt(position: Vector2, layer: string): Set<GridCharacter> {
-    return this.gridTilemap.getCharactersAt(position, layer);
-  }
-
-  hasBlockingTile(
-    pos: Vector2,
-    charLayer: string | undefined,
-    direction?: Direction,
-    ignoreHasTile?: boolean
-  ): boolean {
-    return this.gridTilemap.hasBlockingTile(
-      pos,
-      charLayer,
-      direction,
-      ignoreHasTile
-    );
-  }
-
   getTransition(pos: Vector2, fromLayer?: string): string | undefined {
     return this.gridTilemap.getTransition(pos, fromLayer);
   }
@@ -79,24 +41,6 @@ export class GridTilemapPhaser {
 
   getTransitions(): Map<CharLayer, Map<CharLayer, CharLayer>> {
     return this.gridTilemap.getTransitions();
-  }
-
-  hasNoTile(pos: Vector2, charLayer?: string): boolean {
-    return this.gridTilemap.hasNoTile(pos, charLayer);
-  }
-
-  hasBlockingChar(
-    pos: Vector2,
-    layer: string | undefined,
-    collisionGroups: string[],
-    exclude = new Set<CharId>()
-  ): boolean {
-    return this.gridTilemap.hasBlockingChar(
-      pos,
-      layer,
-      collisionGroups,
-      exclude
-    );
   }
 
   getTileWidth(): number {
@@ -113,12 +57,7 @@ export class GridTilemapPhaser {
     return this.charLayerDepths.get(layerName) ?? 0;
   }
 
-  isInRange(pos: Vector2): boolean {
-    const rect = new Rect(0, 0, this.tilemap.width, this.tilemap.height);
-    return rect.isInRange(pos);
-  }
-
-  getTileSize(): Vector2 {
+  private getTileSize(): Vector2 {
     return new Vector2(this.getTileWidth(), this.getTileHeight());
   }
 
@@ -149,43 +88,13 @@ export class GridTilemapPhaser {
     return this.getTileSize();
   }
 
-  toMapDirection(direction: Direction): Direction {
-    if (this.isIsometric()) {
-      return turnCounterClockwise(direction);
-    }
-    return direction;
-  }
-
-  fromMapDirection(direction: Direction): Direction {
-    if (this.isIsometric()) {
-      return turnClockwise(direction);
-    }
-    return direction;
-  }
-
-  isIsometric(): boolean {
+  private isIsometric(): boolean {
     // Against the documentation of phaser, tilemap seems to be a number instead
     // of a string. Therefore the intentional type coercion here.
     return (
       this.tilemap.orientation ==
       Phaser.Tilemaps.Orientation.ISOMETRIC.toString()
     );
-  }
-
-  getTilePosInDirection(
-    position: LayerVecPos,
-    direction: Direction
-  ): LayerVecPos {
-    const posInDir = position.position.add(
-      directionVector(this.toMapDirection(direction))
-    );
-
-    const transition =
-      this.getTransition(posInDir, position.layer) || position.layer;
-    return {
-      position: posInDir,
-      layer: transition,
-    };
   }
 
   private isLayerAlwaysOnTop(layerData: Phaser.Tilemaps.LayerData): boolean {
@@ -275,10 +184,14 @@ export class GridTilemapPhaser {
     layerData: Phaser.Tilemaps.LayerData,
     row: number
   ): Phaser.Tilemaps.TilemapLayer {
+    const name = `${layerData.name}#${row}`;
     const newLayer = this.tilemap.createBlankLayer(
-      `${layerData.name}#${row}`,
+      name,
       layerData.tilemapLayer.tileset
     );
+    // Somehow phaser does not catch the name through the createBlankLayer
+    // method.
+    newLayer.name = name;
     for (let col = 0; col < layerData.width; col++) {
       newLayer.putTileAt(layerData.data[row][col], col, row);
     }

@@ -1,10 +1,8 @@
 import * as Phaser from "phaser";
 import { GridTilemapPhaser } from "./GridTilemapPhaser";
-import { Direction, NumberOfDirections } from "../../Direction/Direction";
+import { Direction } from "../../Direction/Direction";
 import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
 import { createPhaserTilemapStub } from "../../Utils/MockFactory/MockPhaserTilemap";
 
 describe("GridTilemapPhaser", () => {
@@ -148,6 +146,9 @@ describe("GridTilemapPhaser", () => {
     );
 
     expect(tm.layers.length).toBe(3);
+    expect(tm.layers[0].name).toEqual("lowerCharLayer");
+    expect(tm.layers[1].name).toEqual("heightShiftLayer#0");
+    expect(tm.layers[2].name).toEqual("heightShiftLayer#1");
     expect(dataToIdArr(tm.layers[1].data)).toEqual([
       [0, 1],
       [undefined, undefined],
@@ -162,460 +163,10 @@ describe("GridTilemapPhaser", () => {
     function dataToIdArr(data: Phaser.Tilemaps.Tile[][]): number[][] {
       return data.map((row) =>
         row.map((obj) => {
-          if (!Array.isArray(obj.properties)) return undefined;
-          return obj.properties.find((p) => p.name == "id").value;
+          return obj.properties?.id;
         })
       );
     }
-  });
-
-  it("should add a character", () => {
-    const charMock1 = createCharMock("player", gridTilemap);
-    const charMock2 = createCharMock("player2", gridTilemap);
-    const charMockSameId = createCharMock("player2", gridTilemap);
-    gridTilemap.addCharacter(charMock1);
-    gridTilemap.addCharacter(charMock2);
-    gridTilemap.addCharacter(charMockSameId);
-
-    expect(gridTilemap.getCharacters()).toEqual([charMock1, charMockSameId]);
-  });
-
-  it("should set the lowest char layer", () => {
-    const charMock1 = createCharMock("player", gridTilemap);
-    charMock1.setTilePosition({
-      position: new Vector2(1, 2),
-      layer: undefined,
-    });
-    gridTilemap.addCharacter(charMock1);
-
-    expect(charMock1.getTilePos()).toEqual({
-      position: new Vector2(1, 2),
-      layer: "lowerCharLayer",
-    });
-  });
-
-  it("should remove a character", () => {
-    const charMock1 = createCharMock("player", gridTilemap);
-    charMock1.setTilePosition({
-      position: new Vector2(3, 3),
-      layer: "lowerCharLayer",
-    });
-    const charMock2 = createCharMock("player2", gridTilemap);
-    gridTilemap.addCharacter(charMock1);
-    gridTilemap.addCharacter(charMock2);
-
-    expect(
-      gridTilemap.hasBlockingChar(new Vector2(3, 3), "lowerCharLayer", [
-        "cGroup",
-      ])
-    ).toBe(true);
-
-    gridTilemap.removeCharacter("player");
-
-    expect(gridTilemap.getCharacters()).toEqual([charMock2]);
-    expect(
-      gridTilemap.hasBlockingChar(new Vector2(3, 3), "lowerCharLayer", [
-        "cGroup",
-      ])
-    ).toBe(false);
-  });
-
-  it("should find characters", () => {
-    const charMocks = new Set<GridCharacter>();
-    const char = createCharMock("player", gridTilemap);
-    charMocks.add(char);
-    gridTilemap.addCharacter(char);
-    const set = gridTilemap.getCharactersAt(
-      new Vector2(1, 1),
-      "lowerCharLayer"
-    );
-    expect(set).toEqual(charMocks);
-  });
-
-  it("should detect blocking tiles", () => {
-    const tm = createPhaserTilemapStub(
-      new Map([
-        [
-          "lowerCharLayer",
-          [
-            // prettier-ignore
-            "..",
-            ".#",
-          ],
-        ],
-      ])
-    );
-    gridTilemap = new GridTilemapPhaser(
-      tm,
-      "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
-    const isBlockingTile = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer"
-    );
-    expect(isBlockingTile).toBe(true);
-  });
-
-  it("should not consider missing tiles as blocking", () => {
-    const tm = createPhaserTilemapStub(
-      new Map([
-        [
-          "lowerCharLayer",
-          [
-            // prettier-ignore
-            "..",
-            "._",
-          ],
-        ],
-      ])
-    );
-    gridTilemap = new GridTilemapPhaser(
-      tm,
-      "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
-    const isBlockingTile = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      undefined,
-      true
-    );
-    expect(isBlockingTile).toBe(false);
-  });
-
-  it("should consider missing tiles as blocking", () => {
-    const tm = createPhaserTilemapStub(
-      new Map([
-        [
-          "lowerCharLayer",
-          [
-            // prettier-ignore
-            "..",
-            "._",
-          ],
-        ],
-      ])
-    );
-    gridTilemap = new GridTilemapPhaser(
-      tm,
-      "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
-    const isBlockingTile = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer"
-    );
-    expect(isBlockingTile).toBe(true);
-  });
-
-  it("should detect blocking tiles with custom property", () => {
-    const tm = createPhaserTilemapStub(
-      new Map([
-        [
-          "lowerCharLayer",
-          [
-            // prettier-ignore
-            "..",
-            "..",
-          ],
-        ],
-      ])
-    );
-    tm.getTileAt(1, 1, false, "lowerCharLayer").properties = [
-      { name: "custom_collides_prop", value: "true" },
-    ];
-    gridTilemap = new GridTilemapPhaser(
-      tm,
-      "custom_collides_prop",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
-    const isBlockingTile = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer"
-    );
-    expect(isBlockingTile).toBe(true);
-  });
-
-  it("should detect one-way blocking tiles left free", () => {
-    const tm = createPhaserTilemapStub(
-      new Map([
-        [
-          "lowerCharLayer",
-          [
-            // prettier-ignore
-            "...",
-            ".→.",
-            "...",
-          ],
-        ],
-      ])
-    );
-    gridTilemap = new GridTilemapPhaser(
-      tm,
-      "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
-    const isBlockingLeft = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      Direction.LEFT
-    );
-    const isBlockingRight = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      Direction.RIGHT
-    );
-    const isBlockingUp = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      Direction.UP
-    );
-    const isBlockingDown = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      Direction.DOWN
-    );
-    expect(isBlockingLeft).toBe(false);
-    expect(isBlockingRight).toBe(true);
-    expect(isBlockingUp).toBe(true);
-    expect(isBlockingDown).toBe(true);
-  });
-
-  it("should detect one-way blocking tiles right free", () => {
-    const tm = createPhaserTilemapStub(
-      new Map([
-        [
-          "lowerCharLayer",
-          [
-            // prettier-ignore
-            "...",
-            ".←.",
-            "...",
-          ],
-        ],
-      ])
-    );
-    gridTilemap = new GridTilemapPhaser(
-      tm,
-      "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
-    const isBlockingLeft = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      Direction.LEFT
-    );
-    const isBlockingRight = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      Direction.RIGHT
-    );
-    const isBlockingUp = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      Direction.UP
-    );
-    const isBlockingDown = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      Direction.DOWN
-    );
-    expect(isBlockingLeft).toBe(true);
-    expect(isBlockingRight).toBe(false);
-    expect(isBlockingUp).toBe(true);
-    expect(isBlockingDown).toBe(true);
-  });
-
-  it("should detect one-way blocking tiles up free", () => {
-    const tm = createPhaserTilemapStub(
-      new Map([
-        [
-          "lowerCharLayer",
-          [
-            // prettier-ignore
-            "...",
-            ".↓.",
-            "...",
-          ],
-        ],
-      ])
-    );
-    gridTilemap = new GridTilemapPhaser(
-      tm,
-      "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
-    const isBlockingLeft = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      Direction.LEFT
-    );
-    const isBlockingRight = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      Direction.RIGHT
-    );
-    const isBlockingUp = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      Direction.UP
-    );
-    const isBlockingDown = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      Direction.DOWN
-    );
-    expect(isBlockingLeft).toBe(true);
-    expect(isBlockingRight).toBe(true);
-    expect(isBlockingUp).toBe(false);
-    expect(isBlockingDown).toBe(true);
-  });
-
-  it("should detect one-way blocking tiles down free", () => {
-    const tm = createPhaserTilemapStub(
-      new Map([
-        [
-          "lowerCharLayer",
-          [
-            // prettier-ignore
-            "...",
-            ".↑.",
-            "...",
-          ],
-        ],
-      ])
-    );
-    gridTilemap = new GridTilemapPhaser(
-      tm,
-      "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
-    const isBlockingLeft = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      Direction.LEFT
-    );
-    const isBlockingRight = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      Direction.RIGHT
-    );
-    const isBlockingUp = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      Direction.UP
-    );
-    const isBlockingDown = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      Direction.DOWN
-    );
-    expect(isBlockingLeft).toBe(true);
-    expect(isBlockingRight).toBe(true);
-    expect(isBlockingUp).toBe(true);
-    expect(isBlockingDown).toBe(false);
-  });
-
-  it("should only consider tiles on charLayer", () => {
-    const tm = createPhaserTilemapStub(
-      new Map([
-        [
-          "lowerCharLayer",
-          [
-            // prettier-ignore
-            "..",
-            ".#",
-          ],
-        ],
-        [
-          "testCharLayer",
-          [
-            // prettier-ignore
-            "..",
-            "..",
-          ],
-        ],
-      ])
-    );
-
-    gridTilemap = new GridTilemapPhaser(
-      tm,
-      "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
-    const isBlockingTile = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer"
-    );
-    expect(isBlockingTile).toBe(true);
-
-    const isBlockingTileUpperLayer = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "testCharLayer"
-    );
-    expect(isBlockingTileUpperLayer).toBe(false);
-  });
-
-  it("should not block if no tile or char blocks", () => {
-    const isBlockingTile = gridTilemap.hasBlockingTile(
-      new Vector2(3, 4),
-      "lowerCharLayer"
-    );
-    const hasNoTile = gridTilemap.hasNoTile(
-      new Vector2(3, 4),
-      "lowerCharLayer"
-    );
-    expect(isBlockingTile).toBe(false);
-    expect(hasNoTile).toBe(false);
-  });
-
-  it("should block if no tile present", () => {
-    const tm = createPhaserTilemapStub(
-      new Map([
-        [
-          "lowerCharLayer",
-          [
-            // prettier-ignore
-            "..",
-            "._",
-          ],
-        ],
-      ])
-    );
-
-    gridTilemap = new GridTilemapPhaser(
-      tm,
-      "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
-    );
-    const hasNoTile = gridTilemap.hasNoTile(
-      new Vector2(1, 1),
-      "lowerCharLayer"
-    );
-    expect(hasNoTile).toBe(true);
-    const isBlockingTile = gridTilemap.hasBlockingTile(
-      new Vector2(1, 1),
-      "lowerCharLayer"
-    );
-    expect(isBlockingTile).toBe(true);
-  });
-
-  it("should detect an unblocked tile", () => {
-    const char = createCharMock("player1", gridTilemap);
-    gridTilemap.addCharacter(char);
-    const freePosBlocked = gridTilemap.hasBlockingChar(
-      new Vector2(3, 3),
-      "lowerCharLayer",
-      ["cGroup"]
-    );
-    const occupiedPosBlocked = gridTilemap.hasBlockingChar(
-      new Vector2(1, 1),
-      "lowerCharLayer",
-      ["cGroup"]
-    );
-    expect(freePosBlocked).toBe(false);
-    expect(occupiedPosBlocked).toBe(true);
   });
 
   it("should get scaled tile width", () => {
@@ -624,22 +175,6 @@ describe("GridTilemapPhaser", () => {
 
   it("should get scaled tile height", () => {
     expect(gridTilemap.getTileHeight()).toEqual(48);
-  });
-
-  it("should get positions in range", () => {
-    expect(gridTilemap.isInRange(new Vector2({ x: 10, y: 20 }))).toBe(false);
-    expect(gridTilemap.isInRange(new Vector2({ x: 0, y: 0 }))).toBe(true);
-    expect(gridTilemap.isInRange(new Vector2({ x: 1, y: 1 }))).toBe(true);
-    expect(gridTilemap.isInRange(new Vector2({ x: -1, y: -1 }))).toBe(false);
-  });
-
-  it("should get tileSize", () => {
-    const scaleFactor = 3;
-    const scaledTileWidth = 16 * scaleFactor;
-    const scaledTileHeight = 16 * scaleFactor;
-    expect(gridTilemap.getTileSize()).toEqual(
-      new Vector2(scaledTileWidth, scaledTileHeight)
-    );
   });
 
   it("should transform tile pos to pixel pos", () => {
@@ -672,37 +207,6 @@ describe("GridTilemapPhaser", () => {
     expect(gridTilemap.getTileDistance(Direction.DOWN)).toEqual(
       new Vector2(scaledTileWidth, scaledTileHeight)
     );
-  });
-
-  it("should provide map direction", () => {
-    expect(gridTilemap.toMapDirection(Direction.DOWN)).toEqual(Direction.DOWN);
-    expect(gridTilemap.fromMapDirection(Direction.DOWN)).toEqual(
-      Direction.DOWN
-    );
-  });
-
-  it("should detect non-isometric maps", () => {
-    expect(gridTilemap.isIsometric()).toEqual(false);
-  });
-
-  it("should get tile pos in direction", () => {
-    const pos: LayerVecPos = {
-      position: new Vector2(5, 5),
-      layer: "charLayer1",
-    };
-    gridTilemap.setTransition(new Vector2(6, 5), "charLayer1", "charLayer2");
-    expect(gridTilemap.getTilePosInDirection(pos, Direction.DOWN)).toEqual({
-      position: new Vector2(5, 6),
-      layer: "charLayer1",
-    });
-    expect(gridTilemap.getTilePosInDirection(pos, Direction.UP_LEFT)).toEqual({
-      position: new Vector2(4, 4),
-      layer: "charLayer1",
-    });
-    expect(gridTilemap.getTilePosInDirection(pos, Direction.RIGHT)).toEqual({
-      position: new Vector2(6, 5),
-      layer: "charLayer2",
-    });
   });
 
   describe("isometric", () => {
@@ -745,10 +249,6 @@ describe("GridTilemapPhaser", () => {
       );
     });
 
-    it("should detect isometric maps", () => {
-      expect(gridTilemap.isIsometric()).toEqual(true);
-    });
-
     it("should transform tile pos to pixel pos for isometric maps", () => {
       const scaledTileWidth = 16 * scaleFactor;
       const scaledTileHeight = 16 * scaleFactor;
@@ -766,15 +266,6 @@ describe("GridTilemapPhaser", () => {
       const scaledTileHeight = 16 * scaleFactor;
       expect(gridTilemap.getTileDistance(Direction.DOWN_LEFT)).toEqual(
         new Vector2(scaledTileWidth * 0.5, scaledTileHeight * 0.5)
-      );
-    });
-
-    it("should provide map direction", () => {
-      expect(gridTilemap.toMapDirection(Direction.DOWN)).toEqual(
-        Direction.DOWN_RIGHT
-      );
-      expect(gridTilemap.fromMapDirection(Direction.DOWN_RIGHT)).toEqual(
-        Direction.DOWN
       );
     });
   });
@@ -812,22 +303,4 @@ describe("GridTilemapPhaser", () => {
       expect(gridTilemap.getTransitions()).toEqual(expectedTransitions);
     });
   });
-
-  function createCharMock(
-    id = "player",
-    tilemap: GridTilemapPhaser
-  ): GridCharacter {
-    const char = new GridCharacter(id, {
-      tilemap: tilemap as any,
-      speed: 3,
-      collidesWithTiles: true,
-      numberOfDirections: NumberOfDirections.FOUR,
-      collisionGroups: ["cGroup"],
-    });
-    char.setTilePosition({
-      position: new Vector2(1, 1),
-      layer: "lowerCharLayer",
-    });
-    return char;
-  }
 });

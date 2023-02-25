@@ -38,6 +38,117 @@ describe("GridTilemap", () => {
     );
   });
 
+  it("should consider sub-layers for blocking", () => {
+    const tm = mockLayeredBlockMapNew([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".#",
+          "..",
+        ],
+      },
+      {
+        layer: "noCharLayer",
+        isCharLayer: false,
+        blockMap: [
+          // prettier-ignore
+          "..",
+          ".#",
+        ],
+      },
+      {
+        layer: "upperCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "#.",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tm,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(1, 0), "lowerCharLayer")
+    ).toBe(true);
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(1, 1), "lowerCharLayer")
+    ).toBe(false);
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(1, 1), "upperCharLayer")
+    ).toBe(true);
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(1, 1), "upperCharLayer")
+    ).toBe(true);
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(0, 1), "upperCharLayer")
+    ).toBe(true);
+  });
+
+  it("should consider sub-layers for no tile", () => {
+    const tm = mockLayeredBlockMapNew([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..",
+        ],
+      },
+      {
+        layer: "noCharLayer",
+        isCharLayer: false,
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
+        ],
+      },
+      {
+        layer: "upperCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tm,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+
+    expect(gridTilemap.hasNoTile(new Vector2(1, 1), "lowerCharLayer")).toBe(
+      true
+    );
+    expect(gridTilemap.hasNoTile(new Vector2(1, 1), "upperCharLayer")).toBe(
+      false
+    );
+  });
+
+  it("should not consider ge_collide: false as blocking", () => {
+    const tm = mockLayeredBlockMapNew([
+      {
+        layer: "lowerCharLayer",
+        blockMap: ["."],
+      },
+    ]);
+    // @ts-ignore
+    tm.getLayers()[0].data[0][0].properties["ge_collide"] = false;
+    gridTilemap = new GridTilemap(
+      tm,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(0, 0), "lowerCharLayer")
+    ).toBe(false);
+  });
+
   it("should add a character", () => {
     gridTilemap = new GridTilemap(
       new MockTilemap(),
@@ -70,6 +181,33 @@ describe("GridTilemap", () => {
   });
 
   it("should set the lowest char layer", () => {
+    phaserTilemap = mockLayeredBlockMapNew([
+      {
+        layer: "noCharLayer",
+        isCharLayer: false,
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
+        ],
+      },
+      {
+        layer: "charLayer1",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
+        ],
+      },
+      {
+        layer: "charLayer2",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
+        ],
+      },
+    ]);
     gridTilemap = new GridTilemap(
       phaserTilemap,
       "ge_collide",

@@ -1,7 +1,4 @@
-import {
-  GridCharacterPhaser,
-  PhaserCharacterData,
-} from "./GridEnginePhaser/GridCharacterPhaser/GridCharacterPhaser";
+import { GridCharacterPhaser } from "./GridEnginePhaser/GridCharacterPhaser/GridCharacterPhaser";
 import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import {
   Finished,
@@ -404,17 +401,17 @@ export class GridEngine {
     if (!this.gridTilemap) throw this.createUninitializedErr();
     if (!this.config) throw this.createUninitializedErr();
 
-    const phaserCharData: PhaserCharacterData = {
-      ...charData,
-      numberOfDirections: this.config.numberOfDirections,
-    };
+    // const phaserCharData: CharacterData = {
+    //   // numberOfDirections: this.config.numberOfDirections,
+    //   ...charData,
+    // };
 
-    if (charData.numberOfDirections) {
-      phaserCharData.numberOfDirections = charData.numberOfDirections;
-    }
+    // if (charData.numberOfDirections) {
+    //   phaserCharData.numberOfDirections = charData.numberOfDirections;
+    // }
 
     const gridCharPhaser = new GridCharacterPhaser(
-      phaserCharData,
+      charData,
       this.scene,
       this.gridTilemap,
       this.config.layerOverlay,
@@ -441,7 +438,7 @@ export class GridEngine {
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     gridChar.destroy();
-    this.gridTilemap?.removeCharacter(charId);
+    // this.gridTilemap?.removeCharacter(charId);
     this.gridCharacters?.delete(charId);
 
     this.geHeadless.removeCharacter(charId);

@@ -73,17 +73,10 @@ function createLayer(layerName: string | undefined, allRows: string[]) {
         // Phaser also uses the ctor like this, so the types seem to be wrong.
         // @ts-ignore
         const tile = new Phaser.Tilemaps.Tile(layerData, 1, c, r, 16, 16);
-        tile.properties = [
-          ...Object.entries(getBlockingProps(allRows[r][c])).map(
-            ([key, val]) => {
-              return {
-                name: key,
-                value: val,
-              };
-            }
-          ),
-          { name: "id", value: cnt++ },
-        ];
+        tile.properties = {
+          ...getBlockingProps(allRows[r][c]),
+          id: cnt++,
+        };
         tiles[r][c] = tile;
       }
     }

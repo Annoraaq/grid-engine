@@ -1,13 +1,13 @@
 import {
-  CharTileLayer,
+  TileLayer,
   Orientation,
   Tile,
   Tilemap,
 } from "../../GridTilemap/Tilemap";
 
 export class MockTile implements Tile {
-  constructor(private properties: Record<string, string> = {}) {}
-  getProperty(name: string): string | undefined {
+  constructor(private properties: Record<string, any> = {}) {}
+  getProperty(name: string): any {
     return this.properties[name];
   }
   hasProperty(name: string): boolean {
@@ -17,7 +17,7 @@ export class MockTile implements Tile {
 
 export class MockTilemap implements Tilemap {
   constructor(
-    private layers: CharTileLayer[] = [],
+    private layers: TileLayer[] = [],
     private orientation: Orientation = "orthogonal"
   ) {}
 
@@ -36,7 +36,7 @@ export class MockTilemap implements Tilemap {
   getOrientation(): Orientation {
     return this.orientation;
   }
-  getCharLayers(): CharTileLayer[] {
+  getLayers(): TileLayer[] {
     return this.layers;
   }
   hasTileAt(x: number, y: number, layer?: string): boolean {
@@ -49,7 +49,7 @@ export class MockTilemap implements Tilemap {
   }
 }
 
-export class MockTileLayer implements CharTileLayer {
+export class MockTileLayer implements TileLayer {
   private depth = 0;
   constructor(
     private name: string | undefined,
@@ -68,6 +68,9 @@ export class MockTileLayer implements CharTileLayer {
   }
   getProperties(): Record<string, string> {
     return this.properties;
+  }
+  isCharLayer(): boolean {
+    return this.hasProperty("ge_charLayer");
   }
   getName(): string | undefined {
     return this.name;

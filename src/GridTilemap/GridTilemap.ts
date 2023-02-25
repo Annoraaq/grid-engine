@@ -11,10 +11,9 @@ import { CharId, GridCharacter } from "../GridCharacter/GridCharacter";
 import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
 import { CollisionStrategy } from "../Collisions/CollisionStrategy";
 import { CharLayer } from "../GridEngine";
-import { TileLayer, Tilemap } from "./Tilemap";
+import { CHAR_LAYER_PROP_NAME, TileLayer, Tilemap } from "./Tilemap";
 
 export class GridTilemap {
-  private static readonly CHAR_LAYER_PROP_NAME = "ge_charLayer";
   private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "ge_collide_";
   private characters = new Map<string, GridCharacter>();
   private charBlockCache: CharBlockCache;
@@ -61,9 +60,9 @@ export class GridTilemap {
     ignoreHasTile?: boolean
   ): boolean {
     if (!ignoreHasTile && this.hasNoTile(pos, charLayer)) return true;
-    // return this.getCollisionRelevantLayers(charLayer).some((layer) =>
-    return this.isLayerBlockingAt(charLayer, pos, direction);
-    // );
+    return this.getCollisionRelevantLayers(charLayer).some((layer) => {
+      return this.isLayerBlockingAt(layer.getName(), pos, direction);
+    });
   }
 
   getTransition(pos: Vector2, fromLayer?: string): string | undefined {
@@ -88,22 +87,10 @@ export class GridTilemap {
   }
 
   hasNoTile(pos: Vector2, charLayer?: string): boolean {
-    return !this.tilemap.hasTileAt(pos.x, pos.y, charLayer);
-    // // TODO optimize with map
-    // const layer = this.tilemap.getCharLayers().find(l => l.getName() === charLayer);
-    // return layer && this.tilemap.hasTileAt(pos.x, pos.y, )
-    // return !this.getCollisionRelevantLayers(charLayer).some((layer) =>
-    //   this.tilemap.hasTileAt(pos.x, pos.y, layer.getName())
-    // );
+    return !this.getCollisionRelevantLayers(charLayer).some((layer) =>
+      this.tilemap.hasTileAt(pos.x, pos.y, layer.getName())
+    );
   }
-
-  // hasNoTile(pos: Vector2, charLayer?: string): boolean {
-  //   // TODO optimize with map
-
-  //   return !this.getCollisionRelevantLayers(charLayer).some((layer) =>
-  //     this.tilemap.hasTileAt(pos.x, pos.y, layer.getName())
-  //   );
-  // }
 
   hasBlockingChar(
     pos: Vector2,
@@ -173,80 +160,52 @@ export class GridTilemap {
 
     const tile = this.tilemap.getTileAt(pos.x, pos.y, layerName);
     return !!(
-      tile?.hasProperty(this.collisionTilePropertyName) ||
-      tile?.hasProperty(collidesPropName)
+      tile?.getProperty(this.collisionTilePropertyName) ||
+      tile?.getProperty(collidesPropName)
     );
-    // return Boolean(
-    //   tile?.getProperties() &&
-    //     (tile.getProperties()[this.collisionTilePropertyName] ||
-    //       tile.getProperties()[collidesPropName])
-    // );
   }
 
-  // private getCharLayerIndexes(): number[] {
-  //   return this.tilemap
-  //     .getLayers()
-  //     .map((layer, index) => ({ layer, index }))
-  //     .filter(({ layer }) => this.isCharLayer(layer))
-  //     .map(({ index }) => index);
-  // }
+  private getCharLayerIndexes(): number[] {
+    return this.tilemap
+      .getLayers()
+      .map((layer, index) => ({ layer, index }))
+      .filter(({ layer }) => layer.isCharLayer())
+      .map(({ index }) => index);
+  }
 
-  // private findPrevAndCharLayer(charLayer: string): {
-  //   prevIndex: number;
-  //   charLayerIndex: number;
-  // } {
-  //   const indexes = this.getCharLayerIndexes();
+  private findPrevAndCharLayer(charLayer: string): {
+    prevIndex: number;
+    charLayerIndex: number;
+  } {
+    const indexes = this.getCharLayerIndexes();
+    const layers = this.tilemap.getLayers();
 
-  //   const charLayerIndex = indexes.findIndex((index) => {
-  //     return (
-  //       this.getLayerProp(
-  //         this.tilemap.getLayers()[index],
-  //         GridTilemap.CHAR_LAYER_PROP_NAME
-  //       ) == charLayer
-  //     );
-  //   });
+    const charLayerIndex = indexes.findIndex((index) => {
+      return layers[index].getProperty(CHAR_LAYER_PROP_NAME) == charLayer;
+    });
 
-  //   if (charLayerIndex == 0) {
-  //     return { prevIndex: -1, charLayerIndex: indexes[charLayerIndex] };
-  //   }
+    if (charLayerIndex == 0) {
+      return { prevIndex: -1, charLayerIndex: indexes[charLayerIndex] };
+    }
 
-  //   return {
-  //     prevIndex: indexes[charLayerIndex - 1],
-  //     charLayerIndex: indexes[charLayerIndex],
-  //   };
-  // }
+    return {
+      prevIndex: indexes[charLayerIndex - 1],
+      charLayerIndex: indexes[charLayerIndex],
+    };
+  }
 
-  // private getCollisionRelevantLayers(charLayer?: string): TileLayer[] {
-  //   if (!charLayer) return this.tilemap.getLayers();
+  private getCollisionRelevantLayers(charLayer?: string): TileLayer[] {
+    if (!charLayer) return this.tilemap.getLayers();
 
-  //   const { prevIndex, charLayerIndex } = this.findPrevAndCharLayer(charLayer);
+    const { prevIndex, charLayerIndex } = this.findPrevAndCharLayer(charLayer);
 
-  //   return this.tilemap.getLayers().slice(prevIndex + 1, charLayerIndex + 1);
-  // }
+    return this.tilemap.getLayers().slice(prevIndex + 1, charLayerIndex + 1);
+  }
 
-  // private getLowestCharLayer(): string | undefined {
-  //   const charLayer = this.tilemap.getLayers().find((layer) => {
-  //     return this.hasLayerProp(layer, GridTilemap.CHAR_LAYER_PROP_NAME);
-  //   });
-
-  //   if (charLayer) {
-  //     return this.getLayerProp(charLayer, GridTilemap.CHAR_LAYER_PROP_NAME);
-  //   }
-  // }
   private getLowestCharLayer(): string | undefined {
-    return this.tilemap.getCharLayers()[0]?.getName();
-  }
-
-  getLayerProp(layer: TileLayer, name: string): string | undefined {
-    const prop = layer.getProperties()[name];
-    return prop;
-  }
-
-  hasLayerProp(layer: TileLayer, name: string): boolean {
-    return this.getLayerProp(layer, name) != undefined;
-  }
-
-  private isCharLayer(layer: TileLayer): boolean {
-    return this.hasLayerProp(layer, GridTilemap.CHAR_LAYER_PROP_NAME);
+    for (const layer of this.tilemap.getLayers()) {
+      if (layer.isCharLayer()) return layer.getName();
+    }
+    return undefined;
   }
 }
