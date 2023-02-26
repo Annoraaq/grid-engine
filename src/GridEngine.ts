@@ -558,6 +558,11 @@ export class GridEngine {
    * {@link positionChangeStarted} and {@link positionChangeFinished} observables will
    * emit. If the character was moving, the {@link movementStopped} observable
    * will also emit.
+   *
+   * If the `layer` argument is omitted, the char layer `undefined` will be used
+   * and not the current char layer of the character.
+   * This is unproblematic, if you are not using char layers at all. However,
+   * if you are using char layers in your game, make sure that you always set the `layer` property.
    */
   setPosition(charId: string, pos: Position, layer?: string): void {
     this.geHeadless.setPosition(charId, pos, layer);
