@@ -38,7 +38,7 @@ import {
 } from "./GridEngineHeadless";
 import { GridTilemapPhaser } from "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser";
 import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
-import { Tilemap } from "./GridTilemap/Tilemap";
+import { Orientation, Tile, TileLayer, Tilemap } from "./GridTilemap/Tilemap";
 import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer";
 import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile";
 
@@ -72,6 +72,9 @@ export {
   PhaserTilemap,
   PhaserTileLayer,
   PhaserTile,
+  Tile,
+  TileLayer,
+  Orientation,
 };
 
 /**

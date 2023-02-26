@@ -114,6 +114,12 @@ a:hover {
   color: var(--brand-medium-bright);
 }
 
+blockquote {
+  background: var(--dark-bg-3);
+  margin: 0;
+  border-left: 4px solid var(--dark-bg-2);
+  padding: var(--padding-small) var(--padding-large);
+}
 
 .header {
   background: var(--dark-bg);
