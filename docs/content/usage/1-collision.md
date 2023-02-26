@@ -18,6 +18,8 @@ Once you're in the tileset editor, select the tiles you want to have the custom 
 
 Name it `ge_collide`, or one of the other [supported properties](../tile-properties), make it a `bool` and then set it to `true` if you want the tile to be non-walkable!
 
+> **_NOTE:_** You can also use a custom collision property name, by setting [collisionTilePropertyName](../../api/interfaces/GridEngineConfig.html#collisionTilePropertyName).
+
 ![Add Property context menu](../../src/assets/img/property-helper.png)
 
 ![Collides property](../../src/assets/img/collides-helper.png)
