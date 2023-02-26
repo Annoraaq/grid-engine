@@ -24,20 +24,22 @@ movement to your tilemap game. Your characters will be able to only move in whol
 
 ## Features
 
+### Basic
+
 - Grid-based movement, of course!
-- Multiple characters
-- Pathfinding (for both NPCs and the player)
-- NEW - Headless mode (allows running it independently of Phaser)
 - Tile-based collision detection
-- One-way collision detection
+- **_NEW!_** - Headless mode (allows running it independently of Phaser)
+- Diagonal movement (8 directions)
+- Isometric maps
+- Multiple character layers
+- Multi-tile characters
+
+### Movement / Pathfinding
+
+- Pathfinding (for both NPCs and the player)
 - Random movement (can also limit to a radius)
 - Following other characters
-- Diagonal movement (8 directions)
-- Isometric maps (Beta)
-- Multiple character layers (Beta)
 - Collision groups
-- Multi-tile characters
-- Full TypeScript support
 
 📖 Read our most current [documentation](https://annoraaq.github.io/grid-engine/).
 
