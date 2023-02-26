@@ -1,5 +1,7 @@
 <template>
-  <nav>
+  <nav class="sidenav">
+    <input class="side-menu" type="checkbox" id="side-menu"/>
+    <label class="hamb" for="side-menu"><span class="hamb-line"></span></label>
     <ul>
       <li v-for="group in groups">
         {{group.title}}
@@ -102,39 +104,45 @@ export default {
 
 <style>
 
-nav ul {
+.sidenav {
+  width: var(--nav-width);
+  background: var(--dark-bg);
+  margin-top: 1px;
+}
+
+.sidenav ul {
   padding-left: 0;
 }
 
-nav ul li {
+.sidenav ul li {
   color: var(--dark-font-bright);
   margin-top: 20px;
 }
 
-nav ul ul{
+.sidenav ul ul{
   padding-left: 20px;
 }
 
-nav ul ul li {
+.sidenav ul ul li {
   margin-top: 0;
   list-style-type: none;
 }
 
-nav ul li {
+.sidenav ul li {
   list-style-type: none;
 }
 
-nav ul a {
+.sidenav ul a {
   display: block;
   width: 100%;
   color: var(--dark-font-dark)
 }
 
-nav ul .active {
+.sidenav ul .active {
   color: var(--brand-medium-bright)
 }
 
-nav ul a:hover {
+.sidenav ul a:hover {
   color: var(--dark-font-bright)
 }
 
@@ -144,5 +152,80 @@ nav ul a:hover {
   border-radius: 8px;
   padding: 1px 6px;
   font-size: 12px;
+}
+
+.sidenav .hamb{
+    cursor: pointer;
+    float: right;
+    padding-top: 40px;
+    padding-left: 20px;
+    padding-right: 20px;
+    display: none;
+}
+
+.sidenav .hamb-line {
+    background: #fff;
+    display: block;
+    height: 2px;
+    position: relative;
+    width: 24px;
+}
+
+.sidenav .hamb-line::before,
+.sidenav .hamb-line::after{
+    background: #fff;
+    content: '';
+    display: block;
+    height: 100%;
+    position: absolute;
+    transition: all .2s ease-out;
+    width: 100%;
+}
+.sidenav .hamb-line::before{
+    top: 5px;
+}
+.sidenav .hamb-line::after{
+    top: -5px;
+}
+
+.sidenav .side-menu {
+    display: none;
+}
+
+.sidenav .side-menu:checked ~ ul{
+    display: block;
+}
+.sidenav .side-menu:checked ~ ul ul{
+    display: block;
+}
+.sidenav .side-menu:checked ~ .hamb .hamb-line {
+    background: transparent;
+}
+.sidenav .side-menu:checked ~ .hamb .hamb-line::before {
+    transform: rotate(-45deg);
+    top:0;
+}
+.sidenav .side-menu:checked ~ .hamb .hamb-line::after {
+    transform: rotate(45deg);
+    top:0;
+}
+
+@media (max-width: 1100px) {
+  .sidenav {
+    position: fixed;
+    width: auto;
+    height: 100%;
+    border-right: 1px solid var(--dark-bg-2);
+    z-index: 1000;
+  }
+  .sidenav .hamb {
+    display: block;
+  }
+  .sidenav ul {
+    display: none;
+    padding-right: var(--padding-medium);
+    padding-left: var(--padding-medium);
+  }
+
 }
 </style>

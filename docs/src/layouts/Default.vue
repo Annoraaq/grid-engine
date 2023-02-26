@@ -6,6 +6,8 @@
         <g-link to="/" class="logo-link">
           <Logo />
         </g-link>
+        <input class="top-menu" type="checkbox" id="top-menu"/>
+        <label class="hamb" for="top-menu"><span class="hamb-line"></span></label>
         <nav class="nav">
           <a href="https://annoraaq.github.io/grid-engine/api/" class="nav__link">
             API
@@ -14,10 +16,10 @@
             Dev Tools Plugin
           </g-link>
           <g-link class="nav__link" to="https://github.com/Annoraaq/grid-engine" title="GitHub">
-            <i class="fa-brands fa-github" aria-hidden="true"></i>
+            <span class="icon-text"><span class="resp-hint">GitHub</span><i class="fa-brands fa-github" aria-hidden="true"></i></span>
           </g-link>
           <g-link class="nav__link" to="https://discord.gg/C4jNEZJECs" title="Discord">
-            <i class="fa-brands fa-discord" aria-hidden="true"></i>
+            <span class="icon-text"><span class="resp-hint">Discord</span><i class="fa-brands fa-discord" aria-hidden="true"></i></span>
           </g-link>
         </nav>
       </div>
@@ -239,6 +241,107 @@ table th{
   border: 1px solid var(--dark-bg-2);
   vertical-align: top;
 }
+
+.nav a .resp-hint {
+  display: none;
+}
+
+.hamb {
+    cursor: pointer;
+    float: right;
+    padding: 40px 20px;
+    display: none;
+}
+
+.hamb-line {
+    background: #fff;
+    display: block;
+    height: 2px;
+    position: relative;
+    width: 24px;
+}
+
+.hamb-line::before,
+.hamb-line::after {
+    background: #fff;
+    content: '';
+    display: block;
+    height: 100%;
+    position: absolute;
+    transition: all .2s ease-out;
+    width: 100%;
+}
+.hamb-line::before {
+    top: 5px;
+}
+.hamb-line::after {
+    top: -5px;
+}
+
+.top-menu {
+    display: none;
+}
+
+.top-menu:checked ~ nav {
+    display: block;
+}
+.top-menu:checked ~ .hamb .hamb-line {
+    background: transparent;
+}
+.top-menu:checked ~ .hamb .hamb-line::before {
+    transform: rotate(-45deg);
+    top:0;
+}
+.top-menu:checked ~ .hamb .hamb-line::after {
+    transform: rotate(45deg);
+    top:0;
+}
+
+@media (max-width: 1100px) {
+  .hamb {
+    display: block;
+  }
+
+
+  /* Hide sidebar */
+  .sidebar {
+    width: auto;
+  }
+  .content {
+    margin-left: var(--padding-large);
+  }
+
+  .nav {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: var(--header-height);
+    height: 100vh;
+    background: var(--dark-bg);
+    width: 100%;
+    border-bottom: 1px solid var(--dark-bg-2);
+  }
+  .nav a {
+    height: 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    padding-right: var(--padding-large);
+    user-select: none;
+  }
+
+  .nav a .icon-text {
+    display: flex;
+    align-items: center;
+  }
+
+  .nav a .resp-hint {
+    display: block;
+    margin-right: var(--padding-small);
+  }
+}
+
 
 </style>
 
