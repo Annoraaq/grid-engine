@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Release
+name: Build-and-commit
 
 # Controls when the workflow will run
 on:
