@@ -18,7 +18,7 @@
   "files": [
     "dist"
   ],
-  "types": "dist/GridEngine.d.ts",
+  "types": "dist/src/GridEngine.d.ts",
   "dependencies": {
     "rxjs": "^7.8.0"
   },
