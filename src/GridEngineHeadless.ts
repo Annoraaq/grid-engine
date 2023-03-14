@@ -239,6 +239,32 @@ export enum CharacterShiftAction {
   ADDED = "ADDED",
 }
 
+/** Result of a pathfinding algorithm run. */
+export interface PathfindingResult {
+  /**
+   * Actual shortest path. Contains an empty array if no path has
+   * been found.
+   */
+  path: LayerPosition[];
+
+  /**
+   * If no path could be found, it contains one position that has the closest
+   * distance to the target. The distance is either
+   * {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
+   * in case of 4 direction mode or
+   * {@link https://en.wikipedia.org/wiki/Chebyshev_distance | Chebyshev distance}
+   * in case of 8 direction mode.
+   */
+  closestToTarget: LayerPosition;
+
+  /**
+   * In case that {@link PathfindingOptions.maxPathLength} was set, this
+   * property indicates that pathfinding stopped because it reached that maximum
+   * path lenght.
+   */
+  reachedMaxPathLength: boolean;
+}
+
 export class GridEngineHeadless {
   private gridCharacters?: Map<string, GridCharacter>;
   private config?: Concrete<GridEngineConfigHeadless>;
@@ -367,9 +393,12 @@ export class GridEngineHeadless {
    * further than that radius from its initial position (the position it has
    * been, when `moveRandomly` was called). The distance is calculated with the
    * {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
-   * . Additionally, if a `radius` other than -1 was given, the character might
-   * move more than one tile into a random direction in one run (as long as the
-   * route is neither blocked nor outside of the radius).
+   * in case of 4 direction mode and with and
+   * {@link https://en.wikipedia.org/wiki/Chebyshev_distance | Chebyshev distance}
+   * in case of 8 direction mode. Additionally, if a `radius` other than -1 was
+   * given, the character might move more than one tile into a random direction
+   * in one run (as long as the route is neither blocked nor outside of the
+   * radius).
    */
   moveRandomly(charId: string, delay = 0, radius = -1): void {
     this.initGuard();
@@ -657,10 +686,16 @@ export class GridEngineHeadless {
    * @param charIdToFollow ID of character that should be followed
    * @param distance Minimum distance to keep to `charIdToFollow` in
    *  {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
+   *  in case of 4 direction mode and with and
+   *  {@link https://en.wikipedia.org/wiki/Chebyshev_distance | Chebyshev distance}
+   *  in case of 8 direction mode.
    * @param closestPointIfBlocked `charId` will move to the closest point
-   *  ({@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance})
-   * to `charIdToFollow` that is reachable from `charId` in case that there does
-   * not exist a path between `charId` and `charIdToFollow`.
+   *  ({@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
+   *  in case of 4 direction mode and with and
+   *  {@link https://en.wikipedia.org/wiki/Chebyshev_distance | Chebyshev distance}
+   *  in case of 8 direction mode)
+   *  to `charIdToFollow` that is reachable from `charId` in case that there
+   *  does not exist a path between `charId` and `charIdToFollow`.
    */
   follow(
     charId: string,
@@ -854,7 +889,7 @@ export class GridEngineHeadless {
     source: LayerPosition,
     dest: LayerPosition,
     options: PathfindingOptions = {}
-  ): { path: LayerPosition[]; closestToTarget: LayerPosition } {
+  ): PathfindingResult {
     if (!this.gridTilemap) throw this.createUninitializedErr();
     const pathfinding = new Pathfinding("BFS", this.gridTilemap);
     const res = pathfinding.findShortestPath(
@@ -865,6 +900,7 @@ export class GridEngineHeadless {
     return {
       path: res.path.map(LayerPositionUtils.fromInternal),
       closestToTarget: LayerPositionUtils.fromInternal(res.closestToTarget),
+      reachedMaxPathLength: false,
     };
   }
 

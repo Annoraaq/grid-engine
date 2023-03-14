@@ -81,6 +81,13 @@ export interface PathfindingOptions {
    * to a blocking character.
    */
   ignoreBlockedTarget?: boolean;
+
+  /**
+   * If this is set, the algorithm will stop once it reaches a path length of
+   * this value. This is useful to avoid running out of memory on large or
+   * infinite maps.
+   */
+  maxPathLength?: number;
 }
 
 /**
@@ -136,6 +143,7 @@ export class Pathfinding {
       ignoreTiles,
       ignoreMapBounds,
       ignoreBlockedTarget,
+      maxPathLength: Infinity,
     };
 
     const getNeighbors = createGetNeighbors(ops, dest, this.gridTilemap);

@@ -1406,6 +1406,7 @@ describe("GridEngine", () => {
       expect(res).toEqual({
         path: [source],
         closestToTarget: source,
+        reachedMaxPathLength: false,
       });
     });
   });

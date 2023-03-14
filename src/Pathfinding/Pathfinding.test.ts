@@ -573,6 +573,7 @@ describe("Pathfinding", () => {
         ignoreTiles: false,
         ignoreMapBounds: false,
         ignoreBlockedTarget: false,
+        maxPathLength: Infinity,
       };
     });
 
@@ -991,6 +992,7 @@ describe("Pathfinding", () => {
         ignoreTiles: false,
         ignoreMapBounds: false,
         ignoreBlockedTarget: false,
+        maxPathLength: Infinity,
       };
     });
 
@@ -1450,6 +1452,7 @@ describe("Pathfinding", () => {
         ignoreTiles: false,
         ignoreMapBounds: false,
         ignoreBlockedTarget: false,
+        maxPathLength: Infinity,
       };
     });
 
