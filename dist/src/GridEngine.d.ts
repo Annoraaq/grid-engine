@@ -12,10 +12,10 @@ import { IsPositionAllowedFn, PathfindingOptions } from "./Pathfinding/Pathfindi
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
 import { GridEngineHeadless, TileSizePerSecond, Position, LayerPosition, CharLayer, GridEngineConfigHeadless, CollisionConfig, CharacterDataHeadless, CharacterShift, CharacterShiftAction } from "./GridEngineHeadless";
 import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
-import { Tilemap } from "./GridTilemap/Tilemap";
+import { Orientation, Tile, TileLayer, Tilemap } from "./GridTilemap/Tilemap";
 import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer";
 import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile";
-export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, MovementInfo, PositionChange, IsPositionAllowedFn, PathfindingOptions, ShortestPathAlgorithmType, GridEngineHeadless, TileSizePerSecond, Position, LayerPosition, CharLayer, CollisionConfig, CharacterShift, CharacterShiftAction, CharacterDataHeadless, GridEngineConfigHeadless, Tilemap, PhaserTilemap, PhaserTileLayer, PhaserTile, };
+export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, MovementInfo, PositionChange, IsPositionAllowedFn, PathfindingOptions, ShortestPathAlgorithmType, GridEngineHeadless, TileSizePerSecond, Position, LayerPosition, CharLayer, CollisionConfig, CharacterShift, CharacterShiftAction, CharacterDataHeadless, GridEngineConfigHeadless, Tilemap, PhaserTilemap, PhaserTileLayer, PhaserTile, Tile, TileLayer, Orientation, };
 /**
  * Configuration object for initializing GridEngine.
  */
@@ -295,6 +295,11 @@ export declare class GridEngine {
      * {@link positionChangeStarted} and {@link positionChangeFinished} observables will
      * emit. If the character was moving, the {@link movementStopped} observable
      * will also emit.
+     *
+     * If the `layer` argument is omitted, the char layer `undefined` will be used
+     * and not the current char layer of the character.
+     * This is unproblematic, if you are not using char layers at all. However,
+     * if you are using char layers in your game, make sure that you always set the `layer` property.
      */
     setPosition(charId: string, pos: Position, layer?: string): void;
     /**

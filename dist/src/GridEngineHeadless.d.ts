@@ -31,7 +31,13 @@ export type CharLayer = string | undefined;
 export interface GridEngineConfigHeadless {
     /** An array of character data. Each describing a character on the map. */
     characters: CharacterDataHeadless[];
-    /** A custom name for the collision tile property of your tilemap. */
+    /**
+     * A custom name for the
+     * {@link https://annoraaq.github.io/grid-engine/p/tile-properties/#collisions | collision tile property}
+     * of your tilemap.
+     *
+     * @defaultValue 'ge_collide'
+     */
     collisionTilePropertyName?: string;
     /**
      * The possible number of directions for moving a character. Default is 4
