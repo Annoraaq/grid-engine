@@ -40,6 +40,16 @@ import { LayerPositionUtils } from "./Utils/LayerPositionUtils/LayerPositionUtil
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
 import { GridTilemap } from "./GridTilemap/GridTilemap";
 import { Tilemap } from "./GridTilemap/Tilemap";
+import {
+  CharacterShift,
+  CharacterShiftAction,
+  CharLayer,
+  FollowOptions,
+  IGridEngine,
+  LayerPosition,
+  PathfindingResult,
+  Position,
+} from "./IGridEngine";
 
 export {
   CollisionStrategy,
@@ -60,21 +70,6 @@ export {
 };
 
 export type TileSizePerSecond = number;
-
-export interface Position {
-  x: number;
-  y: number;
-}
-
-/**
- * Specifies a tile position along with a character layer.
- */
-export interface LayerPosition {
-  position: Position;
-  charLayer: CharLayer;
-}
-
-export type CharLayer = string | undefined;
 
 /**
  * Configuration object for initializing GridEngineHeadless.
@@ -219,82 +214,7 @@ export interface CharacterDataHeadless {
   tileHeight?: number;
 }
 
-/**
- * Result of a modification of the internal characters array
- */
-export interface CharacterShift {
-  /** the modified character */
-  charId: string;
-  /** The action that was performed when modifying the character */
-  action: CharacterShiftAction;
-}
-
-/**
- * Type of modification of grid engine characters
- */
-export enum CharacterShiftAction {
-  /** removed existing character */
-  REMOVED = "REMOVED",
-  /** added new character */
-  ADDED = "ADDED",
-}
-
-/** Result of a pathfinding algorithm run. */
-export interface PathfindingResult {
-  /**
-   * Actual shortest path. Contains an empty array if no path has
-   * been found.
-   */
-  path: LayerPosition[];
-
-  /**
-   * If no path could be found, it contains one position that has the closest
-   * distance to the target. The distance is either
-   * {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
-   * in case of 4 direction mode or
-   * {@link https://en.wikipedia.org/wiki/Chebyshev_distance | Chebyshev distance}
-   * in case of 8 direction mode.
-   */
-  closestToTarget: LayerPosition;
-
-  /**
-   * In case that {@link PathfindingOptions.maxPathLength} was set, this
-   * property indicates that pathfinding stopped because it reached that maximum
-   * path lenght.
-   */
-  reachedMaxPathLength: boolean;
-}
-
-export interface FollowOptions {
-  /**
-   *  Minimum distance to keep to `charIdToFollow` in
-   *  {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
-   *  in case of 4 direction mode and with and
-   *  {@link https://en.wikipedia.org/wiki/Chebyshev_distance | Chebyshev distance}
-   *  in case of 8 direction mode.
-   */
-  distance?: number;
-
-  /**
-   * `charId` will move to the closest point
-   *  ({@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
-   *  in case of 4 direction mode and with and
-   *  {@link https://en.wikipedia.org/wiki/Chebyshev_distance | Chebyshev distance}
-   *  in case of 8 direction mode)
-   *  to `charIdToFollow` that is reachable from `charId` in case that there
-   *  does not exist a path between `charId` and `charIdToFollow`.
-   */
-  closestPointIfBlocked?: boolean;
-
-  /**
-   * If this is set, the algorithm will stop once it reaches a path length of
-   * this value. This is useful to avoid running out of memory on large or
-   * infinite maps.
-   */
-  maxPathLength?: number;
-}
-
-export class GridEngineHeadless {
+export class GridEngineHeadless implements IGridEngine {
   private gridCharacters?: Map<string, GridCharacter>;
   private config?: Concrete<GridEngineConfigHeadless>;
   private gridTilemap?: GridTilemap;
@@ -313,11 +233,7 @@ export class GridEngineHeadless {
     console.log(`Using GridEngine v${VERSION}`);
   }
 
-  /**
-   * Returns the character layer of the given character.
-   * You can read more about character layers and transitions
-   * {@link https://annoraaq.github.io/grid-engine/p/character-layers | here}
-   */
+  /** {@inheritDoc IGridEngine.getCharLayer} */
   getCharLayer(charId: string): string | undefined {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -325,29 +241,13 @@ export class GridEngineHeadless {
     return gridChar.getTilePos().layer;
   }
 
-  /**
-   * @returns The character layer that the transition on the given position and
-   * character layer leads to.
-   *
-   * @beta
-   */
+  /** {@inheritDoc IGridEngine.getTransition} */
   getTransition(position: Position, fromLayer: string): string | undefined {
     this.initGuard();
     return this.gridTilemap?.getTransition(new Vector2(position), fromLayer);
   }
 
-  /**
-   * Sets the character layer `toLayer` that the transition on position
-   * `position` from character layer `fromLayer` should lead to.
-   * You can read more about character layers and transitions
-   * {@link https://annoraaq.github.io/grid-engine/p/character-layers | here}
-   *
-   * @param position Position of the new transition
-   * @param fromLayer Character layer the new transition should start at
-   * @param toLayer Character layer the new transition should lead to
-   *
-   * @beta
-   */
+  /** {@inheritDoc IGridEngine.setTransition} */
   setTransition(position: Position, fromLayer: string, toLayer: string): void {
     this.initGuard();
     return this.gridTilemap?.setTransition(
@@ -394,41 +294,20 @@ export class GridEngineHeadless {
     this.addCharacters();
   }
 
-  /**
-   * @returns The tile position of the character with the given id
-   */
+  /** {@inheritDoc IGridEngine.getPosition} */
   getPosition(charId: string): Position {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getTilePos().position;
   }
-  /**
-   * Initiates movement of the character with the given id. If the character is
-   * already moving nothing happens. If the movement direction is currently
-   * blocked, the character will only turn towards that direction. Movement
-   * commands are **not** queued.
-   */
+
+  /** {@inheritDoc IGridEngine.move} */
   move(charId: string, direction: Direction): void {
     this.moveChar(charId, direction);
   }
 
-  /**
-   * Initiates random movement of the character with the given id. The
-   * character will randomly pick one of the non-blocking directions.
-   * Optionally a `delay` in milliseconds can be provided. This represents the
-   * waiting time after a finished movement, before the next is being initiated.
-   * If a `radius` other than -1 is provided, the character will not move
-   * further than that radius from its initial position (the position it has
-   * been, when `moveRandomly` was called). The distance is calculated with the
-   * {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
-   * in case of 4 direction mode and with and
-   * {@link https://en.wikipedia.org/wiki/Chebyshev_distance | Chebyshev distance}
-   * in case of 8 direction mode. Additionally, if a `radius` other than -1 was
-   * given, the character might move more than one tile into a random direction
-   * in one run (as long as the route is neither blocked nor outside of the
-   * radius).
-   */
+  /** {@inheritDoc IGridEngine.moveRandomly} */
   moveRandomly(charId: string, delay = 0, radius = -1): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -437,10 +316,7 @@ export class GridEngineHeadless {
     gridChar.setMovement(randomMovement);
   }
 
-  /**
-   * @returns Information about the current automatic movement (including
-   * random movement, follow movement and target movement)
-   */
+  /** {@inheritDoc IGridEngine.getMovement} */
   getMovement(charId: string): MovementInfo {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -453,16 +329,8 @@ export class GridEngineHeadless {
     }
     return movement.getInfo();
   }
-  /**
-   * Initiates movement toward the specified `targetPos`. The movement will
-   * happen along one shortest path. Check out {@link MoveToConfig} for
-   * pathfinding configurations.
-   *
-   * @returns an observable that will fire
-   * whenever the moveTo movement is finished or aborted. It will provide a
-   * {@link MoveToResult | result code} as well as a description and a character
-   * layer.
-   */
+
+  /** {@inheritDoc IGridEngine.moveTo} */
   moveTo(
     charId: string,
     targetPos: Position,
@@ -496,11 +364,8 @@ export class GridEngineHeadless {
       }))
     );
   }
-  /**
-   * Stops any automated movement such as random movement
-   * ({@link moveRandomly}), following ({@link follow}) or moving to a
-   * specified position ({@link moveTo})
-   */
+
+  /** {@inheritDoc IGridEngine.stopMovement} */
   stopMovement(charId: string): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -508,7 +373,7 @@ export class GridEngineHeadless {
     gridChar.setMovement(undefined);
   }
 
-  /** Sets the speed in tiles per second for a character. */
+  /** {@inheritDoc IGridEngine.setSpeed} */
   setSpeed(charId: string, speed: number): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -516,7 +381,7 @@ export class GridEngineHeadless {
     gridChar.setSpeed(speed);
   }
 
-  /** @returns Speed in tiles per second for a character. */
+  /** {@inheritDoc IGridEngine.getSpeed} */
   getSpeed(charId: string): number {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -524,7 +389,7 @@ export class GridEngineHeadless {
     return gridChar.getSpeed();
   }
 
-  /** @returns Whether character collides with tiles */
+  /** {@inheritDoc IGridEngine.collidesWithTiles} */
   collidesWithTiles(charId: string): boolean {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -623,15 +488,14 @@ export class GridEngineHeadless {
       });
     this.charAdded$?.next(id);
   }
-  /** Checks whether a character with the given ID is registered. */
+
+  /** {@inheritDoc IGridEngine.hasCharacter} */
   hasCharacter(charId: string): boolean {
     this.initGuard();
     return !!this.gridCharacters?.has(charId);
   }
-  /**
-   * Removes the character with the given ID from the plugin.
-   * Please note that the corresponding sprites need to be remove separately.
-   */
+
+  /** {@inheritDoc IGridEngine.removeCharacter} */
   removeCharacter(charId: string): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -641,10 +505,7 @@ export class GridEngineHeadless {
     this.charRemoved$?.next(charId);
   }
 
-  /**
-   * Removes all characters from the plugin.
-   * Please note that the corresponding sprites need to be remove separately.
-   */
+  /** {@inheritDoc IGridEngine.removeAllCharacters} */
   removeAllCharacters(): void {
     this.initGuard();
     if (!this.gridCharacters) return;
@@ -653,10 +514,7 @@ export class GridEngineHeadless {
     }
   }
 
-  /**
-   * @returns All character IDs that are registered in the plugin, satisfying
-   * the provided filtering options.
-   */
+  /** {@inheritDoc IGridEngine.getAllCharacters} */
   getAllCharacters(options?: CharacterFilteringOptions): string[] {
     this.initGuard();
     if (!this.gridCharacters) return [];
@@ -667,9 +525,7 @@ export class GridEngineHeadless {
     return filteredChars.map((char: GridCharacter) => char.getId());
   }
 
-  /**
-   * @returns All labels, attached to the character.
-   */
+  /** {@inheritDoc IGridEngine.getLabels} */
   getLabels(charId: string): string[] {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -677,9 +533,7 @@ export class GridEngineHeadless {
     return gridChar.getLabels();
   }
 
-  /**
-   * Add labels to the character.
-   */
+  /** {@inheritDoc IGridEngine.addLabels} */
   addLabels(charId: string, labels: string[]): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -687,9 +541,7 @@ export class GridEngineHeadless {
     gridChar.addLabels(labels);
   }
 
-  /**
-   * Remove labels from the character.
-   */
+  /** {@inheritDoc IGridEngine.removeLabels} */
   removeLabels(charId: string, labels: string[]): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -697,9 +549,7 @@ export class GridEngineHeadless {
     gridChar.removeLabels(labels);
   }
 
-  /**
-   * Removes all labels from the character.
-   */
+  /** {@inheritDoc IGridEngine.clearLabels} */
   clearLabels(charId: string): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -707,37 +557,8 @@ export class GridEngineHeadless {
     gridChar.clearLabels();
   }
 
-  /**
-   * Character `charId` will start to walk towards `charIdToFollow` on a
-   * shortest path until it reaches the specified `distance`.
-   *
-   * @param charId ID of character that should follow
-   * @param charIdToFollow ID of character that should be followed
-   */
+  /** {@inheritDoc IGridEngine.follow} */
   follow(charId: string, charIdToFollow: string, options?: FollowOptions): void;
-  /**
-   * @deprecated
-   * Use follow(charId: string, charIdToFollow: string, options: FollowOptions): void;
-   * instead.
-   *
-   * Character `charId` will start to walk towards `charIdToFollow` on a
-   * shortest path until it reaches the specified `distance`.
-   *
-   * @param charId ID of character that should follow
-   * @param charIdToFollow ID of character that should be followed
-   * @param distance Minimum distance to keep to `charIdToFollow` in
-   *  {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
-   *  in case of 4 direction mode and with and
-   *  {@link https://en.wikipedia.org/wiki/Chebyshev_distance | Chebyshev distance}
-   *  in case of 8 direction mode.
-   * @param closestPointIfBlocked `charId` will move to the closest point
-   *  ({@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
-   *  in case of 4 direction mode and with and
-   *  {@link https://en.wikipedia.org/wiki/Chebyshev_distance | Chebyshev distance}
-   *  in case of 8 direction mode)
-   *  to `charIdToFollow` that is reachable from `charId` in case that there
-   *  does not exist a path between `charId` and `charIdToFollow`.
-   */
   follow(
     charId: string,
     charIdToFollow: string,
@@ -787,19 +608,16 @@ export class GridEngineHeadless {
     );
     gridChar.setMovement(followMovement);
   }
-  /**
-   * @returns True if the character is currently moving.
-   */
+
+  /** {@inheritDoc IGridEngine.isMoving} */
   isMoving(charId: string): boolean {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.isMoving();
   }
-  /**
-   * @returns Direction the character is currently facing. At time of creation
-   *  this is `down`.
-   */
+
+  /** {@inheritDoc IGridEngine.getFacingDirection} */
   getFacingDirection(charId: string): Direction {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -807,9 +625,7 @@ export class GridEngineHeadless {
     return gridChar.getFacingDirection();
   }
 
-  /**
-   * @returns Position the character is currently facing.
-   */
+  /** {@inheritDoc IGridEngine.getFacingPosition} */
   getFacingPosition(charId: string): Position {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -818,9 +634,7 @@ export class GridEngineHeadless {
     return { x: vectorPos.x, y: vectorPos.y };
   }
 
-  /**
-   * Turns the character towards the given direction without moving it.
-   */
+  /** {@inheritDoc IGridEngine.turnTowards} */
   turnTowards(charId: string, direction: Direction): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -828,10 +642,7 @@ export class GridEngineHeadless {
     return gridChar.turnTowards(direction);
   }
 
-  /**
-   * Finds the identifiers of all characters at the provided tile position.
-   * @returns The identifiers of all characters on this tile.
-   */
+  /** {@inheritDoc IGridEngine.getCharactersAt} */
   getCharactersAt(position: Position, layer: string): string[] {
     // this.initGuard();
     if (!this.gridTilemap) return [];
@@ -842,13 +653,7 @@ export class GridEngineHeadless {
     return Array.from(characters).map((char) => char.getId());
   }
 
-  /**
-   * Places the character with the given id to the provided tile position. If
-   * that character is moving, the movement is stopped. The
-   * {@link positionChangeStarted} and {@link positionChangeFinished} observables will
-   * emit. If the character was moving, the {@link movementStopped} observable
-   * will also emit.
-   */
+  /** {@inheritDoc IGridEngine.setPosition} */
   setPosition(charId: string, pos: Position, layer?: string): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -862,14 +667,7 @@ export class GridEngineHeadless {
     gridChar.setTilePosition({ position: new Vector2(pos), layer });
   }
 
-  /**
-   * Checks whether the given position is blocked by either the tilemap or a
-   * blocking character. If you provide no layer, be sure not to use character
-   * layers in your tilemap.
-   *
-   * @returns True if position on given layer is blocked by the tilemap or a
-   *  character
-   */
+  /** {@inheritDoc IGridEngine.isBlocked} */
   isBlocked(
     position: Position,
     layer?: string,
@@ -883,23 +681,13 @@ export class GridEngineHeadless {
     );
   }
 
-  /**
-   * Checks whether the given position is blocked by the tilemap. If you provide
-   * no layer, be sure not to use character layers in your tilemap.
-   *
-   * @returns True if position on given layer is blocked by the tilemap.
-   */
+  /** {@inheritDoc IGridEngine.isTileBlocked} */
   isTileBlocked(position: Position, layer?: string): boolean {
     this.initGuard();
     return !!this.gridTilemap?.hasBlockingTile(new Vector2(position), layer);
   }
 
-  /**
-   * Returns all collision groups of the given character.
-   * {@link https://annoraaq.github.io/grid-engine/examples/collision-groups | Collision Groups Example}
-   *
-   * @returns All collision groups of the given character.
-   */
+  /** {@inheritDoc IGridEngine.getCollisionGroups} */
   getCollisionGroups(charId: string): string[] {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -907,10 +695,7 @@ export class GridEngineHeadless {
     return gridChar.getCollisionGroups() || [];
   }
 
-  /**
-   * Sets collision groups for the given character. Previous collision groups
-   * will be overwritten.
-   */
+  /** {@inheritDoc IGridEngine.setCollisionGroups} */
   setCollisionGroups(charId: string, collisionGroups: string[]): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -918,10 +703,7 @@ export class GridEngineHeadless {
     gridChar.setCollisionGroups(collisionGroups);
   }
 
-  /**
-   * Gets the tile position and character layer adjacent to the given
-   * position in the given direction.
-   */
+  /** {@inheritDoc IGridEngine.getTilePosInDirection} */
   getTilePosInDirection(
     position: Position,
     charLayer: string | undefined,
@@ -942,14 +724,7 @@ export class GridEngineHeadless {
   }
 
   /**
-   * Returns the shortest path from source to destination.
-   *
-   * @param source Source position
-   * @param dest Destination position
-   * @param options Pathfinding options
-   * @returns Shortest path. In case that no path could be found,
-   * `closestToTarget` is a position with a minimum distance to the target.
-   *
+   * {@inheritDoc IGridEngine.findShortestPath}
    * @alpha
    */
   findShortestPath(
@@ -974,10 +749,7 @@ export class GridEngineHeadless {
     };
   }
 
-  /**
-   * @returns Observable that, whenever a specified position is entered on optionally provided layers,
-   *  will notify with the target characters position change
-   */
+  /** {@inheritDoc IGridEngine.steppedOn} */
   steppedOn(
     charIds: string[],
     tiles: Position[],
@@ -999,9 +771,7 @@ export class GridEngineHeadless {
     );
   }
 
-  /**
-   * @returns Observable that emits when a new character is added or an existing is removed.
-   */
+  /** {@inheritDoc IGridEngine.characterShifted} */
   characterShifted(): Observable<CharacterShift> {
     if (!this.charAdded$ || !this.charRemoved$) {
       throw this.createUninitializedErr();
@@ -1022,64 +792,37 @@ export class GridEngineHeadless {
     );
   }
 
-  /**
-   * @returns Observable that on each start of a movement will provide the
-   *  character ID and the direction.
-   */
+  /** {@inheritDoc IGridEngine.movementStarted} */
   movementStarted(): Observable<{ charId: string; direction: Direction }> {
     if (!this.movementStarted$) throw this.createUninitializedErr();
     return this.movementStarted$;
   }
 
-  /**
-   * @returns Observable that on each stopped movement of a character will
-   *  provide it’s ID and the direction of that movement.
-   */
+  /** {@inheritDoc IGridEngine.movementStopped} */
   movementStopped(): Observable<{ charId: string; direction: Direction }> {
     if (!this.movementStopped$) throw this.createUninitializedErr();
     return this.movementStopped$;
   }
 
-  /**
-   * @returns Observable that will notify about every change of direction that
-   *  is not part of a movement. This is the case if the character tries to walk
-   *  towards a blocked tile. The character will turn but not move.
-   *  It also emits when you call {@link GridEngine.turnTowards}.
-   *
-   * This obsersable never emits more than one time in a row for the same
-   * direction.
-   * So for instance, if {@link GridEngine.turnTowards} is called multiple times
-   * in a row (without any facing direction change occurring inbetween) with the
-   * same direction, this observable would only emit once.
-   */
+  /** {@inheritDoc IGridEngine.directionChanged} */
   directionChanged(): Observable<{ charId: string; direction: Direction }> {
     if (!this.directionChanged$) throw this.createUninitializedErr();
     return this.directionChanged$;
   }
 
-  /**
-   * @returns Observable that will notify about every change of tile position.
-   *  It will notify at the beginning of the movement.
-   */
+  /** {@inheritDoc IGridEngine.positionChangeStarted} */
   positionChangeStarted(): Observable<{ charId: string } & PositionChange> {
     if (!this.positionChangeStarted$) throw this.createUninitializedErr();
     return this.positionChangeStarted$;
   }
 
-  /**
-   * @returns Observable that will notify about every change of tile position.
-   *  It will notify at the end of the movement.
-   */
+  /** {@inheritDoc IGridEngine.positionChangeFinished} */
   positionChangeFinished(): Observable<{ charId: string } & PositionChange> {
     if (!this.positionChangeFinished$) throw this.createUninitializedErr();
     return this.positionChangeFinished$;
   }
 
-  /**
-   * Returns the movement progress (0-1000) of a character to the next tile. For
-   * example, if a character has movement progress 400 that means that it has
-   * moved 400/1000th of the distance to the next tile already.
-   */
+  /** {@inheritDoc IGridEngine.getMovementProgress} */
   getMovementProgress(charId: string): number {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
