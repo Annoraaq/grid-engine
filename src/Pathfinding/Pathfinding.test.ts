@@ -3,7 +3,11 @@ const emptyAlgo: ShortestPathAlgorithm = {
     path: [],
     closestToTarget: startPos,
     steps: 0,
+    maxPathLengthReached: false,
   }),
+  setMaxPathLength: () => {
+    // do nothing
+  },
 };
 const shortestPathAlgorithmFactoryMock = {
   shortestPathAlgorithmFactory: jest.fn((type) => {
@@ -497,6 +501,31 @@ describe("Pathfinding", () => {
     expect(shortestPath.path.length).toEqual(7);
   });
 
+  it("should terminate on infinite maps", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: LOWER_CHAR_LAYER,
+        blockMap: [
+          // prettier-ignore
+          ".s..",
+          "####",
+          "#t#.",
+          "###.",
+        ],
+      },
+    ]);
+    const pathfinding = new Pathfinding(pathfindingAlgo, gridTilemap);
+
+    const shortestPath = pathfinding.findShortestPath(
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(1, 2)),
+      { ignoreMapBounds: true, maxPathLength: 10 }
+    );
+
+    expect(shortestPath.path.length).toEqual(0);
+    expect(shortestPath.maxPathLengthReached).toBe(true);
+  });
+
   it("should ignore blocked target", () => {
     const gridTilemap = createTilemap([
       {
@@ -573,6 +602,7 @@ describe("Pathfinding", () => {
         ignoreTiles: false,
         ignoreMapBounds: false,
         ignoreBlockedTarget: false,
+        maxPathLength: Infinity,
       };
     });
 
@@ -991,6 +1021,7 @@ describe("Pathfinding", () => {
         ignoreTiles: false,
         ignoreMapBounds: false,
         ignoreBlockedTarget: false,
+        maxPathLength: Infinity,
       };
     });
 
@@ -1450,6 +1481,7 @@ describe("Pathfinding", () => {
         ignoreTiles: false,
         ignoreMapBounds: false,
         ignoreBlockedTarget: false,
+        maxPathLength: Infinity,
       };
     });
 

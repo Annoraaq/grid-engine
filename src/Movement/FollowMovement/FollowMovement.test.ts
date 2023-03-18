@@ -65,7 +65,10 @@ describe("FollowMovement", () => {
       targetCharPos,
       {
         distance: 1,
-        config: { noPathFoundStrategy: NoPathFoundStrategy.STOP },
+        config: {
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          maxPathLength: Infinity,
+        },
         ignoreBlockedTarget: true,
       }
     );
@@ -93,6 +96,7 @@ describe("FollowMovement", () => {
         distance: 1,
         config: {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          maxPathLength: Infinity,
         },
         ignoreBlockedTarget: true,
       }
@@ -123,12 +127,14 @@ describe("FollowMovement", () => {
     expect(TargetMovement).toHaveBeenCalled();
   });
 
-  it("should update added character with distance", () => {
+  it("should update added character with distance and maxPathLength", () => {
     followMovement = new FollowMovement(
       mockChar,
       gridTilemapMock,
       targetChar,
-      7
+      7,
+      NoPathFoundStrategy.STOP,
+      100
     );
     followMovement.update(100);
     expect(TargetMovement).toHaveBeenCalledWith(
@@ -137,7 +143,10 @@ describe("FollowMovement", () => {
       targetCharPos,
       {
         distance: 8,
-        config: { noPathFoundStrategy: NoPathFoundStrategy.STOP },
+        config: {
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          maxPathLength: 100,
+        },
         ignoreBlockedTarget: true,
       }
     );
@@ -158,7 +167,10 @@ describe("FollowMovement", () => {
       targetCharPos,
       {
         distance: 8,
-        config: { noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE },
+        config: {
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+          maxPathLength: Infinity,
+        },
         ignoreBlockedTarget: true,
       }
     );
@@ -178,6 +190,7 @@ describe("FollowMovement", () => {
         charToFollow: targetChar.getId(),
         distance: 7,
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        maxPathLength: Infinity,
       },
     });
   });

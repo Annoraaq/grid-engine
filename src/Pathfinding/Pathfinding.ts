@@ -15,6 +15,7 @@ import {
   LayerVecPos,
   shortestPathAlgorithmFactory,
   ShortestPathAlgorithmType,
+  ShortestPathResult,
 } from "./ShortestPathAlgorithm";
 
 /**
@@ -81,6 +82,13 @@ export interface PathfindingOptions {
    * to a blocking character.
    */
   ignoreBlockedTarget?: boolean;
+
+  /**
+   * If this is set, the algorithm will stop once it reaches a path length of
+   * this value. This is useful to avoid running out of memory on large or
+   * infinite maps.
+   */
+  maxPathLength?: number;
 }
 
 /**
@@ -118,11 +126,14 @@ export class Pathfinding {
       ignoreTiles = false,
       ignoreMapBounds = false,
       ignoreBlockedTarget = false,
+      maxPathLength = Infinity,
     }: PathfindingOptions = {}
-  ): { path: LayerVecPos[]; closestToTarget: LayerVecPos; steps: number } {
+  ): ShortestPathResult {
     const shortestPathAlgo = shortestPathAlgorithmFactory(
       shortestPathAlgorithm ?? this.shortestPathAlgorithm
     );
+
+    shortestPathAlgo.setMaxPathLength(maxPathLength);
 
     const ops: Concrete<PathfindingOptions> = {
       shortestPathAlgorithm:
@@ -136,6 +147,7 @@ export class Pathfinding {
       ignoreTiles,
       ignoreMapBounds,
       ignoreBlockedTarget,
+      maxPathLength,
     };
 
     const getNeighbors = createGetNeighbors(ops, dest, this.gridTilemap);

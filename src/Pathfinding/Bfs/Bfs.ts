@@ -2,15 +2,16 @@ import {
   GetNeighbors,
   LayerVecPos,
   ShortestPathAlgorithm,
+  ShortestPathResult,
 } from "./../ShortestPathAlgorithm";
 import { VectorUtils } from "../../Utils/VectorUtils";
 import { Queue } from "../../Datastructures/Queue/Queue";
 
 interface ShortestPathTuple {
-  shortestDistance: number;
   previous: Map<string, LayerVecPos>;
   closestToTarget: LayerVecPos;
   steps: number;
+  maxPathLengthReached: boolean;
 }
 
 interface QueueEntry {
@@ -19,11 +20,17 @@ interface QueueEntry {
 }
 
 export class Bfs implements ShortestPathAlgorithm {
+  private maxPathLength = Infinity;
+
+  setMaxPathLength(maxPathLength: number) {
+    this.maxPathLength = maxPathLength;
+  }
+
   getShortestPath(
     startPos: LayerVecPos,
     targetPos: LayerVecPos,
     getNeighbors: GetNeighbors
-  ): { path: LayerVecPos[]; closestToTarget: LayerVecPos; steps: number } {
+  ): ShortestPathResult {
     const shortestPath = this.shortestPathBfs(
       startPos,
       targetPos,
@@ -33,6 +40,7 @@ export class Bfs implements ShortestPathAlgorithm {
       path: this.returnPath(shortestPath.previous, startPos, targetPos),
       closestToTarget: shortestPath.closestToTarget,
       steps: shortestPath.steps,
+      maxPathLengthReached: shortestPath.maxPathLengthReached,
     };
   }
 
@@ -69,6 +77,14 @@ export class Bfs implements ShortestPathAlgorithm {
       steps++;
       if (!dequeued) break;
       const { node, dist } = dequeued;
+      if (dist > this.maxPathLength) {
+        return {
+          previous: new Map(),
+          closestToTarget,
+          steps,
+          maxPathLengthReached: true,
+        };
+      }
 
       const distToTarget = this.distance(node, stopNode);
       if (distToTarget < smallestDistToTarget) {
@@ -76,7 +92,12 @@ export class Bfs implements ShortestPathAlgorithm {
         closestToTarget = node;
       }
       if (this.equal(node, stopNode)) {
-        return { shortestDistance: dist, previous, closestToTarget, steps };
+        return {
+          previous,
+          closestToTarget,
+          steps,
+          maxPathLengthReached: false,
+        };
       }
 
       for (const neighbor of getNeighbors(node)) {
@@ -87,7 +108,7 @@ export class Bfs implements ShortestPathAlgorithm {
         }
       }
     }
-    return { shortestDistance: -1, previous, closestToTarget, steps };
+    return { previous, closestToTarget, steps, maxPathLengthReached: false };
   }
 
   private returnPath(

@@ -99,6 +99,13 @@ export interface MoveToConfig {
    * Algorithm to use for pathfinding.
    */
   algorithm?: ShortestPathAlgorithmType;
+
+  /**
+   * If this is set, the algorithm will stop once it reaches a path length of
+   * this value. This is useful to avoid running out of memory on large or
+   * infinite maps.
+   */
+  maxPathLength?: number | undefined;
 }
 
 export enum MoveToResult {
@@ -109,6 +116,7 @@ export enum MoveToResult {
   NO_PATH_FOUND = "NO_PATH_FOUND",
   PATH_BLOCKED_WAIT_TIMEOUT = "PATH_BLOCKED_WAIT_TIMEOUT",
   MOVEMENT_TERMINATED = "MOVEMENT_TERMINATED",
+  MAX_PATH_LENGTH_REACHED = "MAX_PATH_LENGTH_REACHED",
 }
 
 export interface Finished {
@@ -142,6 +150,7 @@ export class TargetMovement implements Movement {
   private isPositionAllowed: IsPositionAllowedFn = () => true;
   private shortestPathAlgorithm: ShortestPathAlgorithmType =
     "BIDIRECTIONAL_SEARCH";
+  private maxPathLength = Infinity;
 
   constructor(
     private character: GridCharacter,
@@ -174,6 +183,10 @@ export class TargetMovement implements Movement {
 
     if (config?.isPositionAllowedFn) {
       this.isPositionAllowed = config.isPositionAllowedFn;
+    }
+
+    if (config?.maxPathLength) {
+      this.maxPathLength = config.maxPathLength;
     }
 
     this.distanceUtils = DistanceUtilsFactory.create(
@@ -221,6 +234,7 @@ export class TargetMovement implements Movement {
       ignoreTiles: !this.character.collidesWithTiles(),
       ignoreMapBounds: this.character.getIgnoreMissingTiles(),
       ignoreBlockedTarget: this.ignoreBlockedTarget,
+      maxPathLength: this.maxPathLength,
     };
   }
 
