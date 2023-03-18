@@ -1,10 +1,8 @@
-import { GetNeighbors, LayerVecPos, ShortestPathAlgorithm } from "./../ShortestPathAlgorithm";
+import { GetNeighbors, LayerVecPos, ShortestPathAlgorithm, ShortestPathResult } from "./../ShortestPathAlgorithm";
 export declare class Bfs implements ShortestPathAlgorithm {
-    getShortestPath(startPos: LayerVecPos, targetPos: LayerVecPos, getNeighbors: GetNeighbors): {
-        path: LayerVecPos[];
-        closestToTarget: LayerVecPos;
-        steps: number;
-    };
+    private maxPathLength;
+    setMaxPathLength(maxPathLength: number): void;
+    getShortestPath(startPos: LayerVecPos, targetPos: LayerVecPos, getNeighbors: GetNeighbors): ShortestPathResult;
     private distance;
     private pos2Str;
     private equal;

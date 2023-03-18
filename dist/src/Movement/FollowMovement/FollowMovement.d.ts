@@ -8,8 +8,9 @@ export declare class FollowMovement implements Movement {
     private charToFollow;
     private distance;
     private noPathFoundStrategy;
+    private maxPathLength;
     private targetMovement?;
-    constructor(character: GridCharacter, gridTilemap: GridTilemap, charToFollow: GridCharacter, distance?: number, noPathFoundStrategy?: NoPathFoundStrategy);
+    constructor(character: GridCharacter, gridTilemap: GridTilemap, charToFollow: GridCharacter, distance?: number, noPathFoundStrategy?: NoPathFoundStrategy, maxPathLength?: number);
     update(delta: number): void;
     getInfo(): MovementInfo;
     private updateTarget;

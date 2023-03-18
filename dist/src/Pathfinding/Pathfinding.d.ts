@@ -3,7 +3,7 @@ import { CharId } from "../GridCharacter/GridCharacter";
 import { Position } from "../GridEngine";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { Concrete } from "../Utils/TypeUtils";
-import { GetNeighbors, LayerVecPos, ShortestPathAlgorithmType } from "./ShortestPathAlgorithm";
+import { GetNeighbors, LayerVecPos, ShortestPathAlgorithmType, ShortestPathResult } from "./ShortestPathAlgorithm";
 /**
  * Configuration object for pathfinding.
  */
@@ -59,6 +59,12 @@ export interface PathfindingOptions {
      * to a blocking character.
      */
     ignoreBlockedTarget?: boolean;
+    /**
+     * If this is set, the algorithm will stop once it reaches a path length of
+     * this value. This is useful to avoid running out of memory on large or
+     * infinite maps.
+     */
+    maxPathLength?: number;
 }
 /**
  * Function to specify whether a certain position is allowed for pathfinding.
@@ -75,11 +81,7 @@ export declare class Pathfinding {
     private shortestPathAlgorithm;
     private gridTilemap;
     constructor(shortestPathAlgorithm: ShortestPathAlgorithmType, gridTilemap: GridTilemap);
-    findShortestPath(source: LayerVecPos, dest: LayerVecPos, { shortestPathAlgorithm, pathWidth, pathHeight, numberOfDirections, isPositionAllowed, collisionGroups, ignoredChars, ignoreTiles, ignoreMapBounds, ignoreBlockedTarget, }?: PathfindingOptions): {
-        path: LayerVecPos[];
-        closestToTarget: LayerVecPos;
-        steps: number;
-    };
+    findShortestPath(source: LayerVecPos, dest: LayerVecPos, { shortestPathAlgorithm, pathWidth, pathHeight, numberOfDirections, isPositionAllowed, collisionGroups, ignoredChars, ignoreTiles, ignoreMapBounds, ignoreBlockedTarget, maxPathLength, }?: PathfindingOptions): ShortestPathResult;
 }
 export declare function createGetNeighbors(options: Concrete<PathfindingOptions>, dest: LayerVecPos, gridTilemap: GridTilemap): GetNeighbors;
 export declare function createReverseNeighbors(options: Concrete<PathfindingOptions>, dest: LayerVecPos, gridTilemap: GridTilemap): GetNeighbors;

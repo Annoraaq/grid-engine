@@ -18,11 +18,14 @@ export interface ShortestPath {
     path: LayerVecPos[];
     distOffset: number;
 }
+export interface ShortestPathResult {
+    path: LayerVecPos[];
+    closestToTarget: LayerVecPos;
+    steps: number;
+    maxPathLengthReached: boolean;
+}
 export interface ShortestPathAlgorithm {
-    getShortestPath(startPos: LayerVecPos, targetPos: LayerVecPos, getNeighbors: GetNeighbors, getReverseNeighbors: GetNeighbors): {
-        path: LayerVecPos[];
-        closestToTarget: LayerVecPos;
-        steps: number;
-    };
+    getShortestPath(startPos: LayerVecPos, targetPos: LayerVecPos, getNeighbors: GetNeighbors, getReverseNeighbors: GetNeighbors): ShortestPathResult;
+    setMaxPathLength(maxPathLength: number): void;
 }
 export declare function shortestPathAlgorithmFactory(type: ShortestPathAlgorithmType): ShortestPathAlgorithm;

@@ -74,6 +74,12 @@ export interface MoveToConfig {
      * Algorithm to use for pathfinding.
      */
     algorithm?: ShortestPathAlgorithmType;
+    /**
+     * If this is set, the algorithm will stop once it reaches a path length of
+     * this value. This is useful to avoid running out of memory on large or
+     * infinite maps.
+     */
+    maxPathLength?: number | undefined;
 }
 export declare enum MoveToResult {
     SUCCESS = "SUCCESS",
@@ -82,7 +88,8 @@ export declare enum MoveToResult {
     PATH_BLOCKED = "PATH_BLOCKED",
     NO_PATH_FOUND = "NO_PATH_FOUND",
     PATH_BLOCKED_WAIT_TIMEOUT = "PATH_BLOCKED_WAIT_TIMEOUT",
-    MOVEMENT_TERMINATED = "MOVEMENT_TERMINATED"
+    MOVEMENT_TERMINATED = "MOVEMENT_TERMINATED",
+    MAX_PATH_LENGTH_REACHED = "MAX_PATH_LENGTH_REACHED"
 }
 export interface Finished {
     position: Position;
@@ -115,6 +122,7 @@ export declare class TargetMovement implements Movement {
     private distance;
     private isPositionAllowed;
     private shortestPathAlgorithm;
+    private maxPathLength;
     constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerVecPos, { config, ignoreBlockedTarget, distance }?: Options);
     setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void;
     getPathBlockedStrategy(): PathBlockedStrategy;

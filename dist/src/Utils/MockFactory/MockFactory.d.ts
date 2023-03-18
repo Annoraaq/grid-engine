@@ -20,7 +20,7 @@ export declare function mockLayeredBlockMap(blockMaps: Array<{
     blockMap: string[];
     isCharLayer?: boolean;
 }>, isometric?: boolean): Tilemap;
-export declare function createAllowedFn(map: string[]): ({ x, y }: {
+export declare function createAllowedFn(map: string[], ignoreBounds?: boolean): ({ x, y }: {
     x: any;
     y: any;
 }, _charLayer: any) => boolean;
