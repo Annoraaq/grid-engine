@@ -1,5 +1,6 @@
 import { LayerPositionUtils } from "./../../Utils/LayerPositionUtils/LayerPositionUtils";
 import {
+  DistanceFn,
   GetNeighbors,
   LayerVecPos,
   ShortestPathAlgorithm,
@@ -52,12 +53,14 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
     startPos: LayerVecPos,
     targetPos: LayerVecPos,
     getNeighbors: GetNeighbors,
+    distance: DistanceFn,
     getReverseNeighbors: GetNeighbors
   ): ShortestPathResult {
     const shortestPath = this.shortestPathBfs(
       startPos,
       targetPos,
       getNeighbors,
+      distance,
       getReverseNeighbors
     );
     return {
@@ -74,10 +77,6 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
     };
   }
 
-  private distance(fromNode: LayerVecPos, toNode: LayerVecPos): number {
-    return VectorUtils.manhattanDistance(fromNode.position, toNode.position);
-  }
-
   private equal(layerPos1: LayerVecPos, layerPos2: LayerVecPos): boolean {
     if (!VectorUtils.equal(layerPos1.position, layerPos2.position))
       return false;
@@ -88,6 +87,7 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
     startNode: LayerVecPos,
     stopNode: LayerVecPos,
     getNeighbors: GetNeighbors,
+    distance: DistanceFn,
     getReverseNeighbors: GetNeighbors
   ): ShortestPathTuple {
     const startBfs = new Bfs();
@@ -97,7 +97,10 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
     stopBfs.otherBfs = startBfs;
 
     let closestToTarget: LayerVecPos = startNode;
-    let smallestDistToTarget: number = this.distance(startNode, stopNode);
+    let smallestDistToTarget: number = distance(
+      startNode.position,
+      stopNode.position
+    );
     startBfs.queue.enqueue({ node: startNode, dist: 0 });
     stopBfs.queue.enqueue({ node: stopNode, dist: 0 });
     startBfs.visited.set(LayerPositionUtils.toString(startNode), 0);
@@ -122,7 +125,7 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
         };
       }
 
-      const distToTarget = this.distance(node, stopNode);
+      const distToTarget = distance(node.position, stopNode.position);
       if (distToTarget < smallestDistToTarget) {
         smallestDistToTarget = distToTarget;
         closestToTarget = node;

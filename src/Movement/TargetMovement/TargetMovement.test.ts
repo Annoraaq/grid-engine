@@ -1955,14 +1955,7 @@ describe("TargetMovement", () => {
 
       // This is only one possible shortest path. When the shortest path
       // algorithm changes, this test could break.
-      expectWalkedPath(
-        targetMovement,
-        mockChar,
-        createPath([
-          [2, 0],
-          [3, 1],
-        ])
-      );
+      expectWalkedPath(targetMovement, mockChar, createPath([[2, 1]]));
     });
 
     it("should find the shortest path for allowed positions", () => {

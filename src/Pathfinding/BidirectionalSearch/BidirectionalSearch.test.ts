@@ -1,5 +1,6 @@
 import { createAllowedFn } from "../../Utils/MockFactory/MockFactory";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
+import { VectorUtils } from "../../Utils/VectorUtils";
 import { LayerVecPos } from "../ShortestPathAlgorithm";
 import { BidirectionalSearch } from "./BidirectionalSearch";
 
@@ -37,6 +38,7 @@ describe("BidirectionalSearch", () => {
       startPos,
       targetPos,
       getNeighbors,
+      VectorUtils.manhattanDistance,
       getNeighbors
     );
     expect(path).toEqual([
@@ -54,6 +56,7 @@ describe("BidirectionalSearch", () => {
       startPos,
       targetPos,
       getNeighbors,
+      VectorUtils.manhattanDistance,
       getNeighbors
     );
     expect(path).toEqual([
@@ -75,6 +78,7 @@ describe("BidirectionalSearch", () => {
       startPos,
       targetPos,
       getNeighbors,
+      VectorUtils.manhattanDistance,
       getNeighbors
     );
     expect(path).toEqual([{ position: new Vector2(3, 3), layer: "layer1" }]);
@@ -88,6 +92,7 @@ describe("BidirectionalSearch", () => {
       startPos,
       targetPos,
       () => [],
+      VectorUtils.manhattanDistance,
       () => []
     );
     expect(path).toEqual([]);
@@ -127,6 +132,7 @@ describe("BidirectionalSearch", () => {
       startPos,
       targetPos,
       getNeighborsModified,
+      VectorUtils.manhattanDistance,
       getReverseNeighborsModified
     );
     expect(path).toEqual([]);
@@ -149,6 +155,7 @@ describe("BidirectionalSearch", () => {
       startPos,
       targetPos,
       (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer)),
+      VectorUtils.manhattanDistance,
       (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer))
     );
 
@@ -180,12 +187,40 @@ describe("BidirectionalSearch", () => {
       startPos,
       targetPos,
       (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer)),
+      VectorUtils.manhattanDistance,
       (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer))
     );
 
     expect(path).toEqual([]);
     expect(closestToTarget).toEqual({
       position: new Vector2(3, 1),
+      layer: "layer1",
+    });
+  });
+
+  it("should return closest point dependent on distance metric", () => {
+    const isBlocked = createAllowedFn([
+      "#####",
+      "#s..#",
+      "#####",
+      "#..t#",
+      "#####",
+    ]);
+
+    const startPos = { position: new Vector2(1, 1), layer: "layer1" };
+    const targetPos = { position: new Vector2(3, 3), layer: "layer1" };
+
+    const { path, closestToTarget } = bidirectionalSearch.getShortestPath(
+      startPos,
+      targetPos,
+      (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer)),
+      VectorUtils.chebyshevDistance,
+      (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer))
+    );
+
+    expect(path).toEqual([]);
+    expect(closestToTarget).toEqual({
+      position: new Vector2(1, 1),
       layer: "layer1",
     });
   });
@@ -211,6 +246,7 @@ describe("BidirectionalSearch", () => {
         targetPos,
         (pos) =>
           getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer)),
+        VectorUtils.manhattanDistance,
         (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer))
       );
 
@@ -245,6 +281,7 @@ describe("BidirectionalSearch", () => {
         targetPos,
         (pos) =>
           getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer)),
+        VectorUtils.manhattanDistance,
         (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer))
       );
 
@@ -276,6 +313,7 @@ describe("BidirectionalSearch", () => {
         targetPos,
         (pos) =>
           getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer)),
+        VectorUtils.manhattanDistance,
         (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer))
       );
 

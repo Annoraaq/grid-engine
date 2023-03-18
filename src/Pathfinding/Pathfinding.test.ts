@@ -121,6 +121,57 @@ describe("Pathfinding", () => {
     ]);
   });
 
+  it("should use manhattan distance for 4 directions", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: LOWER_CHAR_LAYER,
+        blockMap: [
+          // prettier-ignore
+          "#####",
+          "#s..#",
+          "#####",
+          "#..t#",
+          "#####",
+        ],
+      },
+    ]);
+
+    const pathfinding = new Pathfinding(pathfindingAlgo, gridTilemap);
+
+    const shortestPath = pathfinding.findShortestPath(
+      layerPos(new Vector2(1, 1)),
+      layerPos(new Vector2(3, 3))
+    );
+
+    expect(shortestPath.closestToTarget).toEqual(layerPos(new Vector2(3, 1)));
+  });
+
+  it("should use manhattan distance for 8 directions", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: LOWER_CHAR_LAYER,
+        blockMap: [
+          // prettier-ignore
+          "#####",
+          "#s..#",
+          "#####",
+          "#..t#",
+          "#####",
+        ],
+      },
+    ]);
+
+    const pathfinding = new Pathfinding(pathfindingAlgo, gridTilemap);
+
+    const shortestPath = pathfinding.findShortestPath(
+      layerPos(new Vector2(1, 1)),
+      layerPos(new Vector2(3, 3)),
+      { numberOfDirections: NumberOfDirections.EIGHT }
+    );
+
+    expect(shortestPath.closestToTarget).toEqual(layerPos(new Vector2(1, 1)));
+  });
+
   it("should not find path for larger tile size", () => {
     const gridTilemap = createTilemap([
       {

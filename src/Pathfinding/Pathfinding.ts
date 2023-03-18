@@ -10,6 +10,7 @@ import { DistanceUtilsFactory } from "../Utils/DistanceUtilsFactory/DistanceUtil
 import { LayerPositionUtils } from "../Utils/LayerPositionUtils/LayerPositionUtils";
 import { Concrete } from "../Utils/TypeUtils";
 import { Vector2 } from "../Utils/Vector2/Vector2";
+import { VectorUtils } from "../Utils/VectorUtils";
 import {
   GetNeighbors,
   LayerVecPos,
@@ -157,10 +158,16 @@ export class Pathfinding {
       this.gridTilemap
     );
 
+    const distance =
+      numberOfDirections === NumberOfDirections.FOUR
+        ? VectorUtils.manhattanDistance
+        : VectorUtils.chebyshevDistance;
+
     return shortestPathAlgo.getShortestPath(
       source,
       dest,
       getNeighbors,
+      distance,
       getReverseNeighbors
     );
   }
