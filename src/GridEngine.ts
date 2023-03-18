@@ -36,6 +36,7 @@ import {
   CharacterShift,
   CharacterShiftAction,
   PathfindingResult,
+  FollowOptions,
 } from "./GridEngineHeadless";
 import { GridTilemapPhaser } from "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser";
 import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
@@ -51,6 +52,7 @@ export {
   MoveToResult,
   Finished,
   FrameRow,
+  FollowOptions,
   NumberOfDirections,
   NoPathFoundStrategy,
   PathBlockedStrategy,
@@ -495,6 +497,18 @@ export class GridEngine {
    *
    * @param charId ID of character that should follow
    * @param charIdToFollow ID of character that should be followed
+   */
+  follow(charId: string, charIdToFollow: string, options?: FollowOptions): void;
+  /**
+   * @deprecated
+   * Use follow(charId: string, charIdToFollow: string, options: FollowOptions): void;
+   * instead.
+   *
+   * Character `charId` will start to walk towards `charIdToFollow` on a
+   * shortest path until it reaches the specified `distance`.
+   *
+   * @param charId ID of character that should follow
+   * @param charIdToFollow ID of character that should be followed
    * @param distance Minimum distance to keep to `charIdToFollow` in
    *  {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
    *  in case of 4 direction mode and with and
@@ -511,15 +525,34 @@ export class GridEngine {
   follow(
     charId: string,
     charIdToFollow: string,
-    distance = 0,
-    closestPointIfBlocked = false
+    distance?: number,
+    closestPointIfBlocked?: boolean
+  ): void;
+  follow(
+    charId: string,
+    charIdToFollow: string,
+    distance?: FollowOptions | number,
+    closestPointIfBlocked?: boolean
   ): void {
-    this.geHeadless.follow(
-      charId,
-      charIdToFollow,
-      distance,
-      closestPointIfBlocked
-    );
+    let options: FollowOptions;
+
+    if (distance === undefined) {
+      options = {
+        distance: 0,
+        closestPointIfBlocked: false,
+      };
+    } else if (typeof distance === "number") {
+      options = {
+        distance,
+        closestPointIfBlocked: false,
+      };
+      if (closestPointIfBlocked) {
+        options.closestPointIfBlocked = true;
+      }
+    } else {
+      options = distance;
+    }
+    this.geHeadless.follow(charId, charIdToFollow, options);
   }
 
   /**

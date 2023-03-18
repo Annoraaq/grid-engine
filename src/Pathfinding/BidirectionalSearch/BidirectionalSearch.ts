@@ -3,17 +3,18 @@ import {
   GetNeighbors,
   LayerVecPos,
   ShortestPathAlgorithm,
+  ShortestPathResult,
 } from "../ShortestPathAlgorithm";
 import { VectorUtils } from "../../Utils/VectorUtils";
 import { Queue } from "../../Datastructures/Queue/Queue";
 
 interface ShortestPathTuple {
-  shortestDistance: number;
   previous: Map<string, LayerVecPos>;
   previous2: Map<string, LayerVecPos>;
   closestToTarget: LayerVecPos;
   matchingPos?: LayerVecPos;
   steps: number;
+  maxPathLengthReached: boolean;
 }
 
 interface QueueEntry {
@@ -41,12 +42,18 @@ class Bfs {
 }
 
 export class BidirectionalSearch implements ShortestPathAlgorithm {
+  private maxPathLength = Infinity;
+
+  setMaxPathLength(maxPathLength: number) {
+    this.maxPathLength = maxPathLength;
+  }
+
   getShortestPath(
     startPos: LayerVecPos,
     targetPos: LayerVecPos,
     getNeighbors: GetNeighbors,
     getReverseNeighbors: GetNeighbors
-  ): { path: LayerVecPos[]; closestToTarget: LayerVecPos; steps: number } {
+  ): ShortestPathResult {
     const shortestPath = this.shortestPathBfs(
       startPos,
       targetPos,
@@ -63,6 +70,7 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
       ),
       closestToTarget: shortestPath.closestToTarget,
       steps: shortestPath.steps,
+      maxPathLengthReached: shortestPath.maxPathLengthReached,
     };
   }
 
@@ -99,6 +107,21 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
       const startDequeued = startBfs.queue.dequeue();
       if (!startDequeued) break;
       const { node, dist } = startDequeued;
+
+      // This will actually allow paths that are one larger than the limit for
+      // even path lenghts. However, since it is a performance setting it does
+      // not matter.  If the path length would be crucial, one could simply
+      // filter out found paths exceeding the max length.
+      if (dist + 1 + (stopBfs.queue.peek()?.dist || 0) > this.maxPathLength) {
+        return {
+          previous: startBfs.previous,
+          previous2: stopBfs.previous,
+          closestToTarget,
+          steps,
+          maxPathLengthReached: true,
+        };
+      }
+
       const distToTarget = this.distance(node, stopNode);
       if (distToTarget < smallestDistToTarget) {
         smallestDistToTarget = distToTarget;
@@ -107,14 +130,12 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
 
       if (stopBfs.visited.has(LayerPositionUtils.toString(node))) {
         return {
-          shortestDistance:
-            dist +
-            (stopBfs.visited.get(LayerPositionUtils.toString(node)) ?? 0),
           previous: startBfs.previous,
           previous2: stopBfs.previous,
           closestToTarget: stopNode,
           matchingPos: node,
           steps,
+          maxPathLengthReached: false,
         };
       }
 
@@ -125,15 +146,12 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
       const { node: stopBfsNode, dist: stopBfsDist } = stopDequeued;
       if (startBfs.visited.has(LayerPositionUtils.toString(stopBfsNode))) {
         return {
-          shortestDistance:
-            stopBfsDist +
-            (startBfs.visited.get(LayerPositionUtils.toString(stopBfsNode)) ??
-              0),
           previous: startBfs.previous,
           previous2: stopBfs.previous,
           closestToTarget: stopNode,
           matchingPos: stopBfsNode,
           steps,
+          maxPathLengthReached: false,
         };
       }
 
@@ -141,11 +159,11 @@ export class BidirectionalSearch implements ShortestPathAlgorithm {
       stopBfs.step(getReverseNeighbors(stopBfsNode), stopBfsNode, stopBfsDist);
     }
     return {
-      shortestDistance: -1,
       previous: startBfs.previous,
       previous2: stopBfs.previous,
       closestToTarget,
       steps,
+      maxPathLengthReached: false,
     };
   }
 

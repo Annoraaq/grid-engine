@@ -830,7 +830,11 @@ describe("GridEngine", () => {
         },
       ],
     });
-    gridEngine.follow("player", "player2", 7, true);
+    gridEngine.follow("player", "player2", {
+      distance: 7,
+      closestPointIfBlocked: true,
+      maxPathLength: 10000,
+    });
 
     expect(gridEngine.getMovement("player")).toEqual({
       type: "Follow",
@@ -838,6 +842,7 @@ describe("GridEngine", () => {
         charToFollow: "player2",
         distance: 7,
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        maxPathLength: 10000,
       },
     });
   });
@@ -864,6 +869,7 @@ describe("GridEngine", () => {
         charToFollow: "player2",
         distance: 0,
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        maxPathLength: Infinity,
       },
     });
   });

@@ -144,4 +144,91 @@ describe("Bfs", () => {
       layer: "layer1",
     });
   });
+
+  it("should terminate on infinite maps", () => {
+    bfs.setMaxPathLength(10);
+    const isBlocked = createAllowedFn(
+      [
+        // prettier-ignore
+        ".s...",
+        "#####",
+        "#t..#",
+        "#####",
+      ],
+      true
+    );
+    const startPos = { position: new Vector2(1, 0), layer: "layer1" };
+    const targetPos = { position: new Vector2(1, 2), layer: "layer1" };
+
+    const { path, closestToTarget, maxPathLengthReached } = bfs.getShortestPath(
+      startPos,
+      targetPos,
+      (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer))
+    );
+
+    expect(maxPathLengthReached).toBe(true);
+    expect(path).toEqual([]);
+    expect(closestToTarget).toEqual({
+      position: new Vector2(1, 0),
+      layer: "layer1",
+    });
+  });
+
+  it("should not exceed maxPathLength", () => {
+    bfs.setMaxPathLength(3);
+    const isBlocked = createAllowedFn(
+      [
+        // prettier-ignore
+        ".s...",
+        ".....",
+        ".....",
+        ".....",
+        ".t...",
+      ],
+      true
+    );
+    const startPos = { position: new Vector2(1, 0), layer: "layer1" };
+    const targetPos = { position: new Vector2(1, 4), layer: "layer1" };
+
+    const { path, closestToTarget, maxPathLengthReached } = bfs.getShortestPath(
+      startPos,
+      targetPos,
+      (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer))
+    );
+
+    expect(maxPathLengthReached).toBe(true);
+    expect(path).toEqual([]);
+    expect(closestToTarget).toEqual({
+      position: new Vector2(1, 3),
+      layer: "layer1",
+    });
+  });
+
+  it("should not stop before exceeding maxPathLength", () => {
+    bfs.setMaxPathLength(3);
+    const isBlocked = createAllowedFn(
+      [
+        // prettier-ignore
+        ".s...",
+        ".....",
+        ".t...",
+      ],
+      true
+    );
+    const startPos = { position: new Vector2(1, 0), layer: "layer1" };
+    const targetPos = { position: new Vector2(1, 2), layer: "layer1" };
+
+    const { path, closestToTarget, maxPathLengthReached } = bfs.getShortestPath(
+      startPos,
+      targetPos,
+      (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer))
+    );
+
+    expect(maxPathLengthReached).toBe(false);
+    expect(path.length).toEqual(3);
+    expect(closestToTarget).toEqual({
+      position: new Vector2(1, 2),
+      layer: "layer1",
+    });
+  });
 });

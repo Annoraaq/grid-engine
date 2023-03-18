@@ -150,6 +150,7 @@ export class TargetMovement implements Movement {
   private isPositionAllowed: IsPositionAllowedFn = () => true;
   private shortestPathAlgorithm: ShortestPathAlgorithmType =
     "BIDIRECTIONAL_SEARCH";
+  private maxPathLength = Infinity;
 
   constructor(
     private character: GridCharacter,
@@ -182,6 +183,10 @@ export class TargetMovement implements Movement {
 
     if (config?.isPositionAllowedFn) {
       this.isPositionAllowed = config.isPositionAllowedFn;
+    }
+
+    if (config?.maxPathLength) {
+      this.maxPathLength = config.maxPathLength;
     }
 
     this.distanceUtils = DistanceUtilsFactory.create(
@@ -229,7 +234,7 @@ export class TargetMovement implements Movement {
       ignoreTiles: !this.character.collidesWithTiles(),
       ignoreMapBounds: this.character.getIgnoreMissingTiles(),
       ignoreBlockedTarget: this.ignoreBlockedTarget,
-      maxPathLength: Infinity,
+      maxPathLength: this.maxPathLength,
     };
   }
 

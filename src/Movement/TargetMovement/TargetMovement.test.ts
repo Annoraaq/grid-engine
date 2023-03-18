@@ -1822,6 +1822,50 @@ describe("TargetMovement", () => {
     expectWalkedPath(targetMovement, mockChar, createPath([[1, 1]]));
   });
 
+  it("should not exceed maxPathLength", () => {
+    const charPos = layerPos(new Vector2(1, 0));
+    const targetPos = layerPos(new Vector2(1, 4));
+
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".s...",
+          ".....",
+          ".....",
+          ".....",
+          ".t...",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+
+    const mockChar = createMockChar("char", charPos, {
+      ...TEST_CHAR_CONFIG,
+      tilemap: gridTilemap,
+      ignoreMissingTiles: true,
+    });
+
+    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+      config: {
+        algorithm: "BFS",
+        maxPathLength: 3,
+      },
+    });
+
+    targetMovement.update(1000);
+    mockChar.update(1000);
+    targetMovement.update(1000);
+    mockChar.update(1000);
+
+    expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 0)));
+  });
+
   describe("Closest reachable", () => {
     it("should move towards closest reachable point if path is blocked", () => {
       const charPos = layerPos(new Vector2(2, 5));

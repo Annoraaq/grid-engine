@@ -15,7 +15,8 @@ export class FollowMovement implements Movement {
     private gridTilemap: GridTilemap,
     private charToFollow: GridCharacter,
     private distance = 0,
-    private noPathFoundStrategy: NoPathFoundStrategy = NoPathFoundStrategy.STOP
+    private noPathFoundStrategy: NoPathFoundStrategy = NoPathFoundStrategy.STOP,
+    private maxPathLength = Infinity
   ) {
     this.character = character;
     this.updateTarget(
@@ -48,6 +49,7 @@ export class FollowMovement implements Movement {
         charToFollow: this.charToFollow.getId(),
         distance: this.distance,
         noPathFoundStrategy: this.noPathFoundStrategy,
+        maxPathLength: this.maxPathLength,
       },
     };
   }
@@ -62,7 +64,11 @@ export class FollowMovement implements Movement {
       },
       {
         distance: this.distance + 1,
-        config: { noPathFoundStrategy: this.noPathFoundStrategy },
+        config: {
+          noPathFoundStrategy: this.noPathFoundStrategy,
+          // TODO: write test
+          maxPathLength: this.maxPathLength,
+        },
         ignoreBlockedTarget: true,
       }
     );

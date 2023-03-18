@@ -183,10 +183,10 @@ export function mockLayeredBlockMap(
   return new MockTilemap(layers, isometric ? "isometric" : "orthogonal");
 }
 
-export function createAllowedFn(map: string[]) {
+export function createAllowedFn(map: string[], ignoreBounds = false) {
   return ({ x, y }, _charLayer) => {
-    if (x < 0 || x >= map[0].length) return false;
-    if (y < 0 || y >= map.length) return false;
+    if (x < 0 || x >= map[0].length) return ignoreBounds;
+    if (y < 0 || y >= map.length) return ignoreBounds;
     return map[y][x] != "#";
   };
 }

@@ -265,6 +265,35 @@ export interface PathfindingResult {
   reachedMaxPathLength: boolean;
 }
 
+export interface FollowOptions {
+  /**
+   *  Minimum distance to keep to `charIdToFollow` in
+   *  {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
+   *  in case of 4 direction mode and with and
+   *  {@link https://en.wikipedia.org/wiki/Chebyshev_distance | Chebyshev distance}
+   *  in case of 8 direction mode.
+   */
+  distance?: number;
+
+  /**
+   * `charId` will move to the closest point
+   *  ({@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
+   *  in case of 4 direction mode and with and
+   *  {@link https://en.wikipedia.org/wiki/Chebyshev_distance | Chebyshev distance}
+   *  in case of 8 direction mode)
+   *  to `charIdToFollow` that is reachable from `charId` in case that there
+   *  does not exist a path between `charId` and `charIdToFollow`.
+   */
+  closestPointIfBlocked?: boolean;
+
+  /**
+   * If this is set, the algorithm will stop once it reaches a path length of
+   * this value. This is useful to avoid running out of memory on large or
+   * infinite maps.
+   */
+  maxPathLength?: number;
+}
+
 export class GridEngineHeadless {
   private gridCharacters?: Map<string, GridCharacter>;
   private config?: Concrete<GridEngineConfigHeadless>;
@@ -684,6 +713,18 @@ export class GridEngineHeadless {
    *
    * @param charId ID of character that should follow
    * @param charIdToFollow ID of character that should be followed
+   */
+  follow(charId: string, charIdToFollow: string, options?: FollowOptions): void;
+  /**
+   * @deprecated
+   * Use follow(charId: string, charIdToFollow: string, options: FollowOptions): void;
+   * instead.
+   *
+   * Character `charId` will start to walk towards `charIdToFollow` on a
+   * shortest path until it reaches the specified `distance`.
+   *
+   * @param charId ID of character that should follow
+   * @param charIdToFollow ID of character that should be followed
    * @param distance Minimum distance to keep to `charIdToFollow` in
    *  {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
    *  in case of 4 direction mode and with and
@@ -700,9 +741,34 @@ export class GridEngineHeadless {
   follow(
     charId: string,
     charIdToFollow: string,
-    distance = 0,
-    closestPointIfBlocked = false
+    distance?: number,
+    closestPointIfBlocked?: boolean
+  ): void;
+  follow(
+    charId: string,
+    charIdToFollow: string,
+    distance?: FollowOptions | number,
+    closestPointIfBlocked?: boolean
   ): void {
+    let options: FollowOptions;
+
+    if (distance === undefined) {
+      options = {
+        distance: 0,
+        closestPointIfBlocked: false,
+      };
+    } else if (typeof distance === "number") {
+      options = {
+        distance,
+        closestPointIfBlocked: false,
+      };
+      if (closestPointIfBlocked) {
+        options.closestPointIfBlocked = true;
+      }
+    } else {
+      options = distance;
+    }
+
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     const gridCharToFollow = this.gridCharacters?.get(charIdToFollow);
@@ -713,10 +779,11 @@ export class GridEngineHeadless {
       gridChar,
       this.gridTilemap,
       gridCharToFollow,
-      distance,
-      closestPointIfBlocked
+      options.distance,
+      options.closestPointIfBlocked
         ? NoPathFoundStrategy.CLOSEST_REACHABLE
-        : NoPathFoundStrategy.STOP
+        : NoPathFoundStrategy.STOP,
+      options.maxPathLength
     );
     gridChar.setMovement(followMovement);
   }
@@ -891,7 +958,10 @@ export class GridEngineHeadless {
     options: PathfindingOptions = {}
   ): PathfindingResult {
     if (!this.gridTilemap) throw this.createUninitializedErr();
-    const pathfinding = new Pathfinding("BFS", this.gridTilemap);
+    const pathfinding = new Pathfinding(
+      options.shortestPathAlgorithm || "BFS",
+      this.gridTilemap
+    );
     const res = pathfinding.findShortestPath(
       LayerPositionUtils.toInternal(source),
       LayerPositionUtils.toInternal(dest),

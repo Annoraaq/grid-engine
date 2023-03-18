@@ -620,7 +620,11 @@ describe("GridEngineHeadless", () => {
     gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
       characters: [{ id: "player" }, { id: "player2" }],
     });
-    gridEngineHeadless.follow("player", "player2", 7, true);
+    gridEngineHeadless.follow("player", "player2", {
+      distance: 7,
+      closestPointIfBlocked: true,
+      maxPathLength: 10000,
+    });
 
     expect(gridEngineHeadless.getMovement("player")).toEqual({
       type: "Follow",
@@ -628,6 +632,7 @@ describe("GridEngineHeadless", () => {
         charToFollow: "player2",
         distance: 7,
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        maxPathLength: 10000,
       },
     });
   });
@@ -645,6 +650,7 @@ describe("GridEngineHeadless", () => {
         charToFollow: "player2",
         distance: 0,
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        maxPathLength: Infinity,
       },
     });
   });
