@@ -1,4 +1,5 @@
 import {
+  DistanceFn,
   GetNeighbors,
   LayerVecPos,
   ShortestPathAlgorithm,
@@ -29,12 +30,14 @@ export class Bfs implements ShortestPathAlgorithm {
   getShortestPath(
     startPos: LayerVecPos,
     targetPos: LayerVecPos,
-    getNeighbors: GetNeighbors
+    getNeighbors: GetNeighbors,
+    distance: DistanceFn
   ): ShortestPathResult {
     const shortestPath = this.shortestPathBfs(
       startPos,
       targetPos,
-      getNeighbors
+      getNeighbors,
+      distance
     );
     return {
       path: this.returnPath(shortestPath.previous, startPos, targetPos),
@@ -42,10 +45,6 @@ export class Bfs implements ShortestPathAlgorithm {
       steps: shortestPath.steps,
       maxPathLengthReached: shortestPath.maxPathLengthReached,
     };
-  }
-
-  private distance(fromNode: LayerVecPos, toNode: LayerVecPos): number {
-    return VectorUtils.manhattanDistance(fromNode.position, toNode.position);
   }
 
   private pos2Str(layerPos: LayerVecPos): string {
@@ -61,13 +60,17 @@ export class Bfs implements ShortestPathAlgorithm {
   private shortestPathBfs(
     startNode: LayerVecPos,
     stopNode: LayerVecPos,
-    getNeighbors: GetNeighbors
+    getNeighbors: GetNeighbors,
+    distance: DistanceFn
   ): ShortestPathTuple {
     const previous = new Map<string, LayerVecPos>();
     const visited = new Set<string>();
     const queue: Queue<QueueEntry> = new Queue();
     let closestToTarget: LayerVecPos = startNode;
-    let smallestDistToTarget: number = this.distance(startNode, stopNode);
+    let smallestDistToTarget: number = distance(
+      startNode.position,
+      stopNode.position
+    );
     let steps = 0;
     queue.enqueue({ node: startNode, dist: 0 });
     visited.add(this.pos2Str(startNode));
@@ -86,7 +89,7 @@ export class Bfs implements ShortestPathAlgorithm {
         };
       }
 
-      const distToTarget = this.distance(node, stopNode);
+      const distToTarget = distance(node.position, stopNode.position);
       if (distToTarget < smallestDistToTarget) {
         smallestDistToTarget = distToTarget;
         closestToTarget = node;

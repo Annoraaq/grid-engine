@@ -10,6 +10,8 @@ export interface LayerVecPos {
 
 export type GetNeighbors = (pos: LayerVecPos) => LayerVecPos[];
 
+export type DistanceFn = (fromNode: Vector2, toNode: Vector2) => number;
+
 /**
  * BFS: (Breadth first search) Simple algorithm. It can find the shortest path
  * in O(4ᵈ) (resp O(8ᵈ) for 8 directions). d is the length of the shortest path.
@@ -37,6 +39,7 @@ export interface ShortestPathAlgorithm {
     startPos: LayerVecPos,
     targetPos: LayerVecPos,
     getNeighbors: GetNeighbors,
+    distance: DistanceFn,
     getReverseNeighbors: GetNeighbors
   ): ShortestPathResult;
   setMaxPathLength(maxPathLength: number): void;

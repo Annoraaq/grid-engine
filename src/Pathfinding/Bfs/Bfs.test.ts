@@ -1,5 +1,6 @@
 import { createAllowedFn } from "../../Utils/MockFactory/MockFactory";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
+import { VectorUtils } from "../../Utils/VectorUtils";
 import { LayerVecPos } from "../ShortestPathAlgorithm";
 import { Bfs } from "./Bfs";
 
@@ -36,7 +37,8 @@ describe("Bfs", () => {
     const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
-      getNeighbors
+      getNeighbors,
+      VectorUtils.manhattanDistance
     );
     expect(path).toEqual([
       { position: new Vector2(3, 3), layer: "layer1" },
@@ -52,7 +54,8 @@ describe("Bfs", () => {
     const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
-      getNeighbors
+      getNeighbors,
+      VectorUtils.manhattanDistance
     );
     expect(path).toEqual([
       { position: new Vector2(3, 3), layer: "layer1" },
@@ -72,7 +75,8 @@ describe("Bfs", () => {
     const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
-      getNeighbors
+      getNeighbors,
+      VectorUtils.manhattanDistance
     );
     expect(path).toEqual([{ position: new Vector2(3, 3), layer: "layer1" }]);
     expect(closestToTarget).toEqual(targetPos);
@@ -84,7 +88,8 @@ describe("Bfs", () => {
     const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
-      () => []
+      () => [],
+      VectorUtils.manhattanDistance
     );
     expect(path).toEqual([]);
     expect(closestToTarget).toEqual(startPos);
@@ -105,7 +110,8 @@ describe("Bfs", () => {
     const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
-      (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer))
+      (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer)),
+      VectorUtils.manhattanDistance
     );
 
     expect(path).toEqual([
@@ -135,12 +141,39 @@ describe("Bfs", () => {
     const { path, closestToTarget } = bfs.getShortestPath(
       startPos,
       targetPos,
-      (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer))
+      (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer)),
+      VectorUtils.manhattanDistance
     );
 
     expect(path).toEqual([]);
     expect(closestToTarget).toEqual({
       position: new Vector2(3, 1),
+      layer: "layer1",
+    });
+  });
+
+  it("should return closest point dependent on distance metric", () => {
+    const isBlocked = createAllowedFn([
+      "#####",
+      "#s..#",
+      "#####",
+      "#..t#",
+      "#####",
+    ]);
+
+    const startPos = { position: new Vector2(1, 1), layer: "layer1" };
+    const targetPos = { position: new Vector2(3, 3), layer: "layer1" };
+
+    const { path, closestToTarget } = bfs.getShortestPath(
+      startPos,
+      targetPos,
+      (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer)),
+      VectorUtils.chebyshevDistance
+    );
+
+    expect(path).toEqual([]);
+    expect(closestToTarget).toEqual({
+      position: new Vector2(1, 1),
       layer: "layer1",
     });
   });
@@ -163,7 +196,8 @@ describe("Bfs", () => {
     const { path, closestToTarget, maxPathLengthReached } = bfs.getShortestPath(
       startPos,
       targetPos,
-      (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer))
+      (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer)),
+      VectorUtils.manhattanDistance
     );
 
     expect(maxPathLengthReached).toBe(true);
@@ -193,7 +227,8 @@ describe("Bfs", () => {
     const { path, closestToTarget, maxPathLengthReached } = bfs.getShortestPath(
       startPos,
       targetPos,
-      (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer))
+      (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer)),
+      VectorUtils.manhattanDistance
     );
 
     expect(maxPathLengthReached).toBe(true);
@@ -221,7 +256,8 @@ describe("Bfs", () => {
     const { path, closestToTarget, maxPathLengthReached } = bfs.getShortestPath(
       startPos,
       targetPos,
-      (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer))
+      (pos) => getNeighbors(pos).filter((n) => isBlocked(n.position, n.layer)),
+      VectorUtils.manhattanDistance
     );
 
     expect(maxPathLengthReached).toBe(false);
