@@ -146,7 +146,7 @@ describe("Pathfinding", () => {
     expect(shortestPath.closestToTarget).toEqual(layerPos(new Vector2(3, 1)));
   });
 
-  it("should use manhattan distance for 8 directions", () => {
+  it("should use Chebyshev distance for 8 directions", () => {
     const gridTilemap = createTilemap([
       {
         layer: LOWER_CHAR_LAYER,
