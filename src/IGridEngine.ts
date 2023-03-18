@@ -192,7 +192,11 @@ export interface IGridEngine {
   /** @returns Speed in tiles per second for a character. */
   getSpeed(charId: string): number;
 
-  /** @returns Whether character collides with tiles */
+  /**
+   * @returns true if the character is able to collide with the tilemap. Don't
+   * confuse this with an actual collision check. You should use
+   * {@link isBlocked} or {@link isTileBlocked} for this.
+   */
   collidesWithTiles(charId: string): boolean;
 
   update(_time: number, delta: number): void;
