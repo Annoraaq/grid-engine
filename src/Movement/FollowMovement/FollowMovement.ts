@@ -66,7 +66,6 @@ export class FollowMovement implements Movement {
         distance: this.distance + 1,
         config: {
           noPathFoundStrategy: this.noPathFoundStrategy,
-          // TODO: write test
           maxPathLength: this.maxPathLength,
         },
         ignoreBlockedTarget: true,
