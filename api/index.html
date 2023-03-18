@@ -39,21 +39,28 @@ movement to your tilemap game. Your characters will be able to only move in whol
 <a href="#features" id="features" style="color: inherit; text-decoration: none;">
   <h2>Features</h2>
 </a>
+
+<a href="#basic" id="basic" style="color: inherit; text-decoration: none;">
+  <h3>Basic</h3>
+</a>
 <ul>
 <li>Grid-based movement, of course!</li>
-<li>Multiple characters</li>
-<li>Pathfinding (for both NPCs and the player)</li>
-<li>NEW - Headless mode (allows running it independently of Phaser)</li>
 <li>Tile-based collision detection</li>
-<li>One-way collision detection</li>
+<li><strong><em>NEW!</em></strong> - Headless mode (allows running it independently of Phaser)</li>
+<li>Diagonal movement (8 directions)</li>
+<li>Isometric maps</li>
+<li>Multiple character layers</li>
+<li>Multi-tile characters</li>
+</ul>
+
+<a href="#movement--pathfinding" id="movement--pathfinding" style="color: inherit; text-decoration: none;">
+  <h3>Movement / Pathfinding</h3>
+</a>
+<ul>
+<li>Pathfinding (for both NPCs and the player)</li>
 <li>Random movement (can also limit to a radius)</li>
 <li>Following other characters</li>
-<li>Diagonal movement (8 directions)</li>
-<li>Isometric maps (Beta)</li>
-<li>Multiple character layers (Beta)</li>
 <li>Collision groups</li>
-<li>Multi-tile characters</li>
-<li>Full TypeScript support</li>
 </ul>
 <p>📖 Read our most current <a href="https://annoraaq.github.io/grid-engine/">documentation</a>.</p>
 <p>➡️ You can try/download <a href="https://annoraaq.github.io/grid-engine/">a list of examples</a>.</p>
@@ -95,6 +102,7 @@ movement to your tilemap game. Your characters will be able to only move in whol
 <ul>
 <li><a href="https://play.google.com/store/apps/details?id=com.raiper34.buildasnowman">Build a Snowman</a></li>
 <li><a href="https://play.definya.com/">Defynia</a></li>
+<li>Fallout Clone [<a href="https://fallout-clone.netlify.app/">Play</a>] [<a href="https://github.com/slysnek/rs-clone">Repo</a>]</li>
 </ul>
 <p>If you have a project that is using Grid Engine and that you would like to see in this list, post it in the #showcase channel on our <a href="https://discord.gg/C4jNEZJECs">Discord</a>.</p>
 
@@ -147,13 +155,16 @@ movement to your tilemap game. Your characters will be able to only move in whol
 <li class="tsd-kind-interface"><a href="interfaces/CharacterShift.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Character<wbr/>Shift</a></li>
 <li class="tsd-kind-interface"><a href="interfaces/CollisionConfig.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Collision<wbr/>Config</a></li>
 <li class="tsd-kind-interface"><a href="interfaces/Finished.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Finished</a></li>
+<li class="tsd-kind-interface"><a href="interfaces/FollowOptions.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Follow<wbr/>Options</a></li>
 <li class="tsd-kind-interface"><a href="interfaces/FrameRow.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Frame<wbr/>Row</a></li>
 <li class="tsd-kind-interface"><a href="interfaces/GridEngineConfig.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Grid<wbr/>Engine<wbr/>Config</a></li>
 <li class="tsd-kind-interface"><a href="interfaces/GridEngineConfigHeadless.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Grid<wbr/>Engine<wbr/>Config<wbr/>Headless</a></li>
+<li class="tsd-kind-interface"><a href="interfaces/IGridEngine.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>IGrid<wbr/>Engine</a></li>
 <li class="tsd-kind-interface"><a href="interfaces/LayerPosition.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Layer<wbr/>Position</a></li>
 <li class="tsd-kind-interface"><a href="interfaces/MoveToConfig.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Move<wbr/>To<wbr/>Config</a></li>
 <li class="tsd-kind-interface"><a href="interfaces/MovementInfo.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Movement<wbr/>Info</a></li>
 <li class="tsd-kind-interface"><a href="interfaces/PathfindingOptions.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Pathfinding<wbr/>Options</a></li>
+<li class="tsd-kind-interface"><a href="interfaces/PathfindingResult.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Pathfinding<wbr/>Result</a></li>
 <li class="tsd-kind-interface"><a href="interfaces/Position.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Position</a></li>
 <li class="tsd-kind-interface"><a href="interfaces/PositionChange.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Position<wbr/>Change</a></li>
 <li class="tsd-kind-interface"><a href="interfaces/Tile.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-256-path"></use><use href="#icon-256-text"></use></svg>Tile</a></li>
