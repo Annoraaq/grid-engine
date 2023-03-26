@@ -1,3 +1,4 @@
+import { Jps4 } from "./Jps4";
 import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
 import { NumberOfDirections } from "../../Direction/Direction";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
@@ -11,7 +12,6 @@ import {
   mockRandomMap,
 } from "../../Utils/MockFactory/MockFactory";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { Bfs } from "./Bfs";
 
 function createTilemap(
   layers: Array<{ blockMap: string[]; layer: string | undefined }>
@@ -26,7 +26,7 @@ function createTilemap(
   return gridTilemap;
 }
 
-describe("Bfs", () => {
+describe("Jps4", () => {
   it("should find blocked path", () => {
     const gridTilemap = createTilemap([
       {
@@ -39,7 +39,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap);
+    const algo = new Jps4(gridTilemap);
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
@@ -61,7 +61,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap);
+    const algo = new Jps4(gridTilemap);
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
@@ -92,7 +92,7 @@ describe("Bfs", () => {
       },
     ]);
 
-    const algo = new Bfs(gridTilemap);
+    const algo = new Jps4(gridTilemap);
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 1)),
@@ -117,7 +117,7 @@ describe("Bfs", () => {
       },
     ]);
 
-    const algo = new Bfs(gridTilemap, {
+    const algo = new Jps4(gridTilemap, {
       numberOfDirections: NumberOfDirections.EIGHT,
     });
 
@@ -143,7 +143,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, { pathWidth: 2, pathHeight: 2 });
+    const algo = new Jps4(gridTilemap, { pathWidth: 2, pathHeight: 2 });
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
@@ -167,7 +167,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, { pathWidth: 2, pathHeight: 2 });
+    const algo = new Jps4(gridTilemap, { pathWidth: 2, pathHeight: 2 });
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
@@ -205,7 +205,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap);
+    const algo = new Jps4(gridTilemap);
 
     gridTilemap.setTransition(
       new Vector2(2, 0),
@@ -239,7 +239,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap);
+    const algo = new Jps4(gridTilemap);
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
@@ -255,29 +255,6 @@ describe("Bfs", () => {
       layerPos(new Vector2(2, 2)),
       layerPos(new Vector2(1, 2)),
     ]);
-  });
-
-  it("should find path with 8 directions", () => {
-    const gridTilemap = createTilemap([
-      {
-        layer: LOWER_CHAR_LAYER,
-        blockMap: [
-          // prettier-ignore
-          ".s..",
-          "..t.",
-        ],
-      },
-    ]);
-    const algo = new Bfs(gridTilemap, {
-      numberOfDirections: NumberOfDirections.EIGHT,
-    });
-
-    const shortestPath = algo.findShortestPath(
-      layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(2, 1))
-    );
-
-    expect(shortestPath.path.length).toEqual(2);
   });
 
   it("should find the shortest path for allowed positions", () => {
@@ -300,7 +277,7 @@ describe("Bfs", () => {
       ".t..",
     ]);
 
-    const algo = new Bfs(gridTilemap, {
+    const algo = new Jps4(gridTilemap, {
       isPositionAllowed: allowedFn,
     });
 
@@ -332,7 +309,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, {
+    const algo = new Jps4(gridTilemap, {
       collisionGroups: [COLLISION_GROUP],
     });
 
@@ -364,7 +341,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap);
+    const algo = new Jps4(gridTilemap);
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
@@ -390,7 +367,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, {
+    const algo = new Jps4(gridTilemap, {
       collisionGroups: ["someOtherCollisionGroup"],
     });
 
@@ -418,7 +395,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, {
+    const algo = new Jps4(gridTilemap, {
       collisionGroups: [COLLISION_GROUP],
       ignoredChars: ["mock_char_1"],
     });
@@ -447,7 +424,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, {
+    const algo = new Jps4(gridTilemap, {
       ignoreTiles: true,
     });
 
@@ -471,7 +448,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, {
+    const algo = new Jps4(gridTilemap, {
       ignoreMapBounds: true,
     });
 
@@ -496,7 +473,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, {
+    const algo = new Jps4(gridTilemap, {
       ignoreMapBounds: true,
       maxPathLength: 10,
     });
@@ -522,7 +499,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, {
+    const algo = new Jps4(gridTilemap, {
       ignoreBlockedTarget: true,
     });
 
@@ -542,14 +519,14 @@ describe("Bfs", () => {
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
-    const algo = new Bfs(gridTilemap);
+    const algo = new Jps4(gridTilemap);
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(150, 150)),
       layerPos(new Vector2(250, 250))
     );
 
-    expect(shortestPath.steps).toEqual(42363);
+    expect(shortestPath.steps).toEqual(842);
     expect(shortestPath.path.length).toEqual(203);
   });
 });

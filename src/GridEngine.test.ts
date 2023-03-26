@@ -59,7 +59,7 @@ jest.mock("../package.json", () => ({
   version: "GRID.ENGINE.VERSION",
 }));
 
-import { GridEngine } from "./GridEngine";
+import { GridEngine, PathfindingOptions } from "./GridEngine";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { createSpriteMock } from "./Utils/MockFactory/MockFactory";
@@ -1392,7 +1392,10 @@ describe("GridEngine", () => {
       });
       const source = { position: { x: 1, y: 2 }, charLayer: "sourceCharLayer" };
       const dest = { position: { x: 10, y: 20 }, charLayer: "destCharLayer" };
-      const options = { pathWidth: 2 };
+      const options: PathfindingOptions = {
+        pathWidth: 2,
+        shortestPathAlgorithm: "BFS",
+      };
 
       const mockRes = {
         path: [{ position: new Vector2(1, 2), layer: "sourceCharLayer" }],

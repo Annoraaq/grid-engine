@@ -11,7 +11,7 @@ import {
   mockRandomMap,
 } from "../../Utils/MockFactory/MockFactory";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { Bfs } from "./Bfs";
+import { AStar } from "./AStar";
 
 function createTilemap(
   layers: Array<{ blockMap: string[]; layer: string | undefined }>
@@ -26,7 +26,7 @@ function createTilemap(
   return gridTilemap;
 }
 
-describe("Bfs", () => {
+describe("BidirectionalSearch", () => {
   it("should find blocked path", () => {
     const gridTilemap = createTilemap([
       {
@@ -39,7 +39,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap);
+    const algo = new AStar(gridTilemap);
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
@@ -61,7 +61,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap);
+    const algo = new AStar(gridTilemap);
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
@@ -92,7 +92,7 @@ describe("Bfs", () => {
       },
     ]);
 
-    const algo = new Bfs(gridTilemap);
+    const algo = new AStar(gridTilemap);
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 1)),
@@ -117,7 +117,7 @@ describe("Bfs", () => {
       },
     ]);
 
-    const algo = new Bfs(gridTilemap, {
+    const algo = new AStar(gridTilemap, {
       numberOfDirections: NumberOfDirections.EIGHT,
     });
 
@@ -143,7 +143,10 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, { pathWidth: 2, pathHeight: 2 });
+    const algo = new AStar(gridTilemap, {
+      pathWidth: 2,
+      pathHeight: 2,
+    });
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
@@ -167,7 +170,10 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, { pathWidth: 2, pathHeight: 2 });
+    const algo = new AStar(gridTilemap, {
+      pathWidth: 2,
+      pathHeight: 2,
+    });
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
@@ -205,7 +211,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap);
+    const algo = new AStar(gridTilemap);
 
     gridTilemap.setTransition(
       new Vector2(2, 0),
@@ -239,7 +245,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap);
+    const algo = new AStar(gridTilemap);
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
@@ -268,7 +274,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, {
+    const algo = new AStar(gridTilemap, {
       numberOfDirections: NumberOfDirections.EIGHT,
     });
 
@@ -300,7 +306,7 @@ describe("Bfs", () => {
       ".t..",
     ]);
 
-    const algo = new Bfs(gridTilemap, {
+    const algo = new AStar(gridTilemap, {
       isPositionAllowed: allowedFn,
     });
 
@@ -332,7 +338,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, {
+    const algo = new AStar(gridTilemap, {
       collisionGroups: [COLLISION_GROUP],
     });
 
@@ -364,7 +370,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap);
+    const algo = new AStar(gridTilemap);
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
@@ -390,7 +396,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, {
+    const algo = new AStar(gridTilemap, {
       collisionGroups: ["someOtherCollisionGroup"],
     });
 
@@ -418,7 +424,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, {
+    const algo = new AStar(gridTilemap, {
       collisionGroups: [COLLISION_GROUP],
       ignoredChars: ["mock_char_1"],
     });
@@ -447,7 +453,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, {
+    const algo = new AStar(gridTilemap, {
       ignoreTiles: true,
     });
 
@@ -471,7 +477,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, {
+    const algo = new AStar(gridTilemap, {
       ignoreMapBounds: true,
     });
 
@@ -496,7 +502,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, {
+    const algo = new AStar(gridTilemap, {
       ignoreMapBounds: true,
       maxPathLength: 10,
     });
@@ -522,7 +528,7 @@ describe("Bfs", () => {
         ],
       },
     ]);
-    const algo = new Bfs(gridTilemap, {
+    const algo = new AStar(gridTilemap, {
       ignoreBlockedTarget: true,
     });
 
@@ -534,7 +540,7 @@ describe("Bfs", () => {
     expect(shortestPath.path.length).toEqual(3);
   });
 
-  it("should keep performance", () => {
+  it("should keep performance of bidirectional search", () => {
     const tilemap = mockRandomMap(LOWER_CHAR_LAYER, 500, 500, 0.3, 12323);
 
     const gridTilemap = new GridTilemap(
@@ -542,14 +548,13 @@ describe("Bfs", () => {
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
-    const algo = new Bfs(gridTilemap);
-
+    const algo = new AStar(gridTilemap);
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(150, 150)),
       layerPos(new Vector2(250, 250))
     );
 
-    expect(shortestPath.steps).toEqual(42363);
+    expect(shortestPath.steps).toEqual(1262);
     expect(shortestPath.path.length).toEqual(203);
   });
 });

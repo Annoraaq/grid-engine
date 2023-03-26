@@ -37,6 +37,16 @@ export function isDiagonal(direction: Direction): boolean {
   return diagonals.includes(direction);
 }
 
+export function isHorizontal(direction: Direction): boolean {
+  const horizontals = [Direction.LEFT, Direction.RIGHT];
+  return horizontals.includes(direction);
+}
+
+export function isVertical(direction: Direction): boolean {
+  const verticals = [Direction.UP, Direction.DOWN];
+  return verticals.includes(direction);
+}
+
 export function turnCounterClockwise(direction: Direction): Direction {
   const mapping = {
     [Direction.LEFT]: Direction.DOWN_LEFT,

@@ -16,12 +16,12 @@ import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
 import { CharLayer, Position } from "../../GridEngine";
 import { filter, Subject, take } from "rxjs";
 import {
-  isBlocking,
   IsPositionAllowedFn,
   Pathfinding,
   PathfindingOptions,
 } from "../../Pathfinding/Pathfinding";
 import { Concrete } from "../../Utils/TypeUtils";
+import { Bfs } from "../../Pathfinding/Bfs/Bfs";
 
 export interface MoveToConfig {
   /**
@@ -407,19 +407,16 @@ export class TargetMovement implements Movement {
   private isBlocking = (pos?: Vector2, charLayer?: string): boolean => {
     if (!pos) return true;
 
-    return isBlocking(
-      this.character.getTilePos(),
-      { position: pos, layer: charLayer },
-      this.tilemap,
-      this.getPathfindingOptions()
-    );
+    const bfs = new Bfs(this.tilemap, this.getPathfindingOptions());
+
+    return bfs.isBlocking(this.character.getTilePos(), {
+      position: pos,
+      layer: charLayer,
+    });
   };
 
   private getShortestPath(): ShortestPath {
-    const pathfinding = new Pathfinding(
-      this.shortestPathAlgorithm,
-      this.tilemap
-    );
+    const pathfinding = new Pathfinding(this.tilemap);
     const { path: shortestPath, closestToTarget } =
       pathfinding.findShortestPath(
         this.character.getNextTilePos(),
