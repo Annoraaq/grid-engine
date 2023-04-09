@@ -540,7 +540,7 @@ describe("BidirectionalSearch", () => {
     expect(shortestPath.path.length).toEqual(3);
   });
 
-  it("should keep performance of bidirectional search", () => {
+  it("should keep expansion count of A*", () => {
     const tilemap = mockRandomMap(LOWER_CHAR_LAYER, 500, 500, 0.3, 12323);
 
     const gridTilemap = new GridTilemap(
@@ -556,5 +556,25 @@ describe("BidirectionalSearch", () => {
 
     expect(shortestPath.steps).toEqual(1262);
     expect(shortestPath.path.length).toEqual(203);
+  });
+
+  it("should keep expansion count of A* 8 dirs", () => {
+    const tilemap = mockRandomMap(LOWER_CHAR_LAYER, 500, 500, 0.3, 12323);
+
+    const gridTilemap = new GridTilemap(
+      tilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    const algo = new AStar(gridTilemap, {
+      numberOfDirections: NumberOfDirections.EIGHT,
+    });
+    const shortestPath = algo.findShortestPath(
+      layerPos(new Vector2(150, 150)),
+      layerPos(new Vector2(250, 250))
+    );
+
+    expect(shortestPath.steps).toEqual(1700);
+    expect(shortestPath.path.length).toEqual(114);
   });
 });
