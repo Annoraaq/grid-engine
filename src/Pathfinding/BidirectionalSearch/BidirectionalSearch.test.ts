@@ -557,4 +557,24 @@ describe("BidirectionalSearch", () => {
     expect(shortestPath.steps).toEqual(24620);
     expect(shortestPath.path.length).toEqual(203);
   });
+
+  it("should keep expansion count 8 dirs", () => {
+    const tilemap = mockRandomMap(LOWER_CHAR_LAYER, 500, 500, 0.3, 12323);
+
+    const gridTilemap = new GridTilemap(
+      tilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    const algo = new BidirectionalSearch(gridTilemap, {
+      numberOfDirections: NumberOfDirections.EIGHT,
+    });
+    const shortestPath = algo.findShortestPath(
+      layerPos(new Vector2(150, 150)),
+      layerPos(new Vector2(250, 250))
+    );
+
+    expect(shortestPath.steps).toEqual(19780);
+    expect(shortestPath.path.length).toEqual(114);
+  });
 });
