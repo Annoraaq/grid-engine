@@ -6,6 +6,7 @@ import { AStar } from "./AStar/AStar";
 import { Bfs } from "./Bfs/Bfs";
 import { BidirectionalSearch } from "./BidirectionalSearch/BidirectionalSearch";
 import { Jps4 } from "./Jps4/Jps4";
+import { Jps8 } from "./Jps8/Jps8";
 import {
   LayerVecPos,
   ShortestPathAlgorithm,
@@ -130,6 +131,9 @@ function shortestPathAlgorithmFactory(
     case "A_STAR":
       return new AStar(gridTilemap, options);
     case "JPS":
+      if (options.numberOfDirections === NumberOfDirections.EIGHT) {
+        return new Jps8(gridTilemap, options);
+      }
       return new Jps4(gridTilemap, options);
   }
   return new Bfs(gridTilemap, options);

@@ -113,24 +113,80 @@ export function getBlockingProps(char: string): Record<string, string> {
         ge_collide_up: "true",
         ge_collide_right: "true",
         ge_collide_down: "true",
+        "ge_collide_up-right": "true",
+        "ge_collide_up-left": "true",
+        "ge_collide_down-right": "true",
+        "ge_collide_down-left": "true",
       };
     case "←":
       return {
         ge_collide_up: "true",
         ge_collide_down: "true",
         ge_collide_left: "true",
+        "ge_collide_up-right": "true",
+        "ge_collide_up-left": "true",
+        "ge_collide_down-right": "true",
+        "ge_collide_down-left": "true",
       };
     case "↑":
       return {
         ge_collide_up: "true",
         ge_collide_right: "true",
         ge_collide_left: "true",
+        "ge_collide_up-right": "true",
+        "ge_collide_up-left": "true",
+        "ge_collide_down-right": "true",
+        "ge_collide_down-left": "true",
       };
     case "↓":
       return {
         ge_collide_right: "true",
         ge_collide_down: "true",
         ge_collide_left: "true",
+        "ge_collide_up-right": "true",
+        "ge_collide_up-left": "true",
+        "ge_collide_down-right": "true",
+        "ge_collide_down-left": "true",
+      };
+    case "↖":
+      return {
+        ge_collide_right: "true",
+        ge_collide_down: "true",
+        ge_collide_up: "true",
+        ge_collide_left: "true",
+        "ge_collide_up-right": "true",
+        "ge_collide_up-left": "true",
+        "ge_collide_down-left": "true",
+      };
+    case "↗":
+      return {
+        ge_collide_right: "true",
+        ge_collide_down: "true",
+        ge_collide_up: "true",
+        ge_collide_left: "true",
+        "ge_collide_up-right": "true",
+        "ge_collide_up-left": "true",
+        "ge_collide_down-right": "true",
+      };
+    case "↘":
+      return {
+        ge_collide_right: "true",
+        ge_collide_down: "true",
+        ge_collide_up: "true",
+        ge_collide_left: "true",
+        "ge_collide_up-right": "true",
+        "ge_collide_down-right": "true",
+        "ge_collide_down-left": "true",
+      };
+    case "↙":
+      return {
+        ge_collide_right: "true",
+        ge_collide_down: "true",
+        ge_collide_up: "true",
+        ge_collide_left: "true",
+        "ge_collide_up-left": "true",
+        "ge_collide_down-right": "true",
+        "ge_collide_down-left": "true",
       };
   }
   return {};
