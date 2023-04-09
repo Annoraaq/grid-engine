@@ -47,16 +47,17 @@ export class AStar extends ShortestPathAlgorithm {
     let steps = 0;
     openSet.push(startNode);
     g.set(LayerPositionUtils.toString(startNode), 0);
-    f.set(LayerPositionUtils.toString(startNode), h(startNode, stopNode));
-
-    // 9
+    f.set(
+      LayerPositionUtils.toString(startNode),
+      this.distance(startNode.position, stopNode.position)
+    );
 
     while (openSet.size > 0) {
       const current = openSet.pop();
       if (!current) break;
       steps++;
 
-      const distToTarget = h(current, stopNode);
+      const distToTarget = this.distance(current.position, stopNode.position);
       if (distToTarget < smallestDistToTarget) {
         smallestDistToTarget = distToTarget;
         closestToTarget = current;
@@ -86,7 +87,10 @@ export class AStar extends ShortestPathAlgorithm {
         if (!g.has(neighborStr) || tentativeG < safeGet(g, neighbor)) {
           previous.set(neighborStr, current);
           g.set(neighborStr, tentativeG);
-          f.set(neighborStr, tentativeG + h(neighbor, stopNode));
+          f.set(
+            neighborStr,
+            tentativeG + this.distance(neighbor.position, stopNode.position)
+          );
           openSet.push(neighbor);
         }
       }
@@ -109,10 +113,6 @@ export class AStar extends ShortestPathAlgorithm {
     }
     return ret.reverse();
   }
-}
-
-function h(src: LayerVecPos, dest: LayerVecPos) {
-  return VectorUtils.manhattanDistance(src.position, dest.position);
 }
 
 function safeGet(map: Map<string, number>, position: LayerVecPos): number {
