@@ -227,6 +227,259 @@ describe("Jps4", () => {
     ]);
   });
 
+  it("should find the shortest path for obstable bottom", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".s..",
+          "..#.",
+          "..t.",
+          "....",
+        ],
+      },
+    ]);
+    const algo = new Jps4(gridTilemap);
+
+    const shortestPath = algo.findShortestPath(
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(2, 2))
+    );
+
+    expect(shortestPath.path.length).toBe(4);
+  });
+
+  it("should find the shortest path for obstable top", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..s.",
+          ".#..",
+          ".t..",
+          "....",
+        ],
+      },
+    ]);
+    const algo = new Jps4(gridTilemap);
+
+    const shortestPath = algo.findShortestPath(
+      layerPos(new Vector2(2, 0)),
+      layerPos(new Vector2(1, 2))
+    );
+
+    expect(shortestPath.path.length).toBe(4);
+  });
+
+  it("should find the shortest path for transition bottom", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".s..",
+          "..*.",
+          "..t.",
+          "....",
+        ],
+      },
+      {
+        layer: "testCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "....",
+          "....",
+          "....",
+          "....",
+        ],
+      },
+    ]);
+    const algo = new Jps4(gridTilemap);
+
+    gridTilemap.setTransition(
+      new Vector2(2, 1),
+      "lowerCharLayer",
+      "testCharLayer"
+    );
+
+    const shortestPath = algo.findShortestPath(
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(2, 2))
+    );
+
+    expect(shortestPath.path.length).toBe(4);
+  });
+
+  it("should find the shortest path for transition top", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..s.",
+          ".*..",
+          ".t..",
+          "....",
+        ],
+      },
+      {
+        layer: "testCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "....",
+          "....",
+          "....",
+          "....",
+        ],
+      },
+    ]);
+    const algo = new Jps4(gridTilemap);
+
+    gridTilemap.setTransition(
+      new Vector2(1, 1),
+      "lowerCharLayer",
+      "testCharLayer"
+    );
+
+    const shortestPath = algo.findShortestPath(
+      layerPos(new Vector2(2, 0)),
+      layerPos(new Vector2(1, 2))
+    );
+
+    expect(shortestPath.path.length).toBe(4);
+  });
+
+  it("should find the shortest path for endless trans", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..s.",
+          "#*##",
+          "....",
+          "....",
+        ],
+      },
+      {
+        layer: "testCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".*..",
+          ".*..",
+          "....",
+          ".t..",
+        ],
+      },
+    ]);
+    const algo = new Jps4(gridTilemap);
+
+    gridTilemap.setTransition(
+      new Vector2(1, 1),
+      "lowerCharLayer",
+      "testCharLayer"
+    );
+
+    gridTilemap.setTransition(
+      new Vector2(1, 0),
+      "testCharLayer",
+      "lowerCharLayer"
+    );
+
+    const shortestPath = algo.findShortestPath(
+      layerPos(new Vector2(2, 0)),
+      layerPos(new Vector2(1, 3), "testCharLayer")
+    );
+
+    expect(shortestPath.path.length).toBe(5);
+  });
+
+  it("should find the shortest path for transition edge case", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".#...",
+          "s....",
+          ".#*..",
+          ".#...",
+        ],
+      },
+      {
+        layer: "testCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".....",
+          ".....",
+          "..*..",
+          "...t.",
+        ],
+      },
+    ]);
+    // TODO: maybe previous is wrong? and therefore path construction
+    const algo = new Jps4(gridTilemap);
+
+    gridTilemap.setTransition(
+      new Vector2(2, 2),
+      "lowerCharLayer",
+      "testCharLayer"
+    );
+
+    const shortestPath = algo.findShortestPath(
+      layerPos(new Vector2(0, 1)),
+      layerPos(new Vector2(3, 3), "testCharLayer")
+    );
+
+    expect(shortestPath.path.length).toBe(6);
+  });
+
+  it("should find the shortest path for transition edge case 2", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "....",
+          ".*..",
+          "....",
+          "....",
+          ".s..",
+          "####",
+        ],
+      },
+      {
+        layer: "testCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".t..",
+          ".*..",
+          "....",
+          "....",
+          ".s..",
+          "####",
+        ],
+      },
+    ]);
+    // TODO: maybe previous is wrong? and therefore path construction
+    const algo = new Jps4(gridTilemap);
+
+    gridTilemap.setTransition(
+      new Vector2(1, 1),
+      "lowerCharLayer",
+      "testCharLayer"
+    );
+
+    const shortestPath = algo.findShortestPath(
+      layerPos(new Vector2(1, 4)),
+      layerPos(new Vector2(1, 0), "testCharLayer")
+    );
+
+    expect(shortestPath.path.length).toBe(5);
+  });
+
   it("should find the shortest path for unidirectional blocking", () => {
     const gridTilemap = createTilemap([
       {
@@ -254,6 +507,66 @@ describe("Jps4", () => {
       layerPos(new Vector2(3, 2)),
       layerPos(new Vector2(2, 2)),
       layerPos(new Vector2(1, 2)),
+    ]);
+  });
+
+  it("should find the shortest path for unidirectional jump point right", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: LOWER_CHAR_LAYER,
+        blockMap: [
+          // prettier-ignore
+          "s..",
+          "..#",
+          ".→t",
+          ".#.",
+          ".#.",
+        ],
+      },
+    ]);
+    const algo = new Jps4(gridTilemap);
+
+    const shortestPath = algo.findShortestPath(
+      layerPos(new Vector2(0, 0)),
+      layerPos(new Vector2(2, 2))
+    );
+
+    expect(shortestPath.path).toEqual([
+      layerPos(new Vector2(0, 0)),
+      layerPos(new Vector2(0, 1)),
+      layerPos(new Vector2(0, 2)),
+      layerPos(new Vector2(1, 2)),
+      layerPos(new Vector2(2, 2)),
+    ]);
+  });
+
+  it("should find the shortest path for unidirectional jump point left", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: LOWER_CHAR_LAYER,
+        blockMap: [
+          // prettier-ignore
+          "..s",
+          "#..",
+          "t←.",
+          ".#.",
+          ".#.",
+        ],
+      },
+    ]);
+    const algo = new Jps4(gridTilemap);
+
+    const shortestPath = algo.findShortestPath(
+      layerPos(new Vector2(2, 0)),
+      layerPos(new Vector2(0, 2))
+    );
+
+    expect(shortestPath.path).toEqual([
+      layerPos(new Vector2(2, 0)),
+      layerPos(new Vector2(2, 1)),
+      layerPos(new Vector2(2, 2)),
+      layerPos(new Vector2(1, 2)),
+      layerPos(new Vector2(0, 2)),
     ]);
   });
 
