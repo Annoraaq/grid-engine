@@ -534,7 +534,7 @@ describe("Bfs", () => {
     expect(shortestPath.path.length).toEqual(3);
   });
 
-  it("should keep performance", () => {
+  it("should keep expansion count", () => {
     const tilemap = mockRandomMap(LOWER_CHAR_LAYER, 500, 500, 0.3, 12323);
 
     const gridTilemap = new GridTilemap(
@@ -550,6 +550,26 @@ describe("Bfs", () => {
     );
 
     expect(shortestPath.steps).toEqual(42363);
-    expect(shortestPath.path.length).toEqual(203);
+  });
+
+  it("should keep expansion count 8dir", () => {
+    const tilemap = mockRandomMap(LOWER_CHAR_LAYER, 500, 500, 0.3, 12323);
+
+    const gridTilemap = new GridTilemap(
+      tilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    const algo = new Bfs(gridTilemap, {
+      numberOfDirections: NumberOfDirections.EIGHT,
+    });
+
+    const shortestPath = algo.findShortestPath(
+      layerPos(new Vector2(150, 150)),
+      layerPos(new Vector2(250, 250))
+    );
+
+    expect(shortestPath.steps).toEqual(34195);
+    expect(shortestPath.path.length).toEqual(114);
   });
 });
