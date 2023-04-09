@@ -1,6 +1,5 @@
 import { Position } from "../GridEngine";
 import { Vector2 } from "../Utils/Vector2/Vector2";
-
 export enum Direction {
   NONE = "none",
   LEFT = "left",
@@ -12,6 +11,61 @@ export enum Direction {
   DOWN = "down",
   DOWN_LEFT = "down-left",
 }
+
+const oppositeDirections = {
+  [Direction.UP]: Direction.DOWN,
+  [Direction.DOWN]: Direction.UP,
+  [Direction.LEFT]: Direction.RIGHT,
+  [Direction.RIGHT]: Direction.LEFT,
+  [Direction.NONE]: Direction.NONE,
+  [Direction.UP_LEFT]: Direction.DOWN_RIGHT,
+  [Direction.UP_RIGHT]: Direction.DOWN_LEFT,
+  [Direction.DOWN_RIGHT]: Direction.UP_LEFT,
+  [Direction.DOWN_LEFT]: Direction.UP_RIGHT,
+};
+
+const directionVectors = {
+  [Direction.UP]: Vector2.UP,
+  [Direction.DOWN]: Vector2.DOWN,
+  [Direction.LEFT]: Vector2.LEFT,
+  [Direction.RIGHT]: Vector2.RIGHT,
+  [Direction.NONE]: Vector2.ZERO,
+  [Direction.UP_LEFT]: Vector2.UP_LEFT,
+  [Direction.UP_RIGHT]: Vector2.UP_RIGHT,
+  [Direction.DOWN_RIGHT]: Vector2.DOWN_RIGHT,
+  [Direction.DOWN_LEFT]: Vector2.DOWN_LEFT,
+};
+
+const clockwiseMapping = {
+  [Direction.LEFT]: Direction.UP_LEFT,
+  [Direction.UP_LEFT]: Direction.UP,
+  [Direction.UP]: Direction.UP_RIGHT,
+  [Direction.UP_RIGHT]: Direction.RIGHT,
+  [Direction.RIGHT]: Direction.DOWN_RIGHT,
+  [Direction.DOWN_RIGHT]: Direction.DOWN,
+  [Direction.DOWN]: Direction.DOWN_LEFT,
+  [Direction.DOWN_LEFT]: Direction.LEFT,
+  [Direction.NONE]: Direction.NONE,
+};
+
+const counterClockwiseMapping = {
+  [Direction.LEFT]: Direction.DOWN_LEFT,
+  [Direction.UP_LEFT]: Direction.LEFT,
+  [Direction.UP]: Direction.UP_LEFT,
+  [Direction.UP_RIGHT]: Direction.UP,
+  [Direction.RIGHT]: Direction.UP_RIGHT,
+  [Direction.DOWN_RIGHT]: Direction.RIGHT,
+  [Direction.DOWN]: Direction.DOWN_RIGHT,
+  [Direction.DOWN_LEFT]: Direction.DOWN,
+  [Direction.NONE]: Direction.NONE,
+};
+
+const diagonals = [
+  Direction.DOWN_LEFT,
+  Direction.DOWN_RIGHT,
+  Direction.UP_RIGHT,
+  Direction.UP_LEFT,
+];
 
 export function directions(): Direction[] {
   return [
@@ -28,12 +82,6 @@ export function directions(): Direction[] {
 }
 
 export function isDiagonal(direction: Direction): boolean {
-  const diagonals = [
-    Direction.DOWN_LEFT,
-    Direction.DOWN_RIGHT,
-    Direction.UP_RIGHT,
-    Direction.UP_LEFT,
-  ];
   return diagonals.includes(direction);
 }
 
@@ -48,62 +96,18 @@ export function isVertical(direction: Direction): boolean {
 }
 
 export function turnCounterClockwise(direction: Direction): Direction {
-  const mapping = {
-    [Direction.LEFT]: Direction.DOWN_LEFT,
-    [Direction.UP_LEFT]: Direction.LEFT,
-    [Direction.UP]: Direction.UP_LEFT,
-    [Direction.UP_RIGHT]: Direction.UP,
-    [Direction.RIGHT]: Direction.UP_RIGHT,
-    [Direction.DOWN_RIGHT]: Direction.RIGHT,
-    [Direction.DOWN]: Direction.DOWN_RIGHT,
-    [Direction.DOWN_LEFT]: Direction.DOWN,
-    [Direction.NONE]: Direction.NONE,
-  };
-  return mapping[direction];
+  return counterClockwiseMapping[direction];
 }
 
 export function turnClockwise(direction: Direction): Direction {
-  const mapping = {
-    [Direction.LEFT]: Direction.UP_LEFT,
-    [Direction.UP_LEFT]: Direction.UP,
-    [Direction.UP]: Direction.UP_RIGHT,
-    [Direction.UP_RIGHT]: Direction.RIGHT,
-    [Direction.RIGHT]: Direction.DOWN_RIGHT,
-    [Direction.DOWN_RIGHT]: Direction.DOWN,
-    [Direction.DOWN]: Direction.DOWN_LEFT,
-    [Direction.DOWN_LEFT]: Direction.LEFT,
-    [Direction.NONE]: Direction.NONE,
-  };
-  return mapping[direction];
+  return clockwiseMapping[direction];
 }
 
 export function directionVector(direction: Direction): Vector2 {
-  const directionVectors = {
-    [Direction.UP]: Vector2.UP,
-    [Direction.DOWN]: Vector2.DOWN,
-    [Direction.LEFT]: Vector2.LEFT,
-    [Direction.RIGHT]: Vector2.RIGHT,
-    [Direction.NONE]: Vector2.ZERO,
-    [Direction.UP_LEFT]: Vector2.UP_LEFT,
-    [Direction.UP_RIGHT]: Vector2.UP_RIGHT,
-    [Direction.DOWN_RIGHT]: Vector2.DOWN_RIGHT,
-    [Direction.DOWN_LEFT]: Vector2.DOWN_LEFT,
-  };
   return directionVectors[direction];
 }
 
 export function oppositeDirection(direction: Direction): Direction {
-  const oppositeDirections = {
-    [Direction.UP]: Direction.DOWN,
-    [Direction.DOWN]: Direction.UP,
-    [Direction.LEFT]: Direction.RIGHT,
-    [Direction.RIGHT]: Direction.LEFT,
-    [Direction.NONE]: Direction.NONE,
-    [Direction.UP_LEFT]: Direction.DOWN_RIGHT,
-    [Direction.UP_RIGHT]: Direction.DOWN_LEFT,
-    [Direction.DOWN_RIGHT]: Direction.UP_LEFT,
-    [Direction.DOWN_LEFT]: Direction.UP_RIGHT,
-  };
   return oppositeDirections[direction];
 }
 
