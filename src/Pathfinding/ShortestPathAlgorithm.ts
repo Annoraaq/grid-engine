@@ -159,30 +159,26 @@ export abstract class ShortestPathAlgorithm {
     const distanceUtils = DistanceUtilsFactory.create(
       this.options.numberOfDirections ?? NumberOfDirections.FOUR
     );
-    const neighbours = distanceUtils.neighbors(pos.position);
-    const transitions = this.gridTilemap.getTransitions();
-    const toCurrentLayer = [...transitions.keys()]
-      .filter((key) => key === pos.position.toString())
-      .map((k) => transitions.get(k))
-      .map((v) => {
-        if (!v) return [];
-        return [...v.keys()].filter((k) => v.get(k) === pos.layer);
-      })
-      .flat();
-
-    const transFromLayer = this.gridTilemap.getTransition(
+    const neighbors = distanceUtils.neighbors(pos.position);
+    const toCurrentLayer = this.gridTilemap.getReverseTransitions(
       pos.position,
       pos.layer
     );
-    if (!(transFromLayer && transFromLayer !== pos.layer)) {
-      toCurrentLayer.push(pos.layer);
-    }
+    const toCurrentLayerArr = toCurrentLayer ? [...toCurrentLayer] : undefined;
 
-    const transitionMappedNeighbors = neighbours
-      .map((unblockedNeighbor) => {
-        return toCurrentLayer.map((lay) => {
+    const transitionMappedNeighbors = neighbors
+      .map((neighbor) => {
+        if (!toCurrentLayerArr) {
+          return [
+            {
+              position: neighbor,
+              layer: pos.layer,
+            },
+          ];
+        }
+        return toCurrentLayerArr.map((lay) => {
           return {
-            position: unblockedNeighbor,
+            position: neighbor,
             layer: lay || pos.layer,
           };
         });

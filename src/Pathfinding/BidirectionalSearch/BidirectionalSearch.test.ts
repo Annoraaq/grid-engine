@@ -233,6 +233,50 @@ describe("BidirectionalSearch", () => {
     ]);
   });
 
+  it("should find the shortest path for transition on second BFS", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".s..",
+          "##.#",
+          "..*.",
+        ],
+      },
+      {
+        layer: "testCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "....",
+          "####",
+          ".t*.",
+        ],
+      },
+    ]);
+    const algo = new BidirectionalSearch(gridTilemap);
+
+    gridTilemap.setTransition(
+      new Vector2(2, 2),
+      "lowerCharLayer",
+      "testCharLayer"
+    );
+
+    const shortestPath = algo.findShortestPath(
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(1, 2), "testCharLayer")
+    );
+
+    expect(shortestPath.path).toEqual([
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(2, 0)),
+      layerPos(new Vector2(2, 1)),
+      layerPos(new Vector2(2, 2), "testCharLayer"),
+      layerPos(new Vector2(1, 2), "testCharLayer"),
+    ]);
+    expect(shortestPath.steps).toEqual(6);
+  });
+
   it("should find the shortest path for unidirectional blocking", () => {
     const gridTilemap = createTilemap([
       {

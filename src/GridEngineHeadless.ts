@@ -403,6 +403,7 @@ export class GridEngineHeadless implements IGridEngine {
         gridChar.update(delta);
       }
     }
+    this.gridTilemap?.invalidateFrameCache();
   }
 
   /** Adds a character after calling {@link create}. */
@@ -746,6 +747,7 @@ export class GridEngineHeadless implements IGridEngine {
       path: res.path.map(LayerPositionUtils.fromInternal),
       closestToTarget: LayerPositionUtils.fromInternal(res.closestToTarget),
       reachedMaxPathLength: false,
+      steps: res.steps,
     };
   }
 

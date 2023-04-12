@@ -26,6 +26,7 @@ export interface Position {
 
 /** Result of a pathfinding algorithm run. */
 export interface PathfindingResult {
+  steps: number;
   /**
    * Actual shortest path. Contains an empty array if no path has
    * been found.
