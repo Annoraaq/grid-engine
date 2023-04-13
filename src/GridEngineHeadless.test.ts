@@ -1182,6 +1182,7 @@ describe("GridEngineHeadless", () => {
         ],
         closestToTarget: layerPos(4, 4, "charLayer"),
         reachedMaxPathLength: false,
+        steps: 9,
       });
     });
 

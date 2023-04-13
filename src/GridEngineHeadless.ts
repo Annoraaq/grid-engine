@@ -601,11 +601,14 @@ export class GridEngineHeadless implements IGridEngine {
       gridChar,
       this.gridTilemap,
       gridCharToFollow,
-      options.distance,
-      options.closestPointIfBlocked
-        ? NoPathFoundStrategy.CLOSEST_REACHABLE
-        : NoPathFoundStrategy.STOP,
-      options.maxPathLength
+      {
+        distance: options.distance,
+        noPathFoundStrategy: options.closestPointIfBlocked
+          ? NoPathFoundStrategy.CLOSEST_REACHABLE
+          : NoPathFoundStrategy.STOP,
+        maxPathLength: options.maxPathLength ?? Infinity,
+        shortestPathAlgorithm: options.algorithm ?? "BIDIRECTIONAL_SEARCH",
+      }
     );
     gridChar.setMovement(followMovement);
   }

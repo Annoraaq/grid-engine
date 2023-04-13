@@ -8,6 +8,7 @@ import { Observable } from "rxjs";
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter";
 import { PathfindingOptions } from "./Pathfinding/Pathfinding";
 import { PositionChange } from "./GridCharacter/GridCharacter";
+import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
 
 export type CharLayer = string | undefined;
 
@@ -78,6 +79,11 @@ export interface FollowOptions {
    * infinite maps.
    */
   maxPathLength?: number;
+
+  /**
+   * Algorithm to use for pathfinding.
+   */
+  algorithm?: ShortestPathAlgorithmType;
 }
 
 /**
