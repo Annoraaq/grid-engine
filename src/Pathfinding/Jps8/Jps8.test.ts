@@ -525,7 +525,7 @@ describe("Jps8", () => {
     expect(shortestPath.path.length).toEqual(114);
   });
 
-  fit("should find the shortest path for transition edge case", () => {
+  it("should find the shortest path for transition edge case", () => {
     const gridTilemap = createTilemap([
       {
         layer: "lowerCharLayer",
