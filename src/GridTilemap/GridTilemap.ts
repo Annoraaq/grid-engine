@@ -13,7 +13,7 @@ import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
 import { CollisionStrategy } from "../Collisions/CollisionStrategy";
 import { CharLayer } from "../GridEngine";
 import { CHAR_LAYER_PROP_NAME, TileLayer, Tilemap } from "./Tilemap";
-
+import { TileCollisionCache } from "./TileCollisionCache/TileCollisionCache";
 export class GridTilemap {
   private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "ge_collide_";
   private characters = new Map<string, GridCharacter>();
@@ -35,10 +35,13 @@ export class GridTilemap {
   private collisionRelevantLayersFrameCache: Map<CharLayer, TileLayer[]> =
     new Map();
 
+  private tileCollisionCache?: TileCollisionCache;
+
   constructor(
     private tilemap: Tilemap,
     private collisionTilePropertyName: string,
-    collisionStrategy: CollisionStrategy
+    collisionStrategy: CollisionStrategy,
+    private useTileCollisionCache = false
   ) {
     this.charBlockCache = new CharBlockCache(collisionStrategy);
 
@@ -49,6 +52,11 @@ export class GridTilemap {
         dir,
         GridTilemap.ONE_WAY_COLLIDE_PROP_PREFIX + dir
       );
+    }
+
+    if (this.useTileCollisionCache) {
+      this.tileCollisionCache = new TileCollisionCache(tilemap, this);
+      this.tileCollisionCache.rebuild();
     }
   }
 
@@ -78,22 +86,49 @@ export class GridTilemap {
     return this.charBlockCache.getCharactersAt(position, layer);
   }
 
+  rebuildTileBlockCache(rect?: Rect): void {
+    this.tileCollisionCache?.rebuild(rect);
+  }
+
   // Performance critical method.
-  hasBlockingTile(
+  hasBlockingTileUncached(
     pos: Vector2,
     charLayer: string | undefined,
     direction?: Direction,
     ignoreHasTile?: boolean
   ): boolean {
-    const crl = this.getCollisionRelevantLayers(charLayer);
-    if (!ignoreHasTile && this.hasNoTile(pos, charLayer, crl)) return true;
+    if (!ignoreHasTile && this.hasNoTileUncached(pos, charLayer)) return true;
+
     // Keep out of loop for performance.
+    const crl = this.getCollisionRelevantLayers(charLayer);
     for (const layer of crl) {
       if (this.isLayerBlockingAt(layer.getName(), pos, direction)) {
         return true;
       }
     }
     return false;
+  }
+
+  hasBlockingTile(
+    pos: Vector2,
+    charLayer: string | undefined,
+    direction?: Direction,
+    ignoreHasTile?: boolean
+  ): boolean {
+    const cached = this.tileCollisionCache?.isBlockingFrom(
+      pos.x,
+      pos.y,
+      charLayer,
+      direction,
+      ignoreHasTile
+    );
+    if (cached !== undefined) return cached;
+    return this.hasBlockingTileUncached(
+      pos,
+      charLayer,
+      direction,
+      ignoreHasTile
+    );
   }
 
   getTransition(pos: Vector2, fromLayer?: string): string | undefined {
@@ -135,16 +170,19 @@ export class GridTilemap {
     );
   }
 
-  hasNoTile(
-    pos: Vector2,
-    charLayer?: string,
-    collisionRelevantLayers?: TileLayer[]
-  ): boolean {
-    const crl =
-      collisionRelevantLayers ?? this.getCollisionRelevantLayers(charLayer);
+  hasNoTileUncached(pos: Vector2, charLayer?: string): boolean {
+    const crl = this.getCollisionRelevantLayers(charLayer);
     return !crl.some((layer) =>
       this.tilemap.hasTileAt(pos.x, pos.y, layer.getName())
     );
+  }
+
+  hasNoTile(pos: Vector2, charLayer?: string): boolean {
+    const cached = this.tileCollisionCache?.hasTileAt(pos.x, pos.y, charLayer);
+    if (cached !== undefined) {
+      return cached;
+    }
+    return this.hasNoTileUncached(pos, charLayer);
   }
 
   hasBlockingChar(

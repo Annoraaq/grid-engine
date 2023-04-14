@@ -246,3 +246,21 @@ export function createAllowedFn(map: string[], ignoreBounds = false) {
     return map[y][x] != "#";
   };
 }
+
+export function updateLayer(tilemapMock, blockMap: string[], layer?: string) {
+  for (let r = 0; r < blockMap.length; r++) {
+    for (let c = 0; c < blockMap[r].length; c++) {
+      if (blockMap[r][c] == "#") {
+        tilemapMock
+          .getLayers()
+          .find((l) => l.getName() == layer)
+          .getData()[r][c].properties["ge_collide"] = "true";
+      } else {
+        tilemapMock
+          .getLayers()
+          .find((l) => l.getName() == layer)
+          .getData()[r][c].properties["ge_collide"] = undefined;
+      }
+    }
+  }
+}

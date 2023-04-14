@@ -15,6 +15,7 @@ import {
   COLLISION_GROUP,
   mockLayeredBlockMap,
   mockCharMap,
+  updateLayer,
 } from "../../Utils/MockFactory/MockFactory";
 
 const TEST_CHAR_CONFIG = {
@@ -544,6 +545,7 @@ describe("TargetMovement", () => {
       expect(mockChar.getTilePos()).toEqual(charPos);
 
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           ".p..",
@@ -604,6 +606,7 @@ describe("TargetMovement", () => {
       expect(mockChar.isMoving()).toBe(false);
 
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           ".p..",
@@ -673,6 +676,7 @@ describe("TargetMovement", () => {
       mockChar.update(1);
 
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           ".p..",
@@ -740,6 +744,7 @@ describe("TargetMovement", () => {
       mockChar.update(1);
 
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           ".p..",
@@ -781,6 +786,7 @@ describe("TargetMovement", () => {
       mockChar.update(1);
 
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           ".p..",
@@ -843,6 +849,7 @@ describe("TargetMovement", () => {
       expect(mockChar.isMoving()).toBe(false);
 
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           ".p..",
@@ -896,24 +903,6 @@ describe("TargetMovement", () => {
       .getData()[charPos.position.y + 1][charPos.position.x].properties[
       "ge_collide"
     ] = undefined;
-  }
-
-  function updateLayer(blockMap: string[], layer?: string) {
-    for (let r = 0; r < blockMap.length; r++) {
-      for (let c = 0; c < blockMap[r].length; c++) {
-        if (blockMap[r][c] == "#") {
-          tilemapMock
-            .getLayers()
-            .find((l) => l.getName() == layer)
-            .getData()[r][c].properties["ge_collide"] = "true";
-        } else {
-          tilemapMock
-            .getLayers()
-            .find((l) => l.getName() == layer)
-            .getData()[r][c].properties["ge_collide"] = undefined;
-        }
-      }
-    }
   }
 
   it("should timeout on strategy WAIT", () => {
@@ -1052,6 +1041,7 @@ describe("TargetMovement", () => {
       });
 
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           "....",
@@ -1071,6 +1061,7 @@ describe("TargetMovement", () => {
 
       expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           "....",
@@ -1121,6 +1112,7 @@ describe("TargetMovement", () => {
 
       expect(mockChar.isMoving()).toBe(false);
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           ".p..",
@@ -1172,6 +1164,7 @@ describe("TargetMovement", () => {
       mockChar.update(100);
       expect(mockChar.isMoving()).toBe(false);
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           ".p..",

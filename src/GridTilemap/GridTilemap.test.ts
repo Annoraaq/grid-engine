@@ -4,9 +4,13 @@ import { Vector2 } from "../Utils/Vector2/Vector2";
 import { Direction, NumberOfDirections } from "./../Direction/Direction";
 import { GridTilemap } from "./GridTilemap";
 import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
-import { mockLayeredBlockMap } from "../Utils/MockFactory/MockFactory";
+import {
+  mockLayeredBlockMap,
+  updateLayer,
+} from "../Utils/MockFactory/MockFactory";
 import { MockTilemap } from "../Utils/MockFactory/MockTilemap";
 import { Tilemap } from "./Tilemap";
+import { Rect } from "../Utils/Rect/Rect";
 
 describe("GridTilemap", () => {
   let gridTilemap: GridTilemap;
@@ -725,5 +729,72 @@ describe("GridTilemap", () => {
       );
       expect(gridTilemap.getTransitions()).toEqual(expectedTransitions);
     });
+  });
+
+  it("rebuilds cache partially", () => {
+    const tm = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "#...",
+          ".##.",
+          ".##.",
+          "....",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tm,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES,
+      true
+    );
+
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(0, 0), "lowerCharLayer")
+    ).toBe(true);
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(1, 1), "lowerCharLayer")
+    ).toBe(true);
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(2, 1), "lowerCharLayer")
+    ).toBe(true);
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(1, 2), "lowerCharLayer")
+    ).toBe(true);
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(2, 2), "lowerCharLayer")
+    ).toBe(true);
+
+    updateLayer(
+      tm,
+      [
+        // prettier-ignore
+        "....",
+        "....",
+        "....",
+        "....",
+      ],
+      "lowerCharLayer"
+    );
+
+    gridTilemap.rebuildTileBlockCache(new Rect(1, 1, 2, 1));
+
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(0, 0), "lowerCharLayer")
+    ).toBe(true);
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(1, 1), "lowerCharLayer")
+    ).toBe(false);
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(2, 1), "lowerCharLayer")
+    ).toBe(false);
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(1, 2), "lowerCharLayer")
+    ).toBe(true);
+    expect(
+      gridTilemap.hasBlockingTile(new Vector2(2, 2), "lowerCharLayer")
+    ).toBe(true);
   });
 });

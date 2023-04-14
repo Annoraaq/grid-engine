@@ -289,7 +289,8 @@ export class GridEngineHeadless implements IGridEngine {
     this.gridTilemap = new GridTilemap(
       tilemap,
       this.config.collisionTilePropertyName,
-      this.config.characterCollisionStrategy
+      this.config.characterCollisionStrategy,
+      true
     );
     this.addCharacters();
   }

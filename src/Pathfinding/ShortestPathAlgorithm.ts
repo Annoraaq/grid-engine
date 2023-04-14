@@ -3,11 +3,7 @@ import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { DistanceUtilsFactory } from "../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
 import { Vector2 } from "../Utils/Vector2/Vector2";
 import { PathfindingOptions } from "./Pathfinding";
-import {
-  directionFromPos,
-  NumberOfDirections,
-  oppositeDirection,
-} from "../Direction/Direction";
+import { directionFromPos, NumberOfDirections } from "../Direction/Direction";
 import { Concrete } from "../Utils/TypeUtils";
 import { LayerPositionUtils } from "../Utils/LayerPositionUtils/LayerPositionUtils";
 import { CharId } from "../GridCharacter/GridCharacter";
@@ -114,10 +110,20 @@ export abstract class ShortestPathAlgorithm {
   }
 
   isBlocking(src: LayerVecPos, dest: LayerVecPos): boolean {
+    // All the early returns are for performance.
+
+    const inRange =
+      this.options.ignoreMapBounds || this.gridTilemap.isInRange(dest.position);
+
+    if (!inRange) return true;
+
     const positionAllowed = this.options.isPositionAllowed(
       dest.position,
       dest.layer
     );
+
+    if (!positionAllowed) return true;
+
     const tileBlocking =
       !this.options.ignoreTiles &&
       hasBlockingTileFrom(
@@ -128,8 +134,8 @@ export abstract class ShortestPathAlgorithm {
         this.options.ignoreMapBounds,
         this.gridTilemap
       );
-    const inRange =
-      this.options.ignoreMapBounds || this.gridTilemap.isInRange(dest.position);
+
+    if (tileBlocking) return true;
 
     const charBlocking = hasBlockingCharFrom(
       dest,
@@ -140,7 +146,7 @@ export abstract class ShortestPathAlgorithm {
       this.gridTilemap
     );
 
-    return charBlocking || tileBlocking || !inRange || !positionAllowed;
+    return charBlocking;
   }
 
   distance(fromNode: Vector2, toNode: Vector2): number {
@@ -231,7 +237,7 @@ function hasBlockingTileFrom(
       const res = gridTilemap.hasBlockingTile(
         new Vector2(x, y),
         dest.layer,
-        oppositeDirection(directionFromPos(src.position, dest.position)),
+        directionFromPos(dest.position, src.position),
         ignoreMapBounds
       );
 
