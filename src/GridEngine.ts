@@ -592,6 +592,16 @@ export class GridEngine implements IGridEngine {
     return this.geHeadless.getMovementProgress(charId);
   }
 
+  /** {@inheritDoc IGridEngine.rebuildTileBlockCache} */
+  rebuildTileBlockCache(
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void {
+    this.geHeadless.rebuildTileBlockCache(x, y, width, height);
+  }
+
   private setConfigDefaults(
     config: GridEngineConfig
   ): Concrete<GridEngineConfig> {
@@ -600,6 +610,7 @@ export class GridEngine implements IGridEngine {
       numberOfDirections: NumberOfDirections.FOUR,
       characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
       layerOverlay: false,
+      cacheTileCollisions: false,
       ...config,
     };
   }

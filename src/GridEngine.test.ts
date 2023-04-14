@@ -388,6 +388,38 @@ describe("GridEngine", () => {
     expect(gridEngine.getCharLayer("player")).toEqual("someCharLayer");
   });
 
+  it("uses tile collision cache", () => {
+    const tm = createPhaserTilemapStub(
+      new Map([
+        [
+          undefined,
+          [
+            // prettier-ignore
+            "#.",
+            ".#",
+          ],
+        ],
+      ])
+    );
+    gridEngine.create(tm, {
+      characters: [{ id: "player", startPosition: { x: 1, y: 1 } }],
+      cacheTileCollisions: true,
+    });
+    expect(gridEngine.isTileBlocked({ x: 0, y: 0 })).toBe(true);
+    expect(gridEngine.isTileBlocked({ x: 1, y: 1 })).toBe(true);
+
+    tm.getLayer(undefined).data[0][0].properties = {};
+    tm.getLayer(undefined).data[1][1].properties = {};
+
+    expect(gridEngine.isTileBlocked({ x: 0, y: 0 })).toBe(true);
+    expect(gridEngine.isTileBlocked({ x: 1, y: 1 })).toBe(true);
+
+    gridEngine.rebuildTileBlockCache(0, 0, 1, 1);
+
+    expect(gridEngine.isTileBlocked({ x: 0, y: 0 })).toBe(false);
+    expect(gridEngine.isTileBlocked({ x: 1, y: 1 })).toBe(true);
+  });
+
   describe("move 4 dirs", () => {
     beforeEach(() => {
       const mock = createPhaserTilemapStub(

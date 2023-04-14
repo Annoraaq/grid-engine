@@ -50,6 +50,7 @@ import {
   PathfindingResult,
   Position,
 } from "./IGridEngine";
+import { Rect } from "./Utils/Rect/Rect";
 
 export {
   CollisionStrategy,
@@ -102,6 +103,16 @@ export interface GridEngineConfigHeadless {
    * @defaultValue {@link CollisionStrategy.BLOCK_TWO_TILES}
    */
   characterCollisionStrategy?: CollisionStrategy;
+
+  /**
+   * Specifies, whether a tile collision cache should be used. It can make
+   * pathfinding significantly faster. However, if you change something on the
+   * tilemap (adding layers, changing tiles, etc.) you need to call
+   * {@link GridEngineHeadless.rebuildTileBlockCache}.
+   *
+   * @defaultValue false
+   */
+  cacheTileCollisions?: boolean;
 }
 
 export interface CollisionConfig {
@@ -290,7 +301,7 @@ export class GridEngineHeadless implements IGridEngine {
       tilemap,
       this.config.collisionTilePropertyName,
       this.config.characterCollisionStrategy,
-      true
+      this.config.cacheTileCollisions
     );
     this.addCharacters();
   }
@@ -836,6 +847,16 @@ export class GridEngineHeadless implements IGridEngine {
     return gridChar.getMovementProgress();
   }
 
+  /** {@inheritDoc IGridEngine.rebuildTileBlockCache} */
+  rebuildTileBlockCache(
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void {
+    this.gridTilemap?.rebuildTileBlockCache(new Rect(x, y, width, height));
+  }
+
   private charRemoved(charId: string): Observable<string> {
     if (!this.charRemoved$) throw this.createUninitializedErr();
     return this.charRemoved$?.pipe(
@@ -921,6 +942,7 @@ export class GridEngineHeadless implements IGridEngine {
       collisionTilePropertyName: "ge_collide",
       numberOfDirections: NumberOfDirections.FOUR,
       characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
+      cacheTileCollisions: false,
       ...config,
     };
   }
