@@ -49,14 +49,14 @@ export class TileCollisionCache {
       .filter((layer) => layer.isCharLayer());
 
     for (const cl of [...charLayers, undefined]) {
-      let arr = this.tileCollisionCache.get(cl?.getName());
+      let layerArr = this.tileCollisionCache.get(cl?.getName());
 
-      if (arr === undefined) {
-        arr = new Array(this.tilemap.getWidth());
+      if (layerArr === undefined) {
+        layerArr = new Array(this.tilemap.getWidth());
         for (let i = 0; i < this.tilemap.getWidth(); i++) {
-          arr[i] = new Array(this.tilemap.getHeight());
+          layerArr[i] = new Array(this.tilemap.getHeight());
         }
-        this.tileCollisionCache.set(cl?.getName(), arr);
+        this.tileCollisionCache.set(cl?.getName(), layerArr);
       }
       for (let r = rect.getY(); r < rect.getY() + rect.getHeight(); r++) {
         for (let c = rect.getX(); c < rect.getX() + rect.getWidth(); c++) {
@@ -89,7 +89,7 @@ export class TileCollisionCache {
           if (blockedUndefined) {
             bitmap = setBitAt(bitmap, dirToBitmapNo[1]);
           }
-          arr[c][r] = bitmap;
+          layerArr[c][r] = bitmap;
         }
       }
     }

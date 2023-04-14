@@ -453,4 +453,15 @@ export interface IGridEngine {
    * moved 400/1000th of the distance to the next tile already.
    */
   getMovementProgress(charId: string): number;
+
+  /**
+   * Refresh the tile blocking cache. For performance reasons, you should
+   * provide an area that needs to be rebuilt, if possible.
+   */
+  rebuildTileBlockCache(
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void;
 }
