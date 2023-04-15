@@ -797,4 +797,65 @@ describe("GridTilemap", () => {
       gridTilemap.hasBlockingTile(new Vector2(2, 2), "lowerCharLayer")
     ).toBe(true);
   });
+
+  it("rebuilds cache partially", () => {
+    const tm = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".#",
+          "..",
+        ],
+      },
+      {
+        layer: "upperCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tm,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES,
+      true
+    );
+
+    gridTilemap.fixCacheLayer("lowerCharLayer");
+
+    expect(
+      gridTilemap.hasBlockingTile(
+        new Vector2(1, 0),
+        "lowerCharLayer",
+        undefined
+      )
+    ).toBe(true);
+    expect(
+      gridTilemap.hasBlockingTile(
+        new Vector2(1, 0),
+        "upperCharLayer",
+        undefined
+      )
+    ).toBe(true);
+
+    gridTilemap.unfixCacheLayers();
+
+    expect(
+      gridTilemap.hasBlockingTile(
+        new Vector2(1, 0),
+        "lowerCharLayer",
+        undefined
+      )
+    ).toBe(true);
+    expect(
+      gridTilemap.hasBlockingTile(
+        new Vector2(1, 0),
+        "upperCharLayer",
+        undefined
+      )
+    ).toBe(false);
+  });
 });

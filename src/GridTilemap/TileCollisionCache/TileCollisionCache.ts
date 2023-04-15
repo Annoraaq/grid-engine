@@ -3,6 +3,7 @@ import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { GridTilemap } from "../GridTilemap";
 import { Tilemap } from "../Tilemap";
 import { Rect } from "../../Utils/Rect/Rect";
+import { CharLayer } from "../../IGridEngine";
 
 const BITMAP_POS_HAS_TILE = 0;
 const BITMAP_POS_NO_DIRECTION = 1;
@@ -19,6 +20,7 @@ const dirToBitmapNo: Record<Direction, number> = {
 };
 
 export class TileCollisionCache {
+  private fixedLayer?: number[][];
   constructor(private tilemap: Tilemap, private gridTilemap: GridTilemap) {}
 
   // TODO: make tile collision cache an array for each layer for faster access
@@ -39,6 +41,14 @@ export class TileCollisionCache {
     number[][]
     // number
   > = new Map();
+
+  fixLayer(layer: CharLayer): void {
+    this.fixedLayer = this.tileCollisionCache.get(layer);
+  }
+
+  unfixLayers(): void {
+    this.fixedLayer = undefined;
+  }
 
   rebuild(rect?: Rect): void {
     if (!rect) {
@@ -96,7 +106,8 @@ export class TileCollisionCache {
   }
 
   hasTileAt(x: number, y: number, layer?: string): boolean | undefined {
-    const cached = this.tileCollisionCache.get(layer)?.[x]?.[y];
+    const arr = this.fixedLayer || this.tileCollisionCache.get(layer);
+    const cached = arr?.[x]?.[y];
     if (cached === undefined) return undefined;
     return getBitAt(cached, BITMAP_POS_HAS_TILE);
   }
@@ -108,7 +119,8 @@ export class TileCollisionCache {
     direction?: Direction,
     ignoreHasTile?: boolean
   ): boolean | undefined {
-    const cached = this.tileCollisionCache.get(layer)?.[x]?.[y];
+    const arr = this.fixedLayer || this.tileCollisionCache.get(layer);
+    const cached = arr?.[x]?.[y];
     if (cached === undefined) return undefined;
     if (!ignoreHasTile && !getBitAt(cached, BITMAP_POS_HAS_TILE)) return true;
     if (direction === undefined) {

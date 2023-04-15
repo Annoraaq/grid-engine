@@ -1561,6 +1561,68 @@ describe("TargetMovement", () => {
     });
   });
 
+  it("should ignore char layers", () => {
+    const charPos = layerPos(new Vector2(0, 0));
+    charPos.layer = "lowerCharLayer";
+    const targetPos = layerPos(new Vector2(2, 1));
+    targetPos.layer = "upperCharLayer";
+
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "s*.",
+          "...",
+        ],
+      },
+      {
+        layer: "upperCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".*.",
+          "..t",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    gridTilemap.setTransition(
+      new Vector2(1, 0),
+      "lowerCharLayer",
+      "upperCharLayer"
+    );
+    const mockChar = createMockChar("char", charPos, {
+      ...TEST_CHAR_CONFIG,
+      tilemap: gridTilemap,
+    });
+    gridTilemap.addCharacter(mockChar);
+
+    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+      config: {
+        algorithm: shortestPathAlgo,
+        ignoreLayers: true,
+      },
+    });
+
+    targetMovement.update(1000);
+    mockChar.update(1000);
+    targetMovement.update(1000);
+    mockChar.update(1000);
+    targetMovement.update(1000);
+    mockChar.update(1000);
+    targetMovement.update(1000);
+    mockChar.update(1000);
+
+    expect(mockChar.getTilePos()).toEqual({
+      position: new Vector2(2, 1),
+      layer: "lowerCharLayer",
+    });
+  });
+
   it("should find path for larger tile size", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const targetPos = layerPos(new Vector2(1, 3));

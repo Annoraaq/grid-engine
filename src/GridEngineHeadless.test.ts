@@ -655,6 +655,7 @@ describe("GridEngineHeadless", () => {
       distance: 7,
       closestPointIfBlocked: true,
       maxPathLength: 10000,
+      ignoreLayers: true,
     });
 
     expect(gridEngineHeadless.getMovement("player")).toEqual({
@@ -664,11 +665,12 @@ describe("GridEngineHeadless", () => {
         distance: 7,
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         maxPathLength: 10000,
+        ignoreLayers: true,
       },
     });
   });
 
-  it("should follow a char with default distance", () => {
+  it("should follow a char with default values", () => {
     gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
       characters: [{ id: "player" }, { id: "player2" }],
     });
@@ -682,6 +684,7 @@ describe("GridEngineHeadless", () => {
         distance: 0,
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
         maxPathLength: Infinity,
+        ignoreLayers: false,
       },
     });
   });

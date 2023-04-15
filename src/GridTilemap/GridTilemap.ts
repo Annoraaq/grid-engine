@@ -60,6 +60,14 @@ export class GridTilemap {
     }
   }
 
+  fixCacheLayer(layer: CharLayer): void {
+    this.tileCollisionCache?.fixLayer(layer);
+  }
+
+  unfixCacheLayers(): void {
+    this.tileCollisionCache?.unfixLayers();
+  }
+
   addCharacter(character: GridCharacter): void {
     this.characters.set(character.getId(), character);
     if (character.getNextTilePos().layer === undefined) {

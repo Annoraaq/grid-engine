@@ -63,7 +63,7 @@ export class Jps4 extends ShortestPathAlgorithm {
     this.distanceUtils = DistanceUtilsFactory.create(NumberOfDirections.FOUR);
   }
 
-  findShortestPath(
+  findShortestPathImpl(
     startPos: LayerVecPos,
     targetPos: LayerVecPos
   ): ShortestPathResult {

@@ -260,4 +260,49 @@ describe("TileCollisionCache", () => {
       tileCollisionCache.isBlockingFrom(2, 2, "lowerCharLayer", undefined)
     ).toBe(true);
   });
+
+  it("fixes layer", () => {
+    const tm = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".#",
+          "..",
+        ],
+      },
+      {
+        layer: "upperCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
+        ],
+      },
+    ]);
+    const gridTilemap = new GridTilemap(
+      tm,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    const tileCollisionCache = new TileCollisionCache(tm, gridTilemap);
+    tileCollisionCache.rebuild();
+    tileCollisionCache.fixLayer("lowerCharLayer");
+
+    expect(
+      tileCollisionCache.isBlockingFrom(1, 0, "lowerCharLayer", undefined)
+    ).toBe(true);
+    expect(
+      tileCollisionCache.isBlockingFrom(1, 0, "upperCharLayer", undefined)
+    ).toBe(true);
+
+    tileCollisionCache.unfixLayers();
+
+    expect(
+      tileCollisionCache.isBlockingFrom(1, 0, "lowerCharLayer", undefined)
+    ).toBe(true);
+    expect(
+      tileCollisionCache.isBlockingFrom(1, 0, "upperCharLayer", undefined)
+    ).toBe(false);
+  });
 });

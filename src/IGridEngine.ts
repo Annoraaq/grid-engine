@@ -84,6 +84,15 @@ export interface FollowOptions {
    * Algorithm to use for pathfinding.
    */
   algorithm?: ShortestPathAlgorithmType;
+
+  /**
+   * If set to `true`, pathfinding will only be performed on the char layer of
+   * the start position. If you don't use char layers, activating this setting
+   * can improve pathfinding performance.
+   *
+   * @default false
+   */
+  ignoreLayers?: boolean;
 }
 
 /**

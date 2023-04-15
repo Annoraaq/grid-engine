@@ -106,6 +106,15 @@ export interface MoveToConfig {
    * infinite maps.
    */
   maxPathLength?: number | undefined;
+
+  /**
+   * If set to `true`, pathfinding will only be performed on the char layer of
+   * the start position. If you don't use char layers, activating this setting
+   * can improve pathfinding performance.
+   *
+   * @default false
+   */
+  ignoreLayers?: boolean;
 }
 
 export enum MoveToResult {
@@ -146,6 +155,7 @@ export class TargetMovement implements Movement {
   private distanceUtils: DistanceUtils;
   private finished$: Subject<Finished>;
   private ignoreBlockedTarget: boolean;
+  private ignoreLayers: boolean;
   private distance: number;
   private isPositionAllowed: IsPositionAllowedFn = () => true;
   private shortestPathAlgorithm: ShortestPathAlgorithmType =
@@ -188,6 +198,8 @@ export class TargetMovement implements Movement {
     if (config?.maxPathLength) {
       this.maxPathLength = config.maxPathLength;
     }
+
+    this.ignoreLayers = !!config?.ignoreLayers;
 
     this.distanceUtils = DistanceUtilsFactory.create(
       character.getNumberOfDirections()
@@ -235,6 +247,7 @@ export class TargetMovement implements Movement {
       ignoreMapBounds: this.character.getIgnoreMissingTiles(),
       ignoreBlockedTarget: this.ignoreBlockedTarget,
       maxPathLength: this.maxPathLength,
+      ignoreLayers: this.ignoreLayers,
     };
   }
 
@@ -405,6 +418,7 @@ export class TargetMovement implements Movement {
   }
 
   private isBlocking = (pos?: Vector2, charLayer?: string): boolean => {
+    // TODO: why do a BFS here?
     if (!pos) return true;
 
     const bfs = new Bfs(this.tilemap, this.getPathfindingOptions());

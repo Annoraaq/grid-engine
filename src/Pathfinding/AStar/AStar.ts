@@ -15,7 +15,7 @@ interface ShortestPathTuple {
 }
 
 export class AStar extends ShortestPathAlgorithm {
-  findShortestPath(
+  findShortestPathImpl(
     startPos: LayerVecPos,
     targetPos: LayerVecPos
   ): ShortestPathResult {

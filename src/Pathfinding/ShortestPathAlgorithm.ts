@@ -44,13 +44,27 @@ export interface ShortestPathResult {
 export abstract class ShortestPathAlgorithm {
   protected options: Concrete<PathfindingOptions>;
 
-  abstract findShortestPath(
+  findShortestPath(
+    startPos: LayerVecPos,
+    targetPos: LayerVecPos
+  ): ShortestPathResult {
+    if (this.options.ignoreLayers) {
+      this.gridTilemap.fixCacheLayer(startPos.layer);
+      targetPos.layer = startPos.layer;
+    }
+    const res = this.findShortestPathImpl(startPos, targetPos);
+    this.gridTilemap.unfixCacheLayers();
+
+    return res;
+  }
+
+  abstract findShortestPathImpl(
     startPos: LayerVecPos,
     targetPos: LayerVecPos
   ): ShortestPathResult;
 
   constructor(
-    private gridTilemap: GridTilemap,
+    protected gridTilemap: GridTilemap,
     {
       shortestPathAlgorithm = "BFS",
       pathWidth = 1,
@@ -63,6 +77,7 @@ export abstract class ShortestPathAlgorithm {
       ignoreMapBounds = false,
       ignoreBlockedTarget = false,
       maxPathLength = Infinity,
+      ignoreLayers = false,
     }: PathfindingOptions = {}
   ) {
     this.options = {
@@ -77,6 +92,7 @@ export abstract class ShortestPathAlgorithm {
       ignoreMapBounds,
       ignoreBlockedTarget,
       maxPathLength,
+      ignoreLayers,
     };
   }
 
@@ -86,10 +102,14 @@ export abstract class ShortestPathAlgorithm {
     );
     const neighbours = distanceUtils.neighbors(pos.position);
     const transitionMappedNeighbors = neighbours.map((unblockedNeighbor) => {
-      const transition = this.gridTilemap.getTransition(
-        unblockedNeighbor,
-        pos.layer
-      );
+      let transition = pos.layer;
+      if (!this.options.ignoreLayers) {
+        transition = this.gridTilemap.getTransition(
+          unblockedNeighbor,
+          pos.layer
+        );
+      }
+
       return {
         position: unblockedNeighbor,
         layer: transition || pos.layer,
@@ -106,6 +126,7 @@ export abstract class ShortestPathAlgorithm {
   }
 
   getTransition(pos: Vector2, fromLayer?: string): string | undefined {
+    if (this.options.ignoreLayers) return undefined;
     return this.gridTilemap.getTransition(pos, fromLayer);
   }
 
@@ -126,7 +147,7 @@ export abstract class ShortestPathAlgorithm {
 
     const tileBlocking =
       !this.options.ignoreTiles &&
-      hasBlockingTileFrom(
+      this.hasBlockingTileFrom(
         src,
         dest,
         this.options.pathWidth,
@@ -137,7 +158,7 @@ export abstract class ShortestPathAlgorithm {
 
     if (tileBlocking) return true;
 
-    const charBlocking = hasBlockingCharFrom(
+    const charBlocking = this.hasBlockingCharFrom(
       dest,
       this.options.pathWidth,
       this.options.pathHeight,
@@ -166,11 +187,15 @@ export abstract class ShortestPathAlgorithm {
       this.options.numberOfDirections ?? NumberOfDirections.FOUR
     );
     const neighbors = distanceUtils.neighbors(pos.position);
-    const toCurrentLayer = this.gridTilemap.getReverseTransitions(
-      pos.position,
-      pos.layer
-    );
-    const toCurrentLayerArr = toCurrentLayer ? [...toCurrentLayer] : undefined;
+
+    let toCurrentLayerArr: CharLayer[] | undefined = undefined;
+    if (!this.options.ignoreLayers) {
+      const toCurrentLayer = this.gridTilemap.getReverseTransitions(
+        pos.position,
+        pos.layer
+      );
+      toCurrentLayerArr = toCurrentLayer ? [...toCurrentLayer] : undefined;
+    }
 
     const transitionMappedNeighbors = neighbors
       .map((neighbor) => {
@@ -199,50 +224,50 @@ export abstract class ShortestPathAlgorithm {
       );
     });
   }
-}
 
-function hasBlockingCharFrom(
-  pos: LayerVecPos,
-  pathWidth: number,
-  pathHeight: number,
-  collisionGroups: string[],
-  ignoredChars: CharId[],
-  gridTilemap: GridTilemap
-): boolean {
-  for (let x = pos.position.x; x < pos.position.x + pathWidth; x++) {
-    for (let y = pos.position.y; y < pos.position.y + pathHeight; y++) {
-      const res = gridTilemap.hasBlockingChar(
-        new Vector2(x, y),
-        pos.layer,
-        collisionGroups,
-        new Set(ignoredChars)
-      );
+  private hasBlockingCharFrom(
+    pos: LayerVecPos,
+    pathWidth: number,
+    pathHeight: number,
+    collisionGroups: string[],
+    ignoredChars: CharId[],
+    gridTilemap: GridTilemap
+  ): boolean {
+    for (let x = pos.position.x; x < pos.position.x + pathWidth; x++) {
+      for (let y = pos.position.y; y < pos.position.y + pathHeight; y++) {
+        const res = gridTilemap.hasBlockingChar(
+          new Vector2(x, y),
+          pos.layer,
+          collisionGroups,
+          new Set(ignoredChars)
+        );
 
-      if (res) return true;
+        if (res) return true;
+      }
     }
+    return false;
   }
-  return false;
-}
 
-function hasBlockingTileFrom(
-  src: LayerVecPos,
-  dest: LayerVecPos,
-  pathWidth: number,
-  pathHeight: number,
-  ignoreMapBounds: boolean,
-  gridTilemap: GridTilemap
-): boolean {
-  for (let x = dest.position.x; x < dest.position.x + pathWidth; x++) {
-    for (let y = dest.position.y; y < dest.position.y + pathHeight; y++) {
-      const res = gridTilemap.hasBlockingTile(
-        new Vector2(x, y),
-        dest.layer,
-        directionFromPos(dest.position, src.position),
-        ignoreMapBounds
-      );
+  private hasBlockingTileFrom(
+    src: LayerVecPos,
+    dest: LayerVecPos,
+    pathWidth: number,
+    pathHeight: number,
+    ignoreMapBounds: boolean,
+    gridTilemap: GridTilemap
+  ): boolean {
+    for (let x = dest.position.x; x < dest.position.x + pathWidth; x++) {
+      for (let y = dest.position.y; y < dest.position.y + pathHeight; y++) {
+        const res = gridTilemap.hasBlockingTile(
+          new Vector2(x, y),
+          dest.layer,
+          directionFromPos(dest.position, src.position),
+          ignoreMapBounds
+        );
 
-      if (res) return true;
+        if (res) return true;
+      }
     }
+    return false;
   }
-  return false;
 }

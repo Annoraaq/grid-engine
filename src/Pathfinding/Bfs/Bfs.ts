@@ -20,7 +20,7 @@ interface QueueEntry {
 }
 
 export class Bfs extends ShortestPathAlgorithm {
-  findShortestPath(
+  findShortestPathImpl(
     startPos: LayerVecPos,
     targetPos: LayerVecPos
   ): ShortestPathResult {

@@ -41,7 +41,7 @@ class Bfs {
 }
 
 export class BidirectionalSearch extends ShortestPathAlgorithm {
-  findShortestPath(
+  findShortestPathImpl(
     startPos: LayerVecPos,
     targetPos: LayerVecPos
   ): ShortestPathResult {

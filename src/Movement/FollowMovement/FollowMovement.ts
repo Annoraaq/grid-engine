@@ -17,6 +17,7 @@ export interface Options {
   noPathFoundStrategy?: NoPathFoundStrategy;
   maxPathLength?: number;
   shortestPathAlgorithm?: ShortestPathAlgorithmType;
+  ignoreLayers?: boolean;
 }
 
 export class FollowMovement implements Movement {
@@ -34,6 +35,7 @@ export class FollowMovement implements Movement {
       noPathFoundStrategy: NoPathFoundStrategy.STOP,
       maxPathLength: Infinity,
       shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
+      ignoreLayers: false,
     };
     this.options = { ...defaultOptions, ...options };
     this.character = character;
@@ -68,6 +70,7 @@ export class FollowMovement implements Movement {
         distance: this.options.distance,
         noPathFoundStrategy: this.options.noPathFoundStrategy,
         maxPathLength: this.options.maxPathLength,
+        ignoreLayers: this.options.ignoreLayers,
       },
     };
   }
@@ -86,6 +89,7 @@ export class FollowMovement implements Movement {
           algorithm: this.options.shortestPathAlgorithm,
           noPathFoundStrategy: this.options.noPathFoundStrategy,
           maxPathLength: this.options.maxPathLength,
+          ignoreLayers: this.options.ignoreLayers,
         },
         ignoreBlockedTarget: true,
       }

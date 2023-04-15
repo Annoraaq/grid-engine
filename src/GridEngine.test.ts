@@ -866,6 +866,7 @@ describe("GridEngine", () => {
       distance: 7,
       closestPointIfBlocked: true,
       maxPathLength: 10000,
+      ignoreLayers: true,
     });
 
     expect(gridEngine.getMovement("player")).toEqual({
@@ -875,11 +876,12 @@ describe("GridEngine", () => {
         distance: 7,
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         maxPathLength: 10000,
+        ignoreLayers: true,
       },
     });
   });
 
-  it("should follow a char with default distance", () => {
+  it("should follow a char with default values", () => {
     gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
@@ -902,6 +904,7 @@ describe("GridEngine", () => {
         distance: 0,
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
         maxPathLength: Infinity,
+        ignoreLayers: false,
       },
     });
   });

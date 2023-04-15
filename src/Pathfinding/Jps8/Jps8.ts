@@ -1,8 +1,4 @@
-import {
-  directionFromPos,
-  isDiagonal,
-  isHorizontal,
-} from "../../Direction/Direction";
+import { directionFromPos, isDiagonal } from "../../Direction/Direction";
 import {
   Direction,
   NumberOfDirections,

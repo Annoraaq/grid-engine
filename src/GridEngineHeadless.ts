@@ -620,6 +620,7 @@ export class GridEngineHeadless implements IGridEngine {
           : NoPathFoundStrategy.STOP,
         maxPathLength: options.maxPathLength ?? Infinity,
         shortestPathAlgorithm: options.algorithm ?? "BIDIRECTIONAL_SEARCH",
+        ignoreLayers: !!options.ignoreLayers,
       }
     );
     gridChar.setMovement(followMovement);

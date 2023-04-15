@@ -69,6 +69,7 @@ describe("FollowMovement", () => {
           algorithm: "BIDIRECTIONAL_SEARCH",
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           maxPathLength: Infinity,
+          ignoreLayers: false,
         },
         ignoreBlockedTarget: true,
       }
@@ -99,6 +100,7 @@ describe("FollowMovement", () => {
           algorithm: "BIDIRECTIONAL_SEARCH",
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           maxPathLength: Infinity,
+          ignoreLayers: false,
         },
         ignoreBlockedTarget: true,
       }
@@ -134,6 +136,7 @@ describe("FollowMovement", () => {
       distance: 7,
       noPathFoundStrategy: NoPathFoundStrategy.STOP,
       maxPathLength: 100,
+      ignoreLayers: true,
     });
     followMovement.update(100);
     expect(TargetMovement).toHaveBeenCalledWith(
@@ -146,6 +149,7 @@ describe("FollowMovement", () => {
           algorithm: "BIDIRECTIONAL_SEARCH",
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           maxPathLength: 100,
+          ignoreLayers: true,
         },
         ignoreBlockedTarget: true,
       }
@@ -168,6 +172,7 @@ describe("FollowMovement", () => {
           algorithm: "BIDIRECTIONAL_SEARCH",
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
           maxPathLength: Infinity,
+          ignoreLayers: false,
         },
         ignoreBlockedTarget: true,
       }
@@ -186,6 +191,7 @@ describe("FollowMovement", () => {
         distance: 7,
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         maxPathLength: Infinity,
+        ignoreLayers: false,
       },
     });
   });
