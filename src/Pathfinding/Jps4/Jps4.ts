@@ -19,6 +19,7 @@ import { DistanceUtilsFactory } from "../../Utils/DistanceUtilsFactory/DistanceU
 import { DistanceUtils } from "../../Utils/DistanceUtils";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { PathfindingOptions } from "../Pathfinding";
+import { VectorUtils } from "../../Utils/VectorUtils";
 
 interface ShortestPathTuple {
   previous: Map<string, LayerVecPos>;
@@ -352,7 +353,6 @@ export class Jps4 extends ShortestPathAlgorithm {
   ): LayerVecPos[] {
     const ret: LayerVecPos[] = [];
     let currentNode: LayerVecPos | undefined = stopNode;
-    // @ts-ignore
     ret.push(currentNode);
     while (!LayerPositionUtils.equal(currentNode, startNode)) {
       const prevNode = previous.get(LayerPositionUtils.toString(currentNode));
@@ -360,25 +360,22 @@ export class Jps4 extends ShortestPathAlgorithm {
         return [];
       }
       if (this.distance(prevNode.position, currentNode.position) > 1) {
-        ret.push(...this.fillPath(prevNode, currentNode).reverse());
+        this.fillPath(currentNode, prevNode, ret);
       } else {
         ret.push(prevNode);
       }
       currentNode = prevNode;
     }
-    const a = ret.reverse();
-    return a;
+    return ret.reverse();
   }
 
-  private fillPath(src: LayerVecPos, target: LayerVecPos): LayerVecPos[] {
+  private fillPath(src: LayerVecPos, target: LayerVecPos, ret: LayerVecPos[]) {
     let current = src;
-    const res: LayerVecPos[] = [];
-    while (!LayerPositionUtils.equal(current, target)) {
-      res.push(current);
+    do {
       const dir = directionFromPos(current.position, target.position);
       current = this.getTilePosInDir(current, dir);
-    }
-    return res;
+      ret.push(current);
+    } while (!VectorUtils.equal(current.position, target.position));
   }
 }
 
