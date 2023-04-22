@@ -12,8 +12,14 @@
     "@gridsome/remark-prismjs": "^0.5.0",
     "@gridsome/source-filesystem": "^0.6.2",
     "@gridsome/transformer-remark": "^0.6.4",
+    "@gridsome/vue-remark": "^0.2.6",
+    "chart.js": "^4.2.1",
     "gh-pages": "^5.0.0",
     "gridsome": "^0.7.23",
-    "gridsome-remark-embed-snippet": "^1.0.3"
+    "gridsome-remark-embed-snippet": "^1.0.3",
+    "vue-chartjs": "^5.2.0"
+  },
+  "devDependencies": {
+    "csv-loader": "^3.0.5"
   }
 }

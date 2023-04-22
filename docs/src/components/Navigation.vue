@@ -83,7 +83,7 @@ export default {
 
       const groupings = groups.map(group => {
         const pages = this.$static.pages.edges.filter(
-          page => page.node.fileInfo.directory.split('/')[2] === group.name
+          page => page.node.fileInfo.directory === group.name
         ).map(page => page.node);
         pages.sort((p1, p2) => nameToOrder(p1.fileInfo.name) - nameToOrder(p2.fileInfo.name));
         return {
@@ -105,7 +105,6 @@ export default {
 <style>
 
 .sidenav {
-  width: var(--nav-width);
   background: var(--dark-bg);
   margin-top: 1px;
 }
@@ -213,8 +212,10 @@ export default {
 @media (max-width: 1100px) {
   .sidenav {
     position: fixed;
-    width: auto;
-    height: 100%;
+    top:  var(--header-height);
+    bottom:0;
+    overflow-y:auto;
+    overflow-x:hidden;
     border-right: 1px solid var(--dark-bg-2);
     z-index: 1000;
   }

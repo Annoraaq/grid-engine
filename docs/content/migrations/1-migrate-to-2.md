@@ -49,7 +49,7 @@ this.gridEngine.movementStarted().subscribe(({ charId, direction }) => {
 
 All tile and tile layer properties that previously started with `gm_` have been renamed and now start with `ge_`.
 
-Further, the tile property `collides` is not a default property anymore. You can either rename it in your tilemap to `ge_collide` or you can set it as `collisionTilePropertyName` in the [config](../../api/interfaces/GridEngineConfig.html#collisionTilePropertyName).
+Further, the tile property `collides` is not a default property anymore. You can either rename it in your tilemap to `ge_collide` or you can set it as `collisionTilePropertyName` in the [config](../../api/interfaces/GridEngineConfig#htmlcollisionTilePropertyName).
 
 ## Remove `firstLayerAboveChar` Config Property
 

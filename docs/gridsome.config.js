@@ -20,20 +20,21 @@ module.exports = {
     {
       use: "@gridsome/source-filesystem",
       options: {
-        typeName: "MarkdownPage",
-        path: "./content/**/*.md",
-      },
-    },
-    {
-      use: "@gridsome/source-filesystem",
-      options: {
         typeName: "Readme",
         path: "../README.md",
       },
     },
+    {
+      use: '@gridsome/vue-remark',
+      options: {
+        typeName: 'MarkdownPage',
+        baseDir: './content',
+        template: './src/templates/MarkdownPage.vue',
+        route: "/p/:title",
+      }
+    }
   ],
   templates: {
-    MarkdownPage: "/p/:title",
     Example: "/example/:title",
     Readme: "/p/:title",
   },
@@ -45,5 +46,37 @@ module.exports = {
       ],
       autolinkClassName: 'autolink fa-solid fa-link'
     }
+  },
+
+  configureWebpack: {
+    // merged with the internal config
+    module: {
+      // rules: [
+      //   {
+      //     test: /\.js$/i,
+      //     exclude: /node_modules/,
+      //     use: ['babel-loader'],
+      //   }
+      // ]
+      rules: [
+        {
+          test: /\.js?$/,
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env"],
+            plugins: ["@babel/plugin-proposal-optional-chaining"],
+          },
+        },
+        {
+          test: /\.csv$/,
+          loader: 'csv-loader',
+          options: {
+            dynamicTyping: false,
+            // header: true,
+            skipEmptyLines: true
+          }
+        }
+      ],
+    },
   }
 }

@@ -9,7 +9,7 @@ Here are some issues we've come across, and how to fix them (if we've found a fi
 
 ## Invalid Scene Plugin: gridEngine
 
-<img src="../img/PGMPnotFound.png" alt="Invalid Scene Plugin: gridEngine error screenshot">
+![Invalid Scene Plugin: gridEngine error screenshot](../../src/assets/img/PGMPnotFound.png)
 This error will prevent loading of the plugin, and can occur if your bundler doesn't require `* as` for commonjs modules. To resolve this, try changing the following line:
 
 ```javascript
