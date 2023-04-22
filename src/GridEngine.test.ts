@@ -414,7 +414,7 @@ describe("GridEngine", () => {
     expect(gridEngine.isTileBlocked({ x: 0, y: 0 })).toBe(true);
     expect(gridEngine.isTileBlocked({ x: 1, y: 1 })).toBe(true);
 
-    gridEngine.rebuildTileBlockCache(0, 0, 1, 1);
+    gridEngine.rebuildTileCollisionCache(0, 0, 1, 1);
 
     expect(gridEngine.isTileBlocked({ x: 0, y: 0 })).toBe(false);
     expect(gridEngine.isTileBlocked({ x: 1, y: 1 })).toBe(true);

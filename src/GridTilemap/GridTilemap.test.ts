@@ -779,7 +779,7 @@ describe("GridTilemap", () => {
       "lowerCharLayer"
     );
 
-    gridTilemap.rebuildTileBlockCache(new Rect(1, 1, 2, 1));
+    gridTilemap.rebuildTileCollisionCache(new Rect(1, 1, 2, 1));
 
     expect(
       gridTilemap.hasBlockingTile(new Vector2(0, 0), "lowerCharLayer")

@@ -108,7 +108,9 @@ export interface GridEngineConfigHeadless {
    * Specifies, whether a tile collision cache should be used. It can make
    * pathfinding significantly faster. However, if you change something on the
    * tilemap (adding layers, changing tiles, etc.) you need to call
-   * {@link GridEngineHeadless.rebuildTileBlockCache}.
+   * {@link GridEngineHeadless.rebuildTileCollisionCache}. For more information on
+   * pathfinding performance check out
+   * {@link https://annoraaq.github.io/grid-engine/p/pathfinding-performance/| pathfinding performance}.
    *
    * @defaultValue false
    */
@@ -848,14 +850,14 @@ export class GridEngineHeadless implements IGridEngine {
     return gridChar.getMovementProgress();
   }
 
-  /** {@inheritDoc IGridEngine.rebuildTileBlockCache} */
-  rebuildTileBlockCache(
+  /** {@inheritDoc IGridEngine.rebuildTileCollisionCache} */
+  rebuildTileCollisionCache(
     x: number,
     y: number,
     width: number,
     height: number
   ): void {
-    this.gridTilemap?.rebuildTileBlockCache(new Rect(x, y, width, height));
+    this.gridTilemap?.rebuildTileCollisionCache(new Rect(x, y, width, height));
   }
 
   private charRemoved(charId: string): Observable<string> {

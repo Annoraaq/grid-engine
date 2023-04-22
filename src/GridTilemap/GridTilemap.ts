@@ -94,7 +94,7 @@ export class GridTilemap {
     return this.charBlockCache.getCharactersAt(position, layer);
   }
 
-  rebuildTileBlockCache(rect?: Rect): void {
+  rebuildTileCollisionCache(rect?: Rect): void {
     this.tileCollisionCache?.rebuild(rect);
   }
 

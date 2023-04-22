@@ -592,14 +592,14 @@ export class GridEngine implements IGridEngine {
     return this.geHeadless.getMovementProgress(charId);
   }
 
-  /** {@inheritDoc IGridEngine.rebuildTileBlockCache} */
-  rebuildTileBlockCache(
+  /** {@inheritDoc IGridEngine.rebuildTileCollisionCache} */
+  rebuildTileCollisionCache(
     x: number,
     y: number,
     width: number,
     height: number
   ): void {
-    this.geHeadless.rebuildTileBlockCache(x, y, width, height);
+    this.geHeadless.rebuildTileCollisionCache(x, y, width, height);
   }
 
   private setConfigDefaults(

@@ -218,7 +218,7 @@ describe("GridEngineHeadless", () => {
     expect(gridEngineHeadless.isTileBlocked({ x: 0, y: 0 })).toBe(true);
     expect(gridEngineHeadless.isTileBlocked({ x: 1, y: 1 })).toBe(true);
 
-    gridEngineHeadless.rebuildTileBlockCache(0, 0, 1, 1);
+    gridEngineHeadless.rebuildTileCollisionCache(0, 0, 1, 1);
 
     expect(gridEngineHeadless.isTileBlocked({ x: 0, y: 0 })).toBe(false);
     expect(gridEngineHeadless.isTileBlocked({ x: 1, y: 1 })).toBe(true);

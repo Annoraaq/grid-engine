@@ -464,10 +464,14 @@ export interface IGridEngine {
   getMovementProgress(charId: string): number;
 
   /**
-   * Refresh the tile blocking cache. For performance reasons, you should
-   * provide an area that needs to be rebuilt, if possible.
+   * Refresh the tile collision cache. For performance reasons, you should
+   * provide an area that needs to be rebuilt, if possible. You need to have
+   * {@link GridEngineConfigHeadless.cacheTileCollisions} enabled.
+   *
+   * For more information on pathfinding performance check out
+   * {@link https://annoraaq.github.io/grid-engine/p/pathfinding-performance/| pathfinding performance}.
    */
-  rebuildTileBlockCache(
+  rebuildTileCollisionCache(
     x: number,
     y: number,
     width: number,
