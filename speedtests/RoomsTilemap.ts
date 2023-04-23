@@ -5,8 +5,8 @@ const MIN_CHAR_CODE = "z".charCodeAt(0) + 1;
 const MAX_CHAR_CODE = MIN_CHAR_CODE + 255;
 
 export class RoomsTilemap implements Tilemap {
-  private height: number;
-  private width: number;
+  private height = 0;
+  private width = 0;
   private layers: TileLayer[];
   private layersByName: Map<string, TileLayer> = new Map();
   constructor(path: string | string[]) {

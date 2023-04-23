@@ -1,6 +1,7 @@
 import { BfsSpeed } from "./tests/BfsSpeed";
 import { BidirSpeed } from "./tests/BidirSpeed";
 import { GridEngineHeadless as GridEngineNew } from "../dist/GridEngine.esm.min.js";
+// @ts-ignore
 import { GridEngineHeadless as GridEngineOld } from "./old/dist/GridEngine.esm.min.js";
 import { RoomsTilemap } from "./RoomsTilemap";
 import { GridEngineHeadless } from "../src/GridEngineHeadless";
