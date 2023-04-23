@@ -57,6 +57,11 @@ export class Bfs extends ShortestPathAlgorithm {
     visited.add(LayerPositionUtils.toString(startNode));
 
     while (queue.size() > 0) {
+      // useless task to slow it down
+      for (let i = 0; i < 100; i++) {
+        console.log("hello");
+      }
+
       const dequeued = queue.dequeue();
       steps++;
       if (!dequeued) break;
