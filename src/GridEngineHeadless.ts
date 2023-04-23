@@ -753,14 +753,6 @@ export class GridEngineHeadless implements IGridEngine {
   ): PathfindingResult {
     if (!this.gridTilemap) throw this.createUninitializedErr();
     const pathfinding = new Pathfinding(this.gridTilemap);
-    pathfinding.findShortestPath(
-      LayerPositionUtils.toInternal(source),
-      LayerPositionUtils.toInternal(dest),
-      {
-        ...options,
-        shortestPathAlgorithm: options.shortestPathAlgorithm || "BFS",
-      }
-    );
     const res = pathfinding.findShortestPath(
       LayerPositionUtils.toInternal(source),
       LayerPositionUtils.toInternal(dest),
