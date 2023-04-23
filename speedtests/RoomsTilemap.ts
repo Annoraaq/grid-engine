@@ -1,9 +1,4 @@
-import {
-  Tilemap,
-  Orientation,
-  TileLayer,
-  Tile,
-} from "../src/GridEngineHeadless";
+import { Tilemap, Orientation, TileLayer, Tile } from "../src/GridEngine";
 const fs = require("fs");
 const CHAR_LAYER_PROP_NAME = "ge_charLayer";
 const MIN_CHAR_CODE = "z".charCodeAt(0) + 1;
