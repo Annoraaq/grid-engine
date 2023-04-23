@@ -31,6 +31,7 @@ geNew.create(geTm, { characters: [], cacheTileCollisions: true });
 
 const speedTests: SpeedTest[] = [BfsSpeed, BidirSpeed];
 
+let hasFailed = false;
 for (const t of speedTests) {
   const compRes = compare(t);
   if (compRes.failed) {
@@ -43,6 +44,7 @@ for (const t of speedTests) {
         compRes.resultOld.tolerance * 100
       }%`
     );
+    hasFailed = true;
   } else {
     console.log(
       `Test "${
@@ -54,6 +56,10 @@ for (const t of speedTests) {
       }%`
     );
   }
+}
+
+if (hasFailed) {
+  process.exit(1);
 }
 
 function compare(speedTest: SpeedTest): Result {
