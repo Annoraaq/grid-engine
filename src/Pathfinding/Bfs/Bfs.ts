@@ -59,7 +59,10 @@ export class Bfs extends ShortestPathAlgorithm {
     while (queue.size() > 0) {
       // useless task to slow it down
       for (let i = 0; i < 100; i++) {
-        console.log("hello");
+        // @ts-ignore
+        // @eslint-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const test = "asc" + "dev";
       }
 
       const dequeued = queue.dequeue();
