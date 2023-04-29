@@ -197,8 +197,8 @@ export interface IGridEngine {
   ): Observable<{ charId: string } & Finished>;
   /**
    * Stops any automated movement such as random movement
-   * ({@link moveRandomly}), following ({@link follow}) or moving to a
-   * specified position ({@link moveTo})
+   * ({@link moveRandomly}), following ({@link follow}), moving to a
+   * specified position ({@link moveTo}) or queued movements ({@link addQueueMovements}).
    */
   stopMovement(charId: string): void;
 
@@ -477,4 +477,7 @@ export interface IGridEngine {
     width: number,
     height: number
   ): void;
+
+  /** Adds new positions to the movement queue. */
+  // addQueueMovements(charId: string, positions: Position[]);
 }

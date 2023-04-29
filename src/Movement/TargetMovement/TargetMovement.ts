@@ -418,7 +418,6 @@ export class TargetMovement implements Movement {
   }
 
   private isBlocking = (pos?: Vector2, charLayer?: string): boolean => {
-    // TODO: why do a BFS here?
     if (!pos) return true;
 
     const bfs = new Bfs(this.tilemap, this.getPathfindingOptions());

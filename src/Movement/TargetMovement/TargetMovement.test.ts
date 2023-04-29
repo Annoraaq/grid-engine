@@ -91,7 +91,7 @@ describe("TargetMovement", () => {
     ]);
     gridTilemap = new GridTilemap(
       tilemapMock,
-      "ge_collides",
+      "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
     shortestPathAlgo = "BIDIRECTIONAL_SEARCH";
@@ -282,7 +282,7 @@ describe("TargetMovement", () => {
     ]);
     gridTilemap = new GridTilemap(
       tilemapMock,
-      "ge_collides",
+      "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
 
