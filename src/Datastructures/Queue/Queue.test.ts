@@ -50,6 +50,17 @@ describe("Queue", () => {
     expect(queue.size()).toBe(2);
   });
 
+  it("should peek all elements", () => {
+    const queue = new Queue();
+    const data = { some: "data" };
+    const data2 = { some: "data" };
+    const data3 = { some: "more data" };
+    queue.enqueue(data);
+    queue.enqueue(data2);
+    queue.enqueue(data3);
+    expect(queue.peekAll()).toEqual([data, data2, data3]);
+  });
+
   it("should reset head if queue is empty", () => {
     const queue = new Queue();
     queue.enqueue(1);

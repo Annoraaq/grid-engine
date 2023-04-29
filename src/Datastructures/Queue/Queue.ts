@@ -50,6 +50,17 @@ export class Queue<T> {
     return this.tail ? this.tail.data : undefined;
   }
 
+  peekAll(): T[] {
+    const arr: T[] = [];
+    let current = this.tail;
+    while (current) {
+      arr.push(current.data);
+      current = current.prev;
+    }
+
+    return arr;
+  }
+
   size(): number {
     return this.sizeInternal;
   }
