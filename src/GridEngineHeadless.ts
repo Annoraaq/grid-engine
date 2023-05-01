@@ -53,6 +53,7 @@ import {
 import { Rect } from "./Utils/Rect/Rect";
 import {
   QueueMovement,
+  QueueMovementConfig,
   Finished as QueueMovementFinished,
 } from "./Movement/QueueMovement/QueueMovement";
 
@@ -871,7 +872,11 @@ export class GridEngineHeadless implements IGridEngine {
   }
 
   /** {@inheritDoc IGridEngine.addQueueMovements} */
-  addQueueMovements(charId: string, positions: LayerPosition[]): void {
+  addQueueMovements(
+    charId: string,
+    positions: LayerPosition[],
+    options?: QueueMovementConfig
+  ): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
@@ -891,6 +896,7 @@ export class GridEngineHeadless implements IGridEngine {
           this.queueMovementFinished$?.next({ charId, ...finished });
         });
     }
+    queueMovement.setConfig(options);
     queueMovement.enqueue(
       positions.map((p) => ({
         position: new Vector2(p.position),

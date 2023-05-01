@@ -28,6 +28,18 @@ export interface QueueMovementConfig {
    * If not set, Grid Engine will wait forever.
    */
   pathBlockedWaitTimeoutMs?: number;
+
+  /**
+   * If `true`, it will not enqueue a tile position that is invalid, meaning not
+   * adjacent to the last position in the queue. It does *not* ignore blocked
+   * positions or positions that do not have a valid layer transition. The
+   * reason for this is that blocked positions or missing layer transitions
+   * might not be missing/blocked anymore when the character actually tries to
+   * move.
+   *
+   * @default `false`
+   */
+  ignoreInvalidPositions?: boolean;
 }
 
 /**
@@ -68,6 +80,7 @@ export class QueueMovement implements Movement {
   private pathBlockedStrategy: QueuedPathBlockedStrategy;
   private pathBlockedWaitTimeoutMs: number;
   private pathBlockedWaitElapsed = 0;
+  private ignoreInvalidPositions: boolean;
 
   constructor(
     private character: GridCharacter,
@@ -76,10 +89,11 @@ export class QueueMovement implements Movement {
   ) {
     this.pathBlockedStrategy =
       config.pathBlockedStrategy ?? QueuedPathBlockedStrategy.STOP;
+    this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
+    this.ignoreInvalidPositions = config.ignoreInvalidPositions ?? false;
     this.distanceUtils = DistanceUtilsFactory.create(
       character.getNumberOfDirections()
     );
-    this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
     this.character
       .autoMovementSet()
       .pipe(
@@ -93,6 +107,13 @@ export class QueueMovement implements Movement {
         this.finished$.complete();
       });
   }
+  setConfig(config: QueueMovementConfig = {}) {
+    this.pathBlockedStrategy =
+      config.pathBlockedStrategy ?? QueuedPathBlockedStrategy.STOP;
+    this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
+    this.ignoreInvalidPositions = config.ignoreInvalidPositions ?? false;
+  }
+
   update(delta: number): void {
     if (!this.character.isMoving() && this.queue.size() > 0) {
       this.moveCharOnPath(delta);
@@ -107,7 +128,15 @@ export class QueueMovement implements Movement {
 
   enqueue(positions: LayerVecPos[]): void {
     for (const pos of positions) {
-      this.queue.enqueue(pos);
+      let end = this.queue.peekEnd();
+      if (!end) {
+        end = this.character.getNextTilePos();
+      }
+      const isNeighborPos =
+        this.distanceUtils.distance(end.position, pos.position) === 1;
+      if (!this.ignoreInvalidPositions || isNeighborPos) {
+        this.queue.enqueue(pos);
+      }
     }
   }
 

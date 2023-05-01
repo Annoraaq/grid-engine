@@ -155,6 +155,56 @@ describe("QueueMovement", () => {
     expect(queueMovement.size()).toBe(0);
   });
 
+  it("should ignore invalid next positions", () => {
+    const {
+      mockChar,
+      queueMovement,
+      finishedObsCallbackMock,
+      finishedObsCompleteMock,
+    } = initQueueMovement(undefined, {
+      ignoreInvalidPositions: true,
+    });
+    queueMovement.enqueue([layerPos(1, 0), layerPos(2, 1)]);
+
+    expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
+    queueMovement.update(1000);
+    mockChar.update(1000);
+
+    expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+      position: layerPos(1, 0).position,
+      result: "SUCCESS",
+      description: "",
+      layer: "testCharLayer",
+    });
+    expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
+  });
+
+  it("should ignore invalid next positions on empty queue", () => {
+    const {
+      mockChar,
+      queueMovement,
+      finishedObsCallbackMock,
+      finishedObsCompleteMock,
+    } = initQueueMovement(undefined, {
+      ignoreInvalidPositions: true,
+    });
+    queueMovement.enqueue([layerPos(2, 0), layerPos(1, 0)]);
+
+    expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
+    queueMovement.update(1000);
+    mockChar.update(1000);
+
+    expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+      position: layerPos(1, 0).position,
+      result: "SUCCESS",
+      description: "",
+      layer: "testCharLayer",
+    });
+    expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
+  });
+
   it("should fail on invalid path", () => {
     const {
       mockChar,

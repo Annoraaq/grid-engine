@@ -1256,6 +1256,34 @@ describe("GridEngineHeadless", () => {
       });
     });
 
+    it("should apply options", () => {
+      createDefaultGridEngine();
+      const obs = jest.fn();
+
+      gridEngineHeadless.queueMovementFinished().subscribe(obs);
+      gridEngineHeadless.addQueueMovements(
+        "player",
+        [{ position: { x: 1, y: 1 }, charLayer: undefined }],
+        { ignoreInvalidPositions: true }
+      );
+      gridEngineHeadless.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+
+      gridEngineHeadless.update(0, 1000);
+
+      expect(obs).toHaveBeenCalledWith({
+        charId: "player",
+        description: "",
+        layer: undefined,
+        position: {
+          x: 1,
+          y: 0,
+        },
+        result: "SUCCESS",
+      });
+    });
+
     it("should unsubscribe from finish on movement change", () => {
       createDefaultGridEngine();
       const obs = jest.fn();

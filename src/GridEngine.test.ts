@@ -1482,6 +1482,33 @@ describe("GridEngine", () => {
       });
     });
 
+    it("should apply options", () => {
+      const obs = jest.fn();
+
+      gridEngine.queueMovementFinished().subscribe(obs);
+      gridEngine.addQueueMovements(
+        "player",
+        [{ position: { x: 1, y: 1 }, charLayer: undefined }],
+        { ignoreInvalidPositions: true }
+      );
+      gridEngine.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+
+      gridEngine.update(0, 1000);
+
+      expect(obs).toHaveBeenCalledWith({
+        charId: "player",
+        description: "",
+        layer: undefined,
+        position: {
+          x: 1,
+          y: 0,
+        },
+        result: "SUCCESS",
+      });
+    });
+
     it("should unsubscribe from finish on movement change", () => {
       const obs = jest.fn();
 
