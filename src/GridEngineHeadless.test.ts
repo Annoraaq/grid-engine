@@ -1237,7 +1237,11 @@ describe("GridEngineHeadless", () => {
       gridEngineHeadless.addQueueMovements("player", [
         { position: { x: 1, y: 0 }, charLayer: undefined },
       ]);
+      gridEngineHeadless.addQueueMovements("player", [
+        { position: { x: 1, y: 1 }, charLayer: undefined },
+      ]);
 
+      gridEngineHeadless.update(0, 1000);
       gridEngineHeadless.update(0, 1000);
 
       expect(obs).toHaveBeenCalledWith({
@@ -1246,7 +1250,7 @@ describe("GridEngineHeadless", () => {
         layer: undefined,
         position: {
           x: 1,
-          y: 0,
+          y: 1,
         },
         result: "SUCCESS",
       });
