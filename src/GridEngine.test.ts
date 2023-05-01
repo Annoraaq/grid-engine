@@ -1500,6 +1500,30 @@ describe("GridEngine", () => {
       expect(obs).not.toHaveBeenCalled();
     });
 
+    it("should unsubscribe from finish on movement stop", () => {
+      const obs = jest.fn();
+
+      gridEngine.queueMovementFinished().subscribe(obs);
+      gridEngine.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+
+      gridEngine.stopMovement("player");
+      expect(obs).toHaveBeenCalledWith(
+        expect.objectContaining({
+          charId: "player",
+          result: "MOVEMENT_TERMINATED",
+        })
+      );
+
+      obs.mockClear();
+
+      gridEngine.update(0, 1000);
+      expect(gridEngine.getPosition("player")).toEqual({ x: 0, y: 0 });
+
+      expect(obs).not.toHaveBeenCalled();
+    });
+
     it("should unsubscribe from finish on char remove", () => {
       const obs = jest.fn();
 

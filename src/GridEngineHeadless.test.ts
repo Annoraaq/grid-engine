@@ -1275,6 +1275,30 @@ describe("GridEngineHeadless", () => {
       expect(obs).not.toHaveBeenCalled();
     });
 
+    it("should unsubscribe from finish on movement stop", () => {
+      createDefaultGridEngine();
+      const obs = jest.fn();
+
+      gridEngineHeadless.queueMovementFinished().subscribe(obs);
+      gridEngineHeadless.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+
+      gridEngineHeadless.stopMovement("player");
+      expect(obs).toHaveBeenCalledWith(
+        expect.objectContaining({
+          charId: "player",
+          result: "MOVEMENT_TERMINATED",
+        })
+      );
+
+      obs.mockClear();
+
+      gridEngineHeadless.update(0, 1000);
+
+      expect(obs).not.toHaveBeenCalled();
+    });
+
     it("should unsubscribe from finish on char remove", () => {
       createDefaultGridEngine();
       const obs = jest.fn();
