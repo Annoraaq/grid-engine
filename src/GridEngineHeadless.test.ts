@@ -1228,6 +1228,69 @@ describe("GridEngineHeadless", () => {
     }
   });
 
+  describe("QueueMovement", () => {
+    it("should enqueue and finish", () => {
+      createDefaultGridEngine();
+      const obs = jest.fn();
+
+      gridEngineHeadless.queueMovementFinished().subscribe(obs);
+      gridEngineHeadless.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+
+      gridEngineHeadless.update(0, 1000);
+
+      expect(obs).toHaveBeenCalledWith({
+        charId: "player",
+        description: "",
+        layer: undefined,
+        position: {
+          x: 1,
+          y: 0,
+        },
+        result: "SUCCESS",
+      });
+    });
+
+    it("should unsubscribe from finish on movement change", () => {
+      createDefaultGridEngine();
+      const obs = jest.fn();
+
+      gridEngineHeadless.queueMovementFinished().subscribe(obs);
+      gridEngineHeadless.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+
+      gridEngineHeadless.moveTo("player", { x: 1, y: 0 });
+      expect(obs).toHaveBeenCalledWith(
+        expect.objectContaining({
+          charId: "player",
+          result: "MOVEMENT_TERMINATED",
+        })
+      );
+
+      obs.mockClear();
+      gridEngineHeadless.update(0, 1000);
+
+      expect(obs).not.toHaveBeenCalled();
+    });
+
+    it("should unsubscribe from finish on char remove", () => {
+      createDefaultGridEngine();
+      const obs = jest.fn();
+
+      gridEngineHeadless.queueMovementFinished().subscribe(obs);
+      gridEngineHeadless.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+
+      gridEngineHeadless.removeCharacter("player");
+      gridEngineHeadless.update(0, 1000);
+
+      expect(obs).not.toHaveBeenCalled();
+    });
+  });
+
   describe("Error Handling unknown char id", () => {
     const UNKNOWN_CHAR_ID = "unknownCharId";
     beforeEach(() => {
@@ -1307,6 +1370,9 @@ describe("GridEngineHeadless", () => {
       );
       expectCharUnknownException(() =>
         gridEngineHeadless.clearLabels(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.addQueueMovements(UNKNOWN_CHAR_ID, [])
       );
     });
 
@@ -1448,6 +1514,9 @@ describe("GridEngineHeadless", () => {
           { position: { x: 2, y: 2 }, charLayer: undefined },
           { position: { x: 2, y: 2 }, charLayer: undefined }
         )
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.addQueueMovements(SOME_CHAR_ID, [])
       );
     });
   });

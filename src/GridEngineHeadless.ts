@@ -17,7 +17,7 @@ import {
   NumberOfDirections,
 } from "./Direction/Direction";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
-import { Observable, Subject } from "rxjs";
+import { Observable, Subject, merge } from "rxjs";
 import { take, takeUntil, filter, map, mergeWith } from "rxjs/operators";
 import { Vector2 } from "./Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
@@ -51,6 +51,10 @@ import {
   Position,
 } from "./IGridEngine";
 import { Rect } from "./Utils/Rect/Rect";
+import {
+  QueueMovement,
+  Finished as QueueMovementFinished,
+} from "./Movement/QueueMovement/QueueMovement";
 
 export {
   CollisionStrategy,
@@ -239,6 +243,9 @@ export class GridEngineHeadless implements IGridEngine {
   private positionChangeFinished$?: Subject<
     { charId: string } & PositionChange
   >;
+  private queueMovementFinished$?: Subject<
+    { charId: string } & QueueMovementFinished
+  >;
   private charRemoved$?: Subject<string>;
   private charAdded$?: Subject<string>;
 
@@ -296,6 +303,9 @@ export class GridEngineHeadless implements IGridEngine {
     >();
     this.positionChangeFinished$ = new Subject<
       { charId: string } & PositionChange
+    >();
+    this.queueMovementFinished$ = new Subject<
+      { charId: string } & QueueMovementFinished
     >();
     this.charRemoved$ = new Subject<string>();
     this.charAdded$ = new Subject<string>();
@@ -858,6 +868,43 @@ export class GridEngineHeadless implements IGridEngine {
     height: number
   ): void {
     this.gridTilemap?.rebuildTileCollisionCache(new Rect(x, y, width, height));
+  }
+
+  /** {@inheritDoc IGridEngine.addQueueMovements} */
+  addQueueMovements(charId: string, positions: LayerPosition[]): void {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    if (!this.gridTilemap) throw this.createUninitializedErr();
+    let queueMovement: QueueMovement;
+    if (gridChar?.getMovement()?.getInfo().type === "Queue") {
+      queueMovement = gridChar.getMovement() as QueueMovement;
+    } else {
+      queueMovement = new QueueMovement(gridChar, this.gridTilemap);
+      gridChar.setMovement(queueMovement);
+      queueMovement
+        .finished()
+        .pipe(
+          takeUntil(merge(this.charRemoved(charId), gridChar.autoMovementSet()))
+        )
+        .subscribe((finished: QueueMovementFinished) => {
+          this.queueMovementFinished$?.next({ charId, ...finished });
+        });
+    }
+    queueMovement.enqueue(
+      positions.map((p) => ({
+        position: new Vector2(p.position),
+        layer: p.charLayer,
+      }))
+    );
+  }
+
+  /** {@inheritDoc IGridEngine.queueMovementFinished} */
+  queueMovementFinished(): Observable<
+    { charId: string } & QueueMovementFinished
+  > {
+    if (!this.queueMovementFinished$) throw this.createUninitializedErr();
+    return this.queueMovementFinished$;
   }
 
   private charRemoved(charId: string): Observable<string> {

@@ -4,6 +4,7 @@ import {
   Finished,
   MoveToConfig,
 } from "./Movement/TargetMovement/TargetMovement";
+import { Finished as QueueMovementFinished } from "./Movement/QueueMovement/QueueMovement";
 import { Observable } from "rxjs";
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter";
 import { PathfindingOptions } from "./Pathfinding/Pathfinding";
@@ -478,6 +479,17 @@ export interface IGridEngine {
     height: number
   ): void;
 
-  /** Adds new positions to the movement queue. */
-  // addQueueMovements(charId: string, positions: Position[]);
+  /**
+   * Adds new positions to the movement queue. Any other automatic movement of
+   * the character will be stopped.
+   */
+  addQueueMovements(charId: string, positions: LayerPosition[]);
+
+  /**
+   * Emits whenever queued movements for a character finish (with success or
+   * failure).
+   */
+  queueMovementFinished(): Observable<
+    { charId: string } & QueueMovementFinished
+  >;
 }
