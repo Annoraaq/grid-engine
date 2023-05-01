@@ -486,6 +486,62 @@ describe("QueueMovement", () => {
     expect(queueMovement.size()).toBe(0);
   });
 
+  it("should skip if path is invalid", () => {
+    const {
+      mockChar,
+      queueMovement,
+      finishedObsCallbackMock,
+      finishedObsCompleteMock,
+    } = initQueueMovement(undefined, {
+      skipInvalidPositions: true,
+    });
+    queueMovement.enqueue([layerPos(1, 0), layerPos(3, 0), layerPos(2, 0)]);
+
+    expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0), layerPos(2, 0)]);
+
+    expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+      position: layerPos(2, 0).position,
+      result: "SUCCESS",
+      description: "",
+      layer: "testCharLayer",
+    });
+    expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
+  });
+
+  it("should skip if path is blocked", () => {
+    const tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "testCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".#.",
+          "...",
+        ],
+      },
+    ]);
+    const {
+      mockChar,
+      queueMovement,
+      finishedObsCallbackMock,
+      finishedObsCompleteMock,
+    } = initQueueMovement(tilemapMock, {
+      pathBlockedStrategy: QueuedPathBlockedStrategy.SKIP,
+    });
+    queueMovement.enqueue([layerPos(1, 0), layerPos(0, 1)]);
+
+    expectWalkedPath(mockChar, queueMovement, [layerPos(0, 1)]);
+
+    expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+      position: layerPos(0, 1).position,
+      result: "SUCCESS",
+      description: "",
+      layer: "testCharLayer",
+    });
+    expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
+  });
+
   it("should wait if path is blocked only until timeout", () => {
     const tilemapMock = mockLayeredBlockMap([
       {

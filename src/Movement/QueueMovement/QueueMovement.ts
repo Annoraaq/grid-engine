@@ -14,7 +14,6 @@ import { filter, take } from "rxjs/operators";
 import { CharLayer, Position } from "../../IGridEngine";
 import { DistanceUtilsFactory } from "../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
 import { DistanceUtils } from "../../Utils/DistanceUtils";
-import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils";
 
 export interface QueueMovementConfig {
   /**
@@ -44,6 +43,20 @@ export interface QueueMovementConfig {
    * @default `false`
    */
   ignoreInvalidPositions?: boolean;
+
+  /**
+   * If `true`, it will not stop when an invalid (not blocked) movement is to be
+   * executed. Instead it will simply drop that movement and try the next one.
+   * Please note that in contrast to
+   * {@link QueueMovementConfig.ignoreInvalidPositions} this also includes
+   * movements that cannot be performed due to missing transitions.
+   *
+   * To control what happens with blocked positions, use
+   * {@link QueueMovementConfig.pathBlockedStrategy}
+   *
+   * @default `false`
+   */
+  skipInvalidPositions?: boolean;
 }
 
 /**
@@ -56,6 +69,12 @@ export enum QueuedPathBlockedStrategy {
    * be free again.
    */
   WAIT = "WAIT",
+
+  /**
+   * Makes the character skip the current movement and try the next in the
+   * queue.
+   */
+  SKIP = "SKIP",
 
   /**
    * Makes the character stop the movement.
@@ -85,6 +104,7 @@ export class QueueMovement implements Movement {
   private pathBlockedWaitTimeoutMs: number;
   private pathBlockedWaitElapsed = 0;
   private ignoreInvalidPositions: boolean;
+  private skipInvalidPositions: boolean;
 
   constructor(
     private character: GridCharacter,
@@ -95,6 +115,7 @@ export class QueueMovement implements Movement {
       config.pathBlockedStrategy ?? QueuedPathBlockedStrategy.STOP;
     this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
     this.ignoreInvalidPositions = config.ignoreInvalidPositions ?? false;
+    this.skipInvalidPositions = config.skipInvalidPositions ?? false;
     this.distanceUtils = DistanceUtilsFactory.create(
       character.getNumberOfDirections()
     );
@@ -116,6 +137,7 @@ export class QueueMovement implements Movement {
       config.pathBlockedStrategy ?? QueuedPathBlockedStrategy.STOP;
     this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
     this.ignoreInvalidPositions = config.ignoreInvalidPositions ?? false;
+    this.skipInvalidPositions = config.skipInvalidPositions ?? false;
   }
 
   update(delta: number): void {
@@ -163,9 +185,17 @@ export class QueueMovement implements Movement {
     const nextPos = this.queue.peek();
     if (!nextPos) return;
 
-    if (!this.isNeighborPos(nextPos)) {
-      this.finishInvalidNextPos(nextPos);
-      return;
+    if (!this.skipInvalidPositions) {
+      if (!this.isNeighborPos(nextPos)) {
+        this.finishInvalidNextPos(nextPos);
+        return;
+      }
+    } else {
+      const nextPos = this.getNextValidPosition();
+      if (!nextPos) {
+        this.finishInvalidNextPos(nextPos);
+        return;
+      }
     }
 
     if (
@@ -175,6 +205,10 @@ export class QueueMovement implements Movement {
     ) {
       if (this.pathBlockedStrategy === QueuedPathBlockedStrategy.STOP) {
         this.finishPathBlocked(nextPos);
+      } else if (this.pathBlockedStrategy === QueuedPathBlockedStrategy.SKIP) {
+        this.queue.dequeue();
+        this.moveCharOnPath(delta);
+        return;
       } else if (
         this.pathBlockedStrategy === QueuedPathBlockedStrategy.WAIT &&
         this.pathBlockedWaitTimeoutMs > -1
@@ -192,16 +226,23 @@ export class QueueMovement implements Movement {
       this.getDir(this.character.getTilePos().position, nextPos.position)
     );
 
-    if (this.isLastMovement(nextPos)) {
+    if (this.isLastMovement()) {
       this.finish("SUCCESS");
     }
   }
+  private getNextValidPosition(): LayerVecPos | undefined {
+    while (this.queue.size() > 0) {
+      const nextPos = this.queue.peek();
+      if (nextPos && this.isNeighborPos(nextPos)) {
+        return nextPos;
+      }
+      this.queue.dequeue();
+    }
+    return undefined;
+  }
 
-  private isLastMovement(nextPos: LayerVecPos): boolean {
-    return (
-      this.queue.size() === 0 &&
-      LayerPositionUtils.equal(this.character.getNextTilePos(), nextPos)
-    );
+  private isLastMovement(): boolean {
+    return this.queue.size() === 0;
   }
 
   private isNeighborPos(position: LayerVecPos): boolean {
@@ -231,13 +272,22 @@ export class QueueMovement implements Movement {
     );
   }
 
-  private finishInvalidNextPos(nextPos: LayerVecPos): void {
-    this.finish(
-      "INVALID_NEXT_POS",
-      `Position ${this.posToStr(nextPos)} is not reachable from ${this.posToStr(
-        this.character.getTilePos()
-      )}.`
-    );
+  private finishInvalidNextPos(nextPos: LayerVecPos | undefined): void {
+    if (nextPos) {
+      this.finish(
+        "INVALID_NEXT_POS",
+        `Position ${this.posToStr(
+          nextPos
+        )} is not reachable from ${this.posToStr(this.character.getTilePos())}.`
+      );
+    } else {
+      this.finish(
+        "INVALID_NEXT_POS",
+        `No enqueued position is reachable from ${this.posToStr(
+          this.character.getTilePos()
+        )}.`
+      );
+    }
   }
 
   private finishPathBlocked(nextPos: LayerVecPos): void {
