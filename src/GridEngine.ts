@@ -609,7 +609,7 @@ export class GridEngine implements IGridEngine {
   /** {@inheritDoc IGridEngine.addQueueMovements} */
   addQueueMovements(
     charId: string,
-    positions: LayerPosition[],
+    positions: Array<LayerPosition | Direction>,
     options?: QueueMovementConfig
   ): void {
     this.geHeadless.addQueueMovements(charId, positions, options);

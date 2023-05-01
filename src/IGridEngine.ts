@@ -492,7 +492,7 @@ export interface IGridEngine {
    */
   addQueueMovements(
     charId: string,
-    positions: LayerPosition[],
+    positions: Array<LayerPosition | Direction>,
     options?: QueueMovementConfig
   );
 

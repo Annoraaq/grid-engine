@@ -83,8 +83,8 @@ describe("GridEngine", () => {
           layer,
           [
             // prettier-ignore
-            "..",
-            "..",
+            "...",
+            "...",
           ],
         ],
       ])
@@ -129,6 +129,7 @@ describe("GridEngine", () => {
           id: "player",
           sprite: playerSpriteMock,
           walkingAnimationMapping: 0,
+          speed: 1,
         },
       ],
     });
@@ -1476,6 +1477,34 @@ describe("GridEngine", () => {
         layer: undefined,
         position: {
           x: 1,
+          y: 1,
+        },
+        result: "SUCCESS",
+      });
+    });
+
+    it("should enqueue and finish", () => {
+      const obs = jest.fn();
+
+      gridEngine.queueMovementFinished().subscribe(obs);
+      gridEngine.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+      gridEngine.addQueueMovements("player", [
+        { position: { x: 1, y: 1 }, charLayer: undefined },
+      ]);
+      gridEngine.addQueueMovements("player", [Direction.RIGHT]);
+
+      gridEngine.update(0, 1000);
+      gridEngine.update(0, 1000);
+      gridEngine.update(0, 1000);
+
+      expect(obs).toHaveBeenCalledWith({
+        charId: "player",
+        description: "",
+        layer: undefined,
+        position: {
+          x: 2,
           y: 1,
         },
         result: "SUCCESS",

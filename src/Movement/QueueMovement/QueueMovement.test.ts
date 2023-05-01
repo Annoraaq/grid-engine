@@ -6,7 +6,7 @@ import {
 } from "./QueueMovement";
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
 import { CharConfig, GridCharacter } from "../../GridCharacter/GridCharacter";
-import { NumberOfDirections } from "../../Direction/Direction";
+import { Direction, NumberOfDirections } from "../../Direction/Direction";
 import {
   mockLayeredBlockMap,
   updateLayer,
@@ -131,6 +131,20 @@ describe("QueueMovement", () => {
     expect(queueMovement.peekAll()).toEqual([
       { position: new Vector2(0, 1), layer: "testLayer" },
       { position: new Vector2(0, 2), layer: "testlayer2" },
+    ]);
+  });
+
+  it("should add directions", () => {
+    const { queueMovement } = initQueueMovement();
+    expect(queueMovement.size()).toEqual(0);
+    queueMovement.enqueue([
+      { position: new Vector2(0, 1), layer: "testLayer" },
+      Direction.DOWN,
+    ]);
+    expect(queueMovement.size()).toEqual(2);
+    expect(queueMovement.peekAll()).toEqual([
+      { position: new Vector2(0, 1), layer: "testLayer" },
+      { position: new Vector2(0, 2), layer: "testLayer" },
     ]);
   });
 

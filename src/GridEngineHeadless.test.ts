@@ -1230,7 +1230,14 @@ describe("GridEngineHeadless", () => {
 
   describe("QueueMovement", () => {
     it("should enqueue and finish", () => {
-      createDefaultGridEngine();
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMap([
+          "...",
+          "...",
+        ]),
+        { characters: [{ id: "player", speed: 1 }] }
+      );
       const obs = jest.fn();
 
       gridEngineHeadless.queueMovementFinished().subscribe(obs);
@@ -1240,7 +1247,9 @@ describe("GridEngineHeadless", () => {
       gridEngineHeadless.addQueueMovements("player", [
         { position: { x: 1, y: 1 }, charLayer: undefined },
       ]);
+      gridEngineHeadless.addQueueMovements("player", [Direction.RIGHT]);
 
+      gridEngineHeadless.update(0, 1000);
       gridEngineHeadless.update(0, 1000);
       gridEngineHeadless.update(0, 1000);
 
@@ -1249,7 +1258,7 @@ describe("GridEngineHeadless", () => {
         description: "",
         layer: undefined,
         position: {
-          x: 1,
+          x: 2,
           y: 1,
         },
         result: "SUCCESS",
@@ -1257,7 +1266,14 @@ describe("GridEngineHeadless", () => {
     });
 
     it("should apply options", () => {
-      createDefaultGridEngine();
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMap([
+          "...",
+          "...",
+        ]),
+        { characters: [{ id: "player", speed: 1 }] }
+      );
       const obs = jest.fn();
 
       gridEngineHeadless.queueMovementFinished().subscribe(obs);
@@ -1285,7 +1301,14 @@ describe("GridEngineHeadless", () => {
     });
 
     it("should unsubscribe from finish on movement change", () => {
-      createDefaultGridEngine();
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMap([
+          "...",
+          "...",
+        ]),
+        { characters: [{ id: "player", speed: 1 }] }
+      );
       const obs = jest.fn();
 
       gridEngineHeadless.queueMovementFinished().subscribe(obs);
@@ -1308,7 +1331,14 @@ describe("GridEngineHeadless", () => {
     });
 
     it("should unsubscribe from finish on movement stop", () => {
-      createDefaultGridEngine();
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMap([
+          "...",
+          "...",
+        ]),
+        { characters: [{ id: "player", speed: 1 }] }
+      );
       const obs = jest.fn();
 
       gridEngineHeadless.queueMovementFinished().subscribe(obs);
@@ -1332,7 +1362,14 @@ describe("GridEngineHeadless", () => {
     });
 
     it("should unsubscribe from finish on char remove", () => {
-      createDefaultGridEngine();
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMap([
+          "...",
+          "...",
+        ]),
+        { characters: [{ id: "player", speed: 1 }] }
+      );
       const obs = jest.fn();
 
       gridEngineHeadless.queueMovementFinished().subscribe(obs);
@@ -1590,8 +1627,8 @@ describe("GridEngineHeadless", () => {
     gridEngineHeadless.create(
       // prettier-ignore
       mockBlockMap([
-        "..",
-        ".."
+        "...",
+        "...",
       ]),
       { characters: [{ id: "player" }] }
     );

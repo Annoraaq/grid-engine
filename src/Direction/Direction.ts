@@ -132,3 +132,7 @@ export enum NumberOfDirections {
   FOUR = 4,
   EIGHT = 8,
 }
+
+export function isDirection(val: any): val is Direction {
+  return typeof val === "string" && directions().includes(val as Direction);
+}

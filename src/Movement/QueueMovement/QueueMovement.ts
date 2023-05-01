@@ -1,5 +1,9 @@
 import { Queue } from "../../Datastructures/Queue/Queue";
-import { Direction, directionFromPos } from "../../Direction/Direction";
+import {
+  Direction,
+  directionFromPos,
+  isDirection,
+} from "../../Direction/Direction";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
@@ -126,11 +130,14 @@ export class QueueMovement implements Movement {
     };
   }
 
-  enqueue(positions: LayerVecPos[]): void {
-    for (const pos of positions) {
+  enqueue(positions: Array<LayerVecPos | Direction>): void {
+    for (let pos of positions) {
       let end = this.queue.peekEnd();
       if (!end) {
         end = this.character.getNextTilePos();
+      }
+      if (isDirection(pos)) {
+        pos = this.tilemap.getTilePosInDirection(end, pos);
       }
       const isNeighborPos =
         this.distanceUtils.distance(end.position, pos.position) === 1;

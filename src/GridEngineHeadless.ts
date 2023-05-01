@@ -14,6 +14,7 @@ import {
 import {
   Direction,
   isDiagonal,
+  isDirection,
   NumberOfDirections,
 } from "./Direction/Direction";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
@@ -874,7 +875,7 @@ export class GridEngineHeadless implements IGridEngine {
   /** {@inheritDoc IGridEngine.addQueueMovements} */
   addQueueMovements(
     charId: string,
-    positions: LayerPosition[],
+    positions: Array<LayerPosition | Direction>,
     options?: QueueMovementConfig
   ): void {
     this.initGuard();
@@ -898,10 +899,15 @@ export class GridEngineHeadless implements IGridEngine {
     }
     queueMovement.setConfig(options);
     queueMovement.enqueue(
-      positions.map((p) => ({
-        position: new Vector2(p.position),
-        layer: p.charLayer,
-      }))
+      positions.map((p) => {
+        if (isDirection(p)) {
+          return p;
+        }
+        return {
+          position: new Vector2(p.position),
+          layer: p.charLayer,
+        };
+      })
     );
   }
 
