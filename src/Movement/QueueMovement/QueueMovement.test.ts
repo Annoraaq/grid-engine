@@ -152,6 +152,7 @@ describe("QueueMovement", () => {
       layer: "testCharLayer",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
   });
 
   it("should fail on invalid path", () => {
@@ -175,6 +176,7 @@ describe("QueueMovement", () => {
       layer: "testCharLayer",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
   });
 
   it("should complete on new automatic movement set", () => {
@@ -195,6 +197,7 @@ describe("QueueMovement", () => {
       layer: "testCharLayer",
     });
     expect(finishedObsCompleteMock).toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
   });
 
   it("should complete on new automatic movement set with empty queue", () => {
@@ -233,6 +236,7 @@ describe("QueueMovement", () => {
       layer: "testCharLayer",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
   });
 
   it("should fail if transition missing", () => {
@@ -256,6 +260,7 @@ describe("QueueMovement", () => {
       layer: "testCharLayer",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
   });
 
   it("should consider transition", () => {
@@ -285,6 +290,7 @@ describe("QueueMovement", () => {
       layer: "someOtherLayer",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
   });
 
   it("should stop if path is blocked", () => {
@@ -317,6 +323,7 @@ describe("QueueMovement", () => {
       layer: "testCharLayer",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
   });
 
   it("should stop if path is blocked on transition", () => {
@@ -363,6 +370,7 @@ describe("QueueMovement", () => {
       layer: "testCharLayer",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
   });
 
   it("should wait if path is blocked", () => {
@@ -411,6 +419,7 @@ describe("QueueMovement", () => {
       layer: "testCharLayer",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
   });
 
   it("should wait if path is blocked only until timeout", () => {
@@ -454,6 +463,7 @@ describe("QueueMovement", () => {
       layer: "testCharLayer",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
   });
 
   it("should reset wait timeout", () => {

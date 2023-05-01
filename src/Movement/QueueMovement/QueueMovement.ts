@@ -221,6 +221,7 @@ export class QueueMovement implements Movement {
   }
 
   private finish(result: QueueMovementResult, description = ""): void {
+    this.queue = new Queue<LayerVecPos>();
     this.finished$.next({
       position: this.character.getNextTilePos().position,
       result,
