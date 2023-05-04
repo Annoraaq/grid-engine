@@ -29,12 +29,20 @@ class Bfs {
   queue = new Queue<QueueEntry>();
   otherBfs?: Bfs;
 
-  step(neighbors: LayerVecPos[], node: LayerVecPos, dist: number) {
+  step(
+    neighbors: LayerVecPos[],
+    node: LayerVecPos,
+    dist: number
+  ): LayerVecPos | undefined {
     for (const neighbor of neighbors) {
-      if (!this.visited.has(LayerPositionUtils.toString(neighbor))) {
-        this.previous.set(LayerPositionUtils.toString(neighbor), node);
+      const nStr = LayerPositionUtils.toString(neighbor);
+      if (!this.visited.has(nStr)) {
+        this.previous.set(nStr, node);
         this.queue.enqueue({ node: neighbor, dist: dist + 1 });
-        this.visited.set(LayerPositionUtils.toString(neighbor), dist + 1);
+        this.visited.set(nStr, dist + 1);
+        if (this.otherBfs?.visited.has(nStr)) {
+          return neighbor;
+        }
       }
     }
   }
@@ -115,39 +123,42 @@ export class BidirectionalSearch extends ShortestPathAlgorithm {
         closestToTarget = node;
       }
 
-      if (stopBfs.visited.has(LayerPositionUtils.toString(node))) {
+      steps++;
+      let matchingPos = startBfs.step(
+        this.getNeighbors(node, stopNode),
+        node,
+        dist
+      );
+      if (matchingPos) {
         return {
           previous: startBfs.previous,
           previous2: stopBfs.previous,
           closestToTarget: stopNode,
-          matchingPos: node,
+          matchingPos,
           steps,
           maxPathLengthReached: false,
         };
       }
-
-      steps++;
-      startBfs.step(this.getNeighbors(node, stopNode), node, dist);
       const stopDequeued = stopBfs.queue.dequeue();
       if (!stopDequeued) continue;
       const { node: stopBfsNode, dist: stopBfsDist } = stopDequeued;
-      if (startBfs.visited.has(LayerPositionUtils.toString(stopBfsNode))) {
-        return {
-          previous: startBfs.previous,
-          previous2: stopBfs.previous,
-          closestToTarget: stopNode,
-          matchingPos: stopBfsNode,
-          steps,
-          maxPathLengthReached: false,
-        };
-      }
 
       steps++;
-      stopBfs.step(
+      matchingPos = stopBfs.step(
         this.getReverseNeighbors(stopBfsNode, stopNode),
         stopBfsNode,
         stopBfsDist
       );
+      if (matchingPos) {
+        return {
+          previous: startBfs.previous,
+          previous2: stopBfs.previous,
+          closestToTarget: stopNode,
+          matchingPos,
+          steps,
+          maxPathLengthReached: false,
+        };
+      }
     }
     return {
       previous: startBfs.previous,

@@ -307,7 +307,7 @@ describe("BidirectionalSearch", () => {
     ]);
   });
 
-  it("should find path with 8 directions", () => {
+  it("should find simple path with 8 directions", () => {
     const gridTilemap = createTilemap([
       {
         layer: LOWER_CHAR_LAYER,
@@ -328,6 +328,36 @@ describe("BidirectionalSearch", () => {
     );
 
     expect(shortestPath.path.length).toEqual(2);
+  });
+
+  it("should find path with 8 directions", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: LOWER_CHAR_LAYER,
+        blockMap: [
+          // prettier-ignore
+          "...........",
+          "...........",
+          "...s.......",
+          "...........",
+          "...........",
+          "...........",
+          ".......t...",
+          "...........",
+          "...........",
+        ],
+      },
+    ]);
+    const algo = new BidirectionalSearch(gridTilemap, {
+      numberOfDirections: NumberOfDirections.EIGHT,
+    });
+
+    const shortestPath = algo.findShortestPath(
+      layerPos(new Vector2(3, 2)),
+      layerPos(new Vector2(7, 6))
+    );
+
+    expect(shortestPath.path.length).toEqual(5);
   });
 
   it("should find the shortest path for allowed positions", () => {
@@ -598,7 +628,7 @@ describe("BidirectionalSearch", () => {
       layerPos(new Vector2(250, 250))
     );
 
-    expect(shortestPath.steps).toEqual(24620);
+    expect(shortestPath.steps).toEqual(24226);
     expect(shortestPath.path.length).toEqual(203);
   });
 
@@ -618,7 +648,7 @@ describe("BidirectionalSearch", () => {
       layerPos(new Vector2(250, 250))
     );
 
-    expect(shortestPath.steps).toEqual(19780);
+    expect(shortestPath.steps).toEqual(19634);
     expect(shortestPath.path.length).toEqual(114);
   });
 });
