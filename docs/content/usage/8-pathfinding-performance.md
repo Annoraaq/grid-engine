@@ -6,6 +6,12 @@ import Plot from '~/components/Plot.vue'
 import bg512PlotData from '~/data/bg512-avg-4-dir.csv';
 import daoPlotData from '~/data/dao-avg-4-dir.csv';
 import roomsPlotData from '~/data/rooms-avg-4-dir.csv';
+import maze1PlotData from '~/data/maze-avg-4-1.csv';
+import maze2PlotData from '~/data/maze-avg-4-2.csv';
+import maze4PlotData from '~/data/maze-avg-4-4.csv';
+import maze8PlotData from '~/data/maze-avg-4-8.csv';
+import maze16PlotData from '~/data/maze-avg-4-16.csv';
+import maze32PlotData from '~/data/maze-avg-4-32.csv';
 
 # Pathfinding Performance
 
@@ -66,6 +72,30 @@ The absolute runtimes depend on the machine and the browser. More important are 
 
 <Plot :rawPlotData="roomsPlotData" />
 
+#### Mazes (corridor witdth: 1)
+
+<Plot :rawPlotData="maze1PlotData" />
+
+#### Mazes (corridor witdth: 2)
+
+<Plot :rawPlotData="maze2PlotData" />
+
+#### Mazes (corridor witdth: 4)
+
+<Plot :rawPlotData="maze4PlotData" />
+
+#### Mazes (corridor witdth: 8)
+
+<Plot :rawPlotData="maze8PlotData" />
+
+#### Mazes (corridor witdth: 16)
+
+<Plot :rawPlotData="maze16PlotData" />
+
+#### Mazes (corridor witdth: 32)
+
+<Plot :rawPlotData="maze32PlotData" />
+
 ---
 
 ### Path lengths <= 100
@@ -82,13 +112,39 @@ The absolute runtimes depend on the machine and the browser. More important are 
 
 <Plot :rawPlotData="daoPlotData.slice(0,6)" />
 
+#### Mazes (corridor witdth: 1)
+
+<Plot :rawPlotData="maze1PlotData.slice(0,6)" />
+
+#### Mazes (corridor witdth: 2)
+
+<Plot :rawPlotData="maze2PlotData.slice(0,6)" />
+
+#### Mazes (corridor witdth: 4)
+
+<Plot :rawPlotData="maze4PlotData.slice(0,6)" />
+
+#### Mazes (corridor witdth: 8)
+
+<Plot :rawPlotData="maze8PlotData.slice(0,6)" />
+
+#### Mazes (corridor witdth: 16)
+
+<Plot :rawPlotData="maze16PlotData.slice(0,6)" />
+
+#### Mazes (corridor witdth: 32)
+
+<Plot :rawPlotData="maze32PlotData.slice(0,6)" />
+
 ---
 
 ### Conclusion
 
 Even though it is not the fastest in each case, JPS seems to be the best choice overall.
 
-BFS and Bidirectional search are also giving acceptable performance. Especially in mazes without much free area, they are unbeatable (that is because there are almost no path-symmetries that JPS could leverage). It is surprising though, that Bidirectional Search seems to underperform BFS in most cases. It is probably due to its specific implementation in Grid Engine.
+BFS and Bidirectional search are also giving acceptable performance. Especially in mazes with a very small corridor size, they are unbeatable (that is because there are almost no path-symmetries that JPS could leverage). So if you have mazes with corridor sizes of 1 or 2, you should consider whether BFS or Bidirectional Search are better choices than JPS.
+
+It is surprising though, that Bidirectional Search seems to underperform BFS in most cases. It is probably due to its specific implementation in Grid Engine.
 
 A\* seems to be quite good on small paths. However, it becomes unacceptably slow for large ones. So JPS seems to be superior to A\* in almost every case.
 
