@@ -11,15 +11,16 @@ import { PhaserTile } from "./PhaserTile";
 describe("PhaserTileLayer", () => {
   it("should get name", () => {
     const tilemap = createPhaserTilemapStub(new Map([["layer_name", [""]]]));
-    const phaserTileLayer = new PhaserTileLayer(
-      tilemap.getLayer("layer_name").tilemapLayer
-    );
+    const layer = tilemap.getLayer("layer_name");
+    if (!layer) throw new Error();
+    const phaserTileLayer = new PhaserTileLayer(layer.tilemapLayer);
     expect(phaserTileLayer.getName()).toEqual("layer_name");
   });
 
   it("should get property", () => {
     const tilemap = createPhaserTilemapStub(new Map([["layer_name", [""]]]));
     const layerData = tilemap.getLayer("layer_name");
+    if (!layerData) throw new Error();
     layerData.properties.push({
       name: "some_prop",
       value: "some_val",
@@ -32,6 +33,7 @@ describe("PhaserTileLayer", () => {
   it("should detect property", () => {
     const tilemap = createPhaserTilemapStub(new Map([["layer_name", [""]]]));
     const layerData = tilemap.getLayer("layer_name");
+    if (!layerData) throw new Error();
     layerData.properties.push({
       name: "some_prop",
       value: "some_val",
@@ -50,6 +52,9 @@ describe("PhaserTileLayer", () => {
     );
     const noCharLayerData = tilemap.getLayer("no_char_layer");
     const charLayerData = tilemap.getLayer("char_layer");
+    if (!noCharLayerData || !charLayerData) {
+      throw new Error();
+    }
     noCharLayerData.properties = [];
     const noCharLayerPhaserTileLayer = new PhaserTileLayer(
       noCharLayerData.tilemapLayer
@@ -64,6 +69,9 @@ describe("PhaserTileLayer", () => {
   it("should get data", () => {
     const tilemap = createPhaserTilemapStub(new Map([["char_layer", [".."]]]));
     const layerData = tilemap.getLayer("char_layer");
+    if (!layerData) {
+      throw new Error();
+    }
     const phaserTileLayer = new PhaserTileLayer(layerData.tilemapLayer);
     expect(phaserTileLayer.getData()).toEqual([
       [

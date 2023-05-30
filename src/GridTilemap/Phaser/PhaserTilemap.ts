@@ -46,7 +46,6 @@ export class PhaserTilemap implements Tilemap {
   getTileAt(x: number, y: number, layer?: string): Tile | undefined {
     const phaserTile = this.phaserTilemap.getTileAt(x, y, false, layer);
     if (!phaserTile) return undefined;
-
-    return new PhaserTile(this.phaserTilemap.getTileAt(x, y, false, layer));
+    return new PhaserTile(phaserTile);
   }
 }

@@ -346,7 +346,6 @@ describe("BidirectionalSearch", () => {
       layerPos(new Vector2(2, 1))
     );
 
-    console.log(shortestPath.path);
     expect(shortestPath.path.length).toEqual(2);
   });
 
