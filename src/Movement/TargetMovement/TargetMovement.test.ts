@@ -24,6 +24,8 @@ const TEST_CHAR_CONFIG = {
   numberOfDirections: NumberOfDirections.FOUR,
 };
 
+const CHUNKS_PER_SECOND = 2;
+
 describe("TargetMovement", () => {
   let targetMovement: TargetMovement;
   let tilemapMock;
@@ -50,14 +52,26 @@ describe("TargetMovement", () => {
     return path.map(([x, y]) => layerPos(new Vector2(x, y)));
   }
 
+  /* Updates in chunks of 500ms. */
+  function chunkUpdate(
+    targetMovement: TargetMovement,
+    mockChar: GridCharacter,
+    numChunks: number
+  ) {
+    const HALF_SECOND_MS = 500;
+    for (let i = 0; i < numChunks; i++) {
+      targetMovement.update(HALF_SECOND_MS);
+      mockChar.update(HALF_SECOND_MS);
+    }
+  }
+
   function expectWalkedPath(
     targetMovement: TargetMovement,
     mockChar: GridCharacter,
     path: LayerVecPos[]
   ) {
     for (const pos of path) {
-      targetMovement.update(1000);
-      mockChar.update(1000);
+      chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
       expect(mockChar.getTilePos()).toEqual(pos);
     }
   }
@@ -255,10 +269,8 @@ describe("TargetMovement", () => {
         },
       }
     );
-    targetMovement.update(1000);
-    mockChar.update(1000);
-    targetMovement.update(1000);
-    mockChar.update(1000);
+
+    chunkUpdate(targetMovement, mockChar, 2 * CHUNKS_PER_SECOND);
 
     expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
   });
@@ -331,13 +343,11 @@ describe("TargetMovement", () => {
         },
       }
     );
-    targetMovement.update(1000);
-    mockChar.update(1000);
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
 
     expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
 
-    targetMovement.update(1000);
-    mockChar.update(1000);
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
 
     expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
   });
@@ -417,10 +427,7 @@ describe("TargetMovement", () => {
       }
     );
 
-    targetMovement.update(1000);
-    mockChar.update(1000);
-    targetMovement.update(1000);
-    mockChar.update(1000);
+    chunkUpdate(targetMovement, mockChar, 2 * CHUNKS_PER_SECOND);
 
     expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
   });
@@ -1052,12 +1059,10 @@ describe("TargetMovement", () => {
         "lowerCharLayer"
       );
 
-      targetMovement.update(1000);
-      mockChar.update(1000);
+      chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
       expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
 
-      targetMovement.update(1000);
-      mockChar.update(1000);
+      chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
 
       expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
       updateLayer(
