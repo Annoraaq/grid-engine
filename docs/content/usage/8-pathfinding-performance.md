@@ -177,30 +177,6 @@ Here JPS is superior on some map structures (rooms for example). It also seems t
 
 <Plot :rawPlotData="roomsPlotData8Dir" />
 
-<!-- #### Mazes (corridor witdth: 1)
-
-<Plot :rawPlotData="maze1PlotData" />
-
-#### Mazes (corridor witdth: 2)
-
-<Plot :rawPlotData="maze2PlotData" />
-
-#### Mazes (corridor witdth: 4)
-
-<Plot :rawPlotData="maze4PlotData" />
-
-#### Mazes (corridor witdth: 8)
-
-<Plot :rawPlotData="maze8PlotData" />
-
-#### Mazes (corridor witdth: 16)
-
-<Plot :rawPlotData="maze16PlotData" />
-
-#### Mazes (corridor witdth: 32)
-
-<Plot :rawPlotData="maze32PlotData" /> -->
-
 ### 8 Directions, path length <= 100
 
 #### Baldurs Gate
