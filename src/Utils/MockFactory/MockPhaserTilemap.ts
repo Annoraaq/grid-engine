@@ -21,7 +21,6 @@ export function createPhaserTilemapStub(
     }
   }
   tm.tiles = mapData.tiles;
-  // console.log("tiles", tm.tiles);
   return tm;
 }
 
@@ -88,7 +87,6 @@ function createLayer(layerName: string | undefined, allRows: string[]) {
       };
       cnt++;
       tiles[r][c] = tile;
-      // }
     }
   }
   // Phaser also uses the ctor like this, so the types seem to be wrong.
