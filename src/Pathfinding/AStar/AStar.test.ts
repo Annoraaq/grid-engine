@@ -26,7 +26,7 @@ function createTilemap(
   return gridTilemap;
 }
 
-describe("BidirectionalSearch", () => {
+describe("A*", () => {
   it("should find blocked path", () => {
     const gridTilemap = createTilemap([
       {
