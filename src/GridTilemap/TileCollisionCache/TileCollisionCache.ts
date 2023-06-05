@@ -23,7 +23,6 @@ export class TileCollisionCache {
   private fixedLayer?: number[][];
   constructor(private tilemap: Tilemap, private gridTilemap: GridTilemap) {}
 
-  // TODO: make tile collision cache an array for each layer for faster access
   private tileCollisionCache: Map<
     string | undefined /* LayerVecPos */,
     /** Bitmap to store blocking information
@@ -39,7 +38,6 @@ export class TileCollisionCache {
      * 9 => DOWN_LEFT
      */
     number[][]
-    // number
   > = new Map();
 
   fixLayer(layer: CharLayer): void {
