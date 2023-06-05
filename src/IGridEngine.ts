@@ -8,6 +8,7 @@ import { Observable } from "rxjs";
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter";
 import { PathfindingOptions } from "./Pathfinding/Pathfinding";
 import { PositionChange } from "./GridCharacter/GridCharacter";
+import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
 
 export type CharLayer = string | undefined;
 
@@ -26,6 +27,7 @@ export interface Position {
 
 /** Result of a pathfinding algorithm run. */
 export interface PathfindingResult {
+  steps: number;
   /**
    * Actual shortest path. Contains an empty array if no path has
    * been found.
@@ -77,6 +79,20 @@ export interface FollowOptions {
    * infinite maps.
    */
   maxPathLength?: number;
+
+  /**
+   * Algorithm to use for pathfinding.
+   */
+  algorithm?: ShortestPathAlgorithmType;
+
+  /**
+   * If set to `true`, pathfinding will only be performed on the char layer of
+   * the start position. If you don't use char layers, activating this setting
+   * can improve pathfinding performance.
+   *
+   * @default false
+   */
+  ignoreLayers?: boolean;
 }
 
 /**
@@ -446,4 +462,19 @@ export interface IGridEngine {
    * moved 400/1000th of the distance to the next tile already.
    */
   getMovementProgress(charId: string): number;
+
+  /**
+   * Refresh the tile collision cache. For performance reasons, you should
+   * provide an area that needs to be rebuilt, if possible. You need to have
+   * {@link GridEngineConfigHeadless.cacheTileCollisions} enabled.
+   *
+   * For more information on pathfinding performance check out
+   * {@link https://annoraaq.github.io/grid-engine/p/pathfinding-performance/| pathfinding performance}.
+   */
+  rebuildTileCollisionCache(
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void;
 }

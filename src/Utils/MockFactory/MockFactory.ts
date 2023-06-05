@@ -104,6 +104,8 @@ export function mockRandomMap(
 
 export function getBlockingProps(char: string): Record<string, string> {
   switch (char) {
+    case "_":
+      return {};
     case "#":
       return {
         ge_collide: "true",
@@ -113,24 +115,80 @@ export function getBlockingProps(char: string): Record<string, string> {
         ge_collide_up: "true",
         ge_collide_right: "true",
         ge_collide_down: "true",
+        "ge_collide_up-right": "true",
+        "ge_collide_up-left": "true",
+        "ge_collide_down-right": "true",
+        "ge_collide_down-left": "true",
       };
     case "←":
       return {
         ge_collide_up: "true",
         ge_collide_down: "true",
         ge_collide_left: "true",
+        "ge_collide_up-right": "true",
+        "ge_collide_up-left": "true",
+        "ge_collide_down-right": "true",
+        "ge_collide_down-left": "true",
       };
     case "↑":
       return {
         ge_collide_up: "true",
         ge_collide_right: "true",
         ge_collide_left: "true",
+        "ge_collide_up-right": "true",
+        "ge_collide_up-left": "true",
+        "ge_collide_down-right": "true",
+        "ge_collide_down-left": "true",
       };
     case "↓":
       return {
         ge_collide_right: "true",
         ge_collide_down: "true",
         ge_collide_left: "true",
+        "ge_collide_up-right": "true",
+        "ge_collide_up-left": "true",
+        "ge_collide_down-right": "true",
+        "ge_collide_down-left": "true",
+      };
+    case "↖":
+      return {
+        ge_collide_right: "true",
+        ge_collide_down: "true",
+        ge_collide_up: "true",
+        ge_collide_left: "true",
+        "ge_collide_up-right": "true",
+        "ge_collide_up-left": "true",
+        "ge_collide_down-left": "true",
+      };
+    case "↗":
+      return {
+        ge_collide_right: "true",
+        ge_collide_down: "true",
+        ge_collide_up: "true",
+        ge_collide_left: "true",
+        "ge_collide_up-right": "true",
+        "ge_collide_up-left": "true",
+        "ge_collide_down-right": "true",
+      };
+    case "↘":
+      return {
+        ge_collide_right: "true",
+        ge_collide_down: "true",
+        ge_collide_up: "true",
+        ge_collide_left: "true",
+        "ge_collide_up-right": "true",
+        "ge_collide_down-right": "true",
+        "ge_collide_down-left": "true",
+      };
+    case "↙":
+      return {
+        ge_collide_right: "true",
+        ge_collide_down: "true",
+        ge_collide_up: "true",
+        ge_collide_left: "true",
+        "ge_collide_up-left": "true",
+        "ge_collide_down-right": "true",
+        "ge_collide_down-left": "true",
       };
   }
   return {};
@@ -189,4 +247,22 @@ export function createAllowedFn(map: string[], ignoreBounds = false) {
     if (y < 0 || y >= map.length) return ignoreBounds;
     return map[y][x] != "#";
   };
+}
+
+export function updateLayer(tilemapMock, blockMap: string[], layer?: string) {
+  for (let r = 0; r < blockMap.length; r++) {
+    for (let c = 0; c < blockMap[r].length; c++) {
+      if (blockMap[r][c] == "#") {
+        tilemapMock
+          .getLayers()
+          .find((l) => l.getName() == layer)
+          .getData()[r][c].properties["ge_collide"] = "true";
+      } else {
+        tilemapMock
+          .getLayers()
+          .find((l) => l.getName() == layer)
+          .getData()[r][c].properties["ge_collide"] = undefined;
+      }
+    }
+  }
 }

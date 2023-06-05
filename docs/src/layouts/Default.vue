@@ -74,7 +74,7 @@ export default {
 
   --nav-width: 250px;
   --header-height: 85px;
-  --page-max-width: 1000px;
+  --page-max-width: 1200px;
 
   --code-font-size-medium: 14px;
 
@@ -84,6 +84,7 @@ export default {
   --padding-small: 8px;
   --padding-medium: 16px;
   --padding-large: 32px;
+  --padding-xl: 64px;
 }
 
 body {
@@ -93,14 +94,39 @@ body {
   margin:0;
   padding:0;
   line-height: 1.5;
-  overflow-y: scroll; /* Show scrollbar */
+  overflow: hidden;
   font-size: var(--font-size-medium);
+}
+
+h1,h2,h3,h4 {
+  font-weight: 500;
 }
 
 h1 {
   font-size: 38px;
   line-height: 1.4;
-  font-weight: 600;
+  margin-bottom: var(--padding-xl);
+}
+
+h2 {
+  margin-top: var(--padding-xl);
+  margin-bottom: var(--padding-large);
+  padding-top: var(--padding-large);
+  border-top: 1px solid var(--dark-bg-2);
+}
+
+h3 {
+
+  margin-top: var(--padding-large);
+  margin-bottom: var(--padding-medium);
+  padding-top: var(--padding-medium);
+}
+
+hr {
+  border-width: 0;
+  border-top: 1px solid var(--dark-bg-2);
+  margin-top: var(--padding-xl);
+  margin-bottom: var(--padding-xl);
 }
 
 a {
@@ -124,8 +150,6 @@ blockquote {
 .header {
   background: var(--dark-bg);
   height: var(--header-height);
-  position: fixed;
-  top: 0;
   width: 100%;
 
   border-bottom: 1px solid #383838;
@@ -139,31 +163,31 @@ blockquote {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
 }
 
 .main {
+  display: flex;
+  height: calc(100vh - var(--header-height));
   margin: 0 auto;
   max-width: var(--page-max-width);
-  display: flex;
-  flex-direction: row;
-  padding-top: var(--header-height);
+  overflow: hidden;
 }
 
 .content {
   padding-top: 20px;
-  padding-left: 20px;
-  padding-right: 20px;
-  margin-left: var(--nav-width);
-  width: calc(var(--page-max-width) - var(--nav-width));
+  padding-left: var(--padding-xl);
+  padding-right: var(--padding-xl);
+  padding-bottom: var(--padding-xl);
+  overflow-y: auto;
 }
 
 .sidebar {
-  width: var(--nav-width);
-  height: 100%;
-  position: fixed;
-  overflow: auto;
+  padding-left: var(--padding-medium);
+  padding-right: var(--padding-medium);
+  flex: 1 0 25%;
   border-right: 1px solid var(--dark-bg-2);
+  overflow-y: auto;
+  height: 100%;
 }
 
 .nav__link {
@@ -311,10 +335,12 @@ table th{
 
   /* Hide sidebar */
   .sidebar {
-    width: auto;
+    flex-basis: 0;
+    padding: 0;
   }
   .content {
-    margin-left: var(--padding-large);
+    margin-left: var(--padding-xl);
+    padding-right: var(--padding-medium);
   }
 
   .nav {

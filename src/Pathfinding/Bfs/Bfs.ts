@@ -1,12 +1,11 @@
 import {
-  DistanceFn,
-  GetNeighbors,
   LayerVecPos,
   ShortestPathAlgorithm,
   ShortestPathResult,
 } from "./../ShortestPathAlgorithm";
 import { VectorUtils } from "../../Utils/VectorUtils";
 import { Queue } from "../../Datastructures/Queue/Queue";
+import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils";
 
 interface ShortestPathTuple {
   previous: Map<string, LayerVecPos>;
@@ -20,35 +19,19 @@ interface QueueEntry {
   dist: number;
 }
 
-export class Bfs implements ShortestPathAlgorithm {
-  private maxPathLength = Infinity;
-
-  setMaxPathLength(maxPathLength: number) {
-    this.maxPathLength = maxPathLength;
-  }
-
-  getShortestPath(
+export class Bfs extends ShortestPathAlgorithm {
+  findShortestPathImpl(
     startPos: LayerVecPos,
-    targetPos: LayerVecPos,
-    getNeighbors: GetNeighbors,
-    distance: DistanceFn
+    targetPos: LayerVecPos
   ): ShortestPathResult {
-    const shortestPath = this.shortestPathBfs(
-      startPos,
-      targetPos,
-      getNeighbors,
-      distance
-    );
+    const shortestPath = this.shortestPathBfs(startPos, targetPos);
     return {
       path: this.returnPath(shortestPath.previous, startPos, targetPos),
       closestToTarget: shortestPath.closestToTarget,
       steps: shortestPath.steps,
       maxPathLengthReached: shortestPath.maxPathLengthReached,
+      algorithmUsed: "BFS",
     };
-  }
-
-  private pos2Str(layerPos: LayerVecPos): string {
-    return `${layerPos.position.toString()}#${layerPos.layer}`;
   }
 
   private equal(layerPos1: LayerVecPos, layerPos2: LayerVecPos): boolean {
@@ -59,28 +42,26 @@ export class Bfs implements ShortestPathAlgorithm {
 
   private shortestPathBfs(
     startNode: LayerVecPos,
-    stopNode: LayerVecPos,
-    getNeighbors: GetNeighbors,
-    distance: DistanceFn
+    stopNode: LayerVecPos
   ): ShortestPathTuple {
     const previous = new Map<string, LayerVecPos>();
     const visited = new Set<string>();
     const queue: Queue<QueueEntry> = new Queue();
     let closestToTarget: LayerVecPos = startNode;
-    let smallestDistToTarget: number = distance(
+    let smallestDistToTarget: number = this.distance(
       startNode.position,
       stopNode.position
     );
     let steps = 0;
     queue.enqueue({ node: startNode, dist: 0 });
-    visited.add(this.pos2Str(startNode));
+    visited.add(LayerPositionUtils.toString(startNode));
 
     while (queue.size() > 0) {
       const dequeued = queue.dequeue();
       steps++;
       if (!dequeued) break;
       const { node, dist } = dequeued;
-      if (dist > this.maxPathLength) {
+      if (dist > this.options.maxPathLength) {
         return {
           previous: new Map(),
           closestToTarget,
@@ -89,7 +70,7 @@ export class Bfs implements ShortestPathAlgorithm {
         };
       }
 
-      const distToTarget = distance(node.position, stopNode.position);
+      const distToTarget = this.distance(node.position, stopNode.position);
       if (distToTarget < smallestDistToTarget) {
         smallestDistToTarget = distToTarget;
         closestToTarget = node;
@@ -103,11 +84,11 @@ export class Bfs implements ShortestPathAlgorithm {
         };
       }
 
-      for (const neighbor of getNeighbors(node)) {
-        if (!visited.has(this.pos2Str(neighbor))) {
-          previous.set(this.pos2Str(neighbor), node);
+      for (const neighbor of this.getNeighbors(node, stopNode)) {
+        if (!visited.has(LayerPositionUtils.toString(neighbor))) {
+          previous.set(LayerPositionUtils.toString(neighbor), node);
           queue.enqueue({ node: neighbor, dist: dist + 1 });
-          visited.add(this.pos2Str(neighbor));
+          visited.add(LayerPositionUtils.toString(neighbor));
         }
       }
     }
@@ -123,7 +104,7 @@ export class Bfs implements ShortestPathAlgorithm {
     let currentNode: LayerVecPos | undefined = stopNode;
     ret.push(currentNode);
     while (!this.equal(currentNode, startNode)) {
-      currentNode = previous.get(this.pos2Str(currentNode));
+      currentNode = previous.get(LayerPositionUtils.toString(currentNode));
       if (!currentNode) return [];
       ret.push(currentNode);
     }

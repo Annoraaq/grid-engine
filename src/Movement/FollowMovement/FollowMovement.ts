@@ -4,20 +4,40 @@ import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
 import { Movement, MovementInfo } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { CharLayer, Position } from "../../GridEngine";
+import {
+  CharLayer,
+  Position,
+  ShortestPathAlgorithmType,
+} from "../../GridEngine";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
+import { Concrete } from "../../Utils/TypeUtils";
+
+export interface Options {
+  distance?: number;
+  noPathFoundStrategy?: NoPathFoundStrategy;
+  maxPathLength?: number;
+  shortestPathAlgorithm?: ShortestPathAlgorithmType;
+  ignoreLayers?: boolean;
+}
 
 export class FollowMovement implements Movement {
   private targetMovement?: TargetMovement;
+  private options: Concrete<Options>;
 
   constructor(
     private character: GridCharacter,
     private gridTilemap: GridTilemap,
     private charToFollow: GridCharacter,
-    private distance = 0,
-    private noPathFoundStrategy: NoPathFoundStrategy = NoPathFoundStrategy.STOP,
-    private maxPathLength = Infinity
+    options: Options = {}
   ) {
+    const defaultOptions: Concrete<Options> = {
+      distance: 0,
+      noPathFoundStrategy: NoPathFoundStrategy.STOP,
+      maxPathLength: Infinity,
+      shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
+      ignoreLayers: false,
+    };
+    this.options = { ...defaultOptions, ...options };
     this.character = character;
     this.updateTarget(
       this.charToFollow.getTilePos().position,
@@ -47,9 +67,10 @@ export class FollowMovement implements Movement {
       type: "Follow",
       config: {
         charToFollow: this.charToFollow.getId(),
-        distance: this.distance,
-        noPathFoundStrategy: this.noPathFoundStrategy,
-        maxPathLength: this.maxPathLength,
+        distance: this.options.distance,
+        noPathFoundStrategy: this.options.noPathFoundStrategy,
+        maxPathLength: this.options.maxPathLength,
+        ignoreLayers: this.options.ignoreLayers,
       },
     };
   }
@@ -63,10 +84,12 @@ export class FollowMovement implements Movement {
         layer: targetLayer,
       },
       {
-        distance: this.distance + 1,
+        distance: this.options.distance + 1,
         config: {
-          noPathFoundStrategy: this.noPathFoundStrategy,
-          maxPathLength: this.maxPathLength,
+          algorithm: this.options.shortestPathAlgorithm,
+          noPathFoundStrategy: this.options.noPathFoundStrategy,
+          maxPathLength: this.options.maxPathLength,
+          ignoreLayers: this.options.ignoreLayers,
         },
         ignoreBlockedTarget: true,
       }

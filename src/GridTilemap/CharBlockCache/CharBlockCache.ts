@@ -30,6 +30,7 @@ export class CharBlockCache {
     collisionGroups: string[],
     exclude = new Set<CharId>()
   ): boolean {
+    if (collisionGroups.length === 0) return false;
     const posStr = this.posToString(pos, layer);
     const charSet = this.tilePosToCharacters.get(posStr);
     return !!(

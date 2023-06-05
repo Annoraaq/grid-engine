@@ -66,8 +66,10 @@ describe("FollowMovement", () => {
       {
         distance: 1,
         config: {
+          algorithm: "BIDIRECTIONAL_SEARCH",
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           maxPathLength: Infinity,
+          ignoreLayers: false,
         },
         ignoreBlockedTarget: true,
       }
@@ -95,8 +97,10 @@ describe("FollowMovement", () => {
       {
         distance: 1,
         config: {
+          algorithm: "BIDIRECTIONAL_SEARCH",
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           maxPathLength: Infinity,
+          ignoreLayers: false,
         },
         ignoreBlockedTarget: true,
       }
@@ -128,14 +132,12 @@ describe("FollowMovement", () => {
   });
 
   it("should update added character with distance and maxPathLength", () => {
-    followMovement = new FollowMovement(
-      mockChar,
-      gridTilemapMock,
-      targetChar,
-      7,
-      NoPathFoundStrategy.STOP,
-      100
-    );
+    followMovement = new FollowMovement(mockChar, gridTilemapMock, targetChar, {
+      distance: 7,
+      noPathFoundStrategy: NoPathFoundStrategy.STOP,
+      maxPathLength: 100,
+      ignoreLayers: true,
+    });
     followMovement.update(100);
     expect(TargetMovement).toHaveBeenCalledWith(
       mockChar,
@@ -144,8 +146,10 @@ describe("FollowMovement", () => {
       {
         distance: 8,
         config: {
+          algorithm: "BIDIRECTIONAL_SEARCH",
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           maxPathLength: 100,
+          ignoreLayers: true,
         },
         ignoreBlockedTarget: true,
       }
@@ -153,13 +157,10 @@ describe("FollowMovement", () => {
   });
 
   it("should update added character with distance and CLOSEST_REACHABLE", () => {
-    followMovement = new FollowMovement(
-      mockChar,
-      gridTilemapMock,
-      targetChar,
-      7,
-      NoPathFoundStrategy.CLOSEST_REACHABLE
-    );
+    followMovement = new FollowMovement(mockChar, gridTilemapMock, targetChar, {
+      distance: 7,
+      noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+    });
     followMovement.update(100);
     expect(TargetMovement).toHaveBeenCalledWith(
       mockChar,
@@ -168,8 +169,10 @@ describe("FollowMovement", () => {
       {
         distance: 8,
         config: {
+          algorithm: "BIDIRECTIONAL_SEARCH",
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
           maxPathLength: Infinity,
+          ignoreLayers: false,
         },
         ignoreBlockedTarget: true,
       }
@@ -177,13 +180,10 @@ describe("FollowMovement", () => {
   });
 
   it("should show movement information", () => {
-    followMovement = new FollowMovement(
-      mockChar,
-      gridTilemapMock,
-      targetChar,
-      7,
-      NoPathFoundStrategy.CLOSEST_REACHABLE
-    );
+    followMovement = new FollowMovement(mockChar, gridTilemapMock, targetChar, {
+      distance: 7,
+      noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+    });
     expect(followMovement.getInfo()).toEqual({
       type: "Follow",
       config: {
@@ -191,6 +191,7 @@ describe("FollowMovement", () => {
         distance: 7,
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         maxPathLength: Infinity,
+        ignoreLayers: false,
       },
     });
   });

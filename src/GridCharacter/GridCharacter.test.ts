@@ -416,6 +416,7 @@ describe("GridCharacter", () => {
 
   it("should continue moving to different dir", async () => {
     const { gridCharacter } = createDefaultTilemapMock("lowerCharLayer");
+    gridCharacter.setSpeed(1);
 
     const prom = gridCharacter
       .positionChangeFinished()
@@ -423,16 +424,16 @@ describe("GridCharacter", () => {
       .toPromise();
 
     gridCharacter.move(Direction.RIGHT);
-    gridCharacter.update(QUARTER_SECOND);
+    gridCharacter.update(3 * QUARTER_SECOND);
     gridCharacter.move(Direction.DOWN);
-    gridCharacter.update(QUARTER_SECOND);
+    gridCharacter.update(2 * QUARTER_SECOND);
 
     const posChange = await prom;
     expect(posChange?.exitTile).toEqual(new Vector2(0, 0));
     expect(posChange?.enterTile).toEqual(new Vector2(1, 0));
 
     expect(gridCharacter.getMovementProgress()).toEqual(
-      Math.floor(2 * QUARTER_SECOND)
+      Math.floor(QUARTER_SECOND)
     );
 
     expect(gridCharacter.getTilePos()).toEqual({
@@ -472,6 +473,8 @@ describe("GridCharacter", () => {
       position: new Vector2(0, 1),
       layer: "lowerCharLayer",
     });
+    gridCharacter.update(QUARTER_SECOND);
+    expect(gridCharacter.getMovementProgress()).toEqual(250);
   });
 
   it("should stop moving on tile border edge case", () => {

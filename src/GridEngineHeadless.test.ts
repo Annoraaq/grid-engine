@@ -29,7 +29,11 @@ jest.mock("../package.json", () => ({
 import { GridEngineHeadless } from "./GridEngine";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
-import { createMockLayer, mockBlockMap } from "./Utils/MockFactory/MockFactory";
+import {
+  createMockLayer,
+  mockBlockMap,
+  updateLayer,
+} from "./Utils/MockFactory/MockFactory";
 import { MockTilemap } from "./Utils/MockFactory/MockTilemap";
 
 describe("GridEngineHeadless", () => {
@@ -191,6 +195,33 @@ describe("GridEngineHeadless", () => {
       ],
     });
     expect(gridEngineHeadless.getCharLayer("player")).toEqual("someCharLayer");
+  });
+
+  it("uses tile collision cache", () => {
+    const tm = mockBlockMap([
+      // prettier-ignore
+      "#.",
+      ".#",
+    ]);
+    gridEngineHeadless.create(tm, {
+      characters: [{ id: "player", startPosition: { x: 1, y: 1 } }],
+      cacheTileCollisions: true,
+    });
+    expect(gridEngineHeadless.isTileBlocked({ x: 0, y: 0 })).toBe(true);
+    expect(gridEngineHeadless.isTileBlocked({ x: 1, y: 1 })).toBe(true);
+
+    updateLayer(tm, [
+      // prettier-ignore
+      "..",
+      "..",
+    ]);
+    expect(gridEngineHeadless.isTileBlocked({ x: 0, y: 0 })).toBe(true);
+    expect(gridEngineHeadless.isTileBlocked({ x: 1, y: 1 })).toBe(true);
+
+    gridEngineHeadless.rebuildTileCollisionCache(0, 0, 1, 1);
+
+    expect(gridEngineHeadless.isTileBlocked({ x: 0, y: 0 })).toBe(false);
+    expect(gridEngineHeadless.isTileBlocked({ x: 1, y: 1 })).toBe(true);
   });
 
   describe("move 4 dirs", () => {
@@ -624,6 +655,7 @@ describe("GridEngineHeadless", () => {
       distance: 7,
       closestPointIfBlocked: true,
       maxPathLength: 10000,
+      ignoreLayers: true,
     });
 
     expect(gridEngineHeadless.getMovement("player")).toEqual({
@@ -633,11 +665,12 @@ describe("GridEngineHeadless", () => {
         distance: 7,
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         maxPathLength: 10000,
+        ignoreLayers: true,
       },
     });
   });
 
-  it("should follow a char with default distance", () => {
+  it("should follow a char with default values", () => {
     gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
       characters: [{ id: "player" }, { id: "player2" }],
     });
@@ -651,6 +684,7 @@ describe("GridEngineHeadless", () => {
         distance: 0,
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
         maxPathLength: Infinity,
+        ignoreLayers: false,
       },
     });
   });
@@ -1182,6 +1216,7 @@ describe("GridEngineHeadless", () => {
         ],
         closestToTarget: layerPos(4, 4, "charLayer"),
         reachedMaxPathLength: false,
+        steps: 9,
       });
     });
 

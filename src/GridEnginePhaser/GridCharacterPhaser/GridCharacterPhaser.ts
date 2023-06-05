@@ -173,8 +173,8 @@ export class GridCharacterPhaser {
 
     const gameObj = this.getGameObj();
     if (gameObj) {
-      gameObj.x = newPixelPos.x;
-      gameObj.y = newPixelPos.y;
+      gameObj.x = Math.floor(newPixelPos.x);
+      gameObj.y = Math.floor(newPixelPos.y);
     }
   }
 

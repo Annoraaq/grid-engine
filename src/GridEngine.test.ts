@@ -59,7 +59,7 @@ jest.mock("../package.json", () => ({
   version: "GRID.ENGINE.VERSION",
 }));
 
-import { GridEngine } from "./GridEngine";
+import { GridEngine, PathfindingOptions } from "./GridEngine";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import { createSpriteMock } from "./Utils/MockFactory/MockFactory";
@@ -386,6 +386,41 @@ describe("GridEngine", () => {
       ],
     });
     expect(gridEngine.getCharLayer("player")).toEqual("someCharLayer");
+  });
+
+  it("uses tile collision cache", () => {
+    const tm = createPhaserTilemapStub(
+      new Map([
+        [
+          undefined,
+          [
+            // prettier-ignore
+            "#.",
+            ".#",
+          ],
+        ],
+      ])
+    );
+    gridEngine.create(tm, {
+      characters: [{ id: "player", startPosition: { x: 1, y: 1 } }],
+      cacheTileCollisions: true,
+    });
+    expect(gridEngine.isTileBlocked({ x: 0, y: 0 })).toBe(true);
+    expect(gridEngine.isTileBlocked({ x: 1, y: 1 })).toBe(true);
+
+    const layer = tm.getLayer(undefined);
+    if (layer) {
+      layer.data[0][0].properties = {};
+      layer.data[1][1].properties = {};
+    }
+
+    expect(gridEngine.isTileBlocked({ x: 0, y: 0 })).toBe(true);
+    expect(gridEngine.isTileBlocked({ x: 1, y: 1 })).toBe(true);
+
+    gridEngine.rebuildTileCollisionCache(0, 0, 1, 1);
+
+    expect(gridEngine.isTileBlocked({ x: 0, y: 0 })).toBe(false);
+    expect(gridEngine.isTileBlocked({ x: 1, y: 1 })).toBe(true);
   });
 
   describe("move 4 dirs", () => {
@@ -834,6 +869,7 @@ describe("GridEngine", () => {
       distance: 7,
       closestPointIfBlocked: true,
       maxPathLength: 10000,
+      ignoreLayers: true,
     });
 
     expect(gridEngine.getMovement("player")).toEqual({
@@ -843,11 +879,12 @@ describe("GridEngine", () => {
         distance: 7,
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         maxPathLength: 10000,
+        ignoreLayers: true,
       },
     });
   });
 
-  it("should follow a char with default distance", () => {
+  it("should follow a char with default values", () => {
     gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
@@ -870,6 +907,7 @@ describe("GridEngine", () => {
         distance: 0,
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
         maxPathLength: Infinity,
+        ignoreLayers: false,
       },
     });
   });
@@ -1392,7 +1430,10 @@ describe("GridEngine", () => {
       });
       const source = { position: { x: 1, y: 2 }, charLayer: "sourceCharLayer" };
       const dest = { position: { x: 10, y: 20 }, charLayer: "destCharLayer" };
-      const options = { pathWidth: 2 };
+      const options: PathfindingOptions = {
+        pathWidth: 2,
+        shortestPathAlgorithm: "BFS",
+      };
 
       const mockRes = {
         path: [{ position: new Vector2(1, 2), layer: "sourceCharLayer" }],

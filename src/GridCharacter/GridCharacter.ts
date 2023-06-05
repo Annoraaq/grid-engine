@@ -371,8 +371,7 @@ export class GridCharacter {
       deltaInSeconds * this.speed * MAX_MOVEMENT_PROGRESS
     );
     const willCrossTileBorderThisUpdate =
-      MAX_MOVEMENT_PROGRESS - this.movementProgress <= maxProgressForDelta &&
-      this.movementProgress < MAX_MOVEMENT_PROGRESS;
+      this.movementProgress + maxProgressForDelta >= MAX_MOVEMENT_PROGRESS;
 
     const progressThisUpdate = willCrossTileBorderThisUpdate
       ? MAX_MOVEMENT_PROGRESS - this.movementProgress
@@ -387,7 +386,7 @@ export class GridCharacter {
 
     if (willCrossTileBorderThisUpdate) {
       this.movementProgress = 0;
-      if (this.shouldContinueMoving() && proportionToWalk > 0) {
+      if (this.shouldContinueMoving()) {
         this.fire(
           this.positionChangeFinished$,
           this.tilePos,
@@ -395,7 +394,9 @@ export class GridCharacter {
         );
         this.tilePos = this.getNextTilePos();
         this.startMoving(this.lastMovementImpulse);
-        this.updateCharacterPosition(delta * proportionToWalk);
+        if (proportionToWalk > 0) {
+          this.updateCharacterPosition(delta * proportionToWalk);
+        }
       } else {
         this.stopMoving();
       }

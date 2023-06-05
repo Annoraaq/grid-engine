@@ -66,14 +66,18 @@ describe("PhaserTilemap", () => {
     );
     const layerData = tilemap.getLayer("layer_name");
     const phaserTilemap = new PhaserTilemap(tilemap);
-    expect(phaserTilemap.getTileAt(0, 0, "layer_name")).toEqual(
-      new PhaserTile(layerData.data[0][0])
-    );
-    expect(phaserTilemap.getTileAt(3, 3, "layer_name")).toBe(undefined);
-    expect(phaserTilemap.getTileAt(0, 0)).toEqual(
-      new PhaserTile(layerData.data[0][0])
-    );
-    expect(phaserTilemap.getTileAt(3, 3)).toBe(undefined);
-    expect(phaserTilemap.getTileAt(0, 0, "unknown")).toBe(undefined);
+    expect(layerData).toBeTruthy();
+
+    if (layerData) {
+      expect(phaserTilemap.getTileAt(0, 0, "layer_name")).toEqual(
+        new PhaserTile(layerData.data[0][0])
+      );
+      expect(phaserTilemap.getTileAt(3, 3, "layer_name")).toBe(undefined);
+      expect(phaserTilemap.getTileAt(0, 0)).toEqual(
+        new PhaserTile(layerData.data[0][0])
+      );
+      expect(phaserTilemap.getTileAt(3, 3)).toBe(undefined);
+      expect(phaserTilemap.getTileAt(0, 0, "unknown")).toBe(undefined);
+    }
   });
 });

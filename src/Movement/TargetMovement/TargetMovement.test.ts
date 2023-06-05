@@ -15,6 +15,7 @@ import {
   COLLISION_GROUP,
   mockLayeredBlockMap,
   mockCharMap,
+  updateLayer,
 } from "../../Utils/MockFactory/MockFactory";
 
 const TEST_CHAR_CONFIG = {
@@ -22,6 +23,8 @@ const TEST_CHAR_CONFIG = {
   collidesWithTiles: true,
   numberOfDirections: NumberOfDirections.FOUR,
 };
+
+const CHUNKS_PER_SECOND = 2;
 
 describe("TargetMovement", () => {
   let targetMovement: TargetMovement;
@@ -49,14 +52,26 @@ describe("TargetMovement", () => {
     return path.map(([x, y]) => layerPos(new Vector2(x, y)));
   }
 
+  /* Updates in chunks of 500ms. */
+  function chunkUpdate(
+    targetMovement: TargetMovement,
+    mockChar: GridCharacter,
+    numChunks: number
+  ) {
+    const HALF_SECOND_MS = 500;
+    for (let i = 0; i < numChunks; i++) {
+      targetMovement.update(HALF_SECOND_MS);
+      mockChar.update(HALF_SECOND_MS);
+    }
+  }
+
   function expectWalkedPath(
     targetMovement: TargetMovement,
     mockChar: GridCharacter,
     path: LayerVecPos[]
   ) {
     for (const pos of path) {
-      targetMovement.update(1000);
-      mockChar.update(1000);
+      chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
       expect(mockChar.getTilePos()).toEqual(pos);
     }
   }
@@ -254,10 +269,8 @@ describe("TargetMovement", () => {
         },
       }
     );
-    targetMovement.update(1000);
-    mockChar.update(1000);
-    targetMovement.update(1000);
-    mockChar.update(1000);
+
+    chunkUpdate(targetMovement, mockChar, 2 * CHUNKS_PER_SECOND);
 
     expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
   });
@@ -330,13 +343,11 @@ describe("TargetMovement", () => {
         },
       }
     );
-    targetMovement.update(1000);
-    mockChar.update(1000);
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
 
     expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
 
-    targetMovement.update(1000);
-    mockChar.update(1000);
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
 
     expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
   });
@@ -416,10 +427,7 @@ describe("TargetMovement", () => {
       }
     );
 
-    targetMovement.update(1000);
-    mockChar.update(1000);
-    targetMovement.update(1000);
-    mockChar.update(1000);
+    chunkUpdate(targetMovement, mockChar, 2 * CHUNKS_PER_SECOND);
 
     expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
   });
@@ -544,6 +552,7 @@ describe("TargetMovement", () => {
       expect(mockChar.getTilePos()).toEqual(charPos);
 
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           ".p..",
@@ -604,6 +613,7 @@ describe("TargetMovement", () => {
       expect(mockChar.isMoving()).toBe(false);
 
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           ".p..",
@@ -673,6 +683,7 @@ describe("TargetMovement", () => {
       mockChar.update(1);
 
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           ".p..",
@@ -740,6 +751,7 @@ describe("TargetMovement", () => {
       mockChar.update(1);
 
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           ".p..",
@@ -781,6 +793,7 @@ describe("TargetMovement", () => {
       mockChar.update(1);
 
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           ".p..",
@@ -843,6 +856,7 @@ describe("TargetMovement", () => {
       expect(mockChar.isMoving()).toBe(false);
 
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           ".p..",
@@ -896,24 +910,6 @@ describe("TargetMovement", () => {
       .getData()[charPos.position.y + 1][charPos.position.x].properties[
       "ge_collide"
     ] = undefined;
-  }
-
-  function updateLayer(blockMap: string[], layer?: string) {
-    for (let r = 0; r < blockMap.length; r++) {
-      for (let c = 0; c < blockMap[r].length; c++) {
-        if (blockMap[r][c] == "#") {
-          tilemapMock
-            .getLayers()
-            .find((l) => l.getName() == layer)
-            .getData()[r][c].properties["ge_collide"] = "true";
-        } else {
-          tilemapMock
-            .getLayers()
-            .find((l) => l.getName() == layer)
-            .getData()[r][c].properties["ge_collide"] = undefined;
-        }
-      }
-    }
   }
 
   it("should timeout on strategy WAIT", () => {
@@ -1052,6 +1048,7 @@ describe("TargetMovement", () => {
       });
 
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           "....",
@@ -1062,15 +1059,14 @@ describe("TargetMovement", () => {
         "lowerCharLayer"
       );
 
-      targetMovement.update(1000);
-      mockChar.update(1000);
+      chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
       expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
 
-      targetMovement.update(1000);
-      mockChar.update(1000);
+      chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
 
       expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           "....",
@@ -1121,6 +1117,7 @@ describe("TargetMovement", () => {
 
       expect(mockChar.isMoving()).toBe(false);
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           ".p..",
@@ -1172,6 +1169,7 @@ describe("TargetMovement", () => {
       mockChar.update(100);
       expect(mockChar.isMoving()).toBe(false);
       updateLayer(
+        tilemapMock,
         [
           // prettier-ignore
           ".p..",
@@ -1565,6 +1563,68 @@ describe("TargetMovement", () => {
       mockChar.update(100);
 
       expect(mockChar.isMoving()).toBe(false);
+    });
+  });
+
+  it("should ignore char layers", () => {
+    const charPos = layerPos(new Vector2(0, 0));
+    charPos.layer = "lowerCharLayer";
+    const targetPos = layerPos(new Vector2(2, 1));
+    targetPos.layer = "upperCharLayer";
+
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "s*.",
+          "...",
+        ],
+      },
+      {
+        layer: "upperCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".*.",
+          "..t",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    gridTilemap.setTransition(
+      new Vector2(1, 0),
+      "lowerCharLayer",
+      "upperCharLayer"
+    );
+    const mockChar = createMockChar("char", charPos, {
+      ...TEST_CHAR_CONFIG,
+      tilemap: gridTilemap,
+    });
+    gridTilemap.addCharacter(mockChar);
+
+    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+      config: {
+        algorithm: shortestPathAlgo,
+        ignoreLayers: true,
+      },
+    });
+
+    targetMovement.update(1000);
+    mockChar.update(1000);
+    targetMovement.update(1000);
+    mockChar.update(1000);
+    targetMovement.update(1000);
+    mockChar.update(1000);
+    targetMovement.update(1000);
+    mockChar.update(1000);
+
+    expect(mockChar.getTilePos()).toEqual({
+      position: new Vector2(2, 1),
+      layer: "lowerCharLayer",
     });
   });
 

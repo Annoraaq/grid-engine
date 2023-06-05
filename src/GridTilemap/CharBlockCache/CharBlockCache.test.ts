@@ -5,14 +5,8 @@ import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { CharBlockCache } from "./CharBlockCache";
 import { GridTilemap } from "../GridTilemap";
 import { mockLayeredBlockMap } from "../../Utils/MockFactory/MockFactory";
-import * as Phaser from "phaser";
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
 import { Tilemap } from "../Tilemap";
-
-// Hack to get Phaser included at runtime
-((_a) => {
-  // do nothing
-})(Phaser);
 
 describe("CharBlockCache", () => {
   let charBlockCache: CharBlockCache;

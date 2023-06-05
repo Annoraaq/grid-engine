@@ -50,6 +50,7 @@ import {
   PathfindingResult,
   Position,
 } from "./IGridEngine";
+import { Rect } from "./Utils/Rect/Rect";
 
 export {
   CollisionStrategy,
@@ -102,6 +103,18 @@ export interface GridEngineConfigHeadless {
    * @defaultValue {@link CollisionStrategy.BLOCK_TWO_TILES}
    */
   characterCollisionStrategy?: CollisionStrategy;
+
+  /**
+   * Specifies, whether a tile collision cache should be used. It can make
+   * pathfinding significantly faster. However, if you change something on the
+   * tilemap (adding layers, changing tiles, etc.) you need to call
+   * {@link GridEngineHeadless.rebuildTileCollisionCache}. For more information on
+   * pathfinding performance check out
+   * {@link https://annoraaq.github.io/grid-engine/p/pathfinding-performance/| pathfinding performance}.
+   *
+   * @defaultValue false
+   */
+  cacheTileCollisions?: boolean;
 }
 
 export interface CollisionConfig {
@@ -289,7 +302,8 @@ export class GridEngineHeadless implements IGridEngine {
     this.gridTilemap = new GridTilemap(
       tilemap,
       this.config.collisionTilePropertyName,
-      this.config.characterCollisionStrategy
+      this.config.characterCollisionStrategy,
+      this.config.cacheTileCollisions
     );
     this.addCharacters();
   }
@@ -403,6 +417,7 @@ export class GridEngineHeadless implements IGridEngine {
         gridChar.update(delta);
       }
     }
+    this.gridTilemap?.invalidateFrameCache();
   }
 
   /** Adds a character after calling {@link create}. */
@@ -600,11 +615,15 @@ export class GridEngineHeadless implements IGridEngine {
       gridChar,
       this.gridTilemap,
       gridCharToFollow,
-      options.distance,
-      options.closestPointIfBlocked
-        ? NoPathFoundStrategy.CLOSEST_REACHABLE
-        : NoPathFoundStrategy.STOP,
-      options.maxPathLength
+      {
+        distance: options.distance,
+        noPathFoundStrategy: options.closestPointIfBlocked
+          ? NoPathFoundStrategy.CLOSEST_REACHABLE
+          : NoPathFoundStrategy.STOP,
+        maxPathLength: options.maxPathLength ?? Infinity,
+        shortestPathAlgorithm: options.algorithm ?? "BIDIRECTIONAL_SEARCH",
+        ignoreLayers: !!options.ignoreLayers,
+      }
     );
     gridChar.setMovement(followMovement);
   }
@@ -733,19 +752,20 @@ export class GridEngineHeadless implements IGridEngine {
     options: PathfindingOptions = {}
   ): PathfindingResult {
     if (!this.gridTilemap) throw this.createUninitializedErr();
-    const pathfinding = new Pathfinding(
-      options.shortestPathAlgorithm || "BFS",
-      this.gridTilemap
-    );
+    const pathfinding = new Pathfinding(this.gridTilemap);
     const res = pathfinding.findShortestPath(
       LayerPositionUtils.toInternal(source),
       LayerPositionUtils.toInternal(dest),
-      options
+      {
+        ...options,
+        shortestPathAlgorithm: options.shortestPathAlgorithm || "BFS",
+      }
     );
     return {
       path: res.path.map(LayerPositionUtils.fromInternal),
       closestToTarget: LayerPositionUtils.fromInternal(res.closestToTarget),
       reachedMaxPathLength: false,
+      steps: res.steps,
     };
   }
 
@@ -828,6 +848,16 @@ export class GridEngineHeadless implements IGridEngine {
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getMovementProgress();
+  }
+
+  /** {@inheritDoc IGridEngine.rebuildTileCollisionCache} */
+  rebuildTileCollisionCache(
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void {
+    this.gridTilemap?.rebuildTileCollisionCache(new Rect(x, y, width, height));
   }
 
   private charRemoved(charId: string): Observable<string> {
@@ -915,6 +945,7 @@ export class GridEngineHeadless implements IGridEngine {
       collisionTilePropertyName: "ge_collide",
       numberOfDirections: NumberOfDirections.FOUR,
       characterCollisionStrategy: CollisionStrategy.BLOCK_TWO_TILES,
+      cacheTileCollisions: false,
       ...config,
     };
   }
