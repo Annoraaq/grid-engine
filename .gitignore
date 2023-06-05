@@ -8,6 +8,8 @@ docs/.jekyll-metadata
 docs/vendor
 docs/node_modules
 docs/**/*.d.ts
+speedtests/old
+speedtests/run.js
 
 # stryker temp files
 .stryker-tmp
