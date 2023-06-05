@@ -2,8 +2,7 @@ import { NumberOfDirections } from "../Direction/Direction";
 import { CharId } from "../GridCharacter/GridCharacter";
 import { Position } from "../GridEngine";
 import { GridTilemap } from "../GridTilemap/GridTilemap";
-import { Concrete } from "../Utils/TypeUtils";
-import { GetNeighbors, LayerVecPos, ShortestPathAlgorithmType, ShortestPathResult } from "./ShortestPathAlgorithm";
+import { LayerVecPos, ShortestPathAlgorithmType, ShortestPathResult } from "./ShortestPathAlgorithm";
 /**
  * Configuration object for pathfinding.
  */
@@ -65,6 +64,14 @@ export interface PathfindingOptions {
      * infinite maps.
      */
     maxPathLength?: number;
+    /**
+     * If set to `true`, pathfinding will only be performed on the char layer of
+     * the start position. If you don't use char layers, activating this setting
+     * can improve pathfinding performance.
+     *
+     * @default false
+     */
+    ignoreLayers?: boolean;
 }
 /**
  * Function to specify whether a certain position is allowed for pathfinding.
@@ -78,11 +85,7 @@ export interface PathfindingOptions {
  */
 export type IsPositionAllowedFn = (pos: Position, charLayer?: string) => boolean;
 export declare class Pathfinding {
-    private shortestPathAlgorithm;
     private gridTilemap;
-    constructor(shortestPathAlgorithm: ShortestPathAlgorithmType, gridTilemap: GridTilemap);
-    findShortestPath(source: LayerVecPos, dest: LayerVecPos, { shortestPathAlgorithm, pathWidth, pathHeight, numberOfDirections, isPositionAllowed, collisionGroups, ignoredChars, ignoreTiles, ignoreMapBounds, ignoreBlockedTarget, maxPathLength, }?: PathfindingOptions): ShortestPathResult;
+    constructor(gridTilemap: GridTilemap);
+    findShortestPath(source: LayerVecPos, dest: LayerVecPos, pathfindingOptions?: PathfindingOptions): ShortestPathResult;
 }
-export declare function createGetNeighbors(options: Concrete<PathfindingOptions>, dest: LayerVecPos, gridTilemap: GridTilemap): GetNeighbors;
-export declare function createReverseNeighbors(options: Concrete<PathfindingOptions>, dest: LayerVecPos, gridTilemap: GridTilemap): GetNeighbors;
-export declare function isBlocking(src: LayerVecPos, dest: LayerVecPos, gridTilemap: GridTilemap, options: Concrete<PathfindingOptions>): boolean;

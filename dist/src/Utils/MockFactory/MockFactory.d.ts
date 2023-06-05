@@ -24,3 +24,4 @@ export declare function createAllowedFn(map: string[], ignoreBounds?: boolean): 
     x: any;
     y: any;
 }, _charLayer: any) => boolean;
+export declare function updateLayer(tilemapMock: any, blockMap: string[], layer?: string): void;

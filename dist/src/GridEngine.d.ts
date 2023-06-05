@@ -250,6 +250,8 @@ export declare class GridEngine implements IGridEngine {
     } & PositionChange>;
     /** {@inheritDoc IGridEngine.getMovementProgress} */
     getMovementProgress(charId: string): number;
+    /** {@inheritDoc IGridEngine.rebuildTileCollisionCache} */
+    rebuildTileCollisionCache(x: number, y: number, width: number, height: number): void;
     private setConfigDefaults;
     private initGuard;
     private createUninitializedErr;

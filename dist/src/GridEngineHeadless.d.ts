@@ -42,6 +42,17 @@ export interface GridEngineConfigHeadless {
      * @defaultValue {@link CollisionStrategy.BLOCK_TWO_TILES}
      */
     characterCollisionStrategy?: CollisionStrategy;
+    /**
+     * Specifies, whether a tile collision cache should be used. It can make
+     * pathfinding significantly faster. However, if you change something on the
+     * tilemap (adding layers, changing tiles, etc.) you need to call
+     * {@link GridEngineHeadless.rebuildTileCollisionCache}. For more information on
+     * pathfinding performance check out
+     * {@link https://annoraaq.github.io/grid-engine/p/pathfinding-performance/| pathfinding performance}.
+     *
+     * @defaultValue false
+     */
+    cacheTileCollisions?: boolean;
 }
 export interface CollisionConfig {
     /**
@@ -264,6 +275,8 @@ export declare class GridEngineHeadless implements IGridEngine {
     } & PositionChange>;
     /** {@inheritDoc IGridEngine.getMovementProgress} */
     getMovementProgress(charId: string): number;
+    /** {@inheritDoc IGridEngine.rebuildTileCollisionCache} */
+    rebuildTileCollisionCache(x: number, y: number, width: number, height: number): void;
     private charRemoved;
     private initGuard;
     private createUninitializedErr;
