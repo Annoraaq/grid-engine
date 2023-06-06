@@ -38,7 +38,6 @@ export class TileCollisionCache {
      * 9 => DOWN_LEFT
      */
     number[][]
-    // number
   > = new Map();
 
   fixLayer(layer: CharLayer): void {

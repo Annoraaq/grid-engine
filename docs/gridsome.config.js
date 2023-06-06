@@ -51,13 +51,6 @@ module.exports = {
   configureWebpack: {
     // merged with the internal config
     module: {
-      // rules: [
-      //   {
-      //     test: /\.js$/i,
-      //     exclude: /node_modules/,
-      //     use: ['babel-loader'],
-      //   }
-      // ]
       rules: [
         {
           test: /\.js?$/,
@@ -72,7 +65,6 @@ module.exports = {
           loader: 'csv-loader',
           options: {
             dynamicTyping: false,
-            // header: true,
             skipEmptyLines: true
           }
         }

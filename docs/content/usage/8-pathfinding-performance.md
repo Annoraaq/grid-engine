@@ -6,6 +6,15 @@ import Plot from '~/components/Plot.vue'
 import bg512PlotData from '~/data/bg512-avg-4-dir.csv';
 import daoPlotData from '~/data/dao-avg-4-dir.csv';
 import roomsPlotData from '~/data/rooms-avg-4-dir.csv';
+import maze1PlotData from '~/data/maze-avg-4-1.csv';
+import maze2PlotData from '~/data/maze-avg-4-2.csv';
+import maze4PlotData from '~/data/maze-avg-4-4.csv';
+import maze8PlotData from '~/data/maze-avg-4-8.csv';
+import maze16PlotData from '~/data/maze-avg-4-16.csv';
+import maze32PlotData from '~/data/maze-avg-4-32.csv';
+import roomsPlotData8Dir from '~/data/rooms-avg-8-dir.csv';
+import daoPlotData8Dir from '~/data/dao-avg-8-dir.csv';
+import bg512PlotData8Dir from '~/data/bg512-avg-8-dir.csv';
 
 # Pathfinding Performance
 
@@ -50,9 +59,31 @@ By default, these are set to [STOP][stop] and [WAIT][wait]. These settings are a
 
 I chose [some benchmarks](https://movingai.com/benchmarks/grids.html) that are frequently used in research for pathfinding on grids. As you can see in the following plots, the results vary quite a bit depending on the benchmark. The reason is the different structure of the maps. For each benchmark I have plotted the average runtimes of the different algorithms, grouped by the path length. Because the path length can get quite large and many games only contain smaller maps, I have additionaly provided a "zoomed in" version of each plot, which shows only results for path lengths up to 100.
 
+There is one section for 4 direction (up, down, left, right) pathfinding and one for 8 directions.
+
 The absolute runtimes depend on the machine and the browser. More important are the runtimes of the algorithms relative to each other.
 
-### All path lengths
+The results can be found in the [Benchmark Results](#benchmark-results) section.
+
+## Conclusion
+
+### 4 Directions
+
+Even though it is not the fastest in each case, JPS seems to be the best choice overall.
+
+BFS and Bidirectional search are also giving acceptable performance. Especially in mazes with a very small corridor size, they are unbeatable (that is because there are almost no path-symmetries that JPS could leverage). So if you have mazes with corridor sizes of 1 or 2, you should consider whether BFS or Bidirectional Search are better choices than JPS.
+
+It is surprising though, that Bidirectional Search seems to underperform BFS in most cases. It is probably due to its specific implementation in Grid Engine.
+
+A\* seems to be quite good on small paths. However, it becomes unacceptably slow for large ones. So JPS seems to be superior to A\* in almost every case.
+
+### 8 Directions
+
+Here JPS is superior on some map structures (rooms for example). It also seems to be a good choice for small path lengths (<= ~200). For longer paths BFS or Bidirectional Search seem to be good options.
+
+## Benchmark Results
+
+### 4 directions, all path lengths
 
 #### Baldurs Gate
 
@@ -66,9 +97,33 @@ The absolute runtimes depend on the machine and the browser. More important are 
 
 <Plot :rawPlotData="roomsPlotData" />
 
+#### Mazes (corridor witdth: 1)
+
+<Plot :rawPlotData="maze1PlotData" />
+
+#### Mazes (corridor witdth: 2)
+
+<Plot :rawPlotData="maze2PlotData" />
+
+#### Mazes (corridor witdth: 4)
+
+<Plot :rawPlotData="maze4PlotData" />
+
+#### Mazes (corridor witdth: 8)
+
+<Plot :rawPlotData="maze8PlotData" />
+
+#### Mazes (corridor witdth: 16)
+
+<Plot :rawPlotData="maze16PlotData" />
+
+#### Mazes (corridor witdth: 32)
+
+<Plot :rawPlotData="maze32PlotData" />
+
 ---
 
-### Path lengths <= 100
+### 4 directions, path length <= 100
 
 #### Baldurs Gate
 
@@ -82,15 +137,59 @@ The absolute runtimes depend on the machine and the browser. More important are 
 
 <Plot :rawPlotData="daoPlotData.slice(0,6)" />
 
+#### Mazes (corridor witdth: 1)
+
+<Plot :rawPlotData="maze1PlotData.slice(0,6)" />
+
+#### Mazes (corridor witdth: 2)
+
+<Plot :rawPlotData="maze2PlotData.slice(0,6)" />
+
+#### Mazes (corridor witdth: 4)
+
+<Plot :rawPlotData="maze4PlotData.slice(0,6)" />
+
+#### Mazes (corridor witdth: 8)
+
+<Plot :rawPlotData="maze8PlotData.slice(0,6)" />
+
+#### Mazes (corridor witdth: 16)
+
+<Plot :rawPlotData="maze16PlotData.slice(0,6)" />
+
+#### Mazes (corridor witdth: 32)
+
+<Plot :rawPlotData="maze32PlotData.slice(0,6)" />
+
 ---
 
-### Conclusion
+### 8 Directions, all path lengths
 
-Even though it is not the fastest in each case, JPS seems to be the best choice overall.
+#### Baldurs Gate
 
-BFS and Bidirectional search are also giving acceptable performance. Especially in mazes without much free area, they are unbeatable (that is because there are almost no path-symmetries that JPS could leverage). It is surprising though, that Bidirectional Search seems to underperform BFS in most cases. It is probably due to its specific implementation in Grid Engine.
+<Plot :rawPlotData="bg512PlotData8Dir" />
 
-A\* seems to be quite good on small paths. However, it becomes unacceptably slow for large ones. So JPS seems to be superior to A\* in almost every case.
+#### Dragon Age Origin
+
+<Plot :rawPlotData="daoPlotData8Dir" />
+
+#### Rooms
+
+<Plot :rawPlotData="roomsPlotData8Dir" />
+
+### 8 Directions, path length <= 100
+
+#### Baldurs Gate
+
+<Plot :rawPlotData="bg512PlotData8Dir.slice(0,6)" />
+
+#### Dragon Age Origin
+
+<Plot :rawPlotData="daoPlotData8Dir.slice(0,6)" />
+
+#### Rooms
+
+<Plot :rawPlotData="roomsPlotData8Dir.slice(0,6)" />
 
 [find-shortest-path]: ../../api/interfaces/IGridEngine.html#findShortestPath
 [move-to]: ../../api/interfaces/IGridEngine.html#moveTo

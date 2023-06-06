@@ -104,6 +104,8 @@ export function mockRandomMap(
 
 export function getBlockingProps(char: string): Record<string, string> {
   switch (char) {
+    case "_":
+      return {};
     case "#":
       return {
         ge_collide: "true",

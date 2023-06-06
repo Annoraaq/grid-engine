@@ -80,6 +80,14 @@ export interface MoveToConfig {
      * infinite maps.
      */
     maxPathLength?: number | undefined;
+    /**
+     * If set to `true`, pathfinding will only be performed on the char layer of
+     * the start position. If you don't use char layers, activating this setting
+     * can improve pathfinding performance.
+     *
+     * @default false
+     */
+    ignoreLayers?: boolean;
 }
 export declare enum MoveToResult {
     SUCCESS = "SUCCESS",
@@ -119,6 +127,7 @@ export declare class TargetMovement implements Movement {
     private distanceUtils;
     private finished$;
     private ignoreBlockedTarget;
+    private ignoreLayers;
     private distance;
     private isPositionAllowed;
     private shortestPathAlgorithm;

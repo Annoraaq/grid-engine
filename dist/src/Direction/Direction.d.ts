@@ -13,6 +13,8 @@ export declare enum Direction {
 }
 export declare function directions(): Direction[];
 export declare function isDiagonal(direction: Direction): boolean;
+export declare function isHorizontal(direction: Direction): boolean;
+export declare function isVertical(direction: Direction): boolean;
 export declare function turnCounterClockwise(direction: Direction): Direction;
 export declare function turnClockwise(direction: Direction): Direction;
 export declare function directionVector(direction: Direction): Vector2;

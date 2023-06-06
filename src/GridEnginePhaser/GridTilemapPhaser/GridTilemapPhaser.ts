@@ -126,15 +126,17 @@ export class GridTilemapPhaser {
     const makeHigherThanCharWhenOnSameLevel = 1;
     for (let row = 0; row < layer.height; row++) {
       const newLayer = this.copyLayer(layer, row);
-      newLayer.scale = layer.tilemapLayer.scale;
-      newLayer.setDepth(
-        offset +
-          Utils.shiftPad(
-            (row + heightShift) * this.getTileHeight() +
-              makeHigherThanCharWhenOnSameLevel,
-            GridTilemapPhaser.Z_INDEX_PADDING
-          )
-      );
+      if (newLayer) {
+        newLayer.scale = layer.tilemapLayer.scale;
+        newLayer.setDepth(
+          offset +
+            Utils.shiftPad(
+              (row + heightShift) * this.getTileHeight() +
+                makeHigherThanCharWhenOnSameLevel,
+              GridTilemapPhaser.Z_INDEX_PADDING
+            )
+        );
+      }
     }
   }
 
@@ -154,12 +156,15 @@ export class GridTilemapPhaser {
   private copyLayer(
     layerData: Phaser.Tilemaps.LayerData,
     row: number
-  ): Phaser.Tilemaps.TilemapLayer {
+  ): Phaser.Tilemaps.TilemapLayer | undefined {
     const name = `${layerData.name}#${row}`;
     const newLayer = this.tilemap.createBlankLayer(
       name,
       layerData.tilemapLayer.tileset
     );
+
+    if (!newLayer) return undefined;
+
     // Somehow phaser does not catch the name through the createBlankLayer
     // method.
     newLayer.name = name;

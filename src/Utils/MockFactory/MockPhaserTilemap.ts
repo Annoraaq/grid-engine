@@ -15,8 +15,12 @@ export function createPhaserTilemapStub(
   const tm = new Phaser.Tilemaps.Tilemap(scene, mapData);
   for (let i = 0; i < tm.layers.length; i++) {
     const layer = tm.createLayer(i, "Test tileset", 0, 0);
-    layer.scale = 3;
+    if (layer) {
+      layer.tileset = mapData.tilesets;
+      layer.scale = 3;
+    }
   }
+  tm.tiles = mapData.tiles;
   return tm;
 }
 
@@ -25,10 +29,16 @@ function parseBlockMap(
 ): Phaser.Tilemaps.MapData {
   const layers: Phaser.Tilemaps.LayerData[] = [];
 
+  const tiles: any[] = [];
   for (const [layerName, allRows] of blockMap.entries()) {
     const ld = createLayer(layerName, allRows);
     if (ld) {
       layers.push(ld);
+      for (const r of ld.data) {
+        for (const t of r) {
+          tiles[t.index] = [0, 0, 0];
+        }
+      }
     }
   }
 
@@ -36,6 +46,7 @@ function parseBlockMap(
     tileWidth: 16,
     tileHeight: 16,
     layers,
+    tiles,
   });
 
   mapData.width = layers[0]?.width || 0;
@@ -67,18 +78,15 @@ function createLayer(layerName: string | undefined, allRows: string[]) {
   for (let r = 0; r < allRows.length; r++) {
     tiles[r] = [];
     for (let c = 0; c < allRows[r].length; c++) {
-      if (allRows[r][c] == "_") {
-        return undefined;
-      } else {
-        // Phaser also uses the ctor like this, so the types seem to be wrong.
-        // @ts-ignore
-        const tile = new Phaser.Tilemaps.Tile(layerData, 1, c, r, 16, 16);
-        tile.properties = {
-          ...getBlockingProps(allRows[r][c]),
-          id: cnt++,
-        };
-        tiles[r][c] = tile;
-      }
+      // Phaser also uses the ctor like this, so the types seem to be wrong.
+      // @ts-ignore
+      const tile = new Phaser.Tilemaps.Tile(layerData, cnt, c, r, 16, 16);
+      tile.properties = {
+        ...getBlockingProps(allRows[r][c]),
+        id: cnt,
+      };
+      cnt++;
+      tiles[r][c] = tile;
     }
   }
   // Phaser also uses the ctor like this, so the types seem to be wrong.

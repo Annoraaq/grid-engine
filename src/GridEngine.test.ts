@@ -409,8 +409,11 @@ describe("GridEngine", () => {
     expect(gridEngine.isTileBlocked({ x: 0, y: 0 })).toBe(true);
     expect(gridEngine.isTileBlocked({ x: 1, y: 1 })).toBe(true);
 
-    tm.getLayer(undefined).data[0][0].properties = {};
-    tm.getLayer(undefined).data[1][1].properties = {};
+    const layer = tm.getLayer(undefined);
+    if (layer) {
+      layer.data[0][0].properties = {};
+      layer.data[1][1].properties = {};
+    }
 
     expect(gridEngine.isTileBlocked({ x: 0, y: 0 })).toBe(true);
     expect(gridEngine.isTileBlocked({ x: 1, y: 1 })).toBe(true);

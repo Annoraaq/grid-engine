@@ -467,6 +467,36 @@ describe("GridCharacterPhaser", () => {
         expect(gridCharPhaser.getSprite()?.y).toBe(expectedYPos);
       });
 
+      it("should round sprite pixel pos horizontally", () => {
+        const { gridCharPhaser } = createChar(charData, false);
+        gridEngineHeadless.setSpeed("charID", 1);
+        gridEngineHeadless.setPosition("charID", charTilePos, "lowerCharLayer");
+        gridEngineHeadless.move("charID", Direction.RIGHT);
+        gridEngineHeadless.update(1000, 300);
+        gridCharPhaser.update(300);
+
+        const expectedXPos = 182;
+        const expectedYPos = 215;
+
+        expect(gridCharPhaser.getSprite()?.x).toBe(expectedXPos);
+        expect(gridCharPhaser.getSprite()?.y).toBe(expectedYPos);
+      });
+
+      it("should round sprite pixel pos vertically", () => {
+        const { gridCharPhaser } = createChar(charData, false);
+        gridEngineHeadless.setSpeed("charID", 1);
+        gridEngineHeadless.setPosition("charID", charTilePos, "lowerCharLayer");
+        gridEngineHeadless.move("charID", Direction.DOWN);
+        gridEngineHeadless.update(1000, 300);
+        gridCharPhaser.update(300);
+
+        const expectedXPos = 168;
+        const expectedYPos = 229;
+
+        expect(gridCharPhaser.getSprite()?.x).toBe(expectedXPos);
+        expect(gridCharPhaser.getSprite()?.y).toBe(expectedYPos);
+      });
+
       it("should update sprite pixel pos diagonally", () => {
         const { gridCharPhaser } = createChar(
           { ...charData, numberOfDirections: NumberOfDirections.EIGHT },
