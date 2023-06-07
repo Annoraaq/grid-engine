@@ -22,7 +22,7 @@ interface Result {
   resultNew: SpeedTestResult;
 }
 
-const geTm = new RoomsTilemap("speedtests/8room_000.map");
+const geTm = new RoomsTilemap("8room_000.map");
 const geOld = new GridEngineOld();
 const geNew = new GridEngineNew();
 
