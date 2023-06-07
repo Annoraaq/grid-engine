@@ -15,6 +15,8 @@ import { Tilemap } from "../../GridTilemap/Tilemap";
 import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
 
+const CHUNKS_PER_SECOND = 2;
+
 interface TestData {
   gridTilemap: GridTilemap;
   mockChar: GridCharacter;
@@ -107,9 +109,20 @@ describe("QueueMovement", () => {
     path: LayerVecPos[]
   ) {
     for (const pos of path) {
-      queueMovement.update(1000);
-      mockChar.update(1000);
+      chunkUpdate(queueMovement, mockChar, CHUNKS_PER_SECOND);
       expect(mockChar.getTilePos()).toEqual(pos);
+    }
+  }
+  /* Updates in chunks of 500ms. */
+  function chunkUpdate(
+    queueMovement: QueueMovement,
+    mockChar: GridCharacter,
+    numChunks: number
+  ) {
+    const HALF_SECOND_MS = 500;
+    for (let i = 0; i < numChunks; i++) {
+      queueMovement.update(HALF_SECOND_MS);
+      mockChar.update(HALF_SECOND_MS);
     }
   }
 

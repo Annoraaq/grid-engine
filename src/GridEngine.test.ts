@@ -1471,8 +1471,10 @@ describe("GridEngine", () => {
         { position: { x: 1, y: 1 }, charLayer: undefined },
       ]);
 
-      gridEngine.update(0, 1000);
-      gridEngine.update(0, 1000);
+      gridEngine.update(0, 500);
+      gridEngine.update(0, 500);
+      gridEngine.update(0, 500);
+      gridEngine.update(0, 500);
 
       expect(obs).toHaveBeenCalledWith({
         charId: "player",
@@ -1498,9 +1500,12 @@ describe("GridEngine", () => {
       ]);
       gridEngine.addQueueMovements("player", [Direction.RIGHT]);
 
-      gridEngine.update(0, 1000);
-      gridEngine.update(0, 1000);
-      gridEngine.update(0, 1000);
+      gridEngine.update(0, 500);
+      gridEngine.update(0, 500);
+      gridEngine.update(0, 500);
+      gridEngine.update(0, 500);
+      gridEngine.update(0, 500);
+      gridEngine.update(0, 500);
 
       expect(obs).toHaveBeenCalledWith({
         charId: "player",

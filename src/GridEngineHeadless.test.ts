@@ -1249,9 +1249,12 @@ describe("GridEngineHeadless", () => {
       ]);
       gridEngineHeadless.addQueueMovements("player", [Direction.RIGHT]);
 
-      gridEngineHeadless.update(0, 1000);
-      gridEngineHeadless.update(0, 1000);
-      gridEngineHeadless.update(0, 1000);
+      gridEngineHeadless.update(0, 500);
+      gridEngineHeadless.update(0, 500);
+      gridEngineHeadless.update(0, 500);
+      gridEngineHeadless.update(0, 500);
+      gridEngineHeadless.update(0, 500);
+      gridEngineHeadless.update(0, 500);
 
       expect(obs).toHaveBeenCalledWith({
         charId: "player",
