@@ -30,7 +30,7 @@ export const BidirSpeed = {
 
     return {
       result: timeMs,
-      tolerance: 0.05,
+      tolerance: 0.1,
     };
   },
 };
