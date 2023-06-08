@@ -43,4 +43,7 @@ jobs:
 
       - run: npm run build-speedtest
 
-      - run: node speedtests/run.js
+      - run: node run.js
+        working-directory: ./speedtests
+
+

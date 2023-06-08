@@ -1228,6 +1228,165 @@ describe("GridEngineHeadless", () => {
     }
   });
 
+  describe("QueueMovement", () => {
+    it("should enqueue and finish", () => {
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMap([
+          "...",
+          "...",
+        ]),
+        { characters: [{ id: "player", speed: 1 }] }
+      );
+      const obs = jest.fn();
+
+      gridEngineHeadless.queueMovementFinished().subscribe(obs);
+      gridEngineHeadless.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+      gridEngineHeadless.addQueueMovements("player", [
+        { position: { x: 1, y: 1 }, charLayer: undefined },
+      ]);
+      gridEngineHeadless.addQueueMovements("player", [Direction.RIGHT]);
+
+      gridEngineHeadless.update(0, 500);
+      gridEngineHeadless.update(0, 500);
+      gridEngineHeadless.update(0, 500);
+      gridEngineHeadless.update(0, 500);
+      gridEngineHeadless.update(0, 500);
+      gridEngineHeadless.update(0, 500);
+
+      expect(obs).toHaveBeenCalledWith({
+        charId: "player",
+        description: "",
+        layer: undefined,
+        position: {
+          x: 2,
+          y: 1,
+        },
+        result: "SUCCESS",
+      });
+    });
+
+    it("should apply options", () => {
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMap([
+          "...",
+          "...",
+        ]),
+        { characters: [{ id: "player", speed: 1 }] }
+      );
+      const obs = jest.fn();
+
+      gridEngineHeadless.queueMovementFinished().subscribe(obs);
+      gridEngineHeadless.addQueueMovements(
+        "player",
+        [{ position: { x: 1, y: 1 }, charLayer: undefined }],
+        { ignoreInvalidPositions: true }
+      );
+      gridEngineHeadless.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+
+      gridEngineHeadless.update(0, 1000);
+
+      expect(obs).toHaveBeenCalledWith({
+        charId: "player",
+        description: "",
+        layer: undefined,
+        position: {
+          x: 1,
+          y: 0,
+        },
+        result: "SUCCESS",
+      });
+    });
+
+    it("should unsubscribe from finish on movement change", () => {
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMap([
+          "...",
+          "...",
+        ]),
+        { characters: [{ id: "player", speed: 1 }] }
+      );
+      const obs = jest.fn();
+
+      gridEngineHeadless.queueMovementFinished().subscribe(obs);
+      gridEngineHeadless.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+
+      gridEngineHeadless.moveTo("player", { x: 1, y: 0 });
+      expect(obs).toHaveBeenCalledWith(
+        expect.objectContaining({
+          charId: "player",
+          result: "MOVEMENT_TERMINATED",
+        })
+      );
+
+      obs.mockClear();
+      gridEngineHeadless.update(0, 1000);
+
+      expect(obs).not.toHaveBeenCalled();
+    });
+
+    it("should unsubscribe from finish on movement stop", () => {
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMap([
+          "...",
+          "...",
+        ]),
+        { characters: [{ id: "player", speed: 1 }] }
+      );
+      const obs = jest.fn();
+
+      gridEngineHeadless.queueMovementFinished().subscribe(obs);
+      gridEngineHeadless.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+
+      gridEngineHeadless.stopMovement("player");
+      expect(obs).toHaveBeenCalledWith(
+        expect.objectContaining({
+          charId: "player",
+          result: "MOVEMENT_TERMINATED",
+        })
+      );
+
+      obs.mockClear();
+
+      gridEngineHeadless.update(0, 1000);
+
+      expect(obs).not.toHaveBeenCalled();
+    });
+
+    it("should unsubscribe from finish on char remove", () => {
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMap([
+          "...",
+          "...",
+        ]),
+        { characters: [{ id: "player", speed: 1 }] }
+      );
+      const obs = jest.fn();
+
+      gridEngineHeadless.queueMovementFinished().subscribe(obs);
+      gridEngineHeadless.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+
+      gridEngineHeadless.removeCharacter("player");
+      gridEngineHeadless.update(0, 1000);
+
+      expect(obs).not.toHaveBeenCalled();
+    });
+  });
+
   describe("Error Handling unknown char id", () => {
     const UNKNOWN_CHAR_ID = "unknownCharId";
     beforeEach(() => {
@@ -1307,6 +1466,9 @@ describe("GridEngineHeadless", () => {
       );
       expectCharUnknownException(() =>
         gridEngineHeadless.clearLabels(UNKNOWN_CHAR_ID)
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.addQueueMovements(UNKNOWN_CHAR_ID, [])
       );
     });
 
@@ -1449,6 +1611,9 @@ describe("GridEngineHeadless", () => {
           { position: { x: 2, y: 2 }, charLayer: undefined }
         )
       );
+      expectUninitializedException(() =>
+        gridEngineHeadless.addQueueMovements(SOME_CHAR_ID, [])
+      );
     });
   });
 
@@ -1465,8 +1630,8 @@ describe("GridEngineHeadless", () => {
     gridEngineHeadless.create(
       // prettier-ignore
       mockBlockMap([
-        "..",
-        ".."
+        "...",
+        "...",
       ]),
       { characters: [{ id: "player" }] }
     );

@@ -462,7 +462,6 @@ describe("Jps4", () => {
         ],
       },
     ]);
-    // TODO: maybe previous is wrong? and therefore path construction
     const algo = new Jps4(gridTilemap);
 
     gridTilemap.setTransition(

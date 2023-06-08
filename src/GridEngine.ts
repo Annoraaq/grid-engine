@@ -37,6 +37,10 @@ import { Orientation, Tile, TileLayer, Tilemap } from "./GridTilemap/Tilemap";
 import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer";
 import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile";
 import {
+  QueueMovementConfig,
+  Finished as QueueMovementFinished,
+} from "./Movement/QueueMovement/QueueMovement";
+import {
   CharacterShift,
   CharacterShiftAction,
   CharLayer,
@@ -600,6 +604,22 @@ export class GridEngine implements IGridEngine {
     height: number
   ): void {
     this.geHeadless.rebuildTileCollisionCache(x, y, width, height);
+  }
+
+  /** {@inheritDoc IGridEngine.addQueueMovements} */
+  addQueueMovements(
+    charId: string,
+    positions: Array<LayerPosition | Direction>,
+    options?: QueueMovementConfig
+  ): void {
+    this.geHeadless.addQueueMovements(charId, positions, options);
+  }
+
+  /** {@inheritDoc IGridEngine.queueMovementFinished} */
+  queueMovementFinished(): Observable<
+    { charId: string } & QueueMovementFinished
+  > {
+    return this.geHeadless.queueMovementFinished();
   }
 
   private setConfigDefaults(

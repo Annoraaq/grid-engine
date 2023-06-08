@@ -83,8 +83,8 @@ describe("GridEngine", () => {
           layer,
           [
             // prettier-ignore
-            "..",
-            "..",
+            "...",
+            "...",
           ],
         ],
       ])
@@ -129,6 +129,7 @@ describe("GridEngine", () => {
           id: "player",
           sprite: playerSpriteMock,
           walkingAnimationMapping: 0,
+          speed: 1,
         },
       ],
     });
@@ -1458,6 +1459,154 @@ describe("GridEngine", () => {
     });
   });
 
+  describe("QueueMovement", () => {
+    it("should enqueue and finish", () => {
+      const obs = jest.fn();
+
+      gridEngine.queueMovementFinished().subscribe(obs);
+      gridEngine.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+      gridEngine.addQueueMovements("player", [
+        { position: { x: 1, y: 1 }, charLayer: undefined },
+      ]);
+
+      gridEngine.update(0, 500);
+      gridEngine.update(0, 500);
+      gridEngine.update(0, 500);
+      gridEngine.update(0, 500);
+
+      expect(obs).toHaveBeenCalledWith({
+        charId: "player",
+        description: "",
+        layer: undefined,
+        position: {
+          x: 1,
+          y: 1,
+        },
+        result: "SUCCESS",
+      });
+    });
+
+    it("should enqueue and finish", () => {
+      const obs = jest.fn();
+
+      gridEngine.queueMovementFinished().subscribe(obs);
+      gridEngine.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+      gridEngine.addQueueMovements("player", [
+        { position: { x: 1, y: 1 }, charLayer: undefined },
+      ]);
+      gridEngine.addQueueMovements("player", [Direction.RIGHT]);
+
+      gridEngine.update(0, 500);
+      gridEngine.update(0, 500);
+      gridEngine.update(0, 500);
+      gridEngine.update(0, 500);
+      gridEngine.update(0, 500);
+      gridEngine.update(0, 500);
+
+      expect(obs).toHaveBeenCalledWith({
+        charId: "player",
+        description: "",
+        layer: undefined,
+        position: {
+          x: 2,
+          y: 1,
+        },
+        result: "SUCCESS",
+      });
+    });
+
+    it("should apply options", () => {
+      const obs = jest.fn();
+
+      gridEngine.queueMovementFinished().subscribe(obs);
+      gridEngine.addQueueMovements(
+        "player",
+        [{ position: { x: 1, y: 1 }, charLayer: undefined }],
+        { ignoreInvalidPositions: true }
+      );
+      gridEngine.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+
+      gridEngine.update(0, 1000);
+
+      expect(obs).toHaveBeenCalledWith({
+        charId: "player",
+        description: "",
+        layer: undefined,
+        position: {
+          x: 1,
+          y: 0,
+        },
+        result: "SUCCESS",
+      });
+    });
+
+    it("should unsubscribe from finish on movement change", () => {
+      const obs = jest.fn();
+
+      gridEngine.queueMovementFinished().subscribe(obs);
+      gridEngine.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+
+      gridEngine.moveTo("player", { x: 1, y: 0 });
+      expect(obs).toHaveBeenCalledWith(
+        expect.objectContaining({
+          charId: "player",
+          result: "MOVEMENT_TERMINATED",
+        })
+      );
+
+      obs.mockClear();
+      gridEngine.update(0, 1000);
+
+      expect(obs).not.toHaveBeenCalled();
+    });
+
+    it("should unsubscribe from finish on movement stop", () => {
+      const obs = jest.fn();
+
+      gridEngine.queueMovementFinished().subscribe(obs);
+      gridEngine.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+
+      gridEngine.stopMovement("player");
+      expect(obs).toHaveBeenCalledWith(
+        expect.objectContaining({
+          charId: "player",
+          result: "MOVEMENT_TERMINATED",
+        })
+      );
+
+      obs.mockClear();
+
+      gridEngine.update(0, 1000);
+      expect(gridEngine.getPosition("player")).toEqual({ x: 0, y: 0 });
+
+      expect(obs).not.toHaveBeenCalled();
+    });
+
+    it("should unsubscribe from finish on char remove", () => {
+      const obs = jest.fn();
+
+      gridEngine.queueMovementFinished().subscribe(obs);
+      gridEngine.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+
+      gridEngine.removeCharacter("player");
+      gridEngine.update(0, 1000);
+
+      expect(obs).not.toHaveBeenCalled();
+    });
+  });
+
   describe("Error Handling unknown char id", () => {
     const UNKNOWN_CHAR_ID = "unknownCharId";
 
@@ -1537,6 +1686,9 @@ describe("GridEngine", () => {
         gridEngine.removeLabels(UNKNOWN_CHAR_ID, ["label"])
       );
       expectCharUnknownException(() => gridEngine.clearLabels(UNKNOWN_CHAR_ID));
+      expectCharUnknownException(() =>
+        gridEngine.addQueueMovements(UNKNOWN_CHAR_ID, [])
+      );
     });
 
     it("should throw error if follow is invoked", () => {
@@ -1666,6 +1818,9 @@ describe("GridEngine", () => {
           { position: { x: 2, y: 2 }, charLayer: undefined },
           { position: { x: 2, y: 2 }, charLayer: undefined }
         )
+      );
+      expectUninitializedException(() =>
+        gridEngine.addQueueMovements(SOME_CHAR_ID, [])
       );
     });
   });

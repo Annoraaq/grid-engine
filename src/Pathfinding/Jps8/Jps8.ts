@@ -111,7 +111,6 @@ export class Jps8 extends Jps4 {
   }
 
   protected prune(parent: LayerVecPos, node: LayerVecPos): LayerVecPos[] {
-    // console.log("prune2");
     const { right, topRight, downRight } = this.normalizedPositions(
       parent,
       node
