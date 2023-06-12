@@ -19,6 +19,7 @@ export interface QueueMovementConfig {
   /**
    * Determines what happens if the next position on the enqueued path is blocked.
    * For the different strategies see {@link QueuedPathBlockedStrategy}.
+   * @default QueuePathBlockedStrategy.STOP
    */
   pathBlockedStrategy?: QueuedPathBlockedStrategy;
 
@@ -97,7 +98,7 @@ export interface Finished {
 }
 
 export class QueueMovement implements Movement {
-  private queue = new Queue<LayerVecPos>();
+  private queue = new Queue<LayerVecPos | Direction>();
   private finished$ = new Subject<Finished>();
   private distanceUtils: DistanceUtils;
   private pathBlockedStrategy: QueuedPathBlockedStrategy;
@@ -153,13 +154,19 @@ export class QueueMovement implements Movement {
   }
 
   enqueue(positions: Array<LayerVecPos | Direction>): void {
-    for (let pos of positions) {
+    for (const pos of positions) {
+      if (isDirection(pos)) {
+        this.queue.enqueue(pos);
+        continue;
+      }
+
       let end = this.queue.peekEnd();
       if (!end) {
         end = this.character.getNextTilePos();
       }
-      if (isDirection(pos)) {
-        pos = this.tilemap.getTilePosInDirection(end, pos);
+      if (isDirection(end)) {
+        this.queue.enqueue(pos);
+        continue;
       }
       const isNeighborPos =
         this.distanceUtils.distance(end.position, pos.position) === 1;
@@ -169,7 +176,7 @@ export class QueueMovement implements Movement {
     }
   }
 
-  peekAll(): LayerVecPos[] {
+  peekAll(): Array<LayerVecPos | Direction> {
     return this.queue.peekAll();
   }
 
@@ -182,7 +189,14 @@ export class QueueMovement implements Movement {
   }
 
   private moveCharOnPath(delta: number): void {
-    const nextPos = this.queue.peek();
+    let nextPos = this.queue.peek();
+
+    if (isDirection(nextPos)) {
+      nextPos = this.tilemap.getTilePosInDirection(
+        this.character.getNextTilePos(),
+        nextPos
+      );
+    }
     if (!nextPos) return;
 
     if (!this.skipInvalidPositions) {
@@ -191,7 +205,7 @@ export class QueueMovement implements Movement {
         return;
       }
     } else {
-      const nextPos = this.getNextValidPosition();
+      nextPos = this.getNextValidPosition();
       if (!nextPos) {
         this.finishInvalidNextPos(nextPos);
         return;
@@ -232,7 +246,14 @@ export class QueueMovement implements Movement {
   }
   private getNextValidPosition(): LayerVecPos | undefined {
     while (this.queue.size() > 0) {
-      const nextPos = this.queue.peek();
+      let nextPos = this.queue.peek();
+      if (isDirection(nextPos)) {
+        nextPos = this.tilemap.getTilePosInDirection(
+          this.character.getNextTilePos(),
+          nextPos
+        );
+      }
+
       if (nextPos && this.isNeighborPos(nextPos)) {
         return nextPos;
       }

@@ -157,7 +157,7 @@ describe("QueueMovement", () => {
     expect(queueMovement.size()).toEqual(2);
     expect(queueMovement.peekAll()).toEqual([
       { position: new Vector2(0, 1), layer: "testLayer" },
-      { position: new Vector2(0, 2), layer: "testLayer" },
+      Direction.DOWN,
     ]);
   });
 
@@ -191,14 +191,14 @@ describe("QueueMovement", () => {
     } = initQueueMovement(undefined, {
       ignoreInvalidPositions: true,
     });
-    queueMovement.enqueue([layerPos(1, 0), layerPos(2, 1)]);
+    queueMovement.enqueue([layerPos(1, 0), layerPos(2, 1), Direction.RIGHT]);
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
     queueMovement.update(1000);
     mockChar.update(1000);
 
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
-      position: layerPos(1, 0).position,
+      position: layerPos(2, 0).position,
       result: "SUCCESS",
       description: "",
       layer: "testCharLayer",
@@ -508,12 +508,46 @@ describe("QueueMovement", () => {
     } = initQueueMovement(undefined, {
       skipInvalidPositions: true,
     });
-    queueMovement.enqueue([layerPos(1, 0), layerPos(3, 0), layerPos(2, 0)]);
+    queueMovement.enqueue([layerPos(1, 0), layerPos(3, 0), Direction.RIGHT]);
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0), layerPos(2, 0)]);
 
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
       position: layerPos(2, 0).position,
+      result: "SUCCESS",
+      description: "",
+      layer: "testCharLayer",
+    });
+    expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
+  });
+
+  it("should skip if path is blocked using directions", () => {
+    const tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "testCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".#.",
+          "...",
+        ],
+      },
+    ]);
+    const {
+      mockChar,
+      queueMovement,
+      finishedObsCallbackMock,
+      finishedObsCompleteMock,
+    } = initQueueMovement(tilemapMock, {
+      pathBlockedStrategy: QueuedPathBlockedStrategy.SKIP,
+      skipInvalidPositions: true,
+    });
+    queueMovement.enqueue([layerPos(1, 0), layerPos(2, 0), Direction.DOWN]);
+
+    expectWalkedPath(mockChar, queueMovement, [layerPos(0, 1)]);
+
+    expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+      position: layerPos(0, 1).position,
       result: "SUCCESS",
       description: "",
       layer: "testCharLayer",
