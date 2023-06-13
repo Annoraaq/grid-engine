@@ -1470,42 +1470,33 @@ describe("GridEngine", () => {
       gridEngine.addQueueMovements("player", [
         { position: { x: 1, y: 1 }, charLayer: undefined },
       ]);
-
-      gridEngine.update(0, 500);
-      gridEngine.update(0, 500);
-      gridEngine.update(0, 500);
-      gridEngine.update(0, 500);
-
-      expect(obs).toHaveBeenCalledWith({
-        charId: "player",
-        description: "",
-        layer: undefined,
-        position: {
-          x: 1,
-          y: 1,
-        },
-        result: "SUCCESS",
-      });
-    });
-
-    it("should enqueue and finish", () => {
-      const obs = jest.fn();
-
-      gridEngine.queueMovementFinished().subscribe(obs);
-      gridEngine.addQueueMovements("player", [
-        { position: { x: 1, y: 0 }, charLayer: undefined },
-      ]);
-      gridEngine.addQueueMovements("player", [
-        { position: { x: 1, y: 1 }, charLayer: undefined },
-      ]);
       gridEngine.addQueueMovements("player", [Direction.RIGHT]);
 
+      expect(gridEngine.getEnqueuedMovements("player")).toEqual([
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+        { position: { x: 1, y: 1 }, charLayer: undefined },
+        Direction.RIGHT,
+      ]);
+
+      gridEngine.update(0, 500);
+      expect(gridEngine.getEnqueuedMovements("player")).toEqual([
+        { position: { x: 1, y: 1 }, charLayer: undefined },
+        Direction.RIGHT,
+      ]);
+      gridEngine.update(0, 500);
+      expect(gridEngine.getEnqueuedMovements("player")).toEqual([
+        { position: { x: 1, y: 1 }, charLayer: undefined },
+        Direction.RIGHT,
+      ]);
       gridEngine.update(0, 500);
       gridEngine.update(0, 500);
+      expect(gridEngine.getEnqueuedMovements("player")).toEqual([
+        Direction.RIGHT,
+      ]);
       gridEngine.update(0, 500);
       gridEngine.update(0, 500);
-      gridEngine.update(0, 500);
-      gridEngine.update(0, 500);
+
+      expect(gridEngine.getEnqueuedMovements("player")).toEqual([]);
 
       expect(obs).toHaveBeenCalledWith({
         charId: "player",
@@ -1517,6 +1508,22 @@ describe("GridEngine", () => {
         },
         result: "SUCCESS",
       });
+    });
+
+    it("should return empty queue if other movement set", () => {
+      gridEngine.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+      gridEngine.addQueueMovements("player", [Direction.RIGHT]);
+
+      expect(gridEngine.getEnqueuedMovements("player")).toEqual([
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+        Direction.RIGHT,
+      ]);
+
+      gridEngine.moveTo("player", { x: 2, y: 0 });
+
+      expect(gridEngine.getEnqueuedMovements("player")).toEqual([]);
     });
 
     it("should apply options", () => {
@@ -1689,6 +1696,9 @@ describe("GridEngine", () => {
       expectCharUnknownException(() =>
         gridEngine.addQueueMovements(UNKNOWN_CHAR_ID, [])
       );
+      expectCharUnknownException(() =>
+        gridEngine.getEnqueuedMovements(UNKNOWN_CHAR_ID)
+      );
     });
 
     it("should throw error if follow is invoked", () => {
@@ -1821,6 +1831,9 @@ describe("GridEngine", () => {
       );
       expectUninitializedException(() =>
         gridEngine.addQueueMovements(SOME_CHAR_ID, [])
+      );
+      expectUninitializedException(() =>
+        gridEngine.getEnqueuedMovements(SOME_CHAR_ID)
       );
     });
   });

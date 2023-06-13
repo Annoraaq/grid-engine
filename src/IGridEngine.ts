@@ -496,6 +496,9 @@ export interface IGridEngine {
     options?: QueueMovementConfig
   );
 
+  /** Returns all enqueued movements for the given character. */
+  getEnqueuedMovements(charId: string): Array<LayerPosition | Direction>;
+
   /**
    * Emits whenever queued movements for a character finish (with success or
    * failure).

@@ -1249,12 +1249,30 @@ describe("GridEngineHeadless", () => {
       ]);
       gridEngineHeadless.addQueueMovements("player", [Direction.RIGHT]);
 
+      expect(gridEngineHeadless.getEnqueuedMovements("player")).toEqual([
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+        { position: { x: 1, y: 1 }, charLayer: undefined },
+        Direction.RIGHT,
+      ]);
+      gridEngineHeadless.update(0, 500);
+      expect(gridEngineHeadless.getEnqueuedMovements("player")).toEqual([
+        { position: { x: 1, y: 1 }, charLayer: undefined },
+        Direction.RIGHT,
+      ]);
+      gridEngineHeadless.update(0, 500);
+      expect(gridEngineHeadless.getEnqueuedMovements("player")).toEqual([
+        { position: { x: 1, y: 1 }, charLayer: undefined },
+        Direction.RIGHT,
+      ]);
       gridEngineHeadless.update(0, 500);
       gridEngineHeadless.update(0, 500);
+      expect(gridEngineHeadless.getEnqueuedMovements("player")).toEqual([
+        Direction.RIGHT,
+      ]);
       gridEngineHeadless.update(0, 500);
       gridEngineHeadless.update(0, 500);
-      gridEngineHeadless.update(0, 500);
-      gridEngineHeadless.update(0, 500);
+
+      expect(gridEngineHeadless.getEnqueuedMovements("player")).toEqual([]);
 
       expect(obs).toHaveBeenCalledWith({
         charId: "player",
@@ -1266,6 +1284,31 @@ describe("GridEngineHeadless", () => {
         },
         result: "SUCCESS",
       });
+    });
+
+    it("should return empty queue if other movement set", () => {
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMap([
+          "...",
+          "...",
+        ]),
+        { characters: [{ id: "player", speed: 1 }] }
+      );
+
+      gridEngineHeadless.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+      ]);
+      gridEngineHeadless.addQueueMovements("player", [Direction.RIGHT]);
+
+      expect(gridEngineHeadless.getEnqueuedMovements("player")).toEqual([
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+        Direction.RIGHT,
+      ]);
+
+      gridEngineHeadless.moveTo("player", { x: 2, y: 0 });
+
+      expect(gridEngineHeadless.getEnqueuedMovements("player")).toEqual([]);
     });
 
     it("should apply options", () => {
@@ -1470,6 +1513,9 @@ describe("GridEngineHeadless", () => {
       expectCharUnknownException(() =>
         gridEngineHeadless.addQueueMovements(UNKNOWN_CHAR_ID, [])
       );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.getEnqueuedMovements(UNKNOWN_CHAR_ID)
+      );
     });
 
     it("should throw error if follow is invoked", () => {
@@ -1613,6 +1659,9 @@ describe("GridEngineHeadless", () => {
       );
       expectUninitializedException(() =>
         gridEngineHeadless.addQueueMovements(SOME_CHAR_ID, [])
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.getEnqueuedMovements(SOME_CHAR_ID)
       );
     });
   });

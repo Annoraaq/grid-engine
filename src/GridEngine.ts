@@ -38,7 +38,9 @@ import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer";
 import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile";
 import {
   QueueMovementConfig,
+  QueuedPathBlockedStrategy,
   Finished as QueueMovementFinished,
+  QueueMovementResult,
 } from "./Movement/QueueMovement/QueueMovement";
 import {
   CharacterShift,
@@ -82,6 +84,10 @@ export {
   PhaserTile,
   PhaserTileLayer,
   PhaserTilemap,
+  QueueMovementConfig,
+  QueueMovementFinished,
+  QueueMovementResult,
+  QueuedPathBlockedStrategy,
   ShortestPathAlgorithmType,
   Tile,
   TileLayer,
@@ -613,6 +619,11 @@ export class GridEngine implements IGridEngine {
     options?: QueueMovementConfig
   ): void {
     this.geHeadless.addQueueMovements(charId, positions, options);
+  }
+
+  /** {@inheritDoc IGridEngine.getEnqueuedMovements} */
+  getEnqueuedMovements(charId: string): Array<LayerPosition | Direction> {
+    return this.geHeadless.getEnqueuedMovements(charId);
   }
 
   /** {@inheritDoc IGridEngine.queueMovementFinished} */
