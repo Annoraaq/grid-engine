@@ -633,6 +633,11 @@ export class GridEngine implements IGridEngine {
     return this.geHeadless.queueMovementFinished();
   }
 
+  /** {@inheritDoc IGridEngine.clearEnqueuedMovements} */
+  clearEnqueuedMovements(charId: string): void {
+    return this.geHeadless.clearEnqueuedMovements(charId);
+  }
+
   private setConfigDefaults(
     config: GridEngineConfig
   ): Concrete<GridEngineConfig> {

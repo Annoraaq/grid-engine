@@ -1286,6 +1286,32 @@ describe("GridEngineHeadless", () => {
       });
     });
 
+    it("should clear queue", () => {
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMap([
+          "...",
+          "...",
+        ]),
+        { characters: [{ id: "player", speed: 1 }, { id: "otherChar" }] }
+      );
+
+      gridEngineHeadless.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+        Direction.RIGHT,
+      ]);
+      gridEngineHeadless.addQueueMovements("otherChar", [Direction.RIGHT]);
+
+      expect(gridEngineHeadless.getEnqueuedMovements("player")).toHaveLength(2);
+
+      gridEngineHeadless.clearEnqueuedMovements("player");
+
+      expect(gridEngineHeadless.getEnqueuedMovements("player")).toHaveLength(0);
+      expect(gridEngineHeadless.getEnqueuedMovements("otherChar")).toHaveLength(
+        1
+      );
+    });
+
     it("should return empty queue if other movement set", () => {
       gridEngineHeadless.create(
         // prettier-ignore
@@ -1516,6 +1542,9 @@ describe("GridEngineHeadless", () => {
       expectCharUnknownException(() =>
         gridEngineHeadless.getEnqueuedMovements(UNKNOWN_CHAR_ID)
       );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.clearEnqueuedMovements(UNKNOWN_CHAR_ID)
+      );
     });
 
     it("should throw error if follow is invoked", () => {
@@ -1662,6 +1691,9 @@ describe("GridEngineHeadless", () => {
       );
       expectUninitializedException(() =>
         gridEngineHeadless.getEnqueuedMovements(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.clearEnqueuedMovements(SOME_CHAR_ID)
       );
     });
   });

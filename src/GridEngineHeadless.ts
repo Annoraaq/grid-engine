@@ -935,6 +935,17 @@ export class GridEngineHeadless implements IGridEngine {
     return [];
   }
 
+  /** {@inheritDoc IGridEngine.clearEnqueuedMovements} */
+  clearEnqueuedMovements(charId: string): void {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    if (gridChar.getMovement()?.getInfo().type === "Queue") {
+      const queueMovement = gridChar.getMovement() as QueueMovement;
+      queueMovement.clear();
+    }
+  }
+
   private charRemoved(charId: string): Observable<string> {
     if (!this.charRemoved$) throw this.createUninitializedErr();
     return this.charRemoved$?.pipe(

@@ -1510,6 +1510,22 @@ describe("GridEngine", () => {
       });
     });
 
+    it("should clear queue", () => {
+      gridEngine.addCharacter({ id: "otherChar" });
+      gridEngine.addQueueMovements("player", [
+        { position: { x: 1, y: 0 }, charLayer: undefined },
+        Direction.RIGHT,
+      ]);
+      gridEngine.addQueueMovements("otherChar", [Direction.RIGHT]);
+
+      expect(gridEngine.getEnqueuedMovements("player")).toHaveLength(2);
+
+      gridEngine.clearEnqueuedMovements("player");
+
+      expect(gridEngine.getEnqueuedMovements("player")).toHaveLength(0);
+      expect(gridEngine.getEnqueuedMovements("otherChar")).toHaveLength(1);
+    });
+
     it("should return empty queue if other movement set", () => {
       gridEngine.addQueueMovements("player", [
         { position: { x: 1, y: 0 }, charLayer: undefined },
@@ -1699,6 +1715,9 @@ describe("GridEngine", () => {
       expectCharUnknownException(() =>
         gridEngine.getEnqueuedMovements(UNKNOWN_CHAR_ID)
       );
+      expectCharUnknownException(() =>
+        gridEngine.clearEnqueuedMovements(UNKNOWN_CHAR_ID)
+      );
     });
 
     it("should throw error if follow is invoked", () => {
@@ -1834,6 +1853,9 @@ describe("GridEngine", () => {
       );
       expectUninitializedException(() =>
         gridEngine.getEnqueuedMovements(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngine.clearEnqueuedMovements(SOME_CHAR_ID)
       );
     });
   });

@@ -61,6 +61,12 @@ export class Queue<T> {
     return arr;
   }
 
+  clear(): void {
+    this.head = undefined;
+    this.tail = undefined;
+    this.sizeInternal = 0;
+  }
+
   peekEnd(): T | undefined {
     return this.head?.data;
   }

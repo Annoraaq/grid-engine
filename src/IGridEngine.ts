@@ -500,6 +500,12 @@ export interface IGridEngine {
   getEnqueuedMovements(charId: string): Array<LayerPosition | Direction>;
 
   /**
+   * Clears the complete movement queue for the character, that was filled by
+   * using {@link IGridEngine.addQueueMovements}.
+   */
+  clearEnqueuedMovements(charId: string): void;
+
+  /**
    * Emits whenever queued movements for a character finish (with success or
    * failure).
    */

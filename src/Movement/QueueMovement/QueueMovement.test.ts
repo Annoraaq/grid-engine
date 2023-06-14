@@ -674,4 +674,16 @@ describe("QueueMovement", () => {
 
     expect(finishedObsCallbackMock).not.toHaveBeenCalled();
   });
+
+  it("should clear", () => {
+    const { queueMovement } = initQueueMovement();
+    expect(queueMovement.size()).toEqual(0);
+    queueMovement.enqueue([
+      { position: new Vector2(0, 1), layer: "testLayer" },
+      Direction.DOWN,
+    ]);
+    expect(queueMovement.size()).toEqual(2);
+    queueMovement.clear();
+    expect(queueMovement.size()).toEqual(0);
+  });
 });

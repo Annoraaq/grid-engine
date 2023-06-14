@@ -188,6 +188,10 @@ export class QueueMovement implements Movement {
     return this.finished$;
   }
 
+  clear(): void {
+    this.queue.clear();
+  }
+
   private moveCharOnPath(delta: number): void {
     let nextPos = this.queue.peek();
 
