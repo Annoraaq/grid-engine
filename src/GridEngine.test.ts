@@ -1908,4 +1908,22 @@ describe("GridEngine", () => {
       "Using GridEngine vGRID.ENGINE.VERSION"
     );
   });
+
+  it("should set/get offset", () => {
+    const offsetX = 3;
+    const offsetY = 4;
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+        },
+      ],
+    });
+    gridEngine.setOffsetX("player", offsetX);
+    gridEngine.setOffsetY("player", offsetY);
+    expect(gridEngine.getOffsetX("player")).toEqual(offsetX);
+    expect(gridEngine.getOffsetY("player")).toEqual(offsetY);
+  });
 });

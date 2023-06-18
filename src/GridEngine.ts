@@ -294,12 +294,32 @@ export class GridEngine implements IGridEngine {
     return gridChar.getOffsetX();
   }
 
+  /**
+   * Set custom x-offset for the sprite/container.
+   */
+  setOffsetX(charId: string, offsetX: number): void {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.setOffsetX(offsetX);
+  }
+
   /** @returns Y-offset for a character. */
   getOffsetY(charId: string): number {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getOffsetY();
+  }
+
+  /**
+   * Set custom y-offset for the sprite/container.
+   */
+  setOffsetY(charId: string, offsetY: number): void {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.setOffsetY(offsetY);
   }
 
   /** {@inheritDoc IGridEngine.collidesWithTiles} */

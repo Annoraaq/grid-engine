@@ -104,6 +104,16 @@ describe("GridCharacterPhaser", () => {
     };
   }
 
+  it("should set/get offset", () => {
+    const { gridCharPhaser } = createChar({}, true);
+    const offsetX = 3;
+    const offsetY = 4;
+    gridCharPhaser.setOffsetX(offsetX);
+    gridCharPhaser.setOffsetY(offsetY);
+    expect(gridCharPhaser.getOffsetX()).toEqual(offsetX);
+    expect(gridCharPhaser.getOffsetY()).toEqual(offsetY);
+  });
+
   describe("On creation", () => {
     it("should create a grid character", () => {
       const walkingAnimationMock = {} as any;
