@@ -897,7 +897,6 @@ export class GridEngineHeadless implements IGridEngine {
           this.queueMovementFinished$?.next({ charId, ...finished });
         });
     }
-    queueMovement.setConfig(options);
     queueMovement.enqueue(
       positions.map((p) => {
         if (isDirection(p)) {
@@ -907,7 +906,8 @@ export class GridEngineHeadless implements IGridEngine {
           position: new Vector2(p.position),
           layer: p.charLayer,
         };
-      })
+      }),
+      options
     );
   }
 
@@ -920,16 +920,22 @@ export class GridEngineHeadless implements IGridEngine {
   }
 
   /** {@inheritDoc IGridEngine.getEnqueuedMovements} */
-  getEnqueuedMovements(charId: string): Array<LayerPosition | Direction> {
+  getEnqueuedMovements(charId: string): Array<{
+    command: LayerPosition | Direction;
+    config: QueueMovementConfig;
+  }> {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     if (gridChar.getMovement()?.getInfo().type === "Queue") {
       const queueMovement = gridChar.getMovement() as QueueMovement;
       return queueMovement.peekAll().map((entry) => {
-        return isDirection(entry)
-          ? entry
-          : LayerPositionUtils.fromInternal(entry);
+        return {
+          command: isDirection(entry.command)
+            ? entry.command
+            : LayerPositionUtils.fromInternal(entry.command),
+          config: entry.config,
+        };
       });
     }
     return [];

@@ -1,6 +1,10 @@
 import { take } from "rxjs/operators";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { GridCharacter } from "./GridCharacter/GridCharacter";
+import {
+  QueueMovementConfig,
+  QueuedPathBlockedStrategy,
+} from "./Movement/QueueMovement/QueueMovement";
 import { Vector2 } from "./Utils/Vector2/Vector2";
 
 expect.extend({
@@ -1229,6 +1233,13 @@ describe("GridEngineHeadless", () => {
   });
 
   describe("QueueMovement", () => {
+    const DEFAULT_QUEUE_CONFIG: QueueMovementConfig = {
+      ignoreInvalidPositions: false,
+      pathBlockedStrategy: QueuedPathBlockedStrategy.STOP,
+      pathBlockedWaitTimeoutMs: -1,
+      skipInvalidPositions: false,
+    };
+
     it("should enqueue and finish", () => {
       gridEngineHeadless.create(
         // prettier-ignore
@@ -1250,24 +1261,36 @@ describe("GridEngineHeadless", () => {
       gridEngineHeadless.addQueueMovements("player", [Direction.RIGHT]);
 
       expect(gridEngineHeadless.getEnqueuedMovements("player")).toEqual([
-        { position: { x: 1, y: 0 }, charLayer: undefined },
-        { position: { x: 1, y: 1 }, charLayer: undefined },
-        Direction.RIGHT,
+        {
+          command: { position: { x: 1, y: 0 }, charLayer: undefined },
+          config: DEFAULT_QUEUE_CONFIG,
+        },
+        {
+          command: { position: { x: 1, y: 1 }, charLayer: undefined },
+          config: DEFAULT_QUEUE_CONFIG,
+        },
+        { command: Direction.RIGHT, config: DEFAULT_QUEUE_CONFIG },
       ]);
       gridEngineHeadless.update(0, 500);
       expect(gridEngineHeadless.getEnqueuedMovements("player")).toEqual([
-        { position: { x: 1, y: 1 }, charLayer: undefined },
-        Direction.RIGHT,
+        {
+          command: { position: { x: 1, y: 1 }, charLayer: undefined },
+          config: DEFAULT_QUEUE_CONFIG,
+        },
+        { command: Direction.RIGHT, config: DEFAULT_QUEUE_CONFIG },
       ]);
       gridEngineHeadless.update(0, 500);
       expect(gridEngineHeadless.getEnqueuedMovements("player")).toEqual([
-        { position: { x: 1, y: 1 }, charLayer: undefined },
-        Direction.RIGHT,
+        {
+          command: { position: { x: 1, y: 1 }, charLayer: undefined },
+          config: DEFAULT_QUEUE_CONFIG,
+        },
+        { command: Direction.RIGHT, config: DEFAULT_QUEUE_CONFIG },
       ]);
       gridEngineHeadless.update(0, 500);
       gridEngineHeadless.update(0, 500);
       expect(gridEngineHeadless.getEnqueuedMovements("player")).toEqual([
-        Direction.RIGHT,
+        { command: Direction.RIGHT, config: DEFAULT_QUEUE_CONFIG },
       ]);
       gridEngineHeadless.update(0, 500);
       gridEngineHeadless.update(0, 500);
@@ -1328,8 +1351,11 @@ describe("GridEngineHeadless", () => {
       gridEngineHeadless.addQueueMovements("player", [Direction.RIGHT]);
 
       expect(gridEngineHeadless.getEnqueuedMovements("player")).toEqual([
-        { position: { x: 1, y: 0 }, charLayer: undefined },
-        Direction.RIGHT,
+        {
+          command: { position: { x: 1, y: 0 }, charLayer: undefined },
+          config: DEFAULT_QUEUE_CONFIG,
+        },
+        { command: Direction.RIGHT, config: DEFAULT_QUEUE_CONFIG },
       ]);
 
       gridEngineHeadless.moveTo("player", { x: 2, y: 0 });

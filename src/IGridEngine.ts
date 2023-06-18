@@ -497,7 +497,10 @@ export interface IGridEngine {
   );
 
   /** Returns all enqueued movements for the given character. */
-  getEnqueuedMovements(charId: string): Array<LayerPosition | Direction>;
+  getEnqueuedMovements(charId: string): Array<{
+    command: LayerPosition | Direction;
+    config: QueueMovementConfig;
+  }>;
 
   /**
    * Clears the complete movement queue for the character, that was filled by

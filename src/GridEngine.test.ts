@@ -2,6 +2,10 @@ import { take } from "rxjs/operators";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { GridCharacter } from "./GridCharacter/GridCharacter";
 import { Vector2 } from "./Utils/Vector2/Vector2";
+import {
+  QueueMovementConfig,
+  QueuedPathBlockedStrategy,
+} from "./Movement/QueueMovement/QueueMovement";
 import * as Phaser from "phaser";
 
 // Hack to get Phaser included at runtime
@@ -1460,6 +1464,13 @@ describe("GridEngine", () => {
   });
 
   describe("QueueMovement", () => {
+    const DEFAULT_QUEUE_CONFIG: QueueMovementConfig = {
+      ignoreInvalidPositions: false,
+      pathBlockedStrategy: QueuedPathBlockedStrategy.STOP,
+      pathBlockedWaitTimeoutMs: -1,
+      skipInvalidPositions: false,
+    };
+
     it("should enqueue and finish", () => {
       const obs = jest.fn();
 
@@ -1473,25 +1484,37 @@ describe("GridEngine", () => {
       gridEngine.addQueueMovements("player", [Direction.RIGHT]);
 
       expect(gridEngine.getEnqueuedMovements("player")).toEqual([
-        { position: { x: 1, y: 0 }, charLayer: undefined },
-        { position: { x: 1, y: 1 }, charLayer: undefined },
-        Direction.RIGHT,
+        {
+          command: { position: { x: 1, y: 0 }, charLayer: undefined },
+          config: DEFAULT_QUEUE_CONFIG,
+        },
+        {
+          command: { position: { x: 1, y: 1 }, charLayer: undefined },
+          config: DEFAULT_QUEUE_CONFIG,
+        },
+        { command: Direction.RIGHT, config: DEFAULT_QUEUE_CONFIG },
       ]);
 
       gridEngine.update(0, 500);
       expect(gridEngine.getEnqueuedMovements("player")).toEqual([
-        { position: { x: 1, y: 1 }, charLayer: undefined },
-        Direction.RIGHT,
+        {
+          command: { position: { x: 1, y: 1 }, charLayer: undefined },
+          config: DEFAULT_QUEUE_CONFIG,
+        },
+        { command: Direction.RIGHT, config: DEFAULT_QUEUE_CONFIG },
       ]);
       gridEngine.update(0, 500);
       expect(gridEngine.getEnqueuedMovements("player")).toEqual([
-        { position: { x: 1, y: 1 }, charLayer: undefined },
-        Direction.RIGHT,
+        {
+          command: { position: { x: 1, y: 1 }, charLayer: undefined },
+          config: DEFAULT_QUEUE_CONFIG,
+        },
+        { command: Direction.RIGHT, config: DEFAULT_QUEUE_CONFIG },
       ]);
       gridEngine.update(0, 500);
       gridEngine.update(0, 500);
       expect(gridEngine.getEnqueuedMovements("player")).toEqual([
-        Direction.RIGHT,
+        { command: Direction.RIGHT, config: DEFAULT_QUEUE_CONFIG },
       ]);
       gridEngine.update(0, 500);
       gridEngine.update(0, 500);
@@ -1533,8 +1556,11 @@ describe("GridEngine", () => {
       gridEngine.addQueueMovements("player", [Direction.RIGHT]);
 
       expect(gridEngine.getEnqueuedMovements("player")).toEqual([
-        { position: { x: 1, y: 0 }, charLayer: undefined },
-        Direction.RIGHT,
+        {
+          command: { position: { x: 1, y: 0 }, charLayer: undefined },
+          config: DEFAULT_QUEUE_CONFIG,
+        },
+        { command: Direction.RIGHT, config: DEFAULT_QUEUE_CONFIG },
       ]);
 
       gridEngine.moveTo("player", { x: 2, y: 0 });

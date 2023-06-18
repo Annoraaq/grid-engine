@@ -622,7 +622,12 @@ export class GridEngine implements IGridEngine {
   }
 
   /** {@inheritDoc IGridEngine.getEnqueuedMovements} */
-  getEnqueuedMovements(charId: string): Array<LayerPosition | Direction> {
+  getEnqueuedMovements(
+    charId: string
+  ): Array<{
+    command: LayerPosition | Direction;
+    config: QueueMovementConfig;
+  }> {
     return this.geHeadless.getEnqueuedMovements(charId);
   }
 

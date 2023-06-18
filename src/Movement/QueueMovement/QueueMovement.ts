@@ -30,7 +30,7 @@ export interface QueueMovementConfig {
    * It sets the number of milliseconds that Grid Engine will wait
    * for the path to become unblocked again before stopping the movement.
    *
-   * If not set, Grid Engine will wait forever.
+   * If not set, Grid Engine will wait forever (equals a value of `-1`).
    */
   pathBlockedWaitTimeoutMs?: number;
 
@@ -178,8 +178,8 @@ export class QueueMovement implements Movement {
     }
   }
 
-  peekAll(): Array<LayerVecPos | Direction> {
-    return this.queue.peekAll().map((e) => e.command);
+  peekAll(): Array<QueueEntry> {
+    return this.queue.peekAll();
   }
 
   size(): number {
