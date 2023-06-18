@@ -24,7 +24,7 @@
 <ul class="tsd-hierarchy">
 <li><a href="../interfaces/IGridEngine.html" class="tsd-signature-type" data-tsd-kind="Interface">IGridEngine</a></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L230">GridEngineHeadless.ts:230</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L237">GridEngineHeadless.ts:237</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -38,7 +38,9 @@
 <h3 class="tsd-index-heading">Methods</h3>
 <div class="tsd-index-list"><a href="GridEngineHeadless.html#addCharacter" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-2048-path"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)" id="icon-2048-text"></path></svg><span>add<wbr/>Character</span></a>
 <a href="GridEngineHeadless.html#addLabels" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>add<wbr/>Labels</span></a>
+<a href="GridEngineHeadless.html#addQueueMovements" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>add<wbr/>Queue<wbr/>Movements</span></a>
 <a href="GridEngineHeadless.html#characterShifted" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>character<wbr/>Shifted</span></a>
+<a href="GridEngineHeadless.html#clearEnqueuedMovements" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>clear<wbr/>Enqueued<wbr/>Movements</span></a>
 <a href="GridEngineHeadless.html#clearLabels" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>clear<wbr/>Labels</span></a>
 <a href="GridEngineHeadless.html#collidesWithTiles" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>collides<wbr/>With<wbr/>Tiles</span></a>
 <a href="GridEngineHeadless.html#create" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>create</span></a>
@@ -49,6 +51,7 @@
 <a href="GridEngineHeadless.html#getCharLayer" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Char<wbr/>Layer</span></a>
 <a href="GridEngineHeadless.html#getCharactersAt" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Characters<wbr/>At</span></a>
 <a href="GridEngineHeadless.html#getCollisionGroups" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Collision<wbr/>Groups</span></a>
+<a href="GridEngineHeadless.html#getEnqueuedMovements" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Enqueued<wbr/>Movements</span></a>
 <a href="GridEngineHeadless.html#getFacingDirection" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Facing<wbr/>Direction</span></a>
 <a href="GridEngineHeadless.html#getFacingPosition" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Facing<wbr/>Position</span></a>
 <a href="GridEngineHeadless.html#getLabels" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Labels</span></a>
@@ -69,6 +72,7 @@
 <a href="GridEngineHeadless.html#movementStopped" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>movement<wbr/>Stopped</span></a>
 <a href="GridEngineHeadless.html#positionChangeFinished" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>position<wbr/>Change<wbr/>Finished</span></a>
 <a href="GridEngineHeadless.html#positionChangeStarted" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>position<wbr/>Change<wbr/>Started</span></a>
+<a href="GridEngineHeadless.html#queueMovementFinished" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>queue<wbr/>Movement<wbr/>Finished</span></a>
 <a href="GridEngineHeadless.html#rebuildTileCollisionCache" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>rebuild<wbr/>Tile<wbr/>Collision<wbr/>Cache</span></a>
 <a href="GridEngineHeadless.html#removeAllCharacters" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>remove<wbr/>All<wbr/>Characters</span></a>
 <a href="GridEngineHeadless.html#removeCharacter" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>remove<wbr/>Character</span></a>
@@ -91,7 +95,7 @@
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <a href="GridEngineHeadless.html" class="tsd-signature-type" data-tsd-kind="Class">GridEngineHeadless</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L245">GridEngineHeadless.ts:245</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L255">GridEngineHeadless.ts:255</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="addCharacter" class="tsd-anchor"></a>
@@ -108,7 +112,7 @@
 <h5>charData: <a href="../interfaces/CharacterDataHeadless.html" class="tsd-signature-type" data-tsd-kind="Interface">CharacterDataHeadless</a></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L424">GridEngineHeadless.ts:424</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L437">GridEngineHeadless.ts:437</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="addLabels" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>add<wbr/>Labels</span><a href="#addLabels" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -126,7 +130,33 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#addLabels">addLabels</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L552">GridEngineHeadless.ts:552</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L565">GridEngineHeadless.ts:565</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="addQueueMovements" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>add<wbr/>Queue<wbr/>Movements</span><a href="#addQueueMovements" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="addQueueMovements.addQueueMovements-1">add<wbr/>Queue<wbr/>Movements<span class="tsd-signature-symbol">(</span>charId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, positions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><a href="../enums/Direction.html" class="tsd-signature-type" data-tsd-kind="Enumeration">Direction</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/LayerPosition.html" class="tsd-signature-type" data-tsd-kind="Interface">LayerPosition</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span>, options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/QueueMovementConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">QueueMovementConfig</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#addQueueMovements.addQueueMovements-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Adds new positions to the movement queue. Any other automatic movement of
+the character will be stopped.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>charId: <span class="tsd-signature-type">string</span></h5></li>
+<li>
+<h5>positions: <span class="tsd-signature-symbol">(</span><a href="../enums/Direction.html" class="tsd-signature-type" data-tsd-kind="Enumeration">Direction</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/LayerPosition.html" class="tsd-signature-type" data-tsd-kind="Interface">LayerPosition</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span></h5>
+<div class="tsd-comment tsd-typography"><p>Positions to enqueue</p>
+</div></li>
+<li>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> options: <a href="../interfaces/QueueMovementConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">QueueMovementConfig</a></h5>
+<div class="tsd-comment tsd-typography"><p>Options for the queue movement. These options take effect
+ immediately (also for previously enqueued but not yet executed movements).</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#addQueueMovements">addQueueMovements</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L877">GridEngineHeadless.ts:877</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="characterShifted" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>character<wbr/>Shifted</span><a href="#characterShifted" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -138,7 +168,24 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/CharacterShift.html" class="tsd-signature-type" data-tsd-kind="Interface">CharacterShift</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#characterShifted">characterShifted</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L795">GridEngineHeadless.ts:795</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L808">GridEngineHeadless.ts:808</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="clearEnqueuedMovements" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>clear<wbr/>Enqueued<wbr/>Movements</span><a href="#clearEnqueuedMovements" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="clearEnqueuedMovements.clearEnqueuedMovements-1">clear<wbr/>Enqueued<wbr/>Movements<span class="tsd-signature-symbol">(</span>charId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#clearEnqueuedMovements.clearEnqueuedMovements-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Clears the complete movement queue for the character, that was filled by
+using <a href="../interfaces/IGridEngine.html#addQueueMovements">addQueueMovements</a>.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>charId: <span class="tsd-signature-type">string</span></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#clearEnqueuedMovements">clearEnqueuedMovements</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L943">GridEngineHeadless.ts:943</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="clearLabels" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>clear<wbr/>Labels</span><a href="#clearLabels" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -154,7 +201,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#clearLabels">clearLabels</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L568">GridEngineHeadless.ts:568</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L581">GridEngineHeadless.ts:581</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="collidesWithTiles" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>collides<wbr/>With<wbr/>Tiles</span><a href="#collidesWithTiles" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -173,7 +220,7 @@ confuse this with an actual collision check. You should use
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#collidesWithTiles">collidesWithTiles</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L407">GridEngineHeadless.ts:407</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L420">GridEngineHeadless.ts:420</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="create" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>create</span><a href="#create" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -191,7 +238,7 @@ GridEngine are called.</p>
 <h5>config: <a href="../interfaces/GridEngineConfigHeadless.html" class="tsd-signature-type" data-tsd-kind="Interface">GridEngineConfigHeadless</a></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L277">GridEngineHeadless.ts:277</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L287">GridEngineHeadless.ts:287</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="directionChanged" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>direction<wbr/>Changed</span><a href="#directionChanged" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -211,7 +258,7 @@ same direction, this observable would only emit once.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>charId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>direction<span class="tsd-signature-symbol">: </span><a href="../enums/Direction.html" class="tsd-signature-type" data-tsd-kind="Enumeration">Direction</a><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#directionChanged">directionChanged</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L828">GridEngineHeadless.ts:828</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L841">GridEngineHeadless.ts:841</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="findShortestPath" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>find<wbr/>Shortest<wbr/>Path</span><a href="#findShortestPath" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -240,7 +287,7 @@ same direction, this observable would only emit once.</p>
 <h4 class="tsd-returns-title">Returns <a href="../interfaces/PathfindingResult.html" class="tsd-signature-type" data-tsd-kind="Interface">PathfindingResult</a></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#findShortestPath">findShortestPath</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L749">GridEngineHeadless.ts:749</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L762">GridEngineHeadless.ts:762</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="follow" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>follow</span><a href="#follow" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -265,7 +312,7 @@ shortest path until it reaches the specified <code>distance</code>.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#follow">follow</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L576">GridEngineHeadless.ts:576</a></li></ul></aside></li>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L589">GridEngineHeadless.ts:589</a></li></ul></aside></li>
 <li class="tsd-signature tsd-anchor-link" id="follow.follow-2">follow<span class="tsd-signature-symbol">(</span>charId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, charIdToFollow<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, distance<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, closestPointIfBlocked<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#follow.follow-2" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography">
@@ -306,7 +353,7 @@ shortest path until it reaches the specified <code>distance</code>.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#follow">follow</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L577">GridEngineHeadless.ts:577</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L590">GridEngineHeadless.ts:590</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getAllCharacters" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>All<wbr/>Characters</span><a href="#getAllCharacters" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -324,7 +371,7 @@ the provided filtering options.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#getAllCharacters">getAllCharacters</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L533">GridEngineHeadless.ts:533</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L546">GridEngineHeadless.ts:546</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getCharLayer" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Char<wbr/>Layer</span><a href="#getCharLayer" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -342,7 +389,7 @@ You can read more about character layers and transitions
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#getCharLayer">getCharLayer</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L250">GridEngineHeadless.ts:250</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L260">GridEngineHeadless.ts:260</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getCharactersAt" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Characters<wbr/>At</span><a href="#getCharactersAt" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -362,7 +409,7 @@ You can read more about character layers and transitions
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#getCharactersAt">getCharactersAt</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L665">GridEngineHeadless.ts:665</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L678">GridEngineHeadless.ts:678</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getCollisionGroups" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Collision<wbr/>Groups</span><a href="#getCollisionGroups" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -381,7 +428,23 @@ You can read more about character layers and transitions
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#getCollisionGroups">getCollisionGroups</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L710">GridEngineHeadless.ts:710</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L723">GridEngineHeadless.ts:723</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getEnqueuedMovements" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Enqueued<wbr/>Movements</span><a href="#getEnqueuedMovements" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="getEnqueuedMovements.getEnqueuedMovements-1">get<wbr/>Enqueued<wbr/>Movements<span class="tsd-signature-symbol">(</span>charId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/QueueMovementEntry.html" class="tsd-signature-type" data-tsd-kind="Interface">QueueMovementEntry</a><span class="tsd-signature-symbol">[]</span><a href="#getEnqueuedMovements.getEnqueuedMovements-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Returns all enqueued movements for the given character.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>charId: <span class="tsd-signature-type">string</span></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/QueueMovementEntry.html" class="tsd-signature-type" data-tsd-kind="Interface">QueueMovementEntry</a><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#getEnqueuedMovements">getEnqueuedMovements</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L924">GridEngineHeadless.ts:924</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getFacingDirection" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Facing<wbr/>Direction</span><a href="#getFacingDirection" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -399,7 +462,7 @@ You can read more about character layers and transitions
 <h4 class="tsd-returns-title">Returns <a href="../enums/Direction.html" class="tsd-signature-type" data-tsd-kind="Enumeration">Direction</a></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#getFacingDirection">getFacingDirection</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L640">GridEngineHeadless.ts:640</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L653">GridEngineHeadless.ts:653</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getFacingPosition" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Facing<wbr/>Position</span><a href="#getFacingPosition" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -416,7 +479,7 @@ You can read more about character layers and transitions
 <h4 class="tsd-returns-title">Returns <a href="../interfaces/Position.html" class="tsd-signature-type" data-tsd-kind="Interface">Position</a></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#getFacingPosition">getFacingPosition</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L648">GridEngineHeadless.ts:648</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L661">GridEngineHeadless.ts:661</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getLabels" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Labels</span><a href="#getLabels" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -433,7 +496,7 @@ You can read more about character layers and transitions
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#getLabels">getLabels</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L544">GridEngineHeadless.ts:544</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L557">GridEngineHeadless.ts:557</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getMovement" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Movement</span><a href="#getMovement" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -451,7 +514,7 @@ random movement, follow movement and target movement)</p>
 <h4 class="tsd-returns-title">Returns <a href="../interfaces/MovementInfo.html" class="tsd-signature-type" data-tsd-kind="Interface">MovementInfo</a></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#getMovement">getMovement</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L334">GridEngineHeadless.ts:334</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L347">GridEngineHeadless.ts:347</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getMovementProgress" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Movement<wbr/>Progress</span><a href="#getMovementProgress" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -469,7 +532,7 @@ moved 400/1000th of the distance to the next tile already.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#getMovementProgress">getMovementProgress</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L846">GridEngineHeadless.ts:846</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L859">GridEngineHeadless.ts:859</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getPosition" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Position</span><a href="#getPosition" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -486,7 +549,7 @@ moved 400/1000th of the distance to the next tile already.</p>
 <h4 class="tsd-returns-title">Returns <a href="../interfaces/Position.html" class="tsd-signature-type" data-tsd-kind="Interface">Position</a></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#getPosition">getPosition</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L312">GridEngineHeadless.ts:312</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L325">GridEngineHeadless.ts:325</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getSpeed" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Speed</span><a href="#getSpeed" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -503,7 +566,7 @@ moved 400/1000th of the distance to the next tile already.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#getSpeed">getSpeed</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L399">GridEngineHeadless.ts:399</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L412">GridEngineHeadless.ts:412</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getTilePosInDirection" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Tile<wbr/>Pos<wbr/>In<wbr/>Direction</span><a href="#getTilePosInDirection" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -524,7 +587,7 @@ position in the given direction.</p>
 <h4 class="tsd-returns-title">Returns <a href="../interfaces/LayerPosition.html" class="tsd-signature-type" data-tsd-kind="Interface">LayerPosition</a></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#getTilePosInDirection">getTilePosInDirection</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L726">GridEngineHeadless.ts:726</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L739">GridEngineHeadless.ts:739</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getTransition" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Transition</span><a href="#getTransition" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -544,7 +607,7 @@ character layer leads to.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#getTransition">getTransition</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L258">GridEngineHeadless.ts:258</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L268">GridEngineHeadless.ts:268</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="hasCharacter" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>has<wbr/>Character</span><a href="#hasCharacter" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -560,7 +623,7 @@ character layer leads to.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#hasCharacter">hasCharacter</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L508">GridEngineHeadless.ts:508</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L521">GridEngineHeadless.ts:521</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="isBlocked" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>is<wbr/>Blocked</span><a href="#isBlocked" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -585,7 +648,7 @@ layers in your tilemap.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#isBlocked">isBlocked</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L690">GridEngineHeadless.ts:690</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L703">GridEngineHeadless.ts:703</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="isMoving" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>is<wbr/>Moving</span><a href="#isMoving" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -602,7 +665,7 @@ layers in your tilemap.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#isMoving">isMoving</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L632">GridEngineHeadless.ts:632</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L645">GridEngineHeadless.ts:645</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="isTileBlocked" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>is<wbr/>Tile<wbr/>Blocked</span><a href="#isTileBlocked" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -623,7 +686,7 @@ no layer, be sure not to use character layers in your tilemap.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#isTileBlocked">isTileBlocked</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L704">GridEngineHeadless.ts:704</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L717">GridEngineHeadless.ts:717</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="move" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>move</span><a href="#move" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -644,7 +707,7 @@ commands are <strong>not</strong> queued.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#move">move</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L320">GridEngineHeadless.ts:320</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L333">GridEngineHeadless.ts:333</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="moveRandomly" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>move<wbr/>Randomly</span><a href="#moveRandomly" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -677,7 +740,7 @@ radius).</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#moveRandomly">moveRandomly</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L325">GridEngineHeadless.ts:325</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L338">GridEngineHeadless.ts:338</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="moveTo" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>move<wbr/>To</span><a href="#moveTo" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -704,7 +767,7 @@ layer.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>charId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol"> &amp; </span><a href="../interfaces/Finished.html" class="tsd-signature-type" data-tsd-kind="Interface">Finished</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#moveTo">moveTo</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L348">GridEngineHeadless.ts:348</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L361">GridEngineHeadless.ts:361</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="movementStarted" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>movement<wbr/>Started</span><a href="#movementStarted" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -717,7 +780,7 @@ layer.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>charId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>direction<span class="tsd-signature-symbol">: </span><a href="../enums/Direction.html" class="tsd-signature-type" data-tsd-kind="Enumeration">Direction</a><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#movementStarted">movementStarted</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L816">GridEngineHeadless.ts:816</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L829">GridEngineHeadless.ts:829</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="movementStopped" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>movement<wbr/>Stopped</span><a href="#movementStopped" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -730,7 +793,7 @@ layer.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>charId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>direction<span class="tsd-signature-symbol">: </span><a href="../enums/Direction.html" class="tsd-signature-type" data-tsd-kind="Enumeration">Direction</a><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#movementStopped">movementStopped</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L822">GridEngineHeadless.ts:822</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L835">GridEngineHeadless.ts:835</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="positionChangeFinished" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>position<wbr/>Change<wbr/>Finished</span><a href="#positionChangeFinished" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -743,7 +806,7 @@ layer.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>charId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol"> &amp; </span><a href="../interfaces/PositionChange.html" class="tsd-signature-type" data-tsd-kind="Interface">PositionChange</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#positionChangeFinished">positionChangeFinished</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L840">GridEngineHeadless.ts:840</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L853">GridEngineHeadless.ts:853</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="positionChangeStarted" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>position<wbr/>Change<wbr/>Started</span><a href="#positionChangeStarted" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -756,7 +819,19 @@ layer.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>charId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol"> &amp; </span><a href="../interfaces/PositionChange.html" class="tsd-signature-type" data-tsd-kind="Interface">PositionChange</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#positionChangeStarted">positionChangeStarted</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L834">GridEngineHeadless.ts:834</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L847">GridEngineHeadless.ts:847</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="queueMovementFinished" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>queue<wbr/>Movement<wbr/>Finished</span><a href="#queueMovementFinished" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="queueMovementFinished.queueMovementFinished-1">queue<wbr/>Movement<wbr/>Finished<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>charId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol"> &amp; </span><a href="../interfaces/QueueMovementFinished.html" class="tsd-signature-type" data-tsd-kind="Interface">QueueMovementFinished</a><span class="tsd-signature-symbol">&gt;</span><a href="#queueMovementFinished.queueMovementFinished-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Emits whenever queued movements for a character finish (with success or
+failure).</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>charId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol"> &amp; </span><a href="../interfaces/QueueMovementFinished.html" class="tsd-signature-type" data-tsd-kind="Interface">QueueMovementFinished</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#queueMovementFinished">queueMovementFinished</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L916">GridEngineHeadless.ts:916</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="rebuildTileCollisionCache" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>rebuild<wbr/>Tile<wbr/>Collision<wbr/>Cache</span><a href="#rebuildTileCollisionCache" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -782,7 +857,7 @@ provide an area that needs to be rebuilt, if possible. You need to have
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#rebuildTileCollisionCache">rebuildTileCollisionCache</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L854">GridEngineHeadless.ts:854</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L867">GridEngineHeadless.ts:867</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="removeAllCharacters" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>remove<wbr/>All<wbr/>Characters</span><a href="#removeAllCharacters" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -794,7 +869,7 @@ Please note that the corresponding sprites need to be remove separately.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#removeAllCharacters">removeAllCharacters</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L524">GridEngineHeadless.ts:524</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L537">GridEngineHeadless.ts:537</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="removeCharacter" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>remove<wbr/>Character</span><a href="#removeCharacter" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -811,7 +886,7 @@ Please note that the corresponding sprites need to be remove separately.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#removeCharacter">removeCharacter</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L514">GridEngineHeadless.ts:514</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L527">GridEngineHeadless.ts:527</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="removeLabels" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>remove<wbr/>Labels</span><a href="#removeLabels" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -829,7 +904,7 @@ Please note that the corresponding sprites need to be remove separately.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#removeLabels">removeLabels</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L560">GridEngineHeadless.ts:560</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L573">GridEngineHeadless.ts:573</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="setCollisionGroups" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Collision<wbr/>Groups</span><a href="#setCollisionGroups" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -848,7 +923,7 @@ will be overwritten.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#setCollisionGroups">setCollisionGroups</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L718">GridEngineHeadless.ts:718</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L731">GridEngineHeadless.ts:731</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="setPosition" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Position</span><a href="#setPosition" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -872,7 +947,7 @@ will also emit.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#setPosition">setPosition</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L676">GridEngineHeadless.ts:676</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L689">GridEngineHeadless.ts:689</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="setSpeed" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Speed</span><a href="#setSpeed" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -890,7 +965,7 @@ will also emit.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#setSpeed">setSpeed</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L391">GridEngineHeadless.ts:391</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L404">GridEngineHeadless.ts:404</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="setTransition" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Transition</span><a href="#setTransition" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -919,7 +994,7 @@ You can read more about character layers and transitions
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#setTransition">setTransition</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L264">GridEngineHeadless.ts:264</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L274">GridEngineHeadless.ts:274</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="steppedOn" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>stepped<wbr/>On</span><a href="#steppedOn" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -941,15 +1016,15 @@ You can read more about character layers and transitions
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>charId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol"> &amp; </span><a href="../interfaces/PositionChange.html" class="tsd-signature-type" data-tsd-kind="Interface">PositionChange</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#steppedOn">steppedOn</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L773">GridEngineHeadless.ts:773</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L786">GridEngineHeadless.ts:786</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="stopMovement" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>stop<wbr/>Movement</span><a href="#stopMovement" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="stopMovement.stopMovement-1">stop<wbr/>Movement<span class="tsd-signature-symbol">(</span>charId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#stopMovement.stopMovement-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Stops any automated movement such as random movement
-(<a href="GridEngineHeadless.html#moveRandomly">moveRandomly</a>), following (<a href="GridEngineHeadless.html#follow">follow</a>) or moving to a
-specified position (<a href="GridEngineHeadless.html#moveTo">moveTo</a>)</p>
+(<a href="GridEngineHeadless.html#moveRandomly">moveRandomly</a>), following (<a href="GridEngineHeadless.html#follow">follow</a>), moving to a
+specified position (<a href="GridEngineHeadless.html#moveTo">moveTo</a>) or queued movements (<a href="GridEngineHeadless.html#addQueueMovements">addQueueMovements</a>).</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -959,7 +1034,7 @@ specified position (<a href="GridEngineHeadless.html#moveTo">moveTo</a>)</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#stopMovement">stopMovement</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L383">GridEngineHeadless.ts:383</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L396">GridEngineHeadless.ts:396</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="turnTowards" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>turn<wbr/>Towards</span><a href="#turnTowards" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -977,7 +1052,7 @@ specified position (<a href="GridEngineHeadless.html#moveTo">moveTo</a>)</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#turnTowards">turnTowards</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L657">GridEngineHeadless.ts:657</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L670">GridEngineHeadless.ts:670</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="update" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>update</span><a href="#update" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -993,7 +1068,7 @@ specified position (<a href="GridEngineHeadless.html#moveTo">moveTo</a>)</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/IGridEngine.html">IGridEngine</a>.<a href="../interfaces/IGridEngine.html#update">update</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/de81fd0/src/GridEngineHeadless.ts#L414">GridEngineHeadless.ts:414</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/afc405d/src/GridEngineHeadless.ts#L427">GridEngineHeadless.ts:427</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -1020,7 +1095,9 @@ specified position (<a href="GridEngineHeadless.html#moveTo">moveTo</a>)</p>
 <li class="tsd-kind-constructor tsd-parent-kind-class"><a href="GridEngineHeadless.html#constructor" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-512-path"></use><use href="#icon-512-text"></use></svg>constructor</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#addCharacter" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>add<wbr/>Character</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#addLabels" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>add<wbr/>Labels</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#addQueueMovements" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>add<wbr/>Queue<wbr/>Movements</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#characterShifted" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>character<wbr/>Shifted</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#clearEnqueuedMovements" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>clear<wbr/>Enqueued<wbr/>Movements</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#clearLabels" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>clear<wbr/>Labels</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#collidesWithTiles" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>collides<wbr/>With<wbr/>Tiles</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#create" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>create</a></li>
@@ -1031,6 +1108,7 @@ specified position (<a href="GridEngineHeadless.html#moveTo">moveTo</a>)</p>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#getCharLayer" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Char<wbr/>Layer</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#getCharactersAt" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Characters<wbr/>At</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#getCollisionGroups" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Collision<wbr/>Groups</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#getEnqueuedMovements" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Enqueued<wbr/>Movements</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#getFacingDirection" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Facing<wbr/>Direction</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#getFacingPosition" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Facing<wbr/>Position</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#getLabels" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Labels</a></li>
@@ -1051,6 +1129,7 @@ specified position (<a href="GridEngineHeadless.html#moveTo">moveTo</a>)</p>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#movementStopped" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>movement<wbr/>Stopped</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#positionChangeFinished" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>position<wbr/>Change<wbr/>Finished</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#positionChangeStarted" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>position<wbr/>Change<wbr/>Started</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#queueMovementFinished" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>queue<wbr/>Movement<wbr/>Finished</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#rebuildTileCollisionCache" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>rebuild<wbr/>Tile<wbr/>Collision<wbr/>Cache</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#removeAllCharacters" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>remove<wbr/>All<wbr/>Characters</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="GridEngineHeadless.html#removeCharacter" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>remove<wbr/>Character</a></li>

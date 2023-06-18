@@ -23,6 +23,15 @@ function config(preload, create, update) {
       create: create,
       update: update,
     },
+    parent: "game",
     backgroundColor: "#48C4F8",
+    input: {
+      mouse: {
+        preventDefaultWheel: false
+      },
+      touch: {
+        capture: false
+      }
+    }
   };
 }

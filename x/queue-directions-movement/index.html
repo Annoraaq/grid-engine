@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="../styles.css" />
+    <script src="../../js/phaser-3.60.min.js"></script>
+    <script src="../../js/grid-engine-2.29.0.min.js"></script>
+    <script src="../../js/examplePhaserConfig.js"></script>
+    <script src="code.js"></script>
+    <meta name="color-scheme" content="dark light">
+  </head>
+  <body>
+    <div class="settings">
+      <h2>Settings:</h2>
+
+      <label for="path-blocked-strategy">pathBlockedStrategy:</label>
+      <select name="path-blocked-strategy" id="path-blocked-strategy" onchange="strategyChanged()">
+        <option value="STOP">STOP</option>
+        <option value="SKIP">SKIP</option>
+        <option value="WAIT">WAIT</option>
+      </select>
+
+      <label for="wait-timeout">pathBlockedWaitTimeoutMs:</label>
+      <div class="wait-timeout-group">
+        <input type="number" id="wait-timeout" name="wait-timeout" value="1000">
+        <input type="checkbox" id="wait-timeout-infinite" name="wait-timeout-infinite" value="true" onchange="infiniteCheckboxChanged(event)">
+        <label for="wait-timeout-infinite">Infinite</label>
+      </div>
+
+      <button class="apply" onclick="applySettings()">Apply settings</button>
+
+      <h3>QueueMovementConfig:</h3>
+      <div id="json-config"></div>
+    </div>
+    <div id="game" scrolling="no"></div>
+  </body>
+</html>
