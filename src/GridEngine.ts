@@ -476,7 +476,7 @@ export class GridEngine implements IGridEngine {
   }
 
   /** {@inheritDoc IGridEngine.getCharactersAt} */
-  getCharactersAt(position: Position, layer: string): string[] {
+  getCharactersAt(position: Position, layer?: string): string[] {
     return this.geHeadless.getCharactersAt(position, layer);
   }
 

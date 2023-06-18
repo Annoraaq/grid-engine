@@ -330,7 +330,7 @@ export interface IGridEngine {
    * Finds the identifiers of all characters at the provided tile position.
    * @returns The identifiers of all characters on this tile.
    */
-  getCharactersAt(position: Position, layer: string): string[];
+  getCharactersAt(position: Position, layer?: string): string[];
 
   /**
    * Places the character with the given id to the provided tile position. If

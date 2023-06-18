@@ -277,6 +277,30 @@ describe("GridTilemap", () => {
     expect(set).toEqual(new Set([char1]));
   });
 
+  it("should find characters without layer", () => {
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+
+    const char1 = new GridCharacter("player", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+      charLayer: undefined,
+    });
+    gridTilemap.addCharacter(char1);
+    char1.setTilePosition({
+      position: new Vector2({ x: 0, y: 0 }),
+      layer: undefined,
+    });
+
+    const set = gridTilemap.getCharactersAt(new Vector2(0, 0));
+    expect(set).toEqual(new Set([char1]));
+  });
+
   it("should detect blocking tiles", () => {
     gridTilemap = new GridTilemap(
       phaserTilemap,

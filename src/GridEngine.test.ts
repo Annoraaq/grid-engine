@@ -847,6 +847,21 @@ describe("GridEngine", () => {
     expect(chars).toEqual(["player"]);
   });
 
+  it("should get all chars at position without layer", () => {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
+      characters: [
+        {
+          id: "player",
+          startPosition: { x: 5, y: 4 },
+          charLayer: undefined,
+          sprite: playerSpriteMock,
+        },
+      ],
+    });
+    const chars = gridEngine.getCharactersAt({ x: 5, y: 4 });
+    expect(chars).toEqual(["player"]);
+  });
+
   it("should check if char is registered", () => {
     gridEngine.addCharacter({
       id: "player2",
