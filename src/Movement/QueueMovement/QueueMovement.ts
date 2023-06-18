@@ -31,6 +31,7 @@ export interface QueueMovementConfig {
    * for the path to become unblocked again before stopping the movement.
    *
    * If not set, Grid Engine will wait forever (equals a value of `-1`).
+   * @default `-1`
    */
   pathBlockedWaitTimeoutMs?: number;
 
