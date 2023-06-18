@@ -12,6 +12,7 @@ import { IsPositionAllowedFn, PathfindingOptions } from "./Pathfinding/Pathfindi
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
 import { Tilemap } from "./GridTilemap/Tilemap";
 import { CharacterShift, CharLayer, FollowOptions, IGridEngine, LayerPosition, PathfindingResult, Position } from "./IGridEngine";
+import { QueueMovementConfig, QueueMovementEntry, Finished as QueueMovementFinished } from "./Movement/QueueMovement/QueueMovement";
 export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, MovementInfo, PositionChange, IsPositionAllowedFn, PathfindingOptions, ShortestPathAlgorithmType, };
 export type TileSizePerSecond = number;
 /**
@@ -161,6 +162,7 @@ export declare class GridEngineHeadless implements IGridEngine {
     private directionChanged$?;
     private positionChangeStarted$?;
     private positionChangeFinished$?;
+    private queueMovementFinished$?;
     private charRemoved$?;
     private charAdded$?;
     constructor();
@@ -277,6 +279,16 @@ export declare class GridEngineHeadless implements IGridEngine {
     getMovementProgress(charId: string): number;
     /** {@inheritDoc IGridEngine.rebuildTileCollisionCache} */
     rebuildTileCollisionCache(x: number, y: number, width: number, height: number): void;
+    /** {@inheritDoc IGridEngine.addQueueMovements} */
+    addQueueMovements(charId: string, positions: Array<LayerPosition | Direction>, options?: QueueMovementConfig): void;
+    /** {@inheritDoc IGridEngine.queueMovementFinished} */
+    queueMovementFinished(): Observable<{
+        charId: string;
+    } & QueueMovementFinished>;
+    /** {@inheritDoc IGridEngine.getEnqueuedMovements} */
+    getEnqueuedMovements(charId: string): QueueMovementEntry[];
+    /** {@inheritDoc IGridEngine.clearEnqueuedMovements} */
+    clearEnqueuedMovements(charId: string): void;
     private charRemoved;
     private initGuard;
     private createUninitializedErr;

@@ -9,5 +9,8 @@ export declare class Queue<T> {
     dequeue(): T | undefined;
     enqueue(data: T): void;
     peek(): T | undefined;
+    peekAll(): T[];
+    clear(): void;
+    peekEnd(): T | undefined;
     size(): number;
 }

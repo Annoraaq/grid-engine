@@ -1,6 +1,7 @@
 import { Direction } from "./Direction/Direction";
 import { MovementInfo } from "./Movement/Movement";
 import { Finished, MoveToConfig } from "./Movement/TargetMovement/TargetMovement";
+import { QueueMovementConfig, QueueMovementEntry, Finished as QueueMovementFinished } from "./Movement/QueueMovement/QueueMovement";
 import { Observable } from "rxjs";
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter";
 import { PathfindingOptions } from "./Pathfinding/Pathfinding";
@@ -173,8 +174,8 @@ export interface IGridEngine {
     } & Finished>;
     /**
      * Stops any automated movement such as random movement
-     * ({@link moveRandomly}), following ({@link follow}) or moving to a
-     * specified position ({@link moveTo})
+     * ({@link moveRandomly}), following ({@link follow}), moving to a
+     * specified position ({@link moveTo}) or queued movements ({@link addQueueMovements}).
      */
     stopMovement(charId: string): void;
     /** Sets the speed in tiles per second for a character. */
@@ -401,4 +402,27 @@ export interface IGridEngine {
      * {@link https://annoraaq.github.io/grid-engine/p/pathfinding-performance/| pathfinding performance}.
      */
     rebuildTileCollisionCache(x: number, y: number, width: number, height: number): void;
+    /**
+     * Adds new positions to the movement queue. Any other automatic movement of
+     * the character will be stopped.
+     * @param charId
+     * @param positions Positions to enqueue
+     * @param options Options for the queue movement. These options take effect
+     *  immediately (also for previously enqueued but not yet executed movements).
+     */
+    addQueueMovements(charId: string, positions: Array<LayerPosition | Direction>, options?: QueueMovementConfig): any;
+    /** Returns all enqueued movements for the given character. */
+    getEnqueuedMovements(charId: string): QueueMovementEntry[];
+    /**
+     * Clears the complete movement queue for the character, that was filled by
+     * using {@link IGridEngine.addQueueMovements}.
+     */
+    clearEnqueuedMovements(charId: string): void;
+    /**
+     * Emits whenever queued movements for a character finish (with success or
+     * failure).
+     */
+    queueMovementFinished(): Observable<{
+        charId: string;
+    } & QueueMovementFinished>;
 }

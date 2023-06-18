@@ -15,8 +15,9 @@ import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
 import { Orientation, Tile, TileLayer, Tilemap } from "./GridTilemap/Tilemap";
 import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer";
 import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile";
+import { QueueMovementConfig, QueuedPathBlockedStrategy, Finished as QueueMovementFinished, QueueMovementResult, QueueMovementEntry } from "./Movement/QueueMovement/QueueMovement";
 import { CharacterShift, CharacterShiftAction, CharLayer, FollowOptions, IGridEngine, LayerPosition, PathfindingResult, Position } from "./IGridEngine";
-export { CharacterDataHeadless, CharacterFilteringOptions, CharacterShift, CharacterShiftAction, CharLayer, CollisionConfig, CollisionStrategy, Direction, Finished, FollowOptions, FrameRow, GridEngineConfigHeadless, GridEngineHeadless, IGridEngine, IsPositionAllowedFn, LayerPosition, MovementInfo, MoveToConfig, MoveToResult, NoPathFoundStrategy, NumberOfDirections, Orientation, PathBlockedStrategy, PathfindingOptions, PathfindingResult, Position, PositionChange, PhaserTile, PhaserTileLayer, PhaserTilemap, ShortestPathAlgorithmType, Tile, TileLayer, Tilemap, TileSizePerSecond, };
+export { CharacterDataHeadless, CharacterFilteringOptions, CharacterShift, CharacterShiftAction, CharLayer, CollisionConfig, CollisionStrategy, Direction, Finished, FollowOptions, FrameRow, GridEngineConfigHeadless, GridEngineHeadless, IGridEngine, IsPositionAllowedFn, LayerPosition, MovementInfo, MoveToConfig, MoveToResult, NoPathFoundStrategy, NumberOfDirections, Orientation, PathBlockedStrategy, PathfindingOptions, PathfindingResult, Position, PositionChange, PhaserTile, PhaserTileLayer, PhaserTilemap, QueueMovementConfig, QueueMovementEntry, QueueMovementFinished, QueueMovementResult, QueuedPathBlockedStrategy, ShortestPathAlgorithmType, Tile, TileLayer, Tilemap, TileSizePerSecond, };
 /**
  * Configuration object for initializing GridEngine.
  */
@@ -252,6 +253,16 @@ export declare class GridEngine implements IGridEngine {
     getMovementProgress(charId: string): number;
     /** {@inheritDoc IGridEngine.rebuildTileCollisionCache} */
     rebuildTileCollisionCache(x: number, y: number, width: number, height: number): void;
+    /** {@inheritDoc IGridEngine.addQueueMovements} */
+    addQueueMovements(charId: string, positions: Array<LayerPosition | Direction>, options?: QueueMovementConfig): void;
+    /** {@inheritDoc IGridEngine.getEnqueuedMovements} */
+    getEnqueuedMovements(charId: string): QueueMovementEntry[];
+    /** {@inheritDoc IGridEngine.queueMovementFinished} */
+    queueMovementFinished(): Observable<{
+        charId: string;
+    } & QueueMovementFinished>;
+    /** {@inheritDoc IGridEngine.clearEnqueuedMovements} */
+    clearEnqueuedMovements(charId: string): void;
     private setConfigDefaults;
     private initGuard;
     private createUninitializedErr;

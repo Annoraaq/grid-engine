@@ -24,3 +24,4 @@ export declare enum NumberOfDirections {
     FOUR = 4,
     EIGHT = 8
 }
+export declare function isDirection(val: any): val is Direction;
