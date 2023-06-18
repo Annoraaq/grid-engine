@@ -675,8 +675,8 @@ export class GridEngineHeadless implements IGridEngine {
   }
 
   /** {@inheritDoc IGridEngine.getCharactersAt} */
-  getCharactersAt(position: Position, layer: string): string[] {
-    // this.initGuard();
+  getCharactersAt(position: Position, layer?: string): string[] {
+    this.initGuard();
     if (!this.gridTilemap) return [];
     const characters = this.gridTilemap.getCharactersAt(
       new Vector2(position),

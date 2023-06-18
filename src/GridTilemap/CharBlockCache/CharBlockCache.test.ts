@@ -278,13 +278,19 @@ describe("CharBlockCache", () => {
     const char1 = createChar("player1");
     const char2 = createChar("player2");
     const charDifferentLayer = createChar("charDifferentLayer");
+    const charNoLayer = createChar("charNoLayer");
     charDifferentLayer.setTilePosition({
       position: new Vector2(3, 3),
       layer: "otherLayer",
     });
+    charNoLayer.setTilePosition({
+      position: new Vector2(3, 3),
+      layer: undefined,
+    });
     charBlockCache.addCharacter(char1);
     charBlockCache.addCharacter(char2);
     charBlockCache.addCharacter(charDifferentLayer);
+    charBlockCache.addCharacter(charNoLayer);
 
     expect(
       charBlockCache.getCharactersAt(new Vector2(3, 3), "someLayer")
@@ -298,6 +304,9 @@ describe("CharBlockCache", () => {
     expect(
       charBlockCache.getCharactersAt(new Vector2(5, 5), "someLayer").size
     ).toBe(0);
+    expect(charBlockCache.getCharactersAt(new Vector2(3, 3))).toContain(
+      charNoLayer
+    );
   });
 
   it("should remove a character", () => {

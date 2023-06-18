@@ -641,6 +641,19 @@ describe("GridEngineHeadless", () => {
     expect(chars).toEqual(["player"]);
   });
 
+  it("should get all chars at position without layer", () => {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
+      characters: [
+        {
+          id: "player",
+          startPosition: { x: 5, y: 4 },
+        },
+      ],
+    });
+    const chars = gridEngineHeadless.getCharactersAt({ x: 5, y: 4 });
+    expect(chars).toEqual(["player"]);
+  });
+
   it("should check if char is registered", () => {
     createDefaultGridEngine();
     gridEngineHeadless.addCharacter({
@@ -1720,6 +1733,9 @@ describe("GridEngineHeadless", () => {
       );
       expectUninitializedException(() =>
         gridEngineHeadless.clearEnqueuedMovements(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.getCharactersAt({ x: 1, y: 1 }, "someLayer")
       );
     });
   });
