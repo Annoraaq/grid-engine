@@ -115,10 +115,7 @@ export class QueueMovement implements Movement {
   private distanceUtils: DistanceUtils;
   private pathBlockedWaitElapsed = 0;
 
-  constructor(
-    private character: GridCharacter,
-    private tilemap: GridTilemap // config: QueueMovementConfig = {}
-  ) {
+  constructor(private character: GridCharacter, private tilemap: GridTilemap) {
     this.distanceUtils = DistanceUtilsFactory.create(
       character.getNumberOfDirections()
     );
@@ -184,7 +181,7 @@ export class QueueMovement implements Movement {
     }
   }
 
-  peekAll(): Array<QueueEntry> {
+  peekAll(): QueueEntry[] {
     return this.queue.peekAll();
   }
 
@@ -267,7 +264,6 @@ export class QueueMovement implements Movement {
   }
   private getNextValidPosition(): LayerVecPos | undefined {
     while (this.queue.size() > 0) {
-      // let nextEntry = this.queue.peek();
       let nextPos = this.queue.peek()?.command;
       if (isDirection(nextPos)) {
         nextPos = this.tilemap.getTilePosInDirection(
