@@ -1,4 +1,5 @@
 import { take } from "rxjs/operators";
+import { PathfindingOptions } from "./Pathfinding/Pathfinding";
 import { Direction, NumberOfDirections } from "./Direction/Direction";
 import { GridCharacter } from "./GridCharacter/GridCharacter";
 import {
@@ -6,6 +7,7 @@ import {
   QueuedPathBlockedStrategy,
 } from "./Movement/QueueMovement/QueueMovement";
 import { Vector2 } from "./Utils/Vector2/Vector2";
+import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
 
 expect.extend({
   toBeCharacter(receivedChar: GridCharacter, expectedCharId: string) {
@@ -30,7 +32,7 @@ jest.mock("../package.json", () => ({
   version: "GRID.ENGINE.VERSION",
 }));
 
-import { GridEngineHeadless } from "./GridEngine";
+import { GridEngineHeadless, MoveToConfig } from "./GridEngine";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
 import {
@@ -403,6 +405,47 @@ describe("GridEngineHeadless", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
 
+    it("should move to coordinates with costs", () => {
+      console.warn = jest.fn();
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMap(
+          [
+            "...",
+            "..#",
+            "...",
+          ],
+          "charLayer",
+          false,
+          [
+            [1,1,1],
+            [1,5,1],
+            [1,1,1],
+          ]
+        ),
+        {
+          characters: [
+            {
+              id: "player",
+              startPosition: { x: 1, y: 0 },
+              charLayer: "charLayer",
+              speed: 1,
+            },
+          ],
+        }
+      );
+      const dest = layerPos(1, 2, "charLayer");
+      const config: MoveToConfig = {
+        considerCosts: true,
+        algorithm: "A_STAR",
+      };
+      gridEngineHeadless.moveTo("player", dest.position, config);
+
+      gridEngineHeadless.update(0, 1000);
+
+      expect(gridEngineHeadless.getPosition("player")).toEqual({ x: 0, y: 0 });
+    });
+
     it("should move to layer", () => {
       const targetVec = { position: new Vector2(3, 4), layer: "layer1" };
       gridEngineHeadless.moveTo("player", targetVec.position, {
@@ -554,6 +597,48 @@ describe("GridEngineHeadless", () => {
         "GridEngine: Unknown PathBlockedStrategy 'unknown strategy'. Falling back to 'WAIT'"
       );
     });
+
+    test.each(["BFS", "BIDIRECTIONAL_SEARCH", "JPS"])(
+      "should show a warning if considerCost pathfinding option is used with" +
+        " algorithm different than A*",
+      (algorithm: ShortestPathAlgorithmType) => {
+        const targetVec = new Vector2(3, 4);
+        const options: PathfindingOptions = {
+          considerCosts: true,
+        };
+
+        gridEngineHeadless.moveTo("player", targetVec, {
+          ...options,
+          algorithm,
+        });
+
+        expect(console.warn).toHaveBeenCalledWith(
+          `GridEngine: Pathfinding option 'considerCosts' cannot be used with` +
+            ` algorithm '${algorithm}'. It can only be used with A* algorithm.`
+        );
+      }
+    );
+
+    it(
+      "should not show a warning if considerCost pathfinding option is used " +
+        "with A*",
+      () => {
+        const targetVec = new Vector2(3, 4);
+        const options: PathfindingOptions = {
+          considerCosts: true,
+        };
+
+        gridEngineHeadless.moveTo("player", targetVec, {
+          ...options,
+          algorithm: "A_STAR",
+        });
+
+        expect(console.warn).not.toHaveBeenCalledWith(
+          `GridEngine: Pathfinding option 'considerCosts' cannot be used with` +
+            ` algorithm 'A_STAR'. It can only be used with A* algorithm.`
+        );
+      }
+    );
   });
 
   it("should stop moving", () => {
@@ -1237,12 +1322,97 @@ describe("GridEngineHeadless", () => {
       });
     });
 
-    function layerPos(x: number, y: number, charLayer: string) {
-      return {
-        position: { x, y },
-        charLayer,
+    it("should delegate to pathfinding with consider costs", () => {
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMap(
+          [
+            "...",
+            "..#",
+            "...",
+          ],
+          "charLayer",
+          false,
+          [
+            [1,1,1],
+            [1,5,1],
+            [1,1,1],
+          ]
+        ),
+        { characters: [{ id: "player" }] }
+      );
+      const source = layerPos(1, 0, "charLayer");
+      const dest = layerPos(1, 2, "charLayer");
+      const options: PathfindingOptions = {
+        pathWidth: 1,
+        considerCosts: true,
+        shortestPathAlgorithm: "A_STAR",
       };
-    }
+
+      const res = gridEngineHeadless.findShortestPath(source, dest, options);
+
+      expect(res).toEqual({
+        path: [
+          layerPos(1, 0, "charLayer"),
+          layerPos(0, 0, "charLayer"),
+          layerPos(0, 1, "charLayer"),
+          layerPos(0, 2, "charLayer"),
+          layerPos(1, 2, "charLayer"),
+        ],
+        closestToTarget: layerPos(1, 2, "charLayer"),
+        reachedMaxPathLength: false,
+        steps: 5,
+      });
+    });
+
+    test.each(["BFS", "BIDIRECTIONAL_SEARCH", "JPS"])(
+      "should show a warning if considerCost pathfinding option is used with" +
+        " algorithm different than A*",
+      (algorithm: ShortestPathAlgorithmType) => {
+        gridEngineHeadless.create(mockBlockMap([""], "charLayer"), {
+          characters: [{ id: "player" }],
+        });
+        const source = layerPos(0, 0, "charLayer");
+        const dest = layerPos(4, 4, "charLayer");
+        const options: PathfindingOptions = {
+          considerCosts: true,
+        };
+
+        gridEngineHeadless.findShortestPath(source, dest, {
+          ...options,
+          shortestPathAlgorithm: algorithm,
+        });
+
+        expect(console.warn).toHaveBeenCalledWith(
+          `GridEngine: Pathfinding option 'considerCosts' cannot be used with` +
+            ` algorithm '${algorithm}'. It can only be used with A* algorithm.`
+        );
+      }
+    );
+    it(
+      "should not show a warning if considerCost pathfinding option is used " +
+        "with A*",
+      () => {
+        gridEngineHeadless.create(mockBlockMap([""], "charLayer"), {
+          characters: [{ id: "player" }],
+        });
+        const source = layerPos(0, 0, "charLayer");
+        const dest = layerPos(4, 4, "charLayer");
+        const options: PathfindingOptions = {
+          considerCosts: true,
+        };
+
+        gridEngineHeadless.findShortestPath(source, dest, {
+          ...options,
+          shortestPathAlgorithm: "A_STAR",
+        });
+
+        expect(console.warn).not.toHaveBeenCalledWith(
+          `GridEngine: Pathfinding option 'considerCosts' cannot be used with` +
+            ` algorithm 'A_STAR'. It can only be used with A* algorithm.`
+        );
+      }
+    );
   });
 
   describe("QueueMovement", () => {
@@ -1758,5 +1928,11 @@ describe("GridEngineHeadless", () => {
       ]),
       { characters: [{ id: "player" }] }
     );
+  }
+  function layerPos(x: number, y: number, charLayer: string) {
+    return {
+      position: { x, y },
+      charLayer,
+    };
   }
 });

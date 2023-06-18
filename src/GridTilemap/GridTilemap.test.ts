@@ -882,4 +882,161 @@ describe("GridTilemap", () => {
       )
     ).toBe(false);
   });
+
+  it("should consider tile costs", () => {
+    phaserTilemap = mockLayeredBlockMap(
+      [
+        {
+          layer: "test",
+          blockMap: [
+            // prettier-ignore
+            "...",
+            "...",
+            "...",
+          ],
+        },
+      ],
+      false,
+      [
+        {
+          layer: "test",
+          costMap: [
+            [1, 1, 1],
+            [1, 3, 1],
+            [1, 1, 1],
+          ],
+        },
+      ]
+    );
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    const tileCostsLeft = gridTilemap.getTileCosts(new Vector2(0, 1), {
+      position: new Vector2(1, 1),
+      layer: "test",
+    });
+    const tileCostsRight = gridTilemap.getTileCosts(new Vector2(2, 1), {
+      position: new Vector2(1, 1),
+      layer: "test",
+    });
+    const tileCostsUp = gridTilemap.getTileCosts(new Vector2(1, 0), {
+      position: new Vector2(1, 1),
+      layer: "test",
+    });
+    const tileCostsDown = gridTilemap.getTileCosts(new Vector2(1, 2), {
+      position: new Vector2(1, 1),
+      layer: "test",
+    });
+    const tileCostUpLeft = gridTilemap.getTileCosts(new Vector2(0, 0), {
+      position: new Vector2(1, 1),
+      layer: "test",
+    });
+    const tileCostUpRight = gridTilemap.getTileCosts(new Vector2(2, 0), {
+      position: new Vector2(1, 1),
+      layer: "test",
+    });
+    const tileCostDownLeft = gridTilemap.getTileCosts(new Vector2(0, 2), {
+      position: new Vector2(1, 1),
+      layer: "test",
+    });
+    const tileCostDownRight = gridTilemap.getTileCosts(new Vector2(2, 2), {
+      position: new Vector2(1, 1),
+      layer: "test",
+    });
+    expect(tileCostsLeft).toBe(3);
+    expect(tileCostsRight).toBe(3);
+    expect(tileCostsUp).toBe(3);
+    expect(tileCostsDown).toBe(3);
+    expect(tileCostUpLeft).toBe(3);
+    expect(tileCostUpRight).toBe(3);
+    expect(tileCostDownLeft).toBe(3);
+    expect(tileCostDownRight).toBe(3);
+  });
+
+  it("should consider different tile costs", () => {
+    phaserTilemap = mockLayeredBlockMap(
+      [
+        {
+          layer: "test",
+          blockMap: [
+            // prettier-ignore
+            "...",
+            "...",
+            "...",
+          ],
+        },
+      ],
+      false,
+      [
+        {
+          layer: "test",
+          costMap: [
+            [1, 1, 1],
+            [
+              1,
+              {
+                ge_cost_left: 2,
+                ge_cost_right: 3,
+                ge_cost_up: 4,
+                ge_cost_down: 5,
+                "ge_cost_up-left": 6,
+                "ge_cost_up-right": 7,
+                "ge_cost_down-left": 8,
+                "ge_cost_down-right": 9,
+              },
+              1,
+            ],
+            [1, 1, 1],
+          ],
+        },
+      ]
+    );
+    gridTilemap = new GridTilemap(
+      phaserTilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+    const tileCostsLeft = gridTilemap.getTileCosts(new Vector2(0, 1), {
+      position: new Vector2(1, 1),
+      layer: "test",
+    });
+    const tileCostsRight = gridTilemap.getTileCosts(new Vector2(2, 1), {
+      position: new Vector2(1, 1),
+      layer: "test",
+    });
+    const tileCostsUp = gridTilemap.getTileCosts(new Vector2(1, 0), {
+      position: new Vector2(1, 1),
+      layer: "test",
+    });
+    const tileCostsDown = gridTilemap.getTileCosts(new Vector2(1, 2), {
+      position: new Vector2(1, 1),
+      layer: "test",
+    });
+    const tileCostUpLeft = gridTilemap.getTileCosts(new Vector2(0, 0), {
+      position: new Vector2(1, 1),
+      layer: "test",
+    });
+    const tileCostUpRight = gridTilemap.getTileCosts(new Vector2(2, 0), {
+      position: new Vector2(1, 1),
+      layer: "test",
+    });
+    const tileCostDownLeft = gridTilemap.getTileCosts(new Vector2(0, 2), {
+      position: new Vector2(1, 1),
+      layer: "test",
+    });
+    const tileCostDownRight = gridTilemap.getTileCosts(new Vector2(2, 2), {
+      position: new Vector2(1, 1),
+      layer: "test",
+    });
+    expect(tileCostsLeft).toBe(2);
+    expect(tileCostsRight).toBe(3);
+    expect(tileCostsUp).toBe(4);
+    expect(tileCostsDown).toBe(5);
+    expect(tileCostUpLeft).toBe(6);
+    expect(tileCostUpRight).toBe(7);
+    expect(tileCostDownLeft).toBe(8);
+    expect(tileCostDownRight).toBe(9);
+  });
 });

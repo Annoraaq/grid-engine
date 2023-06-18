@@ -78,6 +78,7 @@ export abstract class ShortestPathAlgorithm {
       ignoreBlockedTarget = false,
       maxPathLength = Infinity,
       ignoreLayers = false,
+      considerCosts = false,
     }: PathfindingOptions = {}
   ) {
     this.options = {
@@ -93,6 +94,7 @@ export abstract class ShortestPathAlgorithm {
       ignoreBlockedTarget,
       maxPathLength,
       ignoreLayers,
+      considerCosts,
     };
   }
 
@@ -128,6 +130,11 @@ export abstract class ShortestPathAlgorithm {
   getTransition(pos: Vector2, fromLayer?: string): string | undefined {
     if (this.options.ignoreLayers) return undefined;
     return this.gridTilemap.getTransition(pos, fromLayer);
+  }
+
+  getCosts(src: Vector2, dest: LayerVecPos): number {
+    if (!this.options.considerCosts) return 1;
+    return this.gridTilemap.getTileCosts(src, dest);
   }
 
   isBlocking(src: LayerVecPos, dest: LayerVecPos): boolean {

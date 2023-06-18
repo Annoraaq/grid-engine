@@ -7,6 +7,17 @@ import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
 import { TileLayer, Tile, Tilemap } from "../../GridTilemap/Tilemap";
 import { MockTile, MockTileLayer, MockTilemap } from "./MockTilemap";
 
+export interface TileCost {
+  ge_cost_left?: number;
+  ge_cost_right?: number;
+  ge_cost_up?: number;
+  ge_cost_down?: number;
+  "ge_cost_down-left"?: number;
+  "ge_cost_down-right"?: number;
+  "ge_cost_up-left"?: number;
+  "ge_cost_up-right"?: number;
+}
+
 export const LOWER_CHAR_LAYER = "lowerCharLayer";
 export const HIGHER_CHAR_LAYER = "testCharLayer";
 export const COLLISION_GROUP = "testCollisionGroup";
@@ -197,9 +208,14 @@ export function getBlockingProps(char: string): Record<string, string> {
 export function mockBlockMap(
   blockMap: string[],
   charLayer?: string,
-  isometric?: boolean
+  isometric?: boolean,
+  costMap?: Array<Array<number | TileCost>>
 ): Tilemap {
-  return mockLayeredBlockMap([{ layer: charLayer, blockMap }], isometric);
+  return mockLayeredBlockMap(
+    [{ layer: charLayer, blockMap }],
+    isometric,
+    costMap ? [{ layer: charLayer, costMap }] : undefined
+  );
 }
 
 export function mockLayeredBlockMap(
@@ -208,7 +224,11 @@ export function mockLayeredBlockMap(
     blockMap: string[];
     isCharLayer?: boolean;
   }>,
-  isometric?: boolean
+  isometric?: boolean,
+  costMaps?: Array<{
+    layer: string | undefined;
+    costMap: Array<Array<TileCost | number>>;
+  }>
 ): Tilemap {
   const layers: MockTileLayer[] = [];
   for (const bm of blockMaps) {
@@ -216,10 +236,32 @@ export function mockLayeredBlockMap(
     for (let r = 0; r < bm.blockMap.length; r++) {
       const row: Array<Tile | undefined> = [];
       for (let c = 0; c < bm.blockMap[r].length; c++) {
+        const costMap = costMaps?.find((cm) => cm.layer === bm.layer);
         if (bm.blockMap[r][c] == "_") {
-          row.push(undefined);
+          if (costMap?.costMap?.[r]?.[c]) {
+            const cost = costMap.costMap[r][c];
+            if (typeof cost === "number") {
+              row.push(new MockTile({ ge_cost: costMap.costMap[r][c] }));
+            } else {
+              row.push(new MockTile(cost));
+            }
+          } else {
+            row.push(undefined);
+          }
         } else {
-          row.push(new MockTile(getBlockingProps(bm.blockMap[r][c])));
+          if (costMap?.costMap?.[r]?.[c]) {
+            const cost = costMap.costMap[r][c];
+            const costProps =
+              typeof cost === "number" ? { ge_cost: cost } : cost;
+            row.push(
+              new MockTile({
+                ...getBlockingProps(bm.blockMap[r][c]),
+                ...costProps,
+              })
+            );
+          } else {
+            row.push(new MockTile(getBlockingProps(bm.blockMap[r][c])));
+          }
         }
       }
       data.push(row);

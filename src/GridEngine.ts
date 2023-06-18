@@ -718,3 +718,9 @@ export class GridEngine implements IGridEngine {
     this.gridCharacters?.set(charData.id, gridCharPhaser);
   }
 }
+
+// TODO:
+// - Add ge_cost to tile properties in docs
+// - add flag to consider costs for pathfinding (only positive ones)
+// - throw warning if someone tries to use costs without A*
+// - Add example demonstrating this

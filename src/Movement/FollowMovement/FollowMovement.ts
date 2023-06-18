@@ -18,6 +18,7 @@ export interface Options {
   maxPathLength?: number;
   shortestPathAlgorithm?: ShortestPathAlgorithmType;
   ignoreLayers?: boolean;
+  considerCosts?: boolean;
 }
 
 export class FollowMovement implements Movement {
@@ -36,8 +37,19 @@ export class FollowMovement implements Movement {
       maxPathLength: Infinity,
       shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
       ignoreLayers: false,
+      considerCosts: options.considerCosts || false,
     };
     this.options = { ...defaultOptions, ...options };
+    if (
+      this.options.considerCosts &&
+      this.options.shortestPathAlgorithm !== "A_STAR"
+    ) {
+      console.warn(
+        `GridEngine: Pathfinding option 'considerCosts' cannot be used with ` +
+          `algorithm '${this.options.shortestPathAlgorithm}'. It can only be used ` +
+          `with A* algorithm.`
+      );
+    }
     this.character = character;
     this.updateTarget(
       this.charToFollow.getTilePos().position,
@@ -90,6 +102,7 @@ export class FollowMovement implements Movement {
           noPathFoundStrategy: this.options.noPathFoundStrategy,
           maxPathLength: this.options.maxPathLength,
           ignoreLayers: this.options.ignoreLayers,
+          considerCosts: this.options.considerCosts,
         },
         ignoreBlockedTarget: true,
       }

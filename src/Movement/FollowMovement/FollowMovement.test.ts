@@ -1,4 +1,7 @@
-import { LayerVecPos } from "./../../Pathfinding/ShortestPathAlgorithm";
+import {
+  LayerVecPos,
+  ShortestPathAlgorithmType,
+} from "./../../Pathfinding/ShortestPathAlgorithm";
 import { NumberOfDirections } from "./../../Direction/Direction";
 import { FollowMovement } from "./FollowMovement";
 import { TargetMovement } from "../TargetMovement/TargetMovement";
@@ -70,6 +73,7 @@ describe("FollowMovement", () => {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           maxPathLength: Infinity,
           ignoreLayers: false,
+          considerCosts: false,
         },
         ignoreBlockedTarget: true,
       }
@@ -101,6 +105,7 @@ describe("FollowMovement", () => {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           maxPathLength: Infinity,
           ignoreLayers: false,
+          considerCosts: false,
         },
         ignoreBlockedTarget: true,
       }
@@ -150,6 +155,7 @@ describe("FollowMovement", () => {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           maxPathLength: 100,
           ignoreLayers: true,
+          considerCosts: false,
         },
         ignoreBlockedTarget: true,
       }
@@ -173,6 +179,31 @@ describe("FollowMovement", () => {
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
           maxPathLength: Infinity,
           ignoreLayers: false,
+          considerCosts: false,
+        },
+        ignoreBlockedTarget: true,
+      }
+    );
+  });
+
+  it("should update added character with considerCosts", () => {
+    followMovement = new FollowMovement(mockChar, gridTilemapMock, targetChar, {
+      shortestPathAlgorithm: "A_STAR",
+      considerCosts: true,
+    });
+    followMovement.update(100);
+    expect(TargetMovement).toHaveBeenCalledWith(
+      mockChar,
+      gridTilemapMock,
+      targetCharPos,
+      {
+        distance: 1,
+        config: {
+          algorithm: "A_STAR",
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          maxPathLength: Infinity,
+          ignoreLayers: false,
+          considerCosts: true,
         },
         ignoreBlockedTarget: true,
       }
@@ -195,4 +226,48 @@ describe("FollowMovement", () => {
       },
     });
   });
+
+  test.each(["BFS", "BIDIRECTIONAL_SEARCH", "JPS"])(
+    "should show a warning if considerCost pathfinding option is used with" +
+      " algorithm different than A*",
+    (algorithm: ShortestPathAlgorithmType) => {
+      console.warn = jest.fn();
+      followMovement = new FollowMovement(
+        mockChar,
+        gridTilemapMock,
+        targetChar,
+        {
+          considerCosts: true,
+          shortestPathAlgorithm: algorithm,
+        }
+      );
+
+      expect(console.warn).toHaveBeenCalledWith(
+        `GridEngine: Pathfinding option 'considerCosts' cannot be used with ` +
+          `algorithm '${algorithm}'. It can only be used with A* algorithm.`
+      );
+    }
+  );
+
+  it(
+    "should not show a warning if considerCost pathfinding option is used " +
+      "with A*",
+    () => {
+      console.warn = jest.fn();
+      followMovement = new FollowMovement(
+        mockChar,
+        gridTilemapMock,
+        targetChar,
+        {
+          considerCosts: true,
+          shortestPathAlgorithm: "A_STAR",
+        }
+      );
+
+      expect(console.warn).not.toHaveBeenCalledWith(
+        `GridEngine: Pathfinding option 'considerCosts' cannot be used with ` +
+          `algorithm 'A_STAR'. It can only be used with A* algorithm.`
+      );
+    }
+  );
 });
