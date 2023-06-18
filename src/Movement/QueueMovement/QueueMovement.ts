@@ -11,14 +11,16 @@ import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Movement, MovementInfo } from "../Movement";
 import { Subject } from "rxjs";
 import { filter, take } from "rxjs/operators";
-import { CharLayer, Position } from "../../IGridEngine";
+import { CharLayer, LayerPosition, Position } from "../../IGridEngine";
 import { DistanceUtilsFactory } from "../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
 import { DistanceUtils } from "../../Utils/DistanceUtils";
+import { Concrete } from "../../Utils/TypeUtils";
 
 export interface QueueMovementConfig {
   /**
    * Determines what happens if the next position on the enqueued path is blocked.
    * For the different strategies see {@link QueuedPathBlockedStrategy}.
+   * @default QueuePathBlockedStrategy.STOP
    */
   pathBlockedStrategy?: QueuedPathBlockedStrategy;
 
@@ -28,7 +30,8 @@ export interface QueueMovementConfig {
    * It sets the number of milliseconds that Grid Engine will wait
    * for the path to become unblocked again before stopping the movement.
    *
-   * If not set, Grid Engine will wait forever.
+   * If not set, Grid Engine will wait forever (equals a value of `-1`).
+   * @default `-1`
    */
   pathBlockedWaitTimeoutMs?: number;
 
@@ -96,26 +99,23 @@ export interface Finished {
   layer: CharLayer;
 }
 
+interface QueueEntry {
+  command: LayerVecPos | Direction;
+  config: Concrete<QueueMovementConfig>;
+}
+
+export interface QueueMovementEntry {
+  command: LayerPosition | Direction;
+  config: Concrete<QueueMovementConfig>;
+}
+
 export class QueueMovement implements Movement {
-  private queue = new Queue<LayerVecPos>();
+  private queue = new Queue<QueueEntry>();
   private finished$ = new Subject<Finished>();
   private distanceUtils: DistanceUtils;
-  private pathBlockedStrategy: QueuedPathBlockedStrategy;
-  private pathBlockedWaitTimeoutMs: number;
   private pathBlockedWaitElapsed = 0;
-  private ignoreInvalidPositions: boolean;
-  private skipInvalidPositions: boolean;
 
-  constructor(
-    private character: GridCharacter,
-    private tilemap: GridTilemap,
-    config: QueueMovementConfig = {}
-  ) {
-    this.pathBlockedStrategy =
-      config.pathBlockedStrategy ?? QueuedPathBlockedStrategy.STOP;
-    this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
-    this.ignoreInvalidPositions = config.ignoreInvalidPositions ?? false;
-    this.skipInvalidPositions = config.skipInvalidPositions ?? false;
+  constructor(private character: GridCharacter, private tilemap: GridTilemap) {
     this.distanceUtils = DistanceUtilsFactory.create(
       character.getNumberOfDirections()
     );
@@ -132,13 +132,6 @@ export class QueueMovement implements Movement {
         this.finished$.complete();
       });
   }
-  setConfig(config: QueueMovementConfig = {}) {
-    this.pathBlockedStrategy =
-      config.pathBlockedStrategy ?? QueuedPathBlockedStrategy.STOP;
-    this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
-    this.ignoreInvalidPositions = config.ignoreInvalidPositions ?? false;
-    this.skipInvalidPositions = config.skipInvalidPositions ?? false;
-  }
 
   update(delta: number): void {
     if (!this.character.isMoving() && this.queue.size() > 0) {
@@ -152,24 +145,43 @@ export class QueueMovement implements Movement {
     };
   }
 
-  enqueue(positions: Array<LayerVecPos | Direction>): void {
-    for (let pos of positions) {
-      let end = this.queue.peekEnd();
-      if (!end) {
-        end = this.character.getNextTilePos();
-      }
+  enqueue(
+    positions: Array<LayerVecPos | Direction>,
+    config: QueueMovementConfig = {}
+  ): void {
+    const concreteConfig: Concrete<QueueMovementConfig> = {
+      pathBlockedStrategy:
+        config.pathBlockedStrategy ?? QueuedPathBlockedStrategy.STOP,
+      pathBlockedWaitTimeoutMs: config?.pathBlockedWaitTimeoutMs || -1,
+      ignoreInvalidPositions: config.ignoreInvalidPositions ?? false,
+      skipInvalidPositions: config.skipInvalidPositions ?? false,
+    };
+
+    for (const pos of positions) {
+      const newEntry = { command: pos, config: concreteConfig };
       if (isDirection(pos)) {
-        pos = this.tilemap.getTilePosInDirection(end, pos);
+        this.queue.enqueue(newEntry);
+        continue;
+      }
+
+      const endEntry = this.queue.peekEnd();
+      let endCommand = endEntry?.command;
+      if (!endCommand) {
+        endCommand = this.character.getNextTilePos();
+      }
+      if (isDirection(endCommand)) {
+        this.queue.enqueue(newEntry);
+        continue;
       }
       const isNeighborPos =
-        this.distanceUtils.distance(end.position, pos.position) === 1;
-      if (!this.ignoreInvalidPositions || isNeighborPos) {
-        this.queue.enqueue(pos);
+        this.distanceUtils.distance(endCommand.position, pos.position) === 1;
+      if (!config.ignoreInvalidPositions || isNeighborPos) {
+        this.queue.enqueue(newEntry);
       }
     }
   }
 
-  peekAll(): LayerVecPos[] {
+  peekAll(): QueueEntry[] {
     return this.queue.peekAll();
   }
 
@@ -181,17 +193,30 @@ export class QueueMovement implements Movement {
     return this.finished$;
   }
 
-  private moveCharOnPath(delta: number): void {
-    const nextPos = this.queue.peek();
-    if (!nextPos) return;
+  clear(): void {
+    this.queue.clear();
+  }
 
-    if (!this.skipInvalidPositions) {
+  private moveCharOnPath(delta: number): void {
+    const nextEntry = this.queue.peek();
+    if (!nextEntry) return;
+    let nextPos: LayerVecPos | Direction | undefined = nextEntry.command;
+    const nextConfig = nextEntry.config;
+
+    if (isDirection(nextPos)) {
+      nextPos = this.tilemap.getTilePosInDirection(
+        this.character.getNextTilePos(),
+        nextPos
+      );
+    }
+
+    if (!nextConfig.skipInvalidPositions) {
       if (!this.isNeighborPos(nextPos)) {
         this.finishInvalidNextPos(nextPos);
         return;
       }
     } else {
-      const nextPos = this.getNextValidPosition();
+      nextPos = this.getNextValidPosition();
       if (!nextPos) {
         this.finishInvalidNextPos(nextPos);
         return;
@@ -203,19 +228,26 @@ export class QueueMovement implements Movement {
         directionFromPos(this.character.getTilePos().position, nextPos.position)
       )
     ) {
-      if (this.pathBlockedStrategy === QueuedPathBlockedStrategy.STOP) {
+      if (nextConfig.pathBlockedStrategy === QueuedPathBlockedStrategy.STOP) {
         this.finishPathBlocked(nextPos);
-      } else if (this.pathBlockedStrategy === QueuedPathBlockedStrategy.SKIP) {
+      } else if (
+        nextConfig.pathBlockedStrategy === QueuedPathBlockedStrategy.SKIP
+      ) {
         this.queue.dequeue();
         this.moveCharOnPath(delta);
         return;
       } else if (
-        this.pathBlockedStrategy === QueuedPathBlockedStrategy.WAIT &&
-        this.pathBlockedWaitTimeoutMs > -1
+        nextConfig.pathBlockedStrategy === QueuedPathBlockedStrategy.WAIT &&
+        nextConfig.pathBlockedWaitTimeoutMs > -1
       ) {
         this.pathBlockedWaitElapsed += delta;
-        if (this.pathBlockedWaitElapsed >= this.pathBlockedWaitTimeoutMs) {
-          this.finishBlockedWaitTimeout(nextPos);
+        if (
+          this.pathBlockedWaitElapsed >= nextConfig.pathBlockedWaitTimeoutMs
+        ) {
+          this.finishBlockedWaitTimeout(
+            nextPos,
+            nextConfig.pathBlockedWaitTimeoutMs
+          );
         }
       }
       return;
@@ -232,7 +264,14 @@ export class QueueMovement implements Movement {
   }
   private getNextValidPosition(): LayerVecPos | undefined {
     while (this.queue.size() > 0) {
-      const nextPos = this.queue.peek();
+      let nextPos = this.queue.peek()?.command;
+      if (isDirection(nextPos)) {
+        nextPos = this.tilemap.getTilePosInDirection(
+          this.character.getNextTilePos(),
+          nextPos
+        );
+      }
+
       if (nextPos && this.isNeighborPos(nextPos)) {
         return nextPos;
       }
@@ -297,17 +336,20 @@ export class QueueMovement implements Movement {
     );
   }
 
-  private finishBlockedWaitTimeout(nextPos: LayerVecPos): void {
+  private finishBlockedWaitTimeout(
+    nextPos: LayerVecPos,
+    pathBlockedWaitTimeoutMs: number
+  ): void {
     this.finish(
       "PATH_BLOCKED_WAIT_TIMEOUT",
-      `Position ${this.posToStr(nextPos)} is blocked and the wait timeout of ${
-        this.pathBlockedWaitTimeoutMs
-      } ms has been exceeded.`
+      `Position ${this.posToStr(
+        nextPos
+      )} is blocked and the wait timeout of ${pathBlockedWaitTimeoutMs} ms has been exceeded.`
     );
   }
 
   private finish(result: QueueMovementResult, description = ""): void {
-    this.queue = new Queue<LayerVecPos>();
+    this.queue = new Queue<QueueEntry>();
     this.finished$.next({
       position: this.character.getNextTilePos().position,
       result,

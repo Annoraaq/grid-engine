@@ -38,7 +38,10 @@ import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer";
 import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile";
 import {
   QueueMovementConfig,
+  QueuedPathBlockedStrategy,
   Finished as QueueMovementFinished,
+  QueueMovementResult,
+  QueueMovementEntry,
 } from "./Movement/QueueMovement/QueueMovement";
 import {
   CharacterShift,
@@ -82,6 +85,11 @@ export {
   PhaserTile,
   PhaserTileLayer,
   PhaserTilemap,
+  QueueMovementConfig,
+  QueueMovementEntry,
+  QueueMovementFinished,
+  QueueMovementResult,
+  QueuedPathBlockedStrategy,
   ShortestPathAlgorithmType,
   Tile,
   TileLayer,
@@ -615,11 +623,21 @@ export class GridEngine implements IGridEngine {
     this.geHeadless.addQueueMovements(charId, positions, options);
   }
 
+  /** {@inheritDoc IGridEngine.getEnqueuedMovements} */
+  getEnqueuedMovements(charId: string): QueueMovementEntry[] {
+    return this.geHeadless.getEnqueuedMovements(charId);
+  }
+
   /** {@inheritDoc IGridEngine.queueMovementFinished} */
   queueMovementFinished(): Observable<
     { charId: string } & QueueMovementFinished
   > {
     return this.geHeadless.queueMovementFinished();
+  }
+
+  /** {@inheritDoc IGridEngine.clearEnqueuedMovements} */
+  clearEnqueuedMovements(charId: string): void {
+    return this.geHeadless.clearEnqueuedMovements(charId);
   }
 
   private setConfigDefaults(

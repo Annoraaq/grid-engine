@@ -6,6 +6,7 @@ import {
 } from "./Movement/TargetMovement/TargetMovement";
 import {
   QueueMovementConfig,
+  QueueMovementEntry,
   Finished as QueueMovementFinished,
 } from "./Movement/QueueMovement/QueueMovement";
 import { Observable } from "rxjs";
@@ -495,6 +496,15 @@ export interface IGridEngine {
     positions: Array<LayerPosition | Direction>,
     options?: QueueMovementConfig
   );
+
+  /** Returns all enqueued movements for the given character. */
+  getEnqueuedMovements(charId: string): QueueMovementEntry[];
+
+  /**
+   * Clears the complete movement queue for the character, that was filled by
+   * using {@link IGridEngine.addQueueMovements}.
+   */
+  clearEnqueuedMovements(charId: string): void;
 
   /**
    * Emits whenever queued movements for a character finish (with success or

@@ -55,6 +55,7 @@ import { Rect } from "./Utils/Rect/Rect";
 import {
   QueueMovement,
   QueueMovementConfig,
+  QueueMovementEntry,
   Finished as QueueMovementFinished,
 } from "./Movement/QueueMovement/QueueMovement";
 
@@ -897,7 +898,6 @@ export class GridEngineHeadless implements IGridEngine {
           this.queueMovementFinished$?.next({ charId, ...finished });
         });
     }
-    queueMovement.setConfig(options);
     queueMovement.enqueue(
       positions.map((p) => {
         if (isDirection(p)) {
@@ -907,7 +907,8 @@ export class GridEngineHeadless implements IGridEngine {
           position: new Vector2(p.position),
           layer: p.charLayer,
         };
-      })
+      }),
+      options
     );
   }
 
@@ -917,6 +918,36 @@ export class GridEngineHeadless implements IGridEngine {
   > {
     if (!this.queueMovementFinished$) throw this.createUninitializedErr();
     return this.queueMovementFinished$;
+  }
+
+  /** {@inheritDoc IGridEngine.getEnqueuedMovements} */
+  getEnqueuedMovements(charId: string): QueueMovementEntry[] {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    if (gridChar.getMovement()?.getInfo().type === "Queue") {
+      const queueMovement = gridChar.getMovement() as QueueMovement;
+      return queueMovement.peekAll().map((entry) => {
+        return {
+          command: isDirection(entry.command)
+            ? entry.command
+            : LayerPositionUtils.fromInternal(entry.command),
+          config: entry.config,
+        };
+      });
+    }
+    return [];
+  }
+
+  /** {@inheritDoc IGridEngine.clearEnqueuedMovements} */
+  clearEnqueuedMovements(charId: string): void {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    if (gridChar.getMovement()?.getInfo().type === "Queue") {
+      const queueMovement = gridChar.getMovement() as QueueMovement;
+      queueMovement.clear();
+    }
   }
 
   private charRemoved(charId: string): Observable<string> {

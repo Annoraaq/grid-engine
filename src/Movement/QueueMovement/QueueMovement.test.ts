@@ -17,6 +17,13 @@ import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
 
 const CHUNKS_PER_SECOND = 2;
 
+const DEFAULT_CONFIG: QueueMovementConfig = {
+  ignoreInvalidPositions: false,
+  pathBlockedStrategy: QueuedPathBlockedStrategy.STOP,
+  pathBlockedWaitTimeoutMs: -1,
+  skipInvalidPositions: false,
+};
+
 interface TestData {
   gridTilemap: GridTilemap;
   mockChar: GridCharacter;
@@ -32,10 +39,7 @@ const TEST_CHAR_CONFIG = {
 };
 
 describe("QueueMovement", () => {
-  function initQueueMovement(
-    tilemap?: Tilemap,
-    config: QueueMovementConfig = {}
-  ): TestData {
+  function initQueueMovement(tilemap?: Tilemap): TestData {
     if (!tilemap) {
       tilemap = mockLayeredBlockMap([
         {
@@ -65,7 +69,7 @@ describe("QueueMovement", () => {
       ...TEST_CHAR_CONFIG,
       tilemap: gridTilemap,
     });
-    const queueMovement = new QueueMovement(mockChar, gridTilemap, config);
+    const queueMovement = new QueueMovement(mockChar, gridTilemap);
     const finishedObsCallbackMock = jest.fn();
     const finishedObsCompleteMock = jest.fn();
     queueMovement.finished().subscribe({
@@ -135,15 +139,35 @@ describe("QueueMovement", () => {
 
   it("should add positions", () => {
     const { queueMovement } = initQueueMovement();
+    const config: QueueMovementConfig = {
+      ignoreInvalidPositions: true,
+      pathBlockedStrategy: QueuedPathBlockedStrategy.SKIP,
+      pathBlockedWaitTimeoutMs: 10,
+      skipInvalidPositions: true,
+    };
     expect(queueMovement.size()).toEqual(0);
     queueMovement.enqueue([
       { position: new Vector2(0, 1), layer: "testLayer" },
       { position: new Vector2(0, 2), layer: "testlayer2" },
     ]);
-    expect(queueMovement.size()).toEqual(2);
+    queueMovement.enqueue(
+      [{ position: new Vector2(0, 3), layer: "testLayer" }],
+      config
+    );
+    expect(queueMovement.size()).toEqual(3);
     expect(queueMovement.peekAll()).toEqual([
-      { position: new Vector2(0, 1), layer: "testLayer" },
-      { position: new Vector2(0, 2), layer: "testlayer2" },
+      {
+        command: { position: new Vector2(0, 1), layer: "testLayer" },
+        config: DEFAULT_CONFIG,
+      },
+      {
+        command: { position: new Vector2(0, 2), layer: "testlayer2" },
+        config: DEFAULT_CONFIG,
+      },
+      {
+        command: { position: new Vector2(0, 3), layer: "testLayer" },
+        config,
+      },
     ]);
   });
 
@@ -156,8 +180,11 @@ describe("QueueMovement", () => {
     ]);
     expect(queueMovement.size()).toEqual(2);
     expect(queueMovement.peekAll()).toEqual([
-      { position: new Vector2(0, 1), layer: "testLayer" },
-      { position: new Vector2(0, 2), layer: "testLayer" },
+      {
+        command: { position: new Vector2(0, 1), layer: "testLayer" },
+        config: DEFAULT_CONFIG,
+      },
+      { command: Direction.DOWN, config: DEFAULT_CONFIG },
     ]);
   });
 
@@ -188,10 +215,38 @@ describe("QueueMovement", () => {
       queueMovement,
       finishedObsCallbackMock,
       finishedObsCompleteMock,
-    } = initQueueMovement(undefined, {
+    } = initQueueMovement(undefined);
+    queueMovement.enqueue([layerPos(1, 0), layerPos(2, 1), Direction.RIGHT], {
       ignoreInvalidPositions: true,
     });
-    queueMovement.enqueue([layerPos(1, 0), layerPos(2, 1)]);
+
+    expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
+    queueMovement.update(1000);
+    mockChar.update(1000);
+
+    expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+      position: layerPos(2, 0).position,
+      result: "SUCCESS",
+      description: "",
+      layer: "testCharLayer",
+    });
+    expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
+  });
+
+  it("should ignore invalid next positions on command level", () => {
+    const {
+      mockChar,
+      queueMovement,
+      finishedObsCallbackMock,
+      finishedObsCompleteMock,
+    } = initQueueMovement(undefined);
+    queueMovement.enqueue([layerPos(1, 0)], {
+      ignoreInvalidPositions: true,
+    });
+    queueMovement.enqueue([layerPos(2, 1)], {
+      ignoreInvalidPositions: false,
+    });
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
     queueMovement.update(1000);
@@ -199,8 +254,9 @@ describe("QueueMovement", () => {
 
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
       position: layerPos(1, 0).position,
-      result: "SUCCESS",
-      description: "",
+      result: "INVALID_NEXT_POS",
+      description:
+        "Position (2, 1, testCharLayer) is not reachable from (1, 0, testCharLayer).",
       layer: "testCharLayer",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
@@ -213,10 +269,10 @@ describe("QueueMovement", () => {
       queueMovement,
       finishedObsCallbackMock,
       finishedObsCompleteMock,
-    } = initQueueMovement(undefined, {
+    } = initQueueMovement(undefined);
+    queueMovement.enqueue([layerPos(2, 0), layerPos(1, 0)], {
       ignoreInvalidPositions: true,
     });
-    queueMovement.enqueue([layerPos(2, 0), layerPos(1, 0)]);
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
     queueMovement.update(1000);
@@ -466,10 +522,14 @@ describe("QueueMovement", () => {
       queueMovement,
       finishedObsCallbackMock,
       finishedObsCompleteMock,
-    } = initQueueMovement(tilemapMock, {
+    } = initQueueMovement(tilemapMock);
+    queueMovement.enqueue([layerPos(1, 0), layerPos(2, 0)], {
       pathBlockedStrategy: QueuedPathBlockedStrategy.WAIT,
     });
-    queueMovement.enqueue([layerPos(1, 0), layerPos(2, 0)]);
+
+    queueMovement.enqueue([layerPos(2, 1)], {
+      pathBlockedStrategy: QueuedPathBlockedStrategy.STOP,
+    });
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
     queueMovement.update(1000);
@@ -482,17 +542,20 @@ describe("QueueMovement", () => {
       [
         // prettier-ignore
         "...",
-        "...",
+        "..#",
       ],
       "testCharLayer"
     );
+
+    queueMovement.update(1000);
+    mockChar.update(1000);
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(2, 0)]);
 
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
       position: layerPos(2, 0).position,
-      result: "SUCCESS",
-      description: "",
+      result: "PATH_BLOCKED",
+      description: "Position (2, 1, testCharLayer) is blocked.",
       layer: "testCharLayer",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
@@ -505,15 +568,54 @@ describe("QueueMovement", () => {
       queueMovement,
       finishedObsCallbackMock,
       finishedObsCompleteMock,
-    } = initQueueMovement(undefined, {
+    } = initQueueMovement(undefined);
+    queueMovement.enqueue([layerPos(1, 0), layerPos(3, 0), Direction.RIGHT], {
       skipInvalidPositions: true,
     });
-    queueMovement.enqueue([layerPos(1, 0), layerPos(3, 0), layerPos(2, 0)]);
+    queueMovement.enqueue([layerPos(3, 0)], {
+      skipInvalidPositions: false,
+    });
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0), layerPos(2, 0)]);
+    queueMovement.update(1000);
+    mockChar.update(1000);
 
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
       position: layerPos(2, 0).position,
+      result: "PATH_BLOCKED",
+      description: "Position (3, 0, testCharLayer) is blocked.",
+      layer: "testCharLayer",
+    });
+    expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+    expect(queueMovement.size()).toBe(0);
+  });
+
+  it("should skip if path is blocked using directions", () => {
+    const tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "testCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".#.",
+          "...",
+        ],
+      },
+    ]);
+    const {
+      mockChar,
+      queueMovement,
+      finishedObsCallbackMock,
+      finishedObsCompleteMock,
+    } = initQueueMovement(tilemapMock);
+    queueMovement.enqueue([layerPos(1, 0), layerPos(2, 0), Direction.DOWN], {
+      pathBlockedStrategy: QueuedPathBlockedStrategy.SKIP,
+      skipInvalidPositions: true,
+    });
+
+    expectWalkedPath(mockChar, queueMovement, [layerPos(0, 1)]);
+
+    expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+      position: layerPos(0, 1).position,
       result: "SUCCESS",
       description: "",
       layer: "testCharLayer",
@@ -538,10 +640,10 @@ describe("QueueMovement", () => {
       queueMovement,
       finishedObsCallbackMock,
       finishedObsCompleteMock,
-    } = initQueueMovement(tilemapMock, {
+    } = initQueueMovement(tilemapMock);
+    queueMovement.enqueue([layerPos(1, 0), layerPos(0, 1)], {
       pathBlockedStrategy: QueuedPathBlockedStrategy.SKIP,
     });
-    queueMovement.enqueue([layerPos(1, 0), layerPos(0, 1)]);
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(0, 1)]);
 
@@ -572,11 +674,11 @@ describe("QueueMovement", () => {
       queueMovement,
       finishedObsCallbackMock,
       finishedObsCompleteMock,
-    } = initQueueMovement(tilemapMock, {
+    } = initQueueMovement(tilemapMock);
+    queueMovement.enqueue([layerPos(1, 0), layerPos(2, 0)], {
       pathBlockedStrategy: QueuedPathBlockedStrategy.WAIT,
       pathBlockedWaitTimeoutMs: 1001,
     });
-    queueMovement.enqueue([layerPos(1, 0), layerPos(2, 0)]);
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
     queueMovement.update(1000);
@@ -612,11 +714,11 @@ describe("QueueMovement", () => {
     ]);
 
     const { mockChar, queueMovement, finishedObsCallbackMock } =
-      initQueueMovement(tilemapMock, {
-        pathBlockedStrategy: QueuedPathBlockedStrategy.WAIT,
-        pathBlockedWaitTimeoutMs: 1001,
-      });
-    queueMovement.enqueue([layerPos(1, 0), layerPos(2, 0)]);
+      initQueueMovement(tilemapMock);
+    queueMovement.enqueue([layerPos(1, 0), layerPos(2, 0)], {
+      pathBlockedStrategy: QueuedPathBlockedStrategy.WAIT,
+      pathBlockedWaitTimeoutMs: 1001,
+    });
 
     queueMovement.update(1000);
     mockChar.update(1000);
@@ -639,5 +741,17 @@ describe("QueueMovement", () => {
     mockChar.update(1000);
 
     expect(finishedObsCallbackMock).not.toHaveBeenCalled();
+  });
+
+  it("should clear", () => {
+    const { queueMovement } = initQueueMovement();
+    expect(queueMovement.size()).toEqual(0);
+    queueMovement.enqueue([
+      { position: new Vector2(0, 1), layer: "testLayer" },
+      Direction.DOWN,
+    ]);
+    expect(queueMovement.size()).toEqual(2);
+    queueMovement.clear();
+    expect(queueMovement.size()).toEqual(0);
   });
 });

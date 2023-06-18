@@ -79,4 +79,16 @@ describe("Queue", () => {
     queue.dequeue();
     expect(queue.peekEnd()).toEqual(3);
   });
+
+  it("should clear", () => {
+    const queue = new Queue();
+    queue.enqueue(1);
+    queue.enqueue(2);
+    queue.enqueue(3);
+    expect(queue.size()).toEqual(3);
+    expect(queue.peekAll()).toEqual([1, 2, 3]);
+    queue.clear();
+    expect(queue.size()).toEqual(0);
+    expect(queue.peekAll()).toEqual([]);
+  });
 });
