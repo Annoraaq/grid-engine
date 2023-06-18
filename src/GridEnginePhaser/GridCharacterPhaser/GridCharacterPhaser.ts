@@ -113,8 +113,16 @@ export class GridCharacterPhaser {
     return this.customOffset.x;
   }
 
+  setOffsetX(offsetX: number): void {
+    this.customOffset.x = offsetX;
+  }
+
   getOffsetY(): number {
     return this.customOffset.y;
+  }
+
+  setOffsetY(offsetY: number): void {
+    this.customOffset.y = offsetY;
   }
 
   getWalkingAnimationMapping(): WalkingAnimationMapping | number | undefined {
