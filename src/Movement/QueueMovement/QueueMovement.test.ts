@@ -1,5 +1,9 @@
 import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { QueueMovement, QueuedPathBlockedStrategy } from "./QueueMovement";
+import {
+  QueueMovement,
+  QueueMovementConfig,
+  QueuedPathBlockedStrategy,
+} from "./QueueMovement";
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
 import { CharConfig, GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
@@ -12,6 +16,13 @@ import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
 
 const CHUNKS_PER_SECOND = 2;
+
+const DEFAULT_CONFIG: QueueMovementConfig = {
+  ignoreInvalidPositions: false,
+  pathBlockedStrategy: QueuedPathBlockedStrategy.STOP,
+  pathBlockedWaitTimeoutMs: -1,
+  skipInvalidPositions: false,
+};
 
 interface TestData {
   gridTilemap: GridTilemap;
@@ -128,15 +139,35 @@ describe("QueueMovement", () => {
 
   it("should add positions", () => {
     const { queueMovement } = initQueueMovement();
+    const config: QueueMovementConfig = {
+      ignoreInvalidPositions: true,
+      pathBlockedStrategy: QueuedPathBlockedStrategy.SKIP,
+      pathBlockedWaitTimeoutMs: 10,
+      skipInvalidPositions: true,
+    };
     expect(queueMovement.size()).toEqual(0);
     queueMovement.enqueue([
       { position: new Vector2(0, 1), layer: "testLayer" },
       { position: new Vector2(0, 2), layer: "testlayer2" },
     ]);
-    expect(queueMovement.size()).toEqual(2);
+    queueMovement.enqueue(
+      [{ position: new Vector2(0, 3), layer: "testLayer" }],
+      config
+    );
+    expect(queueMovement.size()).toEqual(3);
     expect(queueMovement.peekAll()).toEqual([
-      { position: new Vector2(0, 1), layer: "testLayer" },
-      { position: new Vector2(0, 2), layer: "testlayer2" },
+      {
+        command: { position: new Vector2(0, 1), layer: "testLayer" },
+        config: DEFAULT_CONFIG,
+      },
+      {
+        command: { position: new Vector2(0, 2), layer: "testlayer2" },
+        config: DEFAULT_CONFIG,
+      },
+      {
+        command: { position: new Vector2(0, 3), layer: "testLayer" },
+        config,
+      },
     ]);
   });
 
@@ -149,8 +180,11 @@ describe("QueueMovement", () => {
     ]);
     expect(queueMovement.size()).toEqual(2);
     expect(queueMovement.peekAll()).toEqual([
-      { position: new Vector2(0, 1), layer: "testLayer" },
-      Direction.DOWN,
+      {
+        command: { position: new Vector2(0, 1), layer: "testLayer" },
+        config: DEFAULT_CONFIG,
+      },
+      { command: Direction.DOWN, config: DEFAULT_CONFIG },
     ]);
   });
 
