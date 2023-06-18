@@ -41,6 +41,7 @@ import {
   QueuedPathBlockedStrategy,
   Finished as QueueMovementFinished,
   QueueMovementResult,
+  QueueMovementEntry,
 } from "./Movement/QueueMovement/QueueMovement";
 import {
   CharacterShift,
@@ -85,6 +86,7 @@ export {
   PhaserTileLayer,
   PhaserTilemap,
   QueueMovementConfig,
+  QueueMovementEntry,
   QueueMovementFinished,
   QueueMovementResult,
   QueuedPathBlockedStrategy,
@@ -622,12 +624,7 @@ export class GridEngine implements IGridEngine {
   }
 
   /** {@inheritDoc IGridEngine.getEnqueuedMovements} */
-  getEnqueuedMovements(
-    charId: string
-  ): Array<{
-    command: LayerPosition | Direction;
-    config: QueueMovementConfig;
-  }> {
+  getEnqueuedMovements(charId: string): QueueMovementEntry[] {
     return this.geHeadless.getEnqueuedMovements(charId);
   }
 

@@ -11,7 +11,7 @@ import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Movement, MovementInfo } from "../Movement";
 import { Subject } from "rxjs";
 import { filter, take } from "rxjs/operators";
-import { CharLayer, Position } from "../../IGridEngine";
+import { CharLayer, LayerPosition, Position } from "../../IGridEngine";
 import { DistanceUtilsFactory } from "../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
 import { DistanceUtils } from "../../Utils/DistanceUtils";
 import { Concrete } from "../../Utils/TypeUtils";
@@ -101,6 +101,11 @@ export interface Finished {
 
 interface QueueEntry {
   command: LayerVecPos | Direction;
+  config: Concrete<QueueMovementConfig>;
+}
+
+export interface QueueMovementEntry {
+  command: LayerPosition | Direction;
   config: Concrete<QueueMovementConfig>;
 }
 

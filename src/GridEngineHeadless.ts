@@ -55,6 +55,7 @@ import { Rect } from "./Utils/Rect/Rect";
 import {
   QueueMovement,
   QueueMovementConfig,
+  QueueMovementEntry,
   Finished as QueueMovementFinished,
 } from "./Movement/QueueMovement/QueueMovement";
 
@@ -920,10 +921,7 @@ export class GridEngineHeadless implements IGridEngine {
   }
 
   /** {@inheritDoc IGridEngine.getEnqueuedMovements} */
-  getEnqueuedMovements(charId: string): Array<{
-    command: LayerPosition | Direction;
-    config: QueueMovementConfig;
-  }> {
+  getEnqueuedMovements(charId: string): QueueMovementEntry[] {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
