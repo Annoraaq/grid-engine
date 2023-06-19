@@ -22,6 +22,13 @@ export const LOWER_CHAR_LAYER = "lowerCharLayer";
 export const HIGHER_CHAR_LAYER = "testCharLayer";
 export const COLLISION_GROUP = "testCollisionGroup";
 
+type CostMap = Array<Array<TileCost | number>>;
+
+interface CostMapLayer {
+  layer: string | undefined;
+  costMap: CostMap;
+}
+
 export function createSpriteMock() {
   return {
     x: 10,
@@ -225,10 +232,7 @@ export function mockLayeredBlockMap(
     isCharLayer?: boolean;
   }>,
   isometric?: boolean,
-  costMaps?: Array<{
-    layer: string | undefined;
-    costMap: Array<Array<TileCost | number>>;
-  }>
+  costMaps?: CostMapLayer[]
 ): Tilemap {
   const layers: MockTileLayer[] = [];
   for (const bm of blockMaps) {
@@ -239,24 +243,16 @@ export function mockLayeredBlockMap(
         const costMap = costMaps?.find((cm) => cm.layer === bm.layer);
         if (bm.blockMap[r][c] == "_") {
           if (costMap?.costMap?.[r]?.[c]) {
-            const cost = costMap.costMap[r][c];
-            if (typeof cost === "number") {
-              row.push(new MockTile({ ge_cost: costMap.costMap[r][c] }));
-            } else {
-              row.push(new MockTile(cost));
-            }
+            row.push(new MockTile(tileCostProps(costMap, r, c)));
           } else {
             row.push(undefined);
           }
         } else {
           if (costMap?.costMap?.[r]?.[c]) {
-            const cost = costMap.costMap[r][c];
-            const costProps =
-              typeof cost === "number" ? { ge_cost: cost } : cost;
             row.push(
               new MockTile({
                 ...getBlockingProps(bm.blockMap[r][c]),
-                ...costProps,
+                ...tileCostProps(costMap, r, c),
               })
             );
           } else {
@@ -281,6 +277,16 @@ export function mockLayeredBlockMap(
     layers.push(layer);
   }
   return new MockTilemap(layers, isometric ? "isometric" : "orthogonal");
+}
+
+function tileCostProps(
+  costMap: CostMapLayer,
+  r: number,
+  c: number
+): Record<string, number> {
+  if (!costMap.costMap?.[r]?.[c]) return {};
+  const cost = costMap.costMap[r][c];
+  return typeof cost === "number" ? { ge_cost: cost } : { ...cost };
 }
 
 export function createAllowedFn(map: string[], ignoreBounds = false) {
