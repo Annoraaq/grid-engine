@@ -803,7 +803,7 @@ describe("GridEngine", () => {
           algorithm: "A_STAR",
         });
 
-        expect(console.warn).toHaveBeenCalledWith(
+        expect(console.warn).not.toHaveBeenCalledWith(
           `GridEngine: Pathfinding option 'considerCosts' cannot be used with` +
             ` algorithm 'A_STAR'. It can only be used with A* algorithm.`
         );
@@ -1577,7 +1577,7 @@ describe("GridEngine", () => {
           shortestPathAlgorithm: "A_STAR",
         });
 
-        expect(console.warn).toHaveBeenCalledWith(
+        expect(console.warn).not.toHaveBeenCalledWith(
           `GridEngine: Pathfinding option 'considerCosts' cannot be used with` +
             ` algorithm 'A_STAR'. It can only be used with A* algorithm.`
         );
