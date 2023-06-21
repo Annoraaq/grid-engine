@@ -82,7 +82,8 @@ export class AStar extends ShortestPathAlgorithm {
       }
 
       for (const neighbor of this.getNeighbors(current, stopNode)) {
-        const tentativeG = safeGet(g, current) + 1;
+        const tentativeG =
+          safeGet(g, current) + this.getCosts(current.position, neighbor);
         const neighborStr = LayerPositionUtils.toString(neighbor);
         if (!g.has(neighborStr) || tentativeG < safeGet(g, neighbor)) {
           previous.set(neighborStr, current);

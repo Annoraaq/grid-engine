@@ -765,13 +765,21 @@ export class GridEngineHeadless implements IGridEngine {
     options: PathfindingOptions = {}
   ): PathfindingResult {
     if (!this.gridTilemap) throw this.createUninitializedErr();
+    const algo: ShortestPathAlgorithmType =
+      options.shortestPathAlgorithm || "BFS";
+    if (options.considerCosts && algo !== "A_STAR") {
+      console.warn(
+        `GridEngine: Pathfinding option 'considerCosts' cannot be used with` +
+          ` algorithm '${algo}'. It can only be used with A* algorithm.`
+      );
+    }
     const pathfinding = new Pathfinding(this.gridTilemap);
     const res = pathfinding.findShortestPath(
       LayerPositionUtils.toInternal(source),
       LayerPositionUtils.toInternal(dest),
       {
         ...options,
-        shortestPathAlgorithm: options.shortestPathAlgorithm || "BFS",
+        shortestPathAlgorithm: algo,
       }
     );
     return {
@@ -948,6 +956,21 @@ export class GridEngineHeadless implements IGridEngine {
       const queueMovement = gridChar.getMovement() as QueueMovement;
       queueMovement.clear();
     }
+  }
+
+  /** {@inheritDoc IGridEngine.getTileCost} */
+  getTileCost(
+    position: Position,
+    charLayer?: string,
+    srcDirection?: Direction
+  ): number {
+    this.initGuard();
+    return (
+      this.gridTilemap?.getTileCosts(
+        { position: new Vector2(position), layer: charLayer },
+        srcDirection
+      ) ?? 1
+    );
   }
 
   private charRemoved(charId: string): Observable<string> {

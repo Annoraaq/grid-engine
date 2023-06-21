@@ -3,7 +3,7 @@ import {
   ShortestPathAlgorithmType,
 } from "./../../Pathfinding/ShortestPathAlgorithm";
 import { Direction, NumberOfDirections } from "../../Direction/Direction";
-import { MoveToResult, TargetMovement } from "./TargetMovement";
+import { MoveToConfig, MoveToResult, TargetMovement } from "./TargetMovement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
@@ -77,6 +77,7 @@ describe("TargetMovement", () => {
   }
 
   beforeEach(() => {
+    console.warn = jest.fn();
     tilemapMock = mockLayeredBlockMap([
       {
         layer: "lowerCharLayer",
@@ -430,6 +431,57 @@ describe("TargetMovement", () => {
     chunkUpdate(targetMovement, mockChar, 2 * CHUNKS_PER_SECOND);
 
     expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
+  });
+
+  it("should consider costs", () => {
+    const charPos = layerPos(new Vector2(1, 0));
+    const mockChar = createMockChar("char", charPos);
+    tilemapMock = mockLayeredBlockMap(
+      [
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".p.",
+            "..#",
+            ".t.",
+          ],
+        },
+      ],
+      false,
+      [
+        {
+          layer: "lowerCharLayer",
+          costMap: [
+            [1, 1, 1],
+            [1, 5, 1],
+            [1, 1, 1],
+          ],
+        },
+      ]
+    );
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES
+    );
+
+    targetMovement = new TargetMovement(
+      mockChar,
+      gridTilemap,
+      layerPos(new Vector2(1, 2)),
+      {
+        config: {
+          considerCosts: true,
+          algorithm: "A_STAR",
+        },
+      }
+    );
+
+    targetMovement.update(1000);
+    mockChar.update(1000);
+
+    expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(0, 0)));
   });
 
   it("should not move if no path exists", () => {
@@ -2193,4 +2245,56 @@ describe("TargetMovement", () => {
       expectWalkedPath(targetMovement, mockChar, createPath([[1, 1]]));
     });
   });
+
+  test.each(["BFS", "BIDIRECTIONAL_SEARCH", "JPS"])(
+    "should show a warning if considerCost pathfinding option is used with" +
+      " algorithm different than A*",
+    (algorithm: ShortestPathAlgorithmType) => {
+      console.warn = jest.fn();
+      const charPos = layerPos(new Vector2(1, 1));
+      const mockChar = createMockChar("char1", charPos);
+      const targetPos = {
+        position: new Vector2(3, 1),
+        layer: "lowerCharLayer",
+      };
+      const options: MoveToConfig = {
+        considerCosts: true,
+      };
+
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        config: { ...options, algorithm },
+      });
+
+      expect(console.warn).toHaveBeenCalledWith(
+        `GridEngine: Pathfinding option 'considerCosts' cannot be used with ` +
+          `algorithm '${algorithm}'. It can only be used with A* algorithm.`
+      );
+    }
+  );
+
+  it(
+    "should not show a warning if considerCost pathfinding option is used " +
+      "with A*",
+    () => {
+      console.warn = jest.fn();
+      const charPos = layerPos(new Vector2(1, 1));
+      const mockChar = createMockChar("char1", charPos);
+      const targetPos = {
+        position: new Vector2(3, 1),
+        layer: "lowerCharLayer",
+      };
+      const options: MoveToConfig = {
+        considerCosts: true,
+      };
+
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        config: { ...options, algorithm: "A_STAR" },
+      });
+
+      expect(console.warn).not.toHaveBeenCalledWith(
+        `GridEngine: Pathfinding option 'considerCosts' cannot be used with ` +
+          `algorithm 'A_STAR'. It can only be used with A* algorithm.`
+      );
+    }
+  );
 });

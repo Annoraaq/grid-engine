@@ -34,3 +34,37 @@ These flags inform **Grid Engine** about how it should handle collisions from ce
 | `ge_collide_up-right`   | boolean | If set to `true`, characters cannot walk over tile from the top-right.    |
 | `ge_collide_down-left`  | boolean | If set to `true`, characters cannot walk over tile from the bottom-left.  |
 | `ge_collide_down-right` | boolean | If set to `true`, characters cannot walk over tile from the bottom-right. |
+
+## Pathfinding-Costs
+
+These properties define the cost used for pathfinding for a tile. Please note that you have to use A\* as an algorithm to consider costs. Additionally you need to activate the `considerCosts` option:
+[[1]][consider-costs], [[2]][move-to-consider-costs], [[3]][follow-consider-costs].
+
+If the property is not set, a tile automatically has a cost value of 1.
+
+### Basic
+
+| Property  | Type | Effect                                                         |
+| :-------- | :--- | :------------------------------------------------------------- |
+| `ge_cost` | int  | Cost for pathfinding for entering the tile from any direction. |
+
+### Direction Specific
+
+These properties define pathfinding costs for entering the tile from certain directions.
+
+If `ge_cost` is also set, the direction specific properties below will have precedence before `ge_cost`.
+
+| Property             | Type | Effect                                                            |
+| :------------------- | :--- | :---------------------------------------------------------------- |
+| `ge_cost_up`         | int  | Cost for pathfinding for entering the tile from the top.          |
+| `ge_cost_down`       | int  | Cost for pathfinding for entering the tile from the bottom.       |
+| `ge_cost_left`       | int  | Cost for pathfinding for entering the tile from the left.         |
+| `ge_cost_right`      | int  | Cost for pathfinding for entering the tile from the right.        |
+| `ge_cost_up-left`    | int  | Cost for pathfinding for entering the tile from the top-left.     |
+| `ge_cost_up-right`   | int  | Cost for pathfinding for entering the tile from the top-right.    |
+| `ge_cost_down-left`  | int  | Cost for pathfinding for entering the tile from the bottom-left.  |
+| `ge_cost_down-right` | int  | Cost for pathfinding for entering the tile from the bottom-right. |
+
+[consider-costs]: ../../api/interfaces/PathfindingOptions.html#considerCosts
+[move-to-consider-costs]: ../../api/interfaces/MoveToConfig.html#considerCosts
+[follow-consider-costs]: ../../api/interfaces/FollowOptions.html#considerCosts

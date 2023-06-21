@@ -111,6 +111,13 @@ export function oppositeDirection(direction: Direction): Direction {
   return oppositeDirections[direction];
 }
 
+/**
+ * Helper function that returns the direction from a source to a target
+ * position.
+ *
+ * For example:
+ * `directionFromPos({x:1, y:1}, {{x:2, y:1}}) = Direction.RIGHT`
+ */
 export function directionFromPos(src: Position, dest: Position): Direction {
   if (src.x === dest.x) {
     if (src.y > dest.y) return Direction.UP;

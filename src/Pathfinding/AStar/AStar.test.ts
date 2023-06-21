@@ -9,14 +9,19 @@ import {
   mockCharMap,
   mockLayeredBlockMap,
   mockRandomMap,
+  TileCost,
 } from "../../Utils/MockFactory/MockFactory";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { AStar } from "./AStar";
 
 function createTilemap(
-  layers: Array<{ blockMap: string[]; layer: string | undefined }>
+  layers: Array<{ blockMap: string[]; layer: string | undefined }>,
+  costs?: Array<{
+    costMap: Array<Array<number | TileCost>>;
+    layer: string | undefined;
+  }>
 ) {
-  const tm = mockLayeredBlockMap(layers);
+  const tm = mockLayeredBlockMap(layers, false, costs);
   const gridTilemap = new GridTilemap(
     tm,
     "ge_collide",
@@ -73,6 +78,46 @@ describe("A*", () => {
       layerPos(new Vector2(2, 0)),
       layerPos(new Vector2(2, 1)),
       layerPos(new Vector2(2, 2)),
+      layerPos(new Vector2(1, 2)),
+    ]);
+  });
+
+  it("should find the shortest path using costs", () => {
+    const gridTilemap = createTilemap(
+      [
+        {
+          layer: LOWER_CHAR_LAYER,
+          blockMap: [
+            // prettier-ignore
+            ".s..",
+            "..#.",
+            ".t..",
+          ],
+        },
+      ],
+      [
+        {
+          layer: LOWER_CHAR_LAYER,
+          costMap: [
+            [1, 1, 1, 1],
+            [1, 4, 1, 1],
+            [1, 1, 1, 1],
+          ],
+        },
+      ]
+    );
+    const algo = new AStar(gridTilemap, { considerCosts: true });
+
+    const shortestPath = algo.findShortestPath(
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(1, 2))
+    );
+
+    expect(shortestPath.path).toEqual([
+      layerPos(new Vector2(1, 0)),
+      layerPos(new Vector2(0, 0)),
+      layerPos(new Vector2(0, 1)),
+      layerPos(new Vector2(0, 2)),
       layerPos(new Vector2(1, 2)),
     ]);
   });

@@ -115,6 +115,15 @@ export interface MoveToConfig {
    * @default false
    */
   ignoreLayers?: boolean;
+
+  /**
+   * Only considered by A* algorithm.
+   * If set to `true`, pathfinding will consider costs. Costs are set via tile
+   * properties.
+   *
+   * @default false
+   */
+  considerCosts?: boolean;
 }
 
 export enum MoveToResult {
@@ -161,6 +170,7 @@ export class TargetMovement implements Movement {
   private shortestPathAlgorithm: ShortestPathAlgorithmType =
     "BIDIRECTIONAL_SEARCH";
   private maxPathLength = Infinity;
+  private considerCosts = false;
 
   constructor(
     private character: GridCharacter,
@@ -198,6 +208,16 @@ export class TargetMovement implements Movement {
     if (config?.maxPathLength) {
       this.maxPathLength = config.maxPathLength;
     }
+
+    if (config?.considerCosts && this.shortestPathAlgorithm !== "A_STAR") {
+      console.warn(
+        `GridEngine: Pathfinding option 'considerCosts' cannot be used with ` +
+          `algorithm '${this.shortestPathAlgorithm}'. It can only be used ` +
+          `with A* algorithm.`
+      );
+    }
+
+    this.considerCosts = config?.considerCosts || false;
 
     this.ignoreLayers = !!config?.ignoreLayers;
 
@@ -248,6 +268,7 @@ export class TargetMovement implements Movement {
       ignoreBlockedTarget: this.ignoreBlockedTarget,
       maxPathLength: this.maxPathLength,
       ignoreLayers: this.ignoreLayers,
+      considerCosts: this.considerCosts,
     };
   }
 

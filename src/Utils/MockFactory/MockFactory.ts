@@ -7,9 +7,28 @@ import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
 import { TileLayer, Tile, Tilemap } from "../../GridTilemap/Tilemap";
 import { MockTile, MockTileLayer, MockTilemap } from "./MockTilemap";
 
+export interface TileCost {
+  ge_cost?: number;
+  ge_cost_left?: number;
+  ge_cost_right?: number;
+  ge_cost_up?: number;
+  ge_cost_down?: number;
+  "ge_cost_down-left"?: number;
+  "ge_cost_down-right"?: number;
+  "ge_cost_up-left"?: number;
+  "ge_cost_up-right"?: number;
+}
+
 export const LOWER_CHAR_LAYER = "lowerCharLayer";
 export const HIGHER_CHAR_LAYER = "testCharLayer";
 export const COLLISION_GROUP = "testCollisionGroup";
+
+export type CostMap = Array<Array<TileCost | number>>;
+
+export interface CostMapLayer {
+  layer: string | undefined;
+  costMap: CostMap;
+}
 
 export function createSpriteMock() {
   return {
@@ -197,9 +216,14 @@ export function getBlockingProps(char: string): Record<string, string> {
 export function mockBlockMap(
   blockMap: string[],
   charLayer?: string,
-  isometric?: boolean
+  isometric?: boolean,
+  costMap?: Array<Array<number | TileCost>>
 ): Tilemap {
-  return mockLayeredBlockMap([{ layer: charLayer, blockMap }], isometric);
+  return mockLayeredBlockMap(
+    [{ layer: charLayer, blockMap }],
+    isometric,
+    costMap ? [{ layer: charLayer, costMap }] : undefined
+  );
 }
 
 export function mockLayeredBlockMap(
@@ -208,7 +232,8 @@ export function mockLayeredBlockMap(
     blockMap: string[];
     isCharLayer?: boolean;
   }>,
-  isometric?: boolean
+  isometric?: boolean,
+  costMaps?: CostMapLayer[]
 ): Tilemap {
   const layers: MockTileLayer[] = [];
   for (const bm of blockMaps) {
@@ -216,10 +241,24 @@ export function mockLayeredBlockMap(
     for (let r = 0; r < bm.blockMap.length; r++) {
       const row: Array<Tile | undefined> = [];
       for (let c = 0; c < bm.blockMap[r].length; c++) {
+        const costMap = costMaps?.find((cm) => cm.layer === bm.layer);
         if (bm.blockMap[r][c] == "_") {
-          row.push(undefined);
+          if (costMap?.costMap?.[r]?.[c]) {
+            row.push(new MockTile(tileCostProps(costMap, r, c)));
+          } else {
+            row.push(undefined);
+          }
         } else {
-          row.push(new MockTile(getBlockingProps(bm.blockMap[r][c])));
+          if (costMap?.costMap?.[r]?.[c]) {
+            row.push(
+              new MockTile({
+                ...getBlockingProps(bm.blockMap[r][c]),
+                ...tileCostProps(costMap, r, c),
+              })
+            );
+          } else {
+            row.push(new MockTile(getBlockingProps(bm.blockMap[r][c])));
+          }
         }
       }
       data.push(row);
@@ -239,6 +278,16 @@ export function mockLayeredBlockMap(
     layers.push(layer);
   }
   return new MockTilemap(layers, isometric ? "isometric" : "orthogonal");
+}
+
+export function tileCostProps(
+  costMap: CostMapLayer,
+  r: number,
+  c: number
+): Record<string, number> {
+  if (!costMap.costMap?.[r]?.[c]) return {};
+  const cost = costMap.costMap[r][c];
+  return typeof cost === "number" ? { ge_cost: cost } : { ...cost };
 }
 
 export function createAllowedFn(map: string[], ignoreBounds = false) {

@@ -1,3 +1,7 @@
-import { GridEngine } from "./GridEngine";
+import * as ge from "./GridEngine";
 
-module.exports = GridEngine;
+module.exports = ge.GridEngine;
+// @ts-ignore
+window.GridEngine = ge.GridEngine;
+// @ts-ignore
+window.GridEngineImports = ge;

@@ -14,6 +14,8 @@ import { CollisionStrategy } from "../Collisions/CollisionStrategy";
 import { CharLayer } from "../GridEngine";
 import { CHAR_LAYER_PROP_NAME, TileLayer, Tilemap } from "./Tilemap";
 import { TileCollisionCache } from "./TileCollisionCache/TileCollisionCache";
+
+const TILE_COST_PROPERTY_NAME = "ge_cost";
 export class GridTilemap {
   private static readonly ONE_WAY_COLLIDE_PROP_PREFIX = "ge_collide_";
   private characters = new Map<string, GridCharacter>();
@@ -29,6 +31,7 @@ export class GridTilemap {
   > = new Map();
 
   private collidesPropNames: Map<Direction, string> = new Map();
+  private tileCostPropNames: Map<Direction, string> = new Map();
 
   // Cache collision relevant layers for each frame so they don't have to be
   // computed for each tile check.
@@ -52,6 +55,7 @@ export class GridTilemap {
         dir,
         GridTilemap.ONE_WAY_COLLIDE_PROP_PREFIX + dir
       );
+      this.tileCostPropNames.set(dir, `${TILE_COST_PROPERTY_NAME}_${dir}`);
     }
 
     if (this.useTileCollisionCache) {
@@ -175,6 +179,31 @@ export class GridTilemap {
   getTransitions(): Map<CharLayer, Map<CharLayer, CharLayer>> {
     return new Map(
       [...this.transitions].map(([pos, map]) => [pos, new Map(map)])
+    );
+  }
+
+  getTileCosts(pos: LayerVecPos, srcDir?: Direction): number {
+    const crl = this.getCollisionRelevantLayers(pos.layer);
+    let maxCost = 1;
+    for (const layer of crl) {
+      maxCost = Math.max(
+        maxCost,
+        this.getTileCostsForLayer({ ...pos, layer: layer.getName() }, srcDir)
+      );
+    }
+    return maxCost;
+  }
+
+  private getTileCostsForLayer(dest: LayerVecPos, dir?: Direction): number {
+    const tile = this.tilemap.getTileAt(
+      dest.position.x,
+      dest.position.y,
+      dest.layer
+    );
+    return (
+      (dir && tile?.getProperty(this.tileCostPropNames.get(dir) || "")) ||
+      tile?.getProperty(TILE_COST_PROPERTY_NAME) ||
+      1
     );
   }
 

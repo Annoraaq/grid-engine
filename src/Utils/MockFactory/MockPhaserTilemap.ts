@@ -1,7 +1,13 @@
-import { getBlockingProps } from "./MockFactory";
+import {
+  CostMap,
+  CostMapLayer,
+  getBlockingProps,
+  tileCostProps,
+} from "./MockFactory";
 
 export function createPhaserTilemapStub(
-  blockMap: Map<string | undefined, string[]>
+  blockMap: Map<string | undefined, string[]>,
+  costMap?: CostMapLayer[]
 ): Phaser.Tilemaps.Tilemap {
   const game = new Phaser.Game({ type: Phaser.HEADLESS });
 
@@ -10,7 +16,7 @@ export function createPhaserTilemapStub(
   // This method is added dynamically, so it will exist at runtime.
   // @ts-ignore
   scene.sys.init(game);
-  const mapData = parseBlockMap(blockMap);
+  const mapData = parseBlockMap(blockMap, costMap);
   mapData.tilesets = [new Phaser.Tilemaps.Tileset("Test tileset", 0)];
   const tm = new Phaser.Tilemaps.Tilemap(scene, mapData);
   for (let i = 0; i < tm.layers.length; i++) {
@@ -25,13 +31,18 @@ export function createPhaserTilemapStub(
 }
 
 function parseBlockMap(
-  blockMap: Map<string | undefined, string[]>
+  blockMap: Map<string | undefined, string[]>,
+  costMap?: CostMapLayer[]
 ): Phaser.Tilemaps.MapData {
   const layers: Phaser.Tilemaps.LayerData[] = [];
 
   const tiles: any[] = [];
   for (const [layerName, allRows] of blockMap.entries()) {
-    const ld = createLayer(layerName, allRows);
+    const ld = createLayer(
+      layerName,
+      allRows,
+      costMap?.find((cm) => cm.layer === layerName)?.costMap
+    );
     if (ld) {
       layers.push(ld);
       for (const r of ld.data) {
@@ -57,7 +68,11 @@ function parseBlockMap(
   return mapData;
 }
 
-function createLayer(layerName: string | undefined, allRows: string[]) {
+function createLayer(
+  layerName: string | undefined,
+  allRows: string[],
+  costMap?: CostMap
+) {
   const layerData = new Phaser.Tilemaps.LayerData({
     name: layerName,
     tileWidth: 16,
@@ -83,6 +98,7 @@ function createLayer(layerName: string | undefined, allRows: string[]) {
       const tile = new Phaser.Tilemaps.Tile(layerData, cnt, c, r, 16, 16);
       tile.properties = {
         ...getBlockingProps(allRows[r][c]),
+        ...(costMap ? tileCostProps({ layer: layerName, costMap }, r, c) : []),
         id: cnt,
       };
       cnt++;

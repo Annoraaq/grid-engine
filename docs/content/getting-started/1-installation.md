@@ -71,3 +71,25 @@ function create() {
   // ...
 }
 ```
+
+## Import Helpers
+
+Besides the GridEngine main class, you can also import several helpers. For example there is the `directionFromPos` helper function that gives you a `Direction` from a source to a target position.
+
+If you are importing the NPM module you can import it like:
+
+```javascript
+import {
+  GridEngine, // GridEngine main class
+  directionFromPos, // One of the GridEngine helpers,
+  // ...
+} from "grid-engine";
+```
+
+If you are using the web version (import via `<script>`), all exported functions and classes besides `GridEngine` are stored in a global variable `GridEngineImports`.
+
+So you would use it as follows:
+
+```javascript
+GridEngineImports.directionFromPos(/*...*/);
+```
