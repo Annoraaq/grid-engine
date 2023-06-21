@@ -23,7 +23,9 @@ export declare class GridCharacterPhaser {
     setContainer(container?: Phaser.GameObjects.Container): void;
     getContainer(): Phaser.GameObjects.Container | undefined;
     getOffsetX(): number;
+    setOffsetX(offsetX: number): void;
     getOffsetY(): number;
+    setOffsetY(offsetY: number): void;
     getWalkingAnimationMapping(): WalkingAnimationMapping | number | undefined;
     turnTowards(direction: Direction): void;
     getAnimation(): CharacterAnimation | undefined;

@@ -1,7 +1,7 @@
 import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import { Finished, MoveToConfig, MoveToResult } from "./Movement/TargetMovement/TargetMovement";
 import { PositionChange } from "./GridCharacter/GridCharacter";
-import { Direction, NumberOfDirections } from "./Direction/Direction";
+import { Direction, NumberOfDirections, directionFromPos } from "./Direction/Direction";
 import { Observable } from "rxjs";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
@@ -17,7 +17,7 @@ import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer";
 import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile";
 import { QueueMovementConfig, QueuedPathBlockedStrategy, Finished as QueueMovementFinished, QueueMovementResult, QueueMovementEntry } from "./Movement/QueueMovement/QueueMovement";
 import { CharacterShift, CharacterShiftAction, CharLayer, FollowOptions, IGridEngine, LayerPosition, PathfindingResult, Position } from "./IGridEngine";
-export { CharacterDataHeadless, CharacterFilteringOptions, CharacterShift, CharacterShiftAction, CharLayer, CollisionConfig, CollisionStrategy, Direction, Finished, FollowOptions, FrameRow, GridEngineConfigHeadless, GridEngineHeadless, IGridEngine, IsPositionAllowedFn, LayerPosition, MovementInfo, MoveToConfig, MoveToResult, NoPathFoundStrategy, NumberOfDirections, Orientation, PathBlockedStrategy, PathfindingOptions, PathfindingResult, Position, PositionChange, PhaserTile, PhaserTileLayer, PhaserTilemap, QueueMovementConfig, QueueMovementEntry, QueueMovementFinished, QueueMovementResult, QueuedPathBlockedStrategy, ShortestPathAlgorithmType, Tile, TileLayer, Tilemap, TileSizePerSecond, };
+export { CharacterDataHeadless, CharacterFilteringOptions, CharacterShift, CharacterShiftAction, CharLayer, CollisionConfig, CollisionStrategy, Direction, Finished, FollowOptions, FrameRow, GridEngineConfigHeadless, GridEngineHeadless, IGridEngine, IsPositionAllowedFn, LayerPosition, MovementInfo, MoveToConfig, MoveToResult, NoPathFoundStrategy, NumberOfDirections, Orientation, PathBlockedStrategy, PathfindingOptions, PathfindingResult, Position, PositionChange, PhaserTile, PhaserTileLayer, PhaserTilemap, QueueMovementConfig, QueueMovementEntry, QueueMovementFinished, QueueMovementResult, QueuedPathBlockedStrategy, ShortestPathAlgorithmType, Tile, TileLayer, Tilemap, TileSizePerSecond, directionFromPos, };
 /**
  * Configuration object for initializing GridEngine.
  */
@@ -141,8 +141,16 @@ export declare class GridEngine implements IGridEngine {
     getContainer(charId: string): Phaser.GameObjects.Container | undefined;
     /** @returns X-offset for a character. */
     getOffsetX(charId: string): number;
+    /**
+     * Set custom x-offset for the sprite/container.
+     */
+    setOffsetX(charId: string, offsetX: number): void;
     /** @returns Y-offset for a character. */
     getOffsetY(charId: string): number;
+    /**
+     * Set custom y-offset for the sprite/container.
+     */
+    setOffsetY(charId: string, offsetY: number): void;
     /** {@inheritDoc IGridEngine.collidesWithTiles} */
     collidesWithTiles(charId: string): boolean;
     /**
@@ -194,7 +202,7 @@ export declare class GridEngine implements IGridEngine {
     /** {@inheritDoc IGridEngine.turnTowards} */
     turnTowards(charId: string, direction: Direction): void;
     /** {@inheritDoc IGridEngine.getCharactersAt} */
-    getCharactersAt(position: Position, layer: string): string[];
+    getCharactersAt(position: Position, layer?: string): string[];
     /** {@inheritDoc IGridEngine.setPosition} */
     setPosition(charId: string, pos: Position, layer?: string): void;
     /**
@@ -263,6 +271,8 @@ export declare class GridEngine implements IGridEngine {
     } & QueueMovementFinished>;
     /** {@inheritDoc IGridEngine.clearEnqueuedMovements} */
     clearEnqueuedMovements(charId: string): void;
+    /** {@inheritDoc IGridEngine.getTileCost} */
+    getTileCost(position: Position, charLayer?: string, srcDirection?: Direction): number;
     private setConfigDefaults;
     private initGuard;
     private createUninitializedErr;

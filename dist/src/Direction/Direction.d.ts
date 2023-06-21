@@ -19,6 +19,13 @@ export declare function turnCounterClockwise(direction: Direction): Direction;
 export declare function turnClockwise(direction: Direction): Direction;
 export declare function directionVector(direction: Direction): Vector2;
 export declare function oppositeDirection(direction: Direction): Direction;
+/**
+ * Helper function that returns the direction from a source to a target
+ * position.
+ *
+ * For example:
+ * `directionFromPos({x:1, y:1}, {{x:2, y:1}}) = Direction.RIGHT`
+ */
 export declare function directionFromPos(src: Position, dest: Position): Direction;
 export declare enum NumberOfDirections {
     FOUR = 4,

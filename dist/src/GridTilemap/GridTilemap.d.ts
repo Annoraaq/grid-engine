@@ -16,6 +16,7 @@ export declare class GridTilemap {
     private transitions;
     private reverseTransitions;
     private collidesPropNames;
+    private tileCostPropNames;
     private collisionRelevantLayersFrameCache;
     private tileCollisionCache?;
     constructor(tilemap: Tilemap, collisionTilePropertyName: string, collisionStrategy: CollisionStrategy, useTileCollisionCache?: boolean);
@@ -24,7 +25,7 @@ export declare class GridTilemap {
     addCharacter(character: GridCharacter): void;
     removeCharacter(charId: string): void;
     getCharacters(): GridCharacter[];
-    getCharactersAt(position: Vector2, layer: string): Set<GridCharacter>;
+    getCharactersAt(position: Vector2, layer?: string): Set<GridCharacter>;
     rebuildTileCollisionCache(rect?: Rect): void;
     hasBlockingTileUncached(pos: Vector2, charLayer: string | undefined, direction?: Direction, ignoreHasTile?: boolean): boolean;
     hasBlockingTile(pos: Vector2, charLayer: string | undefined, direction?: Direction, ignoreHasTile?: boolean): boolean;
@@ -32,6 +33,8 @@ export declare class GridTilemap {
     getReverseTransitions(pos: Vector2, targetLayer?: string): Set<CharLayer> | undefined;
     setTransition(pos: Vector2, fromLayer: CharLayer, toLayer: CharLayer): void;
     getTransitions(): Map<CharLayer, Map<CharLayer, CharLayer>>;
+    getTileCosts(pos: LayerVecPos, srcDir?: Direction): number;
+    private getTileCostsForLayer;
     hasNoTileUncached(pos: Vector2, charLayer?: string): boolean;
     hasNoTile(pos: Vector2, charLayer?: string): boolean;
     hasBlockingChar(pos: Vector2, layer: string | undefined, collisionGroups: string[], exclude?: Set<string>): boolean;

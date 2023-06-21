@@ -72,6 +72,14 @@ export interface PathfindingOptions {
      * @default false
      */
     ignoreLayers?: boolean;
+    /**
+     * Only considered by A* algorithm.
+     * If set to `true`, pathfinding will consider costs. Costs are set via tile
+     * properties.
+     *
+     * @default false
+     */
+    considerCosts?: boolean;
 }
 /**
  * Function to specify whether a certain position is allowed for pathfinding.

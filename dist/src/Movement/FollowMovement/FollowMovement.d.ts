@@ -9,6 +9,7 @@ export interface Options {
     maxPathLength?: number;
     shortestPathAlgorithm?: ShortestPathAlgorithmType;
     ignoreLayers?: boolean;
+    considerCosts?: boolean;
 }
 export declare class FollowMovement implements Movement {
     private character;

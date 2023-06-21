@@ -228,7 +228,7 @@ export declare class GridEngineHeadless implements IGridEngine {
     /** {@inheritDoc IGridEngine.turnTowards} */
     turnTowards(charId: string, direction: Direction): void;
     /** {@inheritDoc IGridEngine.getCharactersAt} */
-    getCharactersAt(position: Position, layer: string): string[];
+    getCharactersAt(position: Position, layer?: string): string[];
     /** {@inheritDoc IGridEngine.setPosition} */
     setPosition(charId: string, pos: Position, layer?: string): void;
     /** {@inheritDoc IGridEngine.isBlocked} */
@@ -289,6 +289,8 @@ export declare class GridEngineHeadless implements IGridEngine {
     getEnqueuedMovements(charId: string): QueueMovementEntry[];
     /** {@inheritDoc IGridEngine.clearEnqueuedMovements} */
     clearEnqueuedMovements(charId: string): void;
+    /** {@inheritDoc IGridEngine.getTileCost} */
+    getTileCost(position: Position, charLayer?: string, srcDirection?: Direction): number;
     private charRemoved;
     private initGuard;
     private createUninitializedErr;

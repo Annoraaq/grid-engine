@@ -88,6 +88,14 @@ export interface MoveToConfig {
      * @default false
      */
     ignoreLayers?: boolean;
+    /**
+     * Only considered by A* algorithm.
+     * If set to `true`, pathfinding will consider costs. Costs are set via tile
+     * properties.
+     *
+     * @default false
+     */
+    considerCosts?: boolean;
 }
 export declare enum MoveToResult {
     SUCCESS = "SUCCESS",
@@ -132,6 +140,7 @@ export declare class TargetMovement implements Movement {
     private isPositionAllowed;
     private shortestPathAlgorithm;
     private maxPathLength;
+    private considerCosts;
     constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerVecPos, { config, ignoreBlockedTarget, distance }?: Options);
     setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void;
     getPathBlockedStrategy(): PathBlockedStrategy;

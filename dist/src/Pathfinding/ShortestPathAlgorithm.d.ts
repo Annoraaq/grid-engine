@@ -32,9 +32,10 @@ export declare abstract class ShortestPathAlgorithm {
     protected options: Concrete<PathfindingOptions>;
     findShortestPath(startPos: LayerVecPos, targetPos: LayerVecPos): ShortestPathResult;
     abstract findShortestPathImpl(startPos: LayerVecPos, targetPos: LayerVecPos): ShortestPathResult;
-    constructor(gridTilemap: GridTilemap, { shortestPathAlgorithm, pathWidth, pathHeight, numberOfDirections, isPositionAllowed, collisionGroups, ignoredChars, ignoreTiles, ignoreMapBounds, ignoreBlockedTarget, maxPathLength, ignoreLayers, }?: PathfindingOptions);
+    constructor(gridTilemap: GridTilemap, { shortestPathAlgorithm, pathWidth, pathHeight, numberOfDirections, isPositionAllowed, collisionGroups, ignoredChars, ignoreTiles, ignoreMapBounds, ignoreBlockedTarget, maxPathLength, ignoreLayers, considerCosts, }?: PathfindingOptions);
     getNeighbors(pos: LayerVecPos, dest: LayerVecPos): LayerVecPos[];
     getTransition(pos: Vector2, fromLayer?: string): string | undefined;
+    getCosts(src: Vector2, dest: LayerVecPos): number;
     isBlocking(src: LayerVecPos, dest: LayerVecPos): boolean;
     distance(fromNode: Vector2, toNode: Vector2): number;
     getTilePosInDir(pos: LayerVecPos, dir: Direction): LayerVecPos;

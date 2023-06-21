@@ -8,7 +8,7 @@ export declare class CharBlockCache {
     private charRemoved$;
     constructor(collistionStrategy: CollisionStrategy);
     isCharBlockingAt(pos: Vector2, layer: CharLayer, collisionGroups: string[], exclude?: Set<string>): boolean;
-    getCharactersAt(pos: Vector2, layer: string): Set<GridCharacter>;
+    getCharactersAt(pos: Vector2, layer?: string): Set<GridCharacter>;
     addCharacter(character: GridCharacter): void;
     removeCharacter(character: GridCharacter): void;
     private add;
