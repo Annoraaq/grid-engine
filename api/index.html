@@ -96,6 +96,18 @@ movement to your tilemap game. Your characters will be able to only move in whol
 <pre><code class="language-javascript"><span class="hl-10">function</span><span class="hl-0"> </span><span class="hl-12">create</span><span class="hl-0">() {</span><br/><span class="hl-0">  </span><span class="hl-4">// ...</span><br/><br/><span class="hl-0">  </span><span class="hl-10">const</span><span class="hl-0"> </span><span class="hl-11">gridEngineConfig</span><span class="hl-0"> = {</span><br/><span class="hl-0">    </span><span class="hl-3">characters:</span><span class="hl-0"> [</span><br/><span class="hl-0">      {</span><br/><span class="hl-0">        </span><span class="hl-3">id:</span><span class="hl-0"> </span><span class="hl-1">&quot;player&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">        </span><span class="hl-3">sprite:</span><span class="hl-0"> </span><span class="hl-3">playerSprite</span><span class="hl-0">,</span><br/><span class="hl-0">        </span><span class="hl-3">walkingAnimationMapping:</span><span class="hl-0"> </span><span class="hl-13">6</span><span class="hl-0">,</span><br/><span class="hl-0">      },</span><br/><span class="hl-0">    ],</span><br/><span class="hl-0">  };</span><br/><br/><span class="hl-0">  </span><span class="hl-10">this</span><span class="hl-0">.</span><span class="hl-3">gridEngine</span><span class="hl-0">.</span><span class="hl-12">create</span><span class="hl-0">(</span><span class="hl-3">tilemap</span><span class="hl-0">, </span><span class="hl-3">gridEngineConfig</span><span class="hl-0">);</span><br/><br/><span class="hl-0">  </span><span class="hl-4">// ...</span><br/><span class="hl-0">}</span>
 </code></pre>
 
+<a href="#import-helpers" id="import-helpers" style="color: inherit; text-decoration: none;">
+  <h2>Import Helpers</h2>
+</a>
+<p>Besides the GridEngine main class, you can also import several helpers. For example there is the <code>directionFromPos</code> helper function that gives you a <code>Direction</code> from a source to a target position.</p>
+<p>If you are importing the NPM module you can import it like:</p>
+<pre><code class="language-javascript"><span class="hl-2">import</span><span class="hl-0"> {</span><br/><span class="hl-0">  </span><span class="hl-3">GridEngine</span><span class="hl-0">, </span><span class="hl-4">// GridEngine main class</span><br/><span class="hl-0">  </span><span class="hl-3">directionFromPos</span><span class="hl-0">, </span><span class="hl-4">// One of the GridEngine helpers,</span><br/><span class="hl-0">  </span><span class="hl-4">// ...</span><br/><span class="hl-0">} </span><span class="hl-2">from</span><span class="hl-0"> </span><span class="hl-1">&quot;grid-engine&quot;</span><span class="hl-0">;</span>
+</code></pre>
+<p>If you are using the web version (import via <code>&lt;script&gt;</code>), all exported functions and classes besides <code>GridEngine</code> are stored in a global variable <code>GridEngineImports</code>.</p>
+<p>So you would use it as follows:</p>
+<pre><code class="language-javascript"><span class="hl-3">GridEngineImports</span><span class="hl-0">.</span><span class="hl-12">directionFromPos</span><span class="hl-0">(</span><span class="hl-4">/*...*/</span><span class="hl-0">);</span>
+</code></pre>
+
 <a href="#projects-using-grid-engine" id="projects-using-grid-engine" style="color: inherit; text-decoration: none;">
   <h2>Projects using Grid Engine</h2>
 </a>
@@ -180,7 +192,8 @@ movement to your tilemap game. Your characters will be able to only move in whol
 <li class="tsd-kind-type-alias"><a href="types/Orientation.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg>Orientation</a></li>
 <li class="tsd-kind-type-alias"><a href="types/QueueMovementResult.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg>Queue<wbr/>Movement<wbr/>Result</a></li>
 <li class="tsd-kind-type-alias"><a href="types/ShortestPathAlgorithmType.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg>Shortest<wbr/>Path<wbr/>Algorithm<wbr/>Type</a></li>
-<li class="tsd-kind-type-alias"><a href="types/TileSizePerSecond.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg>Tile<wbr/>Size<wbr/>Per<wbr/>Second</a></li></ul></nav></div></div>
+<li class="tsd-kind-type-alias"><a href="types/TileSizePerSecond.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg>Tile<wbr/>Size<wbr/>Per<wbr/>Second</a></li>
+<li class="tsd-kind-function"><a href="functions/directionFromPos.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-function)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-64-path"></rect><path d="M9.39 16V7.24H14.55V8.224H10.446V11.128H14.238V12.112H10.47V16H9.39Z" fill="var(--color-text)" id="icon-64-text"></path></svg>direction<wbr/>From<wbr/>Pos</a></li></ul></nav></div></div>
 <div class="container tsd-generator">
 <p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div>
 <div class="overlay"></div><script src="assets/main.js"></script></body></html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html data-html-server-rendered="true" lang="en" data-vue-tag="%7B%22lang%22:%7B%22ssr%22:%22en%22%7D%7D">
+  <head>
+    <title>Grid Engine Documentation - Grid Engine Documentation</title><meta name="gridsome:hash" content="626989a49f0f02389f8739694173f83fae6db545"><meta data-vue-tag="ssr" charset="utf-8"><meta data-vue-tag="ssr" name="generator" content="Gridsome v0.7.23"><meta data-vue-tag="ssr" data-key="viewport" name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta data-vue-tag="ssr" data-key="format-detection" name="format-detection" content="telephone=no"><meta data-vue-tag="ssr" data-key="description" name="description" content="Documentation for the Grid Engine Phaser plugin. Learn how to add grid based movement to your games."><link data-vue-tag="ssr" rel="icon" href="data:,"><link data-vue-tag="ssr" rel="icon" type="image/png" sizes="16x16" href="/grid-engine/assets/static/favicon.ce0531f.90651a3d61d28a0cc0a15b51239dc45f.png"><link data-vue-tag="ssr" rel="icon" type="image/png" sizes="32x32" href="/grid-engine/assets/static/favicon.ac8d93a.90651a3d61d28a0cc0a15b51239dc45f.png"><link data-vue-tag="ssr" rel="icon" type="image/png" sizes="96x96" href="/grid-engine/assets/static/favicon.b9532cc.90651a3d61d28a0cc0a15b51239dc45f.png"><link data-vue-tag="ssr" rel="apple-touch-icon" type="image/png" sizes="76x76" href="/grid-engine/assets/static/favicon.f22e9f3.90651a3d61d28a0cc0a15b51239dc45f.png"><link data-vue-tag="ssr" rel="preconnect" href="https://rsms.me/"><link data-vue-tag="ssr" rel="stylesheet" href="https://rsms.me/inter/inter.css"><link data-vue-tag="ssr" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Saira"><link data-vue-tag="ssr" rel="stylesheet" href="/grid-engine/fontawesome/css/fontawesome.min.css"><link data-vue-tag="ssr" rel="stylesheet" href="/grid-engine/fontawesome/css/brands.min.css"><link data-vue-tag="ssr" rel="stylesheet" href="/grid-engine/fontawesome/css/solid.min.css"><link rel="preload" href="/grid-engine/assets/css/0.styles.c77293ba.css" as="style"><link rel="preload" href="/grid-engine/assets/js/app.4a840679.js" as="script"><link rel="preload" href="/grid-engine/assets/js/page--src--templates--example-vue.732b8adf.js" as="script"><link rel="prefetch" href="/grid-engine/assets/js/page--node-modules--gridsome--app--pages--404-vue.fe6dd329.js"><link rel="prefetch" href="/grid-engine/assets/js/page--src--pages--index-vue.9499d587.js"><link rel="prefetch" href="/grid-engine/assets/js/page--src--templates--markdown-page-vue.c50ca096.js"><link rel="prefetch" href="/grid-engine/assets/js/vendors~vue-remark--content--usage--8-pathfinding-performance-md.a23b9656.js"><link rel="prefetch" href="/grid-engine/assets/js/vue-remark--content--getting-started--1-installation-md.1e75f925.js"><link rel="prefetch" href="/grid-engine/assets/js/vue-remark--content--migrations--1-migrate-to-2-md.d00b54ac.js"><link rel="prefetch" href="/grid-engine/assets/js/vue-remark--content--troubleshooting--1-known-errors-md.ff94699e.js"><link rel="prefetch" href="/grid-engine/assets/js/vue-remark--content--usage--1-collision-md.80272d6c.js"><link rel="prefetch" href="/grid-engine/assets/js/vue-remark--content--usage--2-collision-layers-md.215968c6.js"><link rel="prefetch" href="/grid-engine/assets/js/vue-remark--content--usage--3-tile-properties-md.8cce0203.js"><link rel="prefetch" href="/grid-engine/assets/js/vue-remark--content--usage--4-layer-properties-md.b5477abd.js"><link rel="prefetch" href="/grid-engine/assets/js/vue-remark--content--usage--5-height-shift-md.aa047a47.js"><link rel="prefetch" href="/grid-engine/assets/js/vue-remark--content--usage--6-character-layers-md.1a805b25.js"><link rel="prefetch" href="/grid-engine/assets/js/vue-remark--content--usage--7-layer-overlay-md.9f547ae3.js"><link rel="prefetch" href="/grid-engine/assets/js/vue-remark--content--usage--8-pathfinding-performance-md.a4d25419.js"><link rel="stylesheet" href="/grid-engine/assets/css/0.styles.c77293ba.css"><noscript data-vue-tag="ssr"><style>.g-image--loading{display:none;}</style></noscript>
+  </head>
+  <body >
+    <div data-server-rendered="true" id="app" class="layout"><header class="header"><div class="header-content"><a href="/grid-engine/" class="logo-link active"><div class="wrapper"><div class="container"><div class="tile hide"></div><div class="tile tile1"></div><div class="tile tile2"></div><div class="tile bright"></div><div class="tile hide"></div><div class="tile tile3"></div></div><div class="text">
+    GRID ENGINE
+  </div></div></a><input type="checkbox" id="top-menu" class="top-menu"><label for="top-menu" class="hamb"><span class="hamb-line"></span></label><nav class="nav"><a href="https://annoraaq.github.io/grid-engine/api/" class="nav__link">
+          API
+        </a><a href="https://github.com/zewa666/grid-engine-devtools" target="_blank" rel="noopener" class="nav__link">
+          Dev Tools Plugin
+        </a><a title="GitHub" href="https://github.com/Annoraaq/grid-engine" target="_blank" rel="noopener" class="nav__link"><span class="icon-text"><span class="resp-hint">GitHub</span><i aria-hidden="true" class="fa-brands fa-github"></i></span></a><a title="Discord" href="https://discord.gg/C4jNEZJECs" target="_blank" rel="noopener" class="nav__link"><span class="icon-text"><span class="resp-hint">Discord</span><i aria-hidden="true" class="fa-brands fa-discord"></i></span></a></nav></div></header><div class="main"><aside class="sidebar"><nav class="sidenav"><input type="checkbox" id="side-menu" class="side-menu"><label for="side-menu" class="hamb"><span class="hamb-line"></span></label><ul><li>
+      Getting Started
+      <ul><li><a href="/grid-engine/p/installation/">
+            Installation
+            <!----></a></li></ul></li><li>
+      Usage
+      <ul><li><a href="/grid-engine/p/collisions/">
+            Collisions
+            <!----></a></li><li><a href="/grid-engine/p/collision-layers/">
+            Collision Layers
+            <!----></a></li><li><a href="/grid-engine/p/tile-properties/">
+            Tile Properties
+            <!----></a></li><li><a href="/grid-engine/p/layer-properties/">
+            Layer Properties
+            <!----></a></li><li><a href="/grid-engine/p/height-shift/">
+            Height Shift
+            <!----></a></li><li><a href="/grid-engine/p/character-layers/">
+            Character Layers
+            <span class="beta">Beta</span></a></li><li><a href="/grid-engine/p/layer-overlay/">
+            Layer Overlay
+            <span class="beta">Beta</span></a></li><li><a href="/grid-engine/p/pathfinding-performance/">
+            Pathfinding Performance
+            <!----></a></li></ul></li><li>
+      Examples
+      <ul><li><a href="/grid-engine/example/basic-movement/">
+            Basic Movement
+            <!----></a></li><li><a href="/grid-engine/example/char-layers-bridge/">
+            Char Layers - Bridge
+            <!----></a></li><li><a href="/grid-engine/example/char-layers-flying-chars/">
+            Char Layers - Flying Chars
+            <!----></a></li><li><a href="/grid-engine/example/char-layers-flying-chars-with-shadows/">
+            Char Layers - Flying Chars with shadows
+            <!----></a></li><li><a href="/grid-engine/example/collision-groups/">
+            Collision Groups
+            <!----></a></li><li><a href="/grid-engine/example/crowd/">
+            Crowd
+            <!----></a></li><li><a href="/grid-engine/example/custom-walking-animation/">
+            Custom Walking Animation
+            <!----></a></li><li><a href="/grid-engine/example/custom-walking-animation-mapping/">
+            Custom Walking Animation Mapping
+            <!----></a></li><li><a href="/grid-engine/example/facing-direction/">
+            Facing Direction
+            <!----></a></li><li><a href="/grid-engine/example/following/">
+            Following
+            <!----></a></li><li><a href="/grid-engine/example/height-shift/">
+            Height Shift
+            <!----></a></li><li><a href="/grid-engine/example/ice-movement/">
+            Ice Movement
+            <!----></a></li><li><a href="/grid-engine/example/is-moving/">
+            Is Moving
+            <!----></a></li><li><a href="/grid-engine/example/isometric/">
+            Isometric
+            <!----></a></li><li><a href="/grid-engine/example/move-to/">
+            Move To
+            <!----></a></li><li><a href="/grid-engine/example/move-to-multi-tile/">
+            Move To (multi-tile)
+            <!----></a></li><li><a href="/grid-engine/example/one-way-collision/">
+            One-Way Collision
+            <!----></a></li><li><a href="/grid-engine/example/pathfinding-restriction/">
+            Pathfinding Restriction
+            <!----></a></li><li><a href="/grid-engine/example/phaser-containers/">
+            Phaser Containers
+            <!----></a></li><li><a href="/grid-engine/example/position-changed/">
+            Position Changed
+            <!----></a></li><li><a href="/grid-engine/example/radius-movement/">
+            Radius Movement
+            <!----></a></li><li><a href="/grid-engine/example/random-movement/">
+            Random Movement
+            <!----></a></li><li><a href="/grid-engine/example/crowd-8-directions/">
+            Crowd (8 directions)
+            <!----></a></li><li><a href="/grid-engine/example/facing-direction-8-directions/">
+            Facing Direction (8 directions)
+            <!----></a></li><li><a href="/grid-engine/example/following-8-directions/">
+            Following (8 directions)
+            <!----></a></li><li><a href="/grid-engine/example/isometric-8-directions/">
+            Isometric (8 directions)
+            <!----></a></li><li><a href="/grid-engine/example/move-to-8-directions/">
+            Move To (8 directions)
+            <!----></a></li><li><a href="/grid-engine/example/movement-8-directions/">
+            Movement (8 directions)
+            <!----></a></li><li><a href="/grid-engine/example/move-to-8-directions-multi-tile/">
+            Move To (8 directions, multi-tile)
+            <!----></a></li><li><a href="/grid-engine/example/queue-directions-movement/">
+            Queue Directions Movement
+            <!----></a></li><li><a href="/grid-engine/example/tile-costs-for-pathfinding/" aria-current="page" class="active--exact active">
+            Tile Costs for Pathfinding
+            <!----></a></li></ul></li><li>
+      Migrations
+      <ul><li><a href="/grid-engine/p/migrate-to-version-2/">
+            Migrate to Version 2
+            <!----></a></li></ul></li><li>
+      Troubleshooting
+      <ul><li><a href="/grid-engine/p/known-errors/">
+            Known Errors
+            <!----></a></li></ul></li></ul></nav></aside><div class="content"><main class="md-content"><h1 id="tile-costs-for-pathfinding"><a href="#tile-costs-for-pathfinding" aria-hidden="true"><span class="autolink fa-solid fa-link"></span></a>Tile Costs for Pathfinding</h1>
+<p>This example shows how tile costs can be considered for pathfinding. The liana has a tile cost of 4 when climbing <strong>up</strong> (the tiles have the property <code>ge_cost_down = 4</code>).
+Characters have been set up to slow down by the factor of the <a href="../../p/tile-properties#pathfinding-costs">tile costs</a>. Try to climb <strong>up</strong> the liana to observe this.</p>
+<p>You can turn <code>considerCosts</code>(<a href="../../api/interfaces/PathfindingOptions.html#considerCosts">[1]</a>, <a href="../../api/interfaces/MoveToConfig.html#considerCosts">[2]</a>, <a href="../../api/interfaces/FollowOptions.html#considerCosts">[3]</a>) on and off for the pathfinding of the NPC and observe how it will take the higher tile cost of the liana into account.</p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> <code>considerCosts</code> does only work with A*</p>
+</blockquote>
+<iframe style="height: 900px" scrolling="no" src="../../x/path-costs"></iframe>
+<h2 id="example-code"><a href="#example-code" aria-hidden="true"><span class="autolink fa-solid fa-link"></span></a>Example Code</h2>
+<p><pre class="language-jsx"><code class="language-jsx"><span class="token keyword">const</span> game <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Phaser<span class="token punctuation">.</span>Game</span><span class="token punctuation">(</span><span class="token function">config</span><span class="token punctuation">(</span>preload<span class="token punctuation">,</span> create<span class="token punctuation">,</span> update<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> considerCosts <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> gridEngine<span class="token punctuation">;</span>
+
+<span class="token keyword">function</span> <span class="token function">preload</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">load</span><span class="token punctuation">.</span><span class="token method function property-access">image</span><span class="token punctuation">(</span><span class="token string">"tiles"</span><span class="token punctuation">,</span> <span class="token string">"../../assets/tf_jungle_tileset.png"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">load</span><span class="token punctuation">.</span><span class="token method function property-access">tilemapTiledJSON</span><span class="token punctuation">(</span>
+    <span class="token string">"jungle"</span><span class="token punctuation">,</span>
+    <span class="token string">"../../assets/tile-costs.json"</span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">load</span><span class="token punctuation">.</span><span class="token method function property-access">spritesheet</span><span class="token punctuation">(</span><span class="token string">"player"</span><span class="token punctuation">,</span> <span class="token string">"../../assets/characters.png"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    <span class="token literal-property property">frameWidth</span><span class="token operator">:</span> <span class="token number">52</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">frameHeight</span><span class="token operator">:</span> <span class="token number">72</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> cloudCityTilemap <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">make</span><span class="token punctuation">.</span><span class="token method function property-access">tilemap</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">key</span><span class="token operator">:</span> <span class="token string">"jungle"</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  cloudCityTilemap<span class="token punctuation">.</span><span class="token method function property-access">addTilesetImage</span><span class="token punctuation">(</span><span class="token string">"jungle"</span><span class="token punctuation">,</span> <span class="token string">"tiles"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword control-flow">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> cloudCityTilemap<span class="token punctuation">.</span><span class="token property-access">layers</span><span class="token punctuation">.</span><span class="token property-access">length</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> layer <span class="token operator">=</span> cloudCityTilemap<span class="token punctuation">.</span><span class="token method function property-access">createLayer</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> <span class="token string">"jungle"</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    layer<span class="token punctuation">.</span><span class="token property-access">scale</span> <span class="token operator">=</span> <span class="token number">3</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">const</span> playerSprite <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">add</span><span class="token punctuation">.</span><span class="token method function property-access">sprite</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">"player"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  playerSprite<span class="token punctuation">.</span><span class="token property-access">scale</span> <span class="token operator">=</span> <span class="token number">1.5</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> npcSprite <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">add</span><span class="token punctuation">.</span><span class="token method function property-access">sprite</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">"player"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  npcSprite<span class="token punctuation">.</span><span class="token property-access">scale</span> <span class="token operator">=</span> <span class="token number">1.5</span><span class="token punctuation">;</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">cameras</span><span class="token punctuation">.</span><span class="token property-access">main</span><span class="token punctuation">.</span><span class="token method function property-access">startFollow</span><span class="token punctuation">(</span>playerSprite<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">cameras</span><span class="token punctuation">.</span><span class="token property-access">main</span><span class="token punctuation">.</span><span class="token method function property-access">setFollowOffset</span><span class="token punctuation">(</span>
+    <span class="token operator">-</span>playerSprite<span class="token punctuation">.</span><span class="token property-access">width</span><span class="token punctuation">,</span>
+    <span class="token operator">-</span>playerSprite<span class="token punctuation">.</span><span class="token property-access">height</span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">const</span> gridEngineConfig <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token literal-property property">characters</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span>
+        <span class="token literal-property property">id</span><span class="token operator">:</span> <span class="token string">"player"</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">sprite</span><span class="token operator">:</span> playerSprite<span class="token punctuation">,</span>
+        <span class="token literal-property property">walkingAnimationMapping</span><span class="token operator">:</span> <span class="token number">6</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">startPosition</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token literal-property property">x</span><span class="token operator">:</span> <span class="token number">18</span><span class="token punctuation">,</span> <span class="token literal-property property">y</span><span class="token operator">:</span> <span class="token number">14</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">{</span>
+        <span class="token literal-property property">id</span><span class="token operator">:</span> <span class="token string">"npc"</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">sprite</span><span class="token operator">:</span> npcSprite<span class="token punctuation">,</span>
+        <span class="token literal-property property">walkingAnimationMapping</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">startPosition</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token literal-property property">x</span><span class="token operator">:</span> <span class="token number">15</span><span class="token punctuation">,</span> <span class="token literal-property property">y</span><span class="token operator">:</span> <span class="token number">15</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">gridEngine</span><span class="token punctuation">.</span><span class="token method function property-access">create</span><span class="token punctuation">(</span>cloudCityTilemap<span class="token punctuation">,</span> gridEngineConfig<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">gridEngine</span><span class="token punctuation">.</span><span class="token method function property-access">positionChangeStarted</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token method function property-access">subscribe</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter"><span class="token punctuation">{</span> charId<span class="token punctuation">,</span> enterTile<span class="token punctuation">,</span> enterLayer<span class="token punctuation">,</span> exitTile <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> dir <span class="token operator">=</span> <span class="token maybe-class-name">GridEngineImports</span><span class="token punctuation">.</span><span class="token method function property-access">directionFromPos</span><span class="token punctuation">(</span>enterTile<span class="token punctuation">,</span> exitTile<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> cost <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">gridEngine</span><span class="token punctuation">.</span><span class="token method function property-access">getTileCost</span><span class="token punctuation">(</span>enterTile<span class="token punctuation">,</span> enterLayer<span class="token punctuation">,</span> dir<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">gridEngine</span><span class="token punctuation">.</span><span class="token method function property-access">setSpeed</span><span class="token punctuation">(</span>charId<span class="token punctuation">,</span> <span class="token number">3</span> <span class="token operator">/</span> cost<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  gridEngine <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">gridEngine</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">const</span> triangleArgs <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">50</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">24</span><span class="token punctuation">,</span> <span class="token number">50</span><span class="token punctuation">,</span> <span class="token number">0xffffff</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> arrow <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">add</span><span class="token punctuation">.</span><span class="token method function property-access">triangle</span><span class="token punctuation">(</span>
+    <span class="token number">16</span> <span class="token operator">*</span> <span class="token number">48</span> <span class="token operator">+</span> <span class="token number">24</span><span class="token punctuation">,</span>
+    <span class="token number">9</span> <span class="token operator">*</span> <span class="token number">48</span> <span class="token operator">+</span> <span class="token number">24</span><span class="token punctuation">,</span>
+    <span class="token spread operator">...</span>triangleArgs
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">tweens</span><span class="token punctuation">.</span><span class="token method function property-access">add</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token literal-property property">targets</span><span class="token operator">:</span> <span class="token punctuation">[</span>arrow<span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">alpha</span><span class="token operator">:</span> <span class="token number">0.2</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">yoyo</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">repeat</span><span class="token operator">:</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">ease</span><span class="token operator">:</span> <span class="token string">"Sine.easeInOut"</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">settingsToConf</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> cursors <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">input</span><span class="token punctuation">.</span><span class="token property-access">keyboard</span><span class="token punctuation">.</span><span class="token method function property-access">createCursorKeys</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword control-flow">if</span> <span class="token punctuation">(</span>cursors<span class="token punctuation">.</span><span class="token property-access">left</span><span class="token punctuation">.</span><span class="token property-access">isDown</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">gridEngine</span><span class="token punctuation">.</span><span class="token method function property-access">move</span><span class="token punctuation">(</span><span class="token string">"player"</span><span class="token punctuation">,</span> <span class="token string">"left"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span> <span class="token keyword control-flow">else</span> <span class="token keyword control-flow">if</span> <span class="token punctuation">(</span>cursors<span class="token punctuation">.</span><span class="token property-access">right</span><span class="token punctuation">.</span><span class="token property-access">isDown</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">gridEngine</span><span class="token punctuation">.</span><span class="token method function property-access">move</span><span class="token punctuation">(</span><span class="token string">"player"</span><span class="token punctuation">,</span> <span class="token string">"right"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span> <span class="token keyword control-flow">else</span> <span class="token keyword control-flow">if</span> <span class="token punctuation">(</span>cursors<span class="token punctuation">.</span><span class="token property-access">up</span><span class="token punctuation">.</span><span class="token property-access">isDown</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">gridEngine</span><span class="token punctuation">.</span><span class="token method function property-access">move</span><span class="token punctuation">(</span><span class="token string">"player"</span><span class="token punctuation">,</span> <span class="token string">"up"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span> <span class="token keyword control-flow">else</span> <span class="token keyword control-flow">if</span> <span class="token punctuation">(</span>cursors<span class="token punctuation">.</span><span class="token property-access">down</span><span class="token punctuation">.</span><span class="token property-access">isDown</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">gridEngine</span><span class="token punctuation">.</span><span class="token method function property-access">move</span><span class="token punctuation">(</span><span class="token string">"player"</span><span class="token punctuation">,</span> <span class="token string">"down"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function">startPathfinding</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  considerCosts <span class="token operator">=</span> <span class="token operator">!</span><span class="token operator">!</span><span class="token dom variable">document</span><span class="token punctuation">.</span><span class="token method function property-access">getElementById</span><span class="token punctuation">(</span><span class="token string">"consider-costs"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token property-access">checked</span><span class="token punctuation">;</span>
+  <span class="token function">settingsToConf</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  gridEngine<span class="token punctuation">.</span><span class="token method function property-access">setPosition</span><span class="token punctuation">(</span><span class="token string">"npc"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> <span class="token literal-property property">x</span><span class="token operator">:</span> <span class="token number">15</span><span class="token punctuation">,</span> <span class="token literal-property property">y</span><span class="token operator">:</span> <span class="token number">15</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  gridEngine<span class="token punctuation">.</span><span class="token method function property-access">moveTo</span><span class="token punctuation">(</span><span class="token string">"npc"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> <span class="token literal-property property">x</span><span class="token operator">:</span> <span class="token number">16</span><span class="token punctuation">,</span> <span class="token literal-property property">y</span><span class="token operator">:</span> <span class="token number">5</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    <span class="token literal-property property">algorithm</span><span class="token operator">:</span> <span class="token string">"A_STAR"</span><span class="token punctuation">,</span>
+    considerCosts
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function">settingsToConf</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">let</span> text <span class="token operator">=</span> <span class="token string">''</span><span class="token punctuation">;</span>
+  text <span class="token operator">=</span> <span class="token known-class-name class-name">JSON</span><span class="token punctuation">.</span><span class="token method function property-access">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token literal-property property">algorithm</span><span class="token operator">:</span> <span class="token string">"A_STAR"</span><span class="token punctuation">,</span>
+    considerCosts<span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword null nil">null</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token dom variable">document</span><span class="token punctuation">.</span><span class="token method function property-access">getElementById</span><span class="token punctuation">(</span>
+    <span class="token string">"json-config"</span>
+  <span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token property-access">innerHTML</span> <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token html language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>pre</span><span class="token punctuation">></span></span><span class="token plain-text">${text}</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>pre</span><span class="token punctuation">></span></span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre></p>
+<h2 id="example-phaser-config"><a href="#example-phaser-config" aria-hidden="true"><span class="autolink fa-solid fa-link"></span></a>Example Phaser Config</h2>
+<p><pre class="language-jsx"><code class="language-jsx"><span class="token keyword">function</span> <span class="token function">config</span><span class="token punctuation">(</span><span class="token parameter">preload<span class="token punctuation">,</span> create<span class="token punctuation">,</span> update</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword control-flow">return</span> <span class="token punctuation">{</span>
+    <span class="token literal-property property">title</span><span class="token operator">:</span> <span class="token string">"GridEngineExample"</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">render</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token literal-property property">antialias</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token maybe-class-name">Phaser</span><span class="token punctuation">.</span><span class="token constant">AUTO</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">plugins</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token literal-property property">scene</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span>
+          <span class="token literal-property property">key</span><span class="token operator">:</span> <span class="token string">"gridEngine"</span><span class="token punctuation">,</span>
+          <span class="token literal-property property">plugin</span><span class="token operator">:</span> <span class="token maybe-class-name">GridEngine</span><span class="token punctuation">,</span>
+          <span class="token literal-property property">mapping</span><span class="token operator">:</span> <span class="token string">"gridEngine"</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">scale</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token literal-property property">width</span><span class="token operator">:</span> <span class="token number">700</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">height</span><span class="token operator">:</span> <span class="token number">528</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">scene</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token literal-property property">preload</span><span class="token operator">:</span> preload<span class="token punctuation">,</span>
+      <span class="token literal-property property">create</span><span class="token operator">:</span> create<span class="token punctuation">,</span>
+      <span class="token literal-property property">update</span><span class="token operator">:</span> update<span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">parent</span><span class="token operator">:</span> <span class="token string">"game"</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">backgroundColor</span><span class="token operator">:</span> <span class="token string">"#48C4F8"</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">input</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token literal-property property">mouse</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token literal-property property">preventDefaultWheel</span><span class="token operator">:</span> <span class="token boolean">false</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">touch</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token literal-property property">capture</span><span class="token operator">:</span> <span class="token boolean">false</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre></p>
+</main></div></div></div>
+    <script src="/grid-engine/assets/js/app.4a840679.js" defer></script><script src="/grid-engine/assets/js/page--src--templates--example-vue.732b8adf.js" defer></script>
+  </body>
+</html>

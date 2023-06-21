@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="../styles.css" />
+    <script src="../../js/phaser-3.60.min.js"></script>
+    <script src="../../js/grid-engine-2.30.0.min.js"></script>
+    <script src="../../js/examplePhaserConfig.js"></script>
+    <script src="code.js"></script>
+    <meta name="color-scheme" content="dark light">
+  </head>
+  <body>
+    <div class="settings">
+      <h2>Settings:</h2>
+
+      <div class="wait-timeout-group">
+        <input type="checkbox" id="consider-costs" name="consider-costs" value="true">
+        <label for="consider-costs">considerCosts</label>
+      </div>
+
+      <button class="apply" onclick="startPathfinding()">Start pathfinding</button>
+
+      <h3>MoveToConfig:</h3>
+      <div id="json-config"></div>
+    </div>
+    <div id="game" scrolling="no"></div>
+  </body>
+</html>
