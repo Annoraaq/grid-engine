@@ -515,7 +515,7 @@ export interface IGridEngine {
   >;
 
   /**
-   * Returns the {@link https://annoraaq.github.io/grid-engine/p/tile-properties/#tilecosts | tile cost}
+   * Returns the {@link https://annoraaq.github.io/grid-engine/p/tile-properties/#pathfinding-costs | tile cost}
    * for a position.
    */
   getTileCost(
