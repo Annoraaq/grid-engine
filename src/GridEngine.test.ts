@@ -1778,6 +1778,42 @@ describe("GridEngine", () => {
     });
   });
 
+  describe("Tile Cost", () => {
+    it("should get tile cost", () => {
+      const mock = createPhaserTilemapStub(
+        new Map([
+          [
+            "someLayer",
+            [
+              // prettier-ignore
+              "...",
+              "...",
+            ],
+          ],
+        ]),
+        [
+          {
+            layer: "someLayer",
+            costMap: [
+              [1, 2, 1],
+              [1, { ge_cost: 2, ge_cost_left: 3 }, 1],
+            ],
+          },
+        ]
+      );
+      gridEngine.create(mock, {
+        characters: [{ id: "player" }],
+      });
+
+      expect(gridEngine.getTileCost({ x: 0, y: 0 })).toBe(1);
+      expect(gridEngine.getTileCost({ x: 1, y: 0 })).toBe(2);
+      expect(gridEngine.getTileCost({ x: 1, y: 1 })).toBe(2);
+      expect(
+        gridEngine.getTileCost({ x: 1, y: 1 }, undefined, Direction.LEFT)
+      ).toBe(3);
+    });
+  });
+
   describe("Error Handling unknown char id", () => {
     const UNKNOWN_CHAR_ID = "unknownCharId";
 
@@ -2004,6 +2040,9 @@ describe("GridEngine", () => {
       );
       expectUninitializedException(() =>
         gridEngine.clearEnqueuedMovements(SOME_CHAR_ID)
+      );
+      expectUninitializedException(() =>
+        gridEngine.getTileCost({ x: 0, y: 0 })
       );
     });
   });

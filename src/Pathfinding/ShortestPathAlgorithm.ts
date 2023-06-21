@@ -134,7 +134,9 @@ export abstract class ShortestPathAlgorithm {
 
   getCosts(src: Vector2, dest: LayerVecPos): number {
     if (!this.options.considerCosts) return 1;
-    return this.gridTilemap.getTileCosts(src, dest);
+
+    const dir = directionFromPos(dest.position, src);
+    return this.gridTilemap.getTileCosts(dest, dir);
   }
 
   isBlocking(src: LayerVecPos, dest: LayerVecPos): boolean {

@@ -1,6 +1,5 @@
 import {
   Direction,
-  directionFromPos,
   directionVector,
   directions,
   turnClockwise,
@@ -183,13 +182,24 @@ export class GridTilemap {
     );
   }
 
-  getTileCosts(src: Vector2, dest: LayerVecPos): number {
+  getTileCosts(pos: LayerVecPos, srcDir?: Direction): number {
+    const crl = this.getCollisionRelevantLayers(pos.layer);
+    let maxCost = 1;
+    for (const layer of crl) {
+      maxCost = Math.max(
+        maxCost,
+        this.getTileCostsForLayer({ ...pos, layer: layer.getName() }, srcDir)
+      );
+    }
+    return maxCost;
+  }
+
+  private getTileCostsForLayer(dest: LayerVecPos, dir?: Direction): number {
     const tile = this.tilemap.getTileAt(
       dest.position.x,
       dest.position.y,
       dest.layer
     );
-    const dir = directionFromPos(dest.position, src);
     return (
       (dir && tile?.getProperty(this.tileCostPropNames.get(dir) || "")) ||
       tile?.getProperty(TILE_COST_PROPERTY_NAME) ||

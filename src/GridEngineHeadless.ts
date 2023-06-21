@@ -958,6 +958,21 @@ export class GridEngineHeadless implements IGridEngine {
     }
   }
 
+  /** {@inheritDoc IGridEngine.getTileCost} */
+  getTileCost(
+    position: Position,
+    charLayer?: string,
+    srcDirection?: Direction
+  ): number {
+    this.initGuard();
+    return (
+      this.gridTilemap?.getTileCosts(
+        { position: new Vector2(position), layer: charLayer },
+        srcDirection
+      ) ?? 1
+    );
+  }
+
   private charRemoved(charId: string): Observable<string> {
     if (!this.charRemoved$) throw this.createUninitializedErr();
     return this.charRemoved$?.pipe(

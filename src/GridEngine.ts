@@ -6,7 +6,11 @@ import {
   MoveToResult,
 } from "./Movement/TargetMovement/TargetMovement";
 import { PositionChange } from "./GridCharacter/GridCharacter";
-import { Direction, NumberOfDirections } from "./Direction/Direction";
+import {
+  Direction,
+  NumberOfDirections,
+  directionFromPos,
+} from "./Direction/Direction";
 import { Observable } from "rxjs";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
@@ -95,6 +99,7 @@ export {
   TileLayer,
   Tilemap,
   TileSizePerSecond,
+  directionFromPos,
 };
 
 /**
@@ -658,6 +663,16 @@ export class GridEngine implements IGridEngine {
   /** {@inheritDoc IGridEngine.clearEnqueuedMovements} */
   clearEnqueuedMovements(charId: string): void {
     return this.geHeadless.clearEnqueuedMovements(charId);
+  }
+
+  /** {@inheritDoc IGridEngine.getTileCost} */
+  getTileCost(
+    position: Position,
+    charLayer?: string,
+    srcDirection?: Direction
+  ): number {
+    this.initGuard();
+    return this.geHeadless.getTileCost(position, charLayer, srcDirection);
   }
 
   private setConfigDefaults(

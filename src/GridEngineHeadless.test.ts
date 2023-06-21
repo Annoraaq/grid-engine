@@ -1665,6 +1665,35 @@ describe("GridEngineHeadless", () => {
     });
   });
 
+  describe("Tile Cost", () => {
+    it("should get tile cost", () => {
+      gridEngineHeadless.create(
+        // prettier-ignore
+        mockBlockMap([
+          "...",
+          "...",
+        ], undefined, false,
+        [
+          [1,2,1],
+          [1,{ge_cost: 2, ge_cost_left: 3},1],
+        ]
+        ),
+        { characters: [{ id: "player" }] }
+      );
+
+      expect(gridEngineHeadless.getTileCost({ x: 0, y: 0 })).toBe(1);
+      expect(gridEngineHeadless.getTileCost({ x: 1, y: 0 })).toBe(2);
+      expect(gridEngineHeadless.getTileCost({ x: 1, y: 1 })).toBe(2);
+      expect(
+        gridEngineHeadless.getTileCost(
+          { x: 1, y: 1 },
+          undefined,
+          Direction.LEFT
+        )
+      ).toBe(3);
+    });
+  });
+
   describe("Error Handling unknown char id", () => {
     const UNKNOWN_CHAR_ID = "unknownCharId";
     beforeEach(() => {
@@ -1906,6 +1935,9 @@ describe("GridEngineHeadless", () => {
       );
       expectUninitializedException(() =>
         gridEngineHeadless.getCharactersAt({ x: 1, y: 1 }, "someLayer")
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.getTileCost({ x: 1, y: 1 })
       );
     });
   });

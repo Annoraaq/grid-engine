@@ -513,4 +513,14 @@ export interface IGridEngine {
   queueMovementFinished(): Observable<
     { charId: string } & QueueMovementFinished
   >;
+
+  /**
+   * Returns the {@link https://annoraaq.github.io/grid-engine/p/tile-properties/#tilecosts | tile cost}
+   * for a position.
+   */
+  getTileCost(
+    position: Position,
+    charLayer?: string,
+    srcDirection?: Direction
+  ): number;
 }

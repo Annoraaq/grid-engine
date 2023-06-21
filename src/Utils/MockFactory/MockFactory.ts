@@ -8,6 +8,7 @@ import { TileLayer, Tile, Tilemap } from "../../GridTilemap/Tilemap";
 import { MockTile, MockTileLayer, MockTilemap } from "./MockTilemap";
 
 export interface TileCost {
+  ge_cost?: number;
   ge_cost_left?: number;
   ge_cost_right?: number;
   ge_cost_up?: number;
@@ -22,9 +23,9 @@ export const LOWER_CHAR_LAYER = "lowerCharLayer";
 export const HIGHER_CHAR_LAYER = "testCharLayer";
 export const COLLISION_GROUP = "testCollisionGroup";
 
-type CostMap = Array<Array<TileCost | number>>;
+export type CostMap = Array<Array<TileCost | number>>;
 
-interface CostMapLayer {
+export interface CostMapLayer {
   layer: string | undefined;
   costMap: CostMap;
 }
@@ -279,7 +280,7 @@ export function mockLayeredBlockMap(
   return new MockTilemap(layers, isometric ? "isometric" : "orthogonal");
 }
 
-function tileCostProps(
+export function tileCostProps(
   costMap: CostMapLayer,
   r: number,
   c: number
