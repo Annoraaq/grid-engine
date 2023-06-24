@@ -14,6 +14,8 @@ For example a tileset like the following can be used for a 4-direction collision
 
 ![Collides Tileset](../../src/assets/img/collision_tileset.png)
 
+> **_NOTE:_** For an 8-direction collision world you can create a similar tileset. Just use the [collision properties for 8 directions](../tile-properties#one-way)
+
 A red border means that the tile blocks from this direction. Now you can add it as a tileset in tiled and give the corresponding collision tile-properties to the tiles (see also [collisions](../collisions)):
 
 ![Collision tileset custom properties](../../src/assets/img/collision-tileset-properties.png)

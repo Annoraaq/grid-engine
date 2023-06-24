@@ -21,6 +21,8 @@ export interface LayerVecPos {
  * BIDIRECTIONAL_SEARCH: This algorithm starts 2 BFS, one from the start and
  * one from the end position. It has a performance of O(4^(d/2))
  * (resp O(8^(d/2))).
+ *
+ * @category Pathfinding
  */
 export type ShortestPathAlgorithmType =
   | "BFS"
