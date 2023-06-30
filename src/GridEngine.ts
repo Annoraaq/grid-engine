@@ -14,7 +14,6 @@ import {
 import { Observable } from "rxjs";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
-import { Concrete } from "./Utils/TypeUtils";
 import { MovementInfo } from "./Movement/Movement";
 import {
   CharacterIndex,
@@ -36,7 +35,10 @@ import {
   CharacterDataHeadless,
 } from "./GridEngineHeadless";
 import { GridTilemapPhaser } from "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser";
-import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
+import {
+  PhaserTilemap,
+  TiledProject,
+} from "./GridTilemap/Phaser/PhaserTilemap";
 import { Orientation, Tile, TileLayer, Tilemap } from "./GridTilemap/Tilemap";
 import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer";
 import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile";
@@ -120,6 +122,12 @@ export interface GridEngineConfig extends GridEngineConfigHeadless {
    * @beta
    */
   layerOverlay?: boolean;
+
+  /**
+   * Object, parsed from Tiled project file. This is used to provide Tiled
+   * project features like tile classes.
+   */
+  tiledProject?: TiledProject;
 }
 
 export interface WalkingAnimationMapping {
@@ -197,7 +205,7 @@ export interface CharacterData extends CharacterDataHeadless {
  */
 export class GridEngine implements IGridEngine {
   private geHeadless: GridEngineHeadless = new GridEngineHeadless();
-  private config?: Concrete<GridEngineConfig>;
+  private config?: Omit<Required<GridEngineConfig>, "tiledProject">;
   private gridCharacters?: Map<string, GridCharacterPhaser>;
   private gridTilemap?: GridTilemapPhaser;
   private isCreatedInternal = false;
@@ -250,14 +258,17 @@ export class GridEngine implements IGridEngine {
    * @category Grid Engine
    */
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
-    this.geHeadless.create(new PhaserTilemap(tilemap), config);
+    this.geHeadless.create(
+      new PhaserTilemap(tilemap, config.tiledProject),
+      config
+    );
     this.isCreatedInternal = true;
     this.gridCharacters = new Map();
 
     const concreteConfig = this.setConfigDefaults(config);
 
     this.config = concreteConfig;
-    this.gridTilemap = new GridTilemapPhaser(tilemap);
+    this.gridTilemap = new GridTilemapPhaser(tilemap, config.tiledProject);
 
     this.addCharacters();
   }
@@ -904,7 +915,7 @@ export class GridEngine implements IGridEngine {
 
   private setConfigDefaults(
     config: GridEngineConfig
-  ): Concrete<GridEngineConfig> {
+  ): Omit<Required<GridEngineConfig>, "tiledProject"> {
     return {
       collisionTilePropertyName: "ge_collide",
       numberOfDirections: NumberOfDirections.FOUR,
