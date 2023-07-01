@@ -1,7 +1,20 @@
 import { TileLayer, Orientation, Tile, Tilemap } from "../Tilemap";
+export interface TiledProject {
+    propertyTypes: Array<{
+        name: string;
+        type: string;
+        members: Array<{
+            name: string;
+            type: string;
+            propertyType?: string;
+            value: any;
+        }>;
+    }>;
+}
 export declare class PhaserTilemap implements Tilemap {
     private phaserTilemap;
-    constructor(phaserTilemap: Phaser.Tilemaps.Tilemap);
+    private tiledProject?;
+    constructor(phaserTilemap: Phaser.Tilemaps.Tilemap, tiledProject?: TiledProject | undefined);
     getTileWidth(): number;
     getTileHeight(): number;
     getWidth(): number;

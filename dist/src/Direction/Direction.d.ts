@@ -25,6 +25,8 @@ export declare function oppositeDirection(direction: Direction): Direction;
  *
  * For example:
  * `directionFromPos({x:1, y:1}, {{x:2, y:1}}) = Direction.RIGHT`
+ *
+ * @category Helpers
  */
 export declare function directionFromPos(src: Position, dest: Position): Direction;
 export declare enum NumberOfDirections {

@@ -1,3 +1,6 @@
+/**
+ * @category Configuration
+ */
 export declare enum CollisionStrategy {
     /**
      * Not used yet.

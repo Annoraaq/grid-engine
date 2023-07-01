@@ -4,9 +4,12 @@ import { GridTilemap } from "../../GridTilemap/GridTilemap";
 import { GridCharacter } from "../../GridCharacter/GridCharacter";
 import { Movement, MovementInfo } from "../Movement";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
-import { CharLayer, Position } from "../../GridEngine";
+import { CharLayer, LayerPosition, Position } from "../../GridEngine";
 import { Subject } from "rxjs";
 import { IsPositionAllowedFn } from "../../Pathfinding/Pathfinding";
+/**
+ * @category Pathfinding
+ */
 export interface MoveToConfig {
     /**
      * Determines what happens if no path could be found. For the different
@@ -97,6 +100,9 @@ export interface MoveToConfig {
      */
     considerCosts?: boolean;
 }
+/**
+ * @category Pathfinding
+ */
 export declare enum MoveToResult {
     SUCCESS = "SUCCESS",
     NO_PATH_FOUND_MAX_RETRIES_EXCEEDED = "NO_PATH_FOUND_MAX_RETRIES_EXCEEDED",
@@ -107,6 +113,9 @@ export declare enum MoveToResult {
     MOVEMENT_TERMINATED = "MOVEMENT_TERMINATED",
     MAX_PATH_LENGTH_REACHED = "MAX_PATH_LENGTH_REACHED"
 }
+/**
+ * @category Pathfinding
+ */
 export interface Finished {
     position: Position;
     result?: MoveToResult;
@@ -117,6 +126,21 @@ export interface Options {
     distance?: number;
     config?: MoveToConfig;
     ignoreBlockedTarget?: boolean;
+}
+export interface MoveToInfo extends MovementInfo {
+    state: {
+        pathAhead: LayerPosition[];
+    };
+    config: {
+        algorithm: ShortestPathAlgorithmType;
+        ignoreBlockedTarget: boolean;
+        distance: number;
+        targetPos: LayerPosition;
+        noPathFoundStrategy: NoPathFoundStrategy;
+        pathBlockedStrategy: PathBlockedStrategy;
+        noPathFoundRetryBackoffMs: number;
+        noPathFoundMaxRetries: number;
+    };
 }
 export declare class TargetMovement implements Movement {
     private character;
@@ -148,7 +172,7 @@ export declare class TargetMovement implements Movement {
     private getPathfindingOptions;
     update(delta: number): void;
     finishedObs(): Subject<Finished>;
-    getInfo(): MovementInfo;
+    getInfo(): MoveToInfo;
     private resultToReason;
     private applyPathBlockedStrategy;
     private moveCharOnPath;

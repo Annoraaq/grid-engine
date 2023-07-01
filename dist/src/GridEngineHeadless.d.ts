@@ -17,6 +17,8 @@ export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, 
 export type TileSizePerSecond = number;
 /**
  * Configuration object for initializing GridEngineHeadless.
+ *
+ * @category Configuration
  */
 export interface GridEngineConfigHeadless {
     /** An array of character data. Each describing a character on the map. */
@@ -55,6 +57,9 @@ export interface GridEngineConfigHeadless {
      */
     cacheTileCollisions?: boolean;
 }
+/**
+ * @category Configuration
+ */
 export interface CollisionConfig {
     /**
      * Determines whether the character should collide with the tilemap.
@@ -81,7 +86,11 @@ export interface CollisionConfig {
      */
     collisionGroups?: string[];
 }
-/** Configuration object used to initialize a new character in GridEngine. */
+/**
+ * Configuration object used to initialize a new character in GridEngine.
+ *
+ * @category Configuration
+ */
 export interface CharacterDataHeadless {
     /**
      * A unique identifier for the character on the map. If you provice two
@@ -152,6 +161,9 @@ export interface CharacterDataHeadless {
      */
     tileHeight?: number;
 }
+/**
+ * @category Main Modules
+ */
 export declare class GridEngineHeadless implements IGridEngine {
     private gridCharacters?;
     private config?;
@@ -166,130 +178,326 @@ export declare class GridEngineHeadless implements IGridEngine {
     private charRemoved$?;
     private charAdded$?;
     constructor();
-    /** {@inheritDoc IGridEngine.getCharLayer} */
+    /**
+     * {@inheritDoc IGridEngine.getCharLayer}
+     *
+     * @category Character
+     */
     getCharLayer(charId: string): string | undefined;
-    /** {@inheritDoc IGridEngine.getTransition} */
+    /**
+     * {@inheritDoc IGridEngine.getTransition}
+     *
+     * @category Tilemap
+     */
     getTransition(position: Position, fromLayer: string): string | undefined;
-    /** {@inheritDoc IGridEngine.setTransition} */
+    /**
+     * {@inheritDoc IGridEngine.setTransition}
+     *
+     * @category Tilemap
+     */
     setTransition(position: Position, fromLayer: string, toLayer: string): void;
     /**
      * Initializes GridEngine. Must be called before any other methods of
      * GridEngine are called.
+     *
+     * @category Grid Engine
      */
     create(tilemap: Tilemap, config: GridEngineConfigHeadless): void;
-    /** {@inheritDoc IGridEngine.getPosition} */
+    /**
+     * {@inheritDoc IGridEngine.getPosition}
+     *
+     * @category Character
+     */
     getPosition(charId: string): Position;
-    /** {@inheritDoc IGridEngine.move} */
+    /**
+     * {@inheritDoc IGridEngine.move}
+     *
+     * @category Basic Movement
+     */
     move(charId: string, direction: Direction): void;
-    /** {@inheritDoc IGridEngine.moveRandomly} */
+    /**
+     * {@inheritDoc IGridEngine.moveRandomly}
+     *
+     * @category Random Movement
+     */
     moveRandomly(charId: string, delay?: number, radius?: number): void;
-    /** {@inheritDoc IGridEngine.getMovement} */
+    /**
+     * {@inheritDoc IGridEngine.getMovement}
+     *
+     * @category Character
+     */
     getMovement(charId: string): MovementInfo;
-    /** {@inheritDoc IGridEngine.moveTo} */
+    /**
+     * {@inheritDoc IGridEngine.moveTo}
+     *
+     * @category Pathfinding
+     */
     moveTo(charId: string, targetPos: Position, config?: MoveToConfig): Observable<{
         charId: string;
     } & Finished>;
-    /** {@inheritDoc IGridEngine.stopMovement} */
+    /**
+     * {@inheritDoc IGridEngine.stopMovement}
+     *
+     * @category Character
+     */
     stopMovement(charId: string): void;
-    /** {@inheritDoc IGridEngine.setSpeed} */
+    /**
+     * {@inheritDoc IGridEngine.setSpeed}
+     *
+     * @category Character
+     */
     setSpeed(charId: string, speed: number): void;
-    /** {@inheritDoc IGridEngine.getSpeed} */
+    /**
+     * {@inheritDoc IGridEngine.getSpeed}
+     *
+     * @category Character
+     *
+     */
     getSpeed(charId: string): number;
-    /** {@inheritDoc IGridEngine.collidesWithTiles} */
+    /**
+     * {@inheritDoc IGridEngine.collidesWithTiles}
+     *
+     * @category Character
+     */
     collidesWithTiles(charId: string): boolean;
+    /**
+     * @category Grid Engine
+     */
     update(_time: number, delta: number): void;
-    /** Adds a character after calling {@link create}. */
+    /**
+     * Adds a character after calling {@link create}.
+     *
+     * @category Grid Engine
+     */
     addCharacter(charData: CharacterDataHeadless): void;
-    /** {@inheritDoc IGridEngine.hasCharacter} */
+    /**
+     * {@inheritDoc IGridEngine.hasCharacter}
+     *
+     * @category Grid Engine
+     */
     hasCharacter(charId: string): boolean;
-    /** {@inheritDoc IGridEngine.removeCharacter} */
+    /**
+     * {@inheritDoc IGridEngine.removeCharacter}
+     *
+     * @category Grid Engine
+     */
     removeCharacter(charId: string): void;
-    /** {@inheritDoc IGridEngine.removeAllCharacters} */
+    /**
+     * {@inheritDoc IGridEngine.removeAllCharacters}
+     *
+     * @category Grid Engine
+     */
     removeAllCharacters(): void;
-    /** {@inheritDoc IGridEngine.getAllCharacters} */
+    /**
+     * {@inheritDoc IGridEngine.getAllCharacters}
+     *
+     * @category Grid Engine
+     */
     getAllCharacters(options?: CharacterFilteringOptions): string[];
-    /** {@inheritDoc IGridEngine.getLabels} */
+    /**
+     * {@inheritDoc IGridEngine.getLabels}
+     *
+     * @category Character
+     */
     getLabels(charId: string): string[];
-    /** {@inheritDoc IGridEngine.addLabels} */
+    /**
+     * {@inheritDoc IGridEngine.addLabels}
+     *
+     * @category Character
+     */
     addLabels(charId: string, labels: string[]): void;
-    /** {@inheritDoc IGridEngine.removeLabels} */
+    /**
+     * {@inheritDoc IGridEngine.removeLabels}
+     *
+     * @category Character
+     */
     removeLabels(charId: string, labels: string[]): void;
-    /** {@inheritDoc IGridEngine.clearLabels} */
+    /**
+     * {@inheritDoc IGridEngine.clearLabels}
+     *
+     * @category Character
+     */
     clearLabels(charId: string): void;
-    /** {@inheritDoc IGridEngine.follow} */
+    /**
+     * {@inheritDoc IGridEngine.follow}
+     *
+     * @category Pathfinding
+     */
     follow(charId: string, charIdToFollow: string, options?: FollowOptions): void;
     follow(charId: string, charIdToFollow: string, distance?: number, closestPointIfBlocked?: boolean): void;
-    /** {@inheritDoc IGridEngine.isMoving} */
+    /**
+     * {@inheritDoc IGridEngine.isMoving}
+     *
+     * @category Character
+     */
     isMoving(charId: string): boolean;
-    /** {@inheritDoc IGridEngine.getFacingDirection} */
+    /**
+     * {@inheritDoc IGridEngine.getFacingDirection}
+     *
+     * @category Character
+     */
     getFacingDirection(charId: string): Direction;
-    /** {@inheritDoc IGridEngine.getFacingPosition} */
+    /**
+     * {@inheritDoc IGridEngine.getFacingPosition}
+     *
+     * @category Character
+     */
     getFacingPosition(charId: string): Position;
-    /** {@inheritDoc IGridEngine.turnTowards} */
+    /**
+     * {@inheritDoc IGridEngine.turnTowards}
+     *
+     * @category Basic Movement
+     */
     turnTowards(charId: string, direction: Direction): void;
-    /** {@inheritDoc IGridEngine.getCharactersAt} */
+    /**
+     * {@inheritDoc IGridEngine.getCharactersAt}
+     *
+     * @category Tilemap
+     */
     getCharactersAt(position: Position, layer?: string): string[];
-    /** {@inheritDoc IGridEngine.setPosition} */
+    /**
+     * {@inheritDoc IGridEngine.setPosition}
+     *
+     * @category Character
+     */
     setPosition(charId: string, pos: Position, layer?: string): void;
-    /** {@inheritDoc IGridEngine.isBlocked} */
+    /**
+     * {@inheritDoc IGridEngine.isBlocked}
+     *
+     * @category Tilemap
+     */
     isBlocked(position: Position, layer?: string, collisionGroups?: string[]): boolean;
-    /** {@inheritDoc IGridEngine.isTileBlocked} */
+    /**
+     * {@inheritDoc IGridEngine.isTileBlocked}
+     *
+     * @category Tilemap
+     */
     isTileBlocked(position: Position, layer?: string): boolean;
-    /** {@inheritDoc IGridEngine.getCollisionGroups} */
+    /**
+     * {@inheritDoc IGridEngine.getCollisionGroups}
+     *
+     * @category Character
+     */
     getCollisionGroups(charId: string): string[];
-    /** {@inheritDoc IGridEngine.setCollisionGroups} */
+    /**
+     * {@inheritDoc IGridEngine.setCollisionGroups}
+     *
+     * @category Character
+     */
     setCollisionGroups(charId: string, collisionGroups: string[]): void;
-    /** {@inheritDoc IGridEngine.getTilePosInDirection} */
+    /**
+     * {@inheritDoc IGridEngine.getTilePosInDirection}
+     *
+     * @category Tilemap
+     */
     getTilePosInDirection(position: Position, charLayer: string | undefined, direction: Direction): LayerPosition;
     /**
      * {@inheritDoc IGridEngine.findShortestPath}
      * @alpha
+     *
+     * @category Pathfinding
      */
     findShortestPath(source: LayerPosition, dest: LayerPosition, options?: PathfindingOptions): PathfindingResult;
-    /** {@inheritDoc IGridEngine.steppedOn} */
+    /**
+     * {@inheritDoc IGridEngine.steppedOn}
+     *
+     * @category Basic Movement
+     */
     steppedOn(charIds: string[], tiles: Position[], layer?: CharLayer[]): Observable<{
         charId: string;
     } & PositionChange>;
-    /** {@inheritDoc IGridEngine.characterShifted} */
+    /**
+     * {@inheritDoc IGridEngine.characterShifted}
+     *
+     * @category GridEngine
+     */
     characterShifted(): Observable<CharacterShift>;
-    /** {@inheritDoc IGridEngine.movementStarted} */
+    /**
+     * {@inheritDoc IGridEngine.movementStarted}
+     *
+     * @category Character
+     */
     movementStarted(): Observable<{
         charId: string;
         direction: Direction;
     }>;
-    /** {@inheritDoc IGridEngine.movementStopped} */
+    /**
+     * {@inheritDoc IGridEngine.movementStopped}
+     *
+     * @category Character
+     */
     movementStopped(): Observable<{
         charId: string;
         direction: Direction;
     }>;
-    /** {@inheritDoc IGridEngine.directionChanged} */
+    /**
+     * {@inheritDoc IGridEngine.directionChanged}
+     *
+     * @category Character
+     */
     directionChanged(): Observable<{
         charId: string;
         direction: Direction;
     }>;
-    /** {@inheritDoc IGridEngine.positionChangeStarted} */
+    /**
+     * {@inheritDoc IGridEngine.positionChangeStarted}
+     *
+     * @category Character
+     */
     positionChangeStarted(): Observable<{
         charId: string;
     } & PositionChange>;
-    /** {@inheritDoc IGridEngine.positionChangeFinished} */
+    /**
+     * {@inheritDoc IGridEngine.positionChangeFinished}
+     *
+     * @category Character
+     */
     positionChangeFinished(): Observable<{
         charId: string;
     } & PositionChange>;
-    /** {@inheritDoc IGridEngine.getMovementProgress} */
+    /**
+     * {@inheritDoc IGridEngine.getMovementProgress}
+     *
+     * @category Character
+     */
     getMovementProgress(charId: string): number;
-    /** {@inheritDoc IGridEngine.rebuildTileCollisionCache} */
+    /**
+     * {@inheritDoc IGridEngine.rebuildTileCollisionCache}
+     *
+     * @category Character
+     */
     rebuildTileCollisionCache(x: number, y: number, width: number, height: number): void;
-    /** {@inheritDoc IGridEngine.addQueueMovements} */
+    /**
+     * {@inheritDoc IGridEngine.addQueueMovements}
+     *
+     * @category Queue Movement
+     */
     addQueueMovements(charId: string, positions: Array<LayerPosition | Direction>, options?: QueueMovementConfig): void;
-    /** {@inheritDoc IGridEngine.queueMovementFinished} */
+    /**
+     * {@inheritDoc IGridEngine.queueMovementFinished}
+     *
+     * @category Queue Movement
+     */
     queueMovementFinished(): Observable<{
         charId: string;
     } & QueueMovementFinished>;
-    /** {@inheritDoc IGridEngine.getEnqueuedMovements} */
+    /**
+     * {@inheritDoc IGridEngine.getEnqueuedMovements}
+     *
+     * @category Queue Movement
+     */
     getEnqueuedMovements(charId: string): QueueMovementEntry[];
-    /** {@inheritDoc IGridEngine.clearEnqueuedMovements} */
+    /**
+     * {@inheritDoc IGridEngine.clearEnqueuedMovements}
+     *
+     * @category Queue Movement
+     */
     clearEnqueuedMovements(charId: string): void;
-    /** {@inheritDoc IGridEngine.getTileCost} */
+    /**
+     * {@inheritDoc IGridEngine.getTileCost}
+     *
+     * @category Pathfinding
+     */
     getTileCost(position: Position, charLayer?: string, srcDirection?: Direction): number;
     private charRemoved;
     private initGuard;
