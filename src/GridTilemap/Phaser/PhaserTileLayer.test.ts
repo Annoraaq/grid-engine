@@ -80,4 +80,39 @@ describe("PhaserTileLayer", () => {
       ],
     ]);
   });
+
+  it("should get data with Tiled project", () => {
+    const tilemap = createPhaserTilemapStub(new Map([["char_layer", [".."]]]));
+    const layerData = tilemap.getLayer("char_layer");
+    const tiledProject = {
+      propertyTypes: [
+        {
+          name: "SomeTiledClass",
+          members: [
+            {
+              name: "testProp",
+              type: "boolean",
+              value: true,
+            },
+          ],
+        },
+      ],
+    };
+
+    if (!layerData) {
+      throw new Error();
+    }
+
+    const phaserTileLayer = new PhaserTileLayer(
+      layerData.tilemapLayer,
+      tiledProject
+    );
+
+    expect(phaserTileLayer.getData()).toEqual([
+      [
+        new PhaserTile(layerData.data[0][0], tiledProject),
+        new PhaserTile(layerData.data[0][1], tiledProject),
+      ],
+    ]);
+  });
 });

@@ -268,7 +268,7 @@ export class GridEngine implements IGridEngine {
     const concreteConfig = this.setConfigDefaults(config);
 
     this.config = concreteConfig;
-    this.gridTilemap = new GridTilemapPhaser(tilemap, config.tiledProject);
+    this.gridTilemap = new GridTilemapPhaser(tilemap);
 
     this.addCharacters();
   }
