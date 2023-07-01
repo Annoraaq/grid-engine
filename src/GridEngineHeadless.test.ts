@@ -401,6 +401,9 @@ describe("GridEngineHeadless", () => {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
         }),
+        state: {
+          pathAhead: [],
+        },
       });
       expect(console.warn).not.toHaveBeenCalled();
     });
@@ -447,8 +450,8 @@ describe("GridEngineHeadless", () => {
     });
 
     it("should move to layer", () => {
-      const targetVec = { position: new Vector2(3, 4), layer: "layer1" };
-      gridEngineHeadless.moveTo("player", targetVec.position, {
+      const targetPos = { position: { x: 3, y: 4 }, charLayer: "layer1" };
+      gridEngineHeadless.moveTo("player", targetPos.position, {
         targetLayer: "layer1",
       });
 
@@ -458,9 +461,12 @@ describe("GridEngineHeadless", () => {
           distance: 0,
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
-          targetPos: targetVec,
+          targetPos,
           ignoreBlockedTarget: false,
         }),
+        state: {
+          pathAhead: [],
+        },
       });
     });
 
@@ -500,6 +506,9 @@ describe("GridEngineHeadless", () => {
           },
           ignoreBlockedTarget: false,
         },
+        state: {
+          pathAhead: [],
+        },
       });
     });
 
@@ -514,12 +523,15 @@ describe("GridEngineHeadless", () => {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
         }),
+        state: {
+          pathAhead: [],
+        },
       });
     });
 
     it("should move to coordinates CLOSEST_REACHABLE", () => {
-      const targetVec = new Vector2(3, 4);
-      gridEngineHeadless.moveTo("player", targetVec, {
+      const targetPos = { x: 3, y: 4 };
+      gridEngineHeadless.moveTo("player", targetPos, {
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
       });
       expect(gridEngineHeadless.getMovement("player")).toEqual({
@@ -528,6 +540,14 @@ describe("GridEngineHeadless", () => {
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
         }),
+        state: {
+          pathAhead: [
+            { position: { x: 0, y: 0 }, charLayer: undefined },
+            { position: { x: 0, y: 1 }, charLayer: undefined },
+            { position: { x: 1, y: 1 }, charLayer: undefined },
+            { position: { x: 2, y: 1 }, charLayer: undefined },
+          ],
+        },
       });
     });
 
@@ -543,6 +563,9 @@ describe("GridEngineHeadless", () => {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
         }),
+        state: {
+          pathAhead: [],
+        },
       });
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Unknown NoPathFoundStrategy 'unknown strategy'. Falling back to 'STOP'"
@@ -561,6 +584,9 @@ describe("GridEngineHeadless", () => {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
         }),
+        state: {
+          pathAhead: [],
+        },
       });
     });
 
@@ -576,6 +602,9 @@ describe("GridEngineHeadless", () => {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.RETRY,
         }),
+        state: {
+          pathAhead: [],
+        },
       });
     });
 
@@ -592,6 +621,9 @@ describe("GridEngineHeadless", () => {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
         }),
+        state: {
+          pathAhead: [],
+        },
       });
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Unknown PathBlockedStrategy 'unknown strategy'. Falling back to 'WAIT'"

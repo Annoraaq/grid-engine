@@ -161,13 +161,20 @@ describe("TargetMovement", () => {
         ignoreBlockedTarget: true,
         distance: 12,
         targetPos: {
-          position: new Vector2(3, 1),
-          layer: "lowerCharLayer",
+          position: { x: 3, y: 1 },
+          charLayer: "lowerCharLayer",
         },
         noPathFoundMaxRetries: 3,
         noPathFoundRetryBackoffMs: 200,
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         pathBlockedStrategy: PathBlockedStrategy.RETRY,
+      },
+      state: {
+        pathAhead: [
+          { position: { x: 1, y: 1 }, charLayer: "lowerCharLayer" },
+          { position: { x: 2, y: 1 }, charLayer: "lowerCharLayer" },
+          { position: { x: 3, y: 1 }, charLayer: "lowerCharLayer" },
+        ],
       },
     });
   });
@@ -2297,4 +2304,24 @@ describe("TargetMovement", () => {
       );
     }
   );
+
+  it("should provide the current path ahead", () => {
+    const charPos = layerPos(new Vector2(1, 1));
+    const targetPos = layerPos(new Vector2(1, 3));
+    const mockChar = createMockChar("char1", charPos);
+
+    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos);
+    expect(targetMovement.getInfo().state?.pathAhead).toEqual([
+      { position: { x: 1, y: 1 }, charLayer: "lowerCharLayer" },
+      { position: { x: 1, y: 2 }, charLayer: "lowerCharLayer" },
+      { position: { x: 1, y: 3 }, charLayer: "lowerCharLayer" },
+    ]);
+
+    chunkUpdate(targetMovement, mockChar, 2);
+
+    expect(targetMovement.getInfo().state?.pathAhead).toEqual([
+      { position: { x: 1, y: 2 }, charLayer: "lowerCharLayer" },
+      { position: { x: 1, y: 3 }, charLayer: "lowerCharLayer" },
+    ]);
+  });
 });

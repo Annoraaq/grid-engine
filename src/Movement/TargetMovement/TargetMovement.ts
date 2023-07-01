@@ -13,7 +13,7 @@ import { Movement, MovementInfo } from "../Movement";
 import { Vector2 } from "../../Utils/Vector2/Vector2";
 import { Retryable } from "./Retryable/Retryable";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
-import { CharLayer, Position } from "../../GridEngine";
+import { CharLayer, LayerPosition, Position } from "../../GridEngine";
 import { filter, Subject, take } from "rxjs";
 import {
   IsPositionAllowedFn,
@@ -22,6 +22,7 @@ import {
 } from "../../Pathfinding/Pathfinding";
 import { Concrete } from "../../Utils/TypeUtils";
 import { Bfs } from "../../Pathfinding/Bfs/Bfs";
+import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils";
 
 /**
  * @category Pathfinding
@@ -157,6 +158,22 @@ export interface Options {
   distance?: number;
   config?: MoveToConfig;
   ignoreBlockedTarget?: boolean;
+}
+
+export interface MoveToInfo extends MovementInfo {
+  state: {
+    pathAhead: LayerPosition[];
+  };
+  config: {
+    algorithm: ShortestPathAlgorithmType;
+    ignoreBlockedTarget: boolean;
+    distance: number;
+    targetPos: LayerPosition;
+    noPathFoundStrategy: NoPathFoundStrategy;
+    pathBlockedStrategy: PathBlockedStrategy;
+    noPathFoundRetryBackoffMs: number;
+    noPathFoundMaxRetries: number;
+  };
 }
 
 export class TargetMovement implements Movement {
@@ -323,14 +340,19 @@ export class TargetMovement implements Movement {
     return this.finished$;
   }
 
-  getInfo(): MovementInfo {
+  getInfo(): MoveToInfo {
     return {
       type: "Target",
+      state: {
+        pathAhead: this.shortestPath
+          .slice(this.posOnPath)
+          .map((pos) => LayerPositionUtils.fromInternal(pos)),
+      },
       config: {
         algorithm: this.shortestPathAlgorithm,
         ignoreBlockedTarget: this.ignoreBlockedTarget,
         distance: this.distance,
-        targetPos: this.targetPos,
+        targetPos: LayerPositionUtils.fromInternal(this.targetPos),
         noPathFoundStrategy: this.noPathFoundStrategy,
         pathBlockedStrategy: this.pathBlockedStrategy,
         noPathFoundRetryBackoffMs: this.noPathFoundRetryable.getBackoffMs(),

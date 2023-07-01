@@ -612,13 +612,16 @@ describe("GridEngine", () => {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
         }),
+        state: {
+          pathAhead: [],
+        },
       });
       expect(console.warn).not.toHaveBeenCalled();
     });
 
     it("should move to layer", () => {
-      const targetVec = { position: new Vector2(3, 4), layer: "layer1" };
-      gridEngine.moveTo("player", targetVec.position, {
+      const targetPos = { position: { x: 3, y: 4 }, charLayer: "layer1" };
+      gridEngine.moveTo("player", targetPos.position, {
         targetLayer: "layer1",
       });
 
@@ -628,9 +631,12 @@ describe("GridEngine", () => {
           distance: 0,
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
-          targetPos: targetVec,
+          targetPos,
           ignoreBlockedTarget: false,
         }),
+        state: {
+          pathAhead: [],
+        },
       });
     });
 
@@ -670,6 +676,9 @@ describe("GridEngine", () => {
           },
           ignoreBlockedTarget: false,
         },
+        state: {
+          pathAhead: [],
+        },
       });
     });
 
@@ -684,6 +693,9 @@ describe("GridEngine", () => {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
         }),
+        state: {
+          pathAhead: [],
+        },
       });
     });
 
@@ -698,6 +710,9 @@ describe("GridEngine", () => {
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
         }),
+        state: {
+          pathAhead: [],
+        },
       });
     });
 
@@ -713,6 +728,9 @@ describe("GridEngine", () => {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
         }),
+        state: {
+          pathAhead: [],
+        },
       });
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Unknown NoPathFoundStrategy 'unknown strategy'. Falling back to 'STOP'"
@@ -731,6 +749,9 @@ describe("GridEngine", () => {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
         }),
+        state: {
+          pathAhead: [],
+        },
       });
     });
 
@@ -746,6 +767,9 @@ describe("GridEngine", () => {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.RETRY,
         }),
+        state: {
+          pathAhead: [],
+        },
       });
     });
 
@@ -762,6 +786,9 @@ describe("GridEngine", () => {
           noPathFoundStrategy: NoPathFoundStrategy.STOP,
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
         }),
+        state: {
+          pathAhead: [],
+        },
       });
       expect(console.warn).toHaveBeenCalledWith(
         "GridEngine: Unknown PathBlockedStrategy 'unknown strategy'. Falling back to 'WAIT'"
