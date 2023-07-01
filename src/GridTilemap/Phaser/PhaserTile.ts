@@ -1,5 +1,6 @@
 import { Tile } from "../Tilemap";
 import { TiledProject } from "./PhaserTilemap";
+import { TiledProjectParser } from "tiled-property-flattener";
 
 export class PhaserTile implements Tile {
   constructor(
@@ -10,14 +11,13 @@ export class PhaserTile implements Tile {
   getProperty(name: string): any {
     const inheritedTileProps: Record<string, any> = {};
     if (this.tiledProject) {
+      const parsedProject = TiledProjectParser.parse(this.tiledProject);
       const type = this.getType();
       if (type) {
-        const propertyType = this.tiledProject.propertyTypes.find(
-          (pt) => pt.name === type
-        );
-        if (propertyType) {
-          for (const member of propertyType.members) {
-            inheritedTileProps[member.name] = member.value;
+        const inheritedProps = parsedProject.getCustomTypesMap()?.get(type);
+        if (inheritedProps) {
+          for (const [key, val] of Object.entries(inheritedProps)) {
+            inheritedTileProps[key] = val;
           }
         }
       }

@@ -1077,6 +1077,7 @@ describe("GridEngine", () => {
       propertyTypes: [
         {
           name: "SomeTiledClass",
+          type: "class",
           members: [
             {
               name: "ge_collide",
