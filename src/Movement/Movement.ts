@@ -12,4 +12,9 @@ export interface MovementInfo {
    * type
    */
   config?: Record<string, any>;
+  /**
+   * Current state of movement. This is custom for every automatic movement
+   * type
+   */
+  state?: Record<string, any>;
 }
