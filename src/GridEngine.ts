@@ -3,6 +3,7 @@ import { CollisionStrategy } from "./Collisions/CollisionStrategy";
 import {
   Finished,
   MoveToConfig,
+  MoveToInfo,
   MoveToResult,
 } from "./Movement/TargetMovement/TargetMovement";
 import { PositionChange } from "./GridCharacter/GridCharacter";
@@ -79,6 +80,7 @@ export {
   LayerPosition,
   MovementInfo,
   MoveToConfig,
+  MoveToInfo,
   MoveToResult,
   NoPathFoundStrategy,
   NumberOfDirections,
@@ -98,6 +100,7 @@ export {
   QueuedPathBlockedStrategy,
   ShortestPathAlgorithmType,
   Tile,
+  TiledProject,
   TileLayer,
   Tilemap,
   TileSizePerSecond,
