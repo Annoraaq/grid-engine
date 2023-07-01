@@ -117,6 +117,8 @@ export function oppositeDirection(direction: Direction): Direction {
  *
  * For example:
  * `directionFromPos({x:1, y:1}, {{x:2, y:1}}) = Direction.RIGHT`
+ *
+ * @category Helpers
  */
 export function directionFromPos(src: Position, dest: Position): Direction {
   if (src.x === dest.x) {

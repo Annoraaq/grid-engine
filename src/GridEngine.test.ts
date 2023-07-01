@@ -1044,6 +1044,31 @@ describe("GridEngine", () => {
     expect(gridEngine.isTileBlocked({ x: 3, y: 4 }, "someLayer")).toBe(true);
   });
 
+  it("should support Tiled class", () => {
+    const mock = createPhaserTilemapStub(new Map([["someLayer", ["."]]]));
+    const tiledProject = {
+      propertyTypes: [
+        {
+          name: "SomeTiledClass",
+          members: [
+            {
+              name: "ge_collide",
+              type: "boolean",
+              value: true,
+            },
+          ],
+        },
+      ],
+    };
+    mock.tilesets[0].tileData[-1] = { type: "SomeTiledClass" };
+    gridEngine.create(mock, {
+      characters: [{ id: "player" }],
+      tiledProject,
+    });
+
+    expect(gridEngine.isTileBlocked({ x: 0, y: 0 }, "someLayer")).toBe(true);
+  });
+
   it("should block if char is blocking", () => {
     gridEngine.create(createDefaultMockWithLayer("someLayer"), {
       characters: [

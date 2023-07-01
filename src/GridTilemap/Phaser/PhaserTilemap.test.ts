@@ -80,4 +80,37 @@ describe("PhaserTilemap", () => {
       expect(phaserTilemap.getTileAt(0, 0, "unknown")).toBe(undefined);
     }
   });
+
+  it("should get tile with Tiled properties", () => {
+    const tilemap = createPhaserTilemapStub(
+      new Map([["layer_name", ["..", ".."]]])
+    );
+    const tiledProject = {
+      propertyTypes: [
+        {
+          name: "SomeTiledClass",
+          members: [
+            {
+              name: "testProp",
+              type: "boolean",
+              value: true,
+            },
+          ],
+        },
+      ],
+    };
+    const layerData = tilemap.getLayer("layer_name");
+    const phaserTilemap = new PhaserTilemap(tilemap, tiledProject);
+    expect(layerData).toBeTruthy();
+
+    if (layerData) {
+      expect(phaserTilemap.getTileAt(0, 0, "layer_name")).toEqual(
+        new PhaserTile(layerData.data[0][0], tiledProject)
+      );
+      expect(phaserTilemap.getTileAt(3, 3, "layer_name")).toBe(undefined);
+      expect(phaserTilemap.getTileAt(0, 0)).toEqual(
+        new PhaserTile(layerData.data[0][0], tiledProject)
+      );
+    }
+  });
 });

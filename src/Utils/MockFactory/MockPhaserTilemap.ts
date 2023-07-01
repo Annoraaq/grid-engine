@@ -16,14 +16,17 @@ export function createPhaserTilemapStub(
   // This method is added dynamically, so it will exist at runtime.
   // @ts-ignore
   scene.sys.init(game);
+  const tileset = new Phaser.Tilemaps.Tileset("Test tileset", 0);
+  tileset.tileData[-1] = { type: "SomeTiledClass" };
   const mapData = parseBlockMap(blockMap, costMap);
-  mapData.tilesets = [new Phaser.Tilemaps.Tileset("Test tileset", 0)];
+  mapData.tilesets = [tileset];
   const tm = new Phaser.Tilemaps.Tilemap(scene, mapData);
   for (let i = 0; i < tm.layers.length; i++) {
     const layer = tm.createLayer(i, "Test tileset", 0, 0);
     if (layer) {
       layer.tileset = mapData.tilesets;
       layer.scale = 3;
+      layer.gidMap[0] = tileset;
     }
   }
   tm.tiles = mapData.tiles;

@@ -23,6 +23,9 @@ import {
 import { Concrete } from "../../Utils/TypeUtils";
 import { Bfs } from "../../Pathfinding/Bfs/Bfs";
 
+/**
+ * @category Pathfinding
+ */
 export interface MoveToConfig {
   /**
    * Determines what happens if no path could be found. For the different
@@ -126,6 +129,9 @@ export interface MoveToConfig {
   considerCosts?: boolean;
 }
 
+/**
+ * @category Pathfinding
+ */
 export enum MoveToResult {
   SUCCESS = "SUCCESS",
   NO_PATH_FOUND_MAX_RETRIES_EXCEEDED = "NO_PATH_FOUND_MAX_RETRIES_EXCEEDED",
@@ -137,6 +143,9 @@ export enum MoveToResult {
   MAX_PATH_LENGTH_REACHED = "MAX_PATH_LENGTH_REACHED",
 }
 
+/**
+ * @category Pathfinding
+ */
 export interface Finished {
   position: Position;
   result?: MoveToResult;

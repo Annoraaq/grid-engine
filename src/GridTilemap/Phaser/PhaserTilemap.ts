@@ -2,8 +2,22 @@ import { TileLayer, Orientation, Tile, Tilemap } from "../Tilemap";
 import { PhaserTile } from "./PhaserTile";
 import { PhaserTileLayer } from "./PhaserTileLayer";
 
+export interface TiledProject {
+  propertyTypes: Array<{
+    name: string;
+    members: Array<{
+      name: string;
+      type: string;
+      value: any;
+    }>;
+  }>;
+}
+
 export class PhaserTilemap implements Tilemap {
-  constructor(private phaserTilemap: Phaser.Tilemaps.Tilemap) {}
+  constructor(
+    private phaserTilemap: Phaser.Tilemaps.Tilemap,
+    private tiledProject?: TiledProject
+  ) {}
 
   getTileWidth(): number {
     return this.phaserTilemap.tileWidth;
@@ -35,7 +49,7 @@ export class PhaserTilemap implements Tilemap {
 
   getLayers(): TileLayer[] {
     return this.phaserTilemap.layers.map(
-      (l) => new PhaserTileLayer(l.tilemapLayer)
+      (l) => new PhaserTileLayer(l.tilemapLayer, this.tiledProject)
     );
   }
 
@@ -46,6 +60,6 @@ export class PhaserTilemap implements Tilemap {
   getTileAt(x: number, y: number, layer?: string): Tile | undefined {
     const phaserTile = this.phaserTilemap.getTileAt(x, y, false, layer);
     if (!phaserTile) return undefined;
-    return new PhaserTile(phaserTile);
+    return new PhaserTile(phaserTile, this.tiledProject);
   }
 }

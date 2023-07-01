@@ -16,6 +16,9 @@ import { DistanceUtilsFactory } from "../../Utils/DistanceUtilsFactory/DistanceU
 import { DistanceUtils } from "../../Utils/DistanceUtils";
 import { Concrete } from "../../Utils/TypeUtils";
 
+/**
+ * @category Queue Movement
+ */
 export interface QueueMovementConfig {
   /**
    * Determines what happens if the next position on the enqueued path is blocked.
@@ -64,6 +67,8 @@ export interface QueueMovementConfig {
 
 /**
  * Determines what happens if the next position on the enqueued path is blocked.
+ *
+ * @category Queue Movement
  */
 export enum QueuedPathBlockedStrategy {
   /**
@@ -85,6 +90,9 @@ export enum QueuedPathBlockedStrategy {
   STOP = "STOP",
 }
 
+/**
+ * @category Queue Movement
+ */
 export type QueueMovementResult =
   | "SUCCESS"
   | "INVALID_NEXT_POS"
@@ -92,6 +100,9 @@ export type QueueMovementResult =
   | "PATH_BLOCKED"
   | "PATH_BLOCKED_WAIT_TIMEOUT";
 
+/**
+ * @category Queue Movement
+ */
 export interface Finished {
   position: Position;
   result?: QueueMovementResult;
@@ -104,6 +115,9 @@ interface QueueEntry {
   config: Concrete<QueueMovementConfig>;
 }
 
+/**
+ * @category Queue Movement
+ */
 export interface QueueMovementEntry {
   command: LayerPosition | Direction;
   config: Concrete<QueueMovementConfig>;

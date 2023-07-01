@@ -81,6 +81,8 @@ export type TileSizePerSecond = number;
 
 /**
  * Configuration object for initializing GridEngineHeadless.
+ *
+ * @category Configuration
  */
 export interface GridEngineConfigHeadless {
   /** An array of character data. Each describing a character on the map. */
@@ -124,6 +126,9 @@ export interface GridEngineConfigHeadless {
   cacheTileCollisions?: boolean;
 }
 
+/**
+ * @category Configuration
+ */
 export interface CollisionConfig {
   /**
    * Determines whether the character should collide with the tilemap.
@@ -153,7 +158,11 @@ export interface CollisionConfig {
   collisionGroups?: string[];
 }
 
-/** Configuration object used to initialize a new character in GridEngine. */
+/**
+ * Configuration object used to initialize a new character in GridEngine.
+ *
+ * @category Configuration
+ */
 export interface CharacterDataHeadless {
   /**
    * A unique identifier for the character on the map. If you provice two
@@ -234,6 +243,9 @@ export interface CharacterDataHeadless {
   tileHeight?: number;
 }
 
+/**
+ * @category Main Modules
+ */
 export class GridEngineHeadless implements IGridEngine {
   private gridCharacters?: Map<string, GridCharacter>;
   private config?: Concrete<GridEngineConfigHeadless>;
@@ -256,7 +268,11 @@ export class GridEngineHeadless implements IGridEngine {
     console.log(`Using GridEngine v${VERSION}`);
   }
 
-  /** {@inheritDoc IGridEngine.getCharLayer} */
+  /**
+   * {@inheritDoc IGridEngine.getCharLayer}
+   *
+   * @category Character
+   */
   getCharLayer(charId: string): string | undefined {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -264,13 +280,21 @@ export class GridEngineHeadless implements IGridEngine {
     return gridChar.getTilePos().layer;
   }
 
-  /** {@inheritDoc IGridEngine.getTransition} */
+  /**
+   * {@inheritDoc IGridEngine.getTransition}
+   *
+   * @category Tilemap
+   */
   getTransition(position: Position, fromLayer: string): string | undefined {
     this.initGuard();
     return this.gridTilemap?.getTransition(new Vector2(position), fromLayer);
   }
 
-  /** {@inheritDoc IGridEngine.setTransition} */
+  /**
+   * {@inheritDoc IGridEngine.setTransition}
+   *
+   * @category Tilemap
+   */
   setTransition(position: Position, fromLayer: string, toLayer: string): void {
     this.initGuard();
     return this.gridTilemap?.setTransition(
@@ -283,6 +307,8 @@ export class GridEngineHeadless implements IGridEngine {
   /**
    * Initializes GridEngine. Must be called before any other methods of
    * GridEngine are called.
+   *
+   * @category Grid Engine
    */
   create(tilemap: Tilemap, config: GridEngineConfigHeadless): void {
     this.isCreatedInternal = true;
@@ -321,7 +347,11 @@ export class GridEngineHeadless implements IGridEngine {
     this.addCharacters();
   }
 
-  /** {@inheritDoc IGridEngine.getPosition} */
+  /**
+   * {@inheritDoc IGridEngine.getPosition}
+   *
+   * @category Character
+   */
   getPosition(charId: string): Position {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -329,12 +359,20 @@ export class GridEngineHeadless implements IGridEngine {
     return gridChar.getTilePos().position;
   }
 
-  /** {@inheritDoc IGridEngine.move} */
+  /**
+   * {@inheritDoc IGridEngine.move}
+   *
+   * @category Basic Movement
+   */
   move(charId: string, direction: Direction): void {
     this.moveChar(charId, direction);
   }
 
-  /** {@inheritDoc IGridEngine.moveRandomly} */
+  /**
+   * {@inheritDoc IGridEngine.moveRandomly}
+   *
+   * @category Random Movement
+   */
   moveRandomly(charId: string, delay = 0, radius = -1): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -343,7 +381,11 @@ export class GridEngineHeadless implements IGridEngine {
     gridChar.setMovement(randomMovement);
   }
 
-  /** {@inheritDoc IGridEngine.getMovement} */
+  /**
+   * {@inheritDoc IGridEngine.getMovement}
+   *
+   * @category Character
+   */
   getMovement(charId: string): MovementInfo {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -357,7 +399,11 @@ export class GridEngineHeadless implements IGridEngine {
     return movement.getInfo();
   }
 
-  /** {@inheritDoc IGridEngine.moveTo} */
+  /**
+   * {@inheritDoc IGridEngine.moveTo}
+   *
+   * @category Pathfinding
+   */
   moveTo(
     charId: string,
     targetPos: Position,
@@ -392,7 +438,11 @@ export class GridEngineHeadless implements IGridEngine {
     );
   }
 
-  /** {@inheritDoc IGridEngine.stopMovement} */
+  /**
+   * {@inheritDoc IGridEngine.stopMovement}
+   *
+   * @category Character
+   */
   stopMovement(charId: string): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -400,7 +450,11 @@ export class GridEngineHeadless implements IGridEngine {
     gridChar.setMovement(undefined);
   }
 
-  /** {@inheritDoc IGridEngine.setSpeed} */
+  /**
+   * {@inheritDoc IGridEngine.setSpeed}
+   *
+   * @category Character
+   */
   setSpeed(charId: string, speed: number): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -408,7 +462,12 @@ export class GridEngineHeadless implements IGridEngine {
     gridChar.setSpeed(speed);
   }
 
-  /** {@inheritDoc IGridEngine.getSpeed} */
+  /**
+   * {@inheritDoc IGridEngine.getSpeed}
+   *
+   * @category Character
+   *
+   */
   getSpeed(charId: string): number {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -416,7 +475,11 @@ export class GridEngineHeadless implements IGridEngine {
     return gridChar.getSpeed();
   }
 
-  /** {@inheritDoc IGridEngine.collidesWithTiles} */
+  /**
+   * {@inheritDoc IGridEngine.collidesWithTiles}
+   *
+   * @category Character
+   */
   collidesWithTiles(charId: string): boolean {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -424,6 +487,9 @@ export class GridEngineHeadless implements IGridEngine {
     return gridChar.collidesWithTiles();
   }
 
+  /**
+   * @category Grid Engine
+   */
   update(_time: number, delta: number): void {
     if (this.isCreatedInternal && this.gridCharacters) {
       for (const [_key, gridChar] of this.gridCharacters) {
@@ -433,7 +499,11 @@ export class GridEngineHeadless implements IGridEngine {
     this.gridTilemap?.invalidateFrameCache();
   }
 
-  /** Adds a character after calling {@link create}. */
+  /**
+   * Adds a character after calling {@link create}.
+   *
+   * @category Grid Engine
+   */
   addCharacter(charData: CharacterDataHeadless): void {
     if (!this.gridTilemap) throw this.createUninitializedErr();
     if (!this.config) throw this.createUninitializedErr();
@@ -517,13 +587,21 @@ export class GridEngineHeadless implements IGridEngine {
     this.charAdded$?.next(id);
   }
 
-  /** {@inheritDoc IGridEngine.hasCharacter} */
+  /**
+   * {@inheritDoc IGridEngine.hasCharacter}
+   *
+   * @category Grid Engine
+   */
   hasCharacter(charId: string): boolean {
     this.initGuard();
     return !!this.gridCharacters?.has(charId);
   }
 
-  /** {@inheritDoc IGridEngine.removeCharacter} */
+  /**
+   * {@inheritDoc IGridEngine.removeCharacter}
+   *
+   * @category Grid Engine
+   */
   removeCharacter(charId: string): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -533,7 +611,11 @@ export class GridEngineHeadless implements IGridEngine {
     this.charRemoved$?.next(charId);
   }
 
-  /** {@inheritDoc IGridEngine.removeAllCharacters} */
+  /**
+   * {@inheritDoc IGridEngine.removeAllCharacters}
+   *
+   * @category Grid Engine
+   */
   removeAllCharacters(): void {
     this.initGuard();
     if (!this.gridCharacters) return;
@@ -542,7 +624,11 @@ export class GridEngineHeadless implements IGridEngine {
     }
   }
 
-  /** {@inheritDoc IGridEngine.getAllCharacters} */
+  /**
+   * {@inheritDoc IGridEngine.getAllCharacters}
+   *
+   * @category Grid Engine
+   */
   getAllCharacters(options?: CharacterFilteringOptions): string[] {
     this.initGuard();
     if (!this.gridCharacters) return [];
@@ -553,7 +639,11 @@ export class GridEngineHeadless implements IGridEngine {
     return filteredChars.map((char: GridCharacter) => char.getId());
   }
 
-  /** {@inheritDoc IGridEngine.getLabels} */
+  /**
+   * {@inheritDoc IGridEngine.getLabels}
+   *
+   * @category Character
+   */
   getLabels(charId: string): string[] {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -561,7 +651,11 @@ export class GridEngineHeadless implements IGridEngine {
     return gridChar.getLabels();
   }
 
-  /** {@inheritDoc IGridEngine.addLabels} */
+  /**
+   * {@inheritDoc IGridEngine.addLabels}
+   *
+   * @category Character
+   */
   addLabels(charId: string, labels: string[]): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -569,7 +663,11 @@ export class GridEngineHeadless implements IGridEngine {
     gridChar.addLabels(labels);
   }
 
-  /** {@inheritDoc IGridEngine.removeLabels} */
+  /**
+   * {@inheritDoc IGridEngine.removeLabels}
+   *
+   * @category Character
+   */
   removeLabels(charId: string, labels: string[]): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -577,7 +675,11 @@ export class GridEngineHeadless implements IGridEngine {
     gridChar.removeLabels(labels);
   }
 
-  /** {@inheritDoc IGridEngine.clearLabels} */
+  /**
+   * {@inheritDoc IGridEngine.clearLabels}
+   *
+   * @category Character
+   */
   clearLabels(charId: string): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -585,7 +687,11 @@ export class GridEngineHeadless implements IGridEngine {
     gridChar.clearLabels();
   }
 
-  /** {@inheritDoc IGridEngine.follow} */
+  /**
+   * {@inheritDoc IGridEngine.follow}
+   *
+   * @category Pathfinding
+   */
   follow(charId: string, charIdToFollow: string, options?: FollowOptions): void;
   follow(
     charId: string,
@@ -641,7 +747,11 @@ export class GridEngineHeadless implements IGridEngine {
     gridChar.setMovement(followMovement);
   }
 
-  /** {@inheritDoc IGridEngine.isMoving} */
+  /**
+   * {@inheritDoc IGridEngine.isMoving}
+   *
+   * @category Character
+   */
   isMoving(charId: string): boolean {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -649,7 +759,11 @@ export class GridEngineHeadless implements IGridEngine {
     return gridChar.isMoving();
   }
 
-  /** {@inheritDoc IGridEngine.getFacingDirection} */
+  /**
+   * {@inheritDoc IGridEngine.getFacingDirection}
+   *
+   * @category Character
+   */
   getFacingDirection(charId: string): Direction {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -657,7 +771,11 @@ export class GridEngineHeadless implements IGridEngine {
     return gridChar.getFacingDirection();
   }
 
-  /** {@inheritDoc IGridEngine.getFacingPosition} */
+  /**
+   * {@inheritDoc IGridEngine.getFacingPosition}
+   *
+   * @category Character
+   */
   getFacingPosition(charId: string): Position {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -666,7 +784,11 @@ export class GridEngineHeadless implements IGridEngine {
     return { x: vectorPos.x, y: vectorPos.y };
   }
 
-  /** {@inheritDoc IGridEngine.turnTowards} */
+  /**
+   * {@inheritDoc IGridEngine.turnTowards}
+   *
+   * @category Basic Movement
+   */
   turnTowards(charId: string, direction: Direction): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -674,7 +796,11 @@ export class GridEngineHeadless implements IGridEngine {
     return gridChar.turnTowards(direction);
   }
 
-  /** {@inheritDoc IGridEngine.getCharactersAt} */
+  /**
+   * {@inheritDoc IGridEngine.getCharactersAt}
+   *
+   * @category Tilemap
+   */
   getCharactersAt(position: Position, layer?: string): string[] {
     this.initGuard();
     if (!this.gridTilemap) return [];
@@ -685,7 +811,11 @@ export class GridEngineHeadless implements IGridEngine {
     return Array.from(characters).map((char) => char.getId());
   }
 
-  /** {@inheritDoc IGridEngine.setPosition} */
+  /**
+   * {@inheritDoc IGridEngine.setPosition}
+   *
+   * @category Character
+   */
   setPosition(charId: string, pos: Position, layer?: string): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -699,7 +829,11 @@ export class GridEngineHeadless implements IGridEngine {
     gridChar.setTilePosition({ position: new Vector2(pos), layer });
   }
 
-  /** {@inheritDoc IGridEngine.isBlocked} */
+  /**
+   * {@inheritDoc IGridEngine.isBlocked}
+   *
+   * @category Tilemap
+   */
   isBlocked(
     position: Position,
     layer?: string,
@@ -713,13 +847,21 @@ export class GridEngineHeadless implements IGridEngine {
     );
   }
 
-  /** {@inheritDoc IGridEngine.isTileBlocked} */
+  /**
+   * {@inheritDoc IGridEngine.isTileBlocked}
+   *
+   * @category Tilemap
+   */
   isTileBlocked(position: Position, layer?: string): boolean {
     this.initGuard();
     return !!this.gridTilemap?.hasBlockingTile(new Vector2(position), layer);
   }
 
-  /** {@inheritDoc IGridEngine.getCollisionGroups} */
+  /**
+   * {@inheritDoc IGridEngine.getCollisionGroups}
+   *
+   * @category Character
+   */
   getCollisionGroups(charId: string): string[] {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -727,7 +869,11 @@ export class GridEngineHeadless implements IGridEngine {
     return gridChar.getCollisionGroups() || [];
   }
 
-  /** {@inheritDoc IGridEngine.setCollisionGroups} */
+  /**
+   * {@inheritDoc IGridEngine.setCollisionGroups}
+   *
+   * @category Character
+   */
   setCollisionGroups(charId: string, collisionGroups: string[]): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -735,7 +881,11 @@ export class GridEngineHeadless implements IGridEngine {
     gridChar.setCollisionGroups(collisionGroups);
   }
 
-  /** {@inheritDoc IGridEngine.getTilePosInDirection} */
+  /**
+   * {@inheritDoc IGridEngine.getTilePosInDirection}
+   *
+   * @category Tilemap
+   */
   getTilePosInDirection(
     position: Position,
     charLayer: string | undefined,
@@ -758,6 +908,8 @@ export class GridEngineHeadless implements IGridEngine {
   /**
    * {@inheritDoc IGridEngine.findShortestPath}
    * @alpha
+   *
+   * @category Pathfinding
    */
   findShortestPath(
     source: LayerPosition,
@@ -790,7 +942,11 @@ export class GridEngineHeadless implements IGridEngine {
     };
   }
 
-  /** {@inheritDoc IGridEngine.steppedOn} */
+  /**
+   * {@inheritDoc IGridEngine.steppedOn}
+   *
+   * @category Basic Movement
+   */
   steppedOn(
     charIds: string[],
     tiles: Position[],
@@ -812,7 +968,11 @@ export class GridEngineHeadless implements IGridEngine {
     );
   }
 
-  /** {@inheritDoc IGridEngine.characterShifted} */
+  /**
+   * {@inheritDoc IGridEngine.characterShifted}
+   *
+   * @category GridEngine
+   */
   characterShifted(): Observable<CharacterShift> {
     if (!this.charAdded$ || !this.charRemoved$) {
       throw this.createUninitializedErr();
@@ -833,37 +993,61 @@ export class GridEngineHeadless implements IGridEngine {
     );
   }
 
-  /** {@inheritDoc IGridEngine.movementStarted} */
+  /**
+   * {@inheritDoc IGridEngine.movementStarted}
+   *
+   * @category Character
+   */
   movementStarted(): Observable<{ charId: string; direction: Direction }> {
     if (!this.movementStarted$) throw this.createUninitializedErr();
     return this.movementStarted$;
   }
 
-  /** {@inheritDoc IGridEngine.movementStopped} */
+  /**
+   * {@inheritDoc IGridEngine.movementStopped}
+   *
+   * @category Character
+   */
   movementStopped(): Observable<{ charId: string; direction: Direction }> {
     if (!this.movementStopped$) throw this.createUninitializedErr();
     return this.movementStopped$;
   }
 
-  /** {@inheritDoc IGridEngine.directionChanged} */
+  /**
+   * {@inheritDoc IGridEngine.directionChanged}
+   *
+   * @category Character
+   */
   directionChanged(): Observable<{ charId: string; direction: Direction }> {
     if (!this.directionChanged$) throw this.createUninitializedErr();
     return this.directionChanged$;
   }
 
-  /** {@inheritDoc IGridEngine.positionChangeStarted} */
+  /**
+   * {@inheritDoc IGridEngine.positionChangeStarted}
+   *
+   * @category Character
+   */
   positionChangeStarted(): Observable<{ charId: string } & PositionChange> {
     if (!this.positionChangeStarted$) throw this.createUninitializedErr();
     return this.positionChangeStarted$;
   }
 
-  /** {@inheritDoc IGridEngine.positionChangeFinished} */
+  /**
+   * {@inheritDoc IGridEngine.positionChangeFinished}
+   *
+   * @category Character
+   */
   positionChangeFinished(): Observable<{ charId: string } & PositionChange> {
     if (!this.positionChangeFinished$) throw this.createUninitializedErr();
     return this.positionChangeFinished$;
   }
 
-  /** {@inheritDoc IGridEngine.getMovementProgress} */
+  /**
+   * {@inheritDoc IGridEngine.getMovementProgress}
+   *
+   * @category Character
+   */
   getMovementProgress(charId: string): number {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -871,7 +1055,11 @@ export class GridEngineHeadless implements IGridEngine {
     return gridChar.getMovementProgress();
   }
 
-  /** {@inheritDoc IGridEngine.rebuildTileCollisionCache} */
+  /**
+   * {@inheritDoc IGridEngine.rebuildTileCollisionCache}
+   *
+   * @category Character
+   */
   rebuildTileCollisionCache(
     x: number,
     y: number,
@@ -881,7 +1069,11 @@ export class GridEngineHeadless implements IGridEngine {
     this.gridTilemap?.rebuildTileCollisionCache(new Rect(x, y, width, height));
   }
 
-  /** {@inheritDoc IGridEngine.addQueueMovements} */
+  /**
+   * {@inheritDoc IGridEngine.addQueueMovements}
+   *
+   * @category Queue Movement
+   */
   addQueueMovements(
     charId: string,
     positions: Array<LayerPosition | Direction>,
@@ -920,7 +1112,11 @@ export class GridEngineHeadless implements IGridEngine {
     );
   }
 
-  /** {@inheritDoc IGridEngine.queueMovementFinished} */
+  /**
+   * {@inheritDoc IGridEngine.queueMovementFinished}
+   *
+   * @category Queue Movement
+   */
   queueMovementFinished(): Observable<
     { charId: string } & QueueMovementFinished
   > {
@@ -928,7 +1124,11 @@ export class GridEngineHeadless implements IGridEngine {
     return this.queueMovementFinished$;
   }
 
-  /** {@inheritDoc IGridEngine.getEnqueuedMovements} */
+  /**
+   * {@inheritDoc IGridEngine.getEnqueuedMovements}
+   *
+   * @category Queue Movement
+   */
   getEnqueuedMovements(charId: string): QueueMovementEntry[] {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -947,7 +1147,11 @@ export class GridEngineHeadless implements IGridEngine {
     return [];
   }
 
-  /** {@inheritDoc IGridEngine.clearEnqueuedMovements} */
+  /**
+   * {@inheritDoc IGridEngine.clearEnqueuedMovements}
+   *
+   * @category Queue Movement
+   */
   clearEnqueuedMovements(charId: string): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -958,7 +1162,11 @@ export class GridEngineHeadless implements IGridEngine {
     }
   }
 
-  /** {@inheritDoc IGridEngine.getTileCost} */
+  /**
+   * {@inheritDoc IGridEngine.getTileCost}
+   *
+   * @category Pathfinding
+   */
   getTileCost(
     position: Position,
     charLayer?: string,

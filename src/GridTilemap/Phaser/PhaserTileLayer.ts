@@ -1,8 +1,12 @@
 import { TileLayer, Tile, CHAR_LAYER_PROP_NAME } from "../Tilemap";
 import { PhaserTile } from "./PhaserTile";
+import { TiledProject } from "./PhaserTilemap";
 
 export class PhaserTileLayer implements TileLayer {
-  constructor(private phaserTilemapLayer: Phaser.Tilemaps.TilemapLayer) {}
+  constructor(
+    private phaserTilemapLayer: Phaser.Tilemaps.TilemapLayer,
+    private tiledProject?: TiledProject
+  ) {}
 
   getName(): string {
     return this.phaserTilemapLayer.layer.name;
@@ -26,7 +30,7 @@ export class PhaserTileLayer implements TileLayer {
 
   getData(): Tile[][] {
     return this.phaserTilemapLayer.layer.data.map((d) =>
-      d.map((dc) => new PhaserTile(dc))
+      d.map((dc) => new PhaserTile(dc, this.tiledProject))
     );
   }
 }

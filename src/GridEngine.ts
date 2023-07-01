@@ -14,7 +14,6 @@ import {
 import { Observable } from "rxjs";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
-import { Concrete } from "./Utils/TypeUtils";
 import { MovementInfo } from "./Movement/Movement";
 import {
   CharacterIndex,
@@ -36,7 +35,10 @@ import {
   CharacterDataHeadless,
 } from "./GridEngineHeadless";
 import { GridTilemapPhaser } from "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser";
-import { PhaserTilemap } from "./GridTilemap/Phaser/PhaserTilemap";
+import {
+  PhaserTilemap,
+  TiledProject,
+} from "./GridTilemap/Phaser/PhaserTilemap";
 import { Orientation, Tile, TileLayer, Tilemap } from "./GridTilemap/Tilemap";
 import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer";
 import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile";
@@ -104,6 +106,8 @@ export {
 
 /**
  * Configuration object for initializing GridEngine.
+ *
+ * @category Configuration
  */
 export interface GridEngineConfig extends GridEngineConfigHeadless {
   /** An array of character data. Each describing a character on the map. */
@@ -118,6 +122,12 @@ export interface GridEngineConfig extends GridEngineConfigHeadless {
    * @beta
    */
   layerOverlay?: boolean;
+
+  /**
+   * Object, parsed from Tiled project file. This is used to provide Tiled
+   * project features like tile classes.
+   */
+  tiledProject?: TiledProject;
 }
 
 export interface WalkingAnimationMapping {
@@ -139,7 +149,11 @@ export interface WalkingAnimationMapping {
   [Direction.DOWN_RIGHT]?: FrameRow;
 }
 
-/** Configuration object used to initialize a new character in GridEngine. */
+/**
+ * Configuration object used to initialize a new character in GridEngine.
+ *
+ * @category Configuration
+ */
 export interface CharacterData extends CharacterDataHeadless {
   /** The character’s sprite. */
   sprite?: Phaser.GameObjects.Sprite;
@@ -186,9 +200,12 @@ export interface CharacterData extends CharacterDataHeadless {
   offsetY?: number;
 }
 
+/**
+ * @category Main Modules
+ */
 export class GridEngine implements IGridEngine {
   private geHeadless: GridEngineHeadless = new GridEngineHeadless();
-  private config?: Concrete<GridEngineConfig>;
+  private config?: Omit<Required<GridEngineConfig>, "tiledProject">;
   private gridCharacters?: Map<string, GridCharacterPhaser>;
   private gridTilemap?: GridTilemapPhaser;
   private isCreatedInternal = false;
@@ -207,17 +224,29 @@ export class GridEngine implements IGridEngine {
     this.scene.sys.events.on("update", this.update, this);
   }
 
-  /** {@inheritDoc IGridEngine.getCharLayer} */
+  /**
+   * {@inheritDoc IGridEngine.getCharLayer}
+   *
+   * @category Character
+   */
   getCharLayer(charId: string): string | undefined {
     return this.geHeadless.getCharLayer(charId);
   }
 
-  /** {@inheritDoc IGridEngine.getTransition} */
+  /**
+   * {@inheritDoc IGridEngine.getTransition}
+   *
+   * @category Tilemap
+   */
   getTransition(position: Position, fromLayer: string): string | undefined {
     return this.geHeadless.getTransition(position, fromLayer);
   }
 
-  /** {@inheritDoc IGridEngine.setTransition} */
+  /**
+   * {@inheritDoc IGridEngine.setTransition}
+   *
+   * @category Tilemap
+   */
   setTransition(position: Position, fromLayer: string, toLayer: string): void {
     this.geHeadless.setTransition(position, fromLayer, toLayer);
   }
@@ -225,9 +254,14 @@ export class GridEngine implements IGridEngine {
   /**
    * Initializes GridEngine. Must be called before any other methods of
    * GridEngine are called.
+   *
+   * @category Grid Engine
    */
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
-    this.geHeadless.create(new PhaserTilemap(tilemap), config);
+    this.geHeadless.create(
+      new PhaserTilemap(tilemap, config.tiledProject),
+      config
+    );
     this.isCreatedInternal = true;
     this.gridCharacters = new Map();
 
@@ -239,27 +273,47 @@ export class GridEngine implements IGridEngine {
     this.addCharacters();
   }
 
-  /** {@inheritDoc IGridEngine.getPosition} */
+  /**
+   * {@inheritDoc IGridEngine.getPosition}
+   *
+   * @category Character
+   */
   getPosition(charId: string): Position {
     return this.geHeadless.getPosition(charId);
   }
 
-  /** {@inheritDoc IGridEngine.move} */
+  /**
+   * {@inheritDoc IGridEngine.move}
+   *
+   * @category Basic Movement
+   */
   move(charId: string, direction: Direction): void {
     this.geHeadless.move(charId, direction);
   }
 
-  /** {@inheritDoc IGridEngine.moveRandomly} */
+  /**
+   * {@inheritDoc IGridEngine.moveRandomly}
+   *
+   * @category Random Movement
+   */
   moveRandomly(charId: string, delay = 0, radius = -1): void {
     this.geHeadless.moveRandomly(charId, delay, radius);
   }
 
-  /** {@inheritDoc IGridEngine.getMovement} */
+  /**
+   * {@inheritDoc IGridEngine.getMovement}
+   *
+   * @category Character
+   */
   getMovement(charId: string): MovementInfo {
     return this.geHeadless.getMovement(charId);
   }
 
-  /** {@inheritDoc IGridEngine.moveTo} */
+  /**
+   * {@inheritDoc IGridEngine.moveTo}
+   *
+   * @category Pathfinding
+   */
   moveTo(
     charId: string,
     targetPos: Position,
@@ -268,22 +322,38 @@ export class GridEngine implements IGridEngine {
     return this.geHeadless.moveTo(charId, targetPos, config);
   }
 
-  /** {@inheritDoc IGridEngine.stopMovement} */
+  /**
+   * {@inheritDoc IGridEngine.stopMovement}
+   *
+   * @category Basic Movement
+   */
   stopMovement(charId: string): void {
     this.geHeadless.stopMovement(charId);
   }
 
-  /** {@inheritDoc IGridEngine.setSpeed} */
+  /**
+   * {@inheritDoc IGridEngine.setSpeed}
+   *
+   * @category Character
+   */
   setSpeed(charId: string, speed: number): void {
     this.geHeadless.setSpeed(charId, speed);
   }
 
-  /** {@inheritDoc IGridEngine.getSpeed} */
+  /**
+   * {@inheritDoc IGridEngine.getSpeed}
+   *
+   * @category Character
+   */
   getSpeed(charId: string): number {
     return this.geHeadless.getSpeed(charId);
   }
 
-  /** @returns Container for a character. */
+  /**
+   * @returns Container for a character.
+   *
+   * @category Character
+   */
   getContainer(charId: string): Phaser.GameObjects.Container | undefined {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -291,7 +361,11 @@ export class GridEngine implements IGridEngine {
     return gridChar.getContainer();
   }
 
-  /** @returns X-offset for a character. */
+  /**
+   * @returns X-offset for a character.
+   *
+   * @category Character
+   */
   getOffsetX(charId: string): number {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -301,6 +375,8 @@ export class GridEngine implements IGridEngine {
 
   /**
    * Set custom x-offset for the sprite/container.
+   *
+   * @category Character
    */
   setOffsetX(charId: string, offsetX: number): void {
     this.initGuard();
@@ -309,7 +385,11 @@ export class GridEngine implements IGridEngine {
     gridChar.setOffsetX(offsetX);
   }
 
-  /** @returns Y-offset for a character. */
+  /**
+   * @returns Y-offset for a character.
+   *
+   * @category Character
+   */
   getOffsetY(charId: string): number {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -319,6 +399,8 @@ export class GridEngine implements IGridEngine {
 
   /**
    * Set custom y-offset for the sprite/container.
+   *
+   * @category Character
    */
   setOffsetY(charId: string, offsetY: number): void {
     this.initGuard();
@@ -327,7 +409,11 @@ export class GridEngine implements IGridEngine {
     gridChar.setOffsetY(offsetY);
   }
 
-  /** {@inheritDoc IGridEngine.collidesWithTiles} */
+  /**
+   * {@inheritDoc IGridEngine.collidesWithTiles}
+   *
+   * @category Character
+   */
   collidesWithTiles(charId: string): boolean {
     return this.geHeadless.collidesWithTiles(charId);
   }
@@ -335,6 +421,8 @@ export class GridEngine implements IGridEngine {
   /**
    * @returns {@link WalkingAnimationMapping} for a character. If a character
    * index was set, it will be returned instead.
+   *
+   * @category Character
    */
   getWalkingAnimationMapping(
     charId: string
@@ -349,6 +437,8 @@ export class GridEngine implements IGridEngine {
   /**
    * @returns `true` if {@link https://annoraaq.github.io/grid-engine/p/layer-overlay/ | layer overlay}
    * is activated.
+   *
+   * @category Grid Engine
    */
   hasLayerOverlay(): boolean {
     this.initGuard();
@@ -360,6 +450,8 @@ export class GridEngine implements IGridEngine {
    * can provide a number which is the character index (see also
    * {@link CharacterData | Character Config}). If you provide `undefined`, it
    * will disable walking animations for the character.
+   *
+   * @category Character
    */
   setWalkingAnimationMapping(
     charId: string,
@@ -383,18 +475,30 @@ export class GridEngine implements IGridEngine {
     this.geHeadless.update(time, delta);
   }
 
-  /** Adds a character after calling {@link create}. */
+  /**
+   * Adds a character after calling {@link create}.
+   *
+   * @category Grid Engine
+   */
   addCharacter(charData: CharacterData): void {
     this.geHeadless.addCharacter(charData);
     this.addCharacterInternal(charData);
   }
 
-  /** {@inheritDoc IGridEngine.hasCharacter} */
+  /**
+   * {@inheritDoc IGridEngine.hasCharacter}
+   *
+   * @category Grid Engine
+   */
   hasCharacter(charId: string): boolean {
     return this.geHeadless.hasCharacter(charId);
   }
 
-  /** {@inheritDoc IGridEngine.removeCharacter} */
+  /**
+   * {@inheritDoc IGridEngine.removeCharacter}
+   *
+   * @category Grid Engine
+   */
   removeCharacter(charId: string): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -405,7 +509,11 @@ export class GridEngine implements IGridEngine {
     this.geHeadless.removeCharacter(charId);
   }
 
-  /** {@inheritDoc IGridEngine.removeAllCharacters} */
+  /**
+   * {@inheritDoc IGridEngine.removeAllCharacters}
+   *
+   * @category Grid Engine
+   */
   removeAllCharacters(): void {
     this.initGuard();
     if (!this.gridCharacters) return;
@@ -416,32 +524,56 @@ export class GridEngine implements IGridEngine {
     this.geHeadless.removeAllCharacters();
   }
 
-  /** {@inheritDoc IGridEngine.getAllCharacters} */
+  /**
+   * {@inheritDoc IGridEngine.getAllCharacters}
+   *
+   * @category Character
+   */
   getAllCharacters(options?: CharacterFilteringOptions): string[] {
     return this.geHeadless.getAllCharacters(options);
   }
 
-  /** {@inheritDoc IGridEngine.getLabels} */
+  /**
+   * {@inheritDoc IGridEngine.getLabels}
+   *
+   * @category Character
+   */
   getLabels(charId: string): string[] {
     return this.geHeadless.getLabels(charId);
   }
 
-  /** {@inheritDoc IGridEngine.addLabels} */
+  /**
+   * {@inheritDoc IGridEngine.addLabels}
+   *
+   * @category Character
+   */
   addLabels(charId: string, labels: string[]): void {
     this.geHeadless.addLabels(charId, labels);
   }
 
-  /** {@inheritDoc IGridEngine.removeLabels} */
+  /**
+   * {@inheritDoc IGridEngine.removeLabels}
+   *
+   * @category Character
+   */
   removeLabels(charId: string, labels: string[]): void {
     this.geHeadless.removeLabels(charId, labels);
   }
 
-  /** {@inheritDoc IGridEngine.clearLabels} */
+  /**
+   * {@inheritDoc IGridEngine.clearLabels}
+   *
+   * @category Character
+   */
   clearLabels(charId: string): void {
     this.geHeadless.clearLabels(charId);
   }
 
-  /** {@inheritDoc IGridEngine.follow} */
+  /**
+   * {@inheritDoc IGridEngine.follow}
+   *
+   * @category Pathfinding
+   */
   follow(charId: string, charIdToFollow: string, options?: FollowOptions): void;
   follow(
     charId: string,
@@ -476,22 +608,38 @@ export class GridEngine implements IGridEngine {
     this.geHeadless.follow(charId, charIdToFollow, options);
   }
 
-  /** {@inheritDoc IGridEngine.isMoving} */
+  /**
+   * {@inheritDoc IGridEngine.isMoving}
+   *
+   * @category Character
+   */
   isMoving(charId: string): boolean {
     return this.geHeadless.isMoving(charId);
   }
 
-  /** {@inheritDoc IGridEngine.getFacingDirection} */
+  /**
+   * {@inheritDoc IGridEngine.getFacingDirection}
+   *
+   * @category Character
+   */
   getFacingDirection(charId: string): Direction {
     return this.geHeadless.getFacingDirection(charId);
   }
 
-  /** {@inheritDoc IGridEngine.getFacingPosition} */
+  /**
+   * {@inheritDoc IGridEngine.getFacingPosition}
+   *
+   * @category Character
+   */
   getFacingPosition(charId: string): Position {
     return this.geHeadless.getFacingPosition(charId);
   }
 
-  /** {@inheritDoc IGridEngine.turnTowards} */
+  /**
+   * {@inheritDoc IGridEngine.turnTowards}
+   *
+   * @category Basic Movement
+   */
   turnTowards(charId: string, direction: Direction): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -500,18 +648,28 @@ export class GridEngine implements IGridEngine {
     this.geHeadless.turnTowards(charId, direction);
   }
 
-  /** {@inheritDoc IGridEngine.getCharactersAt} */
+  /**
+   * {@inheritDoc IGridEngine.getCharactersAt}
+   *
+   * @category Tilemap
+   */
   getCharactersAt(position: Position, layer?: string): string[] {
     return this.geHeadless.getCharactersAt(position, layer);
   }
 
-  /** {@inheritDoc IGridEngine.setPosition} */
+  /**
+   * {@inheritDoc IGridEngine.setPosition}
+   *
+   * @category Character
+   */
   setPosition(charId: string, pos: Position, layer?: string): void {
     this.geHeadless.setPosition(charId, pos, layer);
   }
 
   /**
    * @returns Sprite of given character
+   *
+   * @category Character
    */
   getSprite(charId: string): Phaser.GameObjects.Sprite | undefined {
     this.initGuard();
@@ -522,6 +680,8 @@ export class GridEngine implements IGridEngine {
 
   /**
    * Sets the sprite for a character.
+   *
+   * @category Character
    */
   setSprite(charId: string, sprite: Phaser.GameObjects.Sprite): void {
     this.initGuard();
@@ -532,7 +692,11 @@ export class GridEngine implements IGridEngine {
     this.setCharSprite(sprite, gridCharPhaser);
   }
 
-  /** {@inheritDoc IGridEngine.isBlocked} */
+  /**
+   * {@inheritDoc IGridEngine.isBlocked}
+   *
+   * @category Tilemap
+   */
   isBlocked(
     position: Position,
     layer?: string,
@@ -541,22 +705,38 @@ export class GridEngine implements IGridEngine {
     return this.geHeadless.isBlocked(position, layer, collisionGroups);
   }
 
-  /** {@inheritDoc IGridEngine.isTileBlocked} */
+  /**
+   * {@inheritDoc IGridEngine.isTileBlocked}
+   *
+   * @category Tilemap
+   */
   isTileBlocked(position: Position, layer?: string): boolean {
     return this.geHeadless.isTileBlocked(position, layer);
   }
 
-  /** {@inheritDoc IGridEngine.getCollisionGroups} */
+  /**
+   * {@inheritDoc IGridEngine.getCollisionGroups}
+   *
+   * @category Character
+   */
   getCollisionGroups(charId: string): string[] {
     return this.geHeadless.getCollisionGroups(charId);
   }
 
-  /** {@inheritDoc IGridEngine.setCollisionGroups} */
+  /**
+   * {@inheritDoc IGridEngine.setCollisionGroups}
+   *
+   * @category Character
+   */
   setCollisionGroups(charId: string, collisionGroups: string[]): void {
     this.geHeadless.setCollisionGroups(charId, collisionGroups);
   }
 
-  /** {@inheritDoc IGridEngine.getTilePosInDirection} */
+  /**
+   * {@inheritDoc IGridEngine.getTilePosInDirection}
+   *
+   * @category Tilemap
+   */
   getTilePosInDirection(
     position: Position,
     charLayer: string | undefined,
@@ -572,6 +752,8 @@ export class GridEngine implements IGridEngine {
   /**
    * {@inheritDoc IGridEngine.findShortestPath}
    * @alpha
+   *
+   * @category Pathfinding
    */
   findShortestPath(
     source: LayerPosition,
@@ -581,7 +763,11 @@ export class GridEngine implements IGridEngine {
     return this.geHeadless.findShortestPath(source, dest, options);
   }
 
-  /** {@inheritDoc IGridEngine.steppedOn} */
+  /**
+   * {@inheritDoc IGridEngine.steppedOn}
+   *
+   * @category Basic Movement
+   */
   steppedOn(
     charIds: string[],
     tiles: Position[],
@@ -594,42 +780,74 @@ export class GridEngine implements IGridEngine {
     return this.geHeadless.steppedOn(charIds, tiles, layer);
   }
 
-  /** {@inheritDoc IGridEngine.characterShifted} */
+  /**
+   * {@inheritDoc IGridEngine.characterShifted}
+   *
+   * @category GridEngine
+   */
   characterShifted(): Observable<CharacterShift> {
     return this.geHeadless.characterShifted();
   }
 
-  /** {@inheritDoc IGridEngine.movementStarted} */
+  /**
+   * {@inheritDoc IGridEngine.movementStarted}
+   *
+   * @category Character
+   */
   movementStarted(): Observable<{ charId: string; direction: Direction }> {
     return this.geHeadless.movementStarted();
   }
 
-  /** {@inheritDoc IGridEngine.movementStopped} */
+  /**
+   * {@inheritDoc IGridEngine.movementStopped}
+   *
+   * @category Character
+   */
   movementStopped(): Observable<{ charId: string; direction: Direction }> {
     return this.geHeadless.movementStopped();
   }
 
-  /** {@inheritDoc IGridEngine.directionChanged} */
+  /**
+   * {@inheritDoc IGridEngine.directionChanged}
+   *
+   * @category Character
+   */
   directionChanged(): Observable<{ charId: string; direction: Direction }> {
     return this.geHeadless.directionChanged();
   }
 
-  /** {@inheritDoc IGridEngine.positionChangeStarted} */
+  /**
+   * {@inheritDoc IGridEngine.positionChangeStarted}
+   *
+   * @category Character
+   */
   positionChangeStarted(): Observable<{ charId: string } & PositionChange> {
     return this.geHeadless.positionChangeStarted();
   }
 
-  /** {@inheritDoc IGridEngine.positionChangeFinished} */
+  /**
+   * {@inheritDoc IGridEngine.positionChangeFinished}
+   *
+   * @category Character
+   */
   positionChangeFinished(): Observable<{ charId: string } & PositionChange> {
     return this.geHeadless.positionChangeFinished();
   }
 
-  /** {@inheritDoc IGridEngine.getMovementProgress} */
+  /**
+   * {@inheritDoc IGridEngine.getMovementProgress}
+   *
+   * @category Character
+   */
   getMovementProgress(charId: string): number {
     return this.geHeadless.getMovementProgress(charId);
   }
 
-  /** {@inheritDoc IGridEngine.rebuildTileCollisionCache} */
+  /**
+   * {@inheritDoc IGridEngine.rebuildTileCollisionCache}
+   *
+   * @category Grid Engine
+   */
   rebuildTileCollisionCache(
     x: number,
     y: number,
@@ -639,7 +857,11 @@ export class GridEngine implements IGridEngine {
     this.geHeadless.rebuildTileCollisionCache(x, y, width, height);
   }
 
-  /** {@inheritDoc IGridEngine.addQueueMovements} */
+  /**
+   * {@inheritDoc IGridEngine.addQueueMovements}
+   *
+   * @category Queue Movement
+   */
   addQueueMovements(
     charId: string,
     positions: Array<LayerPosition | Direction>,
@@ -648,24 +870,40 @@ export class GridEngine implements IGridEngine {
     this.geHeadless.addQueueMovements(charId, positions, options);
   }
 
-  /** {@inheritDoc IGridEngine.getEnqueuedMovements} */
+  /**
+   * {@inheritDoc IGridEngine.getEnqueuedMovements}
+   *
+   * @category Queue Movement
+   */
   getEnqueuedMovements(charId: string): QueueMovementEntry[] {
     return this.geHeadless.getEnqueuedMovements(charId);
   }
 
-  /** {@inheritDoc IGridEngine.queueMovementFinished} */
+  /**
+   * {@inheritDoc IGridEngine.queueMovementFinished}
+   *
+   * @category Queue Movement
+   */
   queueMovementFinished(): Observable<
     { charId: string } & QueueMovementFinished
   > {
     return this.geHeadless.queueMovementFinished();
   }
 
-  /** {@inheritDoc IGridEngine.clearEnqueuedMovements} */
+  /**
+   * {@inheritDoc IGridEngine.clearEnqueuedMovements}
+   *
+   * @category Queue Movement
+   */
   clearEnqueuedMovements(charId: string): void {
     return this.geHeadless.clearEnqueuedMovements(charId);
   }
 
-  /** {@inheritDoc IGridEngine.getTileCost} */
+  /**
+   * {@inheritDoc IGridEngine.getTileCost}
+   *
+   * @category Pathfinding
+   */
   getTileCost(
     position: Position,
     charLayer?: string,
@@ -677,7 +915,7 @@ export class GridEngine implements IGridEngine {
 
   private setConfigDefaults(
     config: GridEngineConfig
-  ): Concrete<GridEngineConfig> {
+  ): Omit<Required<GridEngineConfig>, "tiledProject"> {
     return {
       collisionTilePropertyName: "ge_collide",
       numberOfDirections: NumberOfDirections.FOUR,

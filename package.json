@@ -14,7 +14,7 @@
     "build-speedtest": "esbuild speedtests/run.ts --bundle --format=cjs --target=node18 --platform=node --outfile=speedtests/run.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "serve": "esbuild src/main-iife.ts --servedir=serve --outfile=serve/js/GridEngine.js --bundle --target=es2016 --external:phaser --global-name=GridEngine",
-    "docs": "typedoc src/GridEngine.ts --excludePrivate --excludeProtected --excludeInternal --out docs/static/api"
+    "docs": "typedoc src/GridEngine.ts --excludePrivate --excludeProtected --readme none --excludeInternal --out docs/static/api --sort kind --sort alphabetical --categorizeByGroup false"
   },
   "files": [
     "dist"
