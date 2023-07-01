@@ -88,6 +88,7 @@ describe("PhaserTileLayer", () => {
       propertyTypes: [
         {
           name: "SomeTiledClass",
+          type: "class",
           members: [
             {
               name: "testProp",

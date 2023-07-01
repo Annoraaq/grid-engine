@@ -7,7 +7,11 @@ module.exports = {
   ],
   transform: {
     "^.+\\.(ts|tsx)$": "ts-jest",
+    "\\.[jt]sx?$": "babel-jest",
   },
+  "transformIgnorePatterns": [
+    "/node_modules/(?!(tiled-property-flattener)/)",
+  ],
   testEnvironment: 'jsdom',
   clearMocks: true
 };
