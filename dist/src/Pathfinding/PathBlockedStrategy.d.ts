@@ -2,6 +2,8 @@
  * Determines what happens if a previously calculated path is suddenly
  * blocked. This can happen if a path existed and while the character was
  * moving along that path, it got suddenly blocked.
+ *
+ * @category Pathfinding
  */
 export declare enum PathBlockedStrategy {
     /**

@@ -24,6 +24,7 @@ describe("PhaserTile", () => {
       propertyTypes: [
         {
           name: "SomeTiledClass",
+          type: "class",
           members: [
             {
               name: "testProp",
@@ -32,6 +33,25 @@ describe("PhaserTile", () => {
             },
             {
               name: "propToOverride",
+              type: "boolean",
+              value: true,
+            },
+            {
+              name: "otherClassProp",
+              propertyType: "SomeOtherTiledClass",
+              type: "class",
+              value: {
+                otherTestProp: true,
+              },
+            },
+          ],
+        },
+        {
+          name: "SomeOtherTiledClass",
+          type: "class",
+          members: [
+            {
+              name: "otherTestProp",
               type: "boolean",
               value: true,
             },
@@ -59,5 +79,7 @@ describe("PhaserTile", () => {
     expect(phaserTile.getProperty("propToOverride")).toBe(false);
     expect(phaserTile.hasProperty("testProp")).toBe(true);
     expect(phaserTile.getProperty("testProp")).toBe(true);
+    expect(phaserTile.hasProperty("otherTestProp")).toBe(true);
+    expect(phaserTile.getProperty("otherTestProp")).toBe(true);
   });
 });

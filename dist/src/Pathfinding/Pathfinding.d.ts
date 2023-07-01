@@ -5,6 +5,8 @@ import { GridTilemap } from "../GridTilemap/GridTilemap";
 import { LayerVecPos, ShortestPathAlgorithmType, ShortestPathResult } from "./ShortestPathAlgorithm";
 /**
  * Configuration object for pathfinding.
+ *
+ * @category Pathfinding
  */
 export interface PathfindingOptions {
     /** Algorithm used for Pathfinding. */
@@ -90,6 +92,8 @@ export interface PathfindingOptions {
  * Beware that this method can become a performance bottleneck easily. So be
  * careful and keep it as efficient as possible. An asymptotic runtime
  * complexity of O(1) is recommended.
+ *
+ * @category Pathfinding
  */
 export type IsPositionAllowedFn = (pos: Position, charLayer?: string) => boolean;
 export declare class Pathfinding {

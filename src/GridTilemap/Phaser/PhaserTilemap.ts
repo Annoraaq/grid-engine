@@ -5,9 +5,11 @@ import { PhaserTileLayer } from "./PhaserTileLayer";
 export interface TiledProject {
   propertyTypes: Array<{
     name: string;
+    type: string;
     members: Array<{
       name: string;
       type: string;
+      propertyType?: string;
       value: any;
     }>;
   }>;

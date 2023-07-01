@@ -19,7 +19,11 @@ export interface Position {
     x: number;
     y: number;
 }
-/** Result of a pathfinding algorithm run. */
+/**
+ * Result of a pathfinding algorithm run.
+ *
+ * @category Pathfinding
+ */
 export interface PathfindingResult {
     steps: number;
     /**
@@ -43,6 +47,9 @@ export interface PathfindingResult {
      */
     reachedMaxPathLength: boolean;
 }
+/**
+ * @category Pathfinding
+ */
 export interface FollowOptions {
     /**
      *  Minimum distance to keep to `charIdToFollow` in
@@ -104,6 +111,8 @@ export interface IGridEngine {
      * Returns the character layer of the given character.
      * You can read more about character layers and transitions
      * {@link https://annoraaq.github.io/grid-engine/p/character-layers | here}
+     *
+     * @category Character
      */
     getCharLayer(charId: string): string | undefined;
     /**
@@ -111,6 +120,8 @@ export interface IGridEngine {
      * character layer leads to.
      *
      * @beta
+     *
+     * @category Tilemap
      */
     getTransition(position: Position, fromLayer: string): string | undefined;
     /**
@@ -124,10 +135,14 @@ export interface IGridEngine {
      * @param toLayer Character layer the new transition should lead to
      *
      * @beta
+     *
+     * @category Tilemap
      */
     setTransition(position: Position, fromLayer: string, toLayer: string): void;
     /**
      * @returns The tile position of the character with the given id
+     *
+     * @category Character
      */
     getPosition(charId: string): Position;
     /**
@@ -135,6 +150,8 @@ export interface IGridEngine {
      * already moving nothing happens. If the movement direction is currently
      * blocked, the character will only turn towards that direction. Movement
      * commands are **not** queued.
+     *
+     * @category Basic Movement
      */
     move(charId: string, direction: Direction): void;
     /**
@@ -152,11 +169,15 @@ export interface IGridEngine {
      * given, the character might move more than one tile into a random direction
      * in one run (as long as the route is neither blocked nor outside of the
      * radius).
+     *
+     * @category Random Movement
      */
     moveRandomly(charId: string, delay: number, radius: number): void;
     /**
      * @returns Information about the current automatic movement (including
      * random movement, follow movement and target movement)
+     *
+     * @category Character
      */
     getMovement(charId: string): MovementInfo;
     /**
@@ -168,6 +189,8 @@ export interface IGridEngine {
      * whenever the moveTo movement is finished or aborted. It will provide a
      * {@link MoveToResult | result code} as well as a description and a character
      * layer.
+     *
+     * @category Pathfinding
      */
     moveTo(charId: string, targetPos: Position, config?: MoveToConfig): Observable<{
         charId: string;
@@ -176,29 +199,52 @@ export interface IGridEngine {
      * Stops any automated movement such as random movement
      * ({@link moveRandomly}), following ({@link follow}), moving to a
      * specified position ({@link moveTo}) or queued movements ({@link addQueueMovements}).
+     *
+     * @category Character
      */
     stopMovement(charId: string): void;
-    /** Sets the speed in tiles per second for a character. */
+    /**
+     * Sets the speed in tiles per second for a character.
+     *
+     * @category Character
+     */
     setSpeed(charId: string, speed: number): void;
-    /** @returns Speed in tiles per second for a character. */
+    /**
+     * @returns Speed in tiles per second for a character.
+     *
+     * @category Character
+     */
     getSpeed(charId: string): number;
     /**
      * @returns true if the character is able to collide with the tilemap. Don't
      * confuse this with an actual collision check. You should use
      * {@link isBlocked} or {@link isTileBlocked} for this.
+     *
+     * @category Character
      */
     collidesWithTiles(charId: string): boolean;
+    /**
+     * @category Grid Engine
+     */
     update(_time: number, delta: number): void;
-    /** Checks whether a character with the given ID is registered. */
+    /**
+     * Checks whether a character with the given ID is registered.
+     *
+     * @category Grid Engine
+     */
     hasCharacter(charId: string): boolean;
     /**
      * Removes the character with the given ID from the plugin.
      * Please note that the corresponding sprites need to be remove separately.
+     *
+     * @category Grid Engine
      */
     removeCharacter(charId: string): void;
     /**
      * Removes all characters from the plugin.
      * Please note that the corresponding sprites need to be remove separately.
+     *
+     * @category Grid Engine
      */
     removeAllCharacters(): void;
     /**
@@ -208,18 +254,26 @@ export interface IGridEngine {
     getAllCharacters(options?: CharacterFilteringOptions): string[];
     /**
      * @returns All labels, attached to the character.
+     *
+     * @category Character
      */
     getLabels(charId: string): string[];
     /**
      * Add labels to the character.
+     *
+     * @category Character
      */
     addLabels(charId: string, labels: string[]): void;
     /**
      * Remove labels from the character.
+     *
+     * @category Character
      */
     removeLabels(charId: string, labels: string[]): void;
     /**
      * Removes all labels from the character.
+     *
+     * @category Character
      */
     clearLabels(charId: string): void;
     /**
@@ -228,6 +282,8 @@ export interface IGridEngine {
      *
      * @param charId ID of character that should follow
      * @param charIdToFollow ID of character that should be followed
+     *
+     * @category Pathfinding
      */
     follow(charId: string, charIdToFollow: string, options?: FollowOptions): void;
     /**
@@ -257,24 +313,34 @@ export interface IGridEngine {
     follow(charId: string, charIdToFollow: string, distance?: FollowOptions | number, closestPointIfBlocked?: boolean): void;
     /**
      * @returns True if the character is currently moving.
+     *
+     * @category Chatacter State
      */
     isMoving(charId: string): boolean;
     /**
      * @returns Direction the character is currently facing. At time of creation
      *  this is `down`.
+     *
+     * @category Character
      */
     getFacingDirection(charId: string): Direction;
     /**
      * @returns Position the character is currently facing.
+     *
+     * @category Character
      */
     getFacingPosition(charId: string): Position;
     /**
      * Turns the character towards the given direction without moving it.
+     *
+     * @category Basic Movement
      */
     turnTowards(charId: string, direction: Direction): void;
     /**
      * Finds the identifiers of all characters at the provided tile position.
      * @returns The identifiers of all characters on this tile.
+     *
+     * @category Tilemap
      */
     getCharactersAt(position: Position, layer?: string): string[];
     /**
@@ -283,6 +349,8 @@ export interface IGridEngine {
      * {@link positionChangeStarted} and {@link positionChangeFinished} observables will
      * emit. If the character was moving, the {@link movementStopped} observable
      * will also emit.
+     *
+     * @category Character
      */
     setPosition(charId: string, pos: Position, layer?: string): void;
     /**
@@ -292,6 +360,8 @@ export interface IGridEngine {
      *
      * @returns True if position on given layer is blocked by the tilemap or a
      *  character
+     *
+     * @category Tilemap
      */
     isBlocked(position: Position, layer?: string, collisionGroups?: string[]): boolean;
     /**
@@ -299,6 +369,8 @@ export interface IGridEngine {
      * no layer, be sure not to use character layers in your tilemap.
      *
      * @returns True if position on given layer is blocked by the tilemap.
+     *
+     * @category Tilemap
      */
     isTileBlocked(position: Position, layer?: string): boolean;
     /**
@@ -306,16 +378,22 @@ export interface IGridEngine {
      * {@link https://annoraaq.github.io/grid-engine/examples/collision-groups | Collision Groups Example}
      *
      * @returns All collision groups of the given character.
+     *
+     * @category Character
      */
     getCollisionGroups(charId: string): string[];
     /**
      * Sets collision groups for the given character. Previous collision groups
      * will be overwritten.
+     *
+     * @category Character
      */
     setCollisionGroups(charId: string, collisionGroups: string[]): void;
     /**
      * Gets the tile position and character layer adjacent to the given
      * position in the given direction.
+     *
+     * @category Tilemap
      */
     getTilePosInDirection(position: Position, charLayer: string | undefined, direction: Direction): LayerPosition;
     /**
@@ -328,22 +406,30 @@ export interface IGridEngine {
      * `closestToTarget` is a position with a minimum distance to the target.
      *
      * @alpha
+     *
+     * @category Pathfinding
      */
     findShortestPath(source: LayerPosition, dest: LayerPosition, options?: PathfindingOptions): PathfindingResult;
     /**
      * @returns Observable that, whenever a specified position is entered on optionally provided layers,
      *  will notify with the target characters position change
+     *
+     * @category Basic Movement
      */
     steppedOn(charIds: string[], tiles: Position[], layer?: CharLayer[]): Observable<{
         charId: string;
     } & PositionChange>;
     /**
      * @returns Observable that emits when a new character is added or an existing is removed.
+     *
+     * @category Grid Engine
      */
     characterShifted(): Observable<CharacterShift>;
     /**
      * @returns Observable that on each start of a movement will provide the
      *  character ID and the direction.
+     *
+     * @category Character
      */
     movementStarted(): Observable<{
         charId: string;
@@ -352,6 +438,8 @@ export interface IGridEngine {
     /**
      * @returns Observable that on each stopped movement of a character will
      *  provide it’s ID and the direction of that movement.
+     *
+     * @category Character
      */
     movementStopped(): Observable<{
         charId: string;
@@ -368,6 +456,8 @@ export interface IGridEngine {
      * So for instance, if {@link GridEngine.turnTowards} is called multiple times
      * in a row (without any facing direction change occurring inbetween) with the
      * same direction, this observable would only emit once.
+     *
+     * @category Character
      */
     directionChanged(): Observable<{
         charId: string;
@@ -376,6 +466,8 @@ export interface IGridEngine {
     /**
      * @returns Observable that will notify about every change of tile position.
      *  It will notify at the beginning of the movement.
+     *
+     * @category Character
      */
     positionChangeStarted(): Observable<{
         charId: string;
@@ -383,6 +475,8 @@ export interface IGridEngine {
     /**
      * @returns Observable that will notify about every change of tile position.
      *  It will notify at the end of the movement.
+     *
+     * @category Character
      */
     positionChangeFinished(): Observable<{
         charId: string;
@@ -391,6 +485,8 @@ export interface IGridEngine {
      * Returns the movement progress (0-1000) of a character to the next tile. For
      * example, if a character has movement progress 400 that means that it has
      * moved 400/1000th of the distance to the next tile already.
+     *
+     * @category Character
      */
     getMovementProgress(charId: string): number;
     /**
@@ -400,6 +496,8 @@ export interface IGridEngine {
      *
      * For more information on pathfinding performance check out
      * {@link https://annoraaq.github.io/grid-engine/p/pathfinding-performance/| pathfinding performance}.
+     *
+     * @category Grid Engine
      */
     rebuildTileCollisionCache(x: number, y: number, width: number, height: number): void;
     /**
@@ -409,18 +507,28 @@ export interface IGridEngine {
      * @param positions Positions to enqueue
      * @param options Options for the queue movement. These options take effect
      *  immediately (also for previously enqueued but not yet executed movements).
+     *
+     * @category Queue Movement
      */
     addQueueMovements(charId: string, positions: Array<LayerPosition | Direction>, options?: QueueMovementConfig): any;
-    /** Returns all enqueued movements for the given character. */
+    /**
+     * Returns all enqueued movements for the given character.
+     *
+     * @category Queue Movement
+     */
     getEnqueuedMovements(charId: string): QueueMovementEntry[];
     /**
      * Clears the complete movement queue for the character, that was filled by
      * using {@link IGridEngine.addQueueMovements}.
+     *
+     * @category Queue Movement
      */
     clearEnqueuedMovements(charId: string): void;
     /**
      * Emits whenever queued movements for a character finish (with success or
      * failure).
+     *
+     * @category Queue Movement
      */
     queueMovementFinished(): Observable<{
         charId: string;
@@ -428,6 +536,8 @@ export interface IGridEngine {
     /**
      * Returns the {@link https://annoraaq.github.io/grid-engine/p/tile-properties/#pathfinding-costs | tile cost}
      * for a position.
+     *
+     * @category Pathfinding
      */
     getTileCost(position: Position, charLayer?: string, srcDirection?: Direction): number;
 }

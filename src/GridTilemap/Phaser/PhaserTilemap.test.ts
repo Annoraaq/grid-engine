@@ -89,6 +89,7 @@ describe("PhaserTilemap", () => {
       propertyTypes: [
         {
           name: "SomeTiledClass",
+          type: "class",
           members: [
             {
               name: "testProp",

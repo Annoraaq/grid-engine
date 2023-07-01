@@ -1,6 +1,8 @@
 /**
  * Different strategies that determine the behavior of pathfinding if no path
  * could be found.
+ *
+ * @category Pathfinding
  */
 export declare enum NoPathFoundStrategy {
     /**
