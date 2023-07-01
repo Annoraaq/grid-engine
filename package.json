@@ -6,7 +6,7 @@
   "license": "ISC",
   "main": "dist/GridEngine.esm.min.js",
   "scripts": {
-    "test": "--experimental-vm-modules jest",
+    "test": "jest",
     "dev": "prettier --write src/ && eslint src/",
     "build-web": "esbuild src/main-iife.ts --bundle --minify --external:phaser --target=es2016 --global-name=GridEngine --outfile=dist/GridEngine.min.js",
     "build-esm": "esbuild src/main-esm.ts --bundle --minify --format=esm --external:phaser --target=es2016 --outfile=dist/GridEngine.esm.min.js",
