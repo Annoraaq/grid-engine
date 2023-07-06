@@ -14,7 +14,10 @@
     "build-speedtest": "esbuild speedtests/run.ts --bundle --format=cjs --target=node18 --platform=node --outfile=speedtests/run.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "serve": "esbuild src/main-iife.ts --servedir=serve --outfile=serve/js/GridEngine.js --bundle --target=es2016 --external:phaser --global-name=GridEngine",
-    "docs": "typedoc src/GridEngine.ts --excludePrivate --excludeProtected --readme none --excludeInternal --out docs/static/api --sort kind --sort alphabetical --categorizeByGroup false"
+    "docs": "typedoc src/GridEngine.ts --excludePrivate --excludeProtected --readme none --excludeInternal --out docs/public/api --sort kind --sort alphabetical --categorizeByGroup false",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "files": [
     "dist"
@@ -38,6 +41,7 @@
     "@typescript-eslint/parser": "^5.60.1",
     "babel-jest": "^29.5.0",
     "canvas": "^2.11.2",
+    "csv-parse": "^5.4.0",
     "esbuild": "^0.18.11",
     "eslint": "^8.44.0",
     "eslint-config-prettier": "^8.8.0",
@@ -50,7 +54,10 @@
     "random-js": "^2.1.0",
     "ts-jest": "^29.1.1",
     "typedoc": "^0.24.8",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "vitepress": "^1.0.0-beta.3",
+    "vue": "^3.3.4",
+    "vue-chartjs": "^5.2.0"
   },
   "repository": {
     "type": "git",

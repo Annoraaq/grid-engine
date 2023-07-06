@@ -10,6 +10,8 @@ docs/node_modules
 docs/**/*.d.ts
 speedtests/old
 speedtests/run.js
+docs/.vitepress/dist
+docs/.vitepress/cache
 
 # stryker temp files
 .stryker-tmp

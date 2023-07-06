@@ -41,7 +41,7 @@ movement to your tilemap game. Your characters will be able to only move in whol
 - Following other characters
 - Collision groups
 
-📖 Read our most current [documentation](https://annoraaq.github.io/grid-engine/).
+📖 Read our most current [documentation](https://annoraaq.github.io/grid-engine/) or [API reference](https://annoraaq.github.io/grid-engine/api/)
 
 ➡️ You can try/download [a list of examples](https://annoraaq.github.io/grid-engine/).
 

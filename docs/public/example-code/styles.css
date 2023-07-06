@@ -1,0 +1,65 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #1e1e20;
+  font-family: Inter,-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color: #cacaca;
+}
+
+.settings {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  /* border: 1px solid white; */
+  background: #282828;
+  margin-bottom: 20px;
+  width: 640px;
+  padding: 0 30px;
+}
+
+label {
+  font-weight: bold;
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+select {
+  width: 100px;
+}
+
+input {
+  width: 100px;
+}
+
+button {
+  width: 120px;
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+.wait-timeout-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.wait-timeout-group input {
+  width: auto;
+  margin-right: 10px;
+}
+
+.wait-timeout-group label {
+  margin:0;
+}
+
+#json-config {
+  margin-bottom: 10px;
+}
+
+#json-config pre {
+  font-family: "Consolas", monospace;
+}
+
+.disabled {
+  display: none;
+}

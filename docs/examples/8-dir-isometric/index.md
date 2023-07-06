@@ -1,0 +1,31 @@
+---
+title: Isometric (8 directions)
+next: false
+prev: false
+---
+
+<script setup>
+import ExampleFrame from '../../components/ExampleFrame.vue';
+</script>
+
+# Isometric (8 directions)
+
+**Press the arrow keys to move.** This is a basic demo of isometric maps with 8 directions.
+
+<ExampleFrame :src="'../../example-code/8-dir-isometric/index.html'" />
+
+## Code
+
+[:link: See full code on GitHub](https://github.com/Annoraaq/grid-engine/tree/master/docs/public/example-code/8-dir-isometric)
+
+[:open_book: How to execute examples locally](https://annoraaq.github.io/grid-engine/usage/execute-examples-locally/index.html)
+
+::: code-group
+<<< @/public/example-code/8-dir-isometric/code.js
+
+<<< @/public/example-code/8-dir-isometric/index.html
+
+<<< @/public/js/examplePhaserConfig.js [../../js/examplePhaserConfig.js]
+
+<<< @/public/example-code/styles.css [../styles.css]
+:::
