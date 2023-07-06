@@ -1,25 +1,4 @@
 :root {
-  --vp-nav-height: 80px;
-
-  --brand-light: #D8E9A8;
-  --brand-medium: #4E9F3D;
-  --brand-medium-bright: #9ae78b;
-  --brand-dark: #1E5128;
-  --brand-black: #191A19;
-
-  --vp-c-brand: var(--brand-medium);
-  --vp-c-brand-light: var(--brand-medium-bright);
-  --vp-c-brand-lighter: var(--brand-medium-light);
-  --vp-c-brand-dark: var(--brand-medium-dark);
-  --vp-c-brand-darker: var(--brand-medium-black);
-
-  --vp-c-text-code: var(--brand-dark);
-
-  --vp-button-brand-hover-bg: var(--brand-dark);
-
-  --vp-home-hero-name-background: linear-gradient( 120deg, #4E9F3D 30%, #1E5128 );
-  --vp-home-hero-image-background-image: none;
-
   .VPHero .image {
     margin: 0;
   }
@@ -29,9 +8,3 @@
   }
 }
 
-.dark {
-  --vp-c-text-code: var(--brand-light);
-  --vp-button-brand-hover-bg: var(--brand-black);
-  --vp-button-alt-hover-bg: hsl(240, 5%, 30%);
-  --vp-home-hero-name-background: linear-gradient( 120deg, #D8E9A8 30%, #4E9F3D );
-}
