@@ -26,6 +26,7 @@ a.logo-link {
   display: flex;
   flex-direction: row;
   align-items: stretch;
+  justify-content: center;
 }
 
 .container {

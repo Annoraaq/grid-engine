@@ -20,10 +20,13 @@
   --vp-home-hero-name-background: linear-gradient( 120deg, #4E9F3D 30%, #1E5128 );
   --vp-home-hero-image-background-image: none;
 
-  .has-sidebar .title {
-    background-color: var(--vp-sidebar-bg-color);
+  .VPHero .image {
+    margin: 0;
   }
 
+  .curtain {
+    top: -80px;
+  }
 }
 
 .dark {
