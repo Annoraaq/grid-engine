@@ -6,10 +6,6 @@ hero:
   name: "Grid Engine"
   text: "Add grid movement to your game"
   tagline: Use with Phaser.js or standalone
-  # image:
-  #   light: "/img/grid-engine-logo.png"
-  #   dark: "/img/grid-engine-logo-dark.png"
-  #   alt: "Grid Engine Logo"
   actions:
     - theme: brand
       text: Get Started

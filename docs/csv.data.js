@@ -9,7 +9,6 @@ export default {
     // a list in the theme layout
     return watchedFiles.map(file => {
       const parsed = parse(fs.readFileSync(file, 'utf-8'), {
-        // columns: true,
         skip_empty_lines: true
       });
 

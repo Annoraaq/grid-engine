@@ -24,22 +24,8 @@ const maze32PlotData  = plotData('maze-avg-4-32');
 const roomsPlotData8Dir  = plotData('rooms-avg-8-dir');
 const daoPlotData8Dir  = plotData('dao-avg-8-dir');
 const bg512PlotData8Dir  = plotData('bg512-avg-8-dir');
-// import daoPlotData from '../../data/dao-avg-4-dir.csv';
-// import roomsPlotData from '../../data/rooms-avg-4-dir.csv';
-// import maze1PlotData from '../../data/maze-avg-4-1.csv';
-// import maze2PlotData from '../../data/maze-avg-4-2.csv';
-// import maze4PlotData from '../../data/maze-avg-4-4.csv';
-// import maze8PlotData from '../../data/maze-avg-4-8.csv';
-// import maze16PlotData from '../../data/maze-avg-4-16.csv';
-// import maze32PlotData from '../../data/maze-avg-4-32.csv';
-// import roomsPlotData8Dir from '../../data/rooms-avg-8-dir.csv';
-// import daoPlotData8Dir from '../../data/dao-avg-8-dir.csv';
-// import bg512PlotData8Dir from '../../data/bg512-avg-8-dir.csv';
 
 </script>
-
-<!-- <pre>{{ data }}</pre> -->
-<!-- <pre>{{ data['bg512-avg-4-dir']}}</pre> -->
 
 # Pathfinding Performance
 
