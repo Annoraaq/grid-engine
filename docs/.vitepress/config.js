@@ -12,7 +12,6 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     siteTitle: false,
     externalLinkIcon: true,
-    // logo: { light: '/img/grid-engine-logo.png', dark: 'img/grid-engine-logo-dark.png', alt: 'Grid Engine Logo' },
     search: {
       provider: 'local'
     },
@@ -26,7 +25,6 @@ export default defineConfig({
         text: 'Getting Started',
         collapsed: false,
         items: [
-          { text: 'Why Grid Engine?', link: '/p/why-grid-engine/index.md' },
           { text: 'Installation', link: '/p/installation/index.md' },
         ]
       },
