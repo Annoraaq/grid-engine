@@ -19,8 +19,8 @@ export default {
 </script>
 
 <style>
-iframe {
-	width: 700px;
-	border: none;
-}
-  </style>
+  iframe {
+    width: 700px;
+    border: none;
+  }
+</style>
