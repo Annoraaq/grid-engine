@@ -1,4 +1,3 @@
-
 <template>
   <div>
     <iframe :src="src" scrolling="no" :height="frameHeight"></iframe>
