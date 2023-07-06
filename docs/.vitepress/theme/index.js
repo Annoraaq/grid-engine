@@ -12,9 +12,7 @@ export default {
     return h(Theme.Layout, null, {
       // https://vitepress.dev/guide/extending-default-theme#layout-slots
       'nav-bar-title-before': () => h(Logo),
-      // 'doc-top': () => h(Logo),
       'home-hero-image': () => h(Grid)
-      // 'home-hero-image': () => h(Logo)
     })
   },
   enhanceApp({ app, router, siteData }) {
