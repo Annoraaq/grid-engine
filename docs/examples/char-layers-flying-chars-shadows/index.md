@@ -10,7 +10,7 @@ import ExampleFrame from '../../components/ExampleFrame.vue';
 
 # Character Layers - Flying Chars with Shadows
 
-**Press the arrow keys to move.** This demonstrates the usage of [character layers](../../p/character-layers) to create flying characters with separated shadows. The shadows are represented as _characters_ in GridEngine, are non-colliding and live on the same character layer as the player.
+**Press the arrow keys to move.** This demonstrates the usage of [character layers](../../p/character-layers/index.html) to create flying characters with separated shadows. The shadows are represented as _characters_ in GridEngine, are non-colliding and live on the same character layer as the player.
 
 <ExampleFrame :src="'../../example-code/char-layers-flying-chars-shadows/index.html'" />
 

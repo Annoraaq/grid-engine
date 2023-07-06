@@ -10,7 +10,7 @@ import ExampleFrame from '../../components/ExampleFrame.vue';
 
 # Facing Direction Observable (8 directions)
 
-**Press the arrow keys to move.** This demo demonstrates how to use the `facingDirection` observable on a character using 8 directions, allowing you to know when a character is facing a certain direction. This demo also uses the [Phaser Containers](../phaser-containers) feature.
+**Press the arrow keys to move.** This demo demonstrates how to use the `facingDirection` observable on a character using 8 directions, allowing you to know when a character is facing a certain direction. This demo also uses the [Phaser Containers](../phaser-container/index.html) feature.
 
 <ExampleFrame :src="'../../example-code/8-dir-facing-direction/index.html'" />
 

@@ -6,7 +6,7 @@ prev: false
 
 # Height Shift
 
-So you might have noticed the [layer property](../layer-properties) `ge_heightShift` or seen [it's demo](../../example/height-shift). Great! Here's a bit deeper of an explanation about how height shifting works.
+So you might have noticed the [layer property](../layer-properties/index.html) `ge_heightShift` or seen [it's demo](../../examples/height-shift/index.html). Great! Here's a bit deeper of an explanation about how height shifting works.
 
 For characters, their depth depends on the y-coordinate they are on. If the y-coordinate of a character is higher than that of another character, it means that the first character is more "south" on the map and therefore needs a higher depth than the second character.
 

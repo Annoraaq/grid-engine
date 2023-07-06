@@ -10,7 +10,7 @@ import ExampleFrame from '../../components/ExampleFrame.vue';
 
 # Is Moving Observable
 
-**Press the arrow keys to move.** This demo demonstrates how to use the `isMoving` observable for characters, allowing you to change behavior depending on whether or not they're in motion! This demo also uses the [Phaser Containers](../phaser-containers) feature.
+**Press the arrow keys to move.** This demo demonstrates how to use the `isMoving` observable for characters, allowing you to change behavior depending on whether or not they're in motion! This demo also uses the [Phaser Containers](../phaser-container/index.html) feature.
 
 <ExampleFrame :src="'../../example-code/is-moving/index.html'" />
 

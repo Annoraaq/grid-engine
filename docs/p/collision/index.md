@@ -18,7 +18,7 @@ Once you're in the tileset editor, select the tiles you want to have the custom 
 
 ![Add Property button](../../img/add-property-helper.png)
 
-Name it `ge_collide`, or one of the other [supported properties](../tile-properties), make it a `bool` and then set it to `true` if you want the tile to be non-walkable!
+Name it `ge_collide`, or one of the other [supported properties](../tile-properties/index.html), make it a `bool` and then set it to `true` if you want the tile to be non-walkable!
 
 > **_NOTE:_** You can also use a custom collision property name, by setting [collisionTilePropertyName](https://annoraaq.github.io/grid-engine/api/interfaces/GridEngineConfig#collisionTilePropertyName).
 
@@ -26,4 +26,4 @@ Name it `ge_collide`, or one of the other [supported properties](../tile-propert
 
 ![Collides property](../../img/collides-helper.png)
 
-If you have several [character layers](../character-layers) or simply like to separate collisions from the graphical tiles, using [collision layers](../collision-layers) is a good practice.
+If you have several [character layers](../character-layers/index.html) or simply like to separate collisions from the graphical tiles, using [collision layers](../collision-layers/index.html) is a good practice.

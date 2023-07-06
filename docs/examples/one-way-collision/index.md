@@ -10,7 +10,7 @@ import ExampleFrame from '../../components/ExampleFrame.vue';
 
 # One-Way Collision
 
-**Press the arrow keys to move.** This demo demonstrates tiles that collide only in one direction. This relies on setting the proper [Tile Properties](../../p/tile-properties) on your tilemaps.
+**Press the arrow keys to move.** This demo demonstrates tiles that collide only in one direction. This relies on setting the proper [Tile Properties](../../p/tile-properties/index.html) on your tilemaps.
 
 <ExampleFrame :src="'../../example-code/one-way-collision/index.html'" />
 

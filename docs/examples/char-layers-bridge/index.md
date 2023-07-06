@@ -10,7 +10,7 @@ import ExampleFrame from '../../components/ExampleFrame.vue';
 
 # Character Layers - Bridge
 
-**Press the arrow keys to move.** This demonstrates the usage of character layers as described [here](../../p/character-layers).
+**Press the arrow keys to move.** This demonstrates the usage of character layers as described [here](../../p/character-layers/index.html).
 
 <ExampleFrame :src="'../../example-code/char-layers-bridge/index.html'" />
 

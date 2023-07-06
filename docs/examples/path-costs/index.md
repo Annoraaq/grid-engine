@@ -38,4 +38,4 @@ You can turn `considerCosts`([[1]][consider-costs], [[2]][move-to-consider-costs
 [consider-costs]: https://annoraaq.github.io/grid-engine/api/interfaces/PathfindingOptions.html#considerCosts
 [move-to-consider-costs]: https://annoraaq.github.io/grid-engine/api/interfaces/MoveToConfig.html#considerCosts
 [follow-consider-costs]: https://annoraaq.github.io/grid-engine/api/interfaces/FollowOptions.html#considerCosts
-[tile-costs]: ../../p/tile-properties#pathfinding-costs
+[tile-costs]: ../../p/tile-properties/index.html#pathfinding-costs
