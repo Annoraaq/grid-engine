@@ -20,7 +20,7 @@ Use the **settings** section to experiment with some configurations.
 
 [:link: See full code on GitHub](https://github.com/Annoraaq/grid-engine/tree/master/docs/public/example-code/queue-directions-movement)
 
-[:open_book: How to execute examples locally](https://annoraaq.github.io/grid-engine/usage/execute-examples-locally/index.html)
+[:open_book: How to execute examples locally](../../p/execute-examples-locally/index.html)
 
 ::: code-group
 <<< @/public/example-code/queue-directions-movement/code.js

@@ -23,7 +23,7 @@ You can turn `considerCosts`([[1]][consider-costs], [[2]][move-to-consider-costs
 
 [:link: See full code on GitHub](https://github.com/Annoraaq/grid-engine/tree/master/docs/public/example-code/path-costs)
 
-[:open_book: How to execute examples locally](https://annoraaq.github.io/grid-engine/usage/execute-examples-locally/index.html)
+[:open_book: How to execute examples locally](../../p/execute-examples-locally/index.html)
 
 ::: code-group
 <<< @/public/example-code/path-costs/code.js

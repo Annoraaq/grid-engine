@@ -18,7 +18,7 @@ import ExampleFrame from '../../components/ExampleFrame.vue';
 
 [:link: See full code on GitHub](https://github.com/Annoraaq/grid-engine/tree/master/docs/public/example-code/8-dir-facing-direction)
 
-[:open_book: How to execute examples locally](https://annoraaq.github.io/grid-engine/usage/execute-examples-locally/index.html)
+[:open_book: How to execute examples locally](../../p/execute-examples-locally/index.html)
 
 ::: code-group
 <<< @/public/example-code/8-dir-facing-direction/code.js
