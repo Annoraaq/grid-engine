@@ -184,6 +184,10 @@ export interface CharacterData extends CharacterDataHeadless {
    * tiles, it is necessary that you position the character’s sprite on
    * position (0, 0) in the container.
    *
+   * If you pass both, a container and a sprite, only the container's pixel
+   * position will be changed on movement. That is only relevant if you pass a
+   * sprite that is not included in the container.
+   *
    * For more details see the {@link https://annoraaq.github.io/grid-engine/example/phaser-containers/ | container example}.
    */
   container?: Phaser.GameObjects.Container;
