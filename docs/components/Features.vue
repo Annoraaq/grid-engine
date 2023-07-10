@@ -51,7 +51,7 @@
             <Isometric :tileSize="10" :map="collisionMapData" :loop="true"/>
           </div>
           <h2 class="title">Isometric Maps</h2>
-          <p class="details">Chose between isometric and orthogonal maps.</p>
+          <p class="details">Choose between isometric and orthogonal maps.</p>
         </div>
       </div>
     </div>
