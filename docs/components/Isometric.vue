@@ -89,4 +89,12 @@ export default {
   transform: rotate(45deg);
 }
 
+.rotation :deep(.tile) {
+  box-shadow: 1px 1px 0px 0px var(--brand-black);
+}
+
+html:not(.dark) .rotation :deep(.tile){
+  box-shadow: 1px 1px 0px 0px var(--brand-medium);
+}
+
 </style>

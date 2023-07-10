@@ -52,6 +52,7 @@ export default {
   }
 
 
+
   .tile {
     background-color: var(--brand-dark);
     border-color: var(--brand-dark);
@@ -81,9 +82,9 @@ export default {
     background: repeating-linear-gradient(
       45deg,
       #D8E9A8,
-      #D8E9A8 3px,
-      #191A19 3px,
-      #191A19 8px
+      #D8E9A8 2px,
+      #191A19 2px,
+      #191A19 4px
     );
   }
 
@@ -94,6 +95,40 @@ export default {
       #D8E9A8 4px,
       #1E5128 4px,
       #1E5128 20px
+    );
+  }
+
+  html:not(.dark) .tile {
+    background-color: var(--brand-medium-bright);
+    border-color: var(--brand-medium-bright);
+    box-shadow: 0px 1px 1px 0px var(--brand-medium);
+  }
+
+  html:not(.dark) .bright {
+    background-color: var(--brand-dark);
+  }
+
+  html:not(.dark) .marked {
+    background-color: var(--brand-medium);
+  }
+
+  html:not(.dark) .blocked {
+    background: repeating-linear-gradient(
+      45deg,
+      #9ae78b,
+      #9ae78b 2px,
+      #191A19 2px,
+      #191A19 4px
+    );
+  }
+
+  html:not(.dark) .target {
+    background: repeating-radial-gradient(
+      circle,
+      #191A19,
+      #191A19 4px,
+      #9ae78b 4px,
+      #9ae78b 20px
     );
   }
 
