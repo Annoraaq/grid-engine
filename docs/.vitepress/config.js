@@ -7,7 +7,9 @@ export default defineConfig({
   description: "Documentation for the Grid Engine Phaser plugin. Learn how to add grid based movement to your games.",
   head: [
     ['link', { rel: "icon", type: "image/png", sizes: "96x96", href: "/grid-engine/favicon.png" }],
-    // ['script', { src: '/grid-engine/js/grid-engine-2.30.0.esm.min.js' }],
+    ['link', { rel: "preconnect", href: "https://fonts.googleapis.com" }],
+    ['link', { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" }],
+    ['link', { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Saira&display=swap" }],
   ],
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
