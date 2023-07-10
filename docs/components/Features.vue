@@ -7,8 +7,8 @@
       <div class="feature">
         <div class="info">
           <div class="images">
-            <img class="dark" src="/grid-engine/icons/minor_crash_white_24dp.svg" alt="">
-            <img class="light" src="/grid-engine/icons/minor_crash_black_24dp.svg" alt="">
+            <img class="dark" src="../img/icons/minor_crash_white_24dp.svg" alt="">
+            <img class="light" src="../img/icons/minor_crash_black_24dp.svg" alt="">
             <Collision :tileSize="10" :map="collisionMapData" :loop="true"/>
           </div>
           <h2 class="title">Collision Detection</h2>
@@ -20,8 +20,8 @@
       <div class="feature">
         <div class="info">
           <div class="images">
-            <img class="dark" src="/grid-engine/icons/route_white_24dp.svg" alt="">
-            <img class="light" src="/grid-engine/icons/route_black_24dp.svg" alt="">
+            <img class="dark" src="../img/icons/route_white_24dp.svg" alt="">
+            <img class="light" src="../img/icons/route_black_24dp.svg" alt="">
             <Pathfinding :tileSize="10" :map="pathfindingMapData" :loop="true"/>
           </div>
           <h2 class="title">Pathfinding</h2>
@@ -33,8 +33,8 @@
       <div class="feature">
         <div class="info">
           <div class="images">
-            <img class="dark" src="/grid-engine/icons/grid_view_white_24dp.svg" alt="">
-            <img class="light" src="/grid-engine/icons/grid_view_black_24dp.svg" alt="">
+            <img class="dark" src="../img/icons/grid_view_white_24dp.svg" alt="">
+            <img class="light" src="../img/icons/grid_view_black_24dp.svg" alt="">
             <MultiTile :tileSize="10" :map="collisionMapData" :loop="true"/>
           </div>
           <h2 class="title">Multi-tile Objects</h2>
@@ -46,8 +46,8 @@
       <div class="feature">
         <div class="info">
           <div class="images">
-            <img class="dark" src="/grid-engine/icons/layers_white_24dp.svg" alt="">
-            <img class="light" src="/grid-engine/icons/layers_black_24dp.svg" alt="">
+            <img class="dark" src="../img/icons/layers_white_24dp.svg" alt="">
+            <img class="light" src="../img/icons/layers_black_24dp.svg" alt="">
             <Isometric :tileSize="10" :map="collisionMapData" :loop="true"/>
           </div>
           <h2 class="title">Isometric Maps</h2>
@@ -59,8 +59,8 @@
       <div class="feature">
         <div class="info">
           <div class="images">
-            <img class="dark" src="/grid-engine/icons/signpost_white_24dp.svg" alt="">
-            <img class="light" src="/grid-engine/icons/signpost_black_24dp.svg" alt="">
+            <img class="dark" src="../img/icons/signpost_white_24dp.svg" alt="">
+            <img class="light" src="../img/icons/signpost_black_24dp.svg" alt="">
             <Diagonal :tileSize="10" :map="collisionMapData" :loop="true"/>
           </div>
           <h2 class="title">Diagonal Movement</h2>
