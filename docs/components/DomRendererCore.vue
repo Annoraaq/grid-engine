@@ -4,9 +4,9 @@
       class="container"
       :style="{
         gridTemplateColumns: 'repeat(' + height + ', auto)',
-          rowGap: Math.floor(tileSize/3) +'px',
-          columnGap: Math.floor(tileSize/3)+ 'px'
-        }"
+        rowGap: Math.floor(tileSize/3) +'px',
+        columnGap: Math.floor(tileSize/3)+ 'px'
+      }"
     >
       <div
         class="tile"
@@ -15,13 +15,13 @@
           marked: cell.marked && !cell.character,
           target: cell.target && !cell.character,
           blocked: cell.blocked,
-          }"
+        }"
         v-for="cell in cells"
         :style="{
           width: tileSize + 'px',
           height: tileSize + 'px',
           borderRadius: Math.floor(tileSize/4) + 'px',
-          }"
+        }"
       >
       </div>
     </div>

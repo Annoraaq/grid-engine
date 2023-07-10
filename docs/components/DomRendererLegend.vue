@@ -3,11 +3,7 @@
   <div class="legend">
     <div class="item">
       <div class="tile"
-        :style="{
-          width: tileSize + 'px',
-          height: tileSize + 'px',
-          borderRadius: Math.floor(tileSize/4) + 'px',
-          }"
+        :style="tileStyle"
       ></div>Free
     </div>
     <div class="item">
@@ -16,34 +12,22 @@
           width: tileSize + 'px',
           height: tileSize + 'px',
           borderRadius: Math.floor(tileSize/4) + 'px',
-          }"
+        }"
       ></div>Blocked
     </div>
     <div class="item">
       <div class="tile marked"
-        :style="{
-          width: tileSize + 'px',
-          height: tileSize + 'px',
-          borderRadius: Math.floor(tileSize/4) + 'px',
-          }"
+        :style="tileStyle"
       ></div>Visited
     </div>
     <div class="item">
       <div class="tile target"
-        :style="{
-          width: tileSize + 'px',
-          height: tileSize + 'px',
-          borderRadius: Math.floor(tileSize/4) + 'px',
-          }"
+        :style="tileStyle"
       ></div>Target position
     </div>
     <div class="item">
       <div class="tile bright"
-        :style="{
-          width: tileSize + 'px',
-          height: tileSize + 'px',
-          borderRadius: Math.floor(tileSize/4) + 'px',
-          }"
+        :style="tileStyle"
       ></div>Character
     </div>
   </div>
@@ -52,6 +36,15 @@
 
 export default {
   props: ['tileSize'],
+  computed: {
+    tileStyle() {
+      return {
+        width: this.tileSize + 'px',
+        height: this.tileSize + 'px',
+        borderRadius: Math.floor(this.tileSize/4) + 'px',
+      };
+    }
+  }
 }
 </script>
 

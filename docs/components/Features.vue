@@ -91,14 +91,6 @@ export default {
       pathfindingMapData,
     }
   },
-
-  methods: {
-
-  },
-
-
-  mounted() {
-  }
 }
 </script>
 
@@ -107,40 +99,36 @@ export default {
 
 .container {
   margin: 0 auto;
-    max-width: 1152px;
-
+  max-width: 1152px;
 }
 
 .items {
-    display: flex;
-    flex-wrap: wrap;
-    margin: -8px;
+  display: flex;
+  flex-wrap: wrap;
+  margin: -8px;
 }
 
 .item {
-    padding: 8px;
-    width: 100%;
+  padding: 8px;
+  width: 100%;
 }
-
 
 @media (min-width: 640px) {
-.item.grid-4{
-    width: calc(100% / 2);
-}
-
+  .item.grid-4{
+      width: calc(100% / 2);
+  }
 }
 
 @media (min-width: 768px) {
-.item.grid-4 {
+  .item.grid-4 {
     width: calc(100% / 2);
-}
-
+  }
 }
 
 @media (min-width: 960px) {
-.item.grid-4 {
+  .item.grid-4 {
     width: calc(100% / 4);
-}
+  }
 }
 
 .images {
@@ -153,7 +141,7 @@ export default {
 .info {
   width: 220px;
   display: flex;
-    flex-direction: column;
+  flex-direction: column;
 }
 
 .dark .feature .light {
@@ -175,8 +163,8 @@ html:not(.dark) .feature .dark {
 
 
   display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .feature img {
@@ -188,16 +176,16 @@ html:not(.dark) .feature .dark {
 
 .title {
   line-height: 24px;
-    font-size: 16px;
-    font-weight: 600;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .details {
   flex-grow: 1;
-    padding-top: 8px;
-    line-height: 24px;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--vp-c-text-2);
+  padding-top: 8px;
+  line-height: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--vp-c-text-2);
 }
 </style>
