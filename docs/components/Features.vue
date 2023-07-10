@@ -25,7 +25,7 @@
             <Pathfinding :tileSize="10" :map="pathfindingMapData" :loop="true"/>
           </div>
           <h2 class="title">Pathfinding</h2>
-          <p class="details">Efficient and configurable pathfinding allows moving to a target position or following other characters.</p>
+          <p class="details">Efficient and configurable pathfinding allows moving to a target position or following other objects.</p>
         </div>
       </div>
     </div>
@@ -37,8 +37,8 @@
             <img class="light" src="/grid-engine/icons/grid_view_black_24dp.svg" alt="">
             <MultiTile :tileSize="10" :map="collisionMapData" :loop="true"/>
           </div>
-          <h2 class="title">Multi-tile Characters</h2>
-          <p class="details">Allow characters to span multiple tiles on your grid.</p>
+          <h2 class="title">Multi-tile Objects</h2>
+          <p class="details">Allow objects to span multiple tiles on your grid.</p>
         </div>
       </div>
     </div>
