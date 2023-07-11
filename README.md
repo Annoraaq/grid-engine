@@ -35,10 +35,10 @@ It easily integrates with [Phaser.js](https://phaser.io/) but can also be used s
 
 **Diagonal Movement** - Four and eight direction movement and pathfinding is supported.
 
-<img src="images/collision-detection.gif" />
-<img src="images/pathfinding.gif" />
-<img src="images/multi-tile.gif" />
-<img src="images/diagonal.gif" />
+<img src="images/collision-detection.gif" style="display: inline"/>
+<img src="images/pathfinding.gif" style="display: inline"/>
+<img src="images/multi-tile.gif" style="display: inline"/>
+<img src="images/diagonal.gif" style="display: inline"/>
 
 ## Docs
 
