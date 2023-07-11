@@ -2,7 +2,6 @@
 title: Installation
 parent: getting-started
 next: false
-prev: false
 ---
 
 # Installation

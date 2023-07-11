@@ -9,7 +9,7 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: /p/installation/index.html
+      link: /p/introduction/index.html
     - theme: alt
       text: API Reference
       link: https://annoraaq.github.io/grid-engine/api

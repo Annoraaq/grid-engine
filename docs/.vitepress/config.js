@@ -28,6 +28,7 @@ export default defineConfig({
         text: 'Getting Started',
         collapsed: false,
         items: [
+          { text: 'Introduction', link: '/p/introduction/index.md' },
           { text: 'Installation', link: '/p/installation/index.md' },
         ]
       },
