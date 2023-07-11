@@ -66,6 +66,8 @@ If you have a project that is using Grid Engine and that you would like to see i
 
 Raiper34, splashsky, therebelrobot, xLink,
 
+Most of the images for the examples are from: https://finalbossblues.com/.
+
 ## License
 
 Apache 2.0
