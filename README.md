@@ -11,8 +11,9 @@
   />
 </p>
 
-Welcome to the **Grid Engine** plugin! This Phaser 3 plugin adds grid-based
-movement to your tilemap game. Your characters will be able to only move in whole tile sizes, locked to the x-y grid!
+Welcome to **Grid Engine**!
+Grid Engine helps you position and move objects on a **2-dimensional grid** in **JavaScript/TypeScript**.
+It easily integrates with [Phaser.js](https://phaser.io/) but can also be used standalone. For example you could write your own renderer for an ASCII game. You can even run it on a server with [Node.js](https://nodejs.org/).
 
 <p align="center">
   <img
@@ -24,121 +25,32 @@ movement to your tilemap game. Your characters will be able to only move in whol
 
 ## Features
 
-### Basic
+**Collision Detection** - Detect tile based collisions with the map and other objects, supporting collision groups and multiple layers.
 
-- Grid-based movement, of course!
-- Tile-based collision detection
-- **_NEW!_** - Headless mode (allows running it independently of Phaser)
-- Diagonal movement (8 directions)
-- Isometric maps
-- Multiple character layers
-- Multi-tile characters
+**Pathfinding** - Efficient and configurable pathfinding allows moving to a target position or following other objects.
 
-### Movement / Pathfinding
+**Multi-tile Objects** - Allow objects to span multiple tiles on your grid.
 
-- Pathfinding (for both NPCs and the player)
-- Random movement (can also limit to a radius)
-- Following other characters
-- Collision groups
+**Isometric Maps** - Choose between isometric and orthogonal maps.
+
+**Diagonal Movement** - Four and eight direction movement and pathfinding is supported.
+
+<img src="images/collision-detection.gif" />
+<img src="images/pathfinding.gif" />
+<img src="images/multi-tile.gif" />
+<img src="images/diagonal.gif" />
+
+## Docs
 
 📖 Read our most current [documentation](https://annoraaq.github.io/grid-engine/) or [API reference](https://annoraaq.github.io/grid-engine/api/)
 
 ➡️ You can try/download [a list of examples](https://annoraaq.github.io/grid-engine/).
 
+💻 [Install](https://annoraaq.github.io/grid-engine/p/installation) Grid Engine.
+
 👾 Join our [discord](https://discord.gg/C4jNEZJECs).
 
 🛠 Also check out the [Chrome DevTools plugin](https://github.com/zewa666/grid-engine-devtools).
-
-## Installation
-
-Installing the Grid Engine plugin is simple.
-
-> **_NOTE:_** For TypeScript check out [this example repository](https://github.com/Annoraaq/grid-engine-ts-example).
-
-### NPM
-
-```bash
-npm i --save grid-engine
-```
-
-And then import via:
-
-```javascript
-import { GridEngine } from "grid-engine";
-```
-
-### Web
-
-```html
-<!-- Download the .zip and copy GridEngine.min.js from dist directory -->
-<script src="GridEngine.min.js"></script>
-```
-
-Then, inside your Phaser game config...
-
-```javascript
-const gameConfig = {
-  // ...
-
-  plugins: {
-    scene: [
-      {
-        key: "gridEngine",
-        plugin: GridEngine,
-        mapping: "gridEngine",
-      },
-    ],
-  },
-
-  // ...
-};
-
-const game = new Phaser.Game(gameConfig);
-```
-
-Now you're all set to start using Grid Engine in your scenes!
-
-```javascript
-function create() {
-  // ...
-
-  const gridEngineConfig = {
-    characters: [
-      {
-        id: "player",
-        sprite: playerSprite,
-        walkingAnimationMapping: 6,
-      },
-    ],
-  };
-
-  this.gridEngine.create(tilemap, gridEngineConfig);
-
-  // ...
-}
-```
-
-## Import Helpers
-
-Besides the GridEngine main class, you can also import several helpers. For example there is the `directionFromPos` helper function that gives you a `Direction` from a source to a target position.
-
-If you are importing the NPM module you can import it like:
-
-```javascript
-import {
-  GridEngine, // GridEngine main class
-  directionFromPos, // One of the GridEngine helpers,
-  // ...
-} from "grid-engine";
-```
-
-If you are using the web version (import via `<script>`), all exported functions and classes besides `GridEngine` are stored in a global variable `GridEngineImports`.
-
-So you would use it as follows:
-
-```javascript
-GridEngineImports.directionFromPos(/*...*/);
-```
 
 ## Projects using Grid Engine
 
