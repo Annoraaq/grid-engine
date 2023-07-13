@@ -60,8 +60,10 @@ import {
   PathfindingResult,
   Position,
 } from "./IGridEngine";
+import { ArrayTilemap } from "./GridTilemap/ArrayTilemap/ArrayTilemap";
 
 export {
+  ArrayTilemap,
   CharacterDataHeadless,
   CharacterFilteringOptions,
   CharacterShift,
