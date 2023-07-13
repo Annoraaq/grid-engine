@@ -52,6 +52,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: master
   deploy:
+    needs: build-api-docs
     runs-on: ubuntu-latest
     permissions:
       contents: read
