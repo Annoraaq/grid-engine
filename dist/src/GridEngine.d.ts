@@ -1,5 +1,5 @@
 import { CollisionStrategy } from "./Collisions/CollisionStrategy";
-import { Finished, MoveToConfig, MoveToResult } from "./Movement/TargetMovement/TargetMovement";
+import { Finished, MoveToConfig, MoveToInfo, MoveToResult } from "./Movement/TargetMovement/TargetMovement";
 import { PositionChange } from "./GridCharacter/GridCharacter";
 import { Direction, NumberOfDirections, directionFromPos } from "./Direction/Direction";
 import { Observable } from "rxjs";
@@ -17,7 +17,8 @@ import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer";
 import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile";
 import { QueueMovementConfig, QueuedPathBlockedStrategy, Finished as QueueMovementFinished, QueueMovementResult, QueueMovementEntry } from "./Movement/QueueMovement/QueueMovement";
 import { CharacterShift, CharacterShiftAction, CharLayer, FollowOptions, IGridEngine, LayerPosition, PathfindingResult, Position } from "./IGridEngine";
-export { CharacterDataHeadless, CharacterFilteringOptions, CharacterShift, CharacterShiftAction, CharLayer, CollisionConfig, CollisionStrategy, Direction, Finished, FollowOptions, FrameRow, GridEngineConfigHeadless, GridEngineHeadless, IGridEngine, IsPositionAllowedFn, LayerPosition, MovementInfo, MoveToConfig, MoveToResult, NoPathFoundStrategy, NumberOfDirections, Orientation, PathBlockedStrategy, PathfindingOptions, PathfindingResult, Position, PositionChange, PhaserTile, PhaserTileLayer, PhaserTilemap, QueueMovementConfig, QueueMovementEntry, QueueMovementFinished, QueueMovementResult, QueuedPathBlockedStrategy, ShortestPathAlgorithmType, Tile, TileLayer, Tilemap, TileSizePerSecond, directionFromPos, };
+import { ArrayTilemap } from "./GridTilemap/ArrayTilemap/ArrayTilemap";
+export { ArrayTilemap, CharacterDataHeadless, CharacterFilteringOptions, CharacterShift, CharacterShiftAction, CharLayer, CollisionConfig, CollisionStrategy, Direction, Finished, FollowOptions, FrameRow, GridEngineConfigHeadless, GridEngineHeadless, IGridEngine, IsPositionAllowedFn, LayerPosition, MovementInfo, MoveToConfig, MoveToInfo, MoveToResult, NoPathFoundStrategy, NumberOfDirections, Orientation, PathBlockedStrategy, PathfindingOptions, PathfindingResult, Position, PositionChange, PhaserTile, PhaserTileLayer, PhaserTilemap, QueueMovementConfig, QueueMovementEntry, QueueMovementFinished, QueueMovementResult, QueuedPathBlockedStrategy, ShortestPathAlgorithmType, Tile, TiledProject, TileLayer, Tilemap, TileSizePerSecond, directionFromPos, };
 /**
  * Configuration object for initializing GridEngine.
  *
@@ -88,6 +89,10 @@ export interface CharacterData extends CharacterDataHeadless {
      * name or health bar). In order to position the container correctly on the
      * tiles, it is necessary that you position the character’s sprite on
      * position (0, 0) in the container.
+     *
+     * If you pass both, a container and a sprite, only the container's pixel
+     * position will be changed on movement. That is only relevant if you pass a
+     * sprite that is not included in the container.
      *
      * For more details see the {@link https://annoraaq.github.io/grid-engine/example/phaser-containers/ | container example}.
      */
