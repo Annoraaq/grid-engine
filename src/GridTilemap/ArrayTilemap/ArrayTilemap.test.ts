@@ -118,4 +118,28 @@ describe("ArrayTilemap", () => {
     ).toBe(false);
     expect(tm.getTileAt(-1, 0, "layerOne")).toBe(undefined);
   });
+
+  it("uses a custom collision prop name", () => {
+    const tm = new ArrayTilemap(
+      {
+        layerOne: { data: [[1, 0]] },
+        layerTwo: { data: [[0, 1]] },
+      },
+      "orthogonal",
+      "custom_collision_prop"
+    );
+
+    expect(
+      tm.getTileAt(0, 0, "layerOne")?.getProperty(COLLISION_PROP_NAME)
+    ).toBe(false);
+    expect(
+      tm.getTileAt(0, 0, "layerOne")?.hasProperty(COLLISION_PROP_NAME)
+    ).toBe(false);
+    expect(
+      tm.getTileAt(0, 0, "layerOne")?.getProperty("custom_collision_prop")
+    ).toBe(true);
+    expect(
+      tm.getTileAt(0, 0, "layerOne")?.hasProperty("custom_collision_prop")
+    ).toBe(true);
+  });
 });

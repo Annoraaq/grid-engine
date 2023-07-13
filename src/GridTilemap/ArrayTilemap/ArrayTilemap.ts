@@ -25,7 +25,8 @@ export class ArrayTilemap implements Tilemap {
 
   constructor(
     private map: Record<LayerName, ArrayTilemapInputLayer>,
-    private orientation: Orientation = "orthogonal"
+    private orientation: Orientation = "orthogonal",
+    collisionPropertyName = "ge_collide"
   ) {
     let width = -1;
     let height = -1;
@@ -45,7 +46,10 @@ export class ArrayTilemap implements Tilemap {
       for (let r = 0; r < layer.data.length; r++) {
         const row: Tile[] = [];
         for (let c = 0; c < layer.data[r].length; c++) {
-          const tile = new ArrayTile(layer.data[r][c] === 1);
+          const tile = new ArrayTile(
+            layer.data[r][c] === 1,
+            collisionPropertyName
+          );
           row.push(tile);
         }
         tiles.push(row);
@@ -110,15 +114,18 @@ class ArrayTileLayer implements TileLayer {
 }
 
 class ArrayTile {
-  constructor(private isBlocking: boolean) {}
+  constructor(
+    private isBlocking: boolean,
+    private collisionPropertyName: string
+  ) {}
 
   getProperty(name: string): any {
-    if (name === "ge_collide") {
+    if (name === this.collisionPropertyName) {
       return this.isBlocking;
     }
     return false;
   }
   hasProperty(name: string): boolean {
-    return name === "ge_collide";
+    return name === this.collisionPropertyName;
   }
 }
