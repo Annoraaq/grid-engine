@@ -2,11 +2,11 @@
   <DomRendererCore :width="width" :height="height" :tileSize="tileSize" :cells="cells" />
 </template>
 <script>
-import {GridEngineHeadless} from '../grid-engine-2.30.0.esm.min.js'
+import {GridEngineHeadless, ArrayTilemap} from '../grid-engine-2.32.0.esm.min.js'
 import DomRendererCore from './DomRendererCore.vue';
 import DomRendererLegend from './DomRendererLegend.vue';
 import DomRendererControls from './DomRendererControls.vue';
-import { createGridTilemap, initCellsFromMap} from '../services/gridTilemap.js';
+import { initCellsFromMap} from '../services/gridTilemap.js';
 
 export default {
   components: {DomRendererCore, DomRendererLegend, DomRendererControls},
@@ -42,7 +42,7 @@ export default {
       }
       this.subscriptions = [];
 
-      this.gridEngine.create(createGridTilemap(this.map), {characters: [
+      this.gridEngine.create(new ArrayTilemap({l: {data: this.map}}), {characters: [
         {
           id: 'p1',
           collides: {collisionGroups: []},

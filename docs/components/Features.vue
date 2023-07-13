@@ -81,7 +81,6 @@ import Isometric from './Isometric.vue';
 import Diagonal from './Diagonal.vue';
 import { data as collisionMapData} from '../collisionmap.data.js'
 import { data as pathfindingMapData} from '../map.data.js'
-console.log(pathfindingMapData)
 
 export default {
   components: {Collision, Pathfinding, MultiTile, Isometric, Diagonal},
