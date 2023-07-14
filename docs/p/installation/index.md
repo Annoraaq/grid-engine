@@ -6,30 +6,34 @@ next: false
 
 # Installation
 
-Installing the Grid Engine plugin is simple.
+> **_NOTE:_** For using GridEngine with TypeScript and Phaser.js check out [this example repository](https://github.com/Annoraaq/grid-engine-ts-example).
 
-> **_NOTE:_** For TypeScript check out [this example repository](https://github.com/Annoraaq/grid-engine-ts-example).
+### NPM
 
-## NPM
+If you are using npm, you can install it via:
 
 ```bash
-npm i --save grid-engine
+$ npm i --save grid-engine
 ```
 
-And then import via:
+And then import it in your code:
 
 ```javascript
-import { GridEngine } from "grid-engine";
+import { GridEngine, GridEngineHeadless } from "grid-engine";
 ```
 
-## Web
+### Web
+
+If you are not using a package manager like npm, you can also include the minified web version (iife):
 
 ```html
 <!-- Download the .zip and copy GridEngine.min.js from dist directory -->
 <script src="GridEngine.min.js"></script>
 ```
 
-Then, inside your Phaser game config...
+## Use as Phaser.js Plugin
+
+Add the plugin to your Phaser config:
 
 ```javascript
 const gameConfig = {
@@ -67,10 +71,44 @@ function create() {
     ],
   };
 
-  this.gridEngine.create(tilemap, gridEngineConfig);
+  this.gridEngine.create(
+    tilemap, // Phaser.Tilemaps.Tilemap
+    gridEngineConfig
+  );
 
   // ...
 }
+```
+
+## Use Headless (Standalone)
+
+You have to provide a tilemap to the headless (standalone, no Phaser.js) version of Grid Engine. While the Phaser.js plugin receives a Phaser tilemap, the headless version needs one that implements the [Tilemap interface](https://annoraaq.github.io/grid-engine/api/interfaces/Tilemap.html). There is a simple implementation in Grid Engine that can be created from an array of integers (0 = non-blocking, 1 = blocking). You can also create your own implementation of the [Tilemap interface](https://annoraaq.github.io/grid-engine/api/interfaces/Tilemap.html) and pass it to Grid Engine.
+
+```javascript
+import { GridEngineHeadless, ArrayTilemap} from "grid-engine";
+
+const gridEngineHeadless = new GridEngineHeadless();
+
+// A simple example tilemap created from an array.
+// 0 = non-blocking
+// 1 = blocking
+const tilemap = new ArrayTilemap({
+  data: [
+    [0,0,0,0]
+    [0,1,1,0]
+    [0,1,1,0]
+    [0,0,0,0]
+  ],
+});
+
+gridEngineHeadless.create(tilemap, { characters: [{id: "player"}] }));
+```
+
+If you are using the web version (import via `<script>`), you can access `GridEngineHeadless` from the global variable `GridEngineImports`:
+
+```javascript
+const gridEngineHeadless = new GridEngineImports.GridEngineHeadless();
+// ...
 ```
 
 ## Import Helpers
@@ -81,7 +119,8 @@ If you are importing the NPM module you can import it like:
 
 ```javascript
 import {
-  GridEngine, // GridEngine main class
+  GridEngine, // GridEngine Phaser Plugin main class
+  GridEngineHeadless, // GridEngine headless main class
   directionFromPos, // One of the GridEngine helpers,
   // ...
 } from "grid-engine";
