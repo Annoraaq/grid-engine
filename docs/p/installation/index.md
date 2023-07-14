@@ -85,7 +85,7 @@ function create() {
 You have to provide a tilemap to the headless (standalone, no Phaser.js) version of Grid Engine. While the Phaser.js plugin receives a Phaser tilemap, the headless version needs one that implements the [Tilemap interface](https://annoraaq.github.io/grid-engine/api/interfaces/Tilemap.html). There is a simple implementation in Grid Engine that can be created from an array of integers (0 = non-blocking, 1 = blocking). You can also create your own implementation of the [Tilemap interface](https://annoraaq.github.io/grid-engine/api/interfaces/Tilemap.html) and pass it to Grid Engine.
 
 ```javascript
-import { GridEngineHeadless, ArrayTilemap} from "grid-engine";
+import { GridEngineHeadless, ArrayTilemap } from "grid-engine";
 
 const gridEngineHeadless = new GridEngineHeadless();
 
@@ -93,22 +93,39 @@ const gridEngineHeadless = new GridEngineHeadless();
 // 0 = non-blocking
 // 1 = blocking
 const tilemap = new ArrayTilemap({
-  data: [
-    [0,0,0,0]
-    [0,1,1,0]
-    [0,1,1,0]
-    [0,0,0,0]
-  ],
+  someLayer: {
+    data: [
+      [0, 0, 0, 0],
+      [0, 1, 1, 0],
+      [0, 1, 1, 0],
+      [0, 0, 0, 0],
+    ],
+  },
 });
 
-gridEngineHeadless.create(tilemap, { characters: [{id: "player"}] }));
+gridEngineHeadless.create(tilemap, { characters: [{ id: "player" }] });
 ```
 
 If you are using the web version (import via `<script>`), you can access `GridEngineHeadless` from the global variable `GridEngineImports`:
 
 ```javascript
 const gridEngineHeadless = new GridEngineImports.GridEngineHeadless();
-// ...
+
+// A simple example tilemap created from an array.
+// 0 = non-blocking
+// 1 = blocking
+const tilemap = new GridEngineImports.ArrayTilemap({
+  someLayer: {
+    data: [
+      [0, 0, 0, 0],
+      [0, 1, 1, 0],
+      [0, 1, 1, 0],
+      [0, 0, 0, 0],
+    ],
+  },
+});
+
+gridEngineHeadless.create(tilemap, { characters: [{ id: "player" }] });
 ```
 
 ## Import Helpers
