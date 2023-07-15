@@ -5,12 +5,12 @@ prev: false
 
 # Create an ASCII Renderer
 
-This tutorial demonstrates how to create your own renderer for Grid Engine in Typescript. We will create a simple ASCII renderer together.
-The ASCII renderer will fill a container element on a website with a text representation of our grid.
+This tutorial demonstrates how to create your own renderer for Grid Engine in TypeScript. We will create a simple ASCII renderer together.
+The renderer will fill a container element on a website with a text representation of our grid.
 
-We will create a map that contains a simple maze and add a character that will use Grid Engine pathfinding to find their way to the center.
+We will create a map that contains a simple maze and add a character that will use pathfinding to find their way to the center.
 
-The ASCII representation of the map will use the following encoding:
+The ASCII representation of the map uses the following encoding:
 
 - '.' = free position
 - '#' = blocked position (wall of the maze)
@@ -31,17 +31,17 @@ c.........
 ..........
 ```
 
-## Setup the Project
+## Set Up the Project
 
-We will use [esbuild](https://esbuild.github.io/) to bundle and serve our compiled renderer as a website.
+We use [esbuild](https://esbuild.github.io/) to bundle and serve our compiled renderer as a website.
 
-First, we create a new npm project with:
+Create a new npm project with:
 
 ```bash
 $ npm init
 ```
 
-Next, we install esbuild as a dev depencency:
+Next, install esbuild as a dev depencency:
 
 ```
 $ npm i --save-dev esbuild
@@ -89,7 +89,7 @@ This will be the entry point of our application. It contains a `<div>` that will
 
 Create a directory `src` and create the following empty files within it: `main.ts` and `AsciiRenderer.ts`.
 
-Your directory tree should now look like
+Your directory tree should now look like this:
 
 ```
 | - index.html
@@ -292,7 +292,7 @@ gridEngineHeadless.moveTo("player", targetPos); // [!code ++]
 
 :::
 
-Now, we need to make sure that GridEngine gets updated in frequent intervals (we choose 50ms). And on each update we also want to trigger a re-rendering of the ASCII content in the container.
+Now, we need to make sure that Grid Engine gets updated in frequent intervals (we choose 50ms). And on each update we also want to trigger a re-rendering of the ASCII content in the container.
 
 ::: code-group
 
