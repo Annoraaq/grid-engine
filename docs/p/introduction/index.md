@@ -12,7 +12,7 @@ import { data as pathfindingMapData} from '../../map.data.js'
 ## Why Grid Engine?
 
 Grid Engine helps you position and move objects on a **2-dimensional grid** in **JavaScript/TypeScript**.
-It easily integrates with [Phaser.js](https://phaser.io/) but can also be used standalone. For example you could write your own renderer for an ASCII game. You can even run it on a server with [Node.js](https://nodejs.org/).
+It easily integrates with [Phaser.js](https://phaser.io/) but can also be used standalone. For example you could write your own renderer for an ASCII game (see [this tutorial](/p/ascii-renderer/index.html)). You can even run it on a server with [Node.js](https://nodejs.org/).
 
 ## What is **Grid Based Movement**?
 
@@ -45,7 +45,7 @@ All game objects in Grid Engine are called **characters**. These include actual 
 ### Renderers
 
 A **renderer** is a piece of software that vizualizes the logic of Grid Engine. Grid Engine ships with a [Phaser.js](https://phaser.io/) renderer in shape of a [Phaser.js](https://phaser.io/) plugin.
-That makes it easy to integrate the grid logic of Grid Engine with your [Phaser.js](https://phaser.io/) game. However, a renderer can come in many shapes. There could be a renderer for the terminal that prints the grid as ASCII characters. Or there could be a [Three.js](https://threejs.org/) renderer that renders a 3D representation of the grid.
+That makes it easy to integrate the grid logic of Grid Engine with your [Phaser.js](https://phaser.io/) game. However, a renderer can come in many shapes. There could be a renderer for the terminal that prints the grid as ASCII characters (see [this tutorial](/p/ascii-renderer/index.html)). Or there could be a [Three.js](https://threejs.org/) renderer that renders a 3D representation of the grid.
 
 You can also run Grid Engine without any renderer at all using headless mode. That can be useful on the server or if a visual representation of the grid is just not relevant for your use case.
 

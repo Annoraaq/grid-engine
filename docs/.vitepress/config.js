@@ -46,6 +46,7 @@ export default defineConfig({
           { text: 'Layer Overlay', link: '/p/layer-overlay/index.md' },
           { text: 'Pathfinding Performance', link: '/p/pathfinding-performance/index.md' },
           { text: 'Tiled Project', link: '/p/tiled-project/index.md' },
+          { text: 'Example ASCII Renderer', link: '/p/ascii-renderer/index.md' },
         ]
       },
       {
