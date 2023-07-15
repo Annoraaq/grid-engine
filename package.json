@@ -3,7 +3,7 @@
   "version": "2.32.0",
   "description": "Phaser3 plugin for grid based movement on a 2D game board.",
   "author": "Johannes Baum",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "main": "dist/GridEngine.esm.min.js",
   "scripts": {
     "test": "jest",
