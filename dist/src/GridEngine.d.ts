@@ -17,8 +17,8 @@ import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer";
 import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile";
 import { QueueMovementConfig, QueuedPathBlockedStrategy, Finished as QueueMovementFinished, QueueMovementResult, QueueMovementEntry } from "./Movement/QueueMovement/QueueMovement";
 import { CharacterShift, CharacterShiftAction, CharLayer, FollowOptions, IGridEngine, LayerPosition, PathfindingResult, Position } from "./IGridEngine";
-import { ArrayTilemap } from "./GridTilemap/ArrayTilemap/ArrayTilemap";
-export { ArrayTilemap, CharacterDataHeadless, CharacterFilteringOptions, CharacterShift, CharacterShiftAction, CharLayer, CollisionConfig, CollisionStrategy, Direction, Finished, FollowOptions, FrameRow, GridEngineConfigHeadless, GridEngineHeadless, IGridEngine, IsPositionAllowedFn, LayerPosition, MovementInfo, MoveToConfig, MoveToInfo, MoveToResult, NoPathFoundStrategy, NumberOfDirections, Orientation, PathBlockedStrategy, PathfindingOptions, PathfindingResult, Position, PositionChange, PhaserTile, PhaserTileLayer, PhaserTilemap, QueueMovementConfig, QueueMovementEntry, QueueMovementFinished, QueueMovementResult, QueuedPathBlockedStrategy, ShortestPathAlgorithmType, Tile, TiledProject, TileLayer, Tilemap, TileSizePerSecond, directionFromPos, };
+import { ArrayTilemap, ArrayTilemapInputLayer } from "./GridTilemap/ArrayTilemap/ArrayTilemap";
+export { ArrayTilemap, ArrayTilemapInputLayer, CharacterDataHeadless, CharacterFilteringOptions, CharacterShift, CharacterShiftAction, CharLayer, CollisionConfig, CollisionStrategy, Direction, Finished, FollowOptions, FrameRow, GridEngineConfigHeadless, GridEngineHeadless, IGridEngine, IsPositionAllowedFn, LayerPosition, MovementInfo, MoveToConfig, MoveToInfo, MoveToResult, NoPathFoundStrategy, NumberOfDirections, Orientation, PathBlockedStrategy, PathfindingOptions, PathfindingResult, Position, PositionChange, PhaserTile, PhaserTileLayer, PhaserTilemap, QueueMovementConfig, QueueMovementEntry, QueueMovementFinished, QueueMovementResult, QueuedPathBlockedStrategy, ShortestPathAlgorithmType, Tile, TiledProject, TileLayer, Tilemap, TileSizePerSecond, directionFromPos, };
 /**
  * Configuration object for initializing GridEngine.
  *
@@ -115,6 +115,7 @@ export interface CharacterData extends CharacterDataHeadless {
  */
 export declare class GridEngine implements IGridEngine {
     private scene;
+    static welcomeMessagePrinted: boolean;
     private geHeadless;
     private config?;
     private gridCharacters?;

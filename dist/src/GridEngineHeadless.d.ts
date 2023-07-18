@@ -177,7 +177,7 @@ export declare class GridEngineHeadless implements IGridEngine {
     private queueMovementFinished$?;
     private charRemoved$?;
     private charAdded$?;
-    constructor();
+    constructor(printWelcomeMessage?: boolean);
     /**
      * {@inheritDoc IGridEngine.getCharLayer}
      *
