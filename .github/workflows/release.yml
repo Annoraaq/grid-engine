@@ -31,6 +31,8 @@ jobs:
 
       - name: bump version
         run: npm version ${{ github.event.inputs.versiontype }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: npm install
         run: npm i
