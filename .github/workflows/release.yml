@@ -23,7 +23,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      
+
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
         with:
@@ -31,7 +31,10 @@ jobs:
 
       - name: npm install
         run: npm i
-      
+
+      - name: bump version
+        run: npm version ${{ github.event.inputs.versiontype }}
+
       - name: build
         run: npm run build
 
@@ -47,23 +50,20 @@ jobs:
           # The message for the commit
           # Default: 'Commit from GitHub Actions (name of the workflow)'
           message: 'build'
-          
+
       - run: npm run docs
-      
+
       - uses: EndBug/add-and-commit@v7
         with:
           default_author: github_actions
           message: 'build docs'
-        
-      - name: bump minor
-        run: npm version ${{ github.event.inputs.versiontype }}
-        
+
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
-          
+
       - uses: JS-DevTools/npm-publish@v1
         with:
-          token: ${{ secrets.NPM_TOKEN }}     
+          token: ${{ secrets.NPM_TOKEN }}
