@@ -29,11 +29,11 @@ jobs:
         with:
           node-version: '15'
 
-      - name: npm install
-        run: npm i
-
       - name: bump version
         run: npm version ${{ github.event.inputs.versiontype }}
+
+      - name: npm install
+        run: npm i
 
       - name: build
         run: npm run build
