@@ -217,7 +217,8 @@ export interface CharacterData extends CharacterDataHeadless {
  * @category Main Modules
  */
 export class GridEngine implements IGridEngine {
-  private geHeadless: GridEngineHeadless = new GridEngineHeadless();
+  static welcomeMessagePrinted = false;
+  private geHeadless: GridEngineHeadless = new GridEngineHeadless(false);
   private config?: Omit<Required<GridEngineConfig>, "tiledProject">;
   private gridCharacters?: Map<string, GridCharacterPhaser>;
   private gridTilemap?: GridTilemapPhaser;
@@ -228,12 +229,16 @@ export class GridEngine implements IGridEngine {
    * @internal
    */
   constructor(private scene: Phaser.Scene) {
-    console.log(`Using GridEngine Phaser Plugin v${VERSION}`);
+    if (!GridEngine.welcomeMessagePrinted) {
+      console.log(`Using GridEngine Phaser Plugin v${VERSION}`);
+      GridEngine.welcomeMessagePrinted = true;
+    }
     this.scene.sys.events.once("boot", this.boot, this);
   }
 
   /** @internal */
   boot(): void {
+    console.log("boot");
     this.scene.sys.events.on("update", this.update, this);
   }
 

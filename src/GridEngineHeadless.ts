@@ -264,8 +264,10 @@ export class GridEngineHeadless implements IGridEngine {
   private charRemoved$?: Subject<string>;
   private charAdded$?: Subject<string>;
 
-  constructor() {
-    console.log(`Using GridEngine v${VERSION}`);
+  constructor(printWelcomeMessage = true) {
+    if (printWelcomeMessage) {
+      console.log(`Using GridEngine v${VERSION}`);
+    }
   }
 
   /**
