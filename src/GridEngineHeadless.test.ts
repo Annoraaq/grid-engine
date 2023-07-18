@@ -1976,8 +1976,13 @@ describe("GridEngineHeadless", () => {
 
   it("logs version", () => {
     console.log = jest.fn();
-    gridEngineHeadless = new GridEngineHeadless();
+    gridEngineHeadless = new GridEngineHeadless(false);
 
+    expect(console.log).not.toHaveBeenCalledWith(
+      "Using GridEngine vGRID.ENGINE.VERSION"
+    );
+
+    gridEngineHeadless = new GridEngineHeadless();
     expect(console.log).toHaveBeenCalledWith(
       "Using GridEngine vGRID.ENGINE.VERSION"
     );

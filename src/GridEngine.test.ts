@@ -2100,11 +2100,20 @@ describe("GridEngine", () => {
     });
   });
 
-  it("logs version", () => {
-    gridEngine = new GridEngine(sceneMock);
-
+  it("logs version once", () => {
+    GridEngine.welcomeMessagePrinted = false;
+    new GridEngine(sceneMock);
     expect(console.log).toHaveBeenCalledWith(
+      "Using GridEngine Phaser Plugin vGRID.ENGINE.VERSION"
+    );
+    expect(console.log).not.toHaveBeenCalledWith(
       "Using GridEngine vGRID.ENGINE.VERSION"
+    );
+
+    jest.clearAllMocks();
+    new GridEngine(sceneMock);
+    expect(console.log).not.toHaveBeenCalledWith(
+      "Using GridEngine Phaser Plugin vGRID.ENGINE.VERSION"
     );
   });
 
