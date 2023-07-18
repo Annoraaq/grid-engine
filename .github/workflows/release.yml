@@ -33,6 +33,7 @@ jobs:
         uses: Reedyuk/NPM-Version@1.2.1
         with:
           version: ${{ github.event.inputs.versiontype }}
+          git-tag-version: true
 
       - name: npm install
         run: npm i
