@@ -238,7 +238,6 @@ export class GridEngine implements IGridEngine {
 
   /** @internal */
   boot(): void {
-    console.log("boot");
     this.scene.sys.events.on("update", this.update, this);
   }
 
