@@ -197,6 +197,7 @@ describe("GridTilemap", () => {
       },
       {
         layer: "charLayer1",
+        charLayerName: "differentNameThanTiledLayer",
         blockMap: [
           // prettier-ignore
           "..",
@@ -227,7 +228,7 @@ describe("GridTilemap", () => {
     gridTilemap.addCharacter(char1);
     expect(char1.getTilePos()).toEqual({
       position: new Vector2(0, 0),
-      layer: "charLayer1",
+      layer: "differentNameThanTiledLayer",
     });
   });
 

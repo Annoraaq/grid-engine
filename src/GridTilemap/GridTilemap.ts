@@ -345,7 +345,7 @@ export class GridTilemap {
 
   private getLowestCharLayer(): string | undefined {
     for (const layer of this.tilemap.getLayers()) {
-      if (layer.isCharLayer()) return layer.getName();
+      if (layer.isCharLayer()) return layer.getProperty(CHAR_LAYER_PROP_NAME);
     }
     return undefined;
   }
