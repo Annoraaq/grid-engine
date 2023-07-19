@@ -35,6 +35,7 @@ export declare function mockLayeredBlockMap(blockMaps: Array<{
     layer: string | undefined;
     blockMap: string[];
     isCharLayer?: boolean;
+    charLayerName?: string;
 }>, isometric?: boolean, costMaps?: CostMapLayer[]): Tilemap;
 export declare function tileCostProps(costMap: CostMapLayer, r: number, c: number): Record<string, number>;
 export declare function createAllowedFn(map: string[], ignoreBounds?: boolean): ({ x, y }: {
