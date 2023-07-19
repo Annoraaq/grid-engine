@@ -63,20 +63,31 @@ if (hasFailed) {
 }
 
 function compare(speedTest: SpeedTest): Result {
-  const { result: oldRes, tolerance } = speedTest.run(geOld);
-  const { result: newRes } = speedTest.run(geNew);
+  const TEST_RUNS = 3;
+  let oldResSum = 0;
+  let newResSum = 0;
+  let allTolerance = 0;
+  for (let i = 0; i < TEST_RUNS; i++) {
+    const { result: oldRes, tolerance } = speedTest.run(geOld);
+    const { result: newRes } = speedTest.run(geNew);
+    oldResSum += oldRes;
+    newResSum += newRes;
+    allTolerance = tolerance;
+  }
+  const oldResAvg = oldResSum / TEST_RUNS;
+  const newResAvg = newResSum / TEST_RUNS;
 
-  const absTolerance = oldRes * tolerance;
-  if (oldRes < newRes && newRes - oldRes > absTolerance) {
+  const absTolerance = oldResAvg * allTolerance;
+  if (oldResAvg < newResAvg && newResAvg - oldResAvg > absTolerance) {
     return {
       failed: true,
       resultOld: {
-        result: oldRes,
-        tolerance,
+        result: oldResAvg,
+        tolerance: allTolerance,
       },
       resultNew: {
-        result: newRes,
-        tolerance,
+        result: newResAvg,
+        tolerance: allTolerance,
       },
     };
   }
@@ -84,12 +95,12 @@ function compare(speedTest: SpeedTest): Result {
   return {
     failed: false,
     resultOld: {
-      result: oldRes,
-      tolerance,
+      result: oldResAvg,
+      tolerance: allTolerance,
     },
     resultNew: {
-      result: newRes,
-      tolerance,
+      result: newResAvg,
+      tolerance: allTolerance,
     },
   };
 }
