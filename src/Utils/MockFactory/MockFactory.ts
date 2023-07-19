@@ -231,6 +231,7 @@ export function mockLayeredBlockMap(
     layer: string | undefined;
     blockMap: string[];
     isCharLayer?: boolean;
+    charLayerName?: string;
   }>,
   isometric?: boolean,
   costMaps?: CostMapLayer[]
@@ -268,7 +269,9 @@ export function mockLayeredBlockMap(
     }
     const layer = new MockTileLayer(
       bm.layer,
-      bm.layer && bm.isCharLayer ? { ge_charLayer: bm.layer } : {},
+      bm.layer && bm.isCharLayer
+        ? { ge_charLayer: bm.charLayerName ?? bm.layer }
+        : {},
       bm.blockMap.length,
       bm.blockMap[0].length,
       1,
