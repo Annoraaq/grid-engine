@@ -37,7 +37,7 @@ export interface ShortestPath {
 
 export interface ShortestPathResult {
   path: LayerVecPos[];
-  closestToTarget: LayerVecPos;
+  closestToTarget?: LayerVecPos;
   steps: number;
   maxPathLengthReached: boolean;
   algorithmUsed: ShortestPathAlgorithmType;
@@ -81,6 +81,7 @@ export abstract class ShortestPathAlgorithm {
       maxPathLength = Infinity,
       ignoreLayers = false,
       considerCosts = false,
+      calculateClosestToTarget = true,
     }: PathfindingOptions = {}
   ) {
     this.options = {
@@ -97,6 +98,7 @@ export abstract class ShortestPathAlgorithm {
       maxPathLength,
       ignoreLayers,
       considerCosts,
+      calculateClosestToTarget,
     };
   }
 

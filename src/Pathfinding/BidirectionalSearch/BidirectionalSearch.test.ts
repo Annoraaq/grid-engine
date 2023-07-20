@@ -97,6 +97,125 @@ describe("BidirectionalSearch", () => {
     ]);
   });
 
+  describe("closestToTarget turned off", () => {
+    it("should stop early if no path found", () => {
+      const gridTilemap = createTilemap([
+        {
+          layer: LOWER_CHAR_LAYER,
+          blockMap: [
+            // prettier-ignore
+            "######",
+            "#....#",
+            "#.s..#",
+            "#....#",
+            "#....#",
+            "######",
+            "##t###",
+            "######",
+          ],
+        },
+      ]);
+
+      const algo = new BidirectionalSearch(gridTilemap, {
+        calculateClosestToTarget: false,
+      });
+
+      const shortestPath = algo.findShortestPath(
+        layerPos(new Vector2(1, 1)),
+        layerPos(new Vector2(3, 6))
+      );
+
+      expect(shortestPath.closestToTarget).toBeUndefined();
+      const stepsNeededUsingClosestToTarget = 17;
+      expect(shortestPath.steps).toBeLessThan(stepsNeededUsingClosestToTarget);
+    });
+
+    it("should not calc closestToTarget if second BFS find target", () => {
+      const gridTilemap = createTilemap([
+        {
+          layer: LOWER_CHAR_LAYER,
+          blockMap: [
+            // prettier-ignore
+            "######",
+            "#....#",
+            "#.s..#",
+            "#....#",
+            "#.t..#",
+            "######",
+          ],
+        },
+      ]);
+
+      const algo = new BidirectionalSearch(gridTilemap, {
+        calculateClosestToTarget: false,
+      });
+
+      const shortestPath = algo.findShortestPath(
+        layerPos(new Vector2(2, 2)),
+        layerPos(new Vector2(2, 4))
+      );
+
+      expect(shortestPath.closestToTarget).toBeUndefined();
+    });
+
+    it("should not calc closestToTarget if first BFS finds target", () => {
+      const gridTilemap = createTilemap([
+        {
+          layer: LOWER_CHAR_LAYER,
+          blockMap: [
+            // prettier-ignore
+            "######",
+            "#.s..#",
+            "#....#",
+            "#....#",
+            "#.t..#",
+            "######",
+          ],
+        },
+      ]);
+
+      const algo = new BidirectionalSearch(gridTilemap, {
+        calculateClosestToTarget: false,
+      });
+
+      const shortestPath = algo.findShortestPath(
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(2, 4))
+      );
+
+      expect(shortestPath.closestToTarget).toBeUndefined();
+    });
+
+    it("should not calc closestToTarget when reaching maxLength", () => {
+      const gridTilemap = createTilemap([
+        {
+          layer: LOWER_CHAR_LAYER,
+          blockMap: [
+            // prettier-ignore
+            "######",
+            "#.s..#",
+            "#....#",
+            "#....#",
+            "#.t..#",
+            "######",
+          ],
+        },
+      ]);
+
+      const algo = new BidirectionalSearch(gridTilemap, {
+        calculateClosestToTarget: false,
+        maxPathLength: 1,
+      });
+
+      const shortestPath = algo.findShortestPath(
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(2, 4))
+      );
+
+      expect(shortestPath.closestToTarget).toBeUndefined();
+    });
+  });
+
   it("should use manhattan distance for 4 directions", () => {
     const gridTilemap = createTilemap([
       {
@@ -120,6 +239,7 @@ describe("BidirectionalSearch", () => {
     );
 
     expect(shortestPath.closestToTarget).toEqual(layerPos(new Vector2(3, 1)));
+    expect(shortestPath.steps).toBe(6);
   });
 
   it("should use Chebyshev distance for 8 directions", () => {
