@@ -44,6 +44,9 @@ export interface PathfindingResult {
   path: LayerPosition[];
 
   /**
+   * Only set, if {@link PathfindingOptions.calculateClosestToTarget} is set.
+   * It will still be set in algorithms where it does not come with a
+   * performance penalty (like BFS).
    * If no path could be found, it contains one position that has the closest
    * distance to the target. The distance is either
    * {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
@@ -51,7 +54,7 @@ export interface PathfindingResult {
    * {@link https://en.wikipedia.org/wiki/Chebyshev_distance | Chebyshev distance}
    * in case of 8 direction mode.
    */
-  closestToTarget: LayerPosition;
+  closestToTarget?: LayerPosition;
 
   /**
    * In case that {@link PathfindingOptions.maxPathLength} was set, this

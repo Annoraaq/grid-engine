@@ -295,6 +295,7 @@ export class TargetMovement implements Movement {
       maxPathLength: this.maxPathLength,
       ignoreLayers: this.ignoreLayers,
       considerCosts: this.considerCosts,
+      calculateClosestToTarget: true,
     };
   }
 
@@ -495,6 +496,11 @@ export class TargetMovement implements Movement {
       noPathFound &&
       this.noPathFoundStrategy === NoPathFoundStrategy.CLOSEST_REACHABLE
     ) {
+      if (!closestToTarget) {
+        throw Error(
+          "ClosestToTarget should never be undefined in TargetMovement."
+        );
+      }
       const shortestPathToClosestPoint = pathfinding.findShortestPath(
         this.character.getNextTilePos(),
         closestToTarget,

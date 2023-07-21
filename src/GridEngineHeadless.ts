@@ -938,7 +938,9 @@ export class GridEngineHeadless implements IGridEngine {
     );
     return {
       path: res.path.map(LayerPositionUtils.fromInternal),
-      closestToTarget: LayerPositionUtils.fromInternal(res.closestToTarget),
+      closestToTarget: res.closestToTarget
+        ? LayerPositionUtils.fromInternal(res.closestToTarget)
+        : undefined,
       reachedMaxPathLength: false,
       steps: res.steps,
     };
