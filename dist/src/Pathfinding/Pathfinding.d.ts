@@ -82,6 +82,16 @@ export interface PathfindingOptions {
      * @default false
      */
     considerCosts?: boolean;
+    /**
+     * If `true`, {@link PathfindingResult.closestToTarget} is calculated.
+     * Otherwise it is ignored in some algorithms and will not be set in {@link PathfindingResult}.
+     * Depending on the used pathfinding algorithm (like for BIDIRECTIONAL_SEARCH)
+     * it can be faster if it is disabled. It will not be ignored in algorithms
+     * where it does not come with a performance penalty (like BFS).
+     *
+     * @default true
+     */
+    calculateClosestToTarget?: boolean;
 }
 /**
  * Function to specify whether a certain position is allowed for pathfinding.
