@@ -114,11 +114,7 @@ export class BidirectionalSearch extends ShortestPathAlgorithm {
     stopBfs.visited.set(LayerPositionUtils.toString(stopNode), 0);
 
     while (
-      (this.options.calculateClosestToTarget &&
-        (startBfs.queue.size() > 0 || stopBfs.queue.size() > 0)) ||
-      (!this.options.calculateClosestToTarget &&
-        startBfs.queue.size() > 0 &&
-        stopBfs.queue.size() > 0)
+      this.shouldStop(startBfs.queue.size() > 0, stopBfs.queue.size() > 0)
     ) {
       const startDequeued = startBfs.queue.dequeue();
       if (!startDequeued) break;
@@ -135,9 +131,7 @@ export class BidirectionalSearch extends ShortestPathAlgorithm {
         return {
           previous: startBfs.previous,
           previous2: stopBfs.previous,
-          closestToTarget: this.options.calculateClosestToTarget
-            ? closestToTarget
-            : undefined,
+          closestToTarget: this.maybeClosestToTarget(closestToTarget),
           steps,
           maxPathLengthReached: true,
         };
@@ -155,9 +149,7 @@ export class BidirectionalSearch extends ShortestPathAlgorithm {
         return {
           previous: startBfs.previous,
           previous2: stopBfs.previous,
-          closestToTarget: this.options.calculateClosestToTarget
-            ? stopNode
-            : undefined,
+          closestToTarget: this.maybeClosestToTarget(stopNode),
           matchingPos: startBfs.minMatchingNode,
           steps,
           maxPathLengthReached: false,
@@ -177,9 +169,7 @@ export class BidirectionalSearch extends ShortestPathAlgorithm {
         return {
           previous: startBfs.previous,
           previous2: stopBfs.previous,
-          closestToTarget: this.options.calculateClosestToTarget
-            ? stopNode
-            : undefined,
+          closestToTarget: this.maybeClosestToTarget(stopNode),
           matchingPos: stopBfs.minMatchingNode,
           steps,
           maxPathLengthReached: false,
@@ -189,12 +179,28 @@ export class BidirectionalSearch extends ShortestPathAlgorithm {
     return {
       previous: startBfs.previous,
       previous2: stopBfs.previous,
-      closestToTarget: this.options.calculateClosestToTarget
-        ? closestToTarget
-        : undefined,
+      closestToTarget: this.maybeClosestToTarget(closestToTarget),
       steps,
       maxPathLengthReached: false,
     };
+  }
+
+  private shouldStop(
+    isStartBfsQueueSizeEmpty: boolean,
+    isStopBfsQueueSizeEmpty: boolean
+  ) {
+    if (this.options.calculateClosestToTarget) {
+      return isStartBfsQueueSizeEmpty || isStopBfsQueueSizeEmpty;
+    }
+    return isStartBfsQueueSizeEmpty && isStopBfsQueueSizeEmpty;
+  }
+
+  /**
+   * Returns closestToTarget if it is enabled in the options and undefined
+   * otherwise.
+   */
+  private maybeClosestToTarget(pos: LayerVecPos): LayerVecPos | undefined {
+    return this.options.calculateClosestToTarget ? pos : undefined;
   }
 
   private returnPath(
