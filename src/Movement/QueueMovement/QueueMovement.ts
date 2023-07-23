@@ -148,7 +148,11 @@ export class QueueMovement implements Movement {
   }
 
   update(delta: number): void {
-    if (!this.character.isMoving() && this.queue.size() > 0) {
+    if (
+      (!this.character.isMoving() ||
+        this.character.willCrossTileBorderThisUpdate(delta)) &&
+      this.queue.size() > 0
+    ) {
       this.moveCharOnPath(delta);
     }
   }
@@ -239,7 +243,10 @@ export class QueueMovement implements Movement {
 
     if (
       this.character.isBlockingDirection(
-        directionFromPos(this.character.getTilePos().position, nextPos.position)
+        directionFromPos(
+          this.character.getNextTilePos().position,
+          nextPos.position
+        )
       )
     ) {
       if (nextConfig.pathBlockedStrategy === QueuedPathBlockedStrategy.STOP) {
@@ -269,11 +276,11 @@ export class QueueMovement implements Movement {
     this.pathBlockedWaitElapsed = 0;
     this.queue.dequeue();
     this.character.move(
-      this.getDir(this.character.getTilePos().position, nextPos.position)
+      this.getDir(this.character.getNextTilePos().position, nextPos.position)
     );
 
     if (this.isLastMovement()) {
-      this.finish("SUCCESS");
+      this.finish("SUCCESS", "", nextPos);
     }
   }
   private getNextValidPosition(): LayerVecPos | undefined {
@@ -301,16 +308,16 @@ export class QueueMovement implements Movement {
   private isNeighborPos(position: LayerVecPos): boolean {
     const isNeighborPos =
       this.distanceUtils.distance(
-        this.character.getTilePos().position,
+        this.character.getNextTilePos().position,
         position.position
       ) === 1;
 
     const trans = this.tilemap.getTransition(
       position.position,
-      this.character.getTilePos().layer
+      this.character.getNextTilePos().layer
     );
 
-    if (this.character.getTilePos().layer !== position.layer) {
+    if (this.character.getNextTilePos().layer !== position.layer) {
       return isNeighborPos && trans === position.layer;
     }
 
@@ -331,13 +338,15 @@ export class QueueMovement implements Movement {
         "INVALID_NEXT_POS",
         `Position ${this.posToStr(
           nextPos
-        )} is not reachable from ${this.posToStr(this.character.getTilePos())}.`
+        )} is not reachable from ${this.posToStr(
+          this.character.getNextTilePos()
+        )}.`
       );
     } else {
       this.finish(
         "INVALID_NEXT_POS",
         `No enqueued position is reachable from ${this.posToStr(
-          this.character.getTilePos()
+          this.character.getNextTilePos()
         )}.`
       );
     }
@@ -362,13 +371,17 @@ export class QueueMovement implements Movement {
     );
   }
 
-  private finish(result: QueueMovementResult, description = ""): void {
+  private finish(
+    result: QueueMovementResult,
+    description = "",
+    nextPos: LayerVecPos = this.character.getNextTilePos()
+  ): void {
     this.queue = new Queue<QueueEntry>();
     this.finished$.next({
-      position: this.character.getNextTilePos().position,
+      position: nextPos.position,
       result,
       description,
-      layer: this.character.getNextTilePos().layer,
+      layer: nextPos.layer,
     });
   }
 

@@ -1494,7 +1494,7 @@ describe("GridEngineHeadless", () => {
         },
         { command: Direction.RIGHT, config: DEFAULT_QUEUE_CONFIG },
       ]);
-      gridEngineHeadless.update(0, 500);
+      gridEngineHeadless.update(0, 499);
       expect(gridEngineHeadless.getEnqueuedMovements("player")).toEqual([
         {
           command: { position: { x: 1, y: 1 }, charLayer: undefined },
@@ -1694,6 +1694,114 @@ describe("GridEngineHeadless", () => {
       gridEngineHeadless.update(0, 1000);
 
       expect(obs).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("on different update rates", () => {
+    let geHighUpdateRate: GridEngineHeadless;
+    let geLowUpdateRate: GridEngineHeadless;
+    const highUpdateRateMs = 10;
+    const lowUpdateRateMs = 33;
+    const targetPos = { x: 20, y: 0 };
+    const map = mockBlockMap([
+      "........................................................",
+      "........................................................",
+    ]);
+
+    beforeEach(() => {
+      geHighUpdateRate = new GridEngineHeadless();
+      geLowUpdateRate = new GridEngineHeadless();
+      geHighUpdateRate.create(map, {
+        characters: [{ id: "player", speed: 4 }],
+      });
+      geLowUpdateRate.create(map, {
+        characters: [{ id: "player", speed: 4 }],
+      });
+    });
+
+    it("should not produce different results for TargetMovement", () => {
+      geHighUpdateRate.moveTo("player", targetPos);
+      geLowUpdateRate.moveTo("player", targetPos);
+
+      let totalTimeHighUpdateRate = 0;
+      for (let i = 0; i < 10000; i += highUpdateRateMs) {
+        geHighUpdateRate.update(0, highUpdateRateMs);
+        if (geHighUpdateRate.getPosition("player").x == targetPos.x) {
+          totalTimeHighUpdateRate = i;
+          break;
+        }
+      }
+      let totalTimeLowUpdateRate = 0;
+      for (let i = 0; i < 10000; i += lowUpdateRateMs) {
+        geLowUpdateRate.update(0, lowUpdateRateMs);
+        if (geLowUpdateRate.getPosition("player").x == targetPos.x) {
+          totalTimeLowUpdateRate = i;
+          break;
+        }
+      }
+
+      expect(totalTimeHighUpdateRate).toBeGreaterThan(0);
+      expect(totalTimeLowUpdateRate).toBeGreaterThan(0);
+      expect(
+        Math.abs(totalTimeHighUpdateRate - totalTimeLowUpdateRate)
+      ).toBeLessThanOrEqual(lowUpdateRateMs - highUpdateRateMs);
+    });
+
+    it("should not produce different results for manual movement", () => {
+      let totalTimeHighUpdateRate = 0;
+      for (let i = 0; i < 10000; i += highUpdateRateMs) {
+        geHighUpdateRate.move("player", Direction.RIGHT);
+        geHighUpdateRate.update(0, highUpdateRateMs);
+        if (geHighUpdateRate.getPosition("player").x == targetPos.x) {
+          totalTimeHighUpdateRate = i;
+          break;
+        }
+      }
+      let totalTimeLowUpdateRate = 0;
+      for (let i = 0; i < 10000; i += lowUpdateRateMs) {
+        geLowUpdateRate.move("player", Direction.RIGHT);
+        geLowUpdateRate.update(0, lowUpdateRateMs);
+        if (geLowUpdateRate.getPosition("player").x == targetPos.x) {
+          totalTimeLowUpdateRate = i;
+          break;
+        }
+      }
+
+      expect(totalTimeHighUpdateRate).toBeGreaterThan(0);
+      expect(totalTimeLowUpdateRate).toBeGreaterThan(0);
+      expect(
+        Math.abs(totalTimeHighUpdateRate - totalTimeLowUpdateRate)
+      ).toBeLessThanOrEqual(lowUpdateRateMs - highUpdateRateMs);
+    });
+
+    it("should not produce different results for queue movement", () => {
+      for (let i = 0; i < 31; i++) {
+        geHighUpdateRate.addQueueMovements("player", [Direction.RIGHT]);
+        geLowUpdateRate.addQueueMovements("player", [Direction.RIGHT]);
+      }
+
+      let totalTimeHighUpdateRate = 0;
+      for (let i = 0; i < 10000; i += highUpdateRateMs) {
+        geHighUpdateRate.update(0, highUpdateRateMs);
+        if (geHighUpdateRate.getPosition("player").x == targetPos.x) {
+          totalTimeHighUpdateRate = i;
+          break;
+        }
+      }
+      let totalTimeLowUpdateRate = 0;
+      for (let i = 0; i < 10000; i += lowUpdateRateMs) {
+        geLowUpdateRate.update(0, lowUpdateRateMs);
+        if (geLowUpdateRate.getPosition("player").x == targetPos.x) {
+          totalTimeLowUpdateRate = i;
+          break;
+        }
+      }
+
+      expect(totalTimeHighUpdateRate).toBeGreaterThan(0);
+      expect(totalTimeLowUpdateRate).toBeGreaterThan(0);
+      expect(
+        Math.abs(totalTimeHighUpdateRate - totalTimeLowUpdateRate)
+      ).toBeLessThanOrEqual(lowUpdateRateMs - highUpdateRateMs);
     });
   });
 

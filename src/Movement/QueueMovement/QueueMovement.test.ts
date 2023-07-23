@@ -70,6 +70,8 @@ describe("QueueMovement", () => {
       tilemap: gridTilemap,
     });
     const queueMovement = new QueueMovement(mockChar, gridTilemap);
+    mockChar.setMovement(queueMovement);
+
     const finishedObsCallbackMock = jest.fn();
     const finishedObsCompleteMock = jest.fn();
     queueMovement.finished().subscribe({
@@ -113,19 +115,14 @@ describe("QueueMovement", () => {
     path: LayerVecPos[]
   ) {
     for (const pos of path) {
-      chunkUpdate(queueMovement, mockChar, CHUNKS_PER_SECOND);
+      chunkUpdate(mockChar, CHUNKS_PER_SECOND);
       expect(mockChar.getTilePos()).toEqual(pos);
     }
   }
   /* Updates in chunks of 500ms. */
-  function chunkUpdate(
-    queueMovement: QueueMovement,
-    mockChar: GridCharacter,
-    numChunks: number
-  ) {
+  function chunkUpdate(mockChar: GridCharacter, numChunks: number) {
     const HALF_SECOND_MS = 500;
     for (let i = 0; i < numChunks; i++) {
-      queueMovement.update(HALF_SECOND_MS);
       mockChar.update(HALF_SECOND_MS);
     }
   }
@@ -249,7 +246,6 @@ describe("QueueMovement", () => {
     });
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
-    queueMovement.update(1000);
     mockChar.update(1000);
 
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
@@ -275,7 +271,6 @@ describe("QueueMovement", () => {
     });
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
-    queueMovement.update(1000);
     mockChar.update(1000);
 
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
@@ -298,7 +293,6 @@ describe("QueueMovement", () => {
     queueMovement.enqueue([layerPos(1, 0), layerPos(2, 1)]);
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
-    queueMovement.update(1000);
     mockChar.update(1000);
 
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
@@ -358,7 +352,6 @@ describe("QueueMovement", () => {
     queueMovement.enqueue([layerPos(1, 0), layerPos(2, 0)]);
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
-    queueMovement.update(1000);
     mockChar.update(1000);
 
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
@@ -382,7 +375,6 @@ describe("QueueMovement", () => {
     queueMovement.enqueue([layerPos(1, 0), layerPos(2, 0, "someOtherLayer")]);
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
-    queueMovement.update(1000);
     mockChar.update(1000);
 
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
@@ -446,7 +438,6 @@ describe("QueueMovement", () => {
     queueMovement.enqueue([layerPos(1, 0), layerPos(2, 0)]);
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
-    queueMovement.update(1000);
     mockChar.update(1000);
 
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
@@ -493,7 +484,6 @@ describe("QueueMovement", () => {
     queueMovement.enqueue([layerPos(1, 0), layerPos(2, 0, "someOtherLayer")]);
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
-    queueMovement.update(1000);
     mockChar.update(1000);
 
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
@@ -532,7 +522,6 @@ describe("QueueMovement", () => {
     });
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
-    queueMovement.update(1000);
     mockChar.update(1000);
 
     expect(finishedObsCallbackMock).not.toHaveBeenCalled();
@@ -547,7 +536,6 @@ describe("QueueMovement", () => {
       "testCharLayer"
     );
 
-    queueMovement.update(1000);
     mockChar.update(1000);
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(2, 0)]);
@@ -560,6 +548,44 @@ describe("QueueMovement", () => {
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
+  });
+
+  it("should finish if char will not cross tile border this update", () => {
+    const tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "testCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "...",
+          "...",
+        ],
+      },
+    ]);
+    const { mockChar, queueMovement } = initQueueMovement(tilemapMock);
+    queueMovement.enqueue([layerPos(1, 0)]);
+    mockChar.update(500);
+    mockChar.update(500);
+
+    expect(mockChar.isMoving()).toBe(false);
+  });
+
+  it("should continue if char will cross tile border this update", () => {
+    const tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "testCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "...",
+          "...",
+        ],
+      },
+    ]);
+    const { mockChar, queueMovement } = initQueueMovement(tilemapMock);
+    queueMovement.enqueue([layerPos(1, 0), layerPos(2, 0)]);
+    mockChar.update(500);
+    mockChar.update(500);
+
+    expect(mockChar.isMoving()).toBe(true);
   });
 
   it("should skip if path is invalid", () => {
@@ -577,7 +603,6 @@ describe("QueueMovement", () => {
     });
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0), layerPos(2, 0)]);
-    queueMovement.update(1000);
     mockChar.update(1000);
 
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
@@ -681,12 +706,10 @@ describe("QueueMovement", () => {
     });
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
-    queueMovement.update(1000);
-    mockChar.update(1000);
+    mockChar.update(500);
 
     expect(finishedObsCallbackMock).not.toHaveBeenCalled();
 
-    queueMovement.update(1000);
     mockChar.update(1000);
 
     expect(finishedObsCallbackMock).toHaveBeenCalledWith({
@@ -720,7 +743,6 @@ describe("QueueMovement", () => {
       pathBlockedWaitTimeoutMs: 1001,
     });
 
-    queueMovement.update(1000);
     mockChar.update(1000);
 
     expect(finishedObsCallbackMock).not.toHaveBeenCalled();
@@ -737,8 +759,7 @@ describe("QueueMovement", () => {
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);
 
-    queueMovement.update(1000);
-    mockChar.update(1000);
+    mockChar.update(500);
 
     expect(finishedObsCallbackMock).not.toHaveBeenCalled();
   });

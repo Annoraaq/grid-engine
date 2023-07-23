@@ -14,20 +14,6 @@ import * as Phaser from "phaser";
   // do nothing
 })(Phaser);
 
-const mockPathfinding = {
-  findShortestPath: jest.fn().mockReturnValue({
-    path: [],
-    closestToTarget: { position: { x: 0, y: 0 }, charLayer: undefined },
-  }),
-};
-
-const mockPathfindingConstructor = jest.fn(function (
-  _shortestPathAlgorithm,
-  _gridTilemap
-) {
-  return mockPathfinding;
-});
-
 const mockNewSprite = {
   setCrop: jest.fn(),
   setOrigin: jest.fn(),
@@ -52,12 +38,6 @@ expect.extend({
       };
     }
   },
-});
-
-jest.mock("./Pathfinding/Pathfinding", function () {
-  return {
-    Pathfinding: mockPathfindingConstructor,
-  };
 });
 
 jest.mock("../package.json", () => ({
@@ -700,6 +680,25 @@ describe("GridEngine", () => {
     });
 
     it("should move to coordinates CLOSEST_REACHABLE", () => {
+      const mock = createPhaserTilemapStub(
+        new Map([
+          [
+            undefined,
+            [
+              // prettier-ignore
+              "###..",
+              "#s#..",
+              "#####",
+              ".....",
+              "...t.",
+            ],
+          ],
+        ])
+      );
+      gridEngine.create(mock, {
+        characters: [{ id: "player", startPosition: { x: 1, y: 1 } }],
+      });
+
       const targetVec = new Vector2(3, 4);
       gridEngine.moveTo("player", targetVec, {
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
@@ -711,7 +710,7 @@ describe("GridEngine", () => {
           pathBlockedStrategy: PathBlockedStrategy.WAIT,
         }),
         state: {
-          pathAhead: [],
+          pathAhead: [{ position: { x: 1, y: 1 }, charLayer: undefined }],
         },
       });
     });
@@ -1536,39 +1535,52 @@ describe("GridEngine", () => {
   });
 
   describe("pathfinding", () => {
-    it("should delegate to pathfinding", () => {
-      gridEngine.create(createDefaultMockWithLayer(undefined), {
-        characters: [
-          {
-            id: "player",
-          },
-        ],
+    it("should find a path", () => {
+      const mock = createPhaserTilemapStub(
+        new Map([
+          [
+            "sourceCharLayer",
+            [
+              // prettier-ignore
+              "....",
+              ".s..",
+              ".*..",
+              "....",
+            ],
+          ],
+          [
+            "destCharLayer",
+            [
+              // prettier-ignore
+              "....",
+              "....",
+              ".t..",
+              "....",
+            ],
+          ],
+        ])
+      );
+      gridEngine.create(mock, {
+        characters: [],
       });
-      const source = { position: { x: 1, y: 2 }, charLayer: "sourceCharLayer" };
-      const dest = { position: { x: 10, y: 20 }, charLayer: "destCharLayer" };
+      gridEngine.setTransition(
+        { x: 1, y: 2 },
+        "sourceCharLayer",
+        "destCharLayer"
+      );
+      const source = { position: { x: 1, y: 1 }, charLayer: "sourceCharLayer" };
+      const dest = { position: { x: 1, y: 2 }, charLayer: "destCharLayer" };
       const options: PathfindingOptions = {
-        pathWidth: 2,
+        pathWidth: 1,
         shortestPathAlgorithm: "BFS",
       };
 
-      const mockRes = {
-        path: [{ position: new Vector2(1, 2), layer: "sourceCharLayer" }],
-        closestToTarget: {
-          position: new Vector2(1, 2),
-          layer: "sourceCharLayer",
-        },
-      };
-      mockPathfinding.findShortestPath.mockReturnValue(mockRes);
       const res = gridEngine.findShortestPath(source, dest, options);
-      expect(mockPathfinding.findShortestPath).toHaveBeenCalledWith(
-        { position: new Vector2(1, 2), layer: "sourceCharLayer" },
-        { position: new Vector2(10, 20), layer: "destCharLayer" },
-        options
-      );
 
       expect(res).toEqual({
-        path: [source],
-        closestToTarget: source,
+        path: [source, dest],
+        closestToTarget: dest,
+        steps: 2,
         reachedMaxPathLength: false,
       });
     });
@@ -1678,7 +1690,7 @@ describe("GridEngine", () => {
         },
         { command: Direction.RIGHT, config: DEFAULT_QUEUE_CONFIG },
       ]);
-      gridEngine.update(0, 500);
+      gridEngine.update(0, 499);
       expect(gridEngine.getEnqueuedMovements("player")).toEqual([
         {
           command: { position: { x: 1, y: 1 }, charLayer: undefined },
@@ -1828,6 +1840,122 @@ describe("GridEngine", () => {
       gridEngine.update(0, 1000);
 
       expect(obs).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("on different update rates", () => {
+    let geHighUpdateRate: GridEngine;
+    let geLowUpdateRate: GridEngine;
+    const highUpdateRateMs = 10;
+    const lowUpdateRateMs = 33;
+    const targetPos = new Vector2(20, 0);
+    const map = createPhaserTilemapStub(
+      new Map([
+        [
+          "someLayer",
+          [
+            // prettier-ignore
+            "........................................................",
+            "........................................................",
+          ],
+        ],
+      ])
+    );
+
+    beforeEach(() => {
+      geHighUpdateRate = new GridEngine(sceneMock);
+      geLowUpdateRate = new GridEngine(sceneMock);
+      geHighUpdateRate.create(map, {
+        characters: [{ id: "player", speed: 4, charLayer: "someLayer" }],
+      });
+      geLowUpdateRate.create(map, {
+        characters: [{ id: "player", speed: 4, charLayer: "someLayer" }],
+      });
+    });
+
+    it("should not produce different results for TargetMovement", () => {
+      geHighUpdateRate.moveTo("player", targetPos);
+      geLowUpdateRate.moveTo("player", targetPos);
+
+      let totalTimeHighUpdateRate = 0;
+      for (let i = 0; i < 10000; i += highUpdateRateMs) {
+        geHighUpdateRate.update(0, highUpdateRateMs);
+        if (geHighUpdateRate.getPosition("player").x == targetPos.x) {
+          totalTimeHighUpdateRate = i;
+          break;
+        }
+      }
+      let totalTimeLowUpdateRate = 0;
+      for (let i = 0; i < 10000; i += lowUpdateRateMs) {
+        geLowUpdateRate.update(0, lowUpdateRateMs);
+        if (geLowUpdateRate.getPosition("player").x == targetPos.x) {
+          totalTimeLowUpdateRate = i;
+          break;
+        }
+      }
+
+      expect(totalTimeHighUpdateRate).toBeGreaterThan(0);
+      expect(totalTimeLowUpdateRate).toBeGreaterThan(0);
+      expect(
+        Math.abs(totalTimeHighUpdateRate - totalTimeLowUpdateRate)
+      ).toBeLessThanOrEqual(lowUpdateRateMs - highUpdateRateMs);
+    });
+
+    it("should not produce different results for manual movement", () => {
+      let totalTimeHighUpdateRate = 0;
+      for (let i = 0; i < 10000; i += highUpdateRateMs) {
+        geHighUpdateRate.move("player", Direction.RIGHT);
+        geHighUpdateRate.update(0, highUpdateRateMs);
+        if (geHighUpdateRate.getPosition("player").x == targetPos.x) {
+          totalTimeHighUpdateRate = i;
+          break;
+        }
+      }
+      let totalTimeLowUpdateRate = 0;
+      for (let i = 0; i < 10000; i += lowUpdateRateMs) {
+        geLowUpdateRate.move("player", Direction.RIGHT);
+        geLowUpdateRate.update(0, lowUpdateRateMs);
+        if (geLowUpdateRate.getPosition("player").x == targetPos.x) {
+          totalTimeLowUpdateRate = i;
+          break;
+        }
+      }
+
+      expect(totalTimeHighUpdateRate).toBeGreaterThan(0);
+      expect(totalTimeLowUpdateRate).toBeGreaterThan(0);
+      expect(
+        Math.abs(totalTimeHighUpdateRate - totalTimeLowUpdateRate)
+      ).toBeLessThanOrEqual(lowUpdateRateMs - highUpdateRateMs);
+    });
+
+    it("should not produce different results for queue movement", () => {
+      for (let i = 0; i < 31; i++) {
+        geHighUpdateRate.addQueueMovements("player", [Direction.RIGHT]);
+        geLowUpdateRate.addQueueMovements("player", [Direction.RIGHT]);
+      }
+
+      let totalTimeHighUpdateRate = 0;
+      for (let i = 0; i < 10000; i += highUpdateRateMs) {
+        geHighUpdateRate.update(0, highUpdateRateMs);
+        if (geHighUpdateRate.getPosition("player").x == targetPos.x) {
+          totalTimeHighUpdateRate = i;
+          break;
+        }
+      }
+      let totalTimeLowUpdateRate = 0;
+      for (let i = 0; i < 10000; i += lowUpdateRateMs) {
+        geLowUpdateRate.update(0, lowUpdateRateMs);
+        if (geLowUpdateRate.getPosition("player").x == targetPos.x) {
+          totalTimeLowUpdateRate = i;
+          break;
+        }
+      }
+
+      expect(totalTimeHighUpdateRate).toBeGreaterThan(0);
+      expect(totalTimeLowUpdateRate).toBeGreaterThan(0);
+      expect(
+        Math.abs(totalTimeHighUpdateRate - totalTimeLowUpdateRate)
+      ).toBeLessThanOrEqual(lowUpdateRateMs - highUpdateRateMs);
     });
   });
 
