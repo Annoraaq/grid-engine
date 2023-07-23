@@ -100,7 +100,9 @@ export declare class GridCharacter {
     depthChanged(): Subject<LayerVecPos>;
     getMovementProgress(): number;
     hasWalkedHalfATile(): boolean;
+    willCrossTileBorderThisUpdate(delta: number): boolean;
     private updateCharacterPosition;
+    private maxProgressForDelta;
     private get tilePos();
     private set tilePos(value);
     private startMoving;
