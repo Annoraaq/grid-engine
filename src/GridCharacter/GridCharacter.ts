@@ -363,24 +363,26 @@ export class GridCharacter {
     return this.movementProgress > MAX_MOVEMENT_PROGRESS / 2;
   }
 
-  private updateCharacterPosition(delta: number): void {
-    const millisecondsPerSecond = 1000;
-    const deltaInSeconds = delta / millisecondsPerSecond;
-
-    const maxProgressForDelta = Math.floor(
-      deltaInSeconds * this.speed * MAX_MOVEMENT_PROGRESS
+  willCrossTileBorderThisUpdate(delta: number): boolean {
+    return (
+      this.movementProgress + this.maxProgressForDelta(delta) >=
+      MAX_MOVEMENT_PROGRESS
     );
+  }
+
+  private updateCharacterPosition(delta: number): void {
     const willCrossTileBorderThisUpdate =
-      this.movementProgress + maxProgressForDelta >= MAX_MOVEMENT_PROGRESS;
+      this.willCrossTileBorderThisUpdate(delta);
 
     const progressThisUpdate = willCrossTileBorderThisUpdate
       ? MAX_MOVEMENT_PROGRESS - this.movementProgress
-      : maxProgressForDelta;
+      : this.maxProgressForDelta(delta);
 
-    const proportionToWalk = 1 - progressThisUpdate / maxProgressForDelta;
+    const proportionToWalk =
+      1 - progressThisUpdate / this.maxProgressForDelta(delta);
 
     this.movementProgress = Math.min(
-      this.movementProgress + maxProgressForDelta,
+      this.movementProgress + this.maxProgressForDelta(delta),
       MAX_MOVEMENT_PROGRESS
     );
 
@@ -401,6 +403,12 @@ export class GridCharacter {
         this.stopMoving();
       }
     }
+  }
+
+  private maxProgressForDelta(delta: number): number {
+    const millisecondsPerSecond = 1000;
+    const deltaInSeconds = delta / millisecondsPerSecond;
+    return Math.floor(deltaInSeconds * this.speed * MAX_MOVEMENT_PROGRESS);
   }
 
   private get tilePos(): LayerVecPos {
