@@ -99,11 +99,13 @@ class ArrayTileLayer implements TileLayer {
   getName(): string | undefined {
     return this.name;
   }
-  getProperty(_name: string): string | undefined {
-    return undefined;
+  getProperty(name: string): string | undefined {
+    if (name === "ge_charLayer" && this.isCharLayerInternal) {
+      return this.name;
+    }
   }
-  hasProperty(_name: string): boolean {
-    return false;
+  hasProperty(name: string): boolean {
+    return name === "ge_charLayer" && this.isCharLayerInternal;
   }
   getData(): Array<Array<Tile | undefined>> {
     return this.tiles;
