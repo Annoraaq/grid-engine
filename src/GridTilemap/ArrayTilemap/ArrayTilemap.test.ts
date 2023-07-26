@@ -1,5 +1,6 @@
 import { ArrayTilemap } from "./ArrayTilemap";
 const COLLISION_PROP_NAME = "ge_collide";
+const CHAR_LAYER_PROP_NAME = "ge_charLayer";
 
 describe("ArrayTilemap", () => {
   it("throws an error on different layer dimensions.", () => {
@@ -77,6 +78,10 @@ describe("ArrayTilemap", () => {
 
     const layerOneData = layerOne?.getData();
     expect(layerOne?.isCharLayer()).toBe(true);
+    expect(layerOne?.getProperty(CHAR_LAYER_PROP_NAME)).toBe("layerOne");
+    expect(layerOne?.hasProperty(CHAR_LAYER_PROP_NAME)).toBe(true);
+    expect(layerTwo?.getProperty(CHAR_LAYER_PROP_NAME)).toBe(undefined);
+    expect(layerTwo?.hasProperty(CHAR_LAYER_PROP_NAME)).toBe(false);
     expect(layerOneData?.[0]?.[0]?.hasProperty(COLLISION_PROP_NAME)).toBe(true);
     expect(layerOneData?.[0]?.[1]?.hasProperty(COLLISION_PROP_NAME)).toBe(true);
     expect(layerOneData?.[0]?.[0]?.getProperty(COLLISION_PROP_NAME)).toBe(true);
