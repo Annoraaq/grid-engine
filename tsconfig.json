@@ -11,7 +11,7 @@
   "include": [
     "**/*.ts",
     "jest.config.js",
-    ".eslintrc.js"
+    ".eslintrc.cjs"
   ],
   "exclude": [
     "./dist/**/*",
