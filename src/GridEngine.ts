@@ -219,7 +219,10 @@ export interface CharacterData extends CharacterDataHeadless {
 export class GridEngine implements IGridEngine {
   static welcomeMessagePrinted = false;
   private geHeadless: GridEngineHeadless = new GridEngineHeadless(false);
-  private config?: Omit<Required<GridEngineConfig>, "tiledProject">;
+  private config?: Omit<
+    Required<GridEngineConfig>,
+    "tiledProject" | "collisionGroupRelation"
+  >;
   private gridCharacters?: Map<string, GridCharacterPhaser>;
   private gridTilemap?: GridTilemapPhaser;
   private isCreatedInternal = false;
@@ -932,7 +935,10 @@ export class GridEngine implements IGridEngine {
 
   private setConfigDefaults(
     config: GridEngineConfig
-  ): Omit<Required<GridEngineConfig>, "tiledProject"> {
+  ): Omit<
+    Required<GridEngineConfig>,
+    "tiledProject" | "collisionGroupRelation"
+  > {
     return {
       collisionTilePropertyName: "ge_collide",
       numberOfDirections: NumberOfDirections.FOUR,

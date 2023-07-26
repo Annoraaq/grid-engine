@@ -124,6 +124,8 @@ export interface GridEngineConfigHeadless {
    * @defaultValue false
    */
   cacheTileCollisions?: boolean;
+
+  collisionGroupRelation?: Record<string, string[]>;
 }
 
 /**
@@ -243,12 +245,17 @@ export interface CharacterDataHeadless {
   tileHeight?: number;
 }
 
+interface ConcreteConfig
+  extends Omit<Required<GridEngineConfigHeadless>, "collisionGroupRelation"> {
+  collisionGroupRelation?: Record<string, string[]>;
+}
+
 /**
  * @category Main Modules
  */
 export class GridEngineHeadless implements IGridEngine {
   private gridCharacters?: Map<string, GridCharacter>;
-  private config?: Concrete<GridEngineConfigHeadless>;
+  private config?: ConcreteConfig;
   private gridTilemap?: GridTilemap;
   private isCreatedInternal = false;
   private movementStopped$?: Subject<{ charId: string; direction: Direction }>;
@@ -340,13 +347,25 @@ export class GridEngineHeadless implements IGridEngine {
     >();
     this.charRemoved$ = new Subject<string>();
     this.charAdded$ = new Subject<string>();
+
     this.gridTilemap = new GridTilemap(
       tilemap,
       this.config.collisionTilePropertyName,
       this.config.characterCollisionStrategy,
+      this.recordToMap(this.config.collisionGroupRelation),
       this.config.cacheTileCollisions
     );
     this.addCharacters();
+  }
+
+  private recordToMap(
+    rec?: Record<string, string[]>
+  ): Map<string, Set<string>> | undefined {
+    if (!rec) return undefined;
+    const map = new Map<string, Set<string>>(
+      Object.entries(rec).map(([k, v]) => [k, new Set(v)])
+    );
+    return map;
   }
 
   /**
@@ -1263,9 +1282,7 @@ export class GridEngineHeadless implements IGridEngine {
     return moveToConfig;
   }
 
-  private setConfigDefaults(
-    config: GridEngineConfigHeadless
-  ): Concrete<GridEngineConfigHeadless> {
+  private setConfigDefaults(config: GridEngineConfigHeadless): ConcreteConfig {
     return {
       collisionTilePropertyName: "ge_collide",
       numberOfDirections: NumberOfDirections.FOUR,

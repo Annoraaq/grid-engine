@@ -22,7 +22,10 @@ export class CharBlockCache {
   private tilePosToCharacters: Map<string, Set<GridCharacter>> = new Map();
   private charRemoved$ = new Subject<string>();
 
-  constructor(private collistionStrategy: CollisionStrategy) {}
+  constructor(
+    private collistionStrategy: CollisionStrategy,
+    private collisionGroupRelation?: Map<string, Set<string>>
+  ) {}
 
   isCharBlockingAt(
     pos: Vector2,
@@ -39,11 +42,18 @@ export class CharBlockCache {
       [...charSet]
         .filter((char: GridCharacter) => !exclude.has(char.getId()))
         .some((char: GridCharacter) =>
-          char
-            .getCollisionGroups()
-            .some((group) => collisionGroups.includes(group))
+          collisionGroups.some((group) =>
+            char
+              .getCollisionGroups()
+              .some((charCGroup) => this.collidesWith(group, charCGroup))
+          )
         )
     );
+  }
+
+  private collidesWith(group1: string, group2: string): boolean {
+    if (!this.collisionGroupRelation) return group1 === group2;
+    return (this.collisionGroupRelation.get(group1) || new Set()).has(group2);
   }
 
   getCharactersAt(pos: Vector2, layer?: string): Set<GridCharacter> {

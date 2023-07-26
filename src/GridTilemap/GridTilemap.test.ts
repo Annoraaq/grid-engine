@@ -14,10 +14,10 @@ import { Rect } from "../Utils/Rect/Rect";
 
 describe("GridTilemap", () => {
   let gridTilemap: GridTilemap;
-  let phaserTilemap: Tilemap;
+  let tilemap: Tilemap;
 
   beforeEach(() => {
-    phaserTilemap = mockLayeredBlockMap([
+    tilemap = mockLayeredBlockMap([
       {
         layer: "charLayer1",
         blockMap: [
@@ -36,7 +36,7 @@ describe("GridTilemap", () => {
       },
     ]);
     gridTilemap = new GridTilemap(
-      phaserTilemap,
+      tilemap,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -185,7 +185,7 @@ describe("GridTilemap", () => {
   });
 
   it("should set the lowest char layer", () => {
-    phaserTilemap = mockLayeredBlockMap([
+    tilemap = mockLayeredBlockMap([
       {
         layer: "noCharLayer",
         isCharLayer: false,
@@ -214,7 +214,7 @@ describe("GridTilemap", () => {
       },
     ]);
     gridTilemap = new GridTilemap(
-      phaserTilemap,
+      tilemap,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -234,7 +234,7 @@ describe("GridTilemap", () => {
 
   it("should remove a character", () => {
     gridTilemap = new GridTilemap(
-      phaserTilemap,
+      tilemap,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -261,7 +261,7 @@ describe("GridTilemap", () => {
 
   it("should find characters", () => {
     gridTilemap = new GridTilemap(
-      phaserTilemap,
+      tilemap,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -280,7 +280,7 @@ describe("GridTilemap", () => {
 
   it("should find characters without layer", () => {
     gridTilemap = new GridTilemap(
-      phaserTilemap,
+      tilemap,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -304,7 +304,7 @@ describe("GridTilemap", () => {
 
   it("should detect blocking tiles", () => {
     gridTilemap = new GridTilemap(
-      phaserTilemap,
+      tilemap,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -316,7 +316,7 @@ describe("GridTilemap", () => {
   });
 
   it("should not consider missing tiles as blocking", () => {
-    phaserTilemap = mockLayeredBlockMap([
+    tilemap = mockLayeredBlockMap([
       {
         layer: "test",
         blockMap: [
@@ -327,7 +327,7 @@ describe("GridTilemap", () => {
       },
     ]);
     gridTilemap = new GridTilemap(
-      phaserTilemap,
+      tilemap,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -343,12 +343,11 @@ describe("GridTilemap", () => {
   it("should detect blocking tiles with custom property", () => {
     // Simplest way to set a property on a tile.
     // @ts-ignore
-    phaserTilemap.getTileAt(1, 1, "charLayer1").properties[
-      "custom_collides_prop"
-    ] = "true";
+    tilemap.getTileAt(1, 1, "charLayer1").properties["custom_collides_prop"] =
+      "true";
 
     gridTilemap = new GridTilemap(
-      phaserTilemap,
+      tilemap,
       "custom_collides_prop",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -360,7 +359,7 @@ describe("GridTilemap", () => {
   });
 
   it("should detect one-way blocking tiles left", () => {
-    phaserTilemap = mockLayeredBlockMap([
+    tilemap = mockLayeredBlockMap([
       {
         layer: "test",
         blockMap: [
@@ -372,7 +371,7 @@ describe("GridTilemap", () => {
       },
     ]);
     gridTilemap = new GridTilemap(
-      phaserTilemap,
+      tilemap,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -403,7 +402,7 @@ describe("GridTilemap", () => {
   });
 
   it("should detect one-way blocking tiles right", () => {
-    phaserTilemap = mockLayeredBlockMap([
+    tilemap = mockLayeredBlockMap([
       {
         layer: "test",
         blockMap: [
@@ -415,7 +414,7 @@ describe("GridTilemap", () => {
       },
     ]);
     gridTilemap = new GridTilemap(
-      phaserTilemap,
+      tilemap,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -446,7 +445,7 @@ describe("GridTilemap", () => {
   });
 
   it("should detect one-way blocking tiles up", () => {
-    phaserTilemap = mockLayeredBlockMap([
+    tilemap = mockLayeredBlockMap([
       {
         layer: "test",
         blockMap: [
@@ -458,7 +457,7 @@ describe("GridTilemap", () => {
       },
     ]);
     gridTilemap = new GridTilemap(
-      phaserTilemap,
+      tilemap,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -489,7 +488,7 @@ describe("GridTilemap", () => {
   });
 
   it("should detect one-way blocking tiles down", () => {
-    phaserTilemap = mockLayeredBlockMap([
+    tilemap = mockLayeredBlockMap([
       {
         layer: "test",
         blockMap: [
@@ -501,7 +500,7 @@ describe("GridTilemap", () => {
       },
     ]);
     gridTilemap = new GridTilemap(
-      phaserTilemap,
+      tilemap,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -532,7 +531,7 @@ describe("GridTilemap", () => {
   });
 
   it("should only consider tiles on charLayer", () => {
-    phaserTilemap = mockLayeredBlockMap([
+    tilemap = mockLayeredBlockMap([
       {
         layer: "charLayer1",
         blockMap: [
@@ -552,7 +551,7 @@ describe("GridTilemap", () => {
     ]);
 
     gridTilemap = new GridTilemap(
-      phaserTilemap,
+      tilemap,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -570,7 +569,7 @@ describe("GridTilemap", () => {
   });
 
   it("should block if no tile", () => {
-    phaserTilemap = mockLayeredBlockMap([
+    tilemap = mockLayeredBlockMap([
       {
         layer: "test",
         blockMap: [
@@ -581,7 +580,7 @@ describe("GridTilemap", () => {
       },
     ]);
     gridTilemap = new GridTilemap(
-      phaserTilemap,
+      tilemap,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -593,7 +592,7 @@ describe("GridTilemap", () => {
 
   it("should detect blocking char", () => {
     gridTilemap = new GridTilemap(
-      phaserTilemap,
+      tilemap,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -615,7 +614,7 @@ describe("GridTilemap", () => {
 
   it("should detect an unblocked tile", () => {
     gridTilemap = new GridTilemap(
-      phaserTilemap,
+      tilemap,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES
     );
@@ -715,7 +714,7 @@ describe("GridTilemap", () => {
   describe("transitions", () => {
     it("should set transitions", () => {
       gridTilemap = new GridTilemap(
-        phaserTilemap,
+        tilemap,
         "ge_collide",
         CollisionStrategy.BLOCK_TWO_TILES
       );
@@ -736,7 +735,7 @@ describe("GridTilemap", () => {
       const pos1 = new Vector2(4, 5);
       const pos2 = new Vector2(3, 5);
       gridTilemap = new GridTilemap(
-        phaserTilemap,
+        tilemap,
         "ge_collide",
         CollisionStrategy.BLOCK_TWO_TILES
       );
@@ -773,6 +772,7 @@ describe("GridTilemap", () => {
       tm,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES,
+      undefined,
       true
     );
 
@@ -846,6 +846,7 @@ describe("GridTilemap", () => {
       tm,
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES,
+      undefined,
       true
     );
 
@@ -886,7 +887,7 @@ describe("GridTilemap", () => {
 
   describe("tile costs", () => {
     it("should consider tile costs", () => {
-      phaserTilemap = mockLayeredBlockMap(
+      tilemap = mockLayeredBlockMap(
         [
           {
             layer: "test",
@@ -911,7 +912,7 @@ describe("GridTilemap", () => {
         ]
       );
       gridTilemap = new GridTilemap(
-        phaserTilemap,
+        tilemap,
         "ge_collide",
         CollisionStrategy.BLOCK_TWO_TILES
       );
@@ -928,7 +929,7 @@ describe("GridTilemap", () => {
     });
 
     it("should consider different tile costs", () => {
-      phaserTilemap = mockLayeredBlockMap(
+      tilemap = mockLayeredBlockMap(
         [
           {
             layer: "test",
@@ -966,7 +967,7 @@ describe("GridTilemap", () => {
         ]
       );
       gridTilemap = new GridTilemap(
-        phaserTilemap,
+        tilemap,
         "ge_collide",
         CollisionStrategy.BLOCK_TWO_TILES
       );
@@ -983,7 +984,7 @@ describe("GridTilemap", () => {
     });
 
     it("should override ge_cost", () => {
-      phaserTilemap = mockLayeredBlockMap(
+      tilemap = mockLayeredBlockMap(
         [
           {
             layer: "test",
@@ -1008,7 +1009,7 @@ describe("GridTilemap", () => {
         ]
       );
       gridTilemap = new GridTilemap(
-        phaserTilemap,
+        tilemap,
         "ge_collide",
         CollisionStrategy.BLOCK_TWO_TILES
       );
@@ -1025,7 +1026,7 @@ describe("GridTilemap", () => {
     });
 
     it("should take max tile cost for layer", () => {
-      phaserTilemap = mockLayeredBlockMap(
+      tilemap = mockLayeredBlockMap(
         [
           {
             layer: "no-char-layer",
@@ -1068,7 +1069,7 @@ describe("GridTilemap", () => {
         ]
       );
       gridTilemap = new GridTilemap(
-        phaserTilemap,
+        tilemap,
         "ge_collide",
         CollisionStrategy.BLOCK_TWO_TILES
       );
@@ -1088,4 +1089,137 @@ describe("GridTilemap", () => {
       ).toBe(10);
     });
   });
+
+  it("should consider custom collision relation", () => {
+    tilemap = mockLayeredBlockMap([
+      {
+        layer: "someLayer",
+        blockMap: [
+          // prettier-ignore
+          "...",
+          "...",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES,
+      new Map([
+        ["cGroup1", new Set(["cGroup1", "cGroup2"])],
+        ["cGroup2", new Set(["cGroup1"])],
+        ["cGroup3", new Set([])],
+      ])
+    );
+
+    const layer = "someLayer";
+
+    const cGroup1Char = createChar(
+      "cGroup1Char",
+      gridTilemap,
+      "cGroup1",
+      new Vector2(0, 0),
+      layer
+    );
+    const cGroup2Char = createChar(
+      "cGroup2Char",
+      gridTilemap,
+      "cGroup2",
+      new Vector2(1, 0),
+      layer
+    );
+    const cGroup3Char = createChar(
+      "cGroup3Char",
+      gridTilemap,
+      "cGroup3",
+      new Vector2(2, 0),
+      layer
+    );
+
+    gridTilemap.addCharacter(cGroup1Char);
+    gridTilemap.addCharacter(cGroup2Char);
+    gridTilemap.addCharacter(cGroup3Char);
+
+    // 1 => 1
+    expect(
+      gridTilemap.hasBlockingChar(cGroup1Char.getTilePos().position, layer, [
+        "cGroup1",
+      ])
+    ).toBe(true);
+    // 2 => 1
+    expect(
+      gridTilemap.hasBlockingChar(cGroup1Char.getTilePos().position, layer, [
+        "cGroup2",
+      ])
+    ).toBe(true);
+    // 3 => 1
+    expect(
+      gridTilemap.hasBlockingChar(cGroup1Char.getTilePos().position, layer, [
+        "cGroup3",
+      ])
+    ).toBe(false);
+
+    // 1 => 2
+    expect(
+      gridTilemap.hasBlockingChar(cGroup2Char.getTilePos().position, layer, [
+        "cGroup1",
+      ])
+    ).toBe(true);
+
+    // 2 => 2
+    expect(
+      gridTilemap.hasBlockingChar(cGroup2Char.getTilePos().position, layer, [
+        "cGroup2",
+      ])
+    ).toBe(false);
+
+    // 3 => 2
+    expect(
+      gridTilemap.hasBlockingChar(cGroup2Char.getTilePos().position, layer, [
+        "cGroup3",
+      ])
+    ).toBe(false);
+
+    // 1 => 3
+    expect(
+      gridTilemap.hasBlockingChar(cGroup3Char.getTilePos().position, layer, [
+        "cGroup1",
+      ])
+    ).toBe(false);
+
+    // 2 => 3
+    expect(
+      gridTilemap.hasBlockingChar(cGroup3Char.getTilePos().position, layer, [
+        "cGroup2",
+      ])
+    ).toBe(false);
+
+    // 3 => 3
+    expect(
+      gridTilemap.hasBlockingChar(cGroup3Char.getTilePos().position, layer, [
+        "cGroup3",
+      ])
+    ).toBe(false);
+  });
+
+  function createChar(
+    id: string,
+    gridTilemap: GridTilemap,
+    cGroup: string,
+    position: Vector2,
+    layer: string
+  ) {
+    const char = new GridCharacter(id, {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+      collisionGroups: [cGroup],
+    });
+    char.setTilePosition({
+      position,
+      layer,
+    });
+    return char;
+  }
 });
