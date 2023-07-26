@@ -1,6 +1,6 @@
 import * as ge from "./GridEngine";
 
-module.exports = ge.GridEngine;
+export default ge.GridEngine;
 // @ts-ignore
 window.GridEngine = ge.GridEngine;
 // @ts-ignore

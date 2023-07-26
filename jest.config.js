@@ -1,5 +1,4 @@
-/*eslint-env node*/
-module.exports = {
+export default {
   roots: ["<rootDir>/src"],
   testMatch: [
     "**/__tests__/**/*.+(ts|tsx|js)",

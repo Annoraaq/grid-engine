@@ -5,6 +5,7 @@
   "author": "Johannes Baum",
   "license": "Apache-2.0",
   "main": "dist/GridEngine.esm.min.js",
+  "type": "module",
   "scripts": {
     "test": "jest",
     "dev": "prettier --write src/ && eslint src/",
