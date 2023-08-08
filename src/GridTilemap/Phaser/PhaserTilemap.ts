@@ -19,7 +19,15 @@ export class PhaserTilemap implements Tilemap {
   constructor(
     private phaserTilemap: Phaser.Tilemaps.Tilemap,
     private tiledProject?: TiledProject
-  ) {}
+  ) {
+    for (const l of this.phaserTilemap.layers) {
+      if (l.tilemapLayer == null) {
+        throw new Error(
+          `Error initializing tilemap. Layer '${l.name}' has no 'tilemapLayer'. This can happen if you call 'createLayer' with the wrong layer ID.`
+        );
+      }
+    }
+  }
 
   getTileWidth(): number {
     return this.phaserTilemap.tileWidth;

@@ -114,4 +114,32 @@ describe("PhaserTilemap", () => {
       );
     }
   });
+
+  it("should throw error if initialized without tilemapLayer", () => {
+    const tilemap = createPhaserTilemapStub(
+      new Map([["layer_name", ["..", ".."]]])
+    );
+    const tiledProject = {
+      propertyTypes: [
+        {
+          name: "SomeTiledClass",
+          type: "class",
+          members: [
+            {
+              name: "testProp",
+              type: "boolean",
+              value: true,
+            },
+          ],
+        },
+      ],
+    };
+    // @ts-ignore
+    tilemap.layers[0].tilemapLayer = undefined;
+    expect(() => new PhaserTilemap(tilemap, tiledProject)).toThrow(
+      new Error(
+        "Error initializing tilemap. Layer 'layer_name' has no 'tilemapLayer'. This can happen if you call 'createLayer' with the wrong layer ID."
+      )
+    );
+  });
 });
