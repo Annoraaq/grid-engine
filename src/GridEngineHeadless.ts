@@ -133,6 +133,9 @@ export interface GridEngineConfigHeadless {
    * This means that `group1` collides with `group2` and `group3` (but not with
    * itself!). Also neither `group2` nor `group3` collide with `group1`, so the
    * relation can be non-symmetric.
+   *
+   * If this property is omitted, the default relation is that each group only
+   * collides with itself.
    */
   collisionGroupRelation?: Record<string, string[]>;
 }
