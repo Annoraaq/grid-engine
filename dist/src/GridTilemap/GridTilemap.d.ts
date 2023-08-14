@@ -19,7 +19,7 @@ export declare class GridTilemap {
     private tileCostPropNames;
     private collisionRelevantLayersFrameCache;
     private tileCollisionCache?;
-    constructor(tilemap: Tilemap, collisionTilePropertyName: string, collisionStrategy: CollisionStrategy, useTileCollisionCache?: boolean);
+    constructor(tilemap: Tilemap, collisionTilePropertyName: string, collisionStrategy: CollisionStrategy, collisionGroupRelation?: Map<string, Set<string>> | undefined, useTileCollisionCache?: boolean);
     fixCacheLayer(layer: CharLayer): void;
     unfixCacheLayers(): void;
     addCharacter(character: GridCharacter): void;

@@ -56,6 +56,20 @@ export interface GridEngineConfigHeadless {
      * @defaultValue false
      */
     cacheTileCollisions?: boolean;
+    /**
+     * Specifies a custom collision group relation. You can define which group
+     * collides with which other groups.
+     *
+     * Example:
+     * {'group1': ['group2', 'group3']}
+     * This means that `group1` collides with `group2` and `group3` (but not with
+     * itself!). Also neither `group2` nor `group3` collide with `group1`, so the
+     * relation can be non-symmetric.
+     *
+     * If this property is omitted, the default relation is that each group only
+     * collides with itself.
+     */
+    collisionGroupRelation?: Record<string, string[]>;
 }
 /**
  * @category Configuration
@@ -203,6 +217,7 @@ export declare class GridEngineHeadless implements IGridEngine {
      * @category Grid Engine
      */
     create(tilemap: Tilemap, config: GridEngineConfigHeadless): void;
+    private recordToMap;
     /**
      * {@inheritDoc IGridEngine.getPosition}
      *
