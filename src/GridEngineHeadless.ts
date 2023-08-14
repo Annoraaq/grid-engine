@@ -23,7 +23,6 @@ import { take, takeUntil, filter, map, mergeWith } from "rxjs/operators";
 import { Vector2 } from "./Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
-import { Concrete } from "./Utils/TypeUtils";
 import { MovementInfo } from "./Movement/Movement";
 import { FrameRow } from "./GridCharacter/CharacterAnimation/CharacterAnimation";
 import {
@@ -125,6 +124,16 @@ export interface GridEngineConfigHeadless {
    */
   cacheTileCollisions?: boolean;
 
+  /**
+   * Specifies a custom collision group relation. You can define which group
+   * collides with which other groups.
+   *
+   * Example:
+   * {'group1': ['group2', 'group3']}
+   * This means that `group1` collides with `group2` and `group3` (but not with
+   * itself!). Also neither `group2` nor `group3` collide with `group1`, so the
+   * relation can be non-symmetric.
+   */
   collisionGroupRelation?: Record<string, string[]>;
 }
 
