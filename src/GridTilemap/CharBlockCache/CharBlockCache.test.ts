@@ -79,6 +79,123 @@ describe("CharBlockCache", () => {
     expect(hasBlockingCharOnNextPos).toBe(true);
   });
 
+  it("should consider custom collision relation", () => {
+    charBlockCache = new CharBlockCache(
+      CollisionStrategy.BLOCK_TWO_TILES,
+      new Map([
+        ["cGroup1", new Set(["cGroup1", "cGroup2"])],
+        ["cGroup2", new Set(["cGroup1"])],
+        ["cGroup3", new Set([])],
+      ])
+    );
+
+    const layer = "someLayer";
+
+    const cGroup1Char = createChar("cGroup1Char", 1, 1);
+    cGroup1Char.setCollisionGroups(["cGroup1"]);
+    cGroup1Char.setTilePosition({
+      position: new Vector2(0, 0),
+      layer,
+    });
+
+    const cGroup2Char = createChar("cGroup2Char", 1, 1);
+    cGroup2Char.setCollisionGroups(["cGroup2"]);
+    cGroup2Char.setTilePosition({
+      position: new Vector2(1, 0),
+      layer,
+    });
+
+    const cGroup3Char = createChar("cGroup3Char", 1, 1);
+    cGroup3Char.setCollisionGroups(["cGroup3"]);
+    cGroup3Char.setTilePosition({
+      position: new Vector2(2, 0),
+      layer,
+    });
+
+    charBlockCache.addCharacter(cGroup1Char);
+    charBlockCache.addCharacter(cGroup2Char);
+    charBlockCache.addCharacter(cGroup3Char);
+
+    // 1 => 1
+    expect(
+      charBlockCache.isCharBlockingAt(
+        cGroup1Char.getTilePos().position,
+        layer,
+        ["cGroup1"]
+      )
+    ).toBe(true);
+    // 2 => 1
+    expect(
+      charBlockCache.isCharBlockingAt(
+        cGroup1Char.getTilePos().position,
+        layer,
+        ["cGroup2"]
+      )
+    ).toBe(true);
+    // 3 => 1
+    expect(
+      charBlockCache.isCharBlockingAt(
+        cGroup1Char.getTilePos().position,
+        layer,
+        ["cGroup3"]
+      )
+    ).toBe(false);
+
+    // 1 => 2
+    expect(
+      charBlockCache.isCharBlockingAt(
+        cGroup2Char.getTilePos().position,
+        layer,
+        ["cGroup1"]
+      )
+    ).toBe(true);
+
+    // 2 => 2
+    expect(
+      charBlockCache.isCharBlockingAt(
+        cGroup2Char.getTilePos().position,
+        layer,
+        ["cGroup2"]
+      )
+    ).toBe(false);
+
+    // 3 => 2
+    expect(
+      charBlockCache.isCharBlockingAt(
+        cGroup2Char.getTilePos().position,
+        layer,
+        ["cGroup3"]
+      )
+    ).toBe(false);
+
+    // 1 => 3
+    expect(
+      charBlockCache.isCharBlockingAt(
+        cGroup3Char.getTilePos().position,
+        layer,
+        ["cGroup1"]
+      )
+    ).toBe(false);
+
+    // 2 => 3
+    expect(
+      charBlockCache.isCharBlockingAt(
+        cGroup3Char.getTilePos().position,
+        layer,
+        ["cGroup2"]
+      )
+    ).toBe(false);
+
+    // 3 => 3
+    expect(
+      charBlockCache.isCharBlockingAt(
+        cGroup3Char.getTilePos().position,
+        layer,
+        ["cGroup3"]
+      )
+    ).toBe(false);
+  });
+
   describe("blocking strategy BLOCK_TWO_TILES", () => {
     beforeEach(() => {
       gridTilemap = new GridTilemap(
@@ -359,7 +476,7 @@ describe("CharBlockCache", () => {
     ).toBe(false);
   });
 
-  it("should unsibscribe from position change finished of removed char", () => {
+  it("should unsubscribe from position change finished of removed char", () => {
     const char = createChar("player");
     char.move(Direction.RIGHT);
     char.update(1);
@@ -392,15 +509,19 @@ describe("CharBlockCache", () => {
     expect(isCharBlockingAt(oldPosTileWidth, ["player"])).toBe(false);
   });
 
-  function createChar(id = "player"): GridCharacter {
+  function createChar(
+    id = "player",
+    tileWidth = 5,
+    tileHeight = 2
+  ): GridCharacter {
     const char = new GridCharacter(id, {
       tilemap: gridTilemap,
       speed: 3,
       collidesWithTiles: false,
       numberOfDirections: NumberOfDirections.FOUR,
       collisionGroups: ["cGroup1"],
-      tileWidth: 5,
-      tileHeight: 2,
+      tileWidth,
+      tileHeight,
     });
     char.setTilePosition({
       position: new Vector2(3, 3),

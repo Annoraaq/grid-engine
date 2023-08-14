@@ -44,9 +44,13 @@ export class GridTilemap {
     private tilemap: Tilemap,
     private collisionTilePropertyName: string,
     collisionStrategy: CollisionStrategy,
+    collisionGroupRelation: Map<string, Set<string>> | undefined = undefined,
     private useTileCollisionCache = false
   ) {
-    this.charBlockCache = new CharBlockCache(collisionStrategy);
+    this.charBlockCache = new CharBlockCache(
+      collisionStrategy,
+      collisionGroupRelation
+    );
 
     // Performance optimization for pathfinding.
     // It saves us repeated string concatenation.

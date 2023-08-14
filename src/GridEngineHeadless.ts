@@ -23,7 +23,6 @@ import { take, takeUntil, filter, map, mergeWith } from "rxjs/operators";
 import { Vector2 } from "./Utils/Vector2/Vector2";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
-import { Concrete } from "./Utils/TypeUtils";
 import { MovementInfo } from "./Movement/Movement";
 import { FrameRow } from "./GridCharacter/CharacterAnimation/CharacterAnimation";
 import {
@@ -124,6 +123,21 @@ export interface GridEngineConfigHeadless {
    * @defaultValue false
    */
   cacheTileCollisions?: boolean;
+
+  /**
+   * Specifies a custom collision group relation. You can define which group
+   * collides with which other groups.
+   *
+   * Example:
+   * {'group1': ['group2', 'group3']}
+   * This means that `group1` collides with `group2` and `group3` (but not with
+   * itself!). Also neither `group2` nor `group3` collide with `group1`, so the
+   * relation can be non-symmetric.
+   *
+   * If this property is omitted, the default relation is that each group only
+   * collides with itself.
+   */
+  collisionGroupRelation?: Record<string, string[]>;
 }
 
 /**
@@ -243,12 +257,17 @@ export interface CharacterDataHeadless {
   tileHeight?: number;
 }
 
+interface ConcreteConfig
+  extends Omit<Required<GridEngineConfigHeadless>, "collisionGroupRelation"> {
+  collisionGroupRelation?: Record<string, string[]>;
+}
+
 /**
  * @category Main Modules
  */
 export class GridEngineHeadless implements IGridEngine {
   private gridCharacters?: Map<string, GridCharacter>;
-  private config?: Concrete<GridEngineConfigHeadless>;
+  private config?: ConcreteConfig;
   private gridTilemap?: GridTilemap;
   private isCreatedInternal = false;
   private movementStopped$?: Subject<{ charId: string; direction: Direction }>;
@@ -340,13 +359,25 @@ export class GridEngineHeadless implements IGridEngine {
     >();
     this.charRemoved$ = new Subject<string>();
     this.charAdded$ = new Subject<string>();
+
     this.gridTilemap = new GridTilemap(
       tilemap,
       this.config.collisionTilePropertyName,
       this.config.characterCollisionStrategy,
+      this.recordToMap(this.config.collisionGroupRelation),
       this.config.cacheTileCollisions
     );
     this.addCharacters();
+  }
+
+  private recordToMap(
+    rec?: Record<string, string[]>
+  ): Map<string, Set<string>> | undefined {
+    if (!rec) return undefined;
+    const map = new Map<string, Set<string>>(
+      Object.entries(rec).map(([k, v]) => [k, new Set(v)])
+    );
+    return map;
   }
 
   /**
@@ -1263,9 +1294,7 @@ export class GridEngineHeadless implements IGridEngine {
     return moveToConfig;
   }
 
-  private setConfigDefaults(
-    config: GridEngineConfigHeadless
-  ): Concrete<GridEngineConfigHeadless> {
+  private setConfigDefaults(config: GridEngineConfigHeadless): ConcreteConfig {
     return {
       collisionTilePropertyName: "ge_collide",
       numberOfDirections: NumberOfDirections.FOUR,

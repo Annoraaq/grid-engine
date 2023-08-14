@@ -1834,6 +1834,52 @@ describe("GridEngineHeadless", () => {
     });
   });
 
+  it("should consider custom collision relation", () => {
+    const cGroup1CharPos = { x: 0, y: 0 };
+    const cGroup2CharPos = { x: 2, y: 0 };
+    gridEngineHeadless.create(
+      // prettier-ignore
+      mockBlockMap(
+        [
+          "...",
+          "...",
+        ],
+        undefined,
+        false
+      ),
+      {
+        characters: [
+          {
+            id: "cGroup1Char",
+            startPosition: cGroup1CharPos,
+            collides: { collisionGroups: ["cGroup1"] },
+          },
+          {
+            id: "cGroup2Char",
+            startPosition: cGroup2CharPos,
+            collides: { collisionGroups: ["cGroup2"] },
+          },
+        ],
+        collisionGroupRelation: {
+          cGroup1: ["cGroup2"],
+        },
+      }
+    );
+
+    // 1 => 1
+    expect(
+      gridEngineHeadless.isBlocked(cGroup1CharPos, undefined, ["cGroup1"])
+    ).toBe(false);
+    // 2 => 1
+    expect(
+      gridEngineHeadless.isBlocked(cGroup1CharPos, undefined, ["cGroup2"])
+    ).toBe(false);
+    // 1 => 2
+    expect(
+      gridEngineHeadless.isBlocked(cGroup2CharPos, undefined, ["cGroup1"])
+    ).toBe(true);
+  });
+
   describe("Error Handling unknown char id", () => {
     const UNKNOWN_CHAR_ID = "unknownCharId";
     beforeEach(() => {
