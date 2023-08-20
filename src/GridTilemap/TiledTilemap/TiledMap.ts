@@ -14,13 +14,6 @@ export interface RawTiledLayer {
   data?: number[];
 }
 
-// export interface TilemapLayer {
-//   name: string;
-//   scale: number;
-//   properties: { name: string; value: string }[];
-//   data: any[];
-// }
-
 export interface RawTiledTileset {
   firstgid?: number;
   tiles?: RawTiledTilesetTile[];

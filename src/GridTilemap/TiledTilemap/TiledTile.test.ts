@@ -4,27 +4,28 @@ import { TiledTile } from "./TiledTile";
 describe("TiledTile", () => {
   const tilesets: RawTiledTileset[] = [
     {
-      firstgid:1,
-      tiles: []},
+      firstgid: 1,
+      tiles: [],
+    },
     {
-      firstgid:4,
+      firstgid: 4,
       tiles: [
-      {
-        id: 0,
-        properties: [
-          {name: 'someBooleanProp', type: "bool", value: true},
-          {name: 'someStringProp', type: "string", value: "stringVal"},
-        ]
-      },
-      {
-        id: 1,
-        properties: []
-      },
-      {
-        id: 2,
-      },
-    ]},
-
+        {
+          id: 0,
+          properties: [
+            { name: "someBooleanProp", type: "bool", value: true },
+            { name: "someStringProp", type: "string", value: "stringVal" },
+          ],
+        },
+        {
+          id: 1,
+          properties: [],
+        },
+        {
+          id: 2,
+        },
+      ],
+    },
   ];
 
   it("gets property", () => {
@@ -38,13 +39,13 @@ describe("TiledTile", () => {
   });
 
   it("gets property if properties empty", () => {
-    const tile = new TiledTile(tilesets,5);
+    const tile = new TiledTile(tilesets, 5);
     expect(tile.getProperty("unknownProp")).toBe(undefined);
     expect(tile.hasProperty("unknownProp")).toBe(false);
   });
 
   it("gets property if properties undefined", () => {
-    const tile = new TiledTile(tilesets,6);
+    const tile = new TiledTile(tilesets, 6);
     expect(tile.getProperty("unknownProp")).toBe(undefined);
     expect(tile.hasProperty("unknownProp")).toBe(false);
   });
