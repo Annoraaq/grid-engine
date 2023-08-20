@@ -3,10 +3,7 @@ import { RawTiledTileset } from "./TiledMap";
 
 export class TiledTile implements Tile {
   private props = {};
-  constructor(
-    tilesets: RawTiledTileset[],
-    tileId: number,
-  ) {
+  constructor(tilesets: RawTiledTileset[], tileId: number) {
     const correctTileset = tilesets.find((ts) => {
       if (!ts.tiles) return false;
       const offset = ts.firstgid ?? 0;
@@ -20,7 +17,7 @@ export class TiledTile implements Tile {
     }
 
     const tilesetTile = correctTileset.tiles?.find((t) => {
-      return t.id + (correctTileset.firstgid ?? 0 )=== tileId;
+      return t.id + (correctTileset.firstgid ?? 0) === tileId;
     });
 
     if (tilesetTile?.properties) {
