@@ -64,6 +64,9 @@ import {
   ArrayTilemap,
   ArrayTilemapInputLayer,
 } from "./GridTilemap/ArrayTilemap/ArrayTilemap";
+import { TiledTilemap } from "./GridTilemap/TiledTilemap/TiledTilemap";
+import { TiledLayer } from "./GridTilemap/TiledTilemap/TiledLayer";
+import { TiledTile } from "./GridTilemap/TiledTilemap/TiledTile";
 
 export {
   ArrayTilemap,
@@ -107,6 +110,9 @@ export {
   ShortestPathAlgorithmType,
   Tile,
   TiledProject,
+  TiledTilemap,
+  TiledLayer,
+  TiledTile,
   TileLayer,
   Tilemap,
   TileSizePerSecond,
@@ -280,7 +286,7 @@ export class GridEngine implements IGridEngine {
   create(tilemap: Phaser.Tilemaps.Tilemap, config: GridEngineConfig): void {
     this.geHeadless.create(
       new PhaserTilemap(tilemap, config.tiledProject),
-      config
+      config,
     );
     this.isCreatedInternal = true;
     this.gridCharacters = new Map();
@@ -337,7 +343,7 @@ export class GridEngine implements IGridEngine {
   moveTo(
     charId: string,
     targetPos: Position,
-    config?: MoveToConfig
+    config?: MoveToConfig,
   ): Observable<{ charId: string } & Finished> {
     return this.geHeadless.moveTo(charId, targetPos, config);
   }
@@ -445,7 +451,7 @@ export class GridEngine implements IGridEngine {
    * @category Character
    */
   getWalkingAnimationMapping(
-    charId: string
+    charId: string,
   ): WalkingAnimationMapping | number | undefined {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -475,7 +481,7 @@ export class GridEngine implements IGridEngine {
    */
   setWalkingAnimationMapping(
     charId: string,
-    walkingAnimationMapping?: WalkingAnimationMapping | number
+    walkingAnimationMapping?: WalkingAnimationMapping | number,
   ): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -599,13 +605,13 @@ export class GridEngine implements IGridEngine {
     charId: string,
     charIdToFollow: string,
     distance?: number,
-    closestPointIfBlocked?: boolean
+    closestPointIfBlocked?: boolean,
   ): void;
   follow(
     charId: string,
     charIdToFollow: string,
     distance?: FollowOptions | number,
-    closestPointIfBlocked?: boolean
+    closestPointIfBlocked?: boolean,
   ): void {
     let options: FollowOptions;
 
@@ -720,7 +726,7 @@ export class GridEngine implements IGridEngine {
   isBlocked(
     position: Position,
     layer?: string,
-    collisionGroups: string[] = ["geDefault"]
+    collisionGroups: string[] = ["geDefault"],
   ): boolean {
     return this.geHeadless.isBlocked(position, layer, collisionGroups);
   }
@@ -760,12 +766,12 @@ export class GridEngine implements IGridEngine {
   getTilePosInDirection(
     position: Position,
     charLayer: string | undefined,
-    direction: Direction
+    direction: Direction,
   ): LayerPosition {
     return this.geHeadless.getTilePosInDirection(
       position,
       charLayer,
-      direction
+      direction,
     );
   }
 
@@ -778,7 +784,7 @@ export class GridEngine implements IGridEngine {
   findShortestPath(
     source: LayerPosition,
     dest: LayerPosition,
-    options: PathfindingOptions = {}
+    options: PathfindingOptions = {},
   ): PathfindingResult {
     return this.geHeadless.findShortestPath(source, dest, options);
   }
@@ -791,7 +797,7 @@ export class GridEngine implements IGridEngine {
   steppedOn(
     charIds: string[],
     tiles: Position[],
-    layer?: CharLayer[]
+    layer?: CharLayer[],
   ): Observable<
     {
       charId: string;
@@ -872,7 +878,7 @@ export class GridEngine implements IGridEngine {
     x: number,
     y: number,
     width: number,
-    height: number
+    height: number,
   ): void {
     this.geHeadless.rebuildTileCollisionCache(x, y, width, height);
   }
@@ -885,7 +891,7 @@ export class GridEngine implements IGridEngine {
   addQueueMovements(
     charId: string,
     positions: Array<LayerPosition | Direction>,
-    options?: QueueMovementConfig
+    options?: QueueMovementConfig,
   ): void {
     this.geHeadless.addQueueMovements(charId, positions, options);
   }
@@ -927,14 +933,14 @@ export class GridEngine implements IGridEngine {
   getTileCost(
     position: Position,
     charLayer?: string,
-    srcDirection?: Direction
+    srcDirection?: Direction,
   ): number {
     this.initGuard();
     return this.geHeadless.getTileCost(position, charLayer, srcDirection);
   }
 
   private setConfigDefaults(
-    config: GridEngineConfig
+    config: GridEngineConfig,
   ): Omit<
     Required<GridEngineConfig>,
     "tiledProject" | "collisionGroupRelation"
@@ -957,13 +963,13 @@ export class GridEngine implements IGridEngine {
 
   private createUninitializedErr() {
     throw new Error(
-      "GridEngine not initialized. You need to call create() first."
+      "GridEngine not initialized. You need to call create() first.",
     );
   }
 
   private addCharacters() {
     this.config?.characters.forEach((charData) =>
-      this.addCharacterInternal(charData)
+      this.addCharacterInternal(charData),
     );
   }
 
@@ -973,7 +979,7 @@ export class GridEngine implements IGridEngine {
 
   private setCharSprite(
     sprite: Phaser.GameObjects.Sprite,
-    gridCharPhaser: GridCharacterPhaser
+    gridCharPhaser: GridCharacterPhaser,
   ) {
     gridCharPhaser.setSprite(sprite);
   }
@@ -988,7 +994,7 @@ export class GridEngine implements IGridEngine {
       this.scene,
       this.gridTilemap,
       this.config.layerOverlay,
-      this.geHeadless
+      this.geHeadless,
     );
 
     this.gridCharacters?.set(charData.id, gridCharPhaser);

@@ -3,6 +3,13 @@ import { TiledLayer } from "./TiledLayer";
 
 export const CHAR_LAYER_PROP_NAME = "ge_charLayer";
 
+/**
+ * Simple implementation of the Tilemap interface, using a parsed version of a
+ * Tiled tilemap.
+ *
+ * Example usage:
+ * `new TiledTilemap(JSON.parse(tiledTilemapAsString))`
+ */
 export class TiledTilemap implements Tilemap {
   private layers: TileLayer[] = [];
   constructor(private rawTilemap: any) {
