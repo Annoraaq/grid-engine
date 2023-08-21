@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>PhaserTile | grid-engine</title><meta name="description" content="Documentation for grid-engine"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>TiledTilemap | grid-engine</title><meta name="description" content="Documentation for grid-engine"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
 <div class="tsd-toolbar-contents container">
 <div class="table-cell" id="tsd-search" data-base="..">
 <div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
@@ -13,18 +13,25 @@
 <div class="tsd-page-title">
 <ul class="tsd-breadcrumb">
 <li><a href="../index.html">grid-engine</a></li>
-<li><a href="PhaserTile.html">PhaserTile</a></li></ul>
-<h1>Class PhaserTile</h1></div>
+<li><a href="TiledTilemap.html">TiledTilemap</a></li></ul>
+<h1>Class TiledTilemap</h1></div>
+<section class="tsd-panel tsd-comment">
+<div class="tsd-comment tsd-typography"><p>Simple implementation of the Tilemap interface, using a parsed version of a
+Tiled tilemap.</p>
+<p>Example usage:
+<code>new TiledTilemap(JSON.parse(tiledTilemapAsString))</code></p>
+</div>
+<div class="tsd-comment tsd-typography"></div></section>
 <section class="tsd-panel tsd-hierarchy">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
-<li><span class="target">PhaserTile</span></li></ul></section>
+<li><span class="target">TiledTilemap</span></li></ul></section>
 <section class="tsd-panel">
 <h4>Implements</h4>
 <ul class="tsd-hierarchy">
-<li><a href="../interfaces/Tile.html" class="tsd-signature-type tsd-kind-interface">Tile</a></li></ul></section><aside class="tsd-sources">
+<li><a href="../interfaces/Tilemap.html" class="tsd-signature-type tsd-kind-interface">Tilemap</a></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/6a8ad3d/src/GridTilemap/Phaser/PhaserTile.ts#L5">GridTilemap/Phaser/PhaserTile.ts:5</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/6a8ad3d/src/GridTilemap/TiledTilemap/TiledTilemap.ts#L13">GridTilemap/TiledTilemap/TiledTilemap.ts:13</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -32,60 +39,106 @@
 <div class="tsd-accordion-details">
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Constructors</h3>
-<div class="tsd-index-list"><a href="PhaserTile.html#constructor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-512"><rect fill="var(--color-icon-background)" stroke="#4D7FFF" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)"></path></g></svg><span>constructor</span></a>
+<div class="tsd-index-list"><a href="TiledTilemap.html#constructor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-512"><rect fill="var(--color-icon-background)" stroke="#4D7FFF" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)"></path></g></svg><span>constructor</span></a>
 </div></section>
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Methods</h3>
-<div class="tsd-index-list"><a href="PhaserTile.html#getProperty" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-2048"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)"></path></g></svg><span>get<wbr/>Property</span></a>
-<a href="PhaserTile.html#hasProperty" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>has<wbr/>Property</span></a>
+<div class="tsd-index-list"><a href="TiledTilemap.html#getHeight" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-2048"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)"></path></g></svg><span>get<wbr/>Height</span></a>
+<a href="TiledTilemap.html#getLayers" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Layers</span></a>
+<a href="TiledTilemap.html#getOrientation" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Orientation</span></a>
+<a href="TiledTilemap.html#getTileAt" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Tile<wbr/>At</span></a>
+<a href="TiledTilemap.html#getWidth" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Width</span></a>
+<a href="TiledTilemap.html#hasTileAt" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>has<wbr/>Tile<wbr/>At</span></a>
 </div></section></div></details></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Constructors</h2>
 <section class="tsd-panel tsd-member"><a id="constructor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>constructor</span><a href="#constructor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="constructor.new_PhaserTile"><span class="tsd-kind-constructor-signature">new <wbr/>Phaser<wbr/>Tile</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">phaserTile</span>, <span class="tsd-kind-parameter">tiledProject</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="PhaserTile.html" class="tsd-signature-type tsd-kind-class">PhaserTile</a><a href="#constructor.new_PhaserTile" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="constructor.new_TiledTilemap"><span class="tsd-kind-constructor-signature">new <wbr/>Tiled<wbr/>Tilemap</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">rawTilemap</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="TiledTilemap.html" class="tsd-signature-type tsd-kind-class">TiledTilemap</a><a href="#constructor.new_TiledTilemap" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">phaserTile</span>: <span class="tsd-signature-type ">Tile</span></h5></li>
-<li>
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">tiledProject</span>: <a href="../interfaces/TiledProject.html" class="tsd-signature-type tsd-kind-interface">TiledProject</a></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <a href="PhaserTile.html" class="tsd-signature-type tsd-kind-class">PhaserTile</a></h4><aside class="tsd-sources">
+<h5><span class="tsd-kind-parameter">rawTilemap</span>: <span class="tsd-signature-type">any</span></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="TiledTilemap.html" class="tsd-signature-type tsd-kind-class">TiledTilemap</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/6a8ad3d/src/GridTilemap/Phaser/PhaserTile.ts#L6">GridTilemap/Phaser/PhaserTile.ts:6</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/6a8ad3d/src/GridTilemap/TiledTilemap/TiledTilemap.ts#L15">GridTilemap/TiledTilemap/TiledTilemap.ts:15</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
-<section class="tsd-panel tsd-member"><a id="getProperty" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>get<wbr/>Property</span><a href="#getProperty" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<section class="tsd-panel tsd-member"><a id="getHeight" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Height</span><a href="#getHeight" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="getProperty.getProperty-1"><span class="tsd-kind-call-signature">get<wbr/>Property</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">name</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><a href="#getProperty.getProperty-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="getHeight.getHeight-1"><span class="tsd-kind-call-signature">get<wbr/>Height</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getHeight.getHeight-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-parameters">
-<h4 class="tsd-parameters-title">Parameters</h4>
-<ul class="tsd-parameter-list">
-<li>
-<h5><span class="tsd-kind-parameter">name</span>: <span class="tsd-signature-type">string</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4><aside class="tsd-sources">
-<p>Implementation of <a href="../interfaces/Tile.html">Tile</a>.<a href="../interfaces/Tile.html#getProperty">getProperty</a></p>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/Tilemap.html">Tilemap</a>.<a href="../interfaces/Tilemap.html#getHeight">getHeight</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/6a8ad3d/src/GridTilemap/Phaser/PhaserTile.ts#L11">GridTilemap/Phaser/PhaserTile.ts:11</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member"><a id="hasProperty" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>has<wbr/>Property</span><a href="#hasProperty" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/6a8ad3d/src/GridTilemap/TiledTilemap/TiledTilemap.ts#L59">GridTilemap/TiledTilemap/TiledTilemap.ts:59</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="getLayers" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Layers</span><a href="#getLayers" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="hasProperty.hasProperty-1"><span class="tsd-kind-call-signature">has<wbr/>Property</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">name</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><a href="#hasProperty.hasProperty-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="getLayers.getLayers-1"><span class="tsd-kind-call-signature">get<wbr/>Layers</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/TileLayer.html" class="tsd-signature-type tsd-kind-interface">TileLayer</a><span class="tsd-signature-symbol">[]</span><a href="#getLayers.getLayers-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/TileLayer.html" class="tsd-signature-type tsd-kind-interface">TileLayer</a><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/Tilemap.html">Tilemap</a>.<a href="../interfaces/Tilemap.html#getLayers">getLayers</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/6a8ad3d/src/GridTilemap/TiledTilemap/TiledTilemap.ts#L51">GridTilemap/TiledTilemap/TiledTilemap.ts:51</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="getOrientation" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Orientation</span><a href="#getOrientation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="getOrientation.getOrientation-1"><span class="tsd-kind-call-signature">get<wbr/>Orientation</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Orientation.html" class="tsd-signature-type tsd-kind-type-alias">Orientation</a><a href="#getOrientation.getOrientation-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<h4 class="tsd-returns-title">Returns <a href="../types/Orientation.html" class="tsd-signature-type tsd-kind-type-alias">Orientation</a></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/Tilemap.html">Tilemap</a>.<a href="../interfaces/Tilemap.html#getOrientation">getOrientation</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/6a8ad3d/src/GridTilemap/TiledTilemap/TiledTilemap.ts#L47">GridTilemap/TiledTilemap/TiledTilemap.ts:47</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="getTileAt" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Tile<wbr/>At</span><a href="#getTileAt" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="getTileAt.getTileAt-1"><span class="tsd-kind-call-signature">get<wbr/>Tile<wbr/>At</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">x</span>, <span class="tsd-kind-parameter">y</span>, <span class="tsd-kind-parameter">layer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/Tile.html" class="tsd-signature-type tsd-kind-interface">Tile</a><a href="#getTileAt.getTileAt-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">name</span>: <span class="tsd-signature-type">string</span></h5></li></ul></div>
+<h5><span class="tsd-kind-parameter">x</span>: <span class="tsd-signature-type">number</span></h5></li>
+<li>
+<h5><span class="tsd-kind-parameter">y</span>: <span class="tsd-signature-type">number</span></h5></li>
+<li>
+<h5><span class="tsd-kind-parameter">layer</span>: <span class="tsd-signature-type">string</span></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/Tile.html" class="tsd-signature-type tsd-kind-interface">Tile</a></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/Tilemap.html">Tilemap</a>.<a href="../interfaces/Tilemap.html#getTileAt">getTileAt</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/6a8ad3d/src/GridTilemap/TiledTilemap/TiledTilemap.ts#L35">GridTilemap/TiledTilemap/TiledTilemap.ts:35</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="getWidth" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Width</span><a href="#getWidth" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="getWidth.getWidth-1"><span class="tsd-kind-call-signature">get<wbr/>Width</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><a href="#getWidth.getWidth-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/Tilemap.html">Tilemap</a>.<a href="../interfaces/Tilemap.html#getWidth">getWidth</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/6a8ad3d/src/GridTilemap/TiledTilemap/TiledTilemap.ts#L55">GridTilemap/TiledTilemap/TiledTilemap.ts:55</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="hasTileAt" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>has<wbr/>Tile<wbr/>At</span><a href="#hasTileAt" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="hasTileAt.hasTileAt-1"><span class="tsd-kind-call-signature">has<wbr/>Tile<wbr/>At</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">x</span>, <span class="tsd-kind-parameter">y</span>, <span class="tsd-kind-parameter">layer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><a href="#hasTileAt.hasTileAt-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">x</span>: <span class="tsd-signature-type">number</span></h5></li>
+<li>
+<h5><span class="tsd-kind-parameter">y</span>: <span class="tsd-signature-type">number</span></h5></li>
+<li>
+<h5><span class="tsd-kind-parameter">layer</span>: <span class="tsd-signature-type">string</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
-<p>Implementation of <a href="../interfaces/Tile.html">Tile</a>.<a href="../interfaces/Tile.html#hasProperty">hasProperty</a></p>
+<p>Implementation of <a href="../interfaces/Tilemap.html">Tilemap</a>.<a href="../interfaces/Tilemap.html#hasTileAt">hasTileAt</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/6a8ad3d/src/GridTilemap/Phaser/PhaserTile.ts#L29">GridTilemap/Phaser/PhaserTile.ts:29</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/Annoraaq/grid-engine/blob/6a8ad3d/src/GridTilemap/TiledTilemap/TiledTilemap.ts#L21">GridTilemap/TiledTilemap/TiledTilemap.ts:21</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -104,20 +157,24 @@
 <div class="tsd-accordion-details">
 <ul>
 <li><a href="#constructor" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-512"></use></svg><span>constructor</span></a></li>
-<li><a href="#getProperty" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Property</span></a></li>
-<li><a href="#hasProperty" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>has<wbr/>Property</span></a></li></ul></div></details></div>
+<li><a href="#getHeight" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Height</span></a></li>
+<li><a href="#getLayers" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Layers</span></a></li>
+<li><a href="#getOrientation" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Orientation</span></a></li>
+<li><a href="#getTileAt" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Tile<wbr/>At</span></a></li>
+<li><a href="#getWidth" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Width</span></a></li>
+<li><a href="#hasTileAt" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>has<wbr/>Tile<wbr/>At</span></a></li></ul></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../index.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)"></path></g></svg><span>grid-<wbr/>engine</span></a>
 <ul class="tsd-small-nested-navigation">
 <li><a href="ArrayTilemap.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-128"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-class)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)"></path></g></svg><span>Array<wbr/>Tilemap</span></a></li>
 <li><a href="GridEngine.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Grid<wbr/>Engine</span></a></li>
 <li><a href="GridEngineHeadless.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Grid<wbr/>Engine<wbr/>Headless</span></a></li>
-<li><a href="PhaserTile.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Phaser<wbr/>Tile</span></a></li>
+<li><a href="PhaserTile.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Phaser<wbr/>Tile</span></a></li>
 <li><a href="PhaserTileLayer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Phaser<wbr/>Tile<wbr/>Layer</span></a></li>
 <li><a href="PhaserTilemap.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Phaser<wbr/>Tilemap</span></a></li>
 <li><a href="TiledLayer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Tiled<wbr/>Layer</span></a></li>
 <li><a href="TiledTile.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Tiled<wbr/>Tile</span></a></li>
-<li><a href="TiledTilemap.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Tiled<wbr/>Tilemap</span></a></li>
+<li><a href="TiledTilemap.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Tiled<wbr/>Tilemap</span></a></li>
 <li><a href="../enums/CharacterShiftAction.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-8"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-enum)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.45 16V7.24H14.49V8.224H10.518V10.936H14.07V11.908H10.518V15.016H14.49V16H9.45Z" fill="var(--color-text)"></path></g></svg><span>Character<wbr/>Shift<wbr/>Action</span></a></li>
 <li><a href="../enums/CollisionStrategy.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg><span>Collision<wbr/>Strategy</span></a></li>
 <li><a href="../enums/Direction.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg><span>Direction</span></a></li>
