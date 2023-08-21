@@ -73,7 +73,7 @@ function create() {
 
   this.gridEngine.create(
     tilemap, // Phaser.Tilemaps.Tilemap
-    gridEngineConfig
+    gridEngineConfig,
   );
 
   // ...
@@ -124,6 +124,23 @@ const tilemap = new GridEngineImports.ArrayTilemap({
     ],
   },
 });
+
+gridEngineHeadless.create(tilemap, { characters: [{ id: "player" }] });
+```
+
+### Tiled Tilemaps for headless version (no Phaser)
+
+If you want to use the Tiled map editor for the headless Grid Engine version, you can use the [TiledTilemap](https://annoraaq.github.io/grid-engine/api/interfaces/Tilemap.html) implementation:
+
+> **_NOTE:_** Depending on your environment, the loading of the tilemap might look a bit different. On node.js you can use https://nodejs.dev/en/learn/reading-files-with-nodejs/ and `JSON.parse`.
+
+```javascript
+import { GridEngineHeadless, TiledTilemap } from "grid-engine";
+import * as someTilemap from "./path/to/tilemap.json";
+
+const gridEngineHeadless = new GridEngineHeadless();
+
+const tilemap = new TiledTilemap(someTilemap);
 
 gridEngineHeadless.create(tilemap, { characters: [{ id: "player" }] });
 ```
