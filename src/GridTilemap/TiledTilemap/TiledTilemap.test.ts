@@ -1,5 +1,5 @@
 import { TiledTilemap } from "./TiledTilemap";
-import * as cloudCityTilemap from "../../testing/testdata/tilemaps/cloud_city.json";
+import * as cloudCityTilemap from "../../Testing/testdata/tilemaps/cloud_city.json";
 import { TiledLayer } from "./TiledLayer";
 
 describe("TiledTilemap", () => {
