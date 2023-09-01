@@ -14,6 +14,7 @@ import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/Chara
 import { PathfindingOptions } from "./Pathfinding/Pathfinding";
 import { PositionChange } from "./GridCharacter/GridCharacter";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
+import { GridEngineState } from "./GridEngineState";
 
 export type CharLayer = string | undefined;
 
@@ -224,7 +225,7 @@ export interface IGridEngine {
   moveTo(
     charId: string,
     targetPos: Position,
-    config?: MoveToConfig
+    config?: MoveToConfig,
   ): Observable<{ charId: string } & Finished>;
   /**
    * Stops any automated movement such as random movement
@@ -357,13 +358,13 @@ export interface IGridEngine {
     charId: string,
     charIdToFollow: string,
     distance?: number,
-    closestPointIfBlocked?: boolean
+    closestPointIfBlocked?: boolean,
   ): void;
   follow(
     charId: string,
     charIdToFollow: string,
     distance?: FollowOptions | number,
-    closestPointIfBlocked?: boolean
+    closestPointIfBlocked?: boolean,
   ): void;
   /**
    * @returns True if the character is currently moving.
@@ -425,7 +426,7 @@ export interface IGridEngine {
   isBlocked(
     position: Position,
     layer?: string,
-    collisionGroups?: string[]
+    collisionGroups?: string[],
   ): boolean;
 
   /**
@@ -465,7 +466,7 @@ export interface IGridEngine {
   getTilePosInDirection(
     position: Position,
     charLayer: string | undefined,
-    direction: Direction
+    direction: Direction,
   ): LayerPosition;
 
   /**
@@ -484,7 +485,7 @@ export interface IGridEngine {
   findShortestPath(
     source: LayerPosition,
     dest: LayerPosition,
-    options?: PathfindingOptions
+    options?: PathfindingOptions,
   ): PathfindingResult;
 
   /**
@@ -496,7 +497,7 @@ export interface IGridEngine {
   steppedOn(
     charIds: string[],
     tiles: Position[],
-    layer?: CharLayer[]
+    layer?: CharLayer[],
   ): Observable<
     {
       charId: string;
@@ -581,7 +582,7 @@ export interface IGridEngine {
     x: number,
     y: number,
     width: number,
-    height: number
+    height: number,
   ): void;
 
   /**
@@ -597,7 +598,7 @@ export interface IGridEngine {
   addQueueMovements(
     charId: string,
     positions: Array<LayerPosition | Direction>,
-    options?: QueueMovementConfig
+    options?: QueueMovementConfig,
   );
 
   /**
@@ -634,6 +635,19 @@ export interface IGridEngine {
   getTileCost(
     position: Position,
     charLayer?: string,
-    srcDirection?: Direction
+    srcDirection?: Direction,
   ): number;
+
+  /**
+   * Returns the current state of Grid Engine. This is useful for persiting or
+   * sharing the state.
+   */
+  getState(): GridEngineState;
+
+  /**
+   * Sets the given state for Grid Engine. Be aware that it will **not** remove
+   * any characters from Grid Engine. If you want to completely reset the state,
+   * you should call {@link IGridEngine.removeAllCharacters}  first.
+   */
+  setState(state: GridEngineState): void;
 }

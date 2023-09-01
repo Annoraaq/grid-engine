@@ -71,7 +71,10 @@ export class GridCharacter {
   private tileWidth: number;
   private tileHeight: number;
 
-  constructor(private id: string, config: CharConfig) {
+  constructor(
+    private id: string,
+    config: CharConfig,
+  ) {
     this.tilemap = config.tilemap;
     this.speed = config.speed;
     this.collidesWithTilesInternal = config.collidesWithTiles;
@@ -116,8 +119,16 @@ export class GridCharacter {
     return this.collidesWithTilesInternal;
   }
 
+  setCollidesWithTiles(collidesWithTiles: boolean): void {
+    this.collidesWithTilesInternal = collidesWithTiles;
+  }
+
   getIgnoreMissingTiles(): boolean {
     return this.ignoreMissingTiles;
+  }
+
+  setIgnoreMissingTiles(ignoreMissingTiles: boolean): void {
+    this.ignoreMissingTiles = ignoreMissingTiles;
   }
 
   setTilePosition(tilePosition: LayerVecPos): void {
@@ -144,11 +155,11 @@ export class GridCharacter {
     let layer: CharLayer = this.tilePos.layer;
     const nextPos = this.tilePosInDirection(
       this.tilePos.position,
-      this.movementDirection
+      this.movementDirection,
     );
     const transitionLayer = this.tilemap.getTransition(
       nextPos,
-      this.tilePos.layer
+      this.tilePos.layer,
     );
     if (transitionLayer) {
       layer = transitionLayer;
@@ -157,7 +168,7 @@ export class GridCharacter {
     return {
       position: this.tilePosInDirection(
         this.tilePos.position,
-        this.movementDirection
+        this.movementDirection,
       ),
       layer,
     };
@@ -199,7 +210,7 @@ export class GridCharacter {
 
     const tilePosInDir = this.tilePosInDirection(
       this.getNextTilePos().position,
-      direction
+      direction,
     );
 
     const layerInDirection =
@@ -218,31 +229,31 @@ export class GridCharacter {
     return this.someCharTile((x, y) => {
       const tilePosInDir = this.tilePosInDirection(
         new Vector2(x, y),
-        direction
+        direction,
       );
       return this.tilemap.hasBlockingTile(
         tilePosInDir,
         layerInDirection,
         oppositeDirection(direction),
-        this.ignoreMissingTiles
+        this.ignoreMissingTiles,
       );
     });
   }
 
   private isCharBlocking(
     direction: Direction,
-    layerInDirection: CharLayer
+    layerInDirection: CharLayer,
   ): boolean {
     return this.someCharTile((x, y) => {
       const tilePosInDir = this.tilePosInDirection(
         new Vector2(x, y),
-        direction
+        direction,
       );
       return this.tilemap.hasBlockingChar(
         tilePosInDir,
         layerInDirection,
         this.getCollisionGroups(),
-        new Set([this.getId()])
+        new Set([this.getId()]),
       );
     });
   }
@@ -359,6 +370,11 @@ export class GridCharacter {
     return this.movementProgress;
   }
 
+  setMovementProgress(progress: number): void {
+    const newProgress = Math.max(0, Math.min(MAX_MOVEMENT_PROGRESS, progress));
+    this.movementProgress = newProgress;
+  }
+
   hasWalkedHalfATile(): boolean {
     return this.movementProgress > MAX_MOVEMENT_PROGRESS / 2;
   }
@@ -383,7 +399,7 @@ export class GridCharacter {
 
     this.movementProgress = Math.min(
       this.movementProgress + this.maxProgressForDelta(delta),
-      MAX_MOVEMENT_PROGRESS
+      MAX_MOVEMENT_PROGRESS,
     );
 
     if (willCrossTileBorderThisUpdate) {
@@ -392,7 +408,7 @@ export class GridCharacter {
         this.fire(
           this.positionChangeFinished$,
           this.tilePos,
-          this.getNextTilePos()
+          this.getNextTilePos(),
         );
         this.tilePos = this.getNextTilePos();
         this.startMoving(this.lastMovementImpulse);
@@ -454,7 +470,7 @@ export class GridCharacter {
   private fire(
     subject: Subject<PositionChange>,
     { position: exitTile, layer: exitLayer }: LayerVecPos,
-    { position: enterTile, layer: enterLayer }: LayerVecPos
+    { position: enterTile, layer: enterLayer }: LayerVecPos,
   ): void {
     subject.next({ exitTile, enterTile, exitLayer, enterLayer });
   }

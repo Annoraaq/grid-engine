@@ -17,7 +17,7 @@ describe("GridCharacter", () => {
 
   function createDefaultTilemapMock(
     layer?: string,
-    config: Partial<CharConfig> = {}
+    config: Partial<CharConfig> = {},
   ): { gridTilemap: GridTilemap; gridCharacter: GridCharacter } {
     const gridTilemap = new GridTilemap(
       mockBlockMap(
@@ -28,10 +28,10 @@ describe("GridCharacter", () => {
           "....",
           "....",
         ],
-        layer
+        layer,
       ),
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const gridCharacter = new GridCharacter("player", {
       speed: 3,
@@ -63,7 +63,7 @@ describe("GridCharacter", () => {
     expect(gridCharacter.collidesWithTiles()).toEqual(true);
     expect(gridCharacter.getIgnoreMissingTiles()).toBe(false);
     expect(gridCharacter.getNumberOfDirections()).toEqual(
-      NumberOfDirections.EIGHT
+      NumberOfDirections.EIGHT,
     );
     expect(gridCharacter.getCollisionGroups()).toEqual(["test"]);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
@@ -159,14 +159,44 @@ describe("GridCharacter", () => {
     gridCharacter.update(QUARTER_SECOND / 2);
 
     expect(gridCharacter.getMovementProgress()).toEqual(
-      Math.floor(3 * (QUARTER_SECOND / 2))
+      Math.floor(3 * (QUARTER_SECOND / 2)),
     );
 
     gridCharacter.setSpeed(1.5);
     gridCharacter.update(QUARTER_SECOND / 2);
     expect(gridCharacter.getMovementProgress()).toEqual(
-      Math.floor(3 * (QUARTER_SECOND / 2) + 1.5 * (QUARTER_SECOND / 2))
+      Math.floor(3 * (QUARTER_SECOND / 2) + 1.5 * (QUARTER_SECOND / 2)),
     );
+  });
+
+  it("should set movement progress", () => {
+    const { gridCharacter } = createDefaultTilemapMock();
+
+    expect(gridCharacter.getMovementProgress()).toBe(0);
+    gridCharacter.setMovementProgress(300);
+    expect(gridCharacter.getMovementProgress()).toBe(300);
+
+    gridCharacter.setMovementProgress(-10);
+    expect(gridCharacter.getMovementProgress()).toBe(0);
+
+    gridCharacter.setMovementProgress(10000);
+    expect(gridCharacter.getMovementProgress()).toBe(1000);
+  });
+
+  it("should set collidesWithTiles", () => {
+    const { gridCharacter } = createDefaultTilemapMock();
+
+    expect(gridCharacter.collidesWithTiles()).toBe(true);
+    gridCharacter.setCollidesWithTiles(false);
+    expect(gridCharacter.collidesWithTiles()).toBe(false);
+  });
+
+  it("should set ignoreMissingTiles", () => {
+    const { gridCharacter } = createDefaultTilemapMock();
+
+    expect(gridCharacter.getIgnoreMissingTiles()).toBe(false);
+    gridCharacter.setIgnoreMissingTiles(true);
+    expect(gridCharacter.getIgnoreMissingTiles()).toBe(true);
   });
 
   it("should update vertically", () => {
@@ -176,7 +206,7 @@ describe("GridCharacter", () => {
     gridCharacter.update(QUARTER_SECOND);
 
     expect(gridCharacter.getMovementProgress()).toEqual(
-      Math.floor(3 * QUARTER_SECOND)
+      Math.floor(3 * QUARTER_SECOND),
     );
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
@@ -189,7 +219,7 @@ describe("GridCharacter", () => {
     gridCharacter.update(QUARTER_SECOND);
 
     expect(gridCharacter.getMovementProgress()).toEqual(
-      Math.floor(3 * QUARTER_SECOND)
+      Math.floor(3 * QUARTER_SECOND),
     );
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.RIGHT);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
@@ -202,7 +232,7 @@ describe("GridCharacter", () => {
     gridCharacter.update(QUARTER_SECOND);
 
     expect(gridCharacter.getMovementProgress()).toEqual(
-      Math.floor(3 * QUARTER_SECOND)
+      Math.floor(3 * QUARTER_SECOND),
     );
     expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN_RIGHT);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN_RIGHT);
@@ -433,7 +463,7 @@ describe("GridCharacter", () => {
     expect(posChange?.enterTile).toEqual(new Vector2(1, 0));
 
     expect(gridCharacter.getMovementProgress()).toEqual(
-      Math.floor(QUARTER_SECOND)
+      Math.floor(QUARTER_SECOND),
     );
 
     expect(gridCharacter.getTilePos()).toEqual({
@@ -498,7 +528,7 @@ describe("GridCharacter", () => {
         },
       ]),
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     gridCharacter = new GridCharacter("player", {
       tilemap: gridTilemap,
@@ -512,7 +542,7 @@ describe("GridCharacter", () => {
     gridTilemap.setTransition(
       new Vector2(0, 1),
       "lowerCharLayer",
-      "testCharLayer"
+      "testCharLayer",
     );
     gridCharacter.move(Direction.DOWN);
     gridCharacter.update(QUARTER_SECOND * 3);
@@ -547,7 +577,7 @@ describe("GridCharacter", () => {
         },
       ]),
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     gridCharacter = new GridCharacter("player", {
       tilemap: gridTilemap,
@@ -561,7 +591,7 @@ describe("GridCharacter", () => {
     gridTilemap.setTransition(
       new Vector2(0, 1),
       "lowerCharLayer",
-      "testCharLayer"
+      "testCharLayer",
     );
     gridCharacter.move(Direction.DOWN);
     gridCharacter.update(QUARTER_SECOND * 4);
@@ -582,7 +612,7 @@ describe("GridCharacter", () => {
         "#.",
       ]),
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     gridCharacter = new GridCharacter("player", {
       tilemap: gridTilemap,
@@ -610,7 +640,7 @@ describe("GridCharacter", () => {
         "#.",
       ]),
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     gridCharacter = new GridCharacter("player", {
       tilemap: gridTilemap,
@@ -700,7 +730,7 @@ describe("GridCharacter", () => {
           "##",
         ]),
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       gridCharacter = new GridCharacter("player", {
         tilemap: gridTilemap,
@@ -718,7 +748,7 @@ describe("GridCharacter", () => {
       const gridTilemap = new GridTilemap(
         mockBlockMap(["."]),
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
 
       gridCharacter = new GridCharacter("player", {
@@ -740,7 +770,7 @@ describe("GridCharacter", () => {
           "##",
         ]),
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       gridCharacter = new GridCharacter("player", {
         tilemap: gridTilemap,
@@ -784,7 +814,7 @@ describe("GridCharacter", () => {
             "...",
           ]),
           "ge_collide",
-          CollisionStrategy.BLOCK_TWO_TILES
+          CollisionStrategy.BLOCK_TWO_TILES,
         );
         gridCharacter = new GridCharacter("player", {
           tilemap: gridTilemap,
@@ -809,7 +839,7 @@ describe("GridCharacter", () => {
             "....",
           ]),
           "ge_collide",
-          CollisionStrategy.BLOCK_TWO_TILES
+          CollisionStrategy.BLOCK_TWO_TILES,
         );
         gridCharacter = new GridCharacter("player", {
           tilemap: gridTilemap,
@@ -853,7 +883,7 @@ describe("GridCharacter", () => {
               },
             ]),
             "ge_collide",
-            CollisionStrategy.BLOCK_TWO_TILES
+            CollisionStrategy.BLOCK_TWO_TILES,
           );
           gridCharacter = new GridCharacter("player", {
             tilemap: gridTilemap,
@@ -872,11 +902,11 @@ describe("GridCharacter", () => {
           gridTilemap.setTransition(
             new Vector2(charPosX + 1, charPosY),
             "lowerCharLayer",
-            "testCharLayer"
+            "testCharLayer",
           );
 
           expect(gridCharacter.isBlockingDirection(Direction.RIGHT)).toBe(true);
-        }
+        },
       );
 
       it("should block when blocking tiles in multi-tile radius y", () => {
@@ -888,7 +918,7 @@ describe("GridCharacter", () => {
             "#...",
           ]),
           "ge_collide",
-          CollisionStrategy.BLOCK_TWO_TILES
+          CollisionStrategy.BLOCK_TWO_TILES,
         );
         gridCharacter = new GridCharacter("player", {
           tilemap: gridTilemap,
@@ -913,7 +943,7 @@ describe("GridCharacter", () => {
             "....",
           ]),
           "ge_collide",
-          CollisionStrategy.BLOCK_TWO_TILES
+          CollisionStrategy.BLOCK_TWO_TILES,
         );
         gridCharacter = new GridCharacter("player", {
           tilemap: gridTilemap,
@@ -948,7 +978,7 @@ describe("GridCharacter", () => {
             collisionGroups: ["cGroup1"],
             tileWidth: 2,
             tileHeight: 2,
-          }
+          },
         );
         const blockingChar = new GridCharacter("blocker", {
           tilemap: gridTilemap,
@@ -984,7 +1014,7 @@ describe("GridCharacter", () => {
           {
             collidesWithTiles: false,
             collisionGroups: ["cGroup1"],
-          }
+          },
         );
         const blockingChar = new GridCharacter("blocker", {
           tilemap: gridTilemap,
@@ -1100,7 +1130,7 @@ describe("GridCharacter", () => {
         "..",
       ]),
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     gridCharacter = new GridCharacter("player", {
       tilemap: gridTilemap,
@@ -1152,7 +1182,7 @@ describe("GridCharacter", () => {
       expect(gridCharacter.hasCollisionGroup("collisionGroup1")).toBe(true);
       expect(gridCharacter.hasCollisionGroup("collisionGroup2")).toBe(true);
       expect(gridCharacter.hasCollisionGroup("unknownCollisionGroup")).toBe(
-        false
+        false,
       );
     });
 
