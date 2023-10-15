@@ -12,11 +12,11 @@ import {
   CharId,
   GridCharacter,
   PositionChange,
-} from "../../GridCharacter/GridCharacter";
-import { CharLayer, Position } from "../../GridEngine";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
-import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
+} from "../../GridCharacter/GridCharacter.js";
+import { CharLayer, Position } from "../../GridEngine.js";
+import { Vector2 } from "../../Utils/Vector2/Vector2.js";
+import { CollisionStrategy } from "../../Collisions/CollisionStrategy.js";
+import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm.js";
 
 export class CharBlockCache {
   private tilePosToCharacters: Map<string, Set<GridCharacter>> = new Map();
@@ -24,14 +24,14 @@ export class CharBlockCache {
 
   constructor(
     private collistionStrategy: CollisionStrategy,
-    private collisionGroupRelation?: Map<string, Set<string>>
+    private collisionGroupRelation?: Map<string, Set<string>>,
   ) {}
 
   isCharBlockingAt(
     pos: Vector2,
     layer: CharLayer,
     collisionGroups: string[],
-    exclude = new Set<CharId>()
+    exclude = new Set<CharId>(),
   ): boolean {
     if (collisionGroups.length === 0) return false;
     const posStr = this.posToString(pos, layer);
@@ -45,8 +45,8 @@ export class CharBlockCache {
           collisionGroups.some((group) =>
             char
               .getCollisionGroups()
-              .some((charCGroup) => this.collidesWith(group, charCGroup))
-          )
+              .some((charCGroup) => this.collidesWith(group, charCGroup)),
+          ),
         )
     );
   }
@@ -97,7 +97,7 @@ export class CharBlockCache {
   private charRemoved(charId: string): Observable<string> {
     return this.charRemoved$?.pipe(
       take(1),
-      filter((cId) => cId == charId)
+      filter((cId) => cId == charId),
     );
   }
 
@@ -106,7 +106,7 @@ export class CharBlockCache {
       .positionChangeStarted()
       .pipe(
         takeUntil(this.charRemoved(character.getId())),
-        this.posChangeToLayerPos()
+        this.posChangeToLayerPos(),
       )
       .subscribe((posChange) => {
         if (
@@ -123,7 +123,7 @@ export class CharBlockCache {
       .positionChangeFinished()
       .pipe(
         takeUntil(this.charRemoved(character.getId())),
-        this.posChangeToLayerPos()
+        this.posChangeToLayerPos(),
       )
       .subscribe((posChange) => {
         this.deleteTilePositions(posChange.exit, character);
@@ -139,7 +139,7 @@ export class CharBlockCache {
 
   private deleteTilePositions(
     pos: LayerVecPos,
-    character: GridCharacter
+    character: GridCharacter,
   ): void {
     this.forEachCharTile(pos, character, (x, y) => {
       this.tilePosToCharacters
@@ -151,7 +151,7 @@ export class CharBlockCache {
   private forEachCharTile(
     pos: LayerVecPos,
     character: GridCharacter,
-    fn: (x: number, y: number) => void
+    fn: (x: number, y: number) => void,
   ): void {
     const tilePos = pos.position;
     for (let x = tilePos.x; x < tilePos.x + character.getTileWidth(); x++) {
@@ -180,7 +180,7 @@ export class CharBlockCache {
             layer: posChange.exitLayer,
           },
         };
-      })
+      }),
     );
   }
 

@@ -1,4 +1,4 @@
-import { GridCharacter } from "../GridCharacter";
+import { GridCharacter } from "../GridCharacter.js";
 
 /**
  * Options for filtering characters.
@@ -54,7 +54,7 @@ export interface CharacterFilteringOptions {
 
 export function filterCharacters(
   characters: GridCharacter[],
-  options: CharacterFilteringOptions
+  options: CharacterFilteringOptions,
 ): GridCharacter[] {
   return characters.filter((gridChar: GridCharacter) => {
     if (options.labels?.withAllLabels) {

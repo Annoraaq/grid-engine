@@ -1,4 +1,4 @@
-import { Queue } from "./Queue";
+import { Queue } from "./Queue.js";
 
 describe("Queue", () => {
   it("has a size", () => {

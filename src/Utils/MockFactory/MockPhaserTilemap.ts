@@ -3,11 +3,11 @@ import {
   CostMapLayer,
   getBlockingProps,
   tileCostProps,
-} from "./MockFactory";
+} from "./MockFactory.js";
 
 export function createPhaserTilemapStub(
   blockMap: Map<string | undefined, string[]>,
-  costMap?: CostMapLayer[]
+  costMap?: CostMapLayer[],
 ): Phaser.Tilemaps.Tilemap {
   const game = new Phaser.Game({ type: Phaser.HEADLESS });
 
@@ -35,7 +35,7 @@ export function createPhaserTilemapStub(
 
 function parseBlockMap(
   blockMap: Map<string | undefined, string[]>,
-  costMap?: CostMapLayer[]
+  costMap?: CostMapLayer[],
 ): Phaser.Tilemaps.MapData {
   const layers: Phaser.Tilemaps.LayerData[] = [];
 
@@ -44,7 +44,7 @@ function parseBlockMap(
     const ld = createLayer(
       layerName,
       allRows,
-      costMap?.find((cm) => cm.layer === layerName)?.costMap
+      costMap?.find((cm) => cm.layer === layerName)?.costMap,
     );
     if (ld) {
       layers.push(ld);
@@ -74,7 +74,7 @@ function parseBlockMap(
 function createLayer(
   layerName: string | undefined,
   allRows: string[],
-  costMap?: CostMap
+  costMap?: CostMap,
 ) {
   const layerData = new Phaser.Tilemaps.LayerData({
     name: layerName,

@@ -1,7 +1,7 @@
-import { Direction } from "./../../Direction/Direction";
-import { DistanceUtils8 } from "./DistanceUtils8";
-import { Vector2 } from "../Vector2/Vector2";
-import { VectorUtils } from "../VectorUtils";
+import { Direction } from "./../../Direction/Direction.js";
+import { DistanceUtils8 } from "./DistanceUtils8.js";
+import { Vector2 } from "../Vector2/Vector2.js";
+import { VectorUtils } from "../VectorUtils.js";
 
 jest.mock("../VectorUtils");
 describe("DistanceUtils8", () => {
@@ -37,28 +37,28 @@ describe("DistanceUtils8", () => {
       const distanceUtils8 = new DistanceUtils8();
       const vector = new Vector2(3, -1);
       expect(distanceUtils8.direction(vector, new Vector2(2, -1))).toEqual(
-        Direction.LEFT
+        Direction.LEFT,
       );
       expect(distanceUtils8.direction(vector, new Vector2(4, -1))).toEqual(
-        Direction.RIGHT
+        Direction.RIGHT,
       );
       expect(distanceUtils8.direction(vector, new Vector2(3, -2))).toEqual(
-        Direction.UP
+        Direction.UP,
       );
       expect(distanceUtils8.direction(vector, new Vector2(3, 0))).toEqual(
-        Direction.DOWN
+        Direction.DOWN,
       );
       expect(distanceUtils8.direction(vector, new Vector2(2, 0))).toEqual(
-        Direction.DOWN_LEFT
+        Direction.DOWN_LEFT,
       );
       expect(distanceUtils8.direction(vector, new Vector2(4, 0))).toEqual(
-        Direction.DOWN_RIGHT
+        Direction.DOWN_RIGHT,
       );
       expect(distanceUtils8.direction(vector, new Vector2(2, -2))).toEqual(
-        Direction.UP_LEFT
+        Direction.UP_LEFT,
       );
       expect(distanceUtils8.direction(vector, new Vector2(4, -2))).toEqual(
-        Direction.UP_RIGHT
+        Direction.UP_RIGHT,
       );
     });
   });

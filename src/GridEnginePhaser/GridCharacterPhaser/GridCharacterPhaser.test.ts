@@ -1,15 +1,15 @@
-import { CharacterAnimation } from "./../../GridCharacter/CharacterAnimation/CharacterAnimation";
-import { trackEmit } from "../../Testing/Utils";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { GridCharacterPhaser } from "./GridCharacterPhaser";
+import { CharacterAnimation } from "./../../GridCharacter/CharacterAnimation/CharacterAnimation.js";
+import { trackEmit } from "../../Testing/Utils.js";
+import { Vector2 } from "../../Utils/Vector2/Vector2.js";
+import { GridCharacterPhaser } from "./GridCharacterPhaser.js";
 import * as Phaser from "phaser";
-import { Direction, NumberOfDirections } from "../../Direction/Direction";
-import { CharacterData, GridEngineHeadless } from "../../GridEngine";
-import { createSpriteMock } from "../../Utils/MockFactory/MockFactory";
+import { Direction, NumberOfDirections } from "../../Direction/Direction.js";
+import { CharacterData, GridEngineHeadless } from "../../GridEngine.js";
+import { createSpriteMock } from "../../Utils/MockFactory/MockFactory.js";
 import { take } from "rxjs/operators";
-import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap";
-import { GridTilemapPhaser } from "../GridTilemapPhaser/GridTilemapPhaser";
-import { createPhaserTilemapStub } from "../../Utils/MockFactory/MockPhaserTilemap";
+import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap.js";
+import { GridTilemapPhaser } from "../GridTilemapPhaser/GridTilemapPhaser.js";
+import { createPhaserTilemapStub } from "../../Utils/MockFactory/MockPhaserTilemap.js";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -43,7 +43,7 @@ describe("GridCharacterPhaser", () => {
   function createChar(
     charData: Partial<CharacterData>,
     layerOverlay: boolean,
-    isometric?: boolean
+    isometric?: boolean,
   ): {
     gridCharPhaser: GridCharacterPhaser;
     gridTilemapPhaser: GridTilemapPhaser;
@@ -81,7 +81,7 @@ describe("GridCharacterPhaser", () => {
             ".....",
           ],
         ],
-      ])
+      ]),
     );
     if (isometric) {
       tm.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC.toString();
@@ -98,7 +98,7 @@ describe("GridCharacterPhaser", () => {
         sceneMock,
         gridTilemap,
         layerOverlay,
-        gridEngineHeadless
+        gridEngineHeadless,
       ),
       gridTilemapPhaser: gridTilemap,
     };
@@ -140,7 +140,7 @@ describe("GridCharacterPhaser", () => {
       expect(gridCharPhaser.getSprite()).toBe(spriteMock);
       expect(gridCharPhaser.getLayerOverlaySprite()).toBe(overlaySpriteMock);
       expect(gridCharPhaser.getWalkingAnimationMapping()).toBe(
-        walkingAnimationMock
+        walkingAnimationMock,
       );
       expect(gridCharPhaser.getContainer()).toBe(containerMock);
       expect(gridCharPhaser.getOffsetX()).toBe(5);
@@ -148,12 +148,12 @@ describe("GridCharacterPhaser", () => {
 
       expect(spriteMock.setOrigin).toHaveBeenCalledWith(0, 0);
       expect(gridCharPhaser.getAnimation()?.getWalkingAnimationMapping()).toBe(
-        walkingAnimationMock
+        walkingAnimationMock,
       );
       expect(gridCharPhaser.getAnimation()?.getCharsInRow()).toBe(
         spriteMock.texture.source[0].width /
           spriteMock.width /
-          CharacterAnimation.FRAMES_CHAR_ROW
+          CharacterAnimation.FRAMES_CHAR_ROW,
       );
 
       // should set pixel position
@@ -186,7 +186,7 @@ describe("GridCharacterPhaser", () => {
         0,
         0,
         overlaySpriteMock.displayWidth,
-        spriteMock.height - (tileHeight * scale) / overlaySpriteMock.scale
+        spriteMock.height - (tileHeight * scale) / overlaySpriteMock.scale,
       );
       expect(overlaySpriteMock.setOrigin).toHaveBeenCalledWith(0, 0);
     });
@@ -259,7 +259,7 @@ describe("GridCharacterPhaser", () => {
         0,
         0,
         overlaySpriteMock.displayWidth,
-        newSpriteMock.height - (tileHeight * scale) / overlaySpriteMock.scale
+        newSpriteMock.height - (tileHeight * scale) / overlaySpriteMock.scale,
       );
       expect(overlaySpriteMock.setOrigin).toHaveBeenCalledWith(0, 0);
     });
@@ -510,7 +510,7 @@ describe("GridCharacterPhaser", () => {
       it("should update sprite pixel pos diagonally", () => {
         const { gridCharPhaser } = createChar(
           { ...charData, numberOfDirections: NumberOfDirections.EIGHT },
-          false
+          false,
         );
         gridEngineHeadless.setSpeed("charID", 1);
         gridEngineHeadless.setPosition("charID", charTilePos, "lowerCharLayer");
@@ -598,7 +598,7 @@ describe("GridCharacterPhaser", () => {
         const { gridCharPhaser, gridTilemapPhaser } = createChar(
           { ...charData, numberOfDirections: NumberOfDirections.EIGHT },
           false,
-          true
+          true,
         );
         gridEngineHeadless.setSpeed("charID", 1);
         gridEngineHeadless.setPosition("charID", charTilePos, "lowerCharLayer");
@@ -620,7 +620,7 @@ describe("GridCharacterPhaser", () => {
         const { gridCharPhaser, gridTilemapPhaser } = createChar(
           { ...charData, numberOfDirections: NumberOfDirections.EIGHT },
           false,
-          true
+          true,
         );
         gridEngineHeadless.setSpeed("charID", 1);
         gridEngineHeadless.setPosition("charID", charTilePos, "lowerCharLayer");
@@ -712,7 +712,7 @@ describe("GridCharacterPhaser", () => {
         gridEngineHeadless.setTransition(
           new Vector2(posAbove),
           "testCharLayer",
-          "lowerCharLayer"
+          "lowerCharLayer",
         );
 
         gridEngineHeadless.move("charID", Direction.UP);
@@ -752,7 +752,7 @@ describe("GridCharacterPhaser", () => {
     it("should not turn if moving", () => {
       gridEngineHeadless.move("charID", Direction.DOWN);
       const hasEmitted = trackEmit(
-        gridCharPhaser.getAnimation()?.frameChange()
+        gridCharPhaser.getAnimation()?.frameChange(),
       );
       gridCharPhaser.turnTowards(Direction.LEFT);
       expect(hasEmitted()).toBe(false);
@@ -760,7 +760,7 @@ describe("GridCharacterPhaser", () => {
 
     it("should not turn if direction NONE", () => {
       const hasEmitted = trackEmit(
-        gridCharPhaser.getAnimation()?.frameChange()
+        gridCharPhaser.getAnimation()?.frameChange(),
       );
       gridCharPhaser.turnTowards(Direction.NONE);
       expect(hasEmitted()).toBe(false);
@@ -779,7 +779,7 @@ describe("GridCharacterPhaser", () => {
               "..",
             ],
           ],
-        ])
+        ]),
       );
       const startPos = { x: 2, y: 2 };
       const charData = {
@@ -800,7 +800,7 @@ describe("GridCharacterPhaser", () => {
         sceneMock,
         gridTilemap,
         false,
-        gridEngineHeadless
+        gridEngineHeadless,
       );
 
       const upStandingFrame = 37;
@@ -833,10 +833,10 @@ describe("GridCharacterPhaser", () => {
 function checkSpriteDepth(
   spriteMock,
   charLayerDepth: number,
-  zeroPrefix: string
+  zeroPrefix: string,
 ) {
   const pixelDepth = spriteMock.y + spriteMock.displayHeight;
   expect(spriteMock.setDepth).toHaveBeenCalledWith(
-    +`${charLayerDepth}.${zeroPrefix}${pixelDepth}`
+    +`${charLayerDepth}.${zeroPrefix}${pixelDepth}`,
   );
 }

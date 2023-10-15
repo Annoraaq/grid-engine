@@ -1,12 +1,12 @@
-import { CollisionStrategy } from "./../../Collisions/CollisionStrategy";
-import { Direction, NumberOfDirections } from "./../../Direction/Direction";
-import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { CharBlockCache } from "./CharBlockCache";
-import { GridTilemap } from "../GridTilemap";
-import { mockLayeredBlockMap } from "../../Utils/MockFactory/MockFactory";
-import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
-import { Tilemap } from "../Tilemap";
+import { CollisionStrategy } from "./../../Collisions/CollisionStrategy.js";
+import { Direction, NumberOfDirections } from "./../../Direction/Direction.js";
+import { GridCharacter } from "../../GridCharacter/GridCharacter.js";
+import { Vector2 } from "../../Utils/Vector2/Vector2.js";
+import { CharBlockCache } from "./CharBlockCache.js";
+import { GridTilemap } from "../GridTilemap.js";
+import { mockLayeredBlockMap } from "../../Utils/MockFactory/MockFactory.js";
+import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm.js";
+import { Tilemap } from "../Tilemap.js";
 
 describe("CharBlockCache", () => {
   let charBlockCache: CharBlockCache;
@@ -29,7 +29,7 @@ describe("CharBlockCache", () => {
     gridTilemap = new GridTilemap(
       createTilemap(),
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     gridTilemap.setTransition(new Vector2(4, 3), "someLayer", "enterLayer");
     charBlockCache = new CharBlockCache(CollisionStrategy.BLOCK_TWO_TILES);
@@ -44,32 +44,32 @@ describe("CharBlockCache", () => {
     const hasBlockingCharOnOldPos = charBlockCache.isCharBlockingAt(
       new Vector2(3, 3),
       "someLayer",
-      ["cGroup1"]
+      ["cGroup1"],
     );
     const hasBlockingCharOnOldPosTileWidth = charBlockCache.isCharBlockingAt(
       new Vector2(7, 4),
       "someLayer",
-      ["cGroup1"]
+      ["cGroup1"],
     );
     const hasBlockingCharOnOldPosOtherLayer = charBlockCache.isCharBlockingAt(
       new Vector2(3, 3),
       "otherLayer",
-      ["cGroup1"]
+      ["cGroup1"],
     );
     const hasBlockingCharOnOldPosOtherCGroup = charBlockCache.isCharBlockingAt(
       new Vector2(3, 3),
       "someLayer",
-      ["unknownCGroup"]
+      ["unknownCGroup"],
     );
     const hasBlockingCharOnOldPosNoCGroup = charBlockCache.isCharBlockingAt(
       new Vector2(3, 3),
       "someLayer",
-      []
+      [],
     );
     const hasBlockingCharOnNextPos = charBlockCache.isCharBlockingAt(
       new Vector2(8, 4),
       "enterLayer",
-      ["cGroup1"]
+      ["cGroup1"],
     );
     expect(hasBlockingCharOnOldPos).toBe(true);
     expect(hasBlockingCharOnOldPosTileWidth).toBe(true);
@@ -86,7 +86,7 @@ describe("CharBlockCache", () => {
         ["cGroup1", new Set(["cGroup1", "cGroup2"])],
         ["cGroup2", new Set(["cGroup1"])],
         ["cGroup3", new Set([])],
-      ])
+      ]),
     );
 
     const layer = "someLayer";
@@ -121,24 +121,24 @@ describe("CharBlockCache", () => {
       charBlockCache.isCharBlockingAt(
         cGroup1Char.getTilePos().position,
         layer,
-        ["cGroup1"]
-      )
+        ["cGroup1"],
+      ),
     ).toBe(true);
     // 2 => 1
     expect(
       charBlockCache.isCharBlockingAt(
         cGroup1Char.getTilePos().position,
         layer,
-        ["cGroup2"]
-      )
+        ["cGroup2"],
+      ),
     ).toBe(true);
     // 3 => 1
     expect(
       charBlockCache.isCharBlockingAt(
         cGroup1Char.getTilePos().position,
         layer,
-        ["cGroup3"]
-      )
+        ["cGroup3"],
+      ),
     ).toBe(false);
 
     // 1 => 2
@@ -146,8 +146,8 @@ describe("CharBlockCache", () => {
       charBlockCache.isCharBlockingAt(
         cGroup2Char.getTilePos().position,
         layer,
-        ["cGroup1"]
-      )
+        ["cGroup1"],
+      ),
     ).toBe(true);
 
     // 2 => 2
@@ -155,8 +155,8 @@ describe("CharBlockCache", () => {
       charBlockCache.isCharBlockingAt(
         cGroup2Char.getTilePos().position,
         layer,
-        ["cGroup2"]
-      )
+        ["cGroup2"],
+      ),
     ).toBe(false);
 
     // 3 => 2
@@ -164,8 +164,8 @@ describe("CharBlockCache", () => {
       charBlockCache.isCharBlockingAt(
         cGroup2Char.getTilePos().position,
         layer,
-        ["cGroup3"]
-      )
+        ["cGroup3"],
+      ),
     ).toBe(false);
 
     // 1 => 3
@@ -173,8 +173,8 @@ describe("CharBlockCache", () => {
       charBlockCache.isCharBlockingAt(
         cGroup3Char.getTilePos().position,
         layer,
-        ["cGroup1"]
-      )
+        ["cGroup1"],
+      ),
     ).toBe(false);
 
     // 2 => 3
@@ -182,8 +182,8 @@ describe("CharBlockCache", () => {
       charBlockCache.isCharBlockingAt(
         cGroup3Char.getTilePos().position,
         layer,
-        ["cGroup2"]
-      )
+        ["cGroup2"],
+      ),
     ).toBe(false);
 
     // 3 => 3
@@ -191,8 +191,8 @@ describe("CharBlockCache", () => {
       charBlockCache.isCharBlockingAt(
         cGroup3Char.getTilePos().position,
         layer,
-        ["cGroup3"]
-      )
+        ["cGroup3"],
+      ),
     ).toBe(false);
   });
 
@@ -201,7 +201,7 @@ describe("CharBlockCache", () => {
       gridTilemap = new GridTilemap(
         createTilemap(),
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       gridTilemap.setTransition(new Vector2(4, 3), "someLayer", "enterLayer");
       charBlockCache = new CharBlockCache(CollisionStrategy.BLOCK_TWO_TILES);
@@ -217,7 +217,7 @@ describe("CharBlockCache", () => {
       const oldPosTileWidth = {
         position: new Vector2(
           3 + char.getTileWidth() - 1,
-          3 + char.getTileHeight() - 1
+          3 + char.getTileHeight() - 1,
         ),
         layer: "someLayer",
       };
@@ -225,7 +225,7 @@ describe("CharBlockCache", () => {
       const nextPosTileWidth = {
         position: new Vector2(
           4 + char.getTileWidth() - 1,
-          3 + char.getTileHeight() - 1
+          3 + char.getTileHeight() - 1,
         ),
         layer: "enterLayer",
       };
@@ -246,7 +246,7 @@ describe("CharBlockCache", () => {
       const oldPosTileWidth = {
         position: new Vector2(
           3 + char.getTileWidth() - 1,
-          3 + char.getTileHeight() - 1
+          3 + char.getTileHeight() - 1,
         ),
         layer: "someLayer",
       };
@@ -269,7 +269,7 @@ describe("CharBlockCache", () => {
       const oldPosTileWidth = {
         position: new Vector2(
           3 + char.getTileWidth() - 1,
-          3 + char.getTileHeight() - 1
+          3 + char.getTileHeight() - 1,
         ),
         layer: "someLayer",
       };
@@ -277,7 +277,7 @@ describe("CharBlockCache", () => {
       const newPosTileWidth = {
         position: new Vector2(
           6 + char.getTileWidth() - 1,
-          6 + char.getTileHeight() - 1
+          6 + char.getTileHeight() - 1,
         ),
         layer: "someLayer",
       };
@@ -285,7 +285,7 @@ describe("CharBlockCache", () => {
       const nextPosTileWidth = {
         position: new Vector2(
           4 + char.getTileWidth() - 1,
-          3 + char.getTileHeight() - 1
+          3 + char.getTileHeight() - 1,
         ),
         layer: "enterLayer",
       };
@@ -304,11 +304,11 @@ describe("CharBlockCache", () => {
       gridTilemap = new GridTilemap(
         createTilemap(),
         "ge_collide",
-        CollisionStrategy.BLOCK_ONE_TILE_AHEAD
+        CollisionStrategy.BLOCK_ONE_TILE_AHEAD,
       );
       gridTilemap.setTransition(new Vector2(4, 3), "someLayer", "enterLayer");
       charBlockCache = new CharBlockCache(
-        CollisionStrategy.BLOCK_ONE_TILE_AHEAD
+        CollisionStrategy.BLOCK_ONE_TILE_AHEAD,
       );
     });
 
@@ -322,7 +322,7 @@ describe("CharBlockCache", () => {
       const oldPosTileWidth = {
         position: new Vector2(
           3 + char.getTileWidth() - 1,
-          3 + char.getTileHeight() - 1
+          3 + char.getTileHeight() - 1,
         ),
         layer: "someLayer",
       };
@@ -330,7 +330,7 @@ describe("CharBlockCache", () => {
       const nextPosTileWidth = {
         position: new Vector2(
           4 + char.getTileWidth() - 1,
-          3 + char.getTileHeight() - 1
+          3 + char.getTileHeight() - 1,
         ),
         layer: "enterLayer",
       };
@@ -361,7 +361,7 @@ describe("CharBlockCache", () => {
     const oldPosTileWidth = {
       position: new Vector2(
         3 + char1.getTileWidth() - 1,
-        3 + char1.getTileHeight() - 1
+        3 + char1.getTileHeight() - 1,
       ),
       layer: "someLayer",
     };
@@ -382,7 +382,7 @@ describe("CharBlockCache", () => {
     const oldPosTileWidth = {
       position: new Vector2(
         3 + char1.getTileWidth() - 1,
-        3 + char1.getTileHeight() - 1
+        3 + char1.getTileHeight() - 1,
       ),
       layer: "someLayer",
     };
@@ -410,19 +410,19 @@ describe("CharBlockCache", () => {
     charBlockCache.addCharacter(charNoLayer);
 
     expect(
-      charBlockCache.getCharactersAt(new Vector2(3, 3), "someLayer")
+      charBlockCache.getCharactersAt(new Vector2(3, 3), "someLayer"),
     ).toContain(char1);
     expect(
-      charBlockCache.getCharactersAt(new Vector2(3, 3), "someLayer")
+      charBlockCache.getCharactersAt(new Vector2(3, 3), "someLayer"),
     ).toContain(char2);
     expect(
-      charBlockCache.getCharactersAt(new Vector2(3, 3), "otherLayer")
+      charBlockCache.getCharactersAt(new Vector2(3, 3), "otherLayer"),
     ).toContain(charDifferentLayer);
     expect(
-      charBlockCache.getCharactersAt(new Vector2(5, 5), "someLayer").size
+      charBlockCache.getCharactersAt(new Vector2(5, 5), "someLayer").size,
     ).toBe(0);
     expect(charBlockCache.getCharactersAt(new Vector2(3, 3))).toContain(
-      charNoLayer
+      charNoLayer,
     );
   });
 
@@ -443,14 +443,14 @@ describe("CharBlockCache", () => {
     const char1PosTileWidth = {
       position: new Vector2(
         0 + char1.getTileWidth() - 1,
-        1 + char1.getTileHeight() - 1
+        1 + char1.getTileHeight() - 1,
       ),
       layer: "someLayer",
     };
     const char2PosTileWidth = {
       position: new Vector2(
         10 + char1.getTileWidth() - 1,
-        2 + char1.getTileHeight() - 1
+        2 + char1.getTileHeight() - 1,
       ),
       layer: "someLayer",
     };
@@ -472,7 +472,7 @@ describe("CharBlockCache", () => {
     expect(
       charBlockCache.isCharBlockingAt(new Vector2(4, 3), "enterLayer", [
         "cGroup1",
-      ])
+      ]),
     ).toBe(false);
   });
 
@@ -487,7 +487,7 @@ describe("CharBlockCache", () => {
     expect(
       charBlockCache.isCharBlockingAt(new Vector2(4, 3), "enterLayer", [
         "cGroup1",
-      ])
+      ]),
     ).toBe(false);
   });
 
@@ -501,7 +501,7 @@ describe("CharBlockCache", () => {
     const oldPosTileWidth = {
       position: new Vector2(
         3 + char.getTileWidth() - 1,
-        3 + char.getTileHeight() - 1
+        3 + char.getTileHeight() - 1,
       ),
       layer: "someLayer",
     };
@@ -512,7 +512,7 @@ describe("CharBlockCache", () => {
   function createChar(
     id = "player",
     tileWidth = 5,
-    tileHeight = 2
+    tileHeight = 2,
   ): GridCharacter {
     const char = new GridCharacter(id, {
       tilemap: gridTilemap,
@@ -535,7 +535,7 @@ describe("CharBlockCache", () => {
       pos.position,
       pos.layer,
       ["cGroup1"],
-      new Set(exclude)
+      new Set(exclude),
     );
   }
 });

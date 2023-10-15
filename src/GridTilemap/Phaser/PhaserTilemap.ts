@@ -1,6 +1,6 @@
-import { TileLayer, Orientation, Tile, Tilemap } from "../Tilemap";
-import { PhaserTile } from "./PhaserTile";
-import { PhaserTileLayer } from "./PhaserTileLayer";
+import { TileLayer, Orientation, Tile, Tilemap } from "../Tilemap.js";
+import { PhaserTile } from "./PhaserTile.js";
+import { PhaserTileLayer } from "./PhaserTileLayer.js";
 
 export interface TiledProject {
   propertyTypes: Array<{
@@ -18,12 +18,12 @@ export interface TiledProject {
 export class PhaserTilemap implements Tilemap {
   constructor(
     private phaserTilemap: Phaser.Tilemaps.Tilemap,
-    private tiledProject?: TiledProject
+    private tiledProject?: TiledProject,
   ) {
     for (const l of this.phaserTilemap.layers) {
       if (l.tilemapLayer == null) {
         throw new Error(
-          `Error initializing tilemap. Layer '${l.name}' has no 'tilemapLayer'. This can happen if you call 'createLayer' with the wrong layer ID.`
+          `Error initializing tilemap. Layer '${l.name}' has no 'tilemapLayer'. This can happen if you call 'createLayer' with the wrong layer ID.`,
         );
       }
     }
@@ -59,7 +59,7 @@ export class PhaserTilemap implements Tilemap {
 
   getLayers(): TileLayer[] {
     return this.phaserTilemap.layers.map(
-      (l) => new PhaserTileLayer(l.tilemapLayer, this.tiledProject)
+      (l) => new PhaserTileLayer(l.tilemapLayer, this.tiledProject),
     );
   }
 

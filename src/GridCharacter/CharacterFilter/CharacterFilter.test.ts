@@ -1,15 +1,15 @@
-import { NumberOfDirections } from "../../Direction/Direction";
-import { CollisionStrategy } from "../../GridEngineHeadless";
-import { GridTilemap } from "../../GridTilemap/GridTilemap";
-import { mockLayeredBlockMap } from "../../Utils/MockFactory/MockFactory";
-import { GridCharacter } from "../GridCharacter";
-import { filterCharacters } from "./CharacterFilter";
+import { NumberOfDirections } from "../../Direction/Direction.js";
+import { CollisionStrategy } from "../../GridEngineHeadless.js";
+import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
+import { mockLayeredBlockMap } from "../../Utils/MockFactory/MockFactory.js";
+import { GridCharacter } from "../GridCharacter.js";
+import { filterCharacters } from "./CharacterFilter.js";
 
 describe("CharacterFilter", () => {
   function createChar(
     id: string,
     tilemap: GridTilemap,
-    labels: string[]
+    labels: string[],
   ): GridCharacter {
     return new GridCharacter(id, {
       tilemap,
@@ -34,7 +34,7 @@ describe("CharacterFilter", () => {
     const gridTilemap = new GridTilemap(
       tm,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const char1 = createChar("player1", gridTilemap, ["label1", "label2"]);
     const char2 = createChar("player2", gridTilemap, ["label2"]);
@@ -46,19 +46,19 @@ describe("CharacterFilter", () => {
     expect(
       filterCharacters(characters, {
         labels: { withOneOfLabels: ["label1", "label2"] },
-      })
+      }),
     ).toEqual([char1, char2]);
 
     expect(
       filterCharacters(characters, {
         labels: { withAllLabels: ["label1", "label2"] },
-      })
+      }),
     ).toEqual([char1]);
 
     expect(
       filterCharacters(characters, {
         labels: { withNoneLabels: ["label1", "label2"] },
-      })
+      }),
     ).toEqual([char3]);
 
     expect(
@@ -68,7 +68,7 @@ describe("CharacterFilter", () => {
           withOneOfLabels: ["label1", "label2"],
           withNoneLabels: ["label1", "label2"],
         },
-      })
+      }),
     ).toEqual([char1]);
 
     expect(
@@ -77,7 +77,7 @@ describe("CharacterFilter", () => {
           withOneOfLabels: ["label1", "label2"],
           withNoneLabels: ["label1", "label2"],
         },
-      })
+      }),
     ).toEqual([char1, char2]);
 
     expect(
@@ -86,7 +86,7 @@ describe("CharacterFilter", () => {
           withAllLabels: ["label1", "label2"],
           withNoneLabels: ["label1", "label2"],
         },
-      })
+      }),
     ).toEqual([char1]);
   });
 });

@@ -1,6 +1,6 @@
-import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
-import { NumberOfDirections } from "../../Direction/Direction";
-import { GridTilemap } from "../../GridTilemap/GridTilemap";
+import { CollisionStrategy } from "../../Collisions/CollisionStrategy.js";
+import { NumberOfDirections } from "../../Direction/Direction.js";
+import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
 import {
   COLLISION_GROUP,
   createAllowedFn,
@@ -9,18 +9,18 @@ import {
   mockCharMap,
   mockLayeredBlockMap,
   mockRandomMap,
-} from "../../Utils/MockFactory/MockFactory";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { BidirectionalSearch } from "./BidirectionalSearch";
+} from "../../Utils/MockFactory/MockFactory.js";
+import { Vector2 } from "../../Utils/Vector2/Vector2.js";
+import { BidirectionalSearch } from "./BidirectionalSearch.js";
 
 function createTilemap(
-  layers: Array<{ blockMap: string[]; layer: string | undefined }>
+  layers: Array<{ blockMap: string[]; layer: string | undefined }>,
 ) {
   const tm = mockLayeredBlockMap(layers);
   const gridTilemap = new GridTilemap(
     tm,
     "ge_collide",
-    CollisionStrategy.BLOCK_TWO_TILES
+    CollisionStrategy.BLOCK_TWO_TILES,
   );
   mockCharMap(gridTilemap, layers);
   return gridTilemap;
@@ -42,7 +42,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 0))
+      layerPos(new Vector2(1, 0)),
     );
 
     expect(shortestPath.path).toEqual([layerPos(new Vector2(1, 0))]);
@@ -63,7 +63,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([]);
@@ -85,7 +85,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -122,7 +122,7 @@ describe("BidirectionalSearch", () => {
 
       const shortestPath = algo.findShortestPath(
         layerPos(new Vector2(1, 1)),
-        layerPos(new Vector2(3, 6))
+        layerPos(new Vector2(3, 6)),
       );
 
       expect(shortestPath.closestToTarget).toBeUndefined();
@@ -152,7 +152,7 @@ describe("BidirectionalSearch", () => {
 
       const shortestPath = algo.findShortestPath(
         layerPos(new Vector2(2, 2)),
-        layerPos(new Vector2(2, 4))
+        layerPos(new Vector2(2, 4)),
       );
 
       expect(shortestPath.closestToTarget).toBeUndefined();
@@ -180,7 +180,7 @@ describe("BidirectionalSearch", () => {
 
       const shortestPath = algo.findShortestPath(
         layerPos(new Vector2(2, 1)),
-        layerPos(new Vector2(2, 4))
+        layerPos(new Vector2(2, 4)),
       );
 
       expect(shortestPath.closestToTarget).toBeUndefined();
@@ -209,7 +209,7 @@ describe("BidirectionalSearch", () => {
 
       const shortestPath = algo.findShortestPath(
         layerPos(new Vector2(2, 1)),
-        layerPos(new Vector2(2, 4))
+        layerPos(new Vector2(2, 4)),
       );
 
       expect(shortestPath.closestToTarget).toBeUndefined();
@@ -235,7 +235,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 1)),
-      layerPos(new Vector2(3, 3))
+      layerPos(new Vector2(3, 3)),
     );
 
     expect(shortestPath.closestToTarget).toEqual(layerPos(new Vector2(3, 1)));
@@ -263,7 +263,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 1)),
-      layerPos(new Vector2(3, 3))
+      layerPos(new Vector2(3, 3)),
     );
 
     expect(shortestPath.closestToTarget).toEqual(layerPos(new Vector2(1, 1)));
@@ -290,7 +290,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 3))
+      layerPos(new Vector2(1, 3)),
     );
 
     expect(shortestPath.path).toEqual([]);
@@ -317,7 +317,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 3))
+      layerPos(new Vector2(1, 3)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -356,12 +356,12 @@ describe("BidirectionalSearch", () => {
     gridTilemap.setTransition(
       new Vector2(2, 0),
       "lowerCharLayer",
-      "testCharLayer"
+      "testCharLayer",
     );
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2), "testCharLayer")
+      layerPos(new Vector2(1, 2), "testCharLayer"),
     );
 
     expect(shortestPath.path).toEqual([
@@ -399,12 +399,12 @@ describe("BidirectionalSearch", () => {
     gridTilemap.setTransition(
       new Vector2(2, 2),
       "lowerCharLayer",
-      "testCharLayer"
+      "testCharLayer",
     );
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2), "testCharLayer")
+      layerPos(new Vector2(1, 2), "testCharLayer"),
     );
 
     expect(shortestPath.path).toEqual([
@@ -432,7 +432,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -463,7 +463,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(2, 1))
+      layerPos(new Vector2(2, 1)),
     );
 
     expect(shortestPath.path.length).toEqual(2);
@@ -493,7 +493,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(3, 2)),
-      layerPos(new Vector2(7, 6))
+      layerPos(new Vector2(7, 6)),
     );
 
     expect(shortestPath.path.length).toEqual(5);
@@ -523,7 +523,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(3, 2)),
-      layerPos(new Vector2(6, 5))
+      layerPos(new Vector2(6, 5)),
     );
     expect(shortestPath.path.length).toEqual(4);
   });
@@ -554,7 +554,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -586,7 +586,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -616,7 +616,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -644,7 +644,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -673,7 +673,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -701,7 +701,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path.length).toEqual(3);
@@ -725,7 +725,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path.length).toEqual(7);
@@ -751,7 +751,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path.length).toEqual(0);
@@ -776,7 +776,7 @@ describe("BidirectionalSearch", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path.length).toEqual(3);
@@ -788,12 +788,12 @@ describe("BidirectionalSearch", () => {
     const gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const algo = new BidirectionalSearch(gridTilemap);
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(150, 150)),
-      layerPos(new Vector2(250, 250))
+      layerPos(new Vector2(250, 250)),
     );
 
     expect(shortestPath.steps).toEqual(24288);
@@ -806,14 +806,14 @@ describe("BidirectionalSearch", () => {
     const gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const algo = new BidirectionalSearch(gridTilemap, {
       numberOfDirections: NumberOfDirections.EIGHT,
     });
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(150, 150)),
-      layerPos(new Vector2(250, 250))
+      layerPos(new Vector2(250, 250)),
     );
 
     expect(shortestPath.steps).toEqual(19821);

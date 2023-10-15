@@ -2,7 +2,7 @@ import {
   LayerVecPos,
   ShortestPathAlgorithm,
   ShortestPathResult,
-} from "../ShortestPathAlgorithm";
+} from "../ShortestPathAlgorithm.js";
 import { MinFibonacciHeap } from "mnemonist";
 import {
   Direction,
@@ -12,14 +12,14 @@ import {
   isVertical,
   NumberOfDirections,
   turnClockwise,
-} from "../../Direction/Direction";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils";
-import { DistanceUtilsFactory } from "../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
-import { DistanceUtils } from "../../Utils/DistanceUtils";
-import { GridTilemap } from "../../GridTilemap/GridTilemap";
-import { PathfindingOptions } from "../Pathfinding";
-import { VectorUtils } from "../../Utils/VectorUtils";
+} from "../../Direction/Direction.js";
+import { Vector2 } from "../../Utils/Vector2/Vector2.js";
+import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
+import { DistanceUtilsFactory } from "../../Utils/DistanceUtilsFactory/DistanceUtilsFactory.js";
+import { DistanceUtils } from "../../Utils/DistanceUtils.js";
+import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
+import { PathfindingOptions } from "../Pathfinding.js";
+import { VectorUtils } from "../../Utils/VectorUtils.js";
 
 interface ShortestPathTuple {
   previous: Map<string, LayerVecPos>;
@@ -66,7 +66,7 @@ export class Jps4 extends ShortestPathAlgorithm {
 
   findShortestPathImpl(
     startPos: LayerVecPos,
-    targetPos: LayerVecPos
+    targetPos: LayerVecPos,
   ): ShortestPathResult {
     this.maxJumpSize = this.distance(startPos.position, targetPos.position);
     const shortestPath = this.shortestPath(startPos, targetPos);
@@ -81,7 +81,7 @@ export class Jps4 extends ShortestPathAlgorithm {
 
   private shortestPath(
     startNode: LayerVecPos,
-    stopNode: LayerVecPos
+    stopNode: LayerVecPos,
   ): ShortestPathTuple {
     this.steps = 0;
     const previous = new Map<string, LayerVecPos>();
@@ -90,11 +90,11 @@ export class Jps4 extends ShortestPathAlgorithm {
     this.closestToTarget = startNode;
     this.smallestDistToTarget = this.distance(
       startNode.position,
-      stopNode.position
+      stopNode.position,
     );
 
     this.openSet = new MinFibonacciHeap(
-      (a, b) => safeGet(this.f, a) - safeGet(this.f, b)
+      (a, b) => safeGet(this.f, a) - safeGet(this.f, b),
     );
 
     this.openSet.push(startNode);
@@ -131,7 +131,7 @@ export class Jps4 extends ShortestPathAlgorithm {
       for (const neighbor of this.getNeighborsInternal(
         current,
         previous.get(LayerPositionUtils.toString(current)),
-        stopNode
+        stopNode,
       )) {
         const pStr = LayerPositionUtils.toString(neighbor.p);
         const tentativeG = safeGet(this.g, current) + neighbor.dist;
@@ -140,7 +140,7 @@ export class Jps4 extends ShortestPathAlgorithm {
           this.g.set(pStr, tentativeG);
           this.f.set(
             pStr,
-            tentativeG + this.distance(neighbor.p.position, stopNode.position)
+            tentativeG + this.distance(neighbor.p.position, stopNode.position),
           );
           this.openSet.push(neighbor.p);
         }
@@ -166,7 +166,7 @@ export class Jps4 extends ShortestPathAlgorithm {
   private getNeighborsInternal(
     node: LayerVecPos,
     parent: LayerVecPos | undefined,
-    stopNode: LayerVecPos
+    stopNode: LayerVecPos,
   ): { p: LayerVecPos; dist: number }[] {
     if (!parent || node.layer !== parent.layer) {
       return this.getNeighbors(node, stopNode).map((n) => ({ p: n, dist: 1 }));
@@ -175,7 +175,7 @@ export class Jps4 extends ShortestPathAlgorithm {
     const pruned = this.prune(parent, node).map((unblockedNeighbor) => {
       const transition = this.getTransition(
         unblockedNeighbor.position,
-        node.layer
+        node.layer,
       );
       return {
         position: unblockedNeighbor.position,
@@ -198,7 +198,7 @@ export class Jps4 extends ShortestPathAlgorithm {
     parent: LayerVecPos,
     node: LayerVecPos,
     stopNode: LayerVecPos,
-    dist: number
+    dist: number,
   ): { p: LayerVecPos; dist: number } | undefined {
     const dir = this.distanceUtils.direction(parent.position, node.position);
     if (
@@ -229,10 +229,10 @@ export class Jps4 extends ShortestPathAlgorithm {
       node,
       this.getTilePosInDir(
         node,
-        directionFromPos(parent.position, node.position)
+        directionFromPos(parent.position, node.position),
       ),
       stopNode,
-      dist + 1
+      dist + 1,
     );
   }
 
@@ -242,11 +242,11 @@ export class Jps4 extends ShortestPathAlgorithm {
     // if parent is more than one step away (jump), take the closest one:
     const newParent = this.posInDir(
       node,
-      this.distanceUtils.direction(node.position, parent.position)
+      this.distanceUtils.direction(node.position, parent.position),
     );
     const { topLeft, downLeft, top, bottom } = this.normalizedPositions(
       newParent,
-      node
+      node,
     );
 
     const blockOrTrans = (src: LayerVecPos, dest: LayerVecPos) => {
@@ -288,7 +288,7 @@ export class Jps4 extends ShortestPathAlgorithm {
 
   protected normalizedPositions(
     parent: LayerVecPos,
-    node: LayerVecPos
+    node: LayerVecPos,
   ): {
     topLeft: LayerVecPos;
     downLeft: LayerVecPos;
@@ -304,37 +304,37 @@ export class Jps4 extends ShortestPathAlgorithm {
       topLeft: this.posInDir(
         node,
         this.turnTimes.get(Direction.UP_LEFT)?.get(this.turnOrder[dir]) ||
-          Direction.UP_LEFT
+          Direction.UP_LEFT,
       ),
       downLeft: this.posInDir(
         node,
         this.turnTimes.get(Direction.DOWN_LEFT)?.get(this.turnOrder[dir]) ||
-          Direction.DOWN_LEFT
+          Direction.DOWN_LEFT,
       ),
       downRight: this.posInDir(
         node,
         this.turnTimes.get(Direction.DOWN_RIGHT)?.get(this.turnOrder[dir]) ||
-          Direction.DOWN_RIGHT
+          Direction.DOWN_RIGHT,
       ),
       topRight: this.posInDir(
         node,
         this.turnTimes.get(Direction.UP_RIGHT)?.get(this.turnOrder[dir]) ||
-          Direction.UP_RIGHT
+          Direction.UP_RIGHT,
       ),
       top: this.posInDir(
         node,
         this.turnTimes.get(Direction.UP)?.get(this.turnOrder[dir]) ||
-          Direction.UP
+          Direction.UP,
       ),
       bottom: this.posInDir(
         node,
         this.turnTimes.get(Direction.DOWN)?.get(this.turnOrder[dir]) ||
-          Direction.DOWN
+          Direction.DOWN,
       ),
       right: this.posInDir(
         node,
         this.turnTimes.get(Direction.RIGHT)?.get(this.turnOrder[dir]) ||
-          Direction.RIGHT
+          Direction.RIGHT,
       ),
     };
   }
@@ -349,7 +349,7 @@ export class Jps4 extends ShortestPathAlgorithm {
   private returnPath(
     previous: Map<string, LayerVecPos>,
     startNode: LayerVecPos,
-    stopNode: LayerVecPos
+    stopNode: LayerVecPos,
   ): LayerVecPos[] {
     const ret: LayerVecPos[] = [];
     let currentNode: LayerVecPos | undefined = stopNode;

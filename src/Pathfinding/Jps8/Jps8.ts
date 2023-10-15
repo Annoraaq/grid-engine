@@ -1,14 +1,14 @@
-import { directionFromPos, isDiagonal } from "../../Direction/Direction";
+import { directionFromPos, isDiagonal } from "../../Direction/Direction.js";
 import {
   Direction,
   NumberOfDirections,
   PathfindingOptions,
-} from "../../GridEngineHeadless";
-import { GridTilemap } from "../../GridTilemap/GridTilemap";
-import { DistanceUtilsFactory } from "../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
-import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils";
-import { Jps4 } from "../Jps4/Jps4";
-import { LayerVecPos } from "../ShortestPathAlgorithm";
+} from "../../GridEngineHeadless.js";
+import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
+import { DistanceUtilsFactory } from "../../Utils/DistanceUtilsFactory/DistanceUtilsFactory.js";
+import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
+import { Jps4 } from "../Jps4/Jps4.js";
+import { LayerVecPos } from "../ShortestPathAlgorithm.js";
 
 export class Jps8 extends Jps4 {
   constructor(gridTilemap: GridTilemap, po: PathfindingOptions = {}) {
@@ -23,7 +23,7 @@ export class Jps8 extends Jps4 {
 
     const newParent = this.posInDir(
       node,
-      this.distanceUtils.direction(node.position, parent.position)
+      this.distanceUtils.direction(node.position, parent.position),
     );
     const { topLeft, downLeft, top, bottom, topRight, downRight } =
       this.normalizedPositions(newParent, node);
@@ -113,7 +113,7 @@ export class Jps8 extends Jps4 {
   protected prune(parent: LayerVecPos, node: LayerVecPos): LayerVecPos[] {
     const { right, topRight, downRight } = this.normalizedPositions(
       parent,
-      node
+      node,
     );
     const forced = this.getForced(parent, node);
     const dir = directionFromPos(parent.position, node.position);
@@ -128,7 +128,7 @@ export class Jps8 extends Jps4 {
     parent: LayerVecPos,
     node: LayerVecPos,
     stopNode: LayerVecPos,
-    dist: number
+    dist: number,
   ): { p: LayerVecPos; dist: number } | undefined {
     const dir = this.distanceUtils.direction(parent.position, node.position);
     if (
@@ -160,7 +160,7 @@ export class Jps8 extends Jps4 {
           node,
           this.getTilePosInDir(node, Direction.UP),
           stopNode,
-          dist + 1
+          dist + 1,
         ) !== undefined
       ) {
         return { p: node, dist };
@@ -170,7 +170,7 @@ export class Jps8 extends Jps4 {
           node,
           this.getTilePosInDir(node, Direction.LEFT),
           stopNode,
-          dist + 1
+          dist + 1,
         ) !== undefined
       ) {
         return { p: node, dist };
@@ -181,7 +181,7 @@ export class Jps8 extends Jps4 {
           node,
           this.getTilePosInDir(node, Direction.DOWN),
           stopNode,
-          dist + 1
+          dist + 1,
         ) !== undefined
       ) {
         return { p: node, dist };
@@ -191,7 +191,7 @@ export class Jps8 extends Jps4 {
           node,
           this.getTilePosInDir(node, Direction.LEFT),
           stopNode,
-          dist + 1
+          dist + 1,
         ) !== undefined
       ) {
         return { p: node, dist };
@@ -202,7 +202,7 @@ export class Jps8 extends Jps4 {
           node,
           this.getTilePosInDir(node, Direction.UP),
           stopNode,
-          dist + 1
+          dist + 1,
         ) !== undefined
       ) {
         return { p: node, dist };
@@ -212,7 +212,7 @@ export class Jps8 extends Jps4 {
           node,
           this.getTilePosInDir(node, Direction.RIGHT),
           stopNode,
-          dist + 1
+          dist + 1,
         ) !== undefined
       ) {
         return { p: node, dist };
@@ -223,7 +223,7 @@ export class Jps8 extends Jps4 {
           node,
           this.getTilePosInDir(node, Direction.DOWN),
           stopNode,
-          dist + 1
+          dist + 1,
         ) !== undefined
       ) {
         return { p: node, dist };
@@ -233,7 +233,7 @@ export class Jps8 extends Jps4 {
           node,
           this.getTilePosInDir(node, Direction.RIGHT),
           stopNode,
-          dist + 1
+          dist + 1,
         ) !== undefined
       ) {
         return { p: node, dist };
@@ -244,10 +244,10 @@ export class Jps8 extends Jps4 {
       node,
       this.getTilePosInDir(
         node,
-        directionFromPos(parent.position, node.position)
+        directionFromPos(parent.position, node.position),
       ),
       stopNode,
-      dist + 1
+      dist + 1,
     );
   }
 }

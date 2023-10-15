@@ -1,16 +1,16 @@
-import { CollisionStrategy } from "./../Collisions/CollisionStrategy";
-import { GridCharacter } from "./../GridCharacter/GridCharacter";
-import { Vector2 } from "../Utils/Vector2/Vector2";
-import { Direction, NumberOfDirections } from "./../Direction/Direction";
-import { GridTilemap } from "./GridTilemap";
-import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
+import { CollisionStrategy } from "./../Collisions/CollisionStrategy.js";
+import { GridCharacter } from "./../GridCharacter/GridCharacter.js";
+import { Vector2 } from "../Utils/Vector2/Vector2.js";
+import { Direction, NumberOfDirections } from "./../Direction/Direction.js";
+import { GridTilemap } from "./GridTilemap.js";
+import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm.js";
 import {
   mockLayeredBlockMap,
   updateLayer,
-} from "../Utils/MockFactory/MockFactory";
-import { MockTilemap } from "../Utils/MockFactory/MockTilemap";
-import { Tilemap } from "./Tilemap";
-import { Rect } from "../Utils/Rect/Rect";
+} from "../Utils/MockFactory/MockFactory.js";
+import { MockTilemap } from "../Utils/MockFactory/MockTilemap.js";
+import { Tilemap } from "./Tilemap.js";
+import { Rect } from "../Utils/Rect/Rect.js";
 
 describe("GridTilemap", () => {
   let gridTilemap: GridTilemap;
@@ -38,7 +38,7 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
   });
 
@@ -73,23 +73,23 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tm,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     expect(
-      gridTilemap.hasBlockingTile(new Vector2(1, 0), "lowerCharLayer")
+      gridTilemap.hasBlockingTile(new Vector2(1, 0), "lowerCharLayer"),
     ).toBe(true);
     expect(
-      gridTilemap.hasBlockingTile(new Vector2(1, 1), "lowerCharLayer")
+      gridTilemap.hasBlockingTile(new Vector2(1, 1), "lowerCharLayer"),
     ).toBe(false);
     expect(
-      gridTilemap.hasBlockingTile(new Vector2(1, 1), "upperCharLayer")
+      gridTilemap.hasBlockingTile(new Vector2(1, 1), "upperCharLayer"),
     ).toBe(true);
     expect(
-      gridTilemap.hasBlockingTile(new Vector2(1, 1), "upperCharLayer")
+      gridTilemap.hasBlockingTile(new Vector2(1, 1), "upperCharLayer"),
     ).toBe(true);
     expect(
-      gridTilemap.hasBlockingTile(new Vector2(0, 1), "upperCharLayer")
+      gridTilemap.hasBlockingTile(new Vector2(0, 1), "upperCharLayer"),
     ).toBe(true);
   });
 
@@ -122,14 +122,14 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tm,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     expect(gridTilemap.hasNoTile(new Vector2(1, 1), "lowerCharLayer")).toBe(
-      true
+      true,
     );
     expect(gridTilemap.hasNoTile(new Vector2(1, 1), "upperCharLayer")).toBe(
-      false
+      false,
     );
   });
 
@@ -145,11 +145,11 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tm,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     expect(
-      gridTilemap.hasBlockingTile(new Vector2(0, 0), "lowerCharLayer")
+      gridTilemap.hasBlockingTile(new Vector2(0, 0), "lowerCharLayer"),
     ).toBe(false);
   });
 
@@ -157,7 +157,7 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       new MockTilemap(),
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const char1 = new GridCharacter("player1", {
       tilemap: gridTilemap,
@@ -216,7 +216,7 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const char1 = new GridCharacter("player1", {
       tilemap: gridTilemap,
@@ -236,7 +236,7 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const char1 = new GridCharacter("player1", {
       tilemap: gridTilemap,
@@ -263,7 +263,7 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     const char1 = new GridCharacter("player", {
@@ -282,7 +282,7 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     const char1 = new GridCharacter("player", {
@@ -306,11 +306,11 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(3, 4),
-      undefined
+      undefined,
     );
     expect(isBlockingTile).toBe(true);
   });
@@ -329,13 +329,13 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
       undefined,
-      true
+      true,
     );
     expect(isBlockingTile).toBe(false);
   });
@@ -349,11 +349,11 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tilemap,
       "custom_collides_prop",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
-      "charLayer1"
+      "charLayer1",
     );
     expect(isBlockingTile).toBe(true);
   });
@@ -373,27 +373,27 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
-      Direction.LEFT
+      Direction.LEFT,
     );
     const isBlockingRight = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
-      Direction.RIGHT
+      Direction.RIGHT,
     );
     const isBlockingUp = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
-      Direction.UP
+      Direction.UP,
     );
     const isBlockingDown = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
-      Direction.DOWN
+      Direction.DOWN,
     );
     expect(isBlockingLeft).toBe(true);
     expect(isBlockingRight).toBe(false);
@@ -416,27 +416,27 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
-      Direction.LEFT
+      Direction.LEFT,
     );
     const isBlockingRight = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
-      Direction.RIGHT
+      Direction.RIGHT,
     );
     const isBlockingUp = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
-      Direction.UP
+      Direction.UP,
     );
     const isBlockingDown = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
-      Direction.DOWN
+      Direction.DOWN,
     );
     expect(isBlockingLeft).toBe(false);
     expect(isBlockingRight).toBe(true);
@@ -459,27 +459,27 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
-      Direction.LEFT
+      Direction.LEFT,
     );
     const isBlockingRight = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
-      Direction.RIGHT
+      Direction.RIGHT,
     );
     const isBlockingUp = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
-      Direction.UP
+      Direction.UP,
     );
     const isBlockingDown = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
-      Direction.DOWN
+      Direction.DOWN,
     );
     expect(isBlockingLeft).toBe(true);
     expect(isBlockingRight).toBe(true);
@@ -502,27 +502,27 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const isBlockingLeft = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
-      Direction.LEFT
+      Direction.LEFT,
     );
     const isBlockingRight = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
-      Direction.RIGHT
+      Direction.RIGHT,
     );
     const isBlockingUp = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
-      Direction.UP
+      Direction.UP,
     );
     const isBlockingDown = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
       "test",
-      Direction.DOWN
+      Direction.DOWN,
     );
     expect(isBlockingLeft).toBe(true);
     expect(isBlockingRight).toBe(true);
@@ -553,17 +553,17 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const isBlockingTile = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
-      "charLayer1"
+      "charLayer1",
     );
     expect(isBlockingTile).toBe(true);
 
     const isBlockingTileUpperLayer = gridTilemap.hasBlockingTile(
       new Vector2(1, 1),
-      "charLayer2"
+      "charLayer2",
     );
     expect(isBlockingTileUpperLayer).toBe(false);
   });
@@ -582,7 +582,7 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const isBlocking = gridTilemap.hasBlockingTile(new Vector2(1, 1), "test");
     const hasNoTile = gridTilemap.hasNoTile(new Vector2(1, 1), "test");
@@ -594,7 +594,7 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     const char = new GridCharacter("player1", {
@@ -608,7 +608,7 @@ describe("GridTilemap", () => {
     gridTilemap.addCharacter(char);
 
     expect(
-      gridTilemap.hasBlockingChar(new Vector2(1, 1), "charLayer1", ["cGroup"])
+      gridTilemap.hasBlockingChar(new Vector2(1, 1), "charLayer1", ["cGroup"]),
     ).toBe(true);
   });
 
@@ -616,7 +616,7 @@ describe("GridTilemap", () => {
     gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     const char = new GridCharacter("player1", {
@@ -632,7 +632,7 @@ describe("GridTilemap", () => {
     const hasBlockingChar = gridTilemap.hasBlockingChar(
       new Vector2(0, 0),
       "charLayer1",
-      ["cGroup"]
+      ["cGroup"],
     );
     expect(hasBlockingChar).toBe(false);
   });
@@ -647,7 +647,7 @@ describe("GridTilemap", () => {
   it("should provide map direction", () => {
     expect(gridTilemap.toMapDirection(Direction.DOWN)).toEqual(Direction.DOWN);
     expect(gridTilemap.fromMapDirection(Direction.DOWN)).toEqual(
-      Direction.DOWN
+      Direction.DOWN,
     );
   });
 
@@ -688,12 +688,12 @@ describe("GridTilemap", () => {
             ],
           },
         ],
-        true
+        true,
       );
       gridTilemap = new GridTilemap(
         phaserTilemap,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
     });
 
@@ -703,10 +703,10 @@ describe("GridTilemap", () => {
 
     it("should provide map direction", () => {
       expect(gridTilemap.toMapDirection(Direction.DOWN)).toEqual(
-        Direction.DOWN_RIGHT
+        Direction.DOWN_RIGHT,
       );
       expect(gridTilemap.fromMapDirection(Direction.DOWN_RIGHT)).toEqual(
-        Direction.DOWN
+        Direction.DOWN,
       );
     });
   });
@@ -716,18 +716,18 @@ describe("GridTilemap", () => {
       gridTilemap = new GridTilemap(
         tilemap,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       gridTilemap.setTransition(new Vector2(4, 5), "charLayer2", "charLayer1");
       gridTilemap.setTransition(new Vector2(3, 5), "charLayer2", "charLayer1");
       expect(gridTilemap.getTransition(new Vector2(4, 5), "charLayer2")).toBe(
-        "charLayer1"
+        "charLayer1",
       );
       expect(gridTilemap.getTransition(new Vector2(3, 5), "charLayer2")).toBe(
-        "charLayer1"
+        "charLayer1",
       );
       expect(gridTilemap.getTransition(new Vector2(7, 5), "charLayer2")).toBe(
-        undefined
+        undefined,
       );
     });
 
@@ -737,7 +737,7 @@ describe("GridTilemap", () => {
       gridTilemap = new GridTilemap(
         tilemap,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       gridTilemap.setTransition(pos1, "charLayer2", "charLayer1");
       gridTilemap.setTransition(pos2, "charLayer2", "charLayer1");
@@ -745,11 +745,11 @@ describe("GridTilemap", () => {
       const expectedTransitions = new Map();
       expectedTransitions.set(
         pos1.toString(),
-        new Map([["charLayer2", "charLayer1"]])
+        new Map([["charLayer2", "charLayer1"]]),
       );
       expectedTransitions.set(
         pos2.toString(),
-        new Map([["charLayer2", "charLayer1"]])
+        new Map([["charLayer2", "charLayer1"]]),
       );
       expect(gridTilemap.getTransitions()).toEqual(expectedTransitions);
     });
@@ -773,23 +773,23 @@ describe("GridTilemap", () => {
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES,
       undefined,
-      true
+      true,
     );
 
     expect(
-      gridTilemap.hasBlockingTile(new Vector2(0, 0), "lowerCharLayer")
+      gridTilemap.hasBlockingTile(new Vector2(0, 0), "lowerCharLayer"),
     ).toBe(true);
     expect(
-      gridTilemap.hasBlockingTile(new Vector2(1, 1), "lowerCharLayer")
+      gridTilemap.hasBlockingTile(new Vector2(1, 1), "lowerCharLayer"),
     ).toBe(true);
     expect(
-      gridTilemap.hasBlockingTile(new Vector2(2, 1), "lowerCharLayer")
+      gridTilemap.hasBlockingTile(new Vector2(2, 1), "lowerCharLayer"),
     ).toBe(true);
     expect(
-      gridTilemap.hasBlockingTile(new Vector2(1, 2), "lowerCharLayer")
+      gridTilemap.hasBlockingTile(new Vector2(1, 2), "lowerCharLayer"),
     ).toBe(true);
     expect(
-      gridTilemap.hasBlockingTile(new Vector2(2, 2), "lowerCharLayer")
+      gridTilemap.hasBlockingTile(new Vector2(2, 2), "lowerCharLayer"),
     ).toBe(true);
 
     updateLayer(
@@ -801,25 +801,25 @@ describe("GridTilemap", () => {
         "....",
         "....",
       ],
-      "lowerCharLayer"
+      "lowerCharLayer",
     );
 
     gridTilemap.rebuildTileCollisionCache(new Rect(1, 1, 2, 1));
 
     expect(
-      gridTilemap.hasBlockingTile(new Vector2(0, 0), "lowerCharLayer")
+      gridTilemap.hasBlockingTile(new Vector2(0, 0), "lowerCharLayer"),
     ).toBe(true);
     expect(
-      gridTilemap.hasBlockingTile(new Vector2(1, 1), "lowerCharLayer")
+      gridTilemap.hasBlockingTile(new Vector2(1, 1), "lowerCharLayer"),
     ).toBe(false);
     expect(
-      gridTilemap.hasBlockingTile(new Vector2(2, 1), "lowerCharLayer")
+      gridTilemap.hasBlockingTile(new Vector2(2, 1), "lowerCharLayer"),
     ).toBe(false);
     expect(
-      gridTilemap.hasBlockingTile(new Vector2(1, 2), "lowerCharLayer")
+      gridTilemap.hasBlockingTile(new Vector2(1, 2), "lowerCharLayer"),
     ).toBe(true);
     expect(
-      gridTilemap.hasBlockingTile(new Vector2(2, 2), "lowerCharLayer")
+      gridTilemap.hasBlockingTile(new Vector2(2, 2), "lowerCharLayer"),
     ).toBe(true);
   });
 
@@ -847,7 +847,7 @@ describe("GridTilemap", () => {
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES,
       undefined,
-      true
+      true,
     );
 
     gridTilemap.fixCacheLayer("lowerCharLayer");
@@ -856,15 +856,15 @@ describe("GridTilemap", () => {
       gridTilemap.hasBlockingTile(
         new Vector2(1, 0),
         "lowerCharLayer",
-        undefined
-      )
+        undefined,
+      ),
     ).toBe(true);
     expect(
       gridTilemap.hasBlockingTile(
         new Vector2(1, 0),
         "upperCharLayer",
-        undefined
-      )
+        undefined,
+      ),
     ).toBe(true);
 
     gridTilemap.unfixCacheLayers();
@@ -873,15 +873,15 @@ describe("GridTilemap", () => {
       gridTilemap.hasBlockingTile(
         new Vector2(1, 0),
         "lowerCharLayer",
-        undefined
-      )
+        undefined,
+      ),
     ).toBe(true);
     expect(
       gridTilemap.hasBlockingTile(
         new Vector2(1, 0),
         "upperCharLayer",
-        undefined
-      )
+        undefined,
+      ),
     ).toBe(false);
   });
 
@@ -909,12 +909,12 @@ describe("GridTilemap", () => {
               [1, 1, 1],
             ],
           },
-        ]
+        ],
       );
       gridTilemap = new GridTilemap(
         tilemap,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       const pos = { position: new Vector2(1, 1), layer: "test" };
       expect(gridTilemap.getTileCosts(pos)).toBe(3);
@@ -964,12 +964,12 @@ describe("GridTilemap", () => {
               [1, 1, 1],
             ],
           },
-        ]
+        ],
       );
       gridTilemap = new GridTilemap(
         tilemap,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       const pos = { position: new Vector2(1, 1), layer: "test" };
       expect(gridTilemap.getTileCosts(pos)).toBe(1);
@@ -1006,12 +1006,12 @@ describe("GridTilemap", () => {
               [1, 1, 1],
             ],
           },
-        ]
+        ],
       );
       gridTilemap = new GridTilemap(
         tilemap,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       const pos = { position: new Vector2(1, 1), layer: "test" };
       expect(gridTilemap.getTileCosts(pos)).toBe(2);
@@ -1066,12 +1066,12 @@ describe("GridTilemap", () => {
               [1, 1, 1],
             ],
           },
-        ]
+        ],
       );
       gridTilemap = new GridTilemap(
         tilemap,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       const pos = { position: new Vector2(1, 1), layer: "test" };
       expect(gridTilemap.getTileCosts(pos)).toBe(20);
@@ -1085,7 +1085,10 @@ describe("GridTilemap", () => {
       expect(gridTilemap.getTileCosts(pos, Direction.DOWN_RIGHT)).toBe(20);
 
       expect(
-        gridTilemap.getTileCosts({ position: new Vector2(0, 0), layer: "test" })
+        gridTilemap.getTileCosts({
+          position: new Vector2(0, 0),
+          layer: "test",
+        }),
       ).toBe(10);
     });
   });
@@ -1109,7 +1112,7 @@ describe("GridTilemap", () => {
         ["cGroup1", new Set(["cGroup1", "cGroup2"])],
         ["cGroup2", new Set(["cGroup1"])],
         ["cGroup3", new Set([])],
-      ])
+      ]),
     );
 
     const layer = "someLayer";
@@ -1119,21 +1122,21 @@ describe("GridTilemap", () => {
       gridTilemap,
       "cGroup1",
       new Vector2(0, 0),
-      layer
+      layer,
     );
     const cGroup2Char = createChar(
       "cGroup2Char",
       gridTilemap,
       "cGroup2",
       new Vector2(1, 0),
-      layer
+      layer,
     );
     const cGroup3Char = createChar(
       "cGroup3Char",
       gridTilemap,
       "cGroup3",
       new Vector2(2, 0),
-      layer
+      layer,
     );
 
     gridTilemap.addCharacter(cGroup1Char);
@@ -1144,61 +1147,61 @@ describe("GridTilemap", () => {
     expect(
       gridTilemap.hasBlockingChar(cGroup1Char.getTilePos().position, layer, [
         "cGroup1",
-      ])
+      ]),
     ).toBe(true);
     // 2 => 1
     expect(
       gridTilemap.hasBlockingChar(cGroup1Char.getTilePos().position, layer, [
         "cGroup2",
-      ])
+      ]),
     ).toBe(true);
     // 3 => 1
     expect(
       gridTilemap.hasBlockingChar(cGroup1Char.getTilePos().position, layer, [
         "cGroup3",
-      ])
+      ]),
     ).toBe(false);
 
     // 1 => 2
     expect(
       gridTilemap.hasBlockingChar(cGroup2Char.getTilePos().position, layer, [
         "cGroup1",
-      ])
+      ]),
     ).toBe(true);
 
     // 2 => 2
     expect(
       gridTilemap.hasBlockingChar(cGroup2Char.getTilePos().position, layer, [
         "cGroup2",
-      ])
+      ]),
     ).toBe(false);
 
     // 3 => 2
     expect(
       gridTilemap.hasBlockingChar(cGroup2Char.getTilePos().position, layer, [
         "cGroup3",
-      ])
+      ]),
     ).toBe(false);
 
     // 1 => 3
     expect(
       gridTilemap.hasBlockingChar(cGroup3Char.getTilePos().position, layer, [
         "cGroup1",
-      ])
+      ]),
     ).toBe(false);
 
     // 2 => 3
     expect(
       gridTilemap.hasBlockingChar(cGroup3Char.getTilePos().position, layer, [
         "cGroup2",
-      ])
+      ]),
     ).toBe(false);
 
     // 3 => 3
     expect(
       gridTilemap.hasBlockingChar(cGroup3Char.getTilePos().position, layer, [
         "cGroup3",
-      ])
+      ]),
     ).toBe(false);
   });
 
@@ -1207,7 +1210,7 @@ describe("GridTilemap", () => {
     gridTilemap: GridTilemap,
     cGroup: string,
     position: Vector2,
-    layer: string
+    layer: string,
   ) {
     const char = new GridCharacter(id, {
       tilemap: gridTilemap,

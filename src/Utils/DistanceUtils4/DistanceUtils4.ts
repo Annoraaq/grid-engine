@@ -1,7 +1,7 @@
-import { VectorUtils } from "../VectorUtils";
-import { Direction } from "../../Direction/Direction";
-import { Vector2 } from "../Vector2/Vector2";
-import { DistanceUtils } from "../DistanceUtils";
+import { VectorUtils } from "../VectorUtils.js";
+import { Direction } from "../../Direction/Direction.js";
+import { Vector2 } from "../Vector2/Vector2.js";
+import { DistanceUtils } from "../DistanceUtils.js";
 
 export class DistanceUtils4 implements DistanceUtils {
   distance(pos1: Vector2, pos2: Vector2): number {

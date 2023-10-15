@@ -1,4 +1,4 @@
-import { GridEngine } from "./GridEngine";
-export * from "./GridEngine";
+import { GridEngine } from "./GridEngine.js";
+export * from "./GridEngine.js";
 
 export default GridEngine;

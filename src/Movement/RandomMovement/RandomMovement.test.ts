@@ -1,11 +1,11 @@
 /*eslint no-global-assign: "off"*/
-import { RandomUtils } from "./../../Utils/RandomUtils/RandomUtils";
-import { NumberOfDirections } from "./../../Direction/Direction";
-import { Direction } from "../../Direction/Direction";
-import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import { RandomMovement } from "./RandomMovement";
+import { RandomUtils } from "./../../Utils/RandomUtils/RandomUtils.js";
+import { NumberOfDirections } from "./../../Direction/Direction.js";
+import { Direction } from "../../Direction/Direction.js";
+import { GridCharacter } from "../../GridCharacter/GridCharacter.js";
+import { RandomMovement } from "./RandomMovement.js";
 import { Subject } from "rxjs";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
+import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 
 describe("RandomMovement", () => {
   let randomMovement: RandomMovement;
@@ -223,7 +223,7 @@ describe("RandomMovement", () => {
   describe("8 directions", () => {
     beforeEach(() => {
       (charMock as any).getNumberOfDirections.mockReturnValue(
-        NumberOfDirections.EIGHT
+        NumberOfDirections.EIGHT,
       );
       randomMovement = new RandomMovement(charMock);
     });

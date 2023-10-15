@@ -1,4 +1,4 @@
-import { ArrayTilemap } from "./ArrayTilemap";
+import { ArrayTilemap } from "./ArrayTilemap.js";
 const COLLISION_PROP_NAME = "ge_collide";
 const CHAR_LAYER_PROP_NAME = "ge_charLayer";
 
@@ -55,7 +55,7 @@ describe("ArrayTilemap", () => {
           data: [],
         },
       },
-      "isometric"
+      "isometric",
     );
 
     expect(defaultMap.getOrientation()).toBe("orthogonal");
@@ -86,7 +86,7 @@ describe("ArrayTilemap", () => {
     expect(layerOneData?.[0]?.[1]?.hasProperty(COLLISION_PROP_NAME)).toBe(true);
     expect(layerOneData?.[0]?.[0]?.getProperty(COLLISION_PROP_NAME)).toBe(true);
     expect(layerOneData?.[0]?.[1]?.getProperty(COLLISION_PROP_NAME)).toBe(
-      false
+      false,
     );
 
     const layerTwoData = layerTwo?.getData();
@@ -94,7 +94,7 @@ describe("ArrayTilemap", () => {
     expect(layerTwoData?.[0]?.[0]?.hasProperty(COLLISION_PROP_NAME)).toBe(true);
     expect(layerTwoData?.[0]?.[1]?.hasProperty(COLLISION_PROP_NAME)).toBe(true);
     expect(layerTwoData?.[0]?.[0]?.getProperty(COLLISION_PROP_NAME)).toBe(
-      false
+      false,
     );
     expect(layerTwoData?.[0]?.[1]?.getProperty(COLLISION_PROP_NAME)).toBe(true);
   });
@@ -116,10 +116,10 @@ describe("ArrayTilemap", () => {
     expect(tm.hasTileAt(1, 0, "layerTwo")).toBe(true);
 
     expect(
-      tm.getTileAt(0, 0, "layerOne")?.getProperty(COLLISION_PROP_NAME)
+      tm.getTileAt(0, 0, "layerOne")?.getProperty(COLLISION_PROP_NAME),
     ).toBe(true);
     expect(
-      tm.getTileAt(1, 0, "layerOne")?.getProperty(COLLISION_PROP_NAME)
+      tm.getTileAt(1, 0, "layerOne")?.getProperty(COLLISION_PROP_NAME),
     ).toBe(false);
     expect(tm.getTileAt(-1, 0, "layerOne")).toBe(undefined);
   });
@@ -131,20 +131,20 @@ describe("ArrayTilemap", () => {
         layerTwo: { data: [[0, 1]] },
       },
       "orthogonal",
-      "custom_collision_prop"
+      "custom_collision_prop",
     );
 
     expect(
-      tm.getTileAt(0, 0, "layerOne")?.getProperty(COLLISION_PROP_NAME)
+      tm.getTileAt(0, 0, "layerOne")?.getProperty(COLLISION_PROP_NAME),
     ).toBe(false);
     expect(
-      tm.getTileAt(0, 0, "layerOne")?.hasProperty(COLLISION_PROP_NAME)
+      tm.getTileAt(0, 0, "layerOne")?.hasProperty(COLLISION_PROP_NAME),
     ).toBe(false);
     expect(
-      tm.getTileAt(0, 0, "layerOne")?.getProperty("custom_collision_prop")
+      tm.getTileAt(0, 0, "layerOne")?.getProperty("custom_collision_prop"),
     ).toBe(true);
     expect(
-      tm.getTileAt(0, 0, "layerOne")?.hasProperty("custom_collision_prop")
+      tm.getTileAt(0, 0, "layerOne")?.hasProperty("custom_collision_prop"),
     ).toBe(true);
   });
 });

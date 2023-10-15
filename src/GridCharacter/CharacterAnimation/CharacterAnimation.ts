@@ -1,5 +1,5 @@
-import { Direction } from "./../../Direction/Direction";
-import { WalkingAnimationMapping } from "../../GridEngine";
+import { Direction } from "./../../Direction/Direction.js";
+import { WalkingAnimationMapping } from "../../GridEngine.js";
 import { Observable, Subject } from "rxjs";
 
 export type CharacterIndex = number;
@@ -38,7 +38,7 @@ export class CharacterAnimation {
       | WalkingAnimationMapping
       | number
       | undefined,
-    private charsInRow: number
+    private charsInRow: number,
   ) {
     this.setWalkingAnimationMapping(walkingAnimationMapping);
   }
@@ -58,7 +58,7 @@ export class CharacterAnimation {
   updateCharacterFrame(
     movementDirection: Direction,
     hasWalkedHalfATile: boolean,
-    currentFrame: number
+    currentFrame: number,
   ): void {
     if (this._isEnabled) {
       if (hasWalkedHalfATile) {
@@ -76,7 +76,7 @@ export class CharacterAnimation {
   }
 
   setWalkingAnimationMapping(
-    walkingAnimationMapping?: WalkingAnimationMapping | number
+    walkingAnimationMapping?: WalkingAnimationMapping | number,
   ): void {
     this.walkingAnimationMapping = walkingAnimationMapping;
     this._isEnabled = this.walkingAnimationMapping !== undefined;
@@ -92,7 +92,7 @@ export class CharacterAnimation {
 
   private setStandingFrameDuringWalk(
     direction: Direction,
-    currentFrame: number
+    currentFrame: number,
   ): void {
     if (!this.isCurrentFrameStanding(direction, currentFrame)) {
       this.lastFootLeft = !this.lastFootLeft;
@@ -104,7 +104,7 @@ export class CharacterAnimation {
     const frameRow = this.framesOfDirection(direction);
     if (frameRow)
       this.frameChange$.next(
-        this.lastFootLeft ? frameRow.rightFoot : frameRow.leftFoot
+        this.lastFootLeft ? frameRow.rightFoot : frameRow.leftFoot,
       );
   }
 
@@ -117,7 +117,7 @@ export class CharacterAnimation {
 
   private isCurrentFrameStanding(
     direction: Direction,
-    currentFrame: number
+    currentFrame: number,
   ): boolean {
     return currentFrame === this.framesOfDirection(direction)?.standing;
   }
@@ -126,14 +126,14 @@ export class CharacterAnimation {
     if (typeof this.walkingAnimationMapping === "number") {
       return this.getFramesForCharIndex(
         direction,
-        this.walkingAnimationMapping
+        this.walkingAnimationMapping,
       );
     }
     return this.getFramesForAnimationMapping(direction);
   }
 
   private getFramesForAnimationMapping(
-    direction: Direction
+    direction: Direction,
   ): FrameRow | undefined {
     if (!this.walkingAnimationMapping) return;
     return (
@@ -159,7 +159,7 @@ export class CharacterAnimation {
 
   private getFramesForCharIndex(
     direction: Direction,
-    characterIndex: number
+    characterIndex: number,
   ): FrameRow {
     const playerCharRow = Math.floor(characterIndex / this.charsInRow);
     const playerCharCol = characterIndex % this.charsInRow;

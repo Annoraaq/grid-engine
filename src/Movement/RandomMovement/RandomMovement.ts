@@ -1,11 +1,11 @@
-import { RandomUtils } from "./../../Utils/RandomUtils/RandomUtils";
-import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
-import { DistanceUtils } from "./../../Utils/DistanceUtils";
-import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import { Direction, directionVector } from "../../Direction/Direction";
-import { Movement, MovementInfo } from "../Movement";
+import { RandomUtils } from "./../../Utils/RandomUtils/RandomUtils.js";
+import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory.js";
+import { DistanceUtils } from "./../../Utils/DistanceUtils.js";
+import { GridCharacter } from "../../GridCharacter/GridCharacter.js";
+import { Direction, directionVector } from "../../Direction/Direction.js";
+import { Movement, MovementInfo } from "../Movement.js";
 import { takeUntil, filter, take } from "rxjs/operators";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
+import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 
 export class RandomMovement implements Movement {
   private delayLeft: number;
@@ -19,7 +19,7 @@ export class RandomMovement implements Movement {
   constructor(
     private character: GridCharacter,
     private delay = 0,
-    private radius = -1
+    private radius = -1,
   ) {
     this.delayLeft = this.delay;
     this.initialRow = character.getNextTilePos().position.y;
@@ -33,16 +33,16 @@ export class RandomMovement implements Movement {
         takeUntil(
           this.character.autoMovementSet().pipe(
             filter((movement) => movement !== this),
-            take(1)
-          )
-        )
+            take(1),
+          ),
+        ),
       )
       .subscribe(() => {
         this.stepsWalked++;
       });
 
     this.distanceUtils = DistanceUtilsFactory.create(
-      character.getNumberOfDirections()
+      character.getNumberOfDirections(),
     );
   }
 
@@ -98,7 +98,7 @@ export class RandomMovement implements Movement {
   private getDist(dir: Direction): number {
     return this.distanceUtils.distance(
       this.character.getNextTilePos().position.add(directionVector(dir)),
-      new Vector2(this.initialCol, this.initialRow)
+      new Vector2(this.initialCol, this.initialRow),
     );
   }
 

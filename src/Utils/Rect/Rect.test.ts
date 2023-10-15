@@ -1,5 +1,5 @@
-import { Vector2 } from "../Vector2/Vector2";
-import { Rect } from "./Rect";
+import { Vector2 } from "../Vector2/Vector2.js";
+import { Rect } from "./Rect.js";
 
 describe("Rect", () => {
   it("should create a rect", () => {

@@ -2,10 +2,10 @@ import {
   LayerVecPos,
   ShortestPathAlgorithm,
   ShortestPathResult,
-} from "./../ShortestPathAlgorithm";
-import { VectorUtils } from "../../Utils/VectorUtils";
-import { Queue } from "../../Datastructures/Queue/Queue";
-import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils";
+} from "./../ShortestPathAlgorithm.js";
+import { VectorUtils } from "../../Utils/VectorUtils.js";
+import { Queue } from "../../Datastructures/Queue/Queue.js";
+import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 interface ShortestPathTuple {
   previous: Map<string, LayerVecPos>;
@@ -22,7 +22,7 @@ interface QueueEntry {
 export class Bfs extends ShortestPathAlgorithm {
   findShortestPathImpl(
     startPos: LayerVecPos,
-    targetPos: LayerVecPos
+    targetPos: LayerVecPos,
   ): ShortestPathResult {
     const shortestPath = this.shortestPathBfs(startPos, targetPos);
     return {
@@ -42,7 +42,7 @@ export class Bfs extends ShortestPathAlgorithm {
 
   private shortestPathBfs(
     startNode: LayerVecPos,
-    stopNode: LayerVecPos
+    stopNode: LayerVecPos,
   ): ShortestPathTuple {
     const previous = new Map<string, LayerVecPos>();
     const visited = new Set<string>();
@@ -50,7 +50,7 @@ export class Bfs extends ShortestPathAlgorithm {
     let closestToTarget: LayerVecPos = startNode;
     let smallestDistToTarget: number = this.distance(
       startNode.position,
-      stopNode.position
+      stopNode.position,
     );
     let steps = 0;
     queue.enqueue({ node: startNode, dist: 0 });
@@ -98,7 +98,7 @@ export class Bfs extends ShortestPathAlgorithm {
   private returnPath(
     previous: Map<string, LayerVecPos>,
     startNode: LayerVecPos,
-    stopNode: LayerVecPos
+    stopNode: LayerVecPos,
   ): LayerVecPos[] {
     const ret: LayerVecPos[] = [];
     let currentNode: LayerVecPos | undefined = stopNode;
