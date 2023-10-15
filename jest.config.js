@@ -5,12 +5,15 @@ export default {
     "**/?(*.)+(spec|test).+(ts|tsx|js)",
   ],
   transform: {
-    "^.+\\.(ts|tsx)$": "ts-jest",
+    "^.+\\.(ts|tsx)$": ["ts-jest", { useEsm: true }],
     "\\.[jt]sx?$": "babel-jest",
   },
   "transformIgnorePatterns": [
     "/node_modules/(?!(tiled-property-flattener)/)",
   ],
   testEnvironment: 'jsdom',
-  clearMocks: true
+  clearMocks: true,
+  moduleNameMapper: {
+    "(.+)\\.js": "$1"
+  },
 };
