@@ -1,4 +1,4 @@
-import * as ge from "./GridEngine";
+import * as ge from "./GridEngine.js";
 
 // @ts-ignore
 window.GridEngine = ge.GridEngine;

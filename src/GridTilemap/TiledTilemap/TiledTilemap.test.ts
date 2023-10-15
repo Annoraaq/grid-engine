@@ -1,6 +1,6 @@
-import { TiledTilemap } from "./TiledTilemap";
+import { TiledTilemap } from "./TiledTilemap.js";
 import * as cloudCityTilemap from "../../Testing/testdata/tilemaps/cloud_city.json";
-import { TiledLayer } from "./TiledLayer";
+import { TiledLayer } from "./TiledLayer.js";
 
 describe("TiledTilemap", () => {
   let tilemap: TiledTilemap;

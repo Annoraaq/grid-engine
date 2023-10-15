@@ -1,6 +1,6 @@
-import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
-import { NumberOfDirections } from "../../Direction/Direction";
-import { GridTilemap } from "../../GridTilemap/GridTilemap";
+import { CollisionStrategy } from "../../Collisions/CollisionStrategy.js";
+import { NumberOfDirections } from "../../Direction/Direction.js";
+import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
 import {
   COLLISION_GROUP,
   createAllowedFn,
@@ -10,22 +10,22 @@ import {
   mockLayeredBlockMap,
   mockRandomMap,
   TileCost,
-} from "../../Utils/MockFactory/MockFactory";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { AStar } from "./AStar";
+} from "../../Utils/MockFactory/MockFactory.js";
+import { Vector2 } from "../../Utils/Vector2/Vector2.js";
+import { AStar } from "./AStar.js";
 
 function createTilemap(
   layers: Array<{ blockMap: string[]; layer: string | undefined }>,
   costs?: Array<{
     costMap: Array<Array<number | TileCost>>;
     layer: string | undefined;
-  }>
+  }>,
 ) {
   const tm = mockLayeredBlockMap(layers, false, costs);
   const gridTilemap = new GridTilemap(
     tm,
     "ge_collide",
-    CollisionStrategy.BLOCK_TWO_TILES
+    CollisionStrategy.BLOCK_TWO_TILES,
   );
   mockCharMap(gridTilemap, layers);
   return gridTilemap;
@@ -48,7 +48,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([]);
@@ -70,7 +70,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -104,13 +104,13 @@ describe("A*", () => {
             [1, 1, 1, 1],
           ],
         },
-      ]
+      ],
     );
     const algo = new AStar(gridTilemap, { considerCosts: true });
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -141,7 +141,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 1)),
-      layerPos(new Vector2(3, 3))
+      layerPos(new Vector2(3, 3)),
     );
 
     expect(shortestPath.closestToTarget).toEqual(layerPos(new Vector2(3, 1)));
@@ -168,7 +168,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 1)),
-      layerPos(new Vector2(3, 3))
+      layerPos(new Vector2(3, 3)),
     );
 
     expect(shortestPath.closestToTarget).toEqual(layerPos(new Vector2(1, 1)));
@@ -195,7 +195,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 3))
+      layerPos(new Vector2(1, 3)),
     );
 
     expect(shortestPath.path).toEqual([]);
@@ -222,7 +222,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 3))
+      layerPos(new Vector2(1, 3)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -261,12 +261,12 @@ describe("A*", () => {
     gridTilemap.setTransition(
       new Vector2(2, 0),
       "lowerCharLayer",
-      "testCharLayer"
+      "testCharLayer",
     );
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2), "testCharLayer")
+      layerPos(new Vector2(1, 2), "testCharLayer"),
     );
 
     expect(shortestPath.path).toEqual([
@@ -294,7 +294,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -325,7 +325,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(2, 1))
+      layerPos(new Vector2(2, 1)),
     );
 
     expect(shortestPath.path.length).toEqual(2);
@@ -357,7 +357,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -389,7 +389,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -419,7 +419,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -447,7 +447,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -476,7 +476,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path).toEqual([
@@ -504,7 +504,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path.length).toEqual(3);
@@ -528,7 +528,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path.length).toEqual(7);
@@ -554,7 +554,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path.length).toEqual(0);
@@ -579,7 +579,7 @@ describe("A*", () => {
 
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(1, 0)),
-      layerPos(new Vector2(1, 2))
+      layerPos(new Vector2(1, 2)),
     );
 
     expect(shortestPath.path.length).toEqual(3);
@@ -591,12 +591,12 @@ describe("A*", () => {
     const gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const algo = new AStar(gridTilemap);
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(150, 150)),
-      layerPos(new Vector2(250, 250))
+      layerPos(new Vector2(250, 250)),
     );
 
     expect(shortestPath.steps).toEqual(1262);
@@ -609,14 +609,14 @@ describe("A*", () => {
     const gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const algo = new AStar(gridTilemap, {
       numberOfDirections: NumberOfDirections.EIGHT,
     });
     const shortestPath = algo.findShortestPath(
       layerPos(new Vector2(150, 150)),
-      layerPos(new Vector2(250, 250))
+      layerPos(new Vector2(250, 250)),
     );
 
     expect(shortestPath.steps).toEqual(1700);

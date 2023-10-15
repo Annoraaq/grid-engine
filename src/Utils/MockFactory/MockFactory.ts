@@ -1,11 +1,11 @@
-import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import { NumberOfDirections } from "../../GridEngine";
-import { GridTilemap } from "../../GridTilemap/GridTilemap";
-import { Vector2 } from "../Vector2/Vector2";
+import { GridCharacter } from "../../GridCharacter/GridCharacter.js";
+import { NumberOfDirections } from "../../GridEngine.js";
+import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
+import { Vector2 } from "../Vector2/Vector2.js";
 import { Random, MersenneTwister19937 } from "random-js";
-import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
-import { TileLayer, Tile, Tilemap } from "../../GridTilemap/Tilemap";
-import { MockTile, MockTileLayer, MockTilemap } from "./MockTilemap";
+import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm.js";
+import { TileLayer, Tile, Tilemap } from "../../GridTilemap/Tilemap.js";
+import { MockTile, MockTileLayer, MockTilemap } from "./MockTilemap.js";
 
 export interface TileCost {
   ge_cost?: number;
@@ -61,7 +61,7 @@ export function createMockLayer(layerData: any): TileLayer {
     layerData.width,
     layerData.scale,
     layerData.tilesets,
-    layerData.data
+    layerData.data,
   );
 }
 
@@ -74,7 +74,7 @@ export function layerPos(vec: Vector2, layer?: string): LayerVecPos {
 
 export function mockCharMap(
   gridTilemap: GridTilemap,
-  blockMaps: Array<{ layer: string | undefined; blockMap: string[] }>
+  blockMaps: Array<{ layer: string | undefined; blockMap: string[] }>,
 ): void {
   let charCounter = 0;
   for (const bm of blockMaps) {
@@ -105,7 +105,7 @@ export function mockRandomMap(
   width: number,
   height: number,
   density = 0.1,
-  seed = 12345
+  seed = 12345,
 ) {
   const random = new Random(MersenneTwister19937.seedWithArray([seed]));
 
@@ -217,12 +217,12 @@ export function mockBlockMap(
   blockMap: string[],
   charLayer?: string,
   isometric?: boolean,
-  costMap?: Array<Array<number | TileCost>>
+  costMap?: Array<Array<number | TileCost>>,
 ): Tilemap {
   return mockLayeredBlockMap(
     [{ layer: charLayer, blockMap }],
     isometric,
-    costMap ? [{ layer: charLayer, costMap }] : undefined
+    costMap ? [{ layer: charLayer, costMap }] : undefined,
   );
 }
 
@@ -234,7 +234,7 @@ export function mockLayeredBlockMap(
     charLayerName?: string;
   }>,
   isometric?: boolean,
-  costMaps?: CostMapLayer[]
+  costMaps?: CostMapLayer[],
 ): Tilemap {
   const layers: MockTileLayer[] = [];
   for (const bm of blockMaps) {
@@ -255,7 +255,7 @@ export function mockLayeredBlockMap(
               new MockTile({
                 ...getBlockingProps(bm.blockMap[r][c]),
                 ...tileCostProps(costMap, r, c),
-              })
+              }),
             );
           } else {
             row.push(new MockTile(getBlockingProps(bm.blockMap[r][c])));
@@ -276,7 +276,7 @@ export function mockLayeredBlockMap(
       bm.blockMap[0].length,
       1,
       [],
-      data
+      data,
     );
     layers.push(layer);
   }
@@ -286,7 +286,7 @@ export function mockLayeredBlockMap(
 export function tileCostProps(
   costMap: CostMapLayer,
   r: number,
-  c: number
+  c: number,
 ): Record<string, number> {
   if (!costMap.costMap?.[r]?.[c]) return {};
   const cost = costMap.costMap[r][c];

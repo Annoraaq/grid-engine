@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "emitDeclarationOnly": true,
+    "module": "esnext",
+    "outDir": "dist/mjs",
+    "target": "es2016"
+  },
+}

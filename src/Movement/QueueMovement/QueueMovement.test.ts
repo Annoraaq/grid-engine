@@ -1,19 +1,22 @@
-import { Vector2 } from "../../Utils/Vector2/Vector2";
+import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 import {
   QueueMovement,
   QueueMovementConfig,
   QueuedPathBlockedStrategy,
-} from "./QueueMovement";
-import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm";
-import { CharConfig, GridCharacter } from "../../GridCharacter/GridCharacter";
-import { Direction, NumberOfDirections } from "../../Direction/Direction";
+} from "./QueueMovement.js";
+import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm.js";
+import {
+  CharConfig,
+  GridCharacter,
+} from "../../GridCharacter/GridCharacter.js";
+import { Direction, NumberOfDirections } from "../../Direction/Direction.js";
 import {
   mockLayeredBlockMap,
   updateLayer,
-} from "../../Utils/MockFactory/MockFactory";
-import { Tilemap } from "../../GridTilemap/Tilemap";
-import { GridTilemap } from "../../GridTilemap/GridTilemap";
-import { CollisionStrategy } from "../../Collisions/CollisionStrategy";
+} from "../../Utils/MockFactory/MockFactory.js";
+import { Tilemap } from "../../GridTilemap/Tilemap.js";
+import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
+import { CollisionStrategy } from "../../Collisions/CollisionStrategy.js";
 
 const CHUNKS_PER_SECOND = 2;
 
@@ -63,7 +66,7 @@ describe("QueueMovement", () => {
     const gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const mockChar = createMockChar("player", layerPos(0, 0), {
       ...TEST_CHAR_CONFIG,
@@ -91,7 +94,7 @@ describe("QueueMovement", () => {
   function createMockChar(
     id: string,
     pos: LayerVecPos,
-    charConfig: CharConfig
+    charConfig: CharConfig,
   ): GridCharacter {
     const mockChar = new GridCharacter(id, charConfig);
     mockChar.setTilePosition(pos);
@@ -101,7 +104,7 @@ describe("QueueMovement", () => {
   function layerPos(
     x: number,
     y: number,
-    layer = "testCharLayer"
+    layer = "testCharLayer",
   ): LayerVecPos {
     return {
       position: new Vector2(x, y),
@@ -112,7 +115,7 @@ describe("QueueMovement", () => {
   function expectWalkedPath(
     mockChar: GridCharacter,
     queueMovement: QueueMovement,
-    path: LayerVecPos[]
+    path: LayerVecPos[],
   ) {
     for (const pos of path) {
       chunkUpdate(mockChar, CHUNKS_PER_SECOND);
@@ -149,7 +152,7 @@ describe("QueueMovement", () => {
     ]);
     queueMovement.enqueue(
       [{ position: new Vector2(0, 3), layer: "testLayer" }],
-      config
+      config,
     );
     expect(queueMovement.size()).toEqual(3);
     expect(queueMovement.peekAll()).toEqual([
@@ -347,7 +350,7 @@ describe("QueueMovement", () => {
     gridTilemap.setTransition(
       new Vector2(2, 0),
       "testCharLayer",
-      "someOtherLayer"
+      "someOtherLayer",
     );
     queueMovement.enqueue([layerPos(1, 0), layerPos(2, 0)]);
 
@@ -399,7 +402,7 @@ describe("QueueMovement", () => {
     gridTilemap.setTransition(
       new Vector2(2, 0),
       "testCharLayer",
-      "someOtherLayer"
+      "someOtherLayer",
     );
     queueMovement.enqueue([layerPos(1, 0), layerPos(2, 0, "someOtherLayer")]);
 
@@ -479,7 +482,7 @@ describe("QueueMovement", () => {
     gridTilemap.setTransition(
       new Vector2(2, 0),
       "testCharLayer",
-      "someOtherLayer"
+      "someOtherLayer",
     );
     queueMovement.enqueue([layerPos(1, 0), layerPos(2, 0, "someOtherLayer")]);
 
@@ -533,7 +536,7 @@ describe("QueueMovement", () => {
         "...",
         "..#",
       ],
-      "testCharLayer"
+      "testCharLayer",
     );
 
     mockChar.update(1000);
@@ -754,7 +757,7 @@ describe("QueueMovement", () => {
         "..#",
         "...",
       ],
-      "testCharLayer"
+      "testCharLayer",
     );
 
     expectWalkedPath(mockChar, queueMovement, [layerPos(1, 0)]);

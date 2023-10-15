@@ -1,6 +1,6 @@
-import { Tile, TileLayer } from "../Tilemap";
-import { RawTiledLayer, RawTiledTileset } from "./TiledMap";
-import { TiledTile } from "./TiledTile";
+import { Tile, TileLayer } from "../Tilemap.js";
+import { RawTiledLayer, RawTiledTileset } from "./TiledMap.js";
+import { TiledTile } from "./TiledTile.js";
 
 export class TiledLayer implements TileLayer {
   private data: Array<Array<Tile | undefined>> = [];
@@ -13,7 +13,7 @@ export class TiledLayer implements TileLayer {
       for (let r = 0; r < (this.layer.height || 0); r++) {
         const row: Array<Tile | undefined> = [];
         for (let c = 0; c < (this.layer.width || 0); c++) {
-          const t = this.layer.data[r*(this.layer.width || 0) + c];
+          const t = this.layer.data[r * (this.layer.width || 0) + c];
           if (t !== undefined) {
             row.push(new TiledTile(tilesets, t));
           } else {

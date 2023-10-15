@@ -1,4 +1,4 @@
-import { Vector2 } from "./Vector2/Vector2";
+import { Vector2 } from "./Vector2/Vector2.js";
 
 export class VectorUtils {
   static vec2str(vec: Vector2): string {

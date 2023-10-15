@@ -1,11 +1,11 @@
-import { Vector2 } from "../Vector2/Vector2";
+import { Vector2 } from "../Vector2/Vector2.js";
 
 export class Rect {
   constructor(
     private x: number,
     private y: number,
     private width: number,
-    private height: number
+    private height: number,
   ) {}
 
   getX(): number {

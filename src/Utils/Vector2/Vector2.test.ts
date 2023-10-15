@@ -1,4 +1,4 @@
-import { Vector2 } from "./Vector2";
+import { Vector2 } from "./Vector2.js";
 
 describe("Vector2", () => {
   it("should create", () => {

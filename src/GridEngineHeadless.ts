@@ -1,45 +1,45 @@
-import { CollisionStrategy } from "./Collisions/CollisionStrategy";
-import { FollowMovement } from "./Movement/FollowMovement/FollowMovement";
+import { CollisionStrategy } from "./Collisions/CollisionStrategy.js";
+import { FollowMovement } from "./Movement/FollowMovement/FollowMovement.js";
 import {
   Finished,
   MoveToConfig,
   MoveToResult,
   TargetMovement,
-} from "./Movement/TargetMovement/TargetMovement";
+} from "./Movement/TargetMovement/TargetMovement.js";
 import {
   CharConfig,
   GridCharacter,
   PositionChange,
-} from "./GridCharacter/GridCharacter";
+} from "./GridCharacter/GridCharacter.js";
 import {
   Direction,
   isDiagonal,
   isDirection,
   NumberOfDirections,
-} from "./Direction/Direction";
-import { RandomMovement } from "./Movement/RandomMovement/RandomMovement";
+} from "./Direction/Direction.js";
+import { RandomMovement } from "./Movement/RandomMovement/RandomMovement.js";
 import { Observable, Subject, merge } from "rxjs";
 import { take, takeUntil, filter, map, mergeWith } from "rxjs/operators";
-import { Vector2 } from "./Utils/Vector2/Vector2";
-import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
-import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
-import { MovementInfo } from "./Movement/Movement";
-import { FrameRow } from "./GridCharacter/CharacterAnimation/CharacterAnimation";
+import { Vector2 } from "./Utils/Vector2/Vector2.js";
+import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy.js";
+import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy.js";
+import { MovementInfo } from "./Movement/Movement.js";
+import { FrameRow } from "./GridCharacter/CharacterAnimation/CharacterAnimation.js";
 import {
   CharacterFilteringOptions,
   filterCharacters,
-} from "./GridCharacter/CharacterFilter/CharacterFilter";
+} from "./GridCharacter/CharacterFilter/CharacterFilter.js";
 
 import { version as VERSION } from "../package.json";
 import {
   IsPositionAllowedFn,
   Pathfinding,
   PathfindingOptions,
-} from "./Pathfinding/Pathfinding";
-import { LayerPositionUtils } from "./Utils/LayerPositionUtils/LayerPositionUtils";
-import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
-import { GridTilemap } from "./GridTilemap/GridTilemap";
-import { Tilemap } from "./GridTilemap/Tilemap";
+} from "./Pathfinding/Pathfinding.js";
+import { LayerPositionUtils } from "./Utils/LayerPositionUtils/LayerPositionUtils.js";
+import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
+import { GridTilemap } from "./GridTilemap/GridTilemap.js";
+import { Tilemap } from "./GridTilemap/Tilemap.js";
 import {
   CharacterShift,
   CharacterShiftAction,
@@ -49,14 +49,14 @@ import {
   LayerPosition,
   PathfindingResult,
   Position,
-} from "./IGridEngine";
-import { Rect } from "./Utils/Rect/Rect";
+} from "./IGridEngine.js";
+import { Rect } from "./Utils/Rect/Rect.js";
 import {
   QueueMovement,
   QueueMovementConfig,
   QueueMovementEntry,
   Finished as QueueMovementFinished,
-} from "./Movement/QueueMovement/QueueMovement";
+} from "./Movement/QueueMovement/QueueMovement.js";
 
 export {
   CollisionStrategy,
@@ -321,7 +321,7 @@ export class GridEngineHeadless implements IGridEngine {
     return this.gridTilemap?.setTransition(
       new Vector2(position),
       fromLayer,
-      toLayer
+      toLayer,
     );
   }
 
@@ -365,17 +365,17 @@ export class GridEngineHeadless implements IGridEngine {
       this.config.collisionTilePropertyName,
       this.config.characterCollisionStrategy,
       this.recordToMap(this.config.collisionGroupRelation),
-      this.config.cacheTileCollisions
+      this.config.cacheTileCollisions,
     );
     this.addCharacters();
   }
 
   private recordToMap(
-    rec?: Record<string, string[]>
+    rec?: Record<string, string[]>,
   ): Map<string, Set<string>> | undefined {
     if (!rec) return undefined;
     const map = new Map<string, Set<string>>(
-      Object.entries(rec).map(([k, v]) => [k, new Set(v)])
+      Object.entries(rec).map(([k, v]) => [k, new Set(v)]),
     );
     return map;
   }
@@ -440,7 +440,7 @@ export class GridEngineHeadless implements IGridEngine {
   moveTo(
     charId: string,
     targetPos: Position,
-    config?: MoveToConfig
+    config?: MoveToConfig,
   ): Observable<{ charId: string } & Finished> {
     const moveToConfig = this.assembleMoveToConfig(config);
     this.initGuard();
@@ -457,7 +457,7 @@ export class GridEngineHeadless implements IGridEngine {
       {
         distance: 0,
         config: moveToConfig,
-      }
+      },
     );
     gridChar.setMovement(targetMovement);
     return targetMovement.finishedObs().pipe(
@@ -467,7 +467,7 @@ export class GridEngineHeadless implements IGridEngine {
         result: finished.result,
         description: finished.description,
         layer: finished.layer,
-      }))
+      })),
     );
   }
 
@@ -730,13 +730,13 @@ export class GridEngineHeadless implements IGridEngine {
     charId: string,
     charIdToFollow: string,
     distance?: number,
-    closestPointIfBlocked?: boolean
+    closestPointIfBlocked?: boolean,
   ): void;
   follow(
     charId: string,
     charIdToFollow: string,
     distance?: FollowOptions | number,
-    closestPointIfBlocked?: boolean
+    closestPointIfBlocked?: boolean,
   ): void {
     let options: FollowOptions;
 
@@ -775,7 +775,7 @@ export class GridEngineHeadless implements IGridEngine {
         maxPathLength: options.maxPathLength ?? Infinity,
         shortestPathAlgorithm: options.algorithm ?? "BIDIRECTIONAL_SEARCH",
         ignoreLayers: !!options.ignoreLayers,
-      }
+      },
     );
     gridChar.setMovement(followMovement);
   }
@@ -839,7 +839,7 @@ export class GridEngineHeadless implements IGridEngine {
     if (!this.gridTilemap) return [];
     const characters = this.gridTilemap.getCharactersAt(
       new Vector2(position),
-      layer
+      layer,
     );
     return Array.from(characters).map((char) => char.getId());
   }
@@ -870,7 +870,7 @@ export class GridEngineHeadless implements IGridEngine {
   isBlocked(
     position: Position,
     layer?: string,
-    collisionGroups: string[] = ["geDefault"]
+    collisionGroups: string[] = ["geDefault"],
   ): boolean {
     this.initGuard();
     const positionVec = new Vector2(position);
@@ -922,7 +922,7 @@ export class GridEngineHeadless implements IGridEngine {
   getTilePosInDirection(
     position: Position,
     charLayer: string | undefined,
-    direction: Direction
+    direction: Direction,
   ): LayerPosition {
     if (!this.gridTilemap) throw this.createUninitializedErr();
     const posInDirection = this.gridTilemap.getTilePosInDirection(
@@ -930,7 +930,7 @@ export class GridEngineHeadless implements IGridEngine {
         position: new Vector2(position),
         layer: charLayer,
       },
-      direction
+      direction,
     );
     return {
       position: posInDirection.position.toPosition(),
@@ -947,7 +947,7 @@ export class GridEngineHeadless implements IGridEngine {
   findShortestPath(
     source: LayerPosition,
     dest: LayerPosition,
-    options: PathfindingOptions = {}
+    options: PathfindingOptions = {},
   ): PathfindingResult {
     if (!this.gridTilemap) throw this.createUninitializedErr();
     const algo: ShortestPathAlgorithmType =
@@ -955,7 +955,7 @@ export class GridEngineHeadless implements IGridEngine {
     if (options.considerCosts && algo !== "A_STAR") {
       console.warn(
         `GridEngine: Pathfinding option 'considerCosts' cannot be used with` +
-          ` algorithm '${algo}'. It can only be used with A* algorithm.`
+          ` algorithm '${algo}'. It can only be used with A* algorithm.`,
       );
     }
     const pathfinding = new Pathfinding(this.gridTilemap);
@@ -965,7 +965,7 @@ export class GridEngineHeadless implements IGridEngine {
       {
         ...options,
         shortestPathAlgorithm: algo,
-      }
+      },
     );
     return {
       path: res.path.map(LayerPositionUtils.fromInternal),
@@ -985,7 +985,7 @@ export class GridEngineHeadless implements IGridEngine {
   steppedOn(
     charIds: string[],
     tiles: Position[],
-    layer?: CharLayer[]
+    layer?: CharLayer[],
   ): Observable<
     {
       charId: string;
@@ -996,10 +996,11 @@ export class GridEngineHeadless implements IGridEngine {
         (t) =>
           charIds.includes(t.charId) &&
           tiles.some(
-            (target) => target.x === t.enterTile.x && target.y === t.enterTile.y
+            (target) =>
+              target.x === t.enterTile.x && target.y === t.enterTile.y,
           ) &&
-          (layer === undefined || layer.includes(t.enterLayer))
-      )
+          (layer === undefined || layer.includes(t.enterLayer)),
+      ),
     );
   }
 
@@ -1022,9 +1023,9 @@ export class GridEngineHeadless implements IGridEngine {
           map((c) => ({
             charId: c,
             action: CharacterShiftAction.REMOVED,
-          }))
-        )
-      )
+          })),
+        ),
+      ),
     );
   }
 
@@ -1099,7 +1100,7 @@ export class GridEngineHeadless implements IGridEngine {
     x: number,
     y: number,
     width: number,
-    height: number
+    height: number,
   ): void {
     this.gridTilemap?.rebuildTileCollisionCache(new Rect(x, y, width, height));
   }
@@ -1112,7 +1113,7 @@ export class GridEngineHeadless implements IGridEngine {
   addQueueMovements(
     charId: string,
     positions: Array<LayerPosition | Direction>,
-    options?: QueueMovementConfig
+    options?: QueueMovementConfig,
   ): void {
     this.initGuard();
     const gridChar = this.gridCharacters?.get(charId);
@@ -1127,7 +1128,9 @@ export class GridEngineHeadless implements IGridEngine {
       queueMovement
         .finished()
         .pipe(
-          takeUntil(merge(this.charRemoved(charId), gridChar.autoMovementSet()))
+          takeUntil(
+            merge(this.charRemoved(charId), gridChar.autoMovementSet()),
+          ),
         )
         .subscribe((finished: QueueMovementFinished) => {
           this.queueMovementFinished$?.next({ charId, ...finished });
@@ -1143,7 +1146,7 @@ export class GridEngineHeadless implements IGridEngine {
           layer: p.charLayer,
         };
       }),
-      options
+      options,
     );
   }
 
@@ -1205,13 +1208,13 @@ export class GridEngineHeadless implements IGridEngine {
   getTileCost(
     position: Position,
     charLayer?: string,
-    srcDirection?: Direction
+    srcDirection?: Direction,
   ): number {
     this.initGuard();
     return (
       this.gridTilemap?.getTileCosts(
         { position: new Vector2(position), layer: charLayer },
-        srcDirection
+        srcDirection,
       ) ?? 1
     );
   }
@@ -1220,7 +1223,7 @@ export class GridEngineHeadless implements IGridEngine {
     if (!this.charRemoved$) throw this.createUninitializedErr();
     return this.charRemoved$?.pipe(
       take(1),
-      filter((cId) => cId == charId)
+      filter((cId) => cId == charId),
     );
   }
 
@@ -1232,7 +1235,7 @@ export class GridEngineHeadless implements IGridEngine {
 
   private createUninitializedErr() {
     throw new Error(
-      "GridEngine not initialized. You need to call create() first."
+      "GridEngine not initialized. You need to call create() first.",
     );
   }
 
@@ -1247,12 +1250,12 @@ export class GridEngineHeadless implements IGridEngine {
     if (gridChar.getNumberOfDirections() === NumberOfDirections.FOUR) {
       if (!this.gridTilemap?.isIsometric() && isDiagonal(direction)) {
         console.warn(
-          `GridEngine: Character '${charId}' can't be moved '${direction}' in 4 direction mode.`
+          `GridEngine: Character '${charId}' can't be moved '${direction}' in 4 direction mode.`,
         );
         return;
       } else if (this.gridTilemap?.isIsometric() && !isDiagonal(direction)) {
         console.warn(
-          `GridEngine: Character '${charId}' can't be moved '${direction}' in 4 direction isometric mode.`
+          `GridEngine: Character '${charId}' can't be moved '${direction}' in 4 direction isometric mode.`,
         );
         return;
       }
@@ -1276,7 +1279,7 @@ export class GridEngineHeadless implements IGridEngine {
         moveToConfig.noPathFoundStrategy = config.noPathFoundStrategy;
       } else {
         console.warn(
-          `GridEngine: Unknown NoPathFoundStrategy '${config.noPathFoundStrategy}'. Falling back to '${NoPathFoundStrategy.STOP}'`
+          `GridEngine: Unknown NoPathFoundStrategy '${config.noPathFoundStrategy}'. Falling back to '${NoPathFoundStrategy.STOP}'`,
         );
       }
     }
@@ -1287,7 +1290,7 @@ export class GridEngineHeadless implements IGridEngine {
         moveToConfig.pathBlockedStrategy = config.pathBlockedStrategy;
       } else {
         console.warn(
-          `GridEngine: Unknown PathBlockedStrategy '${config.pathBlockedStrategy}'. Falling back to '${PathBlockedStrategy.WAIT}'`
+          `GridEngine: Unknown PathBlockedStrategy '${config.pathBlockedStrategy}'. Falling back to '${PathBlockedStrategy.WAIT}'`,
         );
       }
     }

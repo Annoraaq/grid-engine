@@ -1,5 +1,5 @@
-import { Tile } from "../Tilemap";
-import { RawTiledTileset } from "./TiledMap";
+import { Tile } from "../Tilemap.js";
+import { RawTiledTileset } from "./TiledMap.js";
 
 export class TiledTile implements Tile {
   private props = {};

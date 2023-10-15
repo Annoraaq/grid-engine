@@ -1,28 +1,28 @@
-import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy";
-import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
+import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy.js";
+import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory.js";
 import {
   LayerVecPos,
   ShortestPath,
   ShortestPathAlgorithmType,
-} from "./../../Pathfinding/ShortestPathAlgorithm";
-import { DistanceUtils } from "./../../Utils/DistanceUtils";
-import { GridTilemap } from "../../GridTilemap/GridTilemap";
-import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import { Direction } from "../../Direction/Direction";
-import { Movement, MovementInfo } from "../Movement";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { Retryable } from "./Retryable/Retryable";
-import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
-import { CharLayer, LayerPosition, Position } from "../../GridEngine";
+} from "./../../Pathfinding/ShortestPathAlgorithm.js";
+import { DistanceUtils } from "./../../Utils/DistanceUtils.js";
+import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
+import { GridCharacter } from "../../GridCharacter/GridCharacter.js";
+import { Direction } from "../../Direction/Direction.js";
+import { Movement, MovementInfo } from "../Movement.js";
+import { Vector2 } from "../../Utils/Vector2/Vector2.js";
+import { Retryable } from "./Retryable/Retryable.js";
+import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy.js";
+import { CharLayer, LayerPosition, Position } from "../../GridEngine.js";
 import { filter, Subject, take } from "rxjs";
 import {
   IsPositionAllowedFn,
   Pathfinding,
   PathfindingOptions,
-} from "../../Pathfinding/Pathfinding";
-import { Concrete } from "../../Utils/TypeUtils";
-import { Bfs } from "../../Pathfinding/Bfs/Bfs";
-import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils";
+} from "../../Pathfinding/Pathfinding.js";
+import { Concrete } from "../../Utils/TypeUtils.js";
+import { Bfs } from "../../Pathfinding/Bfs/Bfs.js";
+import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 /**
  * @category Pathfinding
@@ -202,7 +202,7 @@ export class TargetMovement implements Movement {
     private character: GridCharacter,
     private tilemap: GridTilemap,
     private targetPos: LayerVecPos,
-    { config, ignoreBlockedTarget = false, distance = 0 }: Options = {}
+    { config, ignoreBlockedTarget = false, distance = 0 }: Options = {},
   ) {
     this.shortestPathAlgorithm =
       config?.algorithm ?? this.shortestPathAlgorithm;
@@ -217,14 +217,14 @@ export class TargetMovement implements Movement {
       config?.noPathFoundMaxRetries || -1,
       () => {
         this.stop(MoveToResult.NO_PATH_FOUND_MAX_RETRIES_EXCEEDED);
-      }
+      },
     );
     this.pathBlockedRetryable = new Retryable(
       config?.pathBlockedRetryBackoffMs || 200,
       config?.pathBlockedMaxRetries || -1,
       () => {
         this.stop(MoveToResult.PATH_BLOCKED_MAX_RETRIES_EXCEEDED);
-      }
+      },
     );
 
     if (config?.isPositionAllowedFn) {
@@ -239,7 +239,7 @@ export class TargetMovement implements Movement {
       console.warn(
         `GridEngine: Pathfinding option 'considerCosts' cannot be used with ` +
           `algorithm '${this.shortestPathAlgorithm}'. It can only be used ` +
-          `with A* algorithm.`
+          `with A* algorithm.`,
       );
     }
 
@@ -248,7 +248,7 @@ export class TargetMovement implements Movement {
     this.ignoreLayers = !!config?.ignoreLayers;
 
     this.distanceUtils = DistanceUtilsFactory.create(
-      character.getNumberOfDirections()
+      character.getNumberOfDirections(),
     );
     this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
     this.finished$ = new Subject<Finished>();
@@ -273,7 +273,7 @@ export class TargetMovement implements Movement {
       .autoMovementSet()
       .pipe(
         filter((movement) => movement !== this),
-        take(1)
+        take(1),
       )
       .subscribe(() => {
         this.stop(MoveToResult.MOVEMENT_TERMINATED);
@@ -314,7 +314,7 @@ export class TargetMovement implements Movement {
     if (
       this.isBlocking(
         this.nextTileOnPath()?.position,
-        this.character?.getNextTilePos().layer
+        this.character?.getNextTilePos().layer,
       )
     ) {
       this.applyPathBlockedStrategy(delta);
@@ -330,7 +330,7 @@ export class TargetMovement implements Movement {
     } else if (
       !this.isBlocking(
         this.nextTileOnPath()?.position,
-        this.character?.getNextTilePos().layer
+        this.character?.getNextTilePos().layer,
       )
     ) {
       this.moveCharOnPath();
@@ -406,7 +406,7 @@ export class TargetMovement implements Movement {
     if (!nextTilePosOnPath) return;
     const dir = this.getDir(
       this.character.getNextTilePos().position,
-      nextTilePosOnPath.position
+      nextTilePosOnPath.position,
     );
     this.character.move(dir);
   }
@@ -430,7 +430,7 @@ export class TargetMovement implements Movement {
     const nextTile = this.shortestPath[this.posOnPath + 1];
     const dir = this.getDir(
       this.character.getNextTilePos().position,
-      nextTile.position
+      nextTile.position,
     );
     this.character.turnTowards(dir);
   }
@@ -487,7 +487,7 @@ export class TargetMovement implements Movement {
       pathfinding.findShortestPath(
         this.character.getNextTilePos(),
         this.targetPos,
-        this.getPathfindingOptions()
+        this.getPathfindingOptions(),
       );
 
     const noPathFound = shortestPath.length == 0;
@@ -498,17 +498,17 @@ export class TargetMovement implements Movement {
     ) {
       if (!closestToTarget) {
         throw Error(
-          "ClosestToTarget should never be undefined in TargetMovement."
+          "ClosestToTarget should never be undefined in TargetMovement.",
         );
       }
       const shortestPathToClosestPoint = pathfinding.findShortestPath(
         this.character.getNextTilePos(),
         closestToTarget,
-        this.getPathfindingOptions()
+        this.getPathfindingOptions(),
       ).path;
       const distOffset = this.distanceUtils.distance(
         closestToTarget.position,
-        this.targetPos.position
+        this.targetPos.position,
       );
       return { path: shortestPathToClosestPoint, distOffset };
     }
@@ -518,7 +518,7 @@ export class TargetMovement implements Movement {
 
   private getDir(from: Vector2, to: Vector2): Direction {
     return this.tilemap.fromMapDirection(
-      this.distanceUtils.direction(from, to)
+      this.distanceUtils.direction(from, to),
     );
   }
 }

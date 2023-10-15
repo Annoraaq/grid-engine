@@ -1,8 +1,8 @@
-import { createPhaserTilemapStub } from "../../Utils/MockFactory/MockPhaserTilemap";
+import { createPhaserTilemapStub } from "../../Utils/MockFactory/MockPhaserTilemap.js";
 import * as Phaser from "phaser";
-import { PhaserTilemap } from "./PhaserTilemap";
-import { PhaserTileLayer } from "./PhaserTileLayer";
-import { PhaserTile } from "./PhaserTile";
+import { PhaserTilemap } from "./PhaserTilemap.js";
+import { PhaserTileLayer } from "./PhaserTileLayer.js";
+import { PhaserTile } from "./PhaserTile.js";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -19,7 +19,7 @@ describe("PhaserTilemap", () => {
 
   it("should get tile dimensions", () => {
     const tilemap = createPhaserTilemapStub(
-      new Map([["layer_name", ["...", "..."]]])
+      new Map([["layer_name", ["...", "..."]]]),
     );
     const phaserTilemap = new PhaserTilemap(tilemap);
     expect(phaserTilemap.getWidth()).toEqual(3);
@@ -40,17 +40,17 @@ describe("PhaserTilemap", () => {
       new Map([
         ["layer_name", [""]],
         ["layer2", [""]],
-      ])
+      ]),
     );
     const phaserTilemap = new PhaserTilemap(tilemap);
     expect(phaserTilemap.getLayers()).toEqual(
-      tilemap.layers.map((l) => new PhaserTileLayer(l.tilemapLayer))
+      tilemap.layers.map((l) => new PhaserTileLayer(l.tilemapLayer)),
     );
   });
 
   it("should detect tile", () => {
     const tilemap = createPhaserTilemapStub(
-      new Map([["layer_name", ["..", ".."]]])
+      new Map([["layer_name", ["..", ".."]]]),
     );
     const phaserTilemap = new PhaserTilemap(tilemap);
     expect(phaserTilemap.hasTileAt(0, 0, "layer_name")).toBe(true);
@@ -62,7 +62,7 @@ describe("PhaserTilemap", () => {
 
   it("should get tile", () => {
     const tilemap = createPhaserTilemapStub(
-      new Map([["layer_name", ["..", ".."]]])
+      new Map([["layer_name", ["..", ".."]]]),
     );
     const layerData = tilemap.getLayer("layer_name");
     const phaserTilemap = new PhaserTilemap(tilemap);
@@ -70,11 +70,11 @@ describe("PhaserTilemap", () => {
 
     if (layerData) {
       expect(phaserTilemap.getTileAt(0, 0, "layer_name")).toEqual(
-        new PhaserTile(layerData.data[0][0])
+        new PhaserTile(layerData.data[0][0]),
       );
       expect(phaserTilemap.getTileAt(3, 3, "layer_name")).toBe(undefined);
       expect(phaserTilemap.getTileAt(0, 0)).toEqual(
-        new PhaserTile(layerData.data[0][0])
+        new PhaserTile(layerData.data[0][0]),
       );
       expect(phaserTilemap.getTileAt(3, 3)).toBe(undefined);
       expect(phaserTilemap.getTileAt(0, 0, "unknown")).toBe(undefined);
@@ -83,7 +83,7 @@ describe("PhaserTilemap", () => {
 
   it("should get tile with Tiled properties", () => {
     const tilemap = createPhaserTilemapStub(
-      new Map([["layer_name", ["..", ".."]]])
+      new Map([["layer_name", ["..", ".."]]]),
     );
     const tiledProject = {
       propertyTypes: [
@@ -106,18 +106,18 @@ describe("PhaserTilemap", () => {
 
     if (layerData) {
       expect(phaserTilemap.getTileAt(0, 0, "layer_name")).toEqual(
-        new PhaserTile(layerData.data[0][0], tiledProject)
+        new PhaserTile(layerData.data[0][0], tiledProject),
       );
       expect(phaserTilemap.getTileAt(3, 3, "layer_name")).toBe(undefined);
       expect(phaserTilemap.getTileAt(0, 0)).toEqual(
-        new PhaserTile(layerData.data[0][0], tiledProject)
+        new PhaserTile(layerData.data[0][0], tiledProject),
       );
     }
   });
 
   it("should throw error if initialized without tilemapLayer", () => {
     const tilemap = createPhaserTilemapStub(
-      new Map([["layer_name", ["..", ".."]]])
+      new Map([["layer_name", ["..", ".."]]]),
     );
     const tiledProject = {
       propertyTypes: [
@@ -138,8 +138,8 @@ describe("PhaserTilemap", () => {
     tilemap.layers[0].tilemapLayer = undefined;
     expect(() => new PhaserTilemap(tilemap, tiledProject)).toThrow(
       new Error(
-        "Error initializing tilemap. Layer 'layer_name' has no 'tilemapLayer'. This can happen if you call 'createLayer' with the wrong layer ID."
-      )
+        "Error initializing tilemap. Layer 'layer_name' has no 'tilemapLayer'. This can happen if you call 'createLayer' with the wrong layer ID.",
+      ),
     );
   });
 });

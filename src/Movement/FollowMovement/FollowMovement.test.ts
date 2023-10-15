@@ -1,13 +1,13 @@
 import {
   LayerVecPos,
   ShortestPathAlgorithmType,
-} from "./../../Pathfinding/ShortestPathAlgorithm";
-import { NumberOfDirections } from "./../../Direction/Direction";
-import { FollowMovement } from "./FollowMovement";
-import { TargetMovement } from "../TargetMovement/TargetMovement";
+} from "./../../Pathfinding/ShortestPathAlgorithm.js";
+import { NumberOfDirections } from "./../../Direction/Direction.js";
+import { FollowMovement } from "./FollowMovement.js";
+import { TargetMovement } from "../TargetMovement/TargetMovement.js";
 import { Subject } from "rxjs";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
+import { Vector2 } from "../../Utils/Vector2/Vector2.js";
+import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy.js";
 
 const mockTargetMovement = {
   setCharacter: jest.fn(),
@@ -76,7 +76,7 @@ describe("FollowMovement", () => {
           considerCosts: false,
         },
         ignoreBlockedTarget: true,
-      }
+      },
     );
   });
 
@@ -108,7 +108,7 @@ describe("FollowMovement", () => {
           considerCosts: false,
         },
         ignoreBlockedTarget: true,
-      }
+      },
     );
   });
 
@@ -158,7 +158,7 @@ describe("FollowMovement", () => {
           considerCosts: false,
         },
         ignoreBlockedTarget: true,
-      }
+      },
     );
   });
 
@@ -182,7 +182,7 @@ describe("FollowMovement", () => {
           considerCosts: false,
         },
         ignoreBlockedTarget: true,
-      }
+      },
     );
   });
 
@@ -206,7 +206,7 @@ describe("FollowMovement", () => {
           considerCosts: true,
         },
         ignoreBlockedTarget: true,
-      }
+      },
     );
   });
 
@@ -239,14 +239,14 @@ describe("FollowMovement", () => {
         {
           considerCosts: true,
           shortestPathAlgorithm: algorithm,
-        }
+        },
       );
 
       expect(console.warn).toHaveBeenCalledWith(
         `GridEngine: Pathfinding option 'considerCosts' cannot be used with ` +
-          `algorithm '${algorithm}'. It can only be used with A* algorithm.`
+          `algorithm '${algorithm}'. It can only be used with A* algorithm.`,
       );
-    }
+    },
   );
 
   it(
@@ -261,13 +261,13 @@ describe("FollowMovement", () => {
         {
           considerCosts: true,
           shortestPathAlgorithm: "A_STAR",
-        }
+        },
       );
 
       expect(console.warn).not.toHaveBeenCalledWith(
         `GridEngine: Pathfinding option 'considerCosts' cannot be used with ` +
-          `algorithm 'A_STAR'. It can only be used with A* algorithm.`
+          `algorithm 'A_STAR'. It can only be used with A* algorithm.`,
       );
-    }
+    },
   );
 });

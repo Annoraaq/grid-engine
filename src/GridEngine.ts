@@ -1,55 +1,60 @@
-import { GridCharacterPhaser } from "./GridEnginePhaser/GridCharacterPhaser/GridCharacterPhaser";
-import { CollisionStrategy } from "./Collisions/CollisionStrategy";
+import { GridCharacterPhaser } from "./GridEnginePhaser/GridCharacterPhaser/GridCharacterPhaser.js";
+import { CollisionStrategy } from "./Collisions/CollisionStrategy.js";
 import {
   Finished,
   MoveToConfig,
   MoveToInfo,
   MoveToResult,
-} from "./Movement/TargetMovement/TargetMovement";
-import { PositionChange } from "./GridCharacter/GridCharacter";
+} from "./Movement/TargetMovement/TargetMovement.js";
+import { PositionChange } from "./GridCharacter/GridCharacter.js";
 import {
   Direction,
   NumberOfDirections,
   directionFromPos,
-} from "./Direction/Direction";
+} from "./Direction/Direction.js";
 import { Observable } from "rxjs";
-import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
-import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
-import { MovementInfo } from "./Movement/Movement";
+import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy.js";
+import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy.js";
+import { MovementInfo } from "./Movement/Movement.js";
 import {
   CharacterIndex,
   FrameRow,
-} from "./GridCharacter/CharacterAnimation/CharacterAnimation";
-import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter";
+} from "./GridCharacter/CharacterAnimation/CharacterAnimation.js";
+import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter.js";
 
 import { version as VERSION } from "../package.json";
 import {
   IsPositionAllowedFn,
   PathfindingOptions,
-} from "./Pathfinding/Pathfinding";
-import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
+} from "./Pathfinding/Pathfinding.js";
+import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
 import {
   GridEngineHeadless,
   TileSizePerSecond,
   GridEngineConfigHeadless,
   CollisionConfig,
   CharacterDataHeadless,
-} from "./GridEngineHeadless";
-import { GridTilemapPhaser } from "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser";
+} from "./GridEngineHeadless.js";
+import { GridTilemapPhaser } from "./GridEnginePhaser/GridTilemapPhaser/GridTilemapPhaser.js";
 import {
   PhaserTilemap,
   TiledProject,
-} from "./GridTilemap/Phaser/PhaserTilemap";
-import { Orientation, Tile, TileLayer, Tilemap } from "./GridTilemap/Tilemap";
-import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer";
-import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile";
+} from "./GridTilemap/Phaser/PhaserTilemap.js";
+import {
+  Orientation,
+  Tile,
+  TileLayer,
+  Tilemap,
+} from "./GridTilemap/Tilemap.js";
+import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer.js";
+import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile.js";
 import {
   QueueMovementConfig,
   QueuedPathBlockedStrategy,
   Finished as QueueMovementFinished,
   QueueMovementResult,
   QueueMovementEntry,
-} from "./Movement/QueueMovement/QueueMovement";
+} from "./Movement/QueueMovement/QueueMovement.js";
 import {
   CharacterShift,
   CharacterShiftAction,
@@ -59,14 +64,14 @@ import {
   LayerPosition,
   PathfindingResult,
   Position,
-} from "./IGridEngine";
+} from "./IGridEngine.js";
 import {
   ArrayTilemap,
   ArrayTilemapInputLayer,
-} from "./GridTilemap/ArrayTilemap/ArrayTilemap";
-import { TiledTilemap } from "./GridTilemap/TiledTilemap/TiledTilemap";
-import { TiledLayer } from "./GridTilemap/TiledTilemap/TiledLayer";
-import { TiledTile } from "./GridTilemap/TiledTilemap/TiledTile";
+} from "./GridTilemap/ArrayTilemap/ArrayTilemap.js";
+import { TiledTilemap } from "./GridTilemap/TiledTilemap/TiledTilemap.js";
+import { TiledLayer } from "./GridTilemap/TiledTilemap/TiledLayer.js";
+import { TiledTile } from "./GridTilemap/TiledTilemap/TiledTile.js";
 
 export {
   ArrayTilemap,

@@ -1,4 +1,4 @@
-import { Orientation, Tile, TileLayer, Tilemap } from "../Tilemap";
+import { Orientation, Tile, TileLayer, Tilemap } from "../Tilemap.js";
 
 /**
  * Represents a layer for a simple array tilemap.
@@ -26,7 +26,7 @@ export class ArrayTilemap implements Tilemap {
   constructor(
     private map: Record<LayerName, ArrayTilemapInputLayer>,
     private orientation: Orientation = "orthogonal",
-    collisionPropertyName = "ge_collide"
+    collisionPropertyName = "ge_collide",
   ) {
     let width = -1;
     let height = -1;
@@ -48,7 +48,7 @@ export class ArrayTilemap implements Tilemap {
         for (let c = 0; c < layer.data[r].length; c++) {
           const tile = new ArrayTile(
             layer.data[r][c] === 1,
-            collisionPropertyName
+            collisionPropertyName,
           );
           row.push(tile);
         }
@@ -91,7 +91,7 @@ class ArrayTileLayer implements TileLayer {
   constructor(
     private name: string,
     private tiles: Tile[][],
-    isCharLayer = false
+    isCharLayer = false,
   ) {
     this.isCharLayerInternal = isCharLayer;
   }
@@ -118,7 +118,7 @@ class ArrayTileLayer implements TileLayer {
 class ArrayTile {
   constructor(
     private isBlocking: boolean,
-    private collisionPropertyName: string
+    private collisionPropertyName: string,
   ) {}
 
   getProperty(name: string): any {

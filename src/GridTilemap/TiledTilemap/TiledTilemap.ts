@@ -1,5 +1,5 @@
-import { Orientation, Tile, TileLayer, Tilemap } from "../Tilemap";
-import { TiledLayer } from "./TiledLayer";
+import { Orientation, Tile, TileLayer, Tilemap } from "../Tilemap.js";
+import { TiledLayer } from "./TiledLayer.js";
 
 export const CHAR_LAYER_PROP_NAME = "ge_charLayer";
 

@@ -1,19 +1,19 @@
-import { Direction } from "./Direction/Direction";
-import { MovementInfo } from "./Movement/Movement";
+import { Direction } from "./Direction/Direction.js";
+import { MovementInfo } from "./Movement/Movement.js";
 import {
   Finished,
   MoveToConfig,
-} from "./Movement/TargetMovement/TargetMovement";
+} from "./Movement/TargetMovement/TargetMovement.js";
 import {
   QueueMovementConfig,
   QueueMovementEntry,
   Finished as QueueMovementFinished,
-} from "./Movement/QueueMovement/QueueMovement";
+} from "./Movement/QueueMovement/QueueMovement.js";
 import { Observable } from "rxjs";
-import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter";
-import { PathfindingOptions } from "./Pathfinding/Pathfinding";
-import { PositionChange } from "./GridCharacter/GridCharacter";
-import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
+import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter.js";
+import { PathfindingOptions } from "./Pathfinding/Pathfinding.js";
+import { PositionChange } from "./GridCharacter/GridCharacter.js";
+import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
 
 export type CharLayer = string | undefined;
 
@@ -224,7 +224,7 @@ export interface IGridEngine {
   moveTo(
     charId: string,
     targetPos: Position,
-    config?: MoveToConfig
+    config?: MoveToConfig,
   ): Observable<{ charId: string } & Finished>;
   /**
    * Stops any automated movement such as random movement
@@ -357,13 +357,13 @@ export interface IGridEngine {
     charId: string,
     charIdToFollow: string,
     distance?: number,
-    closestPointIfBlocked?: boolean
+    closestPointIfBlocked?: boolean,
   ): void;
   follow(
     charId: string,
     charIdToFollow: string,
     distance?: FollowOptions | number,
-    closestPointIfBlocked?: boolean
+    closestPointIfBlocked?: boolean,
   ): void;
   /**
    * @returns True if the character is currently moving.
@@ -425,7 +425,7 @@ export interface IGridEngine {
   isBlocked(
     position: Position,
     layer?: string,
-    collisionGroups?: string[]
+    collisionGroups?: string[],
   ): boolean;
 
   /**
@@ -465,7 +465,7 @@ export interface IGridEngine {
   getTilePosInDirection(
     position: Position,
     charLayer: string | undefined,
-    direction: Direction
+    direction: Direction,
   ): LayerPosition;
 
   /**
@@ -484,7 +484,7 @@ export interface IGridEngine {
   findShortestPath(
     source: LayerPosition,
     dest: LayerPosition,
-    options?: PathfindingOptions
+    options?: PathfindingOptions,
   ): PathfindingResult;
 
   /**
@@ -496,7 +496,7 @@ export interface IGridEngine {
   steppedOn(
     charIds: string[],
     tiles: Position[],
-    layer?: CharLayer[]
+    layer?: CharLayer[],
   ): Observable<
     {
       charId: string;
@@ -581,7 +581,7 @@ export interface IGridEngine {
     x: number,
     y: number,
     width: number,
-    height: number
+    height: number,
   ): void;
 
   /**
@@ -597,7 +597,7 @@ export interface IGridEngine {
   addQueueMovements(
     charId: string,
     positions: Array<LayerPosition | Direction>,
-    options?: QueueMovementConfig
+    options?: QueueMovementConfig,
   );
 
   /**
@@ -634,6 +634,6 @@ export interface IGridEngine {
   getTileCost(
     position: Position,
     charLayer?: string,
-    srcDirection?: Direction
+    srcDirection?: Direction,
   ): number;
 }

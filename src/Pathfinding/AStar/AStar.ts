@@ -2,10 +2,10 @@ import {
   LayerVecPos,
   ShortestPathAlgorithm,
   ShortestPathResult,
-} from "../ShortestPathAlgorithm";
-import { VectorUtils } from "../../Utils/VectorUtils";
+} from "../ShortestPathAlgorithm.js";
+import { VectorUtils } from "../../Utils/VectorUtils.js";
 import { MinFibonacciHeap } from "mnemonist/fibonacci-heap";
-import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils";
+import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 interface ShortestPathTuple {
   previous: Map<string, LayerVecPos>;
@@ -17,7 +17,7 @@ interface ShortestPathTuple {
 export class AStar extends ShortestPathAlgorithm {
   findShortestPathImpl(
     startPos: LayerVecPos,
-    targetPos: LayerVecPos
+    targetPos: LayerVecPos,
   ): ShortestPathResult {
     const shortestPath = this.shortestPathBfs(startPos, targetPos);
     return {
@@ -31,25 +31,25 @@ export class AStar extends ShortestPathAlgorithm {
 
   private shortestPathBfs(
     startNode: LayerVecPos,
-    stopNode: LayerVecPos
+    stopNode: LayerVecPos,
   ): ShortestPathTuple {
     const previous = new Map<string, LayerVecPos>();
     const g = new Map<string, number>();
     const f = new Map<string, number>();
     const openSet = new MinFibonacciHeap<LayerVecPos>(
-      (a, b) => safeGet(f, a) - safeGet(f, b)
+      (a, b) => safeGet(f, a) - safeGet(f, b),
     );
     let closestToTarget: LayerVecPos = startNode;
     let smallestDistToTarget: number = this.distance(
       startNode.position,
-      stopNode.position
+      stopNode.position,
     );
     let steps = 0;
     openSet.push(startNode);
     g.set(LayerPositionUtils.toString(startNode), 0);
     f.set(
       LayerPositionUtils.toString(startNode),
-      this.distance(startNode.position, stopNode.position)
+      this.distance(startNode.position, stopNode.position),
     );
 
     while (openSet.size > 0) {
@@ -90,7 +90,7 @@ export class AStar extends ShortestPathAlgorithm {
           g.set(neighborStr, tentativeG);
           f.set(
             neighborStr,
-            tentativeG + this.distance(neighbor.position, stopNode.position)
+            tentativeG + this.distance(neighbor.position, stopNode.position),
           );
           openSet.push(neighbor);
         }
@@ -102,7 +102,7 @@ export class AStar extends ShortestPathAlgorithm {
   private returnPath(
     previous: Map<string, LayerVecPos>,
     startNode: LayerVecPos,
-    stopNode: LayerVecPos
+    stopNode: LayerVecPos,
   ): LayerVecPos[] {
     const ret: LayerVecPos[] = [];
     let currentNode: LayerVecPos | undefined = stopNode;

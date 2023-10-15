@@ -4,16 +4,16 @@ import {
   directions,
   turnClockwise,
   turnCounterClockwise,
-} from "./../Direction/Direction";
-import { Vector2 } from "../Utils/Vector2/Vector2";
-import { CharBlockCache } from "./CharBlockCache/CharBlockCache";
-import { Rect } from "../Utils/Rect/Rect";
-import { CharId, GridCharacter } from "../GridCharacter/GridCharacter";
-import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm";
-import { CollisionStrategy } from "../Collisions/CollisionStrategy";
-import { CharLayer } from "../GridEngine";
-import { CHAR_LAYER_PROP_NAME, TileLayer, Tilemap } from "./Tilemap";
-import { TileCollisionCache } from "./TileCollisionCache/TileCollisionCache";
+} from "./../Direction/Direction.js";
+import { CharBlockCache } from "./CharBlockCache/CharBlockCache.js";
+import { Rect } from "../Utils/Rect/Rect.js";
+import { CharId, GridCharacter } from "../GridCharacter/GridCharacter.js";
+import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm.js";
+import { CollisionStrategy } from "../Collisions/CollisionStrategy.js";
+import { CharLayer } from "../GridEngine.js";
+import { CHAR_LAYER_PROP_NAME, TileLayer, Tilemap } from "./Tilemap.js";
+import { TileCollisionCache } from "./TileCollisionCache/TileCollisionCache.js";
+import { Vector2 } from "../Utils/Vector2/Vector2.js";
 
 const TILE_COST_PROPERTY_NAME = "ge_cost";
 export class GridTilemap {
@@ -45,11 +45,11 @@ export class GridTilemap {
     private collisionTilePropertyName: string,
     collisionStrategy: CollisionStrategy,
     collisionGroupRelation: Map<string, Set<string>> | undefined = undefined,
-    private useTileCollisionCache = false
+    private useTileCollisionCache = false,
   ) {
     this.charBlockCache = new CharBlockCache(
       collisionStrategy,
-      collisionGroupRelation
+      collisionGroupRelation,
     );
 
     // Performance optimization for pathfinding.
@@ -57,7 +57,7 @@ export class GridTilemap {
     for (const dir of directions()) {
       this.collidesPropNames.set(
         dir,
-        GridTilemap.ONE_WAY_COLLIDE_PROP_PREFIX + dir
+        GridTilemap.ONE_WAY_COLLIDE_PROP_PREFIX + dir,
       );
       this.tileCostPropNames.set(dir, `${TILE_COST_PROPERTY_NAME}_${dir}`);
     }
@@ -111,7 +111,7 @@ export class GridTilemap {
     pos: Vector2,
     charLayer: string | undefined,
     direction?: Direction,
-    ignoreHasTile?: boolean
+    ignoreHasTile?: boolean,
   ): boolean {
     if (!ignoreHasTile && this.hasNoTileUncached(pos, charLayer)) return true;
 
@@ -129,21 +129,21 @@ export class GridTilemap {
     pos: Vector2,
     charLayer: string | undefined,
     direction?: Direction,
-    ignoreHasTile?: boolean
+    ignoreHasTile?: boolean,
   ): boolean {
     const cached = this.tileCollisionCache?.isBlockingFrom(
       pos.x,
       pos.y,
       charLayer,
       direction,
-      ignoreHasTile
+      ignoreHasTile,
     );
     if (cached !== undefined) return cached;
     return this.hasBlockingTileUncached(
       pos,
       charLayer,
       direction,
-      ignoreHasTile
+      ignoreHasTile,
     );
   }
 
@@ -157,7 +157,7 @@ export class GridTilemap {
 
   getReverseTransitions(
     pos: Vector2,
-    targetLayer?: string
+    targetLayer?: string,
   ): Set<CharLayer> | undefined {
     const reverseTransitions = this.reverseTransitions.get(pos.toString());
 
@@ -182,7 +182,7 @@ export class GridTilemap {
 
   getTransitions(): Map<CharLayer, Map<CharLayer, CharLayer>> {
     return new Map(
-      [...this.transitions].map(([pos, map]) => [pos, new Map(map)])
+      [...this.transitions].map(([pos, map]) => [pos, new Map(map)]),
     );
   }
 
@@ -192,7 +192,7 @@ export class GridTilemap {
     for (const layer of crl) {
       maxCost = Math.max(
         maxCost,
-        this.getTileCostsForLayer({ ...pos, layer: layer.getName() }, srcDir)
+        this.getTileCostsForLayer({ ...pos, layer: layer.getName() }, srcDir),
       );
     }
     return maxCost;
@@ -202,7 +202,7 @@ export class GridTilemap {
     const tile = this.tilemap.getTileAt(
       dest.position.x,
       dest.position.y,
-      dest.layer
+      dest.layer,
     );
     return (
       (dir && tile?.getProperty(this.tileCostPropNames.get(dir) || "")) ||
@@ -214,7 +214,7 @@ export class GridTilemap {
   hasNoTileUncached(pos: Vector2, charLayer?: string): boolean {
     const crl = this.getCollisionRelevantLayers(charLayer);
     return !crl.some((layer) =>
-      this.tilemap.hasTileAt(pos.x, pos.y, layer.getName())
+      this.tilemap.hasTileAt(pos.x, pos.y, layer.getName()),
     );
   }
 
@@ -230,13 +230,13 @@ export class GridTilemap {
     pos: Vector2,
     layer: string | undefined,
     collisionGroups: string[],
-    exclude = new Set<CharId>()
+    exclude = new Set<CharId>(),
   ): boolean {
     return this.charBlockCache.isCharBlockingAt(
       pos,
       layer,
       collisionGroups,
-      exclude
+      exclude,
     );
   }
 
@@ -245,7 +245,7 @@ export class GridTilemap {
       0,
       0,
       this.tilemap.getWidth(),
-      this.tilemap.getHeight()
+      this.tilemap.getHeight(),
     );
     return rect.isInRange(pos);
   }
@@ -270,10 +270,10 @@ export class GridTilemap {
 
   getTilePosInDirection(
     position: LayerVecPos,
-    direction: Direction
+    direction: Direction,
   ): LayerVecPos {
     const posInDir = position.position.add(
-      directionVector(this.toMapDirection(direction))
+      directionVector(this.toMapDirection(direction)),
     );
 
     const transition =
@@ -292,7 +292,7 @@ export class GridTilemap {
   private isLayerBlockingAt(
     layerName: string | undefined,
     pos: Vector2,
-    direction?: Direction
+    direction?: Direction,
   ): boolean {
     const tile = this.tilemap.getTileAt(pos.x, pos.y, layerName);
     if (!tile) return false;

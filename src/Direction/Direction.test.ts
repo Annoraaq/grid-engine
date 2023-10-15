@@ -1,5 +1,5 @@
-import { Vector2 } from "../Utils/Vector2/Vector2";
-import { Direction, directionFromPos } from "./Direction";
+import { Vector2 } from "../Utils/Vector2/Vector2.js";
+import { Direction, directionFromPos } from "./Direction.js";
 
 describe("Direction", () => {
   it("should get direction from pos", () => {

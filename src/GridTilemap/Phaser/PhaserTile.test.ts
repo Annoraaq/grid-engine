@@ -1,4 +1,4 @@
-import { PhaserTile } from "./PhaserTile";
+import { PhaserTile } from "./PhaserTile.js";
 
 describe("PhaserTile", () => {
   it("should detect properties", () => {

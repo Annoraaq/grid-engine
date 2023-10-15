@@ -1,13 +1,16 @@
-import { CharLayer, Direction } from "../GridEngine";
-import { GridTilemap } from "../GridTilemap/GridTilemap";
-import { DistanceUtilsFactory } from "../Utils/DistanceUtilsFactory/DistanceUtilsFactory";
-import { Vector2 } from "../Utils/Vector2/Vector2";
-import { PathfindingOptions } from "./Pathfinding";
-import { directionFromPos, NumberOfDirections } from "../Direction/Direction";
-import { Concrete } from "../Utils/TypeUtils";
-import { LayerPositionUtils } from "../Utils/LayerPositionUtils/LayerPositionUtils";
-import { CharId } from "../GridCharacter/GridCharacter";
-import { VectorUtils } from "../Utils/VectorUtils";
+import { CharLayer, Direction } from "../GridEngine.js";
+import { GridTilemap } from "../GridTilemap/GridTilemap.js";
+import { DistanceUtilsFactory } from "../Utils/DistanceUtilsFactory/DistanceUtilsFactory.js";
+import { Vector2 } from "../Utils/Vector2/Vector2.js";
+import { PathfindingOptions } from "./Pathfinding.js";
+import {
+  directionFromPos,
+  NumberOfDirections,
+} from "../Direction/Direction.js";
+import { Concrete } from "../Utils/TypeUtils.js";
+import { LayerPositionUtils } from "../Utils/LayerPositionUtils/LayerPositionUtils.js";
+import { CharId } from "../GridCharacter/GridCharacter.js";
+import { VectorUtils } from "../Utils/VectorUtils.js";
 
 export interface LayerVecPos {
   position: Vector2;
@@ -48,7 +51,7 @@ export abstract class ShortestPathAlgorithm {
 
   findShortestPath(
     startPos: LayerVecPos,
-    targetPos: LayerVecPos
+    targetPos: LayerVecPos,
   ): ShortestPathResult {
     if (this.options.ignoreLayers) {
       this.gridTilemap.fixCacheLayer(startPos.layer);
@@ -62,7 +65,7 @@ export abstract class ShortestPathAlgorithm {
 
   abstract findShortestPathImpl(
     startPos: LayerVecPos,
-    targetPos: LayerVecPos
+    targetPos: LayerVecPos,
   ): ShortestPathResult;
 
   constructor(
@@ -82,7 +85,7 @@ export abstract class ShortestPathAlgorithm {
       ignoreLayers = false,
       considerCosts = false,
       calculateClosestToTarget = true,
-    }: PathfindingOptions = {}
+    }: PathfindingOptions = {},
   ) {
     this.options = {
       shortestPathAlgorithm,
@@ -104,7 +107,7 @@ export abstract class ShortestPathAlgorithm {
 
   getNeighbors(pos: LayerVecPos, dest: LayerVecPos): LayerVecPos[] {
     const distanceUtils = DistanceUtilsFactory.create(
-      this.options.numberOfDirections ?? NumberOfDirections.FOUR
+      this.options.numberOfDirections ?? NumberOfDirections.FOUR,
     );
     const neighbours = distanceUtils.neighbors(pos.position);
     const transitionMappedNeighbors = neighbours.map((unblockedNeighbor) => {
@@ -112,7 +115,7 @@ export abstract class ShortestPathAlgorithm {
       if (!this.options.ignoreLayers) {
         transition = this.gridTilemap.getTransition(
           unblockedNeighbor,
-          pos.layer
+          pos.layer,
         );
       }
 
@@ -153,7 +156,7 @@ export abstract class ShortestPathAlgorithm {
 
     const positionAllowed = this.options.isPositionAllowed(
       dest.position,
-      dest.layer
+      dest.layer,
     );
 
     if (!positionAllowed) return true;
@@ -166,7 +169,7 @@ export abstract class ShortestPathAlgorithm {
         this.options.pathWidth,
         this.options.pathHeight,
         this.options.ignoreMapBounds,
-        this.gridTilemap
+        this.gridTilemap,
       );
 
     if (tileBlocking) return true;
@@ -177,7 +180,7 @@ export abstract class ShortestPathAlgorithm {
       this.options.pathHeight,
       this.options.collisionGroups,
       this.options.ignoredChars,
-      this.gridTilemap
+      this.gridTilemap,
     );
 
     return charBlocking;
@@ -197,7 +200,7 @@ export abstract class ShortestPathAlgorithm {
 
   getReverseNeighbors(pos: LayerVecPos, dest: LayerVecPos): LayerVecPos[] {
     const distanceUtils = DistanceUtilsFactory.create(
-      this.options.numberOfDirections ?? NumberOfDirections.FOUR
+      this.options.numberOfDirections ?? NumberOfDirections.FOUR,
     );
     const neighbors = distanceUtils.neighbors(pos.position);
 
@@ -205,7 +208,7 @@ export abstract class ShortestPathAlgorithm {
     if (!this.options.ignoreLayers) {
       const toCurrentLayer = this.gridTilemap.getReverseTransitions(
         pos.position,
-        pos.layer
+        pos.layer,
       );
       toCurrentLayerArr = toCurrentLayer ? [...toCurrentLayer] : undefined;
     }
@@ -244,7 +247,7 @@ export abstract class ShortestPathAlgorithm {
     pathHeight: number,
     collisionGroups: string[],
     ignoredChars: CharId[],
-    gridTilemap: GridTilemap
+    gridTilemap: GridTilemap,
   ): boolean {
     for (let x = pos.position.x; x < pos.position.x + pathWidth; x++) {
       for (let y = pos.position.y; y < pos.position.y + pathHeight; y++) {
@@ -252,7 +255,7 @@ export abstract class ShortestPathAlgorithm {
           new Vector2(x, y),
           pos.layer,
           collisionGroups,
-          new Set(ignoredChars)
+          new Set(ignoredChars),
         );
 
         if (res) return true;
@@ -267,7 +270,7 @@ export abstract class ShortestPathAlgorithm {
     pathWidth: number,
     pathHeight: number,
     ignoreMapBounds: boolean,
-    gridTilemap: GridTilemap
+    gridTilemap: GridTilemap,
   ): boolean {
     for (let x = dest.position.x; x < dest.position.x + pathWidth; x++) {
       for (let y = dest.position.y; y < dest.position.y + pathHeight; y++) {
@@ -275,7 +278,7 @@ export abstract class ShortestPathAlgorithm {
           new Vector2(x, y),
           dest.layer,
           directionFromPos(dest.position, src.position),
-          ignoreMapBounds
+          ignoreMapBounds,
         );
 
         if (res) return true;
