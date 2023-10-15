@@ -6,7 +6,7 @@
     "downlevelIteration": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
   },
   "include": [
     "**/*.ts",
