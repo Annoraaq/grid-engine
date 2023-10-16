@@ -4,7 +4,8 @@
   "description": "Phaser3 plugin for grid based movement on a 2D game board.",
   "author": "Johannes Baum",
   "license": "Apache-2.0",
-  "main": "dist/GridEngine.esm.min.js",
+  "main": "dist/GridEngine.min.cjs",
+  "module": "dist/GridEngine.esm.min.js",
   "type": "module",
   "scripts": {
     "test": "jest",
@@ -37,7 +38,7 @@
   "files": [
     "dist"
   ],
-  "types": "dist/src/GridEngine.d.ts",
+  "types": "dist/mjs/src/main-esm.d.ts",
   "dependencies": {
     "mnemonist": "^0.39.5",
     "rxjs": "^7.8.1",
