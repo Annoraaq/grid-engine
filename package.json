@@ -1,6 +1,6 @@
 {
   "name": "grid-engine",
-  "version": "2.38.0",
+  "version": "2.38.1",
   "description": "Phaser3 plugin for grid based movement on a 2D game board.",
   "author": "Johannes Baum",
   "license": "Apache-2.0",
