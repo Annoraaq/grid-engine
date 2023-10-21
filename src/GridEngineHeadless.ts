@@ -1259,9 +1259,17 @@ export class GridEngineHeadless implements IGridEngine {
       for (const charState of state.characters) {
         const char = this.gridCharacters.get(charState.id);
         if (char) {
-          char.setTilePosition(
-            LayerPositionUtils.toInternal(charState.position),
-          );
+          const currentTilePos = char.getTilePos();
+          if (
+            !LayerPositionUtils.equal(
+              currentTilePos,
+              LayerPositionUtils.toInternal(charState.position),
+            )
+          ) {
+            char.setTilePosition(
+              LayerPositionUtils.toInternal(charState.position),
+            );
+          }
           char.setSpeed(charState.speed);
           char.turnTowards(charState.facingDirection);
           char.turnTowards(charState.facingDirection);
