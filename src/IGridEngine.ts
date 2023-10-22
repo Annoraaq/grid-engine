@@ -641,6 +641,8 @@ export interface IGridEngine {
   /**
    * Returns the current state of Grid Engine. This is useful for persiting or
    * sharing the state.
+   *
+   * @beta
    */
   getState(): GridEngineState;
 
@@ -650,6 +652,8 @@ export interface IGridEngine {
    * you should call {@link GridEngineHeadless.create}/{@link GridEngine.create}
    * or remove all characters via
    * {@link GridEngineHeadless.removeAllCharacters}.
+   *
+   * @beta
    */
   setState(state: GridEngineState): void;
 }
