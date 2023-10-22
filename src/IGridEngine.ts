@@ -647,7 +647,9 @@ export interface IGridEngine {
   /**
    * Sets the given state for Grid Engine. Be aware that it will **not** remove
    * any characters from Grid Engine. If you want to completely reset the state,
-   * you should call {@link GridEngineHeadless.create}/{@link GridEngine.create}.
+   * you should call {@link GridEngineHeadless.create}/{@link GridEngine.create}
+   * or remove all characters via
+   * {@link GridEngineHeadless.removeAllCharacters}.
    */
   setState(state: GridEngineState): void;
 }
