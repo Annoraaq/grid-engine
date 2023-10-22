@@ -13,6 +13,7 @@ import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.j
 import { Tilemap } from "./GridTilemap/Tilemap.js";
 import { CharacterShift, CharLayer, FollowOptions, IGridEngine, LayerPosition, PathfindingResult, Position } from "./IGridEngine.js";
 import { QueueMovementConfig, QueueMovementEntry, Finished as QueueMovementFinished } from "./Movement/QueueMovement/QueueMovement.js";
+import { GridEngineState } from "./GridEngineState.js";
 export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, MovementInfo, PositionChange, IsPositionAllowedFn, PathfindingOptions, ShortestPathAlgorithmType, };
 export type TileSizePerSecond = number;
 /**
@@ -514,6 +515,18 @@ export declare class GridEngineHeadless implements IGridEngine {
      * @category Pathfinding
      */
     getTileCost(position: Position, charLayer?: string, srcDirection?: Direction): number;
+    /**
+     * {@inheritDoc IGridEngine.getState}
+     *
+     * @category GridEngine
+     */
+    getState(): GridEngineState;
+    /**
+     * {@inheritDoc IGridEngine.setState}
+     *
+     * @category GridEngine
+     */
+    setState(state: GridEngineState): void;
     private charRemoved;
     private initGuard;
     private createUninitializedErr;

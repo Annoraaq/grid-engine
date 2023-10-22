@@ -61,7 +61,9 @@ export declare class GridCharacter {
     setMovement(movement?: Movement): void;
     getMovement(): Movement | undefined;
     collidesWithTiles(): boolean;
+    setCollidesWithTiles(collidesWithTiles: boolean): void;
     getIgnoreMissingTiles(): boolean;
+    setIgnoreMissingTiles(ignoreMissingTiles: boolean): void;
     setTilePosition(tilePosition: LayerVecPos): void;
     getTilePos(): LayerVecPos;
     getNextTilePos(): LayerVecPos;
@@ -99,6 +101,7 @@ export declare class GridCharacter {
     autoMovementSet(): Subject<Movement | undefined>;
     depthChanged(): Subject<LayerVecPos>;
     getMovementProgress(): number;
+    setMovementProgress(progress: number): void;
     hasWalkedHalfATile(): boolean;
     willCrossTileBorderThisUpdate(delta: number): boolean;
     private updateCharacterPosition;

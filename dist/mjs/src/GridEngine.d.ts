@@ -21,6 +21,7 @@ import { ArrayTilemap, ArrayTilemapInputLayer } from "./GridTilemap/ArrayTilemap
 import { TiledTilemap } from "./GridTilemap/TiledTilemap/TiledTilemap.js";
 import { TiledLayer } from "./GridTilemap/TiledTilemap/TiledLayer.js";
 import { TiledTile } from "./GridTilemap/TiledTilemap/TiledTile.js";
+import { GridEngineState } from "./GridEngineState.js";
 export { ArrayTilemap, ArrayTilemapInputLayer, CharacterDataHeadless, CharacterFilteringOptions, CharacterShift, CharacterShiftAction, CharLayer, CollisionConfig, CollisionStrategy, Direction, Finished, FollowOptions, FrameRow, GridEngineConfigHeadless, GridEngineHeadless, IGridEngine, IsPositionAllowedFn, LayerPosition, MovementInfo, MoveToConfig, MoveToInfo, MoveToResult, NoPathFoundStrategy, NumberOfDirections, Orientation, PathBlockedStrategy, PathfindingOptions, PathfindingResult, Position, PositionChange, PhaserTile, PhaserTileLayer, PhaserTilemap, QueueMovementConfig, QueueMovementEntry, QueueMovementFinished, QueueMovementResult, QueuedPathBlockedStrategy, ShortestPathAlgorithmType, Tile, TiledProject, TiledTilemap, TiledLayer, TiledTile, TileLayer, Tilemap, TileSizePerSecond, directionFromPos, };
 /**
  * Configuration object for initializing GridEngine.
@@ -508,6 +509,18 @@ export declare class GridEngine implements IGridEngine {
      * @category Queue Movement
      */
     clearEnqueuedMovements(charId: string): void;
+    /**
+     * {@inheritDoc IGridEngine.getState}
+     *
+     * @category GridEngine
+     */
+    getState(): GridEngineState;
+    /**
+     * {@inheritDoc IGridEngine.setState}
+     *
+     * @category GridEngine
+     */
+    setState(state: GridEngineState): void;
     /**
      * {@inheritDoc IGridEngine.getTileCost}
      *
