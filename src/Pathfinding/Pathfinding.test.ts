@@ -1,5 +1,5 @@
-import { CollisionStrategy, NumberOfDirections } from "../GridEngine";
-import { GridTilemap } from "../GridTilemap/GridTilemap";
+import { CollisionStrategy, NumberOfDirections } from "../GridEngine.js";
+import { GridTilemap } from "../GridTilemap/GridTilemap.js";
 import {
   COLLISION_GROUP,
   layerPos,
@@ -8,10 +8,10 @@ import {
   mockLayeredBlockMap,
   LOWER_CHAR_LAYER,
   mockCharMap,
-} from "../Utils/MockFactory/MockFactory";
-import { Vector2 } from "../Utils/Vector2/Vector2";
-import { Pathfinding } from "./Pathfinding";
-import { ShortestPathAlgorithmType } from "./ShortestPathAlgorithm";
+} from "../Utils/MockFactory/MockFactory.js";
+import { Vector2 } from "../Utils/Vector2/Vector2.js";
+import { Pathfinding } from "./Pathfinding.js";
+import { ShortestPathAlgorithmType } from "./ShortestPathAlgorithm.js";
 
 describe("Pathfinding", () => {
   let pathfindingAlgo: ShortestPathAlgorithmType;
@@ -21,13 +21,13 @@ describe("Pathfinding", () => {
   });
 
   function createTilemap(
-    layers: Array<{ blockMap: string[]; layer: string | undefined }>
+    layers: Array<{ blockMap: string[]; layer: string | undefined }>,
   ) {
     const tm = mockLayeredBlockMap(layers);
     const gridTilemap = new GridTilemap(
       tm,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     mockCharMap(gridTilemap, layers);
     return gridTilemap;
@@ -50,7 +50,7 @@ describe("Pathfinding", () => {
     const shortestPath = pathfinding.findShortestPath(
       layerPos(new Vector2(1, 0)),
       layerPos(new Vector2(1, 2)),
-      { shortestPathAlgorithm: pathfindingAlgo }
+      { shortestPathAlgorithm: pathfindingAlgo },
     );
 
     expect(shortestPath.path).toEqual([]);
@@ -73,7 +73,7 @@ describe("Pathfinding", () => {
     const shortestPath = pathfinding.findShortestPath(
       layerPos(new Vector2(1, 0)),
       layerPos(new Vector2(1, 2)),
-      { shortestPathAlgorithm: pathfindingAlgo }
+      { shortestPathAlgorithm: pathfindingAlgo },
     );
 
     expect(shortestPath.path).toEqual([
@@ -105,7 +105,7 @@ describe("Pathfinding", () => {
     const shortestPath = pathfinding.findShortestPath(
       layerPos(new Vector2(1, 1)),
       layerPos(new Vector2(3, 3)),
-      { shortestPathAlgorithm: pathfindingAlgo }
+      { shortestPathAlgorithm: pathfindingAlgo },
     );
 
     expect(shortestPath.closestToTarget).toEqual(layerPos(new Vector2(3, 1)));
@@ -134,7 +134,7 @@ describe("Pathfinding", () => {
       {
         numberOfDirections: NumberOfDirections.EIGHT,
         shortestPathAlgorithm: pathfindingAlgo,
-      }
+      },
     );
 
     expect(shortestPath.closestToTarget).toEqual(layerPos(new Vector2(1, 1)));
@@ -159,7 +159,7 @@ describe("Pathfinding", () => {
     const shortestPath = pathfinding.findShortestPath(
       layerPos(new Vector2(1, 0)),
       layerPos(new Vector2(1, 3)),
-      { pathWidth: 2, pathHeight: 2, shortestPathAlgorithm: pathfindingAlgo }
+      { pathWidth: 2, pathHeight: 2, shortestPathAlgorithm: pathfindingAlgo },
     );
 
     expect(shortestPath.path).toEqual([]);
@@ -184,7 +184,7 @@ describe("Pathfinding", () => {
     const shortestPath = pathfinding.findShortestPath(
       layerPos(new Vector2(1, 0)),
       layerPos(new Vector2(1, 3)),
-      { pathWidth: 2, pathHeight: 2, shortestPathAlgorithm: pathfindingAlgo }
+      { pathWidth: 2, pathHeight: 2, shortestPathAlgorithm: pathfindingAlgo },
     );
 
     expect(shortestPath.path).toEqual([
@@ -223,13 +223,13 @@ describe("Pathfinding", () => {
     gridTilemap.setTransition(
       new Vector2(2, 0),
       "lowerCharLayer",
-      "testCharLayer"
+      "testCharLayer",
     );
 
     const shortestPath = pathfinding.findShortestPath(
       layerPos(new Vector2(1, 0)),
       layerPos(new Vector2(1, 2), "testCharLayer"),
-      { shortestPathAlgorithm: pathfindingAlgo }
+      { shortestPathAlgorithm: pathfindingAlgo },
     );
 
     expect(shortestPath.path).toEqual([
@@ -258,7 +258,7 @@ describe("Pathfinding", () => {
     const shortestPath = pathfinding.findShortestPath(
       layerPos(new Vector2(1, 0)),
       layerPos(new Vector2(1, 2)),
-      { shortestPathAlgorithm: pathfindingAlgo }
+      { shortestPathAlgorithm: pathfindingAlgo },
     );
 
     expect(shortestPath.path).toEqual([
@@ -289,7 +289,7 @@ describe("Pathfinding", () => {
     const shortestPath = pathfinding.findShortestPath(
       layerPos(new Vector2(1, 0)),
       layerPos(new Vector2(1, 2)),
-      { shortestPathAlgorithm: "JPS" }
+      { shortestPathAlgorithm: "JPS" },
     );
 
     expect(shortestPath.algorithmUsed).toEqual("JPS");
@@ -312,7 +312,7 @@ describe("Pathfinding", () => {
     const shortestPath = pathfinding.findShortestPath(
       layerPos(new Vector2(1, 0)),
       layerPos(new Vector2(1, 2)),
-      { shortestPathAlgorithm: pathfindingAlgo }
+      { shortestPathAlgorithm: pathfindingAlgo },
     );
 
     expect(shortestPath.algorithmUsed).toEqual("BIDIRECTIONAL_SEARCH");
@@ -337,7 +337,7 @@ describe("Pathfinding", () => {
       {
         numberOfDirections: NumberOfDirections.EIGHT,
         shortestPathAlgorithm: pathfindingAlgo,
-      }
+      },
     );
 
     expect(shortestPath.path.length).toEqual(2);
@@ -371,7 +371,7 @@ describe("Pathfinding", () => {
       {
         isPositionAllowed: allowedFn,
         shortestPathAlgorithm: pathfindingAlgo,
-      }
+      },
     );
 
     expect(shortestPath.path).toEqual([
@@ -405,7 +405,7 @@ describe("Pathfinding", () => {
       {
         collisionGroups: [COLLISION_GROUP],
         shortestPathAlgorithm: pathfindingAlgo,
-      }
+      },
     );
 
     expect(shortestPath.path).toEqual([
@@ -436,7 +436,7 @@ describe("Pathfinding", () => {
     const shortestPath = pathfinding.findShortestPath(
       layerPos(new Vector2(1, 0)),
       layerPos(new Vector2(1, 2)),
-      { shortestPathAlgorithm: pathfindingAlgo }
+      { shortestPathAlgorithm: pathfindingAlgo },
     );
 
     expect(shortestPath.path).toEqual([
@@ -466,7 +466,7 @@ describe("Pathfinding", () => {
       {
         collisionGroups: ["someOtherCollisionGroup"],
         shortestPathAlgorithm: pathfindingAlgo,
-      }
+      },
     );
 
     expect(shortestPath.path).toEqual([
@@ -497,7 +497,7 @@ describe("Pathfinding", () => {
         collisionGroups: [COLLISION_GROUP],
         ignoredChars: ["mock_char_1"],
         shortestPathAlgorithm: pathfindingAlgo,
-      }
+      },
     );
 
     expect(shortestPath.path).toEqual([
@@ -524,7 +524,7 @@ describe("Pathfinding", () => {
     const shortestPath = pathfinding.findShortestPath(
       layerPos(new Vector2(1, 0)),
       layerPos(new Vector2(1, 2)),
-      { ignoreTiles: true, shortestPathAlgorithm: pathfindingAlgo }
+      { ignoreTiles: true, shortestPathAlgorithm: pathfindingAlgo },
     );
 
     expect(shortestPath.path.length).toEqual(3);
@@ -547,7 +547,7 @@ describe("Pathfinding", () => {
     const shortestPath = pathfinding.findShortestPath(
       layerPos(new Vector2(1, 0)),
       layerPos(new Vector2(1, 2)),
-      { ignoreMapBounds: true, shortestPathAlgorithm: pathfindingAlgo }
+      { ignoreMapBounds: true, shortestPathAlgorithm: pathfindingAlgo },
     );
 
     expect(shortestPath.path.length).toEqual(7);
@@ -575,7 +575,7 @@ describe("Pathfinding", () => {
         ignoreMapBounds: true,
         maxPathLength: 10,
         shortestPathAlgorithm: pathfindingAlgo,
-      }
+      },
     );
 
     expect(shortestPath.path.length).toEqual(0);
@@ -599,7 +599,7 @@ describe("Pathfinding", () => {
     const shortestPath = pathfinding.findShortestPath(
       layerPos(new Vector2(1, 0)),
       layerPos(new Vector2(1, 2)),
-      { ignoreBlockedTarget: true, shortestPathAlgorithm: pathfindingAlgo }
+      { ignoreBlockedTarget: true, shortestPathAlgorithm: pathfindingAlgo },
     );
 
     expect(shortestPath.path.length).toEqual(3);
@@ -612,13 +612,13 @@ describe("Pathfinding", () => {
     const gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const pathfinding = new Pathfinding(gridTilemap);
     const shortestPath = pathfinding.findShortestPath(
       layerPos(new Vector2(150, 150)),
       layerPos(new Vector2(250, 250)),
-      { shortestPathAlgorithm: strat }
+      { shortestPathAlgorithm: strat },
     );
 
     expect(shortestPath.steps).toEqual(42363);
@@ -632,13 +632,13 @@ describe("Pathfinding", () => {
     const gridTilemap = new GridTilemap(
       tilemap,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const pathfinding = new Pathfinding(gridTilemap);
     const shortestPath = pathfinding.findShortestPath(
       layerPos(new Vector2(150, 150)),
       layerPos(new Vector2(250, 250)),
-      { shortestPathAlgorithm: strat }
+      { shortestPathAlgorithm: strat },
     );
 
     expect(shortestPath.steps).toEqual(24288);

@@ -1,8 +1,8 @@
 import * as Phaser from "phaser";
-import { GridTilemapPhaser } from "./GridTilemapPhaser";
-import { Direction } from "../../Direction/Direction";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { createPhaserTilemapStub } from "../../Utils/MockFactory/MockPhaserTilemap";
+import { GridTilemapPhaser } from "./GridTilemapPhaser.js";
+import { Direction } from "../../Direction/Direction.js";
+import { Vector2 } from "../../Utils/Vector2/Vector2.js";
+import { createPhaserTilemapStub } from "../../Utils/MockFactory/MockPhaserTilemap.js";
 
 describe("GridTilemapPhaser", () => {
   let gridTilemap: GridTilemapPhaser;
@@ -35,7 +35,7 @@ describe("GridTilemapPhaser", () => {
             ".....",
           ],
         ],
-      ])
+      ]),
     );
     gridTilemap = new GridTilemapPhaser(tm);
   });
@@ -51,7 +51,7 @@ describe("GridTilemapPhaser", () => {
         ["lowerCharLayer", ["."]],
         ["alwaysOnTopLayer", ["."]],
         ["upperCharLayer", ["."]],
-      ])
+      ]),
     );
     tm.layers[1].properties.push({ name: "ge_alwaysTop", value: "true" });
     gridTilemap = new GridTilemapPhaser(tm);
@@ -67,7 +67,7 @@ describe("GridTilemapPhaser", () => {
         ["lowerCharLayer", ["."]],
         ["noCharLayer", ["."]],
         ["upperCharLayer", ["."]],
-      ])
+      ]),
     );
     tm.layers[1].properties = [];
     gridTilemap = new GridTilemapPhaser(tm);
@@ -84,7 +84,7 @@ describe("GridTilemapPhaser", () => {
       new Map([
         ["lowestNoCharLayer", ["."]],
         ["highestNoCharLayer", ["."]],
-      ])
+      ]),
     );
     // Make layers non-char-layers
     tm.layers[0].properties = [];
@@ -113,7 +113,7 @@ describe("GridTilemapPhaser", () => {
             "..",
           ],
         ],
-      ])
+      ]),
     );
     tm.layers[1].properties = [
       ...tm.layers[1].properties,
@@ -143,7 +143,7 @@ describe("GridTilemapPhaser", () => {
       return data.map((row) =>
         row.map((obj) => {
           return obj.properties?.id;
-        })
+        }),
       );
     }
   });
@@ -164,8 +164,8 @@ describe("GridTilemapPhaser", () => {
     expect(gridTilemap.tilePosToPixelPos(tilePosition)).toEqual(
       new Vector2(
         scaledTileWidth * tilePosition.x,
-        scaledTileHeight * tilePosition.y
-      )
+        scaledTileHeight * tilePosition.y,
+      ),
     );
   });
 
@@ -174,7 +174,7 @@ describe("GridTilemapPhaser", () => {
     const scaledTileWidth = 16 * scaleFactor;
     const scaledTileHeight = 16 * scaleFactor;
     expect(gridTilemap.getTileDistance(Direction.DOWN)).toEqual(
-      new Vector2(scaledTileWidth, scaledTileHeight)
+      new Vector2(scaledTileWidth, scaledTileHeight),
     );
   });
 
@@ -184,7 +184,7 @@ describe("GridTilemapPhaser", () => {
     const scaledTileWidth = 16 * scaleFactor;
     const scaledTileHeight = 16 * scaleFactor;
     expect(gridTilemap.getTileDistance(Direction.DOWN)).toEqual(
-      new Vector2(scaledTileWidth, scaledTileHeight)
+      new Vector2(scaledTileWidth, scaledTileHeight),
     );
   });
 
@@ -230,7 +230,7 @@ describe("GridTilemapPhaser", () => {
               ".....",
             ],
           ],
-        ])
+        ]),
       );
       tm.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC.toString();
       gridTilemap = new GridTilemapPhaser(tm);
@@ -243,8 +243,8 @@ describe("GridTilemapPhaser", () => {
       expect(gridTilemap.tilePosToPixelPos(tilePosition)).toEqual(
         new Vector2(
           scaledTileWidth * 0.5 * (tilePosition.x - tilePosition.y),
-          scaledTileHeight * 0.5 * (tilePosition.x + tilePosition.y)
-        )
+          scaledTileHeight * 0.5 * (tilePosition.x + tilePosition.y),
+        ),
       );
     });
 
@@ -252,7 +252,7 @@ describe("GridTilemapPhaser", () => {
       const scaledTileWidth = 16 * scaleFactor;
       const scaledTileHeight = 16 * scaleFactor;
       expect(gridTilemap.getTileDistance(Direction.DOWN_LEFT)).toEqual(
-        new Vector2(scaledTileWidth * 0.5, scaledTileHeight * 0.5)
+        new Vector2(scaledTileWidth * 0.5, scaledTileHeight * 0.5),
       );
     });
   });

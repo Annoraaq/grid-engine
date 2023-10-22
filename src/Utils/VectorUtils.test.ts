@@ -1,5 +1,5 @@
-import { Vector2 } from "./Vector2/Vector2";
-import { VectorUtils } from "./VectorUtils";
+import { Vector2 } from "./Vector2/Vector2.js";
+import { VectorUtils } from "./VectorUtils.js";
 
 describe("VectorUtils", () => {
   describe("vec2str", () => {

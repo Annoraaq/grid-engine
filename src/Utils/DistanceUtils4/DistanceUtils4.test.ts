@@ -1,7 +1,7 @@
-import { Direction } from "../../Direction/Direction";
-import { Vector2 } from "../Vector2/Vector2";
-import { VectorUtils } from "../VectorUtils";
-import { DistanceUtils4 } from "./DistanceUtils4";
+import { Direction } from "../../Direction/Direction.js";
+import { Vector2 } from "../Vector2/Vector2.js";
+import { VectorUtils } from "../VectorUtils.js";
+import { DistanceUtils4 } from "./DistanceUtils4.js";
 
 jest.mock("../VectorUtils");
 describe("DistanceUtils4", () => {
@@ -36,44 +36,44 @@ describe("DistanceUtils4", () => {
 
       // neighbors
       expect(distanceUtils4.direction(vector, new Vector2(2, -1))).toEqual(
-        Direction.LEFT
+        Direction.LEFT,
       );
       expect(distanceUtils4.direction(vector, new Vector2(4, -1))).toEqual(
-        Direction.RIGHT
+        Direction.RIGHT,
       );
       expect(distanceUtils4.direction(vector, new Vector2(3, -2))).toEqual(
-        Direction.UP
+        Direction.UP,
       );
       expect(distanceUtils4.direction(vector, new Vector2(3, 0))).toEqual(
-        Direction.DOWN
+        Direction.DOWN,
       );
 
       // diagonal neighbors
       expect(distanceUtils4.direction(vector, new Vector2(2, 0))).toEqual(
-        Direction.DOWN
+        Direction.DOWN,
       );
       expect(distanceUtils4.direction(vector, new Vector2(4, 0))).toEqual(
-        Direction.DOWN
+        Direction.DOWN,
       );
       expect(distanceUtils4.direction(vector, new Vector2(2, -2))).toEqual(
-        Direction.UP
+        Direction.UP,
       );
       expect(distanceUtils4.direction(vector, new Vector2(4, -2))).toEqual(
-        Direction.UP
+        Direction.UP,
       );
 
       // asymetric distance
       expect(distanceUtils4.direction(vector, new Vector2(10, 5))).toEqual(
-        Direction.RIGHT
+        Direction.RIGHT,
       );
       expect(distanceUtils4.direction(vector, new Vector2(-10, -5))).toEqual(
-        Direction.LEFT
+        Direction.LEFT,
       );
       expect(distanceUtils4.direction(vector, new Vector2(-1, -10))).toEqual(
-        Direction.UP
+        Direction.UP,
       );
       expect(distanceUtils4.direction(vector, new Vector2(-1, 10))).toEqual(
-        Direction.DOWN
+        Direction.DOWN,
       );
     });
   });

@@ -1,5 +1,5 @@
 /*eslint no-global-assign: "off"*/
-import { RandomUtils } from "./RandomUtils";
+import { RandomUtils } from "./RandomUtils.js";
 
 describe("RandomUtils", () => {
   function mockRandom(val: number) {
@@ -14,7 +14,7 @@ describe("RandomUtils", () => {
     mockRandom(randomMock);
 
     expect(RandomUtils.getRandomInt(max)).toEqual(
-      Math.floor(randomMock * Math.floor(max))
+      Math.floor(randomMock * Math.floor(max)),
     );
   });
 });

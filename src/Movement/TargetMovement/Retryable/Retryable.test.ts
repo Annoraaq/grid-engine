@@ -1,4 +1,4 @@
-import { Retryable } from "./Retryable";
+import { Retryable } from "./Retryable.js";
 describe("Retry", () => {
   let retry: Retryable;
 

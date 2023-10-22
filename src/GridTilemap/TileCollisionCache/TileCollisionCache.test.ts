@@ -1,11 +1,11 @@
-import { CollisionStrategy, Direction } from "../../GridEngineHeadless";
+import { CollisionStrategy, Direction } from "../../GridEngineHeadless.js";
 import {
   mockLayeredBlockMap,
   updateLayer,
-} from "../../Utils/MockFactory/MockFactory";
-import { Rect } from "../../Utils/Rect/Rect";
-import { GridTilemap } from "../GridTilemap";
-import { TileCollisionCache } from "./TileCollisionCache";
+} from "../../Utils/MockFactory/MockFactory.js";
+import { Rect } from "../../Utils/Rect/Rect.js";
+import { GridTilemap } from "../GridTilemap.js";
+import { TileCollisionCache } from "./TileCollisionCache.js";
 
 describe("TileCollisionCache", () => {
   it("detects tiles", () => {
@@ -22,7 +22,7 @@ describe("TileCollisionCache", () => {
     const gridTilemap = new GridTilemap(
       tm,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const tileCollisionCache = new TileCollisionCache(tm, gridTilemap);
     tileCollisionCache.rebuild();
@@ -31,7 +31,7 @@ describe("TileCollisionCache", () => {
     expect(tileCollisionCache.hasTileAt(0, 1, "lowerCharLayer")).toBe(true);
     expect(tileCollisionCache.hasTileAt(0, 1, "unknownLayer")).toBe(undefined);
     expect(tileCollisionCache.hasTileAt(-1, 0, "lowerCharLayer")).toBe(
-      undefined
+      undefined,
     );
   });
 
@@ -66,22 +66,22 @@ describe("TileCollisionCache", () => {
     const gridTilemap = new GridTilemap(
       tm,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const tileCollisionCache = new TileCollisionCache(tm, gridTilemap);
     tileCollisionCache.rebuild();
 
     expect(
-      tileCollisionCache.isBlockingFrom(0, 0, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(0, 0, "lowerCharLayer", undefined),
     ).toBe(false);
     expect(
-      tileCollisionCache.isBlockingFrom(1, 1, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(1, 1, "lowerCharLayer", undefined),
     ).toBe(false);
     expect(
-      tileCollisionCache.isBlockingFrom(1, 1, "upperCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(1, 1, "upperCharLayer", undefined),
     ).toBe(true);
     expect(
-      tileCollisionCache.isBlockingFrom(1, 0, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(1, 0, "lowerCharLayer", undefined),
     ).toBe(true);
 
     const blocking = [
@@ -94,12 +94,12 @@ describe("TileCollisionCache", () => {
       Direction.UP_RIGHT,
     ];
     expect(
-      tileCollisionCache.isBlockingFrom(0, 1, "upperCharLayer", Direction.LEFT)
+      tileCollisionCache.isBlockingFrom(0, 1, "upperCharLayer", Direction.LEFT),
     ).toBe(false);
 
     for (const dir of blocking) {
       expect(
-        tileCollisionCache.isBlockingFrom(0, 1, "upperCharLayer", dir)
+        tileCollisionCache.isBlockingFrom(0, 1, "upperCharLayer", dir),
       ).toBe(true);
     }
   });
@@ -120,7 +120,7 @@ describe("TileCollisionCache", () => {
     const gridTilemap = new GridTilemap(
       tm,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const tileCollisionCache = new TileCollisionCache(tm, gridTilemap);
     tileCollisionCache.rebuild();
@@ -131,12 +131,18 @@ describe("TileCollisionCache", () => {
         0,
         "lowerCharLayer",
         undefined,
-        false
-      )
+        false,
+      ),
     ).toBe(true);
 
     expect(
-      tileCollisionCache.isBlockingFrom(0, 0, "lowerCharLayer", undefined, true)
+      tileCollisionCache.isBlockingFrom(
+        0,
+        0,
+        "lowerCharLayer",
+        undefined,
+        true,
+      ),
     ).toBe(false);
   });
 
@@ -154,16 +160,16 @@ describe("TileCollisionCache", () => {
     const gridTilemap = new GridTilemap(
       tm,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const tileCollisionCache = new TileCollisionCache(tm, gridTilemap);
     tileCollisionCache.rebuild();
 
     expect(
-      tileCollisionCache.isBlockingFrom(0, 0, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(0, 0, "lowerCharLayer", undefined),
     ).toBe(false);
     expect(
-      tileCollisionCache.isBlockingFrom(1, 0, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(1, 0, "lowerCharLayer", undefined),
     ).toBe(true);
 
     updateLayer(
@@ -173,23 +179,23 @@ describe("TileCollisionCache", () => {
         "#.",
         "..",
       ],
-      "lowerCharLayer"
+      "lowerCharLayer",
     );
 
     expect(
-      tileCollisionCache.isBlockingFrom(0, 0, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(0, 0, "lowerCharLayer", undefined),
     ).toBe(false);
     expect(
-      tileCollisionCache.isBlockingFrom(1, 0, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(1, 0, "lowerCharLayer", undefined),
     ).toBe(true);
 
     tileCollisionCache.rebuild();
 
     expect(
-      tileCollisionCache.isBlockingFrom(0, 0, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(0, 0, "lowerCharLayer", undefined),
     ).toBe(true);
     expect(
-      tileCollisionCache.isBlockingFrom(1, 0, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(1, 0, "lowerCharLayer", undefined),
     ).toBe(false);
   });
 
@@ -209,25 +215,25 @@ describe("TileCollisionCache", () => {
     const gridTilemap = new GridTilemap(
       tm,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const tileCollisionCache = new TileCollisionCache(tm, gridTilemap);
     tileCollisionCache.rebuild();
 
     expect(
-      tileCollisionCache.isBlockingFrom(0, 0, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(0, 0, "lowerCharLayer", undefined),
     ).toBe(true);
     expect(
-      tileCollisionCache.isBlockingFrom(1, 1, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(1, 1, "lowerCharLayer", undefined),
     ).toBe(true);
     expect(
-      tileCollisionCache.isBlockingFrom(2, 1, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(2, 1, "lowerCharLayer", undefined),
     ).toBe(true);
     expect(
-      tileCollisionCache.isBlockingFrom(1, 2, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(1, 2, "lowerCharLayer", undefined),
     ).toBe(true);
     expect(
-      tileCollisionCache.isBlockingFrom(2, 2, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(2, 2, "lowerCharLayer", undefined),
     ).toBe(true);
 
     updateLayer(
@@ -239,25 +245,25 @@ describe("TileCollisionCache", () => {
         "....",
         "....",
       ],
-      "lowerCharLayer"
+      "lowerCharLayer",
     );
 
     tileCollisionCache.rebuild(new Rect(1, 1, 2, 1));
 
     expect(
-      tileCollisionCache.isBlockingFrom(0, 0, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(0, 0, "lowerCharLayer", undefined),
     ).toBe(true);
     expect(
-      tileCollisionCache.isBlockingFrom(1, 1, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(1, 1, "lowerCharLayer", undefined),
     ).toBe(false);
     expect(
-      tileCollisionCache.isBlockingFrom(2, 1, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(2, 1, "lowerCharLayer", undefined),
     ).toBe(false);
     expect(
-      tileCollisionCache.isBlockingFrom(1, 2, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(1, 2, "lowerCharLayer", undefined),
     ).toBe(true);
     expect(
-      tileCollisionCache.isBlockingFrom(2, 2, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(2, 2, "lowerCharLayer", undefined),
     ).toBe(true);
   });
 
@@ -283,26 +289,26 @@ describe("TileCollisionCache", () => {
     const gridTilemap = new GridTilemap(
       tm,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     const tileCollisionCache = new TileCollisionCache(tm, gridTilemap);
     tileCollisionCache.rebuild();
     tileCollisionCache.fixLayer("lowerCharLayer");
 
     expect(
-      tileCollisionCache.isBlockingFrom(1, 0, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(1, 0, "lowerCharLayer", undefined),
     ).toBe(true);
     expect(
-      tileCollisionCache.isBlockingFrom(1, 0, "upperCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(1, 0, "upperCharLayer", undefined),
     ).toBe(true);
 
     tileCollisionCache.unfixLayers();
 
     expect(
-      tileCollisionCache.isBlockingFrom(1, 0, "lowerCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(1, 0, "lowerCharLayer", undefined),
     ).toBe(true);
     expect(
-      tileCollisionCache.isBlockingFrom(1, 0, "upperCharLayer", undefined)
+      tileCollisionCache.isBlockingFrom(1, 0, "upperCharLayer", undefined),
     ).toBe(false);
   });
 });

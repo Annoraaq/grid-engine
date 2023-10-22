@@ -1,4 +1,4 @@
-import { SpriteUtils } from "./SpriteUtils";
+import { SpriteUtils } from "./SpriteUtils.js";
 
 describe("SpriteUtils", () => {
   it("should copy important sprite props", () => {
@@ -34,14 +34,14 @@ describe("SpriteUtils", () => {
     expect(clonedSprite.alpha).toEqual(gridSpriteMock.alpha);
     expect(clonedSprite.scale).toEqual(gridSpriteMock.scale);
     expect(clonedSprite.setFrame).toHaveBeenCalledWith(
-      gridSpriteMock.frame.name
+      gridSpriteMock.frame.name,
     );
     expect(clonedSprite.active).toEqual(gridSpriteMock.active);
     expect(clonedSprite.alphaBottomLeft).toEqual(
-      gridSpriteMock.alphaBottomLeft
+      gridSpriteMock.alphaBottomLeft,
     );
     expect(clonedSprite.alphaBottomRight).toEqual(
-      gridSpriteMock.alphaBottomRight
+      gridSpriteMock.alphaBottomRight,
     );
     expect(clonedSprite.alphaTopLeft).toEqual(gridSpriteMock.alphaTopLeft);
     expect(clonedSprite.alphaTopRight).toEqual(gridSpriteMock.alphaTopRight);

@@ -1,13 +1,13 @@
 import { take } from "rxjs/operators";
-import { PathfindingOptions } from "./Pathfinding/Pathfinding";
-import { Direction, NumberOfDirections } from "./Direction/Direction";
-import { GridCharacter } from "./GridCharacter/GridCharacter";
+import { PathfindingOptions } from "./Pathfinding/Pathfinding.js";
+import { Direction, NumberOfDirections } from "./Direction/Direction.js";
+import { GridCharacter } from "./GridCharacter/GridCharacter.js";
 import {
   QueueMovementConfig,
   QueuedPathBlockedStrategy,
-} from "./Movement/QueueMovement/QueueMovement";
-import { Vector2 } from "./Utils/Vector2/Vector2";
-import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
+} from "./Movement/QueueMovement/QueueMovement.js";
+import { Vector2 } from "./Utils/Vector2/Vector2.js";
+import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
 
 expect.extend({
   toBeCharacter(receivedChar: GridCharacter, expectedCharId: string) {
@@ -32,16 +32,16 @@ jest.mock("../package.json", () => ({
   version: "GRID.ENGINE.VERSION",
 }));
 
-import { GridEngineHeadless, MoveToConfig } from "./GridEngine";
-import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
-import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
+import { GridEngineHeadless, MoveToConfig } from "./GridEngine.js";
+import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy.js";
+import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy.js";
 import {
   createMockLayer,
   mockBlockMap,
   updateLayer,
-} from "./Utils/MockFactory/MockFactory";
-import { MockTilemap } from "./Utils/MockFactory/MockTilemap";
-import { GridEngineState } from "./GridEngineState";
+} from "./Utils/MockFactory/MockFactory.js";
+import { MockTilemap } from "./Utils/MockFactory/MockTilemap.js";
+import { GridEngineState } from "./GridEngineState.js";
 
 describe("GridEngineHeadless", () => {
   let gridEngineHeadless: GridEngineHeadless;

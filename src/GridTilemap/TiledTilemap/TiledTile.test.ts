@@ -1,5 +1,5 @@
-import { RawTiledTileset } from "./TiledMap";
-import { TiledTile } from "./TiledTile";
+import { RawTiledTileset } from "./TiledMap.js";
+import { TiledTile } from "./TiledTile.js";
 
 describe("TiledTile", () => {
   const tilesets: RawTiledTileset[] = [

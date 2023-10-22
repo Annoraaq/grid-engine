@@ -1,7 +1,7 @@
-import { createPhaserTilemapStub } from "../../Utils/MockFactory/MockPhaserTilemap";
-import { PhaserTileLayer } from "./PhaserTileLayer";
+import { createPhaserTilemapStub } from "../../Utils/MockFactory/MockPhaserTilemap.js";
+import { PhaserTileLayer } from "./PhaserTileLayer.js";
 import * as Phaser from "phaser";
-import { PhaserTile } from "./PhaserTile";
+import { PhaserTile } from "./PhaserTile.js";
 
 // Hack to get Phaser included at runtime
 ((_a) => {
@@ -48,7 +48,7 @@ describe("PhaserTileLayer", () => {
       new Map([
         ["char_layer", [""]],
         ["no_char_layer", [""]],
-      ])
+      ]),
     );
     const noCharLayerData = tilemap.getLayer("no_char_layer");
     const charLayerData = tilemap.getLayer("char_layer");
@@ -57,10 +57,10 @@ describe("PhaserTileLayer", () => {
     }
     noCharLayerData.properties = [];
     const noCharLayerPhaserTileLayer = new PhaserTileLayer(
-      noCharLayerData.tilemapLayer
+      noCharLayerData.tilemapLayer,
     );
     const charLayerPhaserTileLayer = new PhaserTileLayer(
-      charLayerData.tilemapLayer
+      charLayerData.tilemapLayer,
     );
     expect(noCharLayerPhaserTileLayer.isCharLayer()).toBe(false);
     expect(charLayerPhaserTileLayer.isCharLayer()).toBe(true);
@@ -106,7 +106,7 @@ describe("PhaserTileLayer", () => {
 
     const phaserTileLayer = new PhaserTileLayer(
       layerData.tilemapLayer,
-      tiledProject
+      tiledProject,
     );
 
     expect(phaserTileLayer.getData()).toEqual([

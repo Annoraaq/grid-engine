@@ -1,11 +1,11 @@
-import { Tile } from "../Tilemap";
-import { TiledProject } from "./PhaserTilemap";
+import { Tile } from "../Tilemap.js";
+import { TiledProject } from "./PhaserTilemap.js";
 import { TiledProjectParser } from "tiled-property-flattener";
 
 export class PhaserTile implements Tile {
   constructor(
     private phaserTile: Phaser.Tilemaps.Tile,
-    private tiledProject?: TiledProject
+    private tiledProject?: TiledProject,
   ) {}
 
   getProperty(name: string): any {

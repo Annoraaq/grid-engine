@@ -1,18 +1,18 @@
-import { NumberOfDirections } from "../Direction/Direction";
-import { CharId } from "../GridCharacter/GridCharacter";
-import { Position } from "../GridEngine";
-import { GridTilemap } from "../GridTilemap/GridTilemap";
-import { AStar } from "./AStar/AStar";
-import { Bfs } from "./Bfs/Bfs";
-import { BidirectionalSearch } from "./BidirectionalSearch/BidirectionalSearch";
-import { Jps4 } from "./Jps4/Jps4";
-import { Jps8 } from "./Jps8/Jps8";
+import { NumberOfDirections } from "../Direction/Direction.js";
+import { CharId } from "../GridCharacter/GridCharacter.js";
+import { Position } from "../GridEngine.js";
+import { GridTilemap } from "../GridTilemap/GridTilemap.js";
+import { AStar } from "./AStar/AStar.js";
+import { Bfs } from "./Bfs/Bfs.js";
+import { BidirectionalSearch } from "./BidirectionalSearch/BidirectionalSearch.js";
+import { Jps4 } from "./Jps4/Jps4.js";
+import { Jps8 } from "./Jps8/Jps8.js";
 import {
   LayerVecPos,
   ShortestPathAlgorithm,
   ShortestPathAlgorithmType,
   ShortestPathResult,
-} from "./ShortestPathAlgorithm";
+} from "./ShortestPathAlgorithm.js";
 
 /**
  * Configuration object for pathfinding.
@@ -132,7 +132,7 @@ export interface PathfindingOptions {
  */
 export type IsPositionAllowedFn = (
   pos: Position,
-  charLayer?: string
+  charLayer?: string,
 ) => boolean;
 
 export class Pathfinding {
@@ -141,12 +141,12 @@ export class Pathfinding {
   findShortestPath(
     source: LayerVecPos,
     dest: LayerVecPos,
-    pathfindingOptions: PathfindingOptions = {}
+    pathfindingOptions: PathfindingOptions = {},
   ): ShortestPathResult {
     const shortestPathAlgo = shortestPathAlgorithmFactory(
       pathfindingOptions.shortestPathAlgorithm || "BIDIRECTIONAL_SEARCH",
       this.gridTilemap,
-      pathfindingOptions
+      pathfindingOptions,
     );
 
     return shortestPathAlgo.findShortestPath(source, dest);
@@ -156,7 +156,7 @@ export class Pathfinding {
 function shortestPathAlgorithmFactory(
   type: ShortestPathAlgorithmType,
   gridTilemap: GridTilemap,
-  options: PathfindingOptions
+  options: PathfindingOptions,
 ): ShortestPathAlgorithm {
   switch (type) {
     case "BIDIRECTIONAL_SEARCH":

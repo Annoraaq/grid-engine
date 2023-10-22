@@ -1,14 +1,14 @@
-import { CharConfig, GridCharacter } from "./GridCharacter";
-import { Direction, NumberOfDirections } from "../Direction/Direction";
+import { CharConfig, GridCharacter } from "./GridCharacter.js";
+import { Direction, NumberOfDirections } from "../Direction/Direction.js";
 import { take } from "rxjs/operators";
-import { Movement } from "../Movement/Movement";
-import { Vector2 } from "../Utils/Vector2/Vector2";
-import { GridTilemap } from "../GridTilemap/GridTilemap";
+import { Movement } from "../Movement/Movement.js";
+import { Vector2 } from "../Utils/Vector2/Vector2.js";
+import { GridTilemap } from "../GridTilemap/GridTilemap.js";
 import {
   mockBlockMap,
   mockLayeredBlockMap,
-} from "../Utils/MockFactory/MockFactory";
-import { CollisionStrategy } from "../GridEngine";
+} from "../Utils/MockFactory/MockFactory.js";
+import { CollisionStrategy } from "../GridEngine.js";
 
 describe("GridCharacter", () => {
   let gridCharacter: GridCharacter;

@@ -1,9 +1,9 @@
-import { Direction, directions } from "../../Direction/Direction";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { GridTilemap } from "../GridTilemap";
-import { Tilemap } from "../Tilemap";
-import { Rect } from "../../Utils/Rect/Rect";
-import { CharLayer } from "../../IGridEngine";
+import { Direction, directions } from "../../Direction/Direction.js";
+import { Vector2 } from "../../Utils/Vector2/Vector2.js";
+import { GridTilemap } from "../GridTilemap.js";
+import { Tilemap } from "../Tilemap.js";
+import { Rect } from "../../Utils/Rect/Rect.js";
+import { CharLayer } from "../../IGridEngine.js";
 
 const BITMAP_POS_HAS_TILE = 0;
 const BITMAP_POS_NO_DIRECTION = 1;
@@ -21,7 +21,10 @@ const dirToBitmapNo: Record<Direction, number> = {
 
 export class TileCollisionCache {
   private fixedLayer?: number[][];
-  constructor(private tilemap: Tilemap, private gridTilemap: GridTilemap) {}
+  constructor(
+    private tilemap: Tilemap,
+    private gridTilemap: GridTilemap,
+  ) {}
 
   private tileCollisionCache: Map<
     string | undefined /* LayerVecPos */,
@@ -71,7 +74,7 @@ export class TileCollisionCache {
           let bitmap = 0;
           const hasTile = !this.gridTilemap.hasNoTileUncached(
             new Vector2(c, r),
-            cl?.getName()
+            cl?.getName(),
           );
           if (hasTile) {
             bitmap = setBitAt(bitmap, 0);
@@ -82,7 +85,7 @@ export class TileCollisionCache {
               new Vector2(c, r),
               cl?.getName(),
               dir,
-              true
+              true,
             );
             if (blocked) {
               bitmap = setBitAt(bitmap, dirToBitmapNo[dir]);
@@ -92,7 +95,7 @@ export class TileCollisionCache {
             new Vector2(c, r),
             cl?.getName(),
             undefined,
-            true
+            true,
           );
           if (blockedUndefined) {
             bitmap = setBitAt(bitmap, dirToBitmapNo[1]);
@@ -115,7 +118,7 @@ export class TileCollisionCache {
     y: number,
     layer?: string,
     direction?: Direction,
-    ignoreHasTile?: boolean
+    ignoreHasTile?: boolean,
   ): boolean | undefined {
     const arr = this.fixedLayer || this.tileCollisionCache.get(layer);
     const cached = arr?.[x]?.[y];

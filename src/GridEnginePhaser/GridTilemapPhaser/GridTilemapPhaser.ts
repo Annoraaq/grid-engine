@@ -1,7 +1,7 @@
-import { CharLayer, Direction } from "../../GridEngine";
-import { Utils } from "../../Utils/Utils/Utils";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { VectorUtils } from "../../Utils/VectorUtils";
+import { CharLayer, Direction } from "../../GridEngine.js";
+import { Utils } from "../../Utils/Utils/Utils.js";
+import { Vector2 } from "../../Utils/Vector2/Vector2.js";
+import { VectorUtils } from "../../Utils/VectorUtils.js";
 
 export class GridTilemapPhaser {
   private static readonly ALWAYS_TOP_PROP_NAME = "ge_alwaysTop";
@@ -33,8 +33,8 @@ export class GridTilemapPhaser {
       return VectorUtils.scalarMult(this.getTileSize(), 0.5).multiply(
         new Vector2(
           tilePosition.x - tilePosition.y,
-          tilePosition.x + tilePosition.y
-        )
+          tilePosition.x + tilePosition.y,
+        ),
       );
     }
     return tilePosition.clone().multiply(this.getTileSize());
@@ -80,10 +80,10 @@ export class GridTilemapPhaser {
     const layersToDelete: Phaser.Tilemaps.TilemapLayer[] = [];
     let offset = -1;
     const alwaysOnTopLayers = this.tilemap.layers.filter((l) =>
-      this.isLayerAlwaysOnTop(l)
+      this.isLayerAlwaysOnTop(l),
     );
     const otherLayers = this.tilemap.layers.filter(
-      (l) => !this.isLayerAlwaysOnTop(l)
+      (l) => !this.isLayerAlwaysOnTop(l),
     );
     otherLayers.forEach((layerData) => {
       if (
@@ -108,18 +108,18 @@ export class GridTilemapPhaser {
     if (this.isCharLayer(layerData)) {
       this.charLayerDepths.set(
         this.getLayerProp(layerData, GridTilemapPhaser.CHAR_LAYER_PROP_NAME),
-        depth
+        depth,
       );
     }
   }
 
   private createHeightShiftLayers(
     layer: Phaser.Tilemaps.LayerData,
-    offset: number
+    offset: number,
   ) {
     let heightShift = this.getLayerProp(
       layer,
-      GridTilemapPhaser.HEIGHT_SHIFT_PROP_NAME
+      GridTilemapPhaser.HEIGHT_SHIFT_PROP_NAME,
     );
     if (isNaN(heightShift)) heightShift = 0;
 
@@ -133,8 +133,8 @@ export class GridTilemapPhaser {
             Utils.shiftPad(
               (row + heightShift) * this.getTileHeight() +
                 makeHigherThanCharWhenOnSameLevel,
-              GridTilemapPhaser.Z_INDEX_PADDING
-            )
+              GridTilemapPhaser.Z_INDEX_PADDING,
+            ),
         );
       }
     }
@@ -148,19 +148,19 @@ export class GridTilemapPhaser {
 
   private hasLayerProp(
     layer: Phaser.Tilemaps.LayerData,
-    name: string
+    name: string,
   ): boolean {
     return this.getLayerProp(layer, name) != undefined;
   }
 
   private copyLayer(
     layerData: Phaser.Tilemaps.LayerData,
-    row: number
+    row: number,
   ): Phaser.Tilemaps.TilemapLayer | undefined {
     const name = `${layerData.name}#${row}`;
     const newLayer = this.tilemap.createBlankLayer(
       name,
-      layerData.tilemapLayer.tileset
+      layerData.tilemapLayer.tileset,
     );
 
     if (!newLayer) return undefined;

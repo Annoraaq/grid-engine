@@ -1,12 +1,12 @@
 import { take } from "rxjs/operators";
-import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
-import { Direction, NumberOfDirections } from "./Direction/Direction";
-import { GridCharacter } from "./GridCharacter/GridCharacter";
-import { Vector2 } from "./Utils/Vector2/Vector2";
+import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
+import { Direction, NumberOfDirections } from "./Direction/Direction.js";
+import { GridCharacter } from "./GridCharacter/GridCharacter.js";
+import { Vector2 } from "./Utils/Vector2/Vector2.js";
 import {
   QueueMovementConfig,
   QueuedPathBlockedStrategy,
-} from "./Movement/QueueMovement/QueueMovement";
+} from "./Movement/QueueMovement/QueueMovement.js";
 import * as Phaser from "phaser";
 
 // Hack to get Phaser included at runtime
@@ -44,12 +44,12 @@ jest.mock("../package.json", () => ({
   version: "GRID.ENGINE.VERSION",
 }));
 
-import { GridEngine, PathfindingOptions } from "./GridEngine";
-import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy";
-import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy";
-import { createSpriteMock } from "./Utils/MockFactory/MockFactory";
-import { createPhaserTilemapStub } from "./Utils/MockFactory/MockPhaserTilemap";
-import { GridEngineState } from "./GridEngineState";
+import { GridEngine, PathfindingOptions } from "./GridEngine.js";
+import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy.js";
+import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy.js";
+import { createSpriteMock } from "./Utils/MockFactory/MockFactory.js";
+import { createPhaserTilemapStub } from "./Utils/MockFactory/MockPhaserTilemap.js";
+import { GridEngineState } from "./GridEngineState.js";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;

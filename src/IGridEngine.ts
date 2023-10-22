@@ -1,20 +1,20 @@
-import { Direction } from "./Direction/Direction";
-import { MovementInfo } from "./Movement/Movement";
+import { Direction } from "./Direction/Direction.js";
+import { MovementInfo } from "./Movement/Movement.js";
 import {
   Finished,
   MoveToConfig,
-} from "./Movement/TargetMovement/TargetMovement";
+} from "./Movement/TargetMovement/TargetMovement.js";
 import {
   QueueMovementConfig,
   QueueMovementEntry,
   Finished as QueueMovementFinished,
-} from "./Movement/QueueMovement/QueueMovement";
+} from "./Movement/QueueMovement/QueueMovement.js";
 import { Observable } from "rxjs";
-import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter";
-import { PathfindingOptions } from "./Pathfinding/Pathfinding";
-import { PositionChange } from "./GridCharacter/GridCharacter";
-import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm";
-import { GridEngineState } from "./GridEngineState";
+import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter.js";
+import { PathfindingOptions } from "./Pathfinding/Pathfinding.js";
+import { PositionChange } from "./GridCharacter/GridCharacter.js";
+import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
+import { GridEngineState } from "./GridEngineState.js";
 
 export type CharLayer = string | undefined;
 

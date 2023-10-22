@@ -3,7 +3,7 @@ import {
   Orientation,
   Tile,
   Tilemap,
-} from "../../GridTilemap/Tilemap";
+} from "../../GridTilemap/Tilemap.js";
 
 export class MockTile implements Tile {
   constructor(private properties: Record<string, any> = {}) {}
@@ -18,7 +18,7 @@ export class MockTile implements Tile {
 export class MockTilemap implements Tilemap {
   constructor(
     private layers: TileLayer[] = [],
-    private orientation: Orientation = "orthogonal"
+    private orientation: Orientation = "orthogonal",
   ) {}
 
   getTileWidth(): number {
@@ -58,7 +58,7 @@ export class MockTileLayer implements TileLayer {
     private width: number = 5,
     private scale: number = 1,
     private tilesets: string[] = [],
-    private data: Array<Array<Tile | undefined>> = [[]]
+    private data: Array<Array<Tile | undefined>> = [[]],
   ) {}
   getProperty(name: string): string | undefined {
     return this.properties[name];

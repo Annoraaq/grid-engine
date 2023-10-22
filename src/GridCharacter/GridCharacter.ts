@@ -1,17 +1,17 @@
-import { LayerPositionUtils } from "./../Utils/LayerPositionUtils/LayerPositionUtils";
-import { LayerVecPos } from "./../Pathfinding/ShortestPathAlgorithm";
+import { LayerPositionUtils } from "./../Utils/LayerPositionUtils/LayerPositionUtils.js";
+import { LayerVecPos } from "./../Pathfinding/ShortestPathAlgorithm.js";
 import {
   directionVector,
   NumberOfDirections,
   oppositeDirection,
-} from "./../Direction/Direction";
-import { Direction } from "../Direction/Direction";
+} from "./../Direction/Direction.js";
+import { Direction } from "../Direction/Direction.js";
 import { Subject } from "rxjs";
-import { CharLayer, Position } from "../GridEngine";
-import { Movement } from "../Movement/Movement";
-import { Vector2 } from "../Utils/Vector2/Vector2";
+import { CharLayer, Position } from "../GridEngine.js";
+import { Movement } from "../Movement/Movement.js";
+import { Vector2 } from "../Utils/Vector2/Vector2.js";
 import * as Phaser from "phaser";
-import { GridTilemap } from "../GridTilemap/GridTilemap";
+import { GridTilemap } from "../GridTilemap/GridTilemap.js";
 
 export const MAX_MOVEMENT_PROGRESS = 1000;
 

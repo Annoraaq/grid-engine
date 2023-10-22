@@ -1,16 +1,16 @@
 import { filter, takeUntil, take } from "rxjs/operators";
-import { GridTilemap } from "../../GridTilemap/GridTilemap";
-import { GridCharacter } from "../../GridCharacter/GridCharacter";
-import { TargetMovement } from "../TargetMovement/TargetMovement";
-import { Movement, MovementInfo } from "../Movement";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
+import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
+import { GridCharacter } from "../../GridCharacter/GridCharacter.js";
+import { TargetMovement } from "../TargetMovement/TargetMovement.js";
+import { Movement, MovementInfo } from "../Movement.js";
+import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 import {
   CharLayer,
   Position,
   ShortestPathAlgorithmType,
-} from "../../GridEngine";
-import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
-import { Concrete } from "../../Utils/TypeUtils";
+} from "../../GridEngine.js";
+import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy.js";
+import { Concrete } from "../../Utils/TypeUtils.js";
 
 export interface Options {
   distance?: number;
@@ -29,7 +29,7 @@ export class FollowMovement implements Movement {
     private character: GridCharacter,
     private gridTilemap: GridTilemap,
     private charToFollow: GridCharacter,
-    options: Options = {}
+    options: Options = {},
   ) {
     const defaultOptions: Concrete<Options> = {
       distance: 0,
@@ -47,13 +47,13 @@ export class FollowMovement implements Movement {
       console.warn(
         `GridEngine: Pathfinding option 'considerCosts' cannot be used with ` +
           `algorithm '${this.options.shortestPathAlgorithm}'. It can only be used ` +
-          `with A* algorithm.`
+          `with A* algorithm.`,
       );
     }
     this.character = character;
     this.updateTarget(
       this.charToFollow.getTilePos().position,
-      this.charToFollow.getTilePos().layer
+      this.charToFollow.getTilePos().layer,
     );
     this.charToFollow
       .positionChangeStarted()
@@ -61,9 +61,9 @@ export class FollowMovement implements Movement {
         takeUntil(
           this.character.autoMovementSet().pipe(
             filter((movement) => movement !== this),
-            take(1)
-          )
-        )
+            take(1),
+          ),
+        ),
       )
       .subscribe(({ enterTile, enterLayer }) => {
         this.updateTarget(enterTile, enterLayer);
@@ -105,7 +105,7 @@ export class FollowMovement implements Movement {
           considerCosts: this.options.considerCosts,
         },
         ignoreBlockedTarget: true,
-      }
+      },
     );
   }
 }

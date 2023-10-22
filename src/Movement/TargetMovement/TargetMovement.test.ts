@@ -1,22 +1,29 @@
 import {
   LayerVecPos,
   ShortestPathAlgorithmType,
-} from "./../../Pathfinding/ShortestPathAlgorithm";
-import { Direction, NumberOfDirections } from "../../Direction/Direction";
-import { MoveToConfig, MoveToResult, TargetMovement } from "./TargetMovement";
-import { Vector2 } from "../../Utils/Vector2/Vector2";
-import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy";
-import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy";
-import { CollisionStrategy } from "../../GridEngine";
-import { CharConfig, GridCharacter } from "../../GridCharacter/GridCharacter";
-import { GridTilemap } from "../../GridTilemap/GridTilemap";
+} from "./../../Pathfinding/ShortestPathAlgorithm.js";
+import { Direction, NumberOfDirections } from "../../Direction/Direction.js";
+import {
+  MoveToConfig,
+  MoveToResult,
+  TargetMovement,
+} from "./TargetMovement.js";
+import { Vector2 } from "../../Utils/Vector2/Vector2.js";
+import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy.js";
+import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy.js";
+import { CollisionStrategy } from "../../GridEngine.js";
+import {
+  CharConfig,
+  GridCharacter,
+} from "../../GridCharacter/GridCharacter.js";
+import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
 import {
   createAllowedFn,
   COLLISION_GROUP,
   mockLayeredBlockMap,
   mockCharMap,
   updateLayer,
-} from "../../Utils/MockFactory/MockFactory";
+} from "../../Utils/MockFactory/MockFactory.js";
 
 const TEST_CHAR_CONFIG = {
   speed: 1,
@@ -35,7 +42,7 @@ describe("TargetMovement", () => {
   function createMockChar(
     id: string,
     pos: LayerVecPos,
-    charConfig: CharConfig = { ...TEST_CHAR_CONFIG, tilemap: gridTilemap }
+    charConfig: CharConfig = { ...TEST_CHAR_CONFIG, tilemap: gridTilemap },
   ): GridCharacter {
     const mockChar = new GridCharacter(id, charConfig);
     mockChar.setTilePosition(pos);
@@ -56,7 +63,7 @@ describe("TargetMovement", () => {
   function chunkUpdate(
     targetMovement: TargetMovement,
     mockChar: GridCharacter,
-    numChunks: number
+    numChunks: number,
   ) {
     const HALF_SECOND_MS = 500;
     for (let i = 0; i < numChunks; i++) {
@@ -68,7 +75,7 @@ describe("TargetMovement", () => {
   function expectWalkedPath(
     targetMovement: TargetMovement,
     mockChar: GridCharacter,
-    path: LayerVecPos[]
+    path: LayerVecPos[],
   ) {
     for (const pos of path) {
       chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
@@ -107,7 +114,7 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     shortestPathAlgo = "BIDIRECTIONAL_SEARCH";
   });
@@ -123,7 +130,7 @@ describe("TargetMovement", () => {
         position: new Vector2(3, 1),
         layer: "lowerCharLayer",
       },
-      { config: { algorithm: shortestPathAlgo } }
+      { config: { algorithm: shortestPathAlgo } },
     );
     targetMovement.update(100);
 
@@ -151,7 +158,7 @@ describe("TargetMovement", () => {
         },
         ignoreBlockedTarget: true,
         distance: 12,
-      }
+      },
     );
 
     expect(targetMovement.getInfo()).toEqual({
@@ -186,7 +193,7 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemap,
       layerPos(new Vector2(3, 3)),
-      { config: { algorithm: shortestPathAlgo } }
+      { config: { algorithm: shortestPathAlgo } },
     );
     targetMovement.update(1000);
     mockChar.update(1000);
@@ -212,7 +219,7 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemap,
       layerPos(new Vector2(1, 1)),
-      { config: { algorithm: shortestPathAlgo } }
+      { config: { algorithm: shortestPathAlgo } },
     );
     targetMovement.update(1000);
     mockChar.update(1000);
@@ -238,7 +245,7 @@ describe("TargetMovement", () => {
       mockChar,
       gridTilemap,
       layerPos(new Vector2(3, 1)),
-      { config: { algorithm: shortestPathAlgo } }
+      { config: { algorithm: shortestPathAlgo } },
     );
     targetMovement.update(100);
     expect(mockChar.isMoving()).toBe(false);
@@ -262,7 +269,7 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     gridTilemap.addCharacter(mockChar);
 
@@ -275,7 +282,7 @@ describe("TargetMovement", () => {
           algorithm: shortestPathAlgo,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
-      }
+      },
     );
 
     chunkUpdate(targetMovement, mockChar, 2 * CHUNKS_PER_SECOND);
@@ -303,7 +310,7 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
@@ -337,7 +344,7 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     targetMovement = new TargetMovement(
@@ -349,7 +356,7 @@ describe("TargetMovement", () => {
         config: {
           algorithm: shortestPathAlgo,
         },
-      }
+      },
     );
     chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
 
@@ -378,7 +385,7 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     targetMovement = new TargetMovement(
@@ -391,7 +398,7 @@ describe("TargetMovement", () => {
           algorithm: shortestPathAlgo,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
-      }
+      },
     );
 
     targetMovement.update(1000);
@@ -419,7 +426,7 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     targetMovement = new TargetMovement(
@@ -432,7 +439,7 @@ describe("TargetMovement", () => {
           algorithm: shortestPathAlgo,
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
-      }
+      },
     );
 
     chunkUpdate(targetMovement, mockChar, 2 * CHUNKS_PER_SECOND);
@@ -465,12 +472,12 @@ describe("TargetMovement", () => {
             [1, 1, 1],
           ],
         },
-      ]
+      ],
     );
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     targetMovement = new TargetMovement(
@@ -482,7 +489,7 @@ describe("TargetMovement", () => {
           considerCosts: true,
           algorithm: "A_STAR",
         },
-      }
+      },
     );
 
     targetMovement.update(1000);
@@ -509,14 +516,14 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     targetMovement = new TargetMovement(
       mockChar,
       gridTilemap,
       layerPos(new Vector2(1, 3)),
-      { config: { algorithm: shortestPathAlgo } }
+      { config: { algorithm: shortestPathAlgo } },
     );
     targetMovement.update(1000);
     mockChar.update(1000);
@@ -547,14 +554,14 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     targetMovement = new TargetMovement(
       mockChar,
       gridTilemap,
       layerPos(new Vector2(1, 3)),
-      { config: { algorithm: shortestPathAlgo } }
+      { config: { algorithm: shortestPathAlgo } },
     );
 
     expectWalkedPath(
@@ -568,7 +575,7 @@ describe("TargetMovement", () => {
         [-1, 3],
         [0, 3],
         [1, 3],
-      ])
+      ]),
     );
   });
 
@@ -591,7 +598,7 @@ describe("TargetMovement", () => {
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       targetMovement = new TargetMovement(
         mockChar,
@@ -602,7 +609,7 @@ describe("TargetMovement", () => {
             algorithm: shortestPathAlgo,
             noPathFoundStrategy: NoPathFoundStrategy.RETRY,
           },
-        }
+        },
       );
       targetMovement.update(100);
       mockChar.update(100);
@@ -619,7 +626,7 @@ describe("TargetMovement", () => {
           "#.##",
           ".t..",
         ],
-        "lowerCharLayer"
+        "lowerCharLayer",
       );
 
       targetMovement.update(99);
@@ -651,7 +658,7 @@ describe("TargetMovement", () => {
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
 
       targetMovement = new TargetMovement(
@@ -664,7 +671,7 @@ describe("TargetMovement", () => {
             noPathFoundStrategy: NoPathFoundStrategy.RETRY,
             noPathFoundRetryBackoffMs: 150,
           },
-        }
+        },
       );
       targetMovement.update(100);
       mockChar.update(100);
@@ -680,7 +687,7 @@ describe("TargetMovement", () => {
           "#.##",
           ".t..",
         ],
-        "lowerCharLayer"
+        "lowerCharLayer",
       );
 
       targetMovement.update(49);
@@ -711,7 +718,7 @@ describe("TargetMovement", () => {
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
 
       targetMovement = new TargetMovement(
@@ -725,7 +732,7 @@ describe("TargetMovement", () => {
             noPathFoundRetryBackoffMs: 1,
             noPathFoundMaxRetries: 2,
           },
-        }
+        },
       );
       const finishedObsCallbackMock = jest.fn();
       const finishedObsCompleteMock = jest.fn();
@@ -750,7 +757,7 @@ describe("TargetMovement", () => {
           "#.##",
           ".t..",
         ],
-        "lowerCharLayer"
+        "lowerCharLayer",
       );
       targetMovement.update(1);
       mockChar.update(1);
@@ -785,7 +792,7 @@ describe("TargetMovement", () => {
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
 
       // expect(mockChar.getMovementDirection()).not.toEqual(Direction.DOWN);
@@ -800,7 +807,7 @@ describe("TargetMovement", () => {
             noPathFoundStrategy: NoPathFoundStrategy.RETRY,
             noPathFoundRetryBackoffMs: 1,
           },
-        }
+        },
       );
       targetMovement.update(1);
       mockChar.update(1);
@@ -818,7 +825,7 @@ describe("TargetMovement", () => {
           "#.##",
           ".t..",
         ],
-        "lowerCharLayer"
+        "lowerCharLayer",
       );
 
       targetMovement.update(1);
@@ -842,7 +849,7 @@ describe("TargetMovement", () => {
             noPathFoundRetryBackoffMs: 1,
             noPathFoundMaxRetries: -1,
           },
-        }
+        },
       );
       targetMovement.update(1);
       mockChar.update(1);
@@ -860,7 +867,7 @@ describe("TargetMovement", () => {
           "#.##",
           ".t..",
         ],
-        "lowerCharLayer"
+        "lowerCharLayer",
       );
 
       targetMovement.update(1);
@@ -890,7 +897,7 @@ describe("TargetMovement", () => {
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
 
       targetMovement = new TargetMovement(
@@ -902,7 +909,7 @@ describe("TargetMovement", () => {
             algorithm: shortestPathAlgo,
             noPathFoundStrategy: NoPathFoundStrategy.STOP,
           },
-        }
+        },
       );
       const finishedObsCallbackMock = jest.fn();
       const finishedObsCompleteMock = jest.fn();
@@ -923,7 +930,7 @@ describe("TargetMovement", () => {
           "#.##",
           ".t..",
         ],
-        "lowerCharLayer"
+        "lowerCharLayer",
       );
 
       targetMovement.update(200);
@@ -990,7 +997,7 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     gridTilemap.addCharacter(mockChar);
 
@@ -1045,7 +1052,7 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     gridTilemap.addCharacter(mockChar);
 
@@ -1095,7 +1102,7 @@ describe("TargetMovement", () => {
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       gridTilemap.addCharacter(mockChar);
 
@@ -1115,7 +1122,7 @@ describe("TargetMovement", () => {
           "####",
           ".t..",
         ],
-        "lowerCharLayer"
+        "lowerCharLayer",
       );
 
       chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
@@ -1133,7 +1140,7 @@ describe("TargetMovement", () => {
           "##.#",
           ".t..",
         ],
-        "lowerCharLayer"
+        "lowerCharLayer",
       );
       targetMovement.update(1000);
       mockChar.update(1000);
@@ -1161,7 +1168,7 @@ describe("TargetMovement", () => {
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       gridTilemap.addCharacter(mockChar);
 
@@ -1183,7 +1190,7 @@ describe("TargetMovement", () => {
           "##.#",
           ".t..",
         ],
-        "lowerCharLayer"
+        "lowerCharLayer",
       );
       targetMovement.update(defaultBackoff - 1);
       mockChar.update(defaultBackoff - 1);
@@ -1211,7 +1218,7 @@ describe("TargetMovement", () => {
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       gridTilemap.addCharacter(mockChar);
 
@@ -1235,7 +1242,7 @@ describe("TargetMovement", () => {
           "##.#",
           ".t..",
         ],
-        "lowerCharLayer"
+        "lowerCharLayer",
       );
 
       targetMovement.update(49);
@@ -1265,7 +1272,7 @@ describe("TargetMovement", () => {
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       gridTilemap.addCharacter(mockChar);
 
@@ -1323,7 +1330,7 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     gridTilemap.addCharacter(mockChar);
 
@@ -1379,7 +1386,7 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     gridTilemap.addCharacter(mockChar);
 
@@ -1425,7 +1432,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(0, 0)),
-        { config: { algorithm: shortestPathAlgo } }
+        { config: { algorithm: shortestPathAlgo } },
       );
       const mockCall = jest.fn();
       targetMovement.finishedObs().subscribe(mockCall);
@@ -1445,7 +1452,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(0, 0)),
-        { config: { algorithm: shortestPathAlgo } }
+        { config: { algorithm: shortestPathAlgo } },
       );
       const mockCall = jest.fn();
       targetMovement.finishedObs().subscribe(mockCall);
@@ -1460,7 +1467,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(0, 0)),
-        { config: { algorithm: shortestPathAlgo } }
+        { config: { algorithm: shortestPathAlgo } },
       );
       targetMovement.finishedObs().subscribe({ complete: mockCall });
       mockChar.setMovement(undefined);
@@ -1512,7 +1519,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(1, 1)),
-        { config: { algorithm: shortestPathAlgo } }
+        { config: { algorithm: shortestPathAlgo } },
       );
       targetMovement.update(100);
       mockChar.update(100);
@@ -1533,7 +1540,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(3, 1)),
-        { config: { algorithm: shortestPathAlgo } }
+        { config: { algorithm: shortestPathAlgo } },
       );
       targetMovement.update(100);
       mockChar.update(100);
@@ -1554,7 +1561,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(1, 3)),
-        { config: { algorithm: shortestPathAlgo } }
+        { config: { algorithm: shortestPathAlgo } },
       );
       targetMovement.update(100);
       mockChar.update(100);
@@ -1575,7 +1582,7 @@ describe("TargetMovement", () => {
         mockChar,
         gridTilemap,
         layerPos(new Vector2(3, 3)),
-        { config: { algorithm: shortestPathAlgo } }
+        { config: { algorithm: shortestPathAlgo } },
       );
       targetMovement.update(100);
       mockChar.update(100);
@@ -1608,7 +1615,7 @@ describe("TargetMovement", () => {
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       gridTilemap.addCharacter(mockChar);
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
@@ -1652,12 +1659,12 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     gridTilemap.setTransition(
       new Vector2(1, 0),
       "lowerCharLayer",
-      "upperCharLayer"
+      "upperCharLayer",
     );
     const mockChar = createMockChar("char", charPos, {
       ...TEST_CHAR_CONFIG,
@@ -1713,7 +1720,7 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     gridTilemap.addCharacter(mockChar);
 
@@ -1732,7 +1739,7 @@ describe("TargetMovement", () => {
         [2, 2],
         [2, 3],
         [1, 3],
-      ])
+      ]),
     );
   });
 
@@ -1770,7 +1777,7 @@ describe("TargetMovement", () => {
         [3, 2],
         [2, 2],
         [1, 2],
-      ])
+      ]),
     );
   });
 
@@ -1797,7 +1804,7 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     mockCharMap(gridTilemap, blockMap);
     gridTilemap.addCharacter(mockChar);
@@ -1818,7 +1825,7 @@ describe("TargetMovement", () => {
         [3, 2],
         [2, 2],
         [1, 2],
-      ])
+      ]),
     );
   });
 
@@ -1846,7 +1853,7 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
     mockCharMap(gridTilemap, blockMap);
     gridTilemap.addCharacter(mockChar);
@@ -1863,7 +1870,7 @@ describe("TargetMovement", () => {
       createPath([
         [1, 1],
         [1, 2],
-      ])
+      ]),
     );
   });
 
@@ -1890,7 +1897,7 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
@@ -1905,7 +1912,7 @@ describe("TargetMovement", () => {
       createPath([
         [1, 1],
         [1, 2],
-      ])
+      ]),
     );
   });
 
@@ -1928,7 +1935,7 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
@@ -1961,7 +1968,7 @@ describe("TargetMovement", () => {
     gridTilemap = new GridTilemap(
       tilemapMock,
       "ge_collide",
-      CollisionStrategy.BLOCK_TWO_TILES
+      CollisionStrategy.BLOCK_TWO_TILES,
     );
 
     const mockChar = createMockChar("char", charPos, {
@@ -2007,7 +2014,7 @@ describe("TargetMovement", () => {
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       const mockChar = createMockChar("char", charPos, {
         ...TEST_CHAR_CONFIG,
@@ -2034,7 +2041,7 @@ describe("TargetMovement", () => {
           [1, 3],
           [1, 2],
           [2, 2],
-        ])
+        ]),
       );
     });
 
@@ -2056,7 +2063,7 @@ describe("TargetMovement", () => {
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       const mockChar = createMockChar("char", charPos, {
         ...TEST_CHAR_CONFIG,
@@ -2110,7 +2117,7 @@ describe("TargetMovement", () => {
           [2, 1],
           [2, 2],
           [1, 2],
-        ])
+        ]),
       );
     });
 
@@ -2134,7 +2141,7 @@ describe("TargetMovement", () => {
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       const mockChar = createMockChar("char", charPos, {
         ...TEST_CHAR_CONFIG,
@@ -2161,7 +2168,7 @@ describe("TargetMovement", () => {
           [3, 2],
           [2, 2],
           [1, 2],
-        ])
+        ]),
       );
     });
 
@@ -2185,7 +2192,7 @@ describe("TargetMovement", () => {
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       const mockChar = createMockChar("char", charPos, {
         ...TEST_CHAR_CONFIG,
@@ -2208,7 +2215,7 @@ describe("TargetMovement", () => {
         createPath([
           [1, 1],
           [1, 2],
-        ])
+        ]),
       );
     });
 
@@ -2231,7 +2238,7 @@ describe("TargetMovement", () => {
       gridTilemap = new GridTilemap(
         tilemapMock,
         "ge_collide",
-        CollisionStrategy.BLOCK_TWO_TILES
+        CollisionStrategy.BLOCK_TWO_TILES,
       );
       const mockChar = createMockChar("char", charPos, {
         ...TEST_CHAR_CONFIG,
@@ -2274,9 +2281,9 @@ describe("TargetMovement", () => {
 
       expect(console.warn).toHaveBeenCalledWith(
         `GridEngine: Pathfinding option 'considerCosts' cannot be used with ` +
-          `algorithm '${algorithm}'. It can only be used with A* algorithm.`
+          `algorithm '${algorithm}'. It can only be used with A* algorithm.`,
       );
-    }
+    },
   );
 
   it(
@@ -2300,9 +2307,9 @@ describe("TargetMovement", () => {
 
       expect(console.warn).not.toHaveBeenCalledWith(
         `GridEngine: Pathfinding option 'considerCosts' cannot be used with ` +
-          `algorithm 'A_STAR'. It can only be used with A* algorithm.`
+          `algorithm 'A_STAR'. It can only be used with A* algorithm.`,
       );
-    }
+    },
   );
 
   it("should provide the current path ahead", () => {
