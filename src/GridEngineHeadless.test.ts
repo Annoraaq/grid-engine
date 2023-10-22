@@ -2023,6 +2023,58 @@ describe("GridEngineHeadless", () => {
     expect(gridEngineHeadless.getState()).toEqual(want);
   });
 
+  it("should not reset tile position if it did not change", () => {
+    gridEngineHeadless.create(
+      // prettier-ignore
+      mockBlockMap(
+        [
+          "...",
+          "...",
+        ],
+        "someLayer",
+        false
+      ),
+      {
+        characters: [
+          {
+            id: "char1",
+            startPosition: { x: 1, y: 0 },
+            charLayer: "someLayer",
+            collides: {
+              collisionGroups: ["cGroup3"],
+              collidesWithTiles: false,
+              ignoreMissingTiles: false,
+            },
+            speed: 1,
+          },
+        ],
+      },
+    );
+
+    const want: GridEngineState = {
+      characters: [
+        {
+          id: "char1",
+          position: { position: { x: 1, y: 0 }, charLayer: "someLayer" },
+          collisionConfig: {
+            collisionGroups: ["cGroup3"],
+            collidesWithTiles: false,
+            ignoreMissingTiles: false,
+          },
+          facingDirection: Direction.UP,
+          speed: 2,
+          movementProgress: 20,
+        },
+      ],
+    };
+
+    const mock = jest.fn();
+    gridEngineHeadless.positionChangeFinished().subscribe(mock);
+
+    gridEngineHeadless.setState({ characters: [want.characters[0]] });
+    expect(mock).not.toHaveBeenCalled();
+  });
+
   describe("Error Handling unknown char id", () => {
     const UNKNOWN_CHAR_ID = "unknownCharId";
     beforeEach(() => {
