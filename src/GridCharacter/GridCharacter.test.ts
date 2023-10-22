@@ -169,6 +169,36 @@ describe("GridCharacter", () => {
     );
   });
 
+  it("should set movement progress", () => {
+    const { gridCharacter } = createDefaultTilemapMock();
+
+    expect(gridCharacter.getMovementProgress()).toBe(0);
+    gridCharacter.setMovementProgress(300);
+    expect(gridCharacter.getMovementProgress()).toBe(300);
+
+    gridCharacter.setMovementProgress(-10);
+    expect(gridCharacter.getMovementProgress()).toBe(0);
+
+    gridCharacter.setMovementProgress(10000);
+    expect(gridCharacter.getMovementProgress()).toBe(1000);
+  });
+
+  it("should set collidesWithTiles", () => {
+    const { gridCharacter } = createDefaultTilemapMock();
+
+    expect(gridCharacter.collidesWithTiles()).toBe(true);
+    gridCharacter.setCollidesWithTiles(false);
+    expect(gridCharacter.collidesWithTiles()).toBe(false);
+  });
+
+  it("should set ignoreMissingTiles", () => {
+    const { gridCharacter } = createDefaultTilemapMock();
+
+    expect(gridCharacter.getIgnoreMissingTiles()).toBe(false);
+    gridCharacter.setIgnoreMissingTiles(true);
+    expect(gridCharacter.getIgnoreMissingTiles()).toBe(true);
+  });
+
   it("should update vertically", () => {
     const { gridCharacter } = createDefaultTilemapMock();
 

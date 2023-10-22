@@ -119,8 +119,16 @@ export class GridCharacter {
     return this.collidesWithTilesInternal;
   }
 
+  setCollidesWithTiles(collidesWithTiles: boolean): void {
+    this.collidesWithTilesInternal = collidesWithTiles;
+  }
+
   getIgnoreMissingTiles(): boolean {
     return this.ignoreMissingTiles;
+  }
+
+  setIgnoreMissingTiles(ignoreMissingTiles: boolean): void {
+    this.ignoreMissingTiles = ignoreMissingTiles;
   }
 
   setTilePosition(tilePosition: LayerVecPos): void {
@@ -360,6 +368,11 @@ export class GridCharacter {
 
   getMovementProgress(): number {
     return this.movementProgress;
+  }
+
+  setMovementProgress(progress: number): void {
+    const newProgress = Math.max(0, Math.min(MAX_MOVEMENT_PROGRESS, progress));
+    this.movementProgress = newProgress;
   }
 
   hasWalkedHalfATile(): boolean {

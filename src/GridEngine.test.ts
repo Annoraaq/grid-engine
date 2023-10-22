@@ -49,6 +49,7 @@ import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy.js";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy.js";
 import { createSpriteMock } from "./Utils/MockFactory/MockFactory.js";
 import { createPhaserTilemapStub } from "./Utils/MockFactory/MockPhaserTilemap.js";
+import { GridEngineState } from "./GridEngineState.js";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;
@@ -2040,6 +2041,176 @@ describe("GridEngine", () => {
     expect(gridEngine.isBlocked(cGroup2CharPos, undefined, ["cGroup1"])).toBe(
       true,
     );
+  });
+
+  it("should get state", () => {
+    gridEngine.create(
+      createPhaserTilemapStub(new Map([["someLayer", ["...", "..."]]])),
+      {
+        characters: [
+          {
+            id: "char1",
+            startPosition: { x: 1, y: 0 },
+            charLayer: "someLayer",
+            collides: {
+              collisionGroups: ["cGroup1"],
+              collidesWithTiles: true,
+              ignoreMissingTiles: true,
+            },
+            speed: 1,
+          },
+          {
+            id: "char2",
+            startPosition: { x: 2, y: 0 },
+            charLayer: "someOtherLayer",
+            collides: {
+              collisionGroups: ["cGroup2"],
+              collidesWithTiles: false,
+            },
+          },
+        ],
+      },
+    );
+    gridEngine.move("char1", Direction.LEFT);
+    gridEngine.update(0, 10);
+
+    const want: GridEngineState = {
+      characters: [
+        {
+          id: "char1",
+          position: { position: { x: 1, y: 0 }, charLayer: "someLayer" },
+          collisionConfig: {
+            collisionGroups: ["cGroup1"],
+            collidesWithTiles: true,
+            ignoreMissingTiles: true,
+          },
+          facingDirection: Direction.LEFT,
+          speed: 1,
+          movementProgress: 10,
+        },
+        {
+          id: "char2",
+          position: { position: { x: 2, y: 0 }, charLayer: "someOtherLayer" },
+          collisionConfig: {
+            collisionGroups: ["cGroup2"],
+            collidesWithTiles: false,
+            ignoreMissingTiles: false,
+          },
+          speed: 4,
+          movementProgress: 0,
+          facingDirection: Direction.DOWN,
+        },
+      ],
+    };
+
+    expect(gridEngine.getState()).toEqual(want);
+  });
+
+  it("should set state", () => {
+    gridEngine.create(
+      createPhaserTilemapStub(new Map([["someLayer", ["...", "..."]]])),
+      {
+        characters: [
+          {
+            id: "char1",
+            startPosition: { x: 1, y: 0 },
+            charLayer: "someLayer",
+            collides: {
+              collisionGroups: ["cGroup1"],
+              collidesWithTiles: true,
+              ignoreMissingTiles: true,
+            },
+            speed: 1,
+          },
+          {
+            id: "char2",
+            startPosition: { x: 2, y: 0 },
+            charLayer: "someOtherLayer",
+            collides: {
+              collisionGroups: ["cGroup2"],
+              collidesWithTiles: false,
+            },
+          },
+        ],
+      },
+    );
+
+    const want: GridEngineState = {
+      characters: [
+        {
+          id: "char1",
+          position: { position: { x: 2, y: 3 }, charLayer: "someOtherLayer" },
+          collisionConfig: {
+            collisionGroups: ["cGroup3"],
+            collidesWithTiles: false,
+            ignoreMissingTiles: false,
+          },
+          facingDirection: Direction.UP,
+          speed: 2,
+          movementProgress: 20,
+        },
+        {
+          id: "char2",
+          position: { position: { x: 2, y: 0 }, charLayer: "someOtherLayer" },
+          collisionConfig: {
+            collisionGroups: ["cGroup2"],
+            collidesWithTiles: false,
+            ignoreMissingTiles: false,
+          },
+          speed: 4,
+          movementProgress: 0,
+          facingDirection: Direction.DOWN,
+        },
+      ],
+    };
+
+    gridEngine.setState({ characters: [want.characters[0]] });
+
+    expect(gridEngine.getState()).toEqual(want);
+  });
+
+  it("should not reset tile position if it did not change", () => {
+    gridEngine.create(
+      createPhaserTilemapStub(new Map([["someLayer", ["...", "..."]]])),
+      {
+        characters: [
+          {
+            id: "char1",
+            startPosition: { x: 1, y: 0 },
+            charLayer: "someLayer",
+            collides: {
+              collisionGroups: ["cGroup1"],
+              collidesWithTiles: true,
+              ignoreMissingTiles: true,
+            },
+            speed: 1,
+          },
+        ],
+      },
+    );
+
+    const want: GridEngineState = {
+      characters: [
+        {
+          id: "char1",
+          position: { position: { x: 1, y: 0 }, charLayer: "someLayer" },
+          collisionConfig: {
+            collisionGroups: ["cGroup3"],
+            collidesWithTiles: false,
+            ignoreMissingTiles: false,
+          },
+          facingDirection: Direction.UP,
+          speed: 2,
+          movementProgress: 20,
+        },
+      ],
+    };
+
+    const mock = jest.fn();
+    gridEngine.positionChangeFinished().subscribe(mock);
+
+    gridEngine.setState({ characters: [want.characters[0]] });
+    expect(mock).not.toHaveBeenCalled();
   });
 
   describe("Error Handling unknown char id", () => {

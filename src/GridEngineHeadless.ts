@@ -57,6 +57,8 @@ import {
   QueueMovementEntry,
   Finished as QueueMovementFinished,
 } from "./Movement/QueueMovement/QueueMovement.js";
+import { GridCharacterState } from "./GridCharacter/GridCharacterState.js";
+import { GridEngineState } from "./GridEngineState.js";
 
 export {
   CollisionStrategy,
@@ -1217,6 +1219,77 @@ export class GridEngineHeadless implements IGridEngine {
         srcDirection,
       ) ?? 1
     );
+  }
+
+  /**
+   * {@inheritDoc IGridEngine.getState}
+   *
+   * @category GridEngine
+   */
+  getState(): GridEngineState {
+    const chars: GridCharacterState[] = [];
+    if (this.gridCharacters) {
+      for (const [id, char] of this.gridCharacters.entries()) {
+        chars.push({
+          id,
+          position: LayerPositionUtils.fromInternal(char.getTilePos()),
+          facingDirection: char.getFacingDirection(),
+          speed: char.getSpeed(),
+          movementProgress: char.getMovementProgress(),
+          collisionConfig: {
+            collisionGroups: char.getCollisionGroups(),
+            collidesWithTiles: char.collidesWithTiles(),
+            ignoreMissingTiles: char.getIgnoreMissingTiles(),
+          },
+        });
+      }
+    }
+    return {
+      characters: chars,
+    };
+  }
+
+  /**
+   * {@inheritDoc IGridEngine.setState}
+   *
+   * @category GridEngine
+   */
+  setState(state: GridEngineState): void {
+    if (this.gridCharacters) {
+      for (const charState of state.characters) {
+        const char = this.gridCharacters.get(charState.id);
+        if (char) {
+          const currentTilePos = char.getTilePos();
+          if (
+            !LayerPositionUtils.equal(
+              currentTilePos,
+              LayerPositionUtils.toInternal(charState.position),
+            )
+          ) {
+            char.setTilePosition(
+              LayerPositionUtils.toInternal(charState.position),
+            );
+          }
+          char.setSpeed(charState.speed);
+          char.turnTowards(charState.facingDirection);
+          char.turnTowards(charState.facingDirection);
+          if (charState.collisionConfig.collisionGroups) {
+            char.setCollisionGroups(charState.collisionConfig.collisionGroups);
+          }
+          if (charState.collisionConfig.collidesWithTiles !== undefined) {
+            char.setCollidesWithTiles(
+              charState.collisionConfig.collidesWithTiles,
+            );
+          }
+          if (charState.collisionConfig.ignoreMissingTiles !== undefined) {
+            char.setIgnoreMissingTiles(
+              charState.collisionConfig.ignoreMissingTiles,
+            );
+          }
+          char.setMovementProgress(charState.movementProgress);
+        }
+      }
+    }
   }
 
   private charRemoved(charId: string): Observable<string> {

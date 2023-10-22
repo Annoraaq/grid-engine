@@ -72,6 +72,7 @@ import {
 import { TiledTilemap } from "./GridTilemap/TiledTilemap/TiledTilemap.js";
 import { TiledLayer } from "./GridTilemap/TiledTilemap/TiledLayer.js";
 import { TiledTile } from "./GridTilemap/TiledTilemap/TiledTile.js";
+import { GridEngineState } from "./GridEngineState.js";
 
 export {
   ArrayTilemap,
@@ -928,6 +929,24 @@ export class GridEngine implements IGridEngine {
    */
   clearEnqueuedMovements(charId: string): void {
     return this.geHeadless.clearEnqueuedMovements(charId);
+  }
+
+  /**
+   * {@inheritDoc IGridEngine.getState}
+   *
+   * @category GridEngine
+   */
+  getState(): GridEngineState {
+    return this.geHeadless.getState();
+  }
+
+  /**
+   * {@inheritDoc IGridEngine.setState}
+   *
+   * @category GridEngine
+   */
+  setState(state: GridEngineState): void {
+    this.geHeadless.setState(state);
   }
 
   /**

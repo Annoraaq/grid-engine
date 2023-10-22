@@ -14,6 +14,7 @@ import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/Chara
 import { PathfindingOptions } from "./Pathfinding/Pathfinding.js";
 import { PositionChange } from "./GridCharacter/GridCharacter.js";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
+import { GridEngineState } from "./GridEngineState.js";
 
 export type CharLayer = string | undefined;
 
@@ -636,4 +637,19 @@ export interface IGridEngine {
     charLayer?: string,
     srcDirection?: Direction,
   ): number;
+
+  /**
+   * Returns the current state of Grid Engine. This is useful for persiting or
+   * sharing the state.
+   */
+  getState(): GridEngineState;
+
+  /**
+   * Sets the given state for Grid Engine. Be aware that it will **not** remove
+   * any characters from Grid Engine. If you want to completely reset the state,
+   * you should call {@link GridEngineHeadless.create}/{@link GridEngine.create}
+   * or remove all characters via
+   * {@link GridEngineHeadless.removeAllCharacters}.
+   */
+  setState(state: GridEngineState): void;
 }

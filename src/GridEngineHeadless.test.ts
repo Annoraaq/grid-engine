@@ -41,6 +41,7 @@ import {
   updateLayer,
 } from "./Utils/MockFactory/MockFactory.js";
 import { MockTilemap } from "./Utils/MockFactory/MockTilemap.js";
+import { GridEngineState } from "./GridEngineState.js";
 
 describe("GridEngineHeadless", () => {
   let gridEngineHeadless: GridEngineHeadless;
@@ -1878,6 +1879,200 @@ describe("GridEngineHeadless", () => {
     expect(
       gridEngineHeadless.isBlocked(cGroup2CharPos, undefined, ["cGroup1"]),
     ).toBe(true);
+  });
+
+  it("should get state", () => {
+    gridEngineHeadless.create(
+      // prettier-ignore
+      mockBlockMap(
+        [
+          "...",
+          "...",
+        ],
+        "someLayer",
+        false
+      ),
+      {
+        characters: [
+          {
+            id: "char1",
+            startPosition: { x: 1, y: 0 },
+            charLayer: "someLayer",
+            collides: {
+              collisionGroups: ["cGroup1"],
+              collidesWithTiles: true,
+              ignoreMissingTiles: true,
+            },
+            speed: 1,
+          },
+          {
+            id: "char2",
+            startPosition: { x: 2, y: 0 },
+            charLayer: "someOtherLayer",
+            collides: {
+              collisionGroups: ["cGroup2"],
+              collidesWithTiles: false,
+            },
+          },
+        ],
+      },
+    );
+    gridEngineHeadless.move("char1", Direction.LEFT);
+    gridEngineHeadless.update(0, 10);
+
+    const want: GridEngineState = {
+      characters: [
+        {
+          id: "char1",
+          position: { position: { x: 1, y: 0 }, charLayer: "someLayer" },
+          collisionConfig: {
+            collisionGroups: ["cGroup1"],
+            collidesWithTiles: true,
+            ignoreMissingTiles: true,
+          },
+          facingDirection: Direction.LEFT,
+          speed: 1,
+          movementProgress: 10,
+        },
+        {
+          id: "char2",
+          position: { position: { x: 2, y: 0 }, charLayer: "someOtherLayer" },
+          collisionConfig: {
+            collisionGroups: ["cGroup2"],
+            collidesWithTiles: false,
+            ignoreMissingTiles: false,
+          },
+          speed: 4,
+          movementProgress: 0,
+          facingDirection: Direction.DOWN,
+        },
+      ],
+    };
+
+    expect(gridEngineHeadless.getState()).toEqual(want);
+  });
+
+  it("should set state", () => {
+    gridEngineHeadless.create(
+      // prettier-ignore
+      mockBlockMap(
+        [
+          "...",
+          "...",
+        ],
+        "someLayer",
+        false
+      ),
+      {
+        characters: [
+          {
+            id: "char1",
+            startPosition: { x: 1, y: 0 },
+            charLayer: "someLayer",
+            collides: {
+              collisionGroups: ["cGroup1"],
+              collidesWithTiles: true,
+              ignoreMissingTiles: true,
+            },
+            speed: 1,
+          },
+          {
+            id: "char2",
+            startPosition: { x: 2, y: 0 },
+            charLayer: "someOtherLayer",
+            collides: {
+              collisionGroups: ["cGroup2"],
+              collidesWithTiles: false,
+            },
+          },
+        ],
+      },
+    );
+
+    const want: GridEngineState = {
+      characters: [
+        {
+          id: "char1",
+          position: { position: { x: 2, y: 3 }, charLayer: "someOtherLayer" },
+          collisionConfig: {
+            collisionGroups: ["cGroup3"],
+            collidesWithTiles: false,
+            ignoreMissingTiles: false,
+          },
+          facingDirection: Direction.UP,
+          speed: 2,
+          movementProgress: 20,
+        },
+        {
+          id: "char2",
+          position: { position: { x: 2, y: 0 }, charLayer: "someOtherLayer" },
+          collisionConfig: {
+            collisionGroups: ["cGroup2"],
+            collidesWithTiles: false,
+            ignoreMissingTiles: false,
+          },
+          speed: 4,
+          movementProgress: 0,
+          facingDirection: Direction.DOWN,
+        },
+      ],
+    };
+
+    gridEngineHeadless.setState({ characters: [want.characters[0]] });
+
+    expect(gridEngineHeadless.getState()).toEqual(want);
+  });
+
+  it("should not reset tile position if it did not change", () => {
+    gridEngineHeadless.create(
+      // prettier-ignore
+      mockBlockMap(
+        [
+          "...",
+          "...",
+        ],
+        "someLayer",
+        false
+      ),
+      {
+        characters: [
+          {
+            id: "char1",
+            startPosition: { x: 1, y: 0 },
+            charLayer: "someLayer",
+            collides: {
+              collisionGroups: ["cGroup3"],
+              collidesWithTiles: false,
+              ignoreMissingTiles: false,
+            },
+            speed: 1,
+          },
+        ],
+      },
+    );
+
+    const want: GridEngineState = {
+      characters: [
+        {
+          id: "char1",
+          position: { position: { x: 1, y: 0 }, charLayer: "someLayer" },
+          collisionConfig: {
+            collisionGroups: ["cGroup3"],
+            collidesWithTiles: false,
+            ignoreMissingTiles: false,
+          },
+          facingDirection: Direction.UP,
+          speed: 2,
+          movementProgress: 20,
+        },
+      ],
+    };
+
+    const mock = jest.fn();
+    gridEngineHeadless.positionChangeFinished().subscribe(mock);
+
+    gridEngineHeadless.setState({ characters: [want.characters[0]] });
+    expect(mock).not.toHaveBeenCalled();
   });
 
   describe("Error Handling unknown char id", () => {
