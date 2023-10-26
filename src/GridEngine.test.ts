@@ -2081,6 +2081,7 @@ describe("GridEngine", () => {
           position: { position: { x: 1, y: 0 }, charLayer: "someLayer" },
           collisionConfig: {
             collisionGroups: ["cGroup1"],
+            ignoreCollisionGroups: [],
             collidesWithTiles: true,
             ignoreMissingTiles: true,
           },
@@ -2093,6 +2094,7 @@ describe("GridEngine", () => {
           position: { position: { x: 2, y: 0 }, charLayer: "someOtherLayer" },
           collisionConfig: {
             collisionGroups: ["cGroup2"],
+            ignoreCollisionGroups: [],
             collidesWithTiles: false,
             ignoreMissingTiles: false,
           },
@@ -2142,6 +2144,7 @@ describe("GridEngine", () => {
           position: { position: { x: 2, y: 3 }, charLayer: "someOtherLayer" },
           collisionConfig: {
             collisionGroups: ["cGroup3"],
+            ignoreCollisionGroups: [],
             collidesWithTiles: false,
             ignoreMissingTiles: false,
           },
@@ -2154,6 +2157,7 @@ describe("GridEngine", () => {
           position: { position: { x: 2, y: 0 }, charLayer: "someOtherLayer" },
           collisionConfig: {
             collisionGroups: ["cGroup2"],
+            ignoreCollisionGroups: [],
             collidesWithTiles: false,
             ignoreMissingTiles: false,
           },

@@ -765,6 +765,27 @@ export class GridEngine implements IGridEngine {
   }
 
   /**
+   * {@inheritDoc IGridEngine.getIgnoreCollisionGroups}
+   *
+   * @category Character
+   */
+  getIgnoreCollisionGroups(charId: string): string[] {
+    return this.geHeadless.getIgnoreCollisionGroups(charId);
+  }
+
+  /**
+   * {@inheritDoc IGridEngine.setIgnoreCollisionGroups}
+   *
+   * @category Character
+   */
+  setIgnoreCollisionGroups(
+    charId: string,
+    ignoreCollisionGroups: string[],
+  ): void {
+    this.geHeadless.setIgnoreCollisionGroups(charId, ignoreCollisionGroups);
+  }
+
+  /**
    * {@inheritDoc IGridEngine.getTilePosInDirection}
    *
    * @category Tilemap

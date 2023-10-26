@@ -53,6 +53,7 @@ describe("GridCharacter", () => {
       charLayer: "someLayer",
       facingDirection: Direction.RIGHT,
       collisionGroups: ["test"],
+      ignoreCollisionGroups: ["ignore"],
       labels: ["someLabel"],
       tileWidth: 2,
       tileHeight: 3,
@@ -66,6 +67,7 @@ describe("GridCharacter", () => {
       NumberOfDirections.EIGHT,
     );
     expect(gridCharacter.getCollisionGroups()).toEqual(["test"]);
+    expect(gridCharacter.getIgnoreCollisionGroups()).toEqual(["ignore"]);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
     expect(gridCharacter.getLabels()).toEqual(["someLabel"]);
     expect(gridCharacter.getTileWidth()).toEqual(2);
@@ -78,6 +80,7 @@ describe("GridCharacter", () => {
     });
     expect(gridCharacter.getTilePos().layer).toEqual(undefined);
     expect(gridCharacter.getCollisionGroups()).toEqual([]);
+    expect(gridCharacter.getIgnoreCollisionGroups()).toEqual([]);
     expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
     expect(gridCharacter.getLabels()).toEqual([]);
     expect(gridCharacter.getTileWidth()).toEqual(1);
@@ -1031,6 +1034,31 @@ describe("GridCharacter", () => {
         gridTilemap.addCharacter(blockingChar);
         expect(gridCharacter.isBlockingDirection(direction)).toBe(true);
       });
+
+      it("should not block when chars in ingored collision groups", () => {
+        const { gridTilemap, gridCharacter } = createDefaultTilemapMock(
+          "lowerCharLayer",
+          {
+            collidesWithTiles: false,
+            collisionGroups: ["cGroup1"],
+            ignoreCollisionGroups: ["cGroupIgnore"],
+          },
+        );
+        const ignoredChar = new GridCharacter("blocker", {
+          tilemap: gridTilemap,
+          speed: 3,
+          collidesWithTiles: false,
+          collisionGroups: ["cGroup1", "cGroupIgnore"],
+          numberOfDirections: NumberOfDirections.FOUR,
+        });
+        ignoredChar.setTilePosition({
+          position: new Vector2(1, 0),
+          layer: undefined,
+        });
+        gridTilemap.addCharacter(gridCharacter);
+        gridTilemap.addCharacter(ignoredChar);
+        expect(gridCharacter.isBlockingDirection(direction)).toBe(false);
+      });
     });
   });
 
@@ -1166,8 +1194,10 @@ describe("GridCharacter", () => {
     it("should set collision groups from config", () => {
       const { gridCharacter } = createDefaultTilemapMock("lowerCharLayer", {
         collisionGroups: ["someGroup"],
+        ignoreCollisionGroups: ["ignore"],
       });
       expect(gridCharacter.getCollisionGroups()).toEqual(["someGroup"]);
+      expect(gridCharacter.getIgnoreCollisionGroups()).toEqual(["ignore"]);
     });
 
     it("should add collision groups", () => {
@@ -1224,6 +1254,18 @@ describe("GridCharacter", () => {
       expect(gridCharacter.getCollisionGroups()).toEqual([
         "collisionGroup3",
         "collisionGroup4",
+      ]);
+    });
+
+    it("should set ignore collision groups", () => {
+      const { gridCharacter } = createDefaultTilemapMock("lowerCharLayer");
+      gridCharacter.setIgnoreCollisionGroups([
+        "collisionGroup1",
+        "collisionGroup2",
+      ]);
+      expect(gridCharacter.getIgnoreCollisionGroups()).toEqual([
+        "collisionGroup1",
+        "collisionGroup2",
       ]);
     });
   });

@@ -196,6 +196,39 @@ describe("CharBlockCache", () => {
     ).toBe(false);
   });
 
+  it("should consider ignore collision groups", () => {
+    charBlockCache = new CharBlockCache(CollisionStrategy.BLOCK_TWO_TILES);
+
+    const layer = "someLayer";
+
+    const cGroup1Char = createChar("cGroup1Char", 1, 1);
+    cGroup1Char.setCollisionGroups(["cGroup1", "ignoredGroup"]);
+    cGroup1Char.setTilePosition({
+      position: new Vector2(0, 0),
+      layer,
+    });
+
+    charBlockCache.addCharacter(cGroup1Char);
+
+    expect(
+      charBlockCache.isCharBlockingAt(
+        cGroup1Char.getTilePos().position,
+        layer,
+        ["cGroup1"],
+      ),
+    ).toBe(true);
+
+    expect(
+      charBlockCache.isCharBlockingAt(
+        cGroup1Char.getTilePos().position,
+        layer,
+        ["cGroup1"],
+        new Set(),
+        new Set(["ignoredGroup"]),
+      ),
+    ).toBe(false);
+  });
+
   describe("blocking strategy BLOCK_TWO_TILES", () => {
     beforeEach(() => {
       gridTilemap = new GridTilemap(

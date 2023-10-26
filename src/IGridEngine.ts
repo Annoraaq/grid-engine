@@ -458,6 +458,24 @@ export interface IGridEngine {
   setCollisionGroups(charId: string, collisionGroups: string[]): void;
 
   /**
+   * Sets collision groups for the given character. Previous collision groups
+   * will be overwritten.
+   *
+   * @category Character
+   */
+  setIgnoreCollisionGroups(
+    charId: string,
+    ignoreCollisionGroups: string[],
+  ): void;
+
+  /**
+   * Returns all collision groups the character should ignore.
+   *
+   * @category Character
+   */
+  getIgnoreCollisionGroups(charId: string): string[];
+
+  /**
    * Gets the tile position and character layer adjacent to the given
    * position in the given direction.
    *

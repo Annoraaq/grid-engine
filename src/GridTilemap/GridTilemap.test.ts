@@ -612,6 +612,38 @@ describe("GridTilemap", () => {
     ).toBe(true);
   });
 
+  it("should consider ignored collision groups", () => {
+    gridTilemap = new GridTilemap(
+      tilemap,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES,
+    );
+
+    const char = new GridCharacter("player1", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+      collisionGroups: ["cGroup", "ignoredGroup"],
+    });
+    char.setTilePosition({ position: new Vector2(1, 1), layer: "charLayer1" });
+    gridTilemap.addCharacter(char);
+
+    expect(
+      gridTilemap.hasBlockingChar(new Vector2(1, 1), "charLayer1", ["cGroup"]),
+    ).toBe(true);
+
+    expect(
+      gridTilemap.hasBlockingChar(
+        new Vector2(1, 1),
+        "charLayer1",
+        ["cGroup"],
+        new Set(),
+        new Set(["ignoredGroup"]),
+      ),
+    ).toBe(false);
+  });
+
   it("should detect an unblocked tile", () => {
     gridTilemap = new GridTilemap(
       tilemap,
