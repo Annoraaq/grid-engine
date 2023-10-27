@@ -2276,6 +2276,12 @@ describe("GridEngine", () => {
         gridEngine.setCollisionGroups(UNKNOWN_CHAR_ID, ["cGroup"]),
       );
       expectCharUnknownException(() =>
+        gridEngine.getIgnoreCollisionGroups(UNKNOWN_CHAR_ID),
+      );
+      expectCharUnknownException(() =>
+        gridEngine.setIgnoreCollisionGroups(UNKNOWN_CHAR_ID, ["cGroup"]),
+      );
+      expectCharUnknownException(() =>
         gridEngine.getWalkingAnimationMapping(UNKNOWN_CHAR_ID),
       );
       expectCharUnknownException(() =>
@@ -2402,6 +2408,12 @@ describe("GridEngine", () => {
       );
       expectUninitializedException(() =>
         gridEngine.setCollisionGroups(SOME_CHAR_ID, ["cGroup"]),
+      );
+      expectUninitializedException(() =>
+        gridEngine.getIgnoreCollisionGroups(SOME_CHAR_ID),
+      );
+      expectUninitializedException(() =>
+        gridEngine.setIgnoreCollisionGroups(SOME_CHAR_ID, ["cGroup"]),
       );
       expectUninitializedException(() =>
         gridEngine.getWalkingAnimationMapping(SOME_CHAR_ID),
