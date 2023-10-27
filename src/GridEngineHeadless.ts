@@ -172,6 +172,17 @@ export interface CollisionConfig {
    * @defaultValue `['geDefault']`
    */
   collisionGroups?: string[];
+
+  /**
+   * Array with collision groups to ignore. Only characters with none of these
+   * collision groups collide. If a group is both in
+   * {@link CollisionConfig.collisionGroups} and
+   * {@link CollisionConfig.ignoreCollisionGroups}, the entry in
+   * {@link CollisionConfig.collisionGroups} will be ignored/overridden.
+   *
+   * @defaultValue `[]`
+   */
+  ignoreCollisionGroups?: string[];
 }
 
 /**
@@ -548,6 +559,7 @@ export class GridEngineHeadless implements IGridEngine {
       tilemap: this.gridTilemap,
       collidesWithTiles: true,
       collisionGroups: ["geDefault"],
+      ignoreCollisionGroups: [],
       charLayer: charData.charLayer,
       facingDirection: charData.facingDirection,
       labels: charData.labels,
@@ -568,6 +580,10 @@ export class GridEngineHeadless implements IGridEngine {
       }
       if (charData.collides.collisionGroups) {
         charConfig.collisionGroups = charData.collides.collisionGroups;
+      }
+      if (charData.collides.ignoreCollisionGroups) {
+        charConfig.ignoreCollisionGroups =
+          charData.collides.ignoreCollisionGroups;
       }
       charConfig.ignoreMissingTiles =
         charData.collides?.ignoreMissingTiles ?? false;
@@ -917,6 +933,33 @@ export class GridEngineHeadless implements IGridEngine {
   }
 
   /**
+   * {@inheritDoc IGridEngine.getIgnoreCollisionGroups}
+   *
+   * @category Character
+   */
+  getIgnoreCollisionGroups(charId: string): string[] {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.getIgnoreCollisionGroups() || [];
+  }
+
+  /**
+   * {@inheritDoc IGridEngine.setIgnoreCollisionGroups}
+   *
+   * @category Character
+   */
+  setIgnoreCollisionGroups(
+    charId: string,
+    ignoreCollisionGroups: string[],
+  ): void {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.setIgnoreCollisionGroups(ignoreCollisionGroups);
+  }
+
+  /**
    * {@inheritDoc IGridEngine.getTilePosInDirection}
    *
    * @category Tilemap
@@ -1238,6 +1281,7 @@ export class GridEngineHeadless implements IGridEngine {
           movementProgress: char.getMovementProgress(),
           collisionConfig: {
             collisionGroups: char.getCollisionGroups(),
+            ignoreCollisionGroups: char.getIgnoreCollisionGroups(),
             collidesWithTiles: char.collidesWithTiles(),
             ignoreMissingTiles: char.getIgnoreMissingTiles(),
           },

@@ -32,6 +32,7 @@ export interface CharConfig {
   charLayer?: string;
   collidesWithTiles: boolean;
   collisionGroups?: string[];
+  ignoreCollisionGroups?: string[];
   facingDirection?: Direction;
   ignoreMissingTiles?: boolean;
   labels?: string[];
@@ -63,6 +64,7 @@ export class GridCharacter {
   private movement?: Movement;
   private collidesWithTilesInternal: boolean;
   private collisionGroups: Set<string>;
+  private ignoreCollisionGroups: Set<string>;
   private ignoreMissingTiles: boolean;
   private depthChanged$ = new Subject<LayerVecPos>();
   private movementProgress = 0;
@@ -82,6 +84,9 @@ export class GridCharacter {
 
     this.ignoreMissingTiles = config.ignoreMissingTiles ?? false;
     this.collisionGroups = new Set<string>(config.collisionGroups || []);
+    this.ignoreCollisionGroups = new Set<string>(
+      config.ignoreCollisionGroups || [],
+    );
     this.labels = new Set<string>(config.labels || []);
 
     this.numberOfDirections = config.numberOfDirections;
@@ -254,6 +259,7 @@ export class GridCharacter {
         layerInDirection,
         this.getCollisionGroups(),
         new Set([this.getId()]),
+        this.ignoreCollisionGroups,
       );
     });
   }
@@ -290,8 +296,16 @@ export class GridCharacter {
     this.collisionGroups = new Set(collisionGroups);
   }
 
+  setIgnoreCollisionGroups(ignoreCollisionGroups: string[]): void {
+    this.ignoreCollisionGroups = new Set(ignoreCollisionGroups);
+  }
+
   getCollisionGroups(): string[] {
     return Array.from(this.collisionGroups);
+  }
+
+  getIgnoreCollisionGroups(): string[] {
+    return Array.from(this.ignoreCollisionGroups);
   }
 
   hasCollisionGroup(collisionGroup: string): boolean {

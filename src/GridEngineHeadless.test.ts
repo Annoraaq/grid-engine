@@ -66,6 +66,7 @@ describe("GridEngineHeadless", () => {
     expect(gridEngineHeadless.getCollisionGroups("player")).toEqual([
       "geDefault",
     ]);
+    expect(gridEngineHeadless.getIgnoreCollisionGroups("player")).toEqual([]);
     expect(gridEngineHeadless.getLabels("player")).toEqual([]);
     expect(gridEngineHeadless.getMovementProgress("player")).toEqual(0);
   });
@@ -78,6 +79,7 @@ describe("GridEngineHeadless", () => {
           collides: {
             collidesWithTiles: false,
             collisionGroups: ["cGroup1", "cGroup2"],
+            ignoreCollisionGroups: ["ignore"],
           },
         },
       ],
@@ -86,6 +88,9 @@ describe("GridEngineHeadless", () => {
     expect(gridEngineHeadless.getCollisionGroups("player")).toEqual([
       "cGroup1",
       "cGroup2",
+    ]);
+    expect(gridEngineHeadless.getIgnoreCollisionGroups("player")).toEqual([
+      "ignore",
     ]);
   });
 
@@ -913,6 +918,15 @@ describe("GridEngineHeadless", () => {
     const collisionGroups = ["someCG"];
     gridEngineHeadless.setCollisionGroups("player", collisionGroups);
     expect(gridEngineHeadless.getCollisionGroups("player")).toEqual(
+      collisionGroups,
+    );
+  });
+
+  it("should set ignoreCollisionGroups", () => {
+    createDefaultGridEngine();
+    const collisionGroups = ["someCG"];
+    gridEngineHeadless.setIgnoreCollisionGroups("player", collisionGroups);
+    expect(gridEngineHeadless.getIgnoreCollisionGroups("player")).toEqual(
       collisionGroups,
     );
   });
@@ -1900,6 +1914,7 @@ describe("GridEngineHeadless", () => {
             charLayer: "someLayer",
             collides: {
               collisionGroups: ["cGroup1"],
+              ignoreCollisionGroups: ["ignore"],
               collidesWithTiles: true,
               ignoreMissingTiles: true,
             },
@@ -1927,6 +1942,7 @@ describe("GridEngineHeadless", () => {
           position: { position: { x: 1, y: 0 }, charLayer: "someLayer" },
           collisionConfig: {
             collisionGroups: ["cGroup1"],
+            ignoreCollisionGroups: ["ignore"],
             collidesWithTiles: true,
             ignoreMissingTiles: true,
           },
@@ -1941,6 +1957,7 @@ describe("GridEngineHeadless", () => {
             collisionGroups: ["cGroup2"],
             collidesWithTiles: false,
             ignoreMissingTiles: false,
+            ignoreCollisionGroups: [],
           },
           speed: 4,
           movementProgress: 0,
@@ -1971,6 +1988,7 @@ describe("GridEngineHeadless", () => {
             charLayer: "someLayer",
             collides: {
               collisionGroups: ["cGroup1"],
+              ignoreCollisionGroups: ["ignore"],
               collidesWithTiles: true,
               ignoreMissingTiles: true,
             },
@@ -1996,6 +2014,7 @@ describe("GridEngineHeadless", () => {
           position: { position: { x: 2, y: 3 }, charLayer: "someOtherLayer" },
           collisionConfig: {
             collisionGroups: ["cGroup3"],
+            ignoreCollisionGroups: ["ignore"],
             collidesWithTiles: false,
             ignoreMissingTiles: false,
           },
@@ -2008,6 +2027,7 @@ describe("GridEngineHeadless", () => {
           position: { position: { x: 2, y: 0 }, charLayer: "someOtherLayer" },
           collisionConfig: {
             collisionGroups: ["cGroup2"],
+            ignoreCollisionGroups: [],
             collidesWithTiles: false,
             ignoreMissingTiles: false,
           },
@@ -2133,6 +2153,14 @@ describe("GridEngineHeadless", () => {
       );
       expectCharUnknownException(() =>
         gridEngineHeadless.setCollisionGroups(UNKNOWN_CHAR_ID, ["cGroup"]),
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.getIgnoreCollisionGroups(UNKNOWN_CHAR_ID),
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.setIgnoreCollisionGroups(UNKNOWN_CHAR_ID, [
+          "cGroup",
+        ]),
       );
       expectCharUnknownException(() =>
         gridEngineHeadless.collidesWithTiles(UNKNOWN_CHAR_ID),
@@ -2270,6 +2298,12 @@ describe("GridEngineHeadless", () => {
       );
       expectUninitializedException(() =>
         gridEngineHeadless.setCollisionGroups(SOME_CHAR_ID, ["cGroup"]),
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.getIgnoreCollisionGroups(SOME_CHAR_ID),
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.setIgnoreCollisionGroups(SOME_CHAR_ID, ["cGroup"]),
       );
       expectUninitializedException(() =>
         gridEngineHeadless.collidesWithTiles(SOME_CHAR_ID),

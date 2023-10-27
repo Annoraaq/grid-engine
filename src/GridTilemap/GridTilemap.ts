@@ -231,12 +231,14 @@ export class GridTilemap {
     layer: string | undefined,
     collisionGroups: string[],
     exclude = new Set<CharId>(),
+    ignoreCollisionGroups = new Set<string>(),
   ): boolean {
     return this.charBlockCache.isCharBlockingAt(
       pos,
       layer,
       collisionGroups,
       exclude,
+      ignoreCollisionGroups,
     );
   }
 

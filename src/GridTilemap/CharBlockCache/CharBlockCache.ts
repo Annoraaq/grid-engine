@@ -32,6 +32,7 @@ export class CharBlockCache {
     layer: CharLayer,
     collisionGroups: string[],
     exclude = new Set<CharId>(),
+    ignoredCollisionGroups = new Set<string>(),
   ): boolean {
     if (collisionGroups.length === 0) return false;
     const posStr = this.posToString(pos, layer);
@@ -41,6 +42,13 @@ export class CharBlockCache {
       charSet.size > 0 &&
       [...charSet]
         .filter((char: GridCharacter) => !exclude.has(char.getId()))
+        .filter(
+          (char: GridCharacter) =>
+            !this.doIntersect(
+              char.getCollisionGroups(),
+              ignoredCollisionGroups,
+            ),
+        )
         .some((char: GridCharacter) =>
           collisionGroups.some((group) =>
             char
@@ -49,6 +57,13 @@ export class CharBlockCache {
           ),
         )
     );
+  }
+
+  private doIntersect(arrSet: string[], set: Set<string>): boolean {
+    for (const val of arrSet) {
+      if (set.has(val)) return true;
+    }
+    return false;
   }
 
   private collidesWith(group1: string, group2: string): boolean {
