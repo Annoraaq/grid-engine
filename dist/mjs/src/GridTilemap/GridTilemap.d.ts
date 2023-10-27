@@ -37,7 +37,7 @@ export declare class GridTilemap {
     private getTileCostsForLayer;
     hasNoTileUncached(pos: Vector2, charLayer?: string): boolean;
     hasNoTile(pos: Vector2, charLayer?: string): boolean;
-    hasBlockingChar(pos: Vector2, layer: string | undefined, collisionGroups: string[], exclude?: Set<string>): boolean;
+    hasBlockingChar(pos: Vector2, layer: string | undefined, collisionGroups: string[], exclude?: Set<string>, ignoreCollisionGroups?: Set<string>): boolean;
     isInRange(pos: Vector2): boolean;
     toMapDirection(direction: Direction): Direction;
     fromMapDirection(direction: Direction): Direction;

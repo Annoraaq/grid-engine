@@ -20,6 +20,7 @@ export interface CharConfig {
     charLayer?: string;
     collidesWithTiles: boolean;
     collisionGroups?: string[];
+    ignoreCollisionGroups?: string[];
     facingDirection?: Direction;
     ignoreMissingTiles?: boolean;
     labels?: string[];
@@ -47,6 +48,7 @@ export declare class GridCharacter {
     private movement?;
     private collidesWithTilesInternal;
     private collisionGroups;
+    private ignoreCollisionGroups;
     private ignoreMissingTiles;
     private depthChanged$;
     private movementProgress;
@@ -82,7 +84,9 @@ export declare class GridCharacter {
     getFacingPosition(): Vector2;
     addCollisionGroup(collisionGroup: string): void;
     setCollisionGroups(collisionGroups: string[]): void;
+    setIgnoreCollisionGroups(ignoreCollisionGroups: string[]): void;
     getCollisionGroups(): string[];
+    getIgnoreCollisionGroups(): string[];
     hasCollisionGroup(collisionGroup: string): boolean;
     removeCollisionGroup(collisionGroup: string): void;
     removeAllCollisionGroups(): void;

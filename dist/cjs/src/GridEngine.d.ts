@@ -402,6 +402,18 @@ export declare class GridEngine implements IGridEngine {
      */
     setCollisionGroups(charId: string, collisionGroups: string[]): void;
     /**
+     * {@inheritDoc IGridEngine.getIgnoreCollisionGroups}
+     *
+     * @category Character
+     */
+    getIgnoreCollisionGroups(charId: string): string[];
+    /**
+     * {@inheritDoc IGridEngine.setIgnoreCollisionGroups}
+     *
+     * @category Character
+     */
+    setIgnoreCollisionGroups(charId: string, ignoreCollisionGroups: string[]): void;
+    /**
      * {@inheritDoc IGridEngine.getTilePosInDirection}
      *
      * @category Tilemap

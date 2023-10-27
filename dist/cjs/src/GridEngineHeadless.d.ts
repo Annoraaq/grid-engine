@@ -100,6 +100,16 @@ export interface CollisionConfig {
      * @defaultValue `['geDefault']`
      */
     collisionGroups?: string[];
+    /**
+     * Array with collision groups to ignore. Only characters with none of these
+     * collision groups collide. If a group is both in
+     * {@link CollisionConfig.collisionGroups} and
+     * {@link CollisionConfig.ignoreCollisionGroups}, the entry in
+     * {@link CollisionConfig.collisionGroups} will be ignored/overridden.
+     *
+     * @defaultValue `[]`
+     */
+    ignoreCollisionGroups?: string[];
 }
 /**
  * Configuration object used to initialize a new character in GridEngine.
@@ -401,6 +411,18 @@ export declare class GridEngineHeadless implements IGridEngine {
      * @category Character
      */
     setCollisionGroups(charId: string, collisionGroups: string[]): void;
+    /**
+     * {@inheritDoc IGridEngine.getIgnoreCollisionGroups}
+     *
+     * @category Character
+     */
+    getIgnoreCollisionGroups(charId: string): string[];
+    /**
+     * {@inheritDoc IGridEngine.setIgnoreCollisionGroups}
+     *
+     * @category Character
+     */
+    setIgnoreCollisionGroups(charId: string, ignoreCollisionGroups: string[]): void;
     /**
      * {@inheritDoc IGridEngine.getTilePosInDirection}
      *
