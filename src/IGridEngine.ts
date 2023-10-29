@@ -109,6 +109,29 @@ export interface FollowOptions {
    * @default false
    */
   ignoreLayers?: boolean;
+
+  /**
+   * This setting is ignored if you provide a {@link FollowOptions.distance}
+   * other than 0.
+   *
+   * An unblocked position adjacent to the target character with the shortest
+   * distance to the source character (the one following) is taken as a target.
+   * If there are multiple of these positions any one of them is picked.
+   * With this setting you can give an explicit position based on the current
+   * facing direction of the target character.
+   *
+   * For Example:
+   * If you provide a {@link FollowOptions.facingDirection} of 'down', that
+   * means that you want to follow the position the character is turned away
+   * from. So if the target character's facing direction is `right`, that would
+   * translate to this:
+   * ```
+   *   down-left  | left  | up-left
+   *   down       | (=>)  | up
+   *   down-right | right | up-right
+   * ```
+   */
+  facingDirection?: Direction;
 }
 
 /**
