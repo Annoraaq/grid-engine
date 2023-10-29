@@ -6,6 +6,7 @@ import { Movement, MovementInfo } from "../Movement.js";
 import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 import {
   CharLayer,
+  Direction,
   Position,
   ShortestPathAlgorithmType,
 } from "../../GridEngine.js";
@@ -19,6 +20,7 @@ export interface Options {
   shortestPathAlgorithm?: ShortestPathAlgorithmType;
   ignoreLayers?: boolean;
   considerCosts?: boolean;
+  facingDirection?: Direction;
 }
 
 export class FollowMovement implements Movement {
@@ -38,6 +40,7 @@ export class FollowMovement implements Movement {
       shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
       ignoreLayers: false,
       considerCosts: options.considerCosts || false,
+      facingDirection: Direction.NONE,
     };
     this.options = { ...defaultOptions, ...options };
     if (
@@ -51,6 +54,7 @@ export class FollowMovement implements Movement {
       );
     }
     this.character = character;
+
     this.updateTarget(
       this.charToFollow.getTilePos().position,
       this.charToFollow.getTilePos().layer,
@@ -83,11 +87,22 @@ export class FollowMovement implements Movement {
         noPathFoundStrategy: this.options.noPathFoundStrategy,
         maxPathLength: this.options.maxPathLength,
         ignoreLayers: this.options.ignoreLayers,
+        facingDirection: this.options.facingDirection,
       },
     };
   }
 
   private updateTarget(targetPos: Position, targetLayer: CharLayer): void {
+    // if (
+    //   this.options.facingDirection !== Direction.NONE &&
+    //   this.options.distance === 0
+    // ) {
+    //   targetPos = this.gridTilemap.getTilePosInDirection(
+    //     { position: new Vector2(targetPos), layer: targetLayer },
+
+    //     this.charToFollow.getFacingDirection(),
+    //   ).position;
+    // }
     this.targetMovement = new TargetMovement(
       this.character,
       this.gridTilemap,
@@ -97,6 +112,10 @@ export class FollowMovement implements Movement {
       },
       {
         distance: this.options.distance + 1,
+        // distance:
+        //   this.options.facingDirection !== Direction.NONE
+        //     ? 0
+        //     : this.options.distance + 1,
         config: {
           algorithm: this.options.shortestPathAlgorithm,
           noPathFoundStrategy: this.options.noPathFoundStrategy,
