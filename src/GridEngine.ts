@@ -73,6 +73,7 @@ import { TiledTilemap } from "./GridTilemap/TiledTilemap/TiledTilemap.js";
 import { TiledLayer } from "./GridTilemap/TiledTilemap/TiledLayer.js";
 import { TiledTile } from "./GridTilemap/TiledTilemap/TiledTile.js";
 import { GridEngineState } from "./GridEngineState.js";
+import { GridCharacterState } from "./GridCharacter/GridCharacterState.js";
 
 export {
   ArrayTilemap,
@@ -88,8 +89,10 @@ export {
   Finished,
   FollowOptions,
   FrameRow,
+  GridCharacterState,
   GridEngineConfigHeadless,
   GridEngineHeadless,
+  GridEngineState,
   IGridEngine,
   IsPositionAllowedFn,
   LayerPosition,
