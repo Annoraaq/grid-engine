@@ -956,18 +956,27 @@ export class GridEngine implements IGridEngine {
   }
 
   /**
-   * {@inheritDoc IGridEngine.getState}
+   * Returns the current state of Grid Engine. This is useful for persiting or
+   * sharing the state.
    *
    * @category GridEngine
+   *
+   * @beta
    */
   getState(): GridEngineState {
     return this.geHeadless.getState();
   }
 
   /**
-   * {@inheritDoc IGridEngine.setState}
+   * Sets the given state for Grid Engine. Be aware that it will **not** remove
+   * any characters from Grid Engine. If you want to completely reset the state,
+   * you should call {@link GridEngine.create}
+   * or remove all characters via
+   * {@link GridEngine.removeAllCharacters}.
    *
    * @category GridEngine
+   *
+   * @beta
    */
   setState(state: GridEngineState): void {
     this.geHeadless.setState(state);

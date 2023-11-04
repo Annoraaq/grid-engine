@@ -10,4 +10,5 @@ export interface GridCharacterState {
   speed: number;
   movementProgress: number;
   collisionConfig: CollisionConfig;
+  labels: string[];
 }
