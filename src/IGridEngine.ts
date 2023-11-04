@@ -273,7 +273,8 @@ export interface IGridEngine {
 
   /**
    * Removes the character with the given ID from the plugin.
-   * Please note that the corresponding sprites need to be remove separately.
+   * Please note that the corresponding sprite and container need to be removed
+   * separately.
    *
    * @category Grid Engine
    */
@@ -281,7 +282,8 @@ export interface IGridEngine {
 
   /**
    * Removes all characters from the plugin.
-   * Please note that the corresponding sprites need to be remove separately.
+   * Please note that the corresponding sprites and containers need to be
+   * removed separately.
    *
    * @category Grid Engine
    */
