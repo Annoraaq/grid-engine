@@ -538,15 +538,24 @@ export declare class GridEngineHeadless implements IGridEngine {
      */
     getTileCost(position: Position, charLayer?: string, srcDirection?: Direction): number;
     /**
-     * {@inheritDoc IGridEngine.getState}
+     * Returns the current state of Grid Engine. This is useful for persiting or
+     * sharing the state.
      *
      * @category GridEngine
+     *
+     * @beta
      */
     getState(): GridEngineState;
     /**
-     * {@inheritDoc IGridEngine.setState}
+     * Sets the given state for Grid Engine. Be aware that it will **not** remove
+     * any characters from Grid Engine. If you want to completely reset the state,
+     * you should call {@link GridEngineHeadless.create}
+     * or remove all characters via
+     * {@link GridEngineHeadless.removeAllCharacters}.
      *
      * @category GridEngine
+     *
+     * @beta
      */
     setState(state: GridEngineState): void;
     private charRemoved;
