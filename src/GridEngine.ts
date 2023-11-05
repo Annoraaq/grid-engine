@@ -74,6 +74,7 @@ import { TiledLayer } from "./GridTilemap/TiledTilemap/TiledLayer.js";
 import { TiledTile } from "./GridTilemap/TiledTilemap/TiledTile.js";
 import { GridEngineState } from "./GridEngineState.js";
 import { GridCharacterState } from "./GridCharacter/GridCharacterState.js";
+import { GridEngineStatePhaser } from "./GridEnginePhaser/GridEngineStatePhaser.js";
 
 export {
   ArrayTilemap,
@@ -956,21 +957,45 @@ export class GridEngine implements IGridEngine {
   }
 
   /**
-   * {@inheritDoc IGridEngine.getState}
+   * Returns the current state of Grid Engine. This is useful for persiting or
+   * sharing the state.
    *
    * @category GridEngine
+   *
+   * @beta
    */
-  getState(): GridEngineState {
-    return this.geHeadless.getState();
+  getState(): GridEngineStatePhaser {
+    return {
+      characters: this.geHeadless.getState().characters.map((c) => ({
+        ...c,
+        offsetX: this.getOffsetX(c.id),
+        offsetY: this.getOffsetY(c.id),
+      })),
+    };
   }
 
   /**
-   * {@inheritDoc IGridEngine.setState}
+   * Sets the given state for Grid Engine. Be aware that it will **not** remove
+   * any characters from Grid Engine. If you want to completely reset the state,
+   * you should call {@link GridEngine.create}
+   * or remove all characters via
+   * {@link GridEngine.removeAllCharacters}.
    *
    * @category GridEngine
+   *
+   * @beta
    */
-  setState(state: GridEngineState): void {
+  setState(state: GridEngineStatePhaser): void {
     this.geHeadless.setState(state);
+    if (this.gridCharacters) {
+      for (const charState of state.characters) {
+        const char = this.gridCharacters.get(charState.id);
+        if (char) {
+          char.setOffsetX(charState.offsetX);
+          char.setOffsetY(charState.offsetY);
+        }
+      }
+    }
   }
 
   /**
