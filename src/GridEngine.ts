@@ -74,6 +74,7 @@ import { TiledLayer } from "./GridTilemap/TiledTilemap/TiledLayer.js";
 import { TiledTile } from "./GridTilemap/TiledTilemap/TiledTile.js";
 import { GridEngineState } from "./GridEngineState.js";
 import { GridCharacterState } from "./GridCharacter/GridCharacterState.js";
+import { GridEngineStatePhaser } from "./GridEnginePhaser/GridEngineStatePhaser.js";
 
 export {
   ArrayTilemap,
@@ -963,8 +964,14 @@ export class GridEngine implements IGridEngine {
    *
    * @beta
    */
-  getState(): GridEngineState {
-    return this.geHeadless.getState();
+  getState(): GridEngineStatePhaser {
+    return {
+      characters: this.geHeadless.getState().characters.map((c) => ({
+        ...c,
+        offsetX: this.getOffsetX(c.id),
+        offsetY: this.getOffsetY(c.id),
+      })),
+    };
   }
 
   /**
@@ -978,8 +985,12 @@ export class GridEngine implements IGridEngine {
    *
    * @beta
    */
-  setState(state: GridEngineState): void {
+  setState(state: GridEngineStatePhaser): void {
     this.geHeadless.setState(state);
+    for (const char of state.characters) {
+      this.setOffsetX(char.id, char.offsetX);
+      this.setOffsetY(char.id, char.offsetY);
+    }
   }
 
   /**
