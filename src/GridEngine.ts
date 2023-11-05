@@ -987,9 +987,14 @@ export class GridEngine implements IGridEngine {
    */
   setState(state: GridEngineStatePhaser): void {
     this.geHeadless.setState(state);
-    for (const char of state.characters) {
-      this.setOffsetX(char.id, char.offsetX);
-      this.setOffsetY(char.id, char.offsetY);
+    if (this.gridCharacters) {
+      for (const charState of state.characters) {
+        const char = this.gridCharacters.get(charState.id);
+        if (char) {
+          char.setOffsetX(charState.offsetX);
+          char.setOffsetY(charState.offsetY);
+        }
+      }
     }
   }
 
