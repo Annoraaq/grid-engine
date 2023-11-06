@@ -49,7 +49,7 @@ import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy.js";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy.js";
 import { createSpriteMock } from "./Utils/MockFactory/MockFactory.js";
 import { createPhaserTilemapStub } from "./Utils/MockFactory/MockPhaserTilemap.js";
-import { GridEngineState } from "./GridEngineState.js";
+import { GridEngineStatePhaser } from "./GridEnginePhaser/GridEngineStatePhaser.js";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;
@@ -2058,6 +2058,7 @@ describe("GridEngine", () => {
               ignoreMissingTiles: true,
             },
             speed: 1,
+            labels: ["label1", "label2"],
           },
           {
             id: "char2",
@@ -2074,7 +2075,7 @@ describe("GridEngine", () => {
     gridEngine.move("char1", Direction.LEFT);
     gridEngine.update(0, 10);
 
-    const want: GridEngineState = {
+    const want: GridEngineStatePhaser = {
       characters: [
         {
           id: "char1",
@@ -2088,6 +2089,9 @@ describe("GridEngine", () => {
           facingDirection: Direction.LEFT,
           speed: 1,
           movementProgress: 10,
+          labels: ["label1", "label2"],
+          offsetX: 0,
+          offsetY: 0,
         },
         {
           id: "char2",
@@ -2101,6 +2105,9 @@ describe("GridEngine", () => {
           speed: 4,
           movementProgress: 0,
           facingDirection: Direction.DOWN,
+          labels: [],
+          offsetX: 0,
+          offsetY: 0,
         },
       ],
     };
@@ -2123,6 +2130,9 @@ describe("GridEngine", () => {
               ignoreMissingTiles: true,
             },
             speed: 1,
+            labels: ["someLabel1"],
+            offsetX: 0,
+            offsetY: 0,
           },
           {
             id: "char2",
@@ -2137,7 +2147,7 @@ describe("GridEngine", () => {
       },
     );
 
-    const want: GridEngineState = {
+    const want: GridEngineStatePhaser = {
       characters: [
         {
           id: "char1",
@@ -2151,6 +2161,9 @@ describe("GridEngine", () => {
           facingDirection: Direction.UP,
           speed: 2,
           movementProgress: 20,
+          labels: ["label1", "label2"],
+          offsetX: 10,
+          offsetY: 20,
         },
         {
           id: "char2",
@@ -2164,6 +2177,9 @@ describe("GridEngine", () => {
           speed: 4,
           movementProgress: 0,
           facingDirection: Direction.DOWN,
+          labels: [],
+          offsetX: 0,
+          offsetY: 0,
         },
       ],
     };
@@ -2193,7 +2209,7 @@ describe("GridEngine", () => {
       },
     );
 
-    const want: GridEngineState = {
+    const want: GridEngineStatePhaser = {
       characters: [
         {
           id: "char1",
@@ -2206,6 +2222,9 @@ describe("GridEngine", () => {
           facingDirection: Direction.UP,
           speed: 2,
           movementProgress: 20,
+          labels: [],
+          offsetX: 0,
+          offsetY: 0,
         },
       ],
     };

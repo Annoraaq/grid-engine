@@ -22,7 +22,9 @@ import { TiledTilemap } from "./GridTilemap/TiledTilemap/TiledTilemap.js";
 import { TiledLayer } from "./GridTilemap/TiledTilemap/TiledLayer.js";
 import { TiledTile } from "./GridTilemap/TiledTilemap/TiledTile.js";
 import { GridEngineState } from "./GridEngineState.js";
-export { ArrayTilemap, ArrayTilemapInputLayer, CharacterDataHeadless, CharacterFilteringOptions, CharacterShift, CharacterShiftAction, CharLayer, CollisionConfig, CollisionStrategy, Direction, Finished, FollowOptions, FrameRow, GridEngineConfigHeadless, GridEngineHeadless, IGridEngine, IsPositionAllowedFn, LayerPosition, MovementInfo, MoveToConfig, MoveToInfo, MoveToResult, NoPathFoundStrategy, NumberOfDirections, Orientation, PathBlockedStrategy, PathfindingOptions, PathfindingResult, Position, PositionChange, PhaserTile, PhaserTileLayer, PhaserTilemap, QueueMovementConfig, QueueMovementEntry, QueueMovementFinished, QueueMovementResult, QueuedPathBlockedStrategy, ShortestPathAlgorithmType, Tile, TiledProject, TiledTilemap, TiledLayer, TiledTile, TileLayer, Tilemap, TileSizePerSecond, directionFromPos, };
+import { GridCharacterState } from "./GridCharacter/GridCharacterState.js";
+import { GridEngineStatePhaser } from "./GridEnginePhaser/GridEngineStatePhaser.js";
+export { ArrayTilemap, ArrayTilemapInputLayer, CharacterDataHeadless, CharacterFilteringOptions, CharacterShift, CharacterShiftAction, CharLayer, CollisionConfig, CollisionStrategy, Direction, Finished, FollowOptions, FrameRow, GridCharacterState, GridEngineConfigHeadless, GridEngineHeadless, GridEngineState, IGridEngine, IsPositionAllowedFn, LayerPosition, MovementInfo, MoveToConfig, MoveToInfo, MoveToResult, NoPathFoundStrategy, NumberOfDirections, Orientation, PathBlockedStrategy, PathfindingOptions, PathfindingResult, Position, PositionChange, PhaserTile, PhaserTileLayer, PhaserTilemap, QueueMovementConfig, QueueMovementEntry, QueueMovementFinished, QueueMovementResult, QueuedPathBlockedStrategy, ShortestPathAlgorithmType, Tile, TiledProject, TiledTilemap, TiledLayer, TiledTile, TileLayer, Tilemap, TileSizePerSecond, directionFromPos, };
 /**
  * Configuration object for initializing GridEngine.
  *
@@ -522,17 +524,26 @@ export declare class GridEngine implements IGridEngine {
      */
     clearEnqueuedMovements(charId: string): void;
     /**
-     * {@inheritDoc IGridEngine.getState}
+     * Returns the current state of Grid Engine. This is useful for persiting or
+     * sharing the state.
      *
      * @category GridEngine
+     *
+     * @beta
      */
-    getState(): GridEngineState;
+    getState(): GridEngineStatePhaser;
     /**
-     * {@inheritDoc IGridEngine.setState}
+     * Sets the given state for Grid Engine. Be aware that it will **not** remove
+     * any characters from Grid Engine. If you want to completely reset the state,
+     * you should call {@link GridEngine.create}
+     * or remove all characters via
+     * {@link GridEngine.removeAllCharacters}.
      *
      * @category GridEngine
+     *
+     * @beta
      */
-    setState(state: GridEngineState): void;
+    setState(state: GridEngineStatePhaser): void;
     /**
      * {@inheritDoc IGridEngine.getTileCost}
      *

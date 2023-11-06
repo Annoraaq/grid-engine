@@ -1919,6 +1919,7 @@ describe("GridEngineHeadless", () => {
               ignoreMissingTiles: true,
             },
             speed: 1,
+            labels: ["label1", "label2"],
           },
           {
             id: "char2",
@@ -1949,6 +1950,7 @@ describe("GridEngineHeadless", () => {
           facingDirection: Direction.LEFT,
           speed: 1,
           movementProgress: 10,
+          labels: ["label1", "label2"],
         },
         {
           id: "char2",
@@ -1962,6 +1964,7 @@ describe("GridEngineHeadless", () => {
           speed: 4,
           movementProgress: 0,
           facingDirection: Direction.DOWN,
+          labels: [],
         },
       ],
     };
@@ -1993,6 +1996,7 @@ describe("GridEngineHeadless", () => {
               ignoreMissingTiles: true,
             },
             speed: 1,
+            labels: ["someLabel1"],
           },
           {
             id: "char2",
@@ -2021,6 +2025,7 @@ describe("GridEngineHeadless", () => {
           facingDirection: Direction.UP,
           speed: 2,
           movementProgress: 20,
+          labels: ["label1", "label2"],
         },
         {
           id: "char2",
@@ -2034,6 +2039,7 @@ describe("GridEngineHeadless", () => {
           speed: 4,
           movementProgress: 0,
           facingDirection: Direction.DOWN,
+          labels: [],
         },
       ],
     };
@@ -2084,6 +2090,7 @@ describe("GridEngineHeadless", () => {
           facingDirection: Direction.UP,
           speed: 2,
           movementProgress: 20,
+          labels: [],
         },
       ],
     };

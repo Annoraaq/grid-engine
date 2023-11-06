@@ -1266,9 +1266,12 @@ export class GridEngineHeadless implements IGridEngine {
   }
 
   /**
-   * {@inheritDoc IGridEngine.getState}
+   * Returns the current state of Grid Engine. This is useful for persiting or
+   * sharing the state.
    *
    * @category GridEngine
+   *
+   * @beta
    */
   getState(): GridEngineState {
     const chars: GridCharacterState[] = [];
@@ -1279,6 +1282,7 @@ export class GridEngineHeadless implements IGridEngine {
           position: LayerPositionUtils.fromInternal(char.getTilePos()),
           facingDirection: char.getFacingDirection(),
           speed: char.getSpeed(),
+          labels: char.getLabels(),
           movementProgress: char.getMovementProgress(),
           collisionConfig: {
             collisionGroups: char.getCollisionGroups(),
@@ -1295,9 +1299,15 @@ export class GridEngineHeadless implements IGridEngine {
   }
 
   /**
-   * {@inheritDoc IGridEngine.setState}
+   * Sets the given state for Grid Engine. Be aware that it will **not** remove
+   * any characters from Grid Engine. If you want to completely reset the state,
+   * you should call {@link GridEngineHeadless.create}
+   * or remove all characters via
+   * {@link GridEngineHeadless.removeAllCharacters}.
    *
    * @category GridEngine
+   *
+   * @beta
    */
   setState(state: GridEngineState): void {
     if (this.gridCharacters) {
@@ -1317,7 +1327,6 @@ export class GridEngineHeadless implements IGridEngine {
           }
           char.setSpeed(charState.speed);
           char.turnTowards(charState.facingDirection);
-          char.turnTowards(charState.facingDirection);
           if (charState.collisionConfig.collisionGroups) {
             char.setCollisionGroups(charState.collisionConfig.collisionGroups);
           }
@@ -1332,6 +1341,8 @@ export class GridEngineHeadless implements IGridEngine {
             );
           }
           char.setMovementProgress(charState.movementProgress);
+          char.clearLabels();
+          char.addLabels(charState.labels);
         }
       }
     }
