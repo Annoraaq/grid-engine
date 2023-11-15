@@ -62,6 +62,8 @@ describe("FollowMovement", () => {
     targetCharPos = { position: new Vector2(3, 1), layer: "layer1" };
     char = createChar("char", charPos);
     targetChar = createChar("targetChar", targetCharPos);
+    // @ts-ignore
+    TargetMovement.mockClear();
     followMovement = new FollowMovement(char, gridTilemap, targetChar);
   });
 
@@ -158,6 +160,35 @@ describe("FollowMovement", () => {
     );
   });
 
+  it("should update added character with facing direction 'down'", () => {
+    targetChar.turnTowards(Direction.RIGHT);
+    targetCharPos.position.x -= 1;
+    followMovement = new FollowMovement(char, gridTilemap, targetChar, {
+      distance: 0,
+      noPathFoundStrategy: NoPathFoundStrategy.STOP,
+      maxPathLength: 100,
+      ignoreLayers: true,
+      facingDirection: Direction.DOWN,
+    });
+    followMovement.update(100);
+    expect(TargetMovement).toHaveBeenCalledWith(
+      char,
+      gridTilemap,
+      targetCharPos,
+      {
+        distance: 0,
+        config: {
+          algorithm: "BIDIRECTIONAL_SEARCH",
+          noPathFoundStrategy: NoPathFoundStrategy.STOP,
+          maxPathLength: 100,
+          ignoreLayers: true,
+          considerCosts: false,
+        },
+        ignoreBlockedTarget: true,
+      },
+    );
+  });
+
   it("should update added character with distance and CLOSEST_REACHABLE", () => {
     followMovement = new FollowMovement(char, gridTilemap, targetChar, {
       distance: 7,
@@ -220,6 +251,7 @@ describe("FollowMovement", () => {
         maxPathLength: Infinity,
         ignoreLayers: false,
         facingDirection: Direction.NONE,
+        shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
       },
     });
   });
@@ -237,6 +269,7 @@ describe("FollowMovement", () => {
         maxPathLength: Infinity,
         ignoreLayers: false,
         facingDirection: Direction.LEFT,
+        shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
       },
     });
   });

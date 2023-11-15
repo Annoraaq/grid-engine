@@ -48,6 +48,29 @@ const clockwiseMapping = {
   [Direction.NONE]: Direction.NONE,
 };
 
+const dirToNumber = {
+  [Direction.UP]: 0,
+  [Direction.UP_RIGHT]: 1,
+  [Direction.RIGHT]: 2,
+  [Direction.DOWN_RIGHT]: 3,
+  [Direction.DOWN]: 4,
+  [Direction.DOWN_LEFT]: 5,
+  [Direction.LEFT]: 6,
+  [Direction.UP_LEFT]: 7,
+  [Direction.NONE]: NaN,
+};
+
+const numberToDir = [
+  Direction.UP,
+  Direction.UP_RIGHT,
+  Direction.RIGHT,
+  Direction.DOWN_RIGHT,
+  Direction.DOWN,
+  Direction.DOWN_LEFT,
+  Direction.LEFT,
+  Direction.UP_LEFT,
+];
+
 const counterClockwiseMapping = {
   [Direction.LEFT]: Direction.DOWN_LEFT,
   [Direction.UP_LEFT]: Direction.LEFT,
@@ -95,12 +118,21 @@ export function isVertical(direction: Direction): boolean {
   return verticals.includes(direction);
 }
 
-export function turnCounterClockwise(direction: Direction): Direction {
-  return counterClockwiseMapping[direction];
+export function turnCounterClockwise(
+  direction: Direction,
+  times = 1,
+): Direction {
+  if (direction === Direction.NONE) {
+    return Direction.NONE;
+  }
+  return numberToDir[(dirToNumber[direction] - times) % 8];
 }
 
-export function turnClockwise(direction: Direction): Direction {
-  return clockwiseMapping[direction];
+export function turnClockwise(direction: Direction, times = 1): Direction {
+  if (direction === Direction.NONE) {
+    return Direction.NONE;
+  }
+  return numberToDir[(dirToNumber[direction] + times) % 8];
 }
 
 export function directionVector(direction: Direction): Vector2 {

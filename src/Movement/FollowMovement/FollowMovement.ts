@@ -88,6 +88,7 @@ export class FollowMovement implements Movement {
         maxPathLength: this.options.maxPathLength,
         ignoreLayers: this.options.ignoreLayers,
         facingDirection: this.options.facingDirection,
+        shortestPathAlgorithm: this.options.shortestPathAlgorithm,
       },
     };
   }
@@ -103,6 +104,15 @@ export class FollowMovement implements Movement {
     //     this.charToFollow.getFacingDirection(),
     //   ).position;
     // }
+    //
+    // Direction mapping:
+    // naive approach: turn the facing direction of char as long as it points
+    // up. Store the number of turns and turn the facing direction the same
+    // amount of time in the other direction.
+    //
+    // optimized: precalculate the "distance" of a turn clockwise and
+    // counterclockwise in 2 maps and then do a lookup. We do that in Jps4 already
+    //
     this.targetMovement = new TargetMovement(
       this.character,
       this.gridTilemap,
