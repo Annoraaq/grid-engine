@@ -52,10 +52,10 @@ export class DistanceUtils8 implements DistanceUtils {
 
   getDirections(): Direction[] {
     return [
-      Direction.UP,
-      Direction.RIGHT,
-      Direction.DOWN,
-      Direction.LEFT,
+      // Direction.UP,
+      // Direction.RIGHT,
+      // Direction.DOWN,
+      // Direction.LEFT,
       Direction.DOWN_LEFT,
       Direction.DOWN_RIGHT,
       Direction.UP_RIGHT,
