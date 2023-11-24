@@ -268,10 +268,18 @@ export class GridCharacterPhaser {
       this.tilemap.getDepthOfCharLayer(this.getTransitionLayer(position)) +
         this.getPaddedPixelDepth(gameObject),
     );
+    // console.log(
+    //   "new depth",
+    //   this.tilemap.getDepthOfCharLayer(this.getTransitionLayer(position)) +
+    //     this.getPaddedPixelDepth(gameObject),
+    // );
   }
 
   private getPaddedPixelDepth(gameObject: GameObject): number {
-    return Utils.shiftPad(gameObject.y + gameObject.displayHeight, 7);
+    return Utils.shiftPad(
+      gameObject.y + gameObject.displayHeight,
+      GridTilemapPhaser.Z_INDEX_PADDING,
+    );
   }
 
   private getTransitionLayer(position: LayerVecPos): CharLayer {

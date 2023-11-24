@@ -7,7 +7,7 @@ export class GridTilemapPhaser {
   private static readonly ALWAYS_TOP_PROP_NAME = "ge_alwaysTop";
   private static readonly CHAR_LAYER_PROP_NAME = "ge_charLayer";
   private static readonly HEIGHT_SHIFT_PROP_NAME = "ge_heightShift";
-  private static readonly Z_INDEX_PADDING = 7;
+  static readonly Z_INDEX_PADDING = 7;
   private charLayerDepths = new Map<CharLayer, number>();
 
   constructor(private tilemap: Phaser.Tilemaps.Tilemap) {
@@ -21,6 +21,7 @@ export class GridTilemapPhaser {
 
   getTileHeight(): number {
     const tilemapScale = this.tilemap.layers[0]?.tilemapLayer.scale ?? 1;
+    // console.log("tm height", this.tilemap.tileHeight);
     return this.tilemap.tileHeight * tilemapScale;
   }
 
@@ -92,6 +93,9 @@ export class GridTilemapPhaser {
         this.createHeightShiftLayers(layerData, offset);
         layersToDelete.push(layerData.tilemapLayer);
       } else {
+        // @ts-ignore
+        // layerData.data[1][1] = 0;
+        console.log("set normal depth", offset + 1);
         this.setDepth(layerData, ++offset);
       }
     });
@@ -128,10 +132,22 @@ export class GridTilemapPhaser {
       const newLayer = this.copyLayer(layer, row);
       if (newLayer) {
         newLayer.scale = layer.tilemapLayer.scale;
-        newLayer.setDepth(
+        console.log(
+          "heightShift lay",
+          row,
+          heightShift,
+          this.getTileHeight(),
           offset +
             Utils.shiftPad(
               (row + heightShift) * this.getTileHeight() +
+                makeHigherThanCharWhenOnSameLevel,
+              GridTilemapPhaser.Z_INDEX_PADDING,
+            ),
+        );
+        newLayer.setDepth(
+          offset +
+            Utils.shiftPad(
+              (row + heightShift - 1) * this.getTileHeight() +
                 makeHigherThanCharWhenOnSameLevel,
               GridTilemapPhaser.Z_INDEX_PADDING,
             ),
@@ -168,8 +184,15 @@ export class GridTilemapPhaser {
     // Somehow phaser does not catch the name through the createBlankLayer
     // method.
     newLayer.name = name;
-    for (let col = 0; col < layerData.width; col++) {
-      newLayer.putTileAt(layerData.data[row][col], col, row);
+    if (this.isIsometric()) {
+      for (let r = row; r >= 0; r--) {
+        const col = row - r;
+        newLayer.putTileAt(layerData.data[r][col], col, r);
+      }
+    } else {
+      for (let col = 0; col < layerData.width; col++) {
+        newLayer.putTileAt(layerData.data[row][col], col, row);
+      }
     }
     return newLayer;
   }
