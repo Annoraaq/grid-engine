@@ -1,7 +1,16 @@
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
 import { Vector2 } from "../Vector2/Vector2.js";
 import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm.js";
-import { TileLayer, Tilemap } from "../../GridTilemap/Tilemap.js";
+import { TileLayer, Tile, Tilemap } from "../../GridTilemap/Tilemap.js";
+export interface LayerData {
+    name?: string;
+    properties?: Record<string, string>;
+    height?: number;
+    width?: number;
+    scale?: number;
+    tilesets?: string[];
+    data?: Array<Array<Tile | undefined>>;
+}
 export interface TileCost {
     ge_cost?: number;
     ge_cost_left?: number;
@@ -21,8 +30,9 @@ export interface CostMapLayer {
     layer: string | undefined;
     costMap: CostMap;
 }
-export declare function createSpriteMock(): any;
-export declare function createMockLayer(layerData: any): TileLayer;
+export declare function createSpriteMock(): Phaser.GameObjects.Sprite;
+export declare function createContainerMock(x?: number, y?: number, height?: number): Phaser.GameObjects.Container;
+export declare function createMockLayer(layerData: LayerData): TileLayer;
 export declare function layerPos(vec: Vector2, layer?: string): LayerVecPos;
 export declare function mockCharMap(gridTilemap: GridTilemap, blockMaps: Array<{
     layer: string | undefined;
