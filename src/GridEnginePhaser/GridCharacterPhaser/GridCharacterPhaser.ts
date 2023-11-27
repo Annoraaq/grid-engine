@@ -243,12 +243,17 @@ export class GridCharacterPhaser {
   }
 
   private updateDepth() {
-    const gameObject = this.getGameObj();
+    const gameObj = this.getGameObj();
+    if (!gameObj) return;
 
-    if (!gameObject) return;
     const position = new Vector2(this.geHeadless.getPosition(this.charData.id));
     const layer = this.geHeadless.getCharLayer(this.charData.id);
-    this.setDepth(gameObject, { position, layer });
+
+    if (this.container) {
+      this.setContainerDepth(this.container, { position, layer });
+    } else if (this.sprite) {
+      this.setSpriteDepth(this.sprite, { position, layer });
+    }
     const layerOverlaySprite = this.getLayerOverlaySprite();
 
     if (layerOverlaySprite) {
@@ -256,28 +261,45 @@ export class GridCharacterPhaser {
         ...position,
         y: position.y - 1,
       });
-      this.setDepth(layerOverlaySprite, {
+      this.setSpriteDepth(layerOverlaySprite, {
         position: posAbove,
         layer,
       });
     }
   }
 
-  private setDepth(gameObject: GameObject, position: LayerVecPos): void {
-    gameObject.setDepth(
+  private setSpriteDepth(
+    sprite: Phaser.GameObjects.Sprite,
+    position: LayerVecPos,
+  ): void {
+    sprite.setDepth(
       this.tilemap.getDepthOfCharLayer(this.getTransitionLayer(position)) +
-        this.getPaddedPixelDepth(gameObject),
+        this.getPaddedPixelDepthSprite(sprite),
     );
-    // console.log(
-    //   "new depth",
-    //   this.tilemap.getDepthOfCharLayer(this.getTransitionLayer(position)) +
-    //     this.getPaddedPixelDepth(gameObject),
-    // );
   }
 
-  private getPaddedPixelDepth(gameObject: GameObject): number {
+  private setContainerDepth(
+    container: Phaser.GameObjects.Container,
+    position: LayerVecPos,
+  ): void {
+    container.setDepth(
+      this.tilemap.getDepthOfCharLayer(this.getTransitionLayer(position)) +
+        this.getPaddedPixelDepthContainer(container),
+    );
+  }
+
+  private getPaddedPixelDepthContainer(
+    container: Phaser.GameObjects.Container,
+  ): number {
     return Utils.shiftPad(
-      gameObject.y + gameObject.displayHeight,
+      container.y + container.getBounds().height,
+      GridTilemapPhaser.Z_INDEX_PADDING,
+    );
+  }
+
+  private getPaddedPixelDepthSprite(sprite: Phaser.GameObjects.Sprite): number {
+    return Utils.shiftPad(
+      sprite.y + sprite.displayHeight,
       GridTilemapPhaser.Z_INDEX_PADDING,
     );
   }

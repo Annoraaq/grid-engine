@@ -5,7 +5,7 @@ export declare class GridTilemapPhaser {
     private static readonly ALWAYS_TOP_PROP_NAME;
     private static readonly CHAR_LAYER_PROP_NAME;
     private static readonly HEIGHT_SHIFT_PROP_NAME;
-    private static readonly Z_INDEX_PADDING;
+    static readonly Z_INDEX_PADDING = 7;
     private charLayerDepths;
     constructor(tilemap: Phaser.Tilemaps.Tilemap);
     getTileWidth(): number;

@@ -47,14 +47,17 @@ jest.mock("../package.json", () => ({
 import { GridEngine, PathfindingOptions } from "./GridEngine.js";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy.js";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy.js";
-import { createSpriteMock } from "./Utils/MockFactory/MockFactory.js";
+import {
+  createContainerMock,
+  createSpriteMock,
+} from "./Utils/MockFactory/MockFactory.js";
 import { createPhaserTilemapStub } from "./Utils/MockFactory/MockPhaserTilemap.js";
 import { GridEngineStatePhaser } from "./GridEnginePhaser/GridEngineStatePhaser.js";
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;
   let sceneMock;
-  let playerSpriteMock;
+  let playerSpriteMock: Phaser.GameObjects.Sprite;
   let consoleLogBackup;
 
   afterEach(() => {
@@ -88,25 +91,7 @@ describe("GridEngine", () => {
       add: { sprite: jest.fn().mockReturnValue(mockNewSprite) },
     };
 
-    playerSpriteMock = {
-      x: 10,
-      y: 12,
-      displayWidth: 20,
-      displayHeight: 40,
-      width: 20,
-      setOrigin: jest.fn(),
-      texture: {
-        source: [{ width: 240 }],
-      },
-      setFrame: jest.fn(function (name) {
-        this.frame.name = name;
-      }),
-      setDepth: jest.fn(),
-      scale: 2,
-      frame: {
-        name: "1",
-      },
-    } as any;
+    playerSpriteMock = createSpriteMock();
 
     gridEngine = new GridEngine(sceneMock);
     gridEngine.create(createDefaultMockWithLayer(undefined), {
@@ -131,7 +116,7 @@ describe("GridEngine", () => {
   });
 
   it("should init player", () => {
-    const containerMock = { setDepth: jest.fn() };
+    const containerMock = createContainerMock();
     gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
@@ -191,7 +176,7 @@ describe("GridEngine", () => {
   });
 
   it("should init player with facingDirection", () => {
-    const containerMock = { setDepth: jest.fn() };
+    const containerMock = createContainerMock();
     gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
@@ -560,7 +545,7 @@ describe("GridEngine", () => {
 
   it("should get facing position", () => {
     const rightStandingFrameNo = 25;
-    playerSpriteMock.setFrame.mockClear();
+    (playerSpriteMock.setFrame as any).mockClear();
     gridEngine.turnTowards("player", Direction.RIGHT);
     expect(playerSpriteMock.setFrame).toHaveBeenCalledWith(
       rightStandingFrameNo,

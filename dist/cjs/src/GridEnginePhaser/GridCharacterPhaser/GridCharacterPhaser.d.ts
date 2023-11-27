@@ -38,7 +38,9 @@ export declare class GridCharacterPhaser {
     private resetAnimation;
     private updateOverlaySprite;
     private updateDepth;
-    private setDepth;
-    private getPaddedPixelDepth;
+    private setSpriteDepth;
+    private setContainerDepth;
+    private getPaddedPixelDepthSprite;
+    private getPaddedPixelDepthContainer;
     private getTransitionLayer;
 }
