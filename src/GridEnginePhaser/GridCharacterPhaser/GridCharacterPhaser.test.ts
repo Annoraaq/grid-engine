@@ -5,7 +5,10 @@ import { GridCharacterPhaser } from "./GridCharacterPhaser.js";
 import * as Phaser from "phaser";
 import { Direction, NumberOfDirections } from "../../Direction/Direction.js";
 import { CharacterData, GridEngineHeadless } from "../../GridEngine.js";
-import { createSpriteMock } from "../../Utils/MockFactory/MockFactory.js";
+import {
+  createContainerMock,
+  createSpriteMock,
+} from "../../Utils/MockFactory/MockFactory.js";
 import { take } from "rxjs/operators";
 import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap.js";
 import { GridTilemapPhaser } from "../GridTilemapPhaser/GridTilemapPhaser.js";
@@ -118,7 +121,7 @@ describe("GridCharacterPhaser", () => {
     it("should create a grid character", () => {
       const walkingAnimationMock = {} as any;
       const startPos = { x: 5, y: 6 };
-      const containerMock = { x: 0, y: 0, setDepth: jest.fn() } as any;
+      const containerMock = createContainerMock();
       const charData = {
         id: "charID",
         sprite: spriteMock,
@@ -237,7 +240,7 @@ describe("GridCharacterPhaser", () => {
 
     it("should keep a container", () => {
       const { gridCharPhaser } = createChar({}, false);
-      const containerMock = {} as any;
+      const containerMock = createContainerMock();
       gridCharPhaser.setContainer(containerMock);
 
       expect(gridCharPhaser.getContainer()).toBe(containerMock);
@@ -303,7 +306,7 @@ describe("GridCharacterPhaser", () => {
       const oldAnimation = gridCharPhaser.getAnimation();
       gridCharPhaser.setSprite(newSpriteMock);
 
-      newSpriteMock.setFrame.mockReset();
+      (newSpriteMock.setFrame as any).mockReset();
       (oldAnimation?.frameChange() as any).next(13);
       (gridCharPhaser.getAnimation()?.frameChange() as any).next(13);
 
@@ -349,7 +352,12 @@ describe("GridCharacterPhaser", () => {
 
       gridCharPhaser.setSprite(newSpriteMock);
 
-      checkSpriteDepth(newSpriteMock, charLayerDepth, "0000");
+      checkSpriteDepth(
+        newSpriteMock,
+        newSpriteMock.displayHeight,
+        charLayerDepth,
+        "0000",
+      );
     });
 
     it("should set depth of sprite on char layer", () => {
@@ -364,15 +372,17 @@ describe("GridCharacterPhaser", () => {
 
       gridCharPhaser.setSprite(newSpriteMock);
 
-      checkSpriteDepth(newSpriteMock, charLayerDepth, "0000");
+      checkSpriteDepth(
+        newSpriteMock,
+        newSpriteMock.displayHeight,
+        charLayerDepth,
+        "0000",
+      );
     });
 
     it("should set depth of container", () => {
-      const containerMock = {
-        y: 20,
-        displayHeight: 21,
-        setDepth: jest.fn(),
-      } as any;
+      const height = 21;
+      const containerMock = createContainerMock(0, 20, height);
       const startPos = { x: 2, y: 2 };
       const charData = {
         container: containerMock,
@@ -385,7 +395,7 @@ describe("GridCharacterPhaser", () => {
 
       gridCharPhaser.setSprite(newSpriteMock);
 
-      checkSpriteDepth(containerMock, uppermostCharLayerDepth, "0000");
+      checkSpriteDepth(containerMock, height, uppermostCharLayerDepth, "0000");
     });
 
     it("should set depth of pos above for overlay sprite", () => {
@@ -400,17 +410,18 @@ describe("GridCharacterPhaser", () => {
 
       gridCharPhaser.setSprite(newSpriteMock);
 
-      checkSpriteDepth(overlaySpriteMock, charLayerDepth, "00000");
+      checkSpriteDepth(
+        overlaySpriteMock,
+        overlaySpriteMock.displayHeight,
+        charLayerDepth,
+        "00000",
+      );
     });
   });
 
   describe("On pixel position change", () => {
     it("should update container pixel pos", () => {
-      const containerMock = {
-        x: 0,
-        y: 0,
-        setDepth: jest.fn(),
-      } as any;
+      const containerMock = createContainerMock();
       const charData = {
         container: containerMock,
         offsetX: 10,
@@ -658,7 +669,12 @@ describe("GridCharacterPhaser", () => {
       gridEngineHeadless.update(1000, 10);
       gridCharPhaser.update(10);
 
-      checkSpriteDepth(spriteMock, charLayerDepth, "0000");
+      checkSpriteDepth(
+        spriteMock,
+        spriteMock.displayHeight,
+        charLayerDepth,
+        "0000",
+      );
     });
 
     it("should set depth of sprite on char layer", () => {
@@ -675,15 +691,17 @@ describe("GridCharacterPhaser", () => {
       gridEngineHeadless.update(1000, 10);
       gridCharPhaser.update(10);
 
-      checkSpriteDepth(spriteMock, charLayerDepth, "0000");
+      checkSpriteDepth(
+        spriteMock,
+        spriteMock.displayHeight,
+        charLayerDepth,
+        "0000",
+      );
     });
 
     it("should set depth of container", () => {
-      const containerMock = {
-        y: 20,
-        displayHeight: 21,
-        setDepth: jest.fn(),
-      } as any;
+      const height = 21;
+      const containerMock = createContainerMock(0, 20, height);
       const startPos = { x: 2, y: 2 };
       const charData = {
         container: containerMock,
@@ -696,7 +714,7 @@ describe("GridCharacterPhaser", () => {
       gridEngineHeadless.move("charID", Direction.RIGHT);
       gridCharPhaser.update(10);
 
-      checkSpriteDepth(containerMock, uppermostCharLayerDepth, "0000");
+      checkSpriteDepth(containerMock, height, uppermostCharLayerDepth, "0000");
     });
 
     describe("for overlay sprite", () => {
@@ -719,7 +737,12 @@ describe("GridCharacterPhaser", () => {
         gridEngineHeadless.update(1000, 10);
         gridCharPhaser.update(10);
 
-        checkSpriteDepth(overlaySpriteMock, lowerCharLayerDepth, "00000");
+        checkSpriteDepth(
+          overlaySpriteMock,
+          overlaySpriteMock.displayHeight,
+          lowerCharLayerDepth,
+          "00000",
+        );
       });
     });
   });
@@ -831,12 +854,13 @@ describe("GridCharacterPhaser", () => {
 });
 
 function checkSpriteDepth(
-  spriteMock,
+  gameObject: Phaser.GameObjects.Container | Phaser.GameObjects.Sprite,
+  height: number,
   charLayerDepth: number,
   zeroPrefix: string,
 ) {
-  const pixelDepth = spriteMock.y + spriteMock.displayHeight;
-  expect(spriteMock.setDepth).toHaveBeenCalledWith(
+  const pixelDepth = gameObject.y + height;
+  expect(gameObject.setDepth).toHaveBeenCalledWith(
     +`${charLayerDepth}.${zeroPrefix}${pixelDepth}`,
   );
 }

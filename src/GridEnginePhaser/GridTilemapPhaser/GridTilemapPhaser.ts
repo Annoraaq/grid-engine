@@ -7,7 +7,7 @@ export class GridTilemapPhaser {
   private static readonly ALWAYS_TOP_PROP_NAME = "ge_alwaysTop";
   private static readonly CHAR_LAYER_PROP_NAME = "ge_charLayer";
   private static readonly HEIGHT_SHIFT_PROP_NAME = "ge_heightShift";
-  private static readonly Z_INDEX_PADDING = 7;
+  static readonly Z_INDEX_PADDING = 7;
   private charLayerDepths = new Map<CharLayer, number>();
 
   constructor(private tilemap: Phaser.Tilemaps.Tilemap) {

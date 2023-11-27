@@ -7,6 +7,15 @@ import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm.js";
 import { TileLayer, Tile, Tilemap } from "../../GridTilemap/Tilemap.js";
 import { MockTile, MockTileLayer, MockTilemap } from "./MockTilemap.js";
 
+export interface LayerData {
+  name?: string;
+  properties?: Record<string, string>;
+  height?: number;
+  width?: number;
+  scale?: number;
+  tilesets?: string[];
+  data?: Array<Array<Tile | undefined>>;
+}
 export interface TileCost {
   ge_cost?: number;
   ge_cost_left?: number;
@@ -30,7 +39,7 @@ export interface CostMapLayer {
   costMap: CostMap;
 }
 
-export function createSpriteMock() {
+export function createSpriteMock(): Phaser.GameObjects.Sprite {
   return {
     x: 10,
     y: 12,
@@ -50,10 +59,24 @@ export function createSpriteMock() {
     frame: {
       name: "1",
     },
-  } as any;
+  } as unknown as Phaser.GameObjects.Sprite;
 }
 
-export function createMockLayer(layerData: any): TileLayer {
+export function createContainerMock(
+  x = 0,
+  y = 0,
+  height = 0,
+): Phaser.GameObjects.Container {
+  return {
+    x,
+    y,
+    displayHeight: 0,
+    setDepth: jest.fn(),
+    getBounds: jest.fn(() => ({ height })),
+  } as unknown as Phaser.GameObjects.Container;
+}
+
+export function createMockLayer(layerData: LayerData): TileLayer {
   return new MockTileLayer(
     layerData.name,
     layerData.properties,
