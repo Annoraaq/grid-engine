@@ -40,7 +40,7 @@ export declare class GridCharacterPhaser {
     private updateDepth;
     private setSpriteDepth;
     private setContainerDepth;
-    private getPaddedPixelDepthSprite;
     private getPaddedPixelDepthContainer;
+    private getPaddedPixelDepthSprite;
     private getTransitionLayer;
 }
