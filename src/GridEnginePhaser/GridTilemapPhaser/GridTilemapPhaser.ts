@@ -93,9 +93,6 @@ export class GridTilemapPhaser {
         this.createHeightShiftLayers(layerData, offset);
         layersToDelete.push(layerData.tilemapLayer);
       } else {
-        // @ts-ignore
-        // layerData.data[1][1] = 0;
-        console.log("set normal depth", offset + 1);
         this.setDepth(layerData, ++offset);
       }
     });
@@ -132,22 +129,13 @@ export class GridTilemapPhaser {
       const newLayer = this.copyLayer(layer, row);
       if (newLayer) {
         newLayer.scale = layer.tilemapLayer.scale;
-        console.log(
-          "heightShift lay",
-          row,
-          heightShift,
-          this.getTileHeight(),
-          offset +
-            Utils.shiftPad(
-              (row + heightShift) * this.getTileHeight() +
-                makeHigherThanCharWhenOnSameLevel,
-              GridTilemapPhaser.Z_INDEX_PADDING,
-            ),
-        );
+        const tileHeight = this.isIsometric()
+          ? this.getTileHeight() / 2
+          : this.getTileHeight();
         newLayer.setDepth(
           offset +
             Utils.shiftPad(
-              (row + heightShift - 1) * this.getTileHeight() +
+              (row + heightShift) * tileHeight +
                 makeHigherThanCharWhenOnSameLevel,
               GridTilemapPhaser.Z_INDEX_PADDING,
             ),

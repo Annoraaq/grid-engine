@@ -292,6 +292,7 @@ export class GridCharacterPhaser {
     container: Phaser.GameObjects.Container,
   ): number {
     return Utils.shiftPad(
+      // TODO cache height for performance reasons
       container.y + container.getBounds().height,
       GridTilemapPhaser.Z_INDEX_PADDING,
     );
