@@ -21,7 +21,6 @@ export class GridTilemapPhaser {
 
   getTileHeight(): number {
     const tilemapScale = this.tilemap.layers[0]?.tilemapLayer.scale ?? 1;
-    // console.log("tm height", this.tilemap.tileHeight);
     return this.tilemap.tileHeight * tilemapScale;
   }
 
