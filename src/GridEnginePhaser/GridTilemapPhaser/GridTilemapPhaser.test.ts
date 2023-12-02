@@ -138,14 +138,6 @@ describe("GridTilemapPhaser", () => {
     ]);
     expect(tm.layers[1].tilemapLayer.depth).toBe(0.0000049);
     expect(tm.layers[2].tilemapLayer.depth).toBe(0.0000097);
-
-    function dataToIdArr(data: Phaser.Tilemaps.Tile[][]): number[][] {
-      return data.map((row) =>
-        row.map((obj) => {
-          return obj.properties?.id;
-        }),
-      );
-    }
   });
 
   it("should get scaled tile width", () => {
@@ -255,5 +247,59 @@ describe("GridTilemapPhaser", () => {
         new Vector2(scaledTileWidth * 0.5, scaledTileHeight * 0.5),
       );
     });
+
+    it("should consider 'heightShift' layer", () => {
+      tm = createPhaserTilemapStub(
+        new Map([
+          [
+            "lowerCharLayer",
+            [
+              // prettier-ignore
+              "..",
+              "..",
+            ],
+          ],
+          [
+            "heightShiftLayer",
+            [
+              // prettier-ignore
+              "..",
+              "..",
+            ],
+          ],
+        ]),
+      );
+      tm.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC.toString();
+      tm.layers[1].properties = [
+        ...tm.layers[1].properties,
+        {
+          name: "ge_heightShift",
+          value: 1,
+        },
+      ];
+      gridTilemap = new GridTilemapPhaser(tm);
+
+      expect(tm.layers.length).toBe(3);
+      expect(tm.layers[0].name).toEqual("lowerCharLayer");
+      expect(tm.layers[1].name).toEqual("heightShiftLayer#0");
+      expect(tm.layers[2].name).toEqual("heightShiftLayer#1");
+      expect(dataToIdArr(tm.layers[1].data)).toEqual([
+        [0, undefined],
+        [undefined, undefined],
+      ]);
+      expect(dataToIdArr(tm.layers[2].data)).toEqual([
+        [undefined, 1],
+        [2, undefined],
+      ]);
+      expect(tm.layers[1].tilemapLayer.depth).toBe(0.0000025);
+      expect(tm.layers[2].tilemapLayer.depth).toBe(0.0000049);
+    });
   });
 });
+function dataToIdArr(data: Phaser.Tilemaps.Tile[][]): number[][] {
+  return data.map((row) =>
+    row.map((obj) => {
+      return obj.properties?.id;
+    }),
+  );
+}

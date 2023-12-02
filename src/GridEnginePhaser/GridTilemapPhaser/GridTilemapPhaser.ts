@@ -128,10 +128,13 @@ export class GridTilemapPhaser {
       const newLayer = this.copyLayer(layer, row);
       if (newLayer) {
         newLayer.scale = layer.tilemapLayer.scale;
+        const tileHeight = this.isIsometric()
+          ? this.getTileHeight() / 2
+          : this.getTileHeight();
         newLayer.setDepth(
           offset +
             Utils.shiftPad(
-              (row + heightShift) * this.getTileHeight() +
+              (row + heightShift) * tileHeight +
                 makeHigherThanCharWhenOnSameLevel,
               GridTilemapPhaser.Z_INDEX_PADDING,
             ),
@@ -168,8 +171,15 @@ export class GridTilemapPhaser {
     // Somehow phaser does not catch the name through the createBlankLayer
     // method.
     newLayer.name = name;
-    for (let col = 0; col < layerData.width; col++) {
-      newLayer.putTileAt(layerData.data[row][col], col, row);
+    if (this.isIsometric()) {
+      for (let r = row; r >= 0; r--) {
+        const col = row - r;
+        newLayer.putTileAt(layerData.data[r][col], col, r);
+      }
+    } else {
+      for (let col = 0; col < layerData.width; col++) {
+        newLayer.putTileAt(layerData.data[row][col], col, row);
+      }
     }
     return newLayer;
   }

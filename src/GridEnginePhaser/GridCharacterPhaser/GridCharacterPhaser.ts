@@ -288,18 +288,19 @@ export class GridCharacterPhaser {
     );
   }
 
-  private getPaddedPixelDepthSprite(sprite: Phaser.GameObjects.Sprite): number {
-    return Utils.shiftPad(
-      sprite.y + sprite.displayHeight,
-      GridTilemapPhaser.Z_INDEX_PADDING,
-    );
-  }
-
   private getPaddedPixelDepthContainer(
     container: Phaser.GameObjects.Container,
   ): number {
     return Utils.shiftPad(
+      // TODO cache height for performance reasons
       container.y + container.getBounds().height,
+      GridTilemapPhaser.Z_INDEX_PADDING,
+    );
+  }
+
+  private getPaddedPixelDepthSprite(sprite: Phaser.GameObjects.Sprite): number {
+    return Utils.shiftPad(
+      sprite.y + sprite.displayHeight,
       GridTilemapPhaser.Z_INDEX_PADDING,
     );
   }
