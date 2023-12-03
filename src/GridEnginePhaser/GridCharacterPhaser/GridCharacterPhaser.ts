@@ -23,6 +23,7 @@ export class GridCharacterPhaser {
   private sprite?: Phaser.GameObjects.Sprite;
   private layerOverlaySprite?: Phaser.GameObjects.Sprite;
   private container?: Phaser.GameObjects.Container;
+  private cachedContainerHeight = 0;
   private newSpriteSet$ = new Subject<void>();
   private destroy$ = new Subject<void>();
   private walkingAnimationMapping?: WalkingAnimationMapping | number;
@@ -49,6 +50,7 @@ export class GridCharacterPhaser {
 
     this.sprite = charData.sprite;
     this.container = charData.container;
+    this.cachedContainerHeight = charData.container?.getBounds().height ?? 0;
 
     this.geHeadless
       .directionChanged()
@@ -103,6 +105,7 @@ export class GridCharacterPhaser {
 
   setContainer(container?: Phaser.GameObjects.Container): void {
     this.container = container;
+    this.cachedContainerHeight = container?.getBounds().height ?? 0;
   }
 
   getContainer(): Phaser.GameObjects.Container | undefined {
@@ -292,8 +295,7 @@ export class GridCharacterPhaser {
     container: Phaser.GameObjects.Container,
   ): number {
     return Utils.shiftPad(
-      // TODO cache height for performance reasons
-      container.y + container.getBounds().height,
+      container.y + this.cachedContainerHeight,
       GridTilemapPhaser.Z_INDEX_PADDING,
     );
   }

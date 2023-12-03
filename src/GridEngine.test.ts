@@ -58,6 +58,7 @@ describe("GridEngine", () => {
   let gridEngine: GridEngine;
   let sceneMock;
   let playerSpriteMock: Phaser.GameObjects.Sprite;
+  let containerMock: Phaser.GameObjects.Container;
   let consoleLogBackup;
 
   afterEach(() => {
@@ -92,6 +93,7 @@ describe("GridEngine", () => {
     };
 
     playerSpriteMock = createSpriteMock();
+    containerMock = createContainerMock();
 
     gridEngine = new GridEngine(sceneMock);
     gridEngine.create(createDefaultMockWithLayer(undefined), {
@@ -541,6 +543,13 @@ describe("GridEngine", () => {
     gridEngine.setSprite("player", mockSprite);
 
     expect(gridEngine.getSprite("player")).toEqual(mockSprite);
+  });
+
+  it("should set container", () => {
+    const mockContainer = createContainerMock();
+    gridEngine.setContainer("player", mockContainer);
+
+    expect(gridEngine.getContainer("player")).toEqual(mockContainer);
   });
 
   it("should get facing position", () => {
@@ -2266,6 +2275,9 @@ describe("GridEngine", () => {
       expectCharUnknownException(() =>
         gridEngine.setSprite(UNKNOWN_CHAR_ID, playerSpriteMock),
       );
+      expectCharUnknownException(() =>
+        gridEngine.setContainer(UNKNOWN_CHAR_ID, containerMock),
+      );
       expectCharUnknownException(() => gridEngine.getSprite(UNKNOWN_CHAR_ID));
       expectCharUnknownException(() =>
         gridEngine.getFacingPosition(UNKNOWN_CHAR_ID),
@@ -2385,6 +2397,9 @@ describe("GridEngine", () => {
       expectUninitializedException(() => gridEngine.getAllCharacters());
       expectUninitializedException(() =>
         gridEngine.setSprite(SOME_CHAR_ID, playerSpriteMock),
+      );
+      expectUninitializedException(() =>
+        gridEngine.setContainer(SOME_CHAR_ID, containerMock),
       );
       expectUninitializedException(() => gridEngine.getSprite(SOME_CHAR_ID));
       expectUninitializedException(() =>

@@ -210,6 +210,11 @@ export interface CharacterData extends CharacterDataHeadless {
    * position will be changed on movement. That is only relevant if you pass a
    * sprite that is not included in the container.
    *
+   * The height of the container is needed for depth sorting. Because
+   * calculating the container height is an expensive operation, it will be
+   * cached in Grid Engine. If you change the height of the container, make sure
+   * to set it to for character again to refresh the cached height.
+   *
    * For more details see the {@link https://annoraaq.github.io/grid-engine/example/phaser-containers/ | container example}.
    */
   container?: Phaser.GameObjects.Container;
@@ -383,6 +388,19 @@ export class GridEngine implements IGridEngine {
    */
   getSpeed(charId: string): number {
     return this.geHeadless.getSpeed(charId);
+  }
+
+  /**
+   * Sets the container for a character.
+   *
+   * @category Character
+   */
+  setContainer(charId: string, container?: Phaser.GameObjects.Container): void {
+    this.initGuard();
+    const gridCharPhaser = this.gridCharacters?.get(charId);
+    if (!gridCharPhaser) throw this.createCharUnknownErr(charId);
+
+    gridCharPhaser.setContainer(container);
   }
 
   /**
@@ -725,7 +743,7 @@ export class GridEngine implements IGridEngine {
     if (!gridCharPhaser) throw this.createCharUnknownErr(charId);
     sprite.setOrigin(0, 0);
 
-    this.setCharSprite(sprite, gridCharPhaser);
+    gridCharPhaser.setSprite(sprite);
   }
 
   /**
@@ -1048,13 +1066,6 @@ export class GridEngine implements IGridEngine {
 
   private createCharUnknownErr(charId: string): Error {
     return new Error(`Character unknown: ${charId}`);
-  }
-
-  private setCharSprite(
-    sprite: Phaser.GameObjects.Sprite,
-    gridCharPhaser: GridCharacterPhaser,
-  ) {
-    gridCharPhaser.setSprite(sprite);
   }
 
   private addCharacterInternal(charData: CharacterData): void {

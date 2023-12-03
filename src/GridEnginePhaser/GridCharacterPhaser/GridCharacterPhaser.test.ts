@@ -398,6 +398,30 @@ describe("GridCharacterPhaser", () => {
       checkSpriteDepth(containerMock, height, uppermostCharLayerDepth, "0000");
     });
 
+    it("should set depth of container when reset", () => {
+      const height = 21;
+      const containerMock = createContainerMock(0, 20, height);
+      const startPos = { x: 2, y: 2 };
+      const charData = {
+        container: containerMock,
+        startPosition: startPos,
+        charLayer: "testCharLayer",
+      };
+      const uppermostCharLayerDepth = 1;
+      const { gridCharPhaser } = createChar(charData, false);
+      const newContainerHeight = 40;
+      const newContainerMock = createContainerMock(0, 20, newContainerHeight);
+      gridCharPhaser.setContainer(newContainerMock);
+      gridCharPhaser.update(1);
+
+      checkSpriteDepth(
+        newContainerMock,
+        newContainerHeight,
+        uppermostCharLayerDepth,
+        "0000",
+      );
+    });
+
     it("should set depth of pos above for overlay sprite", () => {
       const startPos = { x: 2, y: 2 };
       const charData = {
