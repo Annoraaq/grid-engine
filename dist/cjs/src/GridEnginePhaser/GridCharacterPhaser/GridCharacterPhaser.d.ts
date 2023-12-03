@@ -11,6 +11,7 @@ export declare class GridCharacterPhaser {
     private sprite?;
     private layerOverlaySprite?;
     private container?;
+    private cachedContainerHeight;
     private newSpriteSet$;
     private destroy$;
     private walkingAnimationMapping?;
