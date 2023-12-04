@@ -4,7 +4,7 @@
   </div>
 </template>
 <script>
-import {GridEngineHeadless, ArrayTilemap} from '../grid-engine-2.33.2.esm.min.js'
+import {GridEngineHeadless, ArrayTilemap} from '../grid-engine-2.41.0.esm.min.js'
 import DomRendererCore from './DomRendererCore.vue';
 import DomRendererLegend from './DomRendererLegend.vue';
 import DomRendererControls from './DomRendererControls.vue';

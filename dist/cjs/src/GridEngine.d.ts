@@ -100,6 +100,11 @@ export interface CharacterData extends CharacterDataHeadless {
      * position will be changed on movement. That is only relevant if you pass a
      * sprite that is not included in the container.
      *
+     * The height of the container is needed for depth sorting. Because
+     * calculating the container height is an expensive operation, it will be
+     * cached in Grid Engine. If you change the height of the container, make sure
+     * to set it to for character again to refresh the cached height.
+     *
      * For more details see the {@link https://annoraaq.github.io/grid-engine/example/phaser-containers/ | container example}.
      */
     container?: Phaser.GameObjects.Container;
@@ -209,6 +214,12 @@ export declare class GridEngine implements IGridEngine {
      * @category Character
      */
     getSpeed(charId: string): number;
+    /**
+     * Sets the container for a character.
+     *
+     * @category Character
+     */
+    setContainer(charId: string, container?: Phaser.GameObjects.Container): void;
     /**
      * @returns Container for a character.
      *
@@ -555,6 +566,5 @@ export declare class GridEngine implements IGridEngine {
     private createUninitializedErr;
     private addCharacters;
     private createCharUnknownErr;
-    private setCharSprite;
     private addCharacterInternal;
 }

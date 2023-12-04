@@ -23,6 +23,7 @@ export class GridCharacterPhaser {
   private sprite?: Phaser.GameObjects.Sprite;
   private layerOverlaySprite?: Phaser.GameObjects.Sprite;
   private container?: Phaser.GameObjects.Container;
+  private cachedContainerHeight = 0;
   private newSpriteSet$ = new Subject<void>();
   private destroy$ = new Subject<void>();
   private walkingAnimationMapping?: WalkingAnimationMapping | number;
@@ -49,6 +50,7 @@ export class GridCharacterPhaser {
 
     this.sprite = charData.sprite;
     this.container = charData.container;
+    this.cachedContainerHeight = charData.container?.getBounds().height ?? 0;
 
     this.geHeadless
       .directionChanged()
@@ -103,6 +105,7 @@ export class GridCharacterPhaser {
 
   setContainer(container?: Phaser.GameObjects.Container): void {
     this.container = container;
+    this.cachedContainerHeight = container?.getBounds().height ?? 0;
   }
 
   getContainer(): Phaser.GameObjects.Container | undefined {
@@ -243,12 +246,17 @@ export class GridCharacterPhaser {
   }
 
   private updateDepth() {
-    const gameObject = this.getGameObj();
+    const gameObj = this.getGameObj();
+    if (!gameObj) return;
 
-    if (!gameObject) return;
     const position = new Vector2(this.geHeadless.getPosition(this.charData.id));
     const layer = this.geHeadless.getCharLayer(this.charData.id);
-    this.setDepth(gameObject, { position, layer });
+
+    if (this.container) {
+      this.setContainerDepth(this.container, { position, layer });
+    } else if (this.sprite) {
+      this.setSpriteDepth(this.sprite, { position, layer });
+    }
     const layerOverlaySprite = this.getLayerOverlaySprite();
 
     if (layerOverlaySprite) {
@@ -256,22 +264,47 @@ export class GridCharacterPhaser {
         ...position,
         y: position.y - 1,
       });
-      this.setDepth(layerOverlaySprite, {
+      this.setSpriteDepth(layerOverlaySprite, {
         position: posAbove,
         layer,
       });
     }
   }
 
-  private setDepth(gameObject: GameObject, position: LayerVecPos): void {
-    gameObject.setDepth(
+  private setSpriteDepth(
+    sprite: Phaser.GameObjects.Sprite,
+    position: LayerVecPos,
+  ): void {
+    sprite.setDepth(
       this.tilemap.getDepthOfCharLayer(this.getTransitionLayer(position)) +
-        this.getPaddedPixelDepth(gameObject),
+        this.getPaddedPixelDepthSprite(sprite),
     );
   }
 
-  private getPaddedPixelDepth(gameObject: GameObject): number {
-    return Utils.shiftPad(gameObject.y + gameObject.displayHeight, 7);
+  private setContainerDepth(
+    container: Phaser.GameObjects.Container,
+    position: LayerVecPos,
+  ): void {
+    container.setDepth(
+      this.tilemap.getDepthOfCharLayer(this.getTransitionLayer(position)) +
+        this.getPaddedPixelDepthContainer(container),
+    );
+  }
+
+  private getPaddedPixelDepthContainer(
+    container: Phaser.GameObjects.Container,
+  ): number {
+    return Utils.shiftPad(
+      container.y + this.cachedContainerHeight,
+      GridTilemapPhaser.Z_INDEX_PADDING,
+    );
+  }
+
+  private getPaddedPixelDepthSprite(sprite: Phaser.GameObjects.Sprite): number {
+    return Utils.shiftPad(
+      sprite.y + sprite.displayHeight,
+      GridTilemapPhaser.Z_INDEX_PADDING,
+    );
   }
 
   private getTransitionLayer(position: LayerVecPos): CharLayer {

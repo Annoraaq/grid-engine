@@ -11,6 +11,7 @@ export declare class GridCharacterPhaser {
     private sprite?;
     private layerOverlaySprite?;
     private container?;
+    private cachedContainerHeight;
     private newSpriteSet$;
     private destroy$;
     private walkingAnimationMapping?;
@@ -38,7 +39,9 @@ export declare class GridCharacterPhaser {
     private resetAnimation;
     private updateOverlaySprite;
     private updateDepth;
-    private setDepth;
-    private getPaddedPixelDepth;
+    private setSpriteDepth;
+    private setContainerDepth;
+    private getPaddedPixelDepthContainer;
+    private getPaddedPixelDepthSprite;
     private getTransitionLayer;
 }
