@@ -961,9 +961,11 @@ describe("GridEngine", () => {
       config: {
         charToFollow: "player2",
         distance: 7,
+        facingDirection: Direction.NONE,
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         maxPathLength: 10000,
         ignoreLayers: true,
+        shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
       },
     });
   });
@@ -990,8 +992,10 @@ describe("GridEngine", () => {
         charToFollow: "player2",
         distance: 0,
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        facingDirection: Direction.NONE,
         maxPathLength: Infinity,
         ignoreLayers: false,
+        shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
       },
     });
   });
