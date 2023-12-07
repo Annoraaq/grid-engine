@@ -12,6 +12,7 @@ import {
 } from "../../GridEngine.js";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy.js";
 import { Concrete } from "../../Utils/TypeUtils.js";
+import { dirToNumber, turnClockwise } from "../../Direction/Direction.js";
 
 export interface Options {
   distance?: number;
@@ -94,25 +95,21 @@ export class FollowMovement implements Movement {
   }
 
   private updateTarget(targetPos: Position, targetLayer: CharLayer): void {
-    // if (
-    //   this.options.facingDirection !== Direction.NONE &&
-    //   this.options.distance === 0
-    // ) {
-    //   targetPos = this.gridTilemap.getTilePosInDirection(
-    //     { position: new Vector2(targetPos), layer: targetLayer },
+    const useFacingDir =
+      this.options.facingDirection !== Direction.NONE &&
+      this.options.distance === 0;
+    if (useFacingDir) {
+      const turnCount =
+        dirToNumber[this.options.facingDirection] +
+        dirToNumber[this.charToFollow.getFacingDirection()];
 
-    //     this.charToFollow.getFacingDirection(),
-    //   ).position;
-    // }
-    //
-    // Direction mapping:
-    // naive approach: turn the facing direction of char as long as it points
-    // up. Store the number of turns and turn the facing direction the same
-    // amount of time in the other direction.
-    //
-    // optimized: precalculate the "distance" of a turn clockwise and
-    // counterclockwise in 2 maps and then do a lookup. We do that in Jps4 already
-    //
+      const newDir: Direction = turnClockwise(Direction.UP, turnCount);
+
+      targetPos = this.gridTilemap.getTilePosInDirection(
+        { position: new Vector2(targetPos), layer: targetLayer },
+        newDir,
+      ).position;
+    }
     this.targetMovement = new TargetMovement(
       this.character,
       this.gridTilemap,
@@ -121,11 +118,7 @@ export class FollowMovement implements Movement {
         layer: targetLayer,
       },
       {
-        distance: this.options.distance + 1,
-        // distance:
-        //   this.options.facingDirection !== Direction.NONE
-        //     ? 0
-        //     : this.options.distance + 1,
+        distance: useFacingDir ? 0 : this.options.distance + 1,
         config: {
           algorithm: this.options.shortestPathAlgorithm,
           noPathFoundStrategy: this.options.noPathFoundStrategy,

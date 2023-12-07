@@ -73,8 +73,33 @@ describe("Direction", () => {
     expect(turnCounterClockwise(Direction.LEFT)).toBe(Direction.DOWN_LEFT);
     expect(turnCounterClockwise(Direction.UP_LEFT)).toBe(Direction.LEFT);
 
-    // // 2 times
+    // 2 times
+    expect(turnCounterClockwise(Direction.UP, 2)).toBe(Direction.LEFT);
+    expect(turnCounterClockwise(Direction.UP_RIGHT, 2)).toBe(Direction.UP_LEFT);
+    expect(turnCounterClockwise(Direction.RIGHT, 2)).toBe(Direction.UP);
+    expect(turnCounterClockwise(Direction.DOWN_RIGHT, 2)).toBe(
+      Direction.UP_RIGHT,
+    );
+    expect(turnCounterClockwise(Direction.DOWN, 2)).toBe(Direction.RIGHT);
+    expect(turnCounterClockwise(Direction.DOWN_LEFT, 2)).toBe(
+      Direction.DOWN_RIGHT,
+    );
+    expect(turnCounterClockwise(Direction.LEFT, 2)).toBe(Direction.DOWN);
+    expect(turnCounterClockwise(Direction.UP_LEFT, 2)).toBe(
+      Direction.DOWN_LEFT,
+    );
 
-    // // 3 times
+    // 3 times
+    expect(turnCounterClockwise(Direction.UP, 3)).toBe(Direction.DOWN_LEFT);
+    expect(turnCounterClockwise(Direction.UP_RIGHT, 3)).toBe(Direction.LEFT);
+    expect(turnCounterClockwise(Direction.RIGHT, 3)).toBe(Direction.UP_LEFT);
+    expect(turnCounterClockwise(Direction.DOWN_RIGHT, 3)).toBe(Direction.UP);
+    expect(turnCounterClockwise(Direction.DOWN, 3)).toBe(Direction.UP_RIGHT);
+    expect(turnCounterClockwise(Direction.DOWN_LEFT, 3)).toBe(Direction.RIGHT);
+    expect(turnCounterClockwise(Direction.LEFT, 3)).toBe(Direction.DOWN_RIGHT);
+    expect(turnCounterClockwise(Direction.UP_LEFT, 3)).toBe(Direction.DOWN);
+
+    expect(turnCounterClockwise(Direction.LEFT, 8)).toBe(Direction.LEFT);
+    expect(turnCounterClockwise(Direction.LEFT, 9)).toBe(Direction.DOWN_LEFT);
   });
 });

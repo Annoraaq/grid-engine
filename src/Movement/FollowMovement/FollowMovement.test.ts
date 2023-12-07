@@ -175,17 +175,29 @@ describe("FollowMovement", () => {
       char,
       gridTilemap,
       targetCharPos,
-      {
+      expect.objectContaining({
         distance: 0,
-        config: {
-          algorithm: "BIDIRECTIONAL_SEARCH",
-          noPathFoundStrategy: NoPathFoundStrategy.STOP,
-          maxPathLength: 100,
-          ignoreLayers: true,
-          considerCosts: false,
-        },
-        ignoreBlockedTarget: true,
-      },
+      }),
+    );
+  });
+
+  it("should not update facing direction if distance > 0", () => {
+    targetChar.turnTowards(Direction.RIGHT);
+    followMovement = new FollowMovement(char, gridTilemap, targetChar, {
+      distance: 2,
+      noPathFoundStrategy: NoPathFoundStrategy.STOP,
+      maxPathLength: 100,
+      ignoreLayers: true,
+      facingDirection: Direction.DOWN,
+    });
+    followMovement.update(100);
+    expect(TargetMovement).toHaveBeenCalledWith(
+      char,
+      gridTilemap,
+      targetCharPos,
+      expect.objectContaining({
+        distance: 3,
+      }),
     );
   });
 

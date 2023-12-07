@@ -36,19 +36,7 @@ const directionVectors = {
   [Direction.DOWN_LEFT]: Vector2.DOWN_LEFT,
 };
 
-const clockwiseMapping = {
-  [Direction.LEFT]: Direction.UP_LEFT,
-  [Direction.UP_LEFT]: Direction.UP,
-  [Direction.UP]: Direction.UP_RIGHT,
-  [Direction.UP_RIGHT]: Direction.RIGHT,
-  [Direction.RIGHT]: Direction.DOWN_RIGHT,
-  [Direction.DOWN_RIGHT]: Direction.DOWN,
-  [Direction.DOWN]: Direction.DOWN_LEFT,
-  [Direction.DOWN_LEFT]: Direction.LEFT,
-  [Direction.NONE]: Direction.NONE,
-};
-
-const dirToNumber = {
+export const dirToNumber = {
   [Direction.UP]: 0,
   [Direction.UP_RIGHT]: 1,
   [Direction.RIGHT]: 2,
@@ -60,7 +48,7 @@ const dirToNumber = {
   [Direction.NONE]: NaN,
 };
 
-const numberToDir = [
+export const numberToDir = [
   Direction.UP,
   Direction.UP_RIGHT,
   Direction.RIGHT,
@@ -70,18 +58,6 @@ const numberToDir = [
   Direction.LEFT,
   Direction.UP_LEFT,
 ];
-
-const counterClockwiseMapping = {
-  [Direction.LEFT]: Direction.DOWN_LEFT,
-  [Direction.UP_LEFT]: Direction.LEFT,
-  [Direction.UP]: Direction.UP_LEFT,
-  [Direction.UP_RIGHT]: Direction.UP,
-  [Direction.RIGHT]: Direction.UP_RIGHT,
-  [Direction.DOWN_RIGHT]: Direction.RIGHT,
-  [Direction.DOWN]: Direction.DOWN_RIGHT,
-  [Direction.DOWN_LEFT]: Direction.DOWN,
-  [Direction.NONE]: Direction.NONE,
-};
 
 const diagonals = [
   Direction.DOWN_LEFT,
@@ -125,7 +101,7 @@ export function turnCounterClockwise(
   if (direction === Direction.NONE) {
     return Direction.NONE;
   }
-  return numberToDir[(dirToNumber[direction] - times) % 8];
+  return numberToDir[(dirToNumber[direction] + 8 - (Math.abs(times) % 8)) % 8];
 }
 
 export function turnClockwise(direction: Direction, times = 1): Direction {
