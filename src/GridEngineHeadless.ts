@@ -786,7 +786,7 @@ export class GridEngineHeadless implements IGridEngine {
       this.gridTilemap,
       gridCharToFollow,
       {
-        distance: options.distance,
+        distance: options.distance ?? 0,
         noPathFoundStrategy: options.closestPointIfBlocked
           ? NoPathFoundStrategy.CLOSEST_REACHABLE
           : NoPathFoundStrategy.STOP,

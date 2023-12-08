@@ -833,6 +833,27 @@ describe("GridEngineHeadless", () => {
     });
   });
 
+  it("should follow a char with default values when providing an object", () => {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
+      characters: [{ id: "player" }, { id: "player2" }],
+    });
+
+    gridEngineHeadless.follow("player", "player2", {});
+
+    expect(gridEngineHeadless.getMovement("player")).toEqual({
+      type: "Follow",
+      config: {
+        charToFollow: "player2",
+        distance: 0,
+        noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        facingDirection: Direction.NONE,
+        shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
+        maxPathLength: Infinity,
+        ignoreLayers: false,
+      },
+    });
+  });
+
   it("should delegate getFacingDirection", () => {
     createDefaultGridEngine();
     gridEngineHeadless.turnTowards("player", Direction.LEFT);
