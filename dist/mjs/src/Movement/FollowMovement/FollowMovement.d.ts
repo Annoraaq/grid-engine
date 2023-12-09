@@ -1,7 +1,7 @@
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
 import { GridCharacter } from "../../GridCharacter/GridCharacter.js";
 import { Movement, MovementInfo } from "../Movement.js";
-import { ShortestPathAlgorithmType } from "../../GridEngine.js";
+import { Direction, ShortestPathAlgorithmType } from "../../GridEngine.js";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy.js";
 export interface Options {
     distance?: number;
@@ -10,6 +10,7 @@ export interface Options {
     shortestPathAlgorithm?: ShortestPathAlgorithmType;
     ignoreLayers?: boolean;
     considerCosts?: boolean;
+    facingDirection?: Direction;
 }
 export declare class FollowMovement implements Movement {
     private character;

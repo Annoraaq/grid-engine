@@ -11,12 +11,24 @@ export declare enum Direction {
     DOWN = "down",
     DOWN_LEFT = "down-left"
 }
+export declare const dirToNumber: {
+    up: number;
+    "up-right": number;
+    right: number;
+    "down-right": number;
+    down: number;
+    "down-left": number;
+    left: number;
+    "up-left": number;
+    none: number;
+};
+export declare const numberToDir: Direction[];
 export declare function directions(): Direction[];
 export declare function isDiagonal(direction: Direction): boolean;
 export declare function isHorizontal(direction: Direction): boolean;
 export declare function isVertical(direction: Direction): boolean;
-export declare function turnCounterClockwise(direction: Direction): Direction;
-export declare function turnClockwise(direction: Direction): Direction;
+export declare function turnCounterClockwise(direction: Direction, times?: number): Direction;
+export declare function turnClockwise(direction: Direction, times?: number): Direction;
 export declare function directionVector(direction: Direction): Vector2;
 export declare function oppositeDirection(direction: Direction): Direction;
 /**
