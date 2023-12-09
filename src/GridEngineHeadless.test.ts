@@ -804,6 +804,8 @@ describe("GridEngineHeadless", () => {
         charToFollow: "player2",
         distance: 7,
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        facingDirection: Direction.NONE,
+        shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
         maxPathLength: 10000,
         ignoreLayers: true,
       },
@@ -823,6 +825,29 @@ describe("GridEngineHeadless", () => {
         charToFollow: "player2",
         distance: 0,
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        facingDirection: Direction.NONE,
+        shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
+        maxPathLength: Infinity,
+        ignoreLayers: false,
+      },
+    });
+  });
+
+  it("should follow a char with default values when providing an object", () => {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
+      characters: [{ id: "player" }, { id: "player2" }],
+    });
+
+    gridEngineHeadless.follow("player", "player2", {});
+
+    expect(gridEngineHeadless.getMovement("player")).toEqual({
+      type: "Follow",
+      config: {
+        charToFollow: "player2",
+        distance: 0,
+        noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        facingDirection: Direction.NONE,
+        shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
         maxPathLength: Infinity,
         ignoreLayers: false,
       },

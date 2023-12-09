@@ -36,29 +36,28 @@ const directionVectors = {
   [Direction.DOWN_LEFT]: Vector2.DOWN_LEFT,
 };
 
-const clockwiseMapping = {
-  [Direction.LEFT]: Direction.UP_LEFT,
-  [Direction.UP_LEFT]: Direction.UP,
-  [Direction.UP]: Direction.UP_RIGHT,
-  [Direction.UP_RIGHT]: Direction.RIGHT,
-  [Direction.RIGHT]: Direction.DOWN_RIGHT,
-  [Direction.DOWN_RIGHT]: Direction.DOWN,
-  [Direction.DOWN]: Direction.DOWN_LEFT,
-  [Direction.DOWN_LEFT]: Direction.LEFT,
-  [Direction.NONE]: Direction.NONE,
+export const dirToNumber = {
+  [Direction.UP]: 0,
+  [Direction.UP_RIGHT]: 1,
+  [Direction.RIGHT]: 2,
+  [Direction.DOWN_RIGHT]: 3,
+  [Direction.DOWN]: 4,
+  [Direction.DOWN_LEFT]: 5,
+  [Direction.LEFT]: 6,
+  [Direction.UP_LEFT]: 7,
+  [Direction.NONE]: NaN,
 };
 
-const counterClockwiseMapping = {
-  [Direction.LEFT]: Direction.DOWN_LEFT,
-  [Direction.UP_LEFT]: Direction.LEFT,
-  [Direction.UP]: Direction.UP_LEFT,
-  [Direction.UP_RIGHT]: Direction.UP,
-  [Direction.RIGHT]: Direction.UP_RIGHT,
-  [Direction.DOWN_RIGHT]: Direction.RIGHT,
-  [Direction.DOWN]: Direction.DOWN_RIGHT,
-  [Direction.DOWN_LEFT]: Direction.DOWN,
-  [Direction.NONE]: Direction.NONE,
-};
+export const numberToDir = [
+  Direction.UP,
+  Direction.UP_RIGHT,
+  Direction.RIGHT,
+  Direction.DOWN_RIGHT,
+  Direction.DOWN,
+  Direction.DOWN_LEFT,
+  Direction.LEFT,
+  Direction.UP_LEFT,
+];
 
 const diagonals = [
   Direction.DOWN_LEFT,
@@ -95,12 +94,21 @@ export function isVertical(direction: Direction): boolean {
   return verticals.includes(direction);
 }
 
-export function turnCounterClockwise(direction: Direction): Direction {
-  return counterClockwiseMapping[direction];
+export function turnCounterClockwise(
+  direction: Direction,
+  times = 1,
+): Direction {
+  if (direction === Direction.NONE) {
+    return Direction.NONE;
+  }
+  return numberToDir[(dirToNumber[direction] + 8 - (Math.abs(times) % 8)) % 8];
 }
 
-export function turnClockwise(direction: Direction): Direction {
-  return clockwiseMapping[direction];
+export function turnClockwise(direction: Direction, times = 1): Direction {
+  if (direction === Direction.NONE) {
+    return Direction.NONE;
+  }
+  return numberToDir[(dirToNumber[direction] + times) % 8];
 }
 
 export function directionVector(direction: Direction): Vector2 {

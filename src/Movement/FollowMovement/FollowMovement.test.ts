@@ -2,12 +2,15 @@ import {
   LayerVecPos,
   ShortestPathAlgorithmType,
 } from "./../../Pathfinding/ShortestPathAlgorithm.js";
-import { NumberOfDirections } from "./../../Direction/Direction.js";
+import { Direction, NumberOfDirections } from "./../../Direction/Direction.js";
 import { FollowMovement } from "./FollowMovement.js";
 import { TargetMovement } from "../TargetMovement/TargetMovement.js";
-import { Subject } from "rxjs";
 import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy.js";
+import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
+import { mockBlockMap } from "../../Utils/MockFactory/MockFactory.js";
+import { CollisionStrategy } from "../../Collisions/CollisionStrategy.js";
+import { GridCharacter } from "../../GridCharacter/GridCharacter.js";
 
 const mockTargetMovement = {
   setCharacter: jest.fn(),
@@ -22,49 +25,52 @@ jest.mock("../TargetMovement/TargetMovement", () => ({
 
 describe("FollowMovement", () => {
   let followMovement: FollowMovement;
-  let gridTilemapMock;
-  let mockChar;
+  let gridTilemap: GridTilemap;
+  let char: GridCharacter;
   let targetCharPos: LayerVecPos;
-  let targetChar;
+  let targetChar: GridCharacter;
 
-  function createMockChar(id: string, pos: LayerVecPos) {
-    return <any>{
-      positionChangeStartedSubject$: new Subject(),
-      autoMovementSetSubject$: new Subject(),
-      getId: () => id,
-      getTilePos: jest.fn(() => pos),
-      move: jest.fn(),
-      isMoving: () => false,
-      positionChangeStarted: function () {
-        return this.positionChangeStartedSubject$;
-      },
-      autoMovementSet: function () {
-        return this.autoMovementSetSubject$;
-      },
-      getNumberOfDirections: jest.fn(() => NumberOfDirections.FOUR),
-    };
+  function createChar(id: string, pos: LayerVecPos) {
+    const char = new GridCharacter(id, {
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+      tilemap: gridTilemap,
+    });
+    char.setTilePosition(pos);
+    return char;
   }
 
   beforeEach(() => {
     jest.clearAllMocks();
-    gridTilemapMock = {
-      hasBlockingTile: jest.fn(),
-      hasNoTile: jest.fn(),
-      hasBlockingChar: jest.fn().mockReturnValue(false),
-      isBlocking: jest.fn(),
-    };
+    gridTilemap = new GridTilemap(
+      mockBlockMap(
+        [
+          // prettier-ignore
+          "....",
+          "....",
+          "....",
+          "....",
+        ],
+        undefined,
+      ),
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES,
+    );
     mockTargetMovement.setCharacter.mockReset();
     const charPos = { position: new Vector2(1, 1), layer: "layer1" };
     targetCharPos = { position: new Vector2(3, 1), layer: "layer1" };
-    mockChar = createMockChar("char", charPos);
-    targetChar = createMockChar("targetChar", targetCharPos);
-    followMovement = new FollowMovement(mockChar, gridTilemapMock, targetChar);
+    char = createChar("char", charPos);
+    targetChar = createChar("targetChar", targetCharPos);
+    // @ts-ignore
+    TargetMovement.mockClear();
+    followMovement = new FollowMovement(char, gridTilemap, targetChar);
   });
 
   it("should set character", () => {
     expect(TargetMovement).toHaveBeenCalledWith(
-      mockChar,
-      gridTilemapMock,
+      char,
+      gridTilemap,
       targetCharPos,
       {
         distance: 1,
@@ -89,37 +95,29 @@ describe("FollowMovement", () => {
     const enterTile = { position: new Vector2(7, 7), layer: "layer1" };
     mockTargetMovement.setCharacter.mockReset();
 
-    targetChar.positionChangeStartedSubject$.next({
-      enterTile: enterTile.position,
-      enterLayer: enterTile.layer,
-    });
+    targetChar.setTilePosition(enterTile);
 
-    expect(TargetMovement).toHaveBeenCalledWith(
-      mockChar,
-      gridTilemapMock,
-      enterTile,
-      {
-        distance: 1,
-        config: {
-          algorithm: "BIDIRECTIONAL_SEARCH",
-          noPathFoundStrategy: NoPathFoundStrategy.STOP,
-          maxPathLength: Infinity,
-          ignoreLayers: false,
-          considerCosts: false,
-        },
-        ignoreBlockedTarget: true,
+    expect(TargetMovement).toHaveBeenCalledWith(char, gridTilemap, enterTile, {
+      distance: 1,
+      config: {
+        algorithm: "BIDIRECTIONAL_SEARCH",
+        noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        maxPathLength: Infinity,
+        ignoreLayers: false,
+        considerCosts: false,
       },
-    );
+      ignoreBlockedTarget: true,
+    });
   });
 
   it("should not update target on position change after autoMovementSet", () => {
     // @ts-ignore
     TargetMovement.mockClear();
-    const enterTile = new Vector2(7, 7);
+    const enterTile = { position: new Vector2(7, 7), layer: "layer1" };
     mockTargetMovement.setCharacter.mockReset();
 
-    mockChar.autoMovementSetSubject$.next(undefined);
-    targetChar.positionChangeStartedSubject$.next({ enterTile });
+    char.setMovement(undefined);
+    targetChar.setTilePosition(enterTile);
 
     expect(TargetMovement).not.toHaveBeenCalled();
   });
@@ -127,17 +125,17 @@ describe("FollowMovement", () => {
   it("should update target on position change after autoMovementSet if movement is the same", () => {
     // @ts-ignore
     TargetMovement.mockClear();
-    const enterTile = new Vector2(7, 7);
+    const enterTile = { position: new Vector2(7, 7), layer: "layer1" };
     mockTargetMovement.setCharacter.mockReset();
 
-    mockChar.autoMovementSetSubject$.next(followMovement);
-    targetChar.positionChangeStartedSubject$.next({ enterTile });
+    char.setMovement(followMovement);
+    targetChar.setTilePosition(enterTile);
 
     expect(TargetMovement).toHaveBeenCalled();
   });
 
   it("should update added character with distance and maxPathLength", () => {
-    followMovement = new FollowMovement(mockChar, gridTilemapMock, targetChar, {
+    followMovement = new FollowMovement(char, gridTilemap, targetChar, {
       distance: 7,
       noPathFoundStrategy: NoPathFoundStrategy.STOP,
       maxPathLength: 100,
@@ -145,8 +143,8 @@ describe("FollowMovement", () => {
     });
     followMovement.update(100);
     expect(TargetMovement).toHaveBeenCalledWith(
-      mockChar,
-      gridTilemapMock,
+      char,
+      gridTilemap,
       targetCharPos,
       {
         distance: 8,
@@ -162,15 +160,75 @@ describe("FollowMovement", () => {
     );
   });
 
+  it.each([
+    {
+      dir: Direction.DOWN,
+      wantPos: { position: { x: 2, y: 1 }, layer: "layer1" },
+    },
+    {
+      dir: Direction.UP,
+      wantPos: { position: { x: 4, y: 1 }, layer: "layer1" },
+    },
+    {
+      dir: Direction.LEFT,
+      wantPos: { position: { x: 3, y: 0 }, layer: "layer1" },
+    },
+    {
+      dir: Direction.RIGHT,
+      wantPos: { position: { x: 3, y: 2 }, layer: "layer1" },
+    },
+  ])(
+    "should update added character with facing direction '$dir'",
+    ({ dir, wantPos }) => {
+      targetChar.turnTowards(Direction.RIGHT);
+      followMovement = new FollowMovement(char, gridTilemap, targetChar, {
+        distance: 0,
+        noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        maxPathLength: 100,
+        ignoreLayers: true,
+        facingDirection: dir,
+      });
+      followMovement.update(100);
+      expect(TargetMovement).toHaveBeenCalledWith(
+        char,
+        gridTilemap,
+        wantPos,
+        expect.objectContaining({
+          distance: 0,
+        }),
+      );
+    },
+  );
+
+  it("should not update facing direction if distance > 0", () => {
+    targetChar.turnTowards(Direction.RIGHT);
+    followMovement = new FollowMovement(char, gridTilemap, targetChar, {
+      distance: 2,
+      noPathFoundStrategy: NoPathFoundStrategy.STOP,
+      maxPathLength: 100,
+      ignoreLayers: true,
+      facingDirection: Direction.DOWN,
+    });
+    followMovement.update(100);
+    expect(TargetMovement).toHaveBeenCalledWith(
+      char,
+      gridTilemap,
+      targetCharPos,
+      expect.objectContaining({
+        distance: 3,
+      }),
+    );
+  });
+
   it("should update added character with distance and CLOSEST_REACHABLE", () => {
-    followMovement = new FollowMovement(mockChar, gridTilemapMock, targetChar, {
+    followMovement = new FollowMovement(char, gridTilemap, targetChar, {
       distance: 7,
       noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
     });
     followMovement.update(100);
     expect(TargetMovement).toHaveBeenCalledWith(
-      mockChar,
-      gridTilemapMock,
+      char,
+      gridTilemap,
       targetCharPos,
       {
         distance: 8,
@@ -187,14 +245,14 @@ describe("FollowMovement", () => {
   });
 
   it("should update added character with considerCosts", () => {
-    followMovement = new FollowMovement(mockChar, gridTilemapMock, targetChar, {
+    followMovement = new FollowMovement(char, gridTilemap, targetChar, {
       shortestPathAlgorithm: "A_STAR",
       considerCosts: true,
     });
     followMovement.update(100);
     expect(TargetMovement).toHaveBeenCalledWith(
-      mockChar,
-      gridTilemapMock,
+      char,
+      gridTilemap,
       targetCharPos,
       {
         distance: 1,
@@ -211,7 +269,7 @@ describe("FollowMovement", () => {
   });
 
   it("should show movement information", () => {
-    followMovement = new FollowMovement(mockChar, gridTilemapMock, targetChar, {
+    followMovement = new FollowMovement(char, gridTilemap, targetChar, {
       distance: 7,
       noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
     });
@@ -223,6 +281,26 @@ describe("FollowMovement", () => {
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         maxPathLength: Infinity,
         ignoreLayers: false,
+        facingDirection: Direction.NONE,
+        shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
+      },
+    });
+  });
+
+  it("should show facingDirection in movement information", () => {
+    followMovement = new FollowMovement(char, gridTilemap, targetChar, {
+      facingDirection: Direction.LEFT,
+    });
+    expect(followMovement.getInfo()).toEqual({
+      type: "Follow",
+      config: {
+        charToFollow: targetChar.getId(),
+        distance: 0,
+        noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        maxPathLength: Infinity,
+        ignoreLayers: false,
+        facingDirection: Direction.LEFT,
+        shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
       },
     });
   });
@@ -232,15 +310,10 @@ describe("FollowMovement", () => {
       " algorithm different than A*",
     (algorithm: ShortestPathAlgorithmType) => {
       console.warn = jest.fn();
-      followMovement = new FollowMovement(
-        mockChar,
-        gridTilemapMock,
-        targetChar,
-        {
-          considerCosts: true,
-          shortestPathAlgorithm: algorithm,
-        },
-      );
+      followMovement = new FollowMovement(char, gridTilemap, targetChar, {
+        considerCosts: true,
+        shortestPathAlgorithm: algorithm,
+      });
 
       expect(console.warn).toHaveBeenCalledWith(
         `GridEngine: Pathfinding option 'considerCosts' cannot be used with ` +
@@ -254,15 +327,10 @@ describe("FollowMovement", () => {
       "with A*",
     () => {
       console.warn = jest.fn();
-      followMovement = new FollowMovement(
-        mockChar,
-        gridTilemapMock,
-        targetChar,
-        {
-          considerCosts: true,
-          shortestPathAlgorithm: "A_STAR",
-        },
-      );
+      followMovement = new FollowMovement(char, gridTilemap, targetChar, {
+        considerCosts: true,
+        shortestPathAlgorithm: "A_STAR",
+      });
 
       expect(console.warn).not.toHaveBeenCalledWith(
         `GridEngine: Pathfinding option 'considerCosts' cannot be used with ` +

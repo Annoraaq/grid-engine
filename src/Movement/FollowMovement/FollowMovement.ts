@@ -6,11 +6,13 @@ import { Movement, MovementInfo } from "../Movement.js";
 import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 import {
   CharLayer,
+  Direction,
   Position,
   ShortestPathAlgorithmType,
 } from "../../GridEngine.js";
 import { NoPathFoundStrategy } from "../../Pathfinding/NoPathFoundStrategy.js";
 import { Concrete } from "../../Utils/TypeUtils.js";
+import { dirToNumber, turnClockwise } from "../../Direction/Direction.js";
 
 export interface Options {
   distance?: number;
@@ -19,6 +21,7 @@ export interface Options {
   shortestPathAlgorithm?: ShortestPathAlgorithmType;
   ignoreLayers?: boolean;
   considerCosts?: boolean;
+  facingDirection?: Direction;
 }
 
 export class FollowMovement implements Movement {
@@ -38,6 +41,7 @@ export class FollowMovement implements Movement {
       shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
       ignoreLayers: false,
       considerCosts: options.considerCosts || false,
+      facingDirection: Direction.NONE,
     };
     this.options = { ...defaultOptions, ...options };
     if (
@@ -51,6 +55,7 @@ export class FollowMovement implements Movement {
       );
     }
     this.character = character;
+
     this.updateTarget(
       this.charToFollow.getTilePos().position,
       this.charToFollow.getTilePos().layer,
@@ -83,11 +88,28 @@ export class FollowMovement implements Movement {
         noPathFoundStrategy: this.options.noPathFoundStrategy,
         maxPathLength: this.options.maxPathLength,
         ignoreLayers: this.options.ignoreLayers,
+        facingDirection: this.options.facingDirection,
+        shortestPathAlgorithm: this.options.shortestPathAlgorithm,
       },
     };
   }
 
   private updateTarget(targetPos: Position, targetLayer: CharLayer): void {
+    const useFacingDir =
+      this.options.facingDirection !== Direction.NONE &&
+      this.options.distance === 0;
+    if (useFacingDir) {
+      const turnCount =
+        dirToNumber[this.options.facingDirection] +
+        dirToNumber[this.charToFollow.getFacingDirection()];
+
+      const newDir: Direction = turnClockwise(Direction.UP, turnCount);
+
+      targetPos = this.gridTilemap.getTilePosInDirection(
+        { position: new Vector2(targetPos), layer: targetLayer },
+        newDir,
+      ).position;
+    }
     this.targetMovement = new TargetMovement(
       this.character,
       this.gridTilemap,
@@ -96,7 +118,7 @@ export class FollowMovement implements Movement {
         layer: targetLayer,
       },
       {
-        distance: this.options.distance + 1,
+        distance: useFacingDir ? 0 : this.options.distance + 1,
         config: {
           algorithm: this.options.shortestPathAlgorithm,
           noPathFoundStrategy: this.options.noPathFoundStrategy,
