@@ -90,6 +90,7 @@ export default defineConfig({
             collapsed: false,
             items: [
               { text: 'Following', link: '/examples/following/index.md' },
+              { text: 'Following Facing Direction', link: '/examples/following-facing-direction/index.md' },
               { text: 'Move To', link: '/examples/move-to/index.md' },
               { text: 'Move To (multi-tile)', link: '/examples/mult-tile-move-to/index.md' },
               { text: 'Pathfinding Restriction', link: '/examples/pathfinding-restriction/index.md' },
