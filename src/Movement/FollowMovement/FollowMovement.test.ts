@@ -160,26 +160,45 @@ describe("FollowMovement", () => {
     );
   });
 
-  it("should update added character with facing direction 'down'", () => {
-    targetChar.turnTowards(Direction.RIGHT);
-    targetCharPos.position.x -= 1;
-    followMovement = new FollowMovement(char, gridTilemap, targetChar, {
-      distance: 0,
-      noPathFoundStrategy: NoPathFoundStrategy.STOP,
-      maxPathLength: 100,
-      ignoreLayers: true,
-      facingDirection: Direction.DOWN,
-    });
-    followMovement.update(100);
-    expect(TargetMovement).toHaveBeenCalledWith(
-      char,
-      gridTilemap,
-      targetCharPos,
-      expect.objectContaining({
+  it.each([
+    {
+      dir: Direction.DOWN,
+      wantPos: { position: { x: 2, y: 1 }, layer: "layer1" },
+    },
+    {
+      dir: Direction.UP,
+      wantPos: { position: { x: 4, y: 1 }, layer: "layer1" },
+    },
+    {
+      dir: Direction.LEFT,
+      wantPos: { position: { x: 3, y: 0 }, layer: "layer1" },
+    },
+    {
+      dir: Direction.RIGHT,
+      wantPos: { position: { x: 3, y: 2 }, layer: "layer1" },
+    },
+  ])(
+    "should update added character with facing direction '$dir'",
+    ({ dir, wantPos }) => {
+      targetChar.turnTowards(Direction.RIGHT);
+      followMovement = new FollowMovement(char, gridTilemap, targetChar, {
         distance: 0,
-      }),
-    );
-  });
+        noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        maxPathLength: 100,
+        ignoreLayers: true,
+        facingDirection: dir,
+      });
+      followMovement.update(100);
+      expect(TargetMovement).toHaveBeenCalledWith(
+        char,
+        gridTilemap,
+        wantPos,
+        expect.objectContaining({
+          distance: 0,
+        }),
+      );
+    },
+  );
 
   it("should not update facing direction if distance > 0", () => {
     targetChar.turnTowards(Direction.RIGHT);
