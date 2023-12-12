@@ -40,6 +40,7 @@ describe("GridTilemap", () => {
       "ge_collide",
       CollisionStrategy.BLOCK_TWO_TILES,
     );
+    console.warn = jest.fn();
   });
 
   it("should consider sub-layers for blocking", () => {
@@ -182,6 +183,44 @@ describe("GridTilemap", () => {
     gridTilemap.addCharacter(charSameId);
 
     expect(gridTilemap.getCharacters()).toEqual([char1, charSameId]);
+  });
+
+  it("shows a warning on unknown char layer", () => {
+    const unknownCharLayerChar = new GridCharacter("char_with_unknown_layer", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    unknownCharLayerChar.setTilePosition({
+      position: new Vector2(0, 0),
+      layer: "unknown",
+    });
+
+    gridTilemap.addCharacter(unknownCharLayerChar);
+
+    expect(console.warn).toHaveBeenCalledWith(
+      expect.stringContaining(
+        `Char layer 'unknown' of character 'char_with_unknown_layer' is unknown.`,
+      ),
+    );
+  });
+
+  it("shows no warning on known char layer", () => {
+    const char = new GridCharacter("char_with_known_layer", {
+      tilemap: gridTilemap,
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+    });
+    char.setTilePosition({
+      position: new Vector2(0, 0),
+      layer: "charLayer1",
+    });
+
+    gridTilemap.addCharacter(char);
+
+    expect(console.warn).not.toHaveBeenCalled();
   });
 
   it("should set the lowest char layer", () => {
