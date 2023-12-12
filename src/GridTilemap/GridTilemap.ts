@@ -78,11 +78,16 @@ export class GridTilemap {
 
   addCharacter(character: GridCharacter): void {
     this.characters.set(character.getId(), character);
-    if (character.getNextTilePos().layer === undefined) {
+    const layer = character.getNextTilePos().layer;
+    if (layer === undefined) {
       character.setTilePosition({
         ...character.getNextTilePos(),
         layer: this.getLowestCharLayer(),
       });
+    } else if (!this.getCharLayerNames().includes(layer)) {
+      console.warn(
+        `Char layer '${layer}' of character '${character.getId()}' is unknown.`,
+      );
     }
     this.charBlockCache.addCharacter(character);
   }
@@ -355,4 +360,16 @@ export class GridTilemap {
     }
     return undefined;
   }
+
+  private getCharLayerNames(): string[] {
+    return this.tilemap
+      .getLayers()
+      .filter((l) => l.isCharLayer())
+      .map((l) => l.getProperty(CHAR_LAYER_PROP_NAME))
+      .filter(isDefined);
+  }
+}
+
+function isDefined<T>(value: T | null | undefined): value is T {
+  return value !== null && value !== undefined;
 }
