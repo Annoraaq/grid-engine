@@ -49,4 +49,5 @@ export declare class GridTilemap {
     private findPrevAndCharLayer;
     private getCollisionRelevantLayers;
     private getLowestCharLayer;
+    private getCharLayerNames;
 }
