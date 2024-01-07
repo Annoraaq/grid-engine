@@ -99,6 +99,21 @@ export interface MoveToConfig {
      * @default false
      */
     considerCosts?: boolean;
+    /**
+     * Only relevant if {@link MoveToConfig.pathBlockedStrategy} is set to {@link
+     * PathBlockedStrategy.ALTERNATIVE_TARGETS}.
+     *
+     * It provides a list of alternative targets that are considered if the main
+     * target is not reachable. That list is processed in order.
+     */
+    alternativeTargets?: LayerPosition[];
+    /**
+     * Only relevant if {@link MoveToConfig.pathBlockedStrategy} is set to {@link
+     * PathBlockedStrategy.ALTERNATIVE_TARGETS}.
+     *
+     * In case all these targets are blocked this is the fallback strategy.
+     */
+    noPathFoundAlternativeTargetsFallbackStrategy?: NoPathFoundStrategy;
 }
 /**
  * @category Pathfinding
@@ -153,6 +168,8 @@ export declare class TargetMovement implements Movement {
     private noPathFoundStrategy;
     private stopped;
     private noPathFoundRetryable;
+    private alternativeTargets?;
+    private noPathFoundAlternativeTargetsFallbackStrategy?;
     private pathBlockedRetryable;
     private pathBlockedWaitTimeoutMs;
     private pathBlockedWaitElapsed;
@@ -186,5 +203,6 @@ export declare class TargetMovement implements Movement {
     private calcShortestPath;
     private isBlocking;
     private getShortestPath;
+    private pathToAlternativeTarget;
     private getDir;
 }
