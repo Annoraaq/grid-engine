@@ -128,6 +128,23 @@ export interface MoveToConfig {
    * @default false
    */
   considerCosts?: boolean;
+
+  /**
+   * Only relevant if {@link MoveToConfig.pathBlockedStrategy} is set to {@link
+   * PathBlockedStrategy.ALTERNATIVE_TARGETS}.
+   *
+   * It provides a list of alternative targets that are considered if the main
+   * target is not reachable. That list is processed in order.
+   */
+  alternativeTargets?: LayerPosition[];
+
+  /**
+   * Only relevant if {@link MoveToConfig.pathBlockedStrategy} is set to {@link
+   * PathBlockedStrategy.ALTERNATIVE_TARGETS}.
+   *
+   * In case all these targets are blocked this is the fallback strategy.
+   */
+  noPathFoundAlternativeTargetsFallbackStrategy?: NoPathFoundStrategy;
 }
 
 /**
@@ -184,6 +201,8 @@ export class TargetMovement implements Movement {
   private noPathFoundStrategy: NoPathFoundStrategy;
   private stopped = false;
   private noPathFoundRetryable: Retryable;
+  private alternativeTargets?: LayerPosition[];
+  private noPathFoundAlternativeTargetsFallbackStrategy?: NoPathFoundStrategy;
   private pathBlockedRetryable: Retryable;
   private pathBlockedWaitTimeoutMs: number;
   private pathBlockedWaitElapsed = 0;
@@ -234,6 +253,11 @@ export class TargetMovement implements Movement {
     if (config?.maxPathLength) {
       this.maxPathLength = config.maxPathLength;
     }
+
+    this.alternativeTargets = config?.alternativeTargets;
+
+    this.noPathFoundAlternativeTargetsFallbackStrategy =
+      config?.noPathFoundAlternativeTargetsFallbackStrategy;
 
     if (config?.considerCosts && this.shortestPathAlgorithm !== "A_STAR") {
       console.warn(
@@ -483,37 +507,56 @@ export class TargetMovement implements Movement {
 
   private getShortestPath(): ShortestPath {
     const pathfinding = new Pathfinding(this.tilemap);
-    const { path: shortestPath, closestToTarget } =
-      pathfinding.findShortestPath(
-        this.character.getNextTilePos(),
-        this.targetPos,
-        this.getPathfindingOptions(),
-      );
+    const { path, closestToTarget } = pathfinding.findShortestPath(
+      this.character.getNextTilePos(),
+      this.targetPos,
+      this.getPathfindingOptions(),
+    );
 
-    const noPathFound = shortestPath.length == 0;
+    const noPathFound = path.length == 0;
 
-    if (
-      noPathFound &&
-      this.noPathFoundStrategy === NoPathFoundStrategy.CLOSEST_REACHABLE
-    ) {
-      if (!closestToTarget) {
-        throw Error(
-          "ClosestToTarget should never be undefined in TargetMovement.",
-        );
+    if (noPathFound) {
+      if (this.noPathFoundStrategy === NoPathFoundStrategy.CLOSEST_REACHABLE) {
+        if (!closestToTarget) {
+          throw Error(
+            "ClosestToTarget should never be undefined in TargetMovement.",
+          );
+        }
+        return this.pathToAlternativeTarget(closestToTarget, pathfinding);
+      } else if (
+        this.noPathFoundStrategy === NoPathFoundStrategy.ALTERNATIVE_TARGETS
+      ) {
+        for (const altTarget of this.alternativeTargets ?? []) {
+          const { path, distOffset } = this.pathToAlternativeTarget(
+            LayerPositionUtils.toInternal(altTarget),
+            pathfinding,
+          );
+          if (path.length > 0) return { path, distOffset };
+        }
+        this.noPathFoundStrategy =
+          this.noPathFoundAlternativeTargetsFallbackStrategy ||
+          NoPathFoundStrategy.STOP;
+        return this.getShortestPath();
       }
-      const shortestPathToClosestPoint = pathfinding.findShortestPath(
-        this.character.getNextTilePos(),
-        closestToTarget,
-        this.getPathfindingOptions(),
-      ).path;
-      const distOffset = this.distanceUtils.distance(
-        closestToTarget.position,
-        this.targetPos.position,
-      );
-      return { path: shortestPathToClosestPoint, distOffset };
     }
 
-    return { path: shortestPath, distOffset: 0 };
+    return { path, distOffset: 0 };
+  }
+
+  private pathToAlternativeTarget(
+    target: LayerVecPos,
+    pathfinding: Pathfinding,
+  ): ShortestPath {
+    const path = pathfinding.findShortestPath(
+      this.character.getNextTilePos(),
+      target,
+      this.getPathfindingOptions(),
+    ).path;
+    const distOffset = this.distanceUtils.distance(
+      target.position,
+      this.targetPos.position,
+    );
+    return { path, distOffset };
   }
 
   private getDir(from: Vector2, to: Vector2): Direction {

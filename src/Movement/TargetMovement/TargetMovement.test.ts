@@ -24,6 +24,7 @@ import {
   mockCharMap,
   updateLayer,
 } from "../../Utils/MockFactory/MockFactory.js";
+import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 const TEST_CHAR_CONFIG = {
   speed: 1,
@@ -2257,6 +2258,187 @@ describe("TargetMovement", () => {
       });
 
       expectWalkedPath(targetMovement, mockChar, createPath([[1, 1]]));
+    });
+  });
+
+  describe("noPathFound: ALTERNATIVE_TARGETS", () => {
+    it("should fall back to STOP if no targets or alternative strategy is provided", () => {
+      const charPos = layerPos(new Vector2(1, 0));
+      const mockChar = createMockChar("char", charPos);
+
+      tilemapMock = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".p..",
+            "....",
+            "####",
+            ".t..",
+          ],
+        },
+      ]);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES,
+      );
+
+      gridTilemap.addCharacter(mockChar);
+
+      targetMovement = new TargetMovement(
+        mockChar,
+        gridTilemap,
+        layerPos(new Vector2(1, 3)),
+        {
+          config: {
+            algorithm: shortestPathAlgo,
+            noPathFoundStrategy: NoPathFoundStrategy.ALTERNATIVE_TARGETS,
+          },
+        },
+      );
+
+      const finishedObsCallbackMock = jest.fn();
+      const finishedObsCompleteMock = jest.fn();
+      targetMovement.finishedObs().subscribe({
+        next: finishedObsCallbackMock,
+        complete: finishedObsCompleteMock,
+      });
+      targetMovement.update(100);
+      mockChar.update(100);
+      expect(mockChar.isMoving()).toBe(false);
+
+      updateLayer(
+        tilemapMock,
+        [
+          // prettier-ignore
+          ".p..",
+          "....",
+          "#.##",
+          ".t..",
+        ],
+        "lowerCharLayer",
+      );
+
+      targetMovement.update(200);
+      mockChar.update(200);
+
+      expect(mockChar.isMoving()).toBe(false);
+      expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+        position: charPos.position,
+        result: MoveToResult.NO_PATH_FOUND,
+        description: "NoPathFoundStrategy STOP: No path found.",
+        layer: "lowerCharLayer",
+      });
+      expect(finishedObsCompleteMock).toHaveBeenCalled();
+    });
+
+    it("should move towards alternative target if path is blocked", () => {
+      const charPos = layerPos(new Vector2(2, 5));
+      const targetPos = layerPos(new Vector2(2, 0));
+      const alternativeTargets = [
+        LayerPositionUtils.fromInternal(layerPos(new Vector2(0, 0))),
+        LayerPositionUtils.fromInternal(layerPos(new Vector2(0, 6))),
+        LayerPositionUtils.fromInternal(layerPos(new Vector2(3, 6))),
+      ];
+      tilemapMock = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            "a.t.",
+            "####",
+            "....",
+            "....",
+            "...#",
+            "..s.",
+            "a..a",
+          ],
+        },
+      ]);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES,
+      );
+      const mockChar = createMockChar("char", charPos, {
+        ...TEST_CHAR_CONFIG,
+        tilemap: gridTilemap,
+      });
+
+      gridTilemap.addCharacter(mockChar);
+
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        config: {
+          algorithm: shortestPathAlgo,
+          noPathFoundStrategy: NoPathFoundStrategy.ALTERNATIVE_TARGETS,
+          alternativeTargets,
+        },
+      });
+
+      expectWalkedPath(
+        targetMovement,
+        mockChar,
+        createPath([
+          [2, 6],
+          [1, 6],
+          [0, 6],
+        ]),
+      );
+    });
+
+    it("uses fallback strategy", () => {
+      const charPos = layerPos(new Vector2(2, 5));
+      const targetPos = layerPos(new Vector2(2, 0));
+      const alternativeTargets = [
+        LayerPositionUtils.fromInternal(layerPos(new Vector2(0, 0))),
+      ];
+      tilemapMock = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            "a.t.",
+            "####",
+            "....",
+            "....",
+            "...#",
+            "..s.",
+            "....",
+          ],
+        },
+      ]);
+      gridTilemap = new GridTilemap(
+        tilemapMock,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES,
+      );
+      const mockChar = createMockChar("char", charPos, {
+        ...TEST_CHAR_CONFIG,
+        tilemap: gridTilemap,
+      });
+
+      gridTilemap.addCharacter(mockChar);
+
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        config: {
+          algorithm: shortestPathAlgo,
+          noPathFoundStrategy: NoPathFoundStrategy.ALTERNATIVE_TARGETS,
+          alternativeTargets,
+          noPathFoundAlternativeTargetsFallbackStrategy:
+            NoPathFoundStrategy.CLOSEST_REACHABLE,
+        },
+      });
+
+      expectWalkedPath(
+        targetMovement,
+        mockChar,
+        createPath([
+          [2, 4],
+          [2, 3],
+          [2, 2],
+        ]),
+      );
     });
   });
 
