@@ -1,21 +1,22 @@
-import { CharLayer, Direction } from "../GridEngine.js";
 import { GridTilemap } from "../GridTilemap/GridTilemap.js";
 import { DistanceUtilsFactory } from "../Utils/DistanceUtilsFactory/DistanceUtilsFactory.js";
 import { Vector2 } from "../Utils/Vector2/Vector2.js";
 import {
+  Direction,
   directionFromPos,
   NumberOfDirections,
 } from "../Direction/Direction.js";
 import { Concrete } from "../Utils/TypeUtils.js";
-import { LayerPositionUtils } from "../Utils/LayerPositionUtils/LayerPositionUtils.js";
+import {
+  LayerPositionUtils,
+  LayerVecPos,
+} from "../Utils/LayerPositionUtils/LayerPositionUtils.js";
 import { CharId } from "../GridCharacter/GridCharacter.js";
 import { VectorUtils } from "../Utils/VectorUtils.js";
 import { PathfindingOptions } from "./PathfindingOptions.js";
+import { CharLayer } from "../Position.js";
 
-export interface LayerVecPos {
-  position: Vector2;
-  layer: CharLayer;
-}
+type Line = { src: Vector2; dest: Vector2 };
 
 /**
  * BFS: (Breadth first search) Simple algorithm. It can find the shortest path
@@ -125,12 +126,18 @@ export abstract class ShortestPathAlgorithm {
       };
     });
 
+    // console.log("---", transitionMappedNeighbors);
     return transitionMappedNeighbors.filter((neighborPos) => {
-      return (
-        !this.isBlocking(pos, neighborPos) ||
+      const ib = this.isBlocking(pos, neighborPos);
+      // console.log("ib", neighborPos, ib);
+
+      // console.log("nn", LayerPositionUtils.equal(neighborPos, dest));
+      const t =
+        !ib ||
         (this.options.ignoreBlockedTarget &&
-          LayerPositionUtils.equal(neighborPos, dest))
-      );
+          LayerPositionUtils.equal(neighborPos, dest));
+      // console.log("check neigh", neighborPos, t);
+      return t;
     });
   }
 
@@ -161,17 +168,16 @@ export abstract class ShortestPathAlgorithm {
 
     if (!positionAllowed) return true;
 
-    const tileBlocking =
-      !this.options.ignoreTiles &&
-      this.hasBlockingTileFrom(
-        src,
-        dest,
-        this.options.pathWidth,
-        this.options.pathHeight,
-        this.options.ignoreMapBounds,
-        this.gridTilemap,
-      );
+    const hbtf = this.hasBlockingTileFrom(
+      src,
+      dest,
+      this.options.pathWidth,
+      this.options.pathHeight,
+      this.options.ignoreMapBounds,
+      this.gridTilemap,
+    );
 
+    const tileBlocking = !this.options.ignoreTiles && hbtf;
     if (tileBlocking) return true;
 
     const charBlocking = this.hasBlockingCharFrom(
@@ -272,15 +278,177 @@ export abstract class ShortestPathAlgorithm {
     ignoreMapBounds: boolean,
     gridTilemap: GridTilemap,
   ): boolean {
-    for (let x = dest.position.x; x < dest.position.x + pathWidth; x++) {
-      for (let y = dest.position.y; y < dest.position.y + pathHeight; y++) {
-        const res = gridTilemap.hasBlockingTile(
-          new Vector2(x, y),
-          dest.layer,
-          directionFromPos(dest.position, src.position),
+    if (pathWidth === 1 && pathHeight === 1) {
+      return gridTilemap.hasBlockingTile(
+        dest.position,
+        dest.layer,
+        directionFromPos(dest.position, src.position),
+        ignoreMapBounds,
+      );
+    }
+
+    // TODO shortcut for single size path
+    const dir = directionFromPos(src.position, dest.position);
+    // if (
+    //   dest.position.x === 2 &&
+    //   dest.position.y === 0 &&
+    //   dest.layer === "testCharLayer"
+    // ) {
+    //   console.log("DIR checki", dir);
+    // }
+
+    const right: Line = {
+      src: new Vector2(src.position.x + pathWidth, src.position.y),
+      dest: new Vector2(
+        src.position.x + pathWidth,
+        src.position.y + pathHeight - 1,
+      ),
+    };
+    const left: Line = {
+      src: new Vector2(src.position.x - 1, src.position.y),
+      dest: new Vector2(src.position.x - 1, src.position.y + pathHeight - 1),
+    };
+    const up: Line = {
+      src: new Vector2(src.position.x, src.position.y - 1),
+      dest: new Vector2(src.position.x + pathWidth - 1, src.position.y - 1),
+    };
+    const down: Line = {
+      src: new Vector2(src.position.x, src.position.y + pathHeight),
+      dest: new Vector2(
+        src.position.x + pathWidth - 1,
+        src.position.y + pathHeight,
+      ),
+    };
+
+    // 1. get the border from dir
+    switch (dir) {
+      case Direction.RIGHT: {
+        return this.checkDir(right, gridTilemap, dest, dir, ignoreMapBounds);
+      }
+      case Direction.LEFT: {
+        // console.log("check left");
+        return this.checkDir(left, gridTilemap, dest, dir, ignoreMapBounds);
+      }
+      case Direction.UP: {
+        // console.log("check up");
+        return this.checkDir(up, gridTilemap, dest, dir, ignoreMapBounds);
+      }
+      case Direction.DOWN: {
+        // console.log("check down");
+        return this.checkDir(down, gridTilemap, dest, dir, ignoreMapBounds);
+      }
+      case Direction.UP_LEFT: {
+        // console.log("check up left");
+        const upRes = this.checkDir(
+          { src: up.src, dest: new Vector2(up.dest.x - 1, up.dest.y) },
+          gridTilemap,
+          dest,
+          dir,
+          ignoreMapBounds,
+        );
+        const leftRes = this.checkDir(
+          {
+            src: new Vector2(left.src.x, left.src.y - 1),
+            dest: new Vector2(left.dest.x, left.dest.y - 1),
+          },
+          gridTilemap,
+          dest,
+          dir,
+          ignoreMapBounds,
+        );
+        // TODO optimize: only check leftRes if upRes did not return true.
+        return upRes || leftRes;
+      }
+      case Direction.UP_RIGHT: {
+        // console.log("check up right");
+        const upRes = this.checkDir(
+          {
+            src: new Vector2(up.src.x + 1, up.src.y),
+            dest: up.dest,
+          },
+          gridTilemap,
+          dest,
+          dir,
+          ignoreMapBounds,
+        );
+        const rightRes = this.checkDir(
+          {
+            src: new Vector2(right.src.x, right.src.y - 1),
+            dest: new Vector2(right.dest.x, right.dest.y - 1),
+          },
+          gridTilemap,
+          dest,
+          dir,
+          ignoreMapBounds,
+        );
+        return upRes || rightRes;
+      }
+      case Direction.DOWN_LEFT: {
+        // console.log("check down left");
+        const leftRes = this.checkDir(
+          {
+            src: new Vector2(left.src.x, left.src.y + 1),
+            dest: new Vector2(left.dest.x, left.dest.y + 1),
+          },
+          gridTilemap,
+          dest,
+          dir,
+          ignoreMapBounds,
+        );
+        const downRes = this.checkDir(
+          { src: down.src, dest: new Vector2(down.dest.x - 1, down.dest.y) },
+          gridTilemap,
+          dest,
+          dir,
+          ignoreMapBounds,
+        );
+        return downRes || leftRes;
+      }
+      case Direction.DOWN_RIGHT: {
+        // console.log("checkdown", {
+        //   src: down.src,
+        //   dest: new Vector2(down.dest.x + 1, down.dest.y),
+        // });
+        const downRes = this.checkDir(
+          { src: new Vector2(down.src.x + 1, down.src.y), dest: down.dest },
+          gridTilemap,
+          dest,
+          dir,
+          ignoreMapBounds,
+        );
+        // console.log("checkright");
+        const rightRes = this.checkDir(
+          {
+            src: new Vector2(right.src.x, right.src.y + 1),
+            dest: new Vector2(right.dest.x, right.dest.y + 1),
+          },
+          gridTilemap,
+          dest,
+          dir,
           ignoreMapBounds,
         );
 
+        return downRes || rightRes;
+      }
+    }
+    return false;
+  }
+
+  private checkDir(
+    line: Line,
+    gridTilemap: GridTilemap,
+    dest: LayerVecPos,
+    dir: Direction,
+    ignoreMapBounds: boolean,
+  ) {
+    for (let x = line.src.x; x <= line.dest.x; x++) {
+      for (let y = line.src.y; y <= line.dest.y; y++) {
+        const res = gridTilemap.hasBlockingTile(
+          new Vector2(x, y),
+          dest.layer,
+          dir,
+          ignoreMapBounds,
+        );
         if (res) return true;
       }
     }
