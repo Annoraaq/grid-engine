@@ -135,7 +135,6 @@ describe("Jps8", () => {
   });
 
   it("should find the shortest path for transition", () => {
-    // Why is pos (2,0) blocked?? it seems that hasBlockingTileFrom returns unblocked
     const gridTilemap = createTilemap([
       {
         layer: "lowerCharLayer",
@@ -175,7 +174,6 @@ describe("Jps8", () => {
       layerPos(new Vector2(1, 0)),
       layerPos(new Vector2(2, 0), "testCharLayer"),
       layerPos(new Vector2(2, 1), "testCharLayer"),
-      // layerPos(new Vector2(2, 2), "testCharLayer"),
       layerPos(new Vector2(1, 2), "testCharLayer"),
     ]);
   });
