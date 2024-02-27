@@ -481,7 +481,7 @@ describe("Jps8", () => {
       layerPos(new Vector2(250, 250)),
     );
 
-    expect(shortestPath.steps).toEqual(1163);
+    expect(shortestPath.steps).toEqual(1224);
     expect(shortestPath.path.length).toEqual(114);
   });
 

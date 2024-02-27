@@ -7,10 +7,11 @@ import {
   LayerVecPos,
 } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 import { Jps4 } from "../Jps4/Jps4.js";
+import { PathfindingOptions } from "../PathfindingOptions.js";
 
 export class Jps8 extends Jps4 {
-  constructor(gridTilemap: GridTilemap) {
-    super(gridTilemap);
+  constructor(gridTilemap: GridTilemap, po: PathfindingOptions = {}) {
+    super(gridTilemap, po);
     this.distanceUtils = DistanceUtilsFactory.create(NumberOfDirections.EIGHT);
   }
 
