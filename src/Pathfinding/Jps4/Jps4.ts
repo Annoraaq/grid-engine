@@ -176,7 +176,6 @@ export class Jps4 extends ShortestPathAlgorithm {
   }
 
   protected blockOrTrans(src: LayerVecPos, dest: LayerVecPos) {
-    // TODO this here seems to be checking the blokcing of non-neighbor positions. That can't be right.
     return (
       this.isBlocking(src, dest) ||
       this.getTransition(dest.position, dest.layer) !== undefined
@@ -327,8 +326,6 @@ export class Jps4 extends ShortestPathAlgorithm {
 
     return false;
   }
-
-  // TODO optimization also for plain JPS4: replace getForced with faster hasForced
 
   protected prune(parent: LayerVecPos, node: LayerVecPos): LayerVecPos[] {
     const { right, top, bottom } = this.normalizedPositions(parent, node);
