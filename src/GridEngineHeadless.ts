@@ -31,11 +31,7 @@ import {
 } from "./GridCharacter/CharacterFilter/CharacterFilter.js";
 
 import { version as VERSION } from "../package.json";
-import {
-  IsPositionAllowedFn,
-  Pathfinding,
-  PathfindingOptions,
-} from "./Pathfinding/Pathfinding.js";
+import { Pathfinding } from "./Pathfinding/Pathfinding.js";
 import { LayerPositionUtils } from "./Utils/LayerPositionUtils/LayerPositionUtils.js";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
 import { GridTilemap } from "./GridTilemap/GridTilemap.js";
@@ -43,12 +39,9 @@ import { Tilemap } from "./GridTilemap/Tilemap.js";
 import {
   CharacterShift,
   CharacterShiftAction,
-  CharLayer,
   FollowOptions,
   IGridEngine,
-  LayerPosition,
   PathfindingResult,
-  Position,
 } from "./IGridEngine.js";
 import { Rect } from "./Utils/Rect/Rect.js";
 import {
@@ -59,6 +52,11 @@ import {
 } from "./Movement/QueueMovement/QueueMovement.js";
 import { GridCharacterState } from "./GridCharacter/GridCharacterState.js";
 import { GridEngineState } from "./GridEngineState.js";
+import {
+  IsPositionAllowedFn,
+  PathfindingOptions,
+} from "./Pathfinding/PathfindingOptions.js";
+import { CharLayer, LayerPosition, Position } from "./Position.js";
 
 export {
   CollisionStrategy,

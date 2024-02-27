@@ -10,12 +10,12 @@ import {
 } from "../../GridEngine.js";
 import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 import { CharacterAnimation } from "../../GridCharacter/CharacterAnimation/CharacterAnimation.js";
-import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm.js";
 import { Utils } from "../../Utils/Utils/Utils.js";
 import { Subject } from "rxjs";
 import { filter, takeUntil } from "rxjs/operators";
 import { Direction, directionVector } from "../../Direction/Direction.js";
 import { GridTilemapPhaser } from "../GridTilemapPhaser/GridTilemapPhaser.js";
+import { LayerVecPos } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 export class GridCharacterPhaser {
   private customOffset = new Vector2(0, 0);

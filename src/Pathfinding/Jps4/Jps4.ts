@@ -1,5 +1,4 @@
 import {
-  LayerVecPos,
   ShortestPathAlgorithm,
   ShortestPathResult,
 } from "../ShortestPathAlgorithm.js";
@@ -14,12 +13,15 @@ import {
   turnClockwise,
 } from "../../Direction/Direction.js";
 import { Vector2 } from "../../Utils/Vector2/Vector2.js";
-import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
+import {
+  LayerPositionUtils,
+  LayerVecPos,
+} from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 import { DistanceUtilsFactory } from "../../Utils/DistanceUtilsFactory/DistanceUtilsFactory.js";
 import { DistanceUtils } from "../../Utils/DistanceUtils.js";
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
-import { PathfindingOptions } from "../Pathfinding.js";
 import { VectorUtils } from "../../Utils/VectorUtils.js";
+import { PathfindingOptions } from "../PathfindingOptions.js";
 
 interface ShortestPathTuple {
   previous: Map<string, LayerVecPos>;
@@ -163,13 +165,34 @@ export class Jps4 extends ShortestPathAlgorithm {
     }
   }
 
+  protected addIfNotBlocked(
+    set: Set<LayerVecPos>,
+    src: LayerVecPos,
+    target: LayerVecPos,
+  ) {
+    if (!this.blockOrTrans(src, target)) {
+      set.add(target);
+    }
+  }
+
+  protected blockOrTrans(src: LayerVecPos, dest: LayerVecPos) {
+    // TODO this here seems to be checking the blokcing of non-neighbor positions. That can't be right.
+    return (
+      this.isBlocking(src, dest) ||
+      this.getTransition(dest.position, dest.layer) !== undefined
+    );
+  }
+
   private getNeighborsInternal(
     node: LayerVecPos,
     parent: LayerVecPos | undefined,
     stopNode: LayerVecPos,
   ): { p: LayerVecPos; dist: number }[] {
     if (!parent || node.layer !== parent.layer) {
-      return this.getNeighbors(node, stopNode).map((n) => ({ p: n, dist: 1 }));
+      return this.getNeighbors(node, stopNode).map((n) => ({
+        p: n,
+        dist: 1,
+      }));
     }
 
     const pruned = this.prune(parent, node).map((unblockedNeighbor) => {
@@ -220,7 +243,7 @@ export class Jps4 extends ShortestPathAlgorithm {
       return { p: node, dist };
     }
     if (isHorizontal(dir)) return { p: node, dist };
-    if (this.getForced(parent, node).length > 0) {
+    if (this.hasForced(parent, node)) {
       return { p: node, dist };
     }
 
@@ -236,8 +259,11 @@ export class Jps4 extends ShortestPathAlgorithm {
     );
   }
 
-  protected getForced(parent: LayerVecPos, node: LayerVecPos): LayerVecPos[] {
-    const res: LayerVecPos[] = [];
+  protected getForced(
+    parent: LayerVecPos,
+    node: LayerVecPos,
+  ): Set<LayerVecPos> {
+    const res = new Set<LayerVecPos>();
 
     // if parent is more than one step away (jump), take the closest one:
     const newParent = this.posInDir(
@@ -249,31 +275,60 @@ export class Jps4 extends ShortestPathAlgorithm {
       node,
     );
 
-    const blockOrTrans = (src: LayerVecPos, dest: LayerVecPos) => {
-      return (
-        this.isBlocking(src, dest) ||
-        this.getTransition(dest.position, dest.layer) !== undefined
-      );
-    };
-
     const dir = this.distanceUtils.direction(parent.position, node.position);
     if (isVertical(dir)) {
       if (
-        (blockOrTrans(newParent, downLeft) || blockOrTrans(downLeft, bottom)) &&
-        !this.isBlocking(node, bottom)
+        this.blockOrTrans(newParent, downLeft) ||
+        this.blockOrTrans(downLeft, bottom)
       ) {
-        res.push(bottom);
+        this.addIfNotBlocked(res, node, bottom);
       }
       if (
-        (blockOrTrans(newParent, topLeft) || blockOrTrans(topLeft, top)) &&
-        !this.isBlocking(node, top)
+        this.blockOrTrans(newParent, topLeft) ||
+        this.blockOrTrans(topLeft, top)
       ) {
-        res.push(top);
+        this.addIfNotBlocked(res, node, top);
       }
     }
 
     return res;
   }
+
+  protected hasForced(parent: LayerVecPos, node: LayerVecPos): boolean {
+    // if parent is more than one step away (jump), take the closest one:
+    const newParent = this.posInDir(
+      node,
+      this.distanceUtils.direction(node.position, parent.position),
+    );
+    const { topLeft, downLeft, top, bottom } = this.normalizedPositions(
+      newParent,
+      node,
+    );
+
+    const dir = this.distanceUtils.direction(parent.position, node.position);
+    if (isVertical(dir)) {
+      if (
+        this.blockOrTrans(newParent, downLeft) ||
+        this.blockOrTrans(downLeft, bottom)
+      ) {
+        if (!this.blockOrTrans(node, bottom)) {
+          return true;
+        }
+      }
+      if (
+        this.blockOrTrans(newParent, topLeft) ||
+        this.blockOrTrans(topLeft, top)
+      ) {
+        if (!this.blockOrTrans(node, top)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  // TODO optimization also for plain JPS4: replace getForced with faster hasForced
 
   protected prune(parent: LayerVecPos, node: LayerVecPos): LayerVecPos[] {
     const { right, top, bottom } = this.normalizedPositions(parent, node);

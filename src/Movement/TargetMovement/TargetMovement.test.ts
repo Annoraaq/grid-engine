@@ -1,7 +1,4 @@
-import {
-  LayerVecPos,
-  ShortestPathAlgorithmType,
-} from "./../../Pathfinding/ShortestPathAlgorithm.js";
+import { ShortestPathAlgorithmType } from "./../../Pathfinding/ShortestPathAlgorithm.js";
 import { Direction, NumberOfDirections } from "../../Direction/Direction.js";
 import {
   MoveToConfig,
@@ -24,7 +21,10 @@ import {
   mockCharMap,
   updateLayer,
 } from "../../Utils/MockFactory/MockFactory.js";
-import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
+import {
+  LayerPositionUtils,
+  LayerVecPos,
+} from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 const TEST_CHAR_CONFIG = {
   speed: 1,

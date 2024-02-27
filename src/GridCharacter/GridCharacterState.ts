@@ -1,6 +1,6 @@
 import { Direction } from "../Direction/Direction";
 import { CollisionConfig } from "../GridEngineHeadless";
-import { LayerPosition } from "../IGridEngine";
+import { LayerPosition } from "../Position.js";
 import { CharId } from "./GridCharacter";
 
 export interface GridCharacterState {

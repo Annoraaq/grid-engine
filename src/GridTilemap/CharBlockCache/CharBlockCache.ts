@@ -16,7 +16,7 @@ import {
 import { CharLayer, Position } from "../../GridEngine.js";
 import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 import { CollisionStrategy } from "../../Collisions/CollisionStrategy.js";
-import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm.js";
+import { LayerVecPos } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 export class CharBlockCache {
   private tilePosToCharacters: Map<string, Set<GridCharacter>> = new Map();

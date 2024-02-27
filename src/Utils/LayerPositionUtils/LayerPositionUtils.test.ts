@@ -1,7 +1,6 @@
 import { LayerPosition } from "../../GridEngine.js";
-import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm.js";
 import { Vector2 } from "../Vector2/Vector2.js";
-import { LayerPositionUtils } from "./LayerPositionUtils.js";
+import { LayerPositionUtils, LayerVecPos } from "./LayerPositionUtils.js";
 
 describe("LayerPositionUtils", () => {
   it("should copy over", () => {

@@ -1,4 +1,4 @@
-import { Position } from "../GridEngine.js";
+import { Position } from "../Position.js";
 import { Vector2 } from "../Utils/Vector2/Vector2.js";
 export enum Direction {
   NONE = "none",

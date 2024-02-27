@@ -1,7 +1,4 @@
-import {
-  LayerVecPos,
-  ShortestPathAlgorithmType,
-} from "./../../Pathfinding/ShortestPathAlgorithm.js";
+import { ShortestPathAlgorithmType } from "./../../Pathfinding/ShortestPathAlgorithm.js";
 import { Direction, NumberOfDirections } from "./../../Direction/Direction.js";
 import { FollowMovement } from "./FollowMovement.js";
 import { TargetMovement } from "../TargetMovement/TargetMovement.js";
@@ -11,6 +8,7 @@ import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
 import { mockBlockMap } from "../../Utils/MockFactory/MockFactory.js";
 import { CollisionStrategy } from "../../Collisions/CollisionStrategy.js";
 import { GridCharacter } from "../../GridCharacter/GridCharacter.js";
+import { LayerVecPos } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 const mockTargetMovement = {
   setCharacter: jest.fn(),
