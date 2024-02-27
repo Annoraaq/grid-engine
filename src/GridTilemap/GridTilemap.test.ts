@@ -3,7 +3,6 @@ import { GridCharacter } from "./../GridCharacter/GridCharacter.js";
 import { Vector2 } from "../Utils/Vector2/Vector2.js";
 import { Direction, NumberOfDirections } from "./../Direction/Direction.js";
 import { GridTilemap } from "./GridTilemap.js";
-import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm.js";
 import {
   mockLayeredBlockMap,
   updateLayer,
@@ -11,6 +10,7 @@ import {
 import { MockTilemap } from "../Utils/MockFactory/MockTilemap.js";
 import { Tilemap } from "./Tilemap.js";
 import { Rect } from "../Utils/Rect/Rect.js";
+import { LayerVecPos } from "../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 describe("GridTilemap", () => {
   let gridTilemap: GridTilemap;

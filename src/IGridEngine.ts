@@ -11,24 +11,10 @@ import {
 } from "./Movement/QueueMovement/QueueMovement.js";
 import { Observable } from "rxjs";
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter.js";
-import { PathfindingOptions } from "./Pathfinding/Pathfinding.js";
 import { PositionChange } from "./GridCharacter/GridCharacter.js";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
-
-export type CharLayer = string | undefined;
-
-/**
- * Specifies a tile position along with a character layer.
- */
-export interface LayerPosition {
-  position: Position;
-  charLayer: CharLayer;
-}
-
-export interface Position {
-  x: number;
-  y: number;
-}
+import { PathfindingOptions } from "./Pathfinding/PathfindingOptions.js";
+import { CharLayer, LayerPosition, Position } from "./Position.js";
 
 /**
  * Result of a pathfinding algorithm run.

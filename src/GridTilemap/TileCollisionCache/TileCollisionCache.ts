@@ -3,7 +3,7 @@ import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 import { GridTilemap } from "../GridTilemap.js";
 import { Tilemap } from "../Tilemap.js";
 import { Rect } from "../../Utils/Rect/Rect.js";
-import { CharLayer } from "../../IGridEngine.js";
+import { CharLayer } from "../../Position.js";
 
 const BITMAP_POS_HAS_TILE = 0;
 const BITMAP_POS_NO_DIRECTION = 1;

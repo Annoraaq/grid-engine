@@ -1,11 +1,13 @@
 import {
-  LayerVecPos,
   ShortestPathAlgorithm,
   ShortestPathResult,
 } from "./../ShortestPathAlgorithm.js";
 import { VectorUtils } from "../../Utils/VectorUtils.js";
 import { Queue } from "../../Datastructures/Queue/Queue.js";
-import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
+import {
+  LayerPositionUtils,
+  LayerVecPos,
+} from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 interface ShortestPathTuple {
   previous: Map<string, LayerVecPos>;

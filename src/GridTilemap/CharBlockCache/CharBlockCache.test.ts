@@ -5,8 +5,8 @@ import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 import { CharBlockCache } from "./CharBlockCache.js";
 import { GridTilemap } from "../GridTilemap.js";
 import { mockLayeredBlockMap } from "../../Utils/MockFactory/MockFactory.js";
-import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm.js";
 import { Tilemap } from "../Tilemap.js";
+import { LayerVecPos } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 describe("CharBlockCache", () => {
   let charBlockCache: CharBlockCache;

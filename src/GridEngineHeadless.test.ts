@@ -1,5 +1,4 @@
 import { take } from "rxjs/operators";
-import { PathfindingOptions } from "./Pathfinding/Pathfinding.js";
 import { Direction, NumberOfDirections } from "./Direction/Direction.js";
 import { GridCharacter } from "./GridCharacter/GridCharacter.js";
 import {
@@ -8,6 +7,7 @@ import {
 } from "./Movement/QueueMovement/QueueMovement.js";
 import { Vector2 } from "./Utils/Vector2/Vector2.js";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
+import { PathfindingOptions } from "./Pathfinding/PathfindingOptions.js";
 
 expect.extend({
   toBeCharacter(receivedChar: GridCharacter, expectedCharId: string) {

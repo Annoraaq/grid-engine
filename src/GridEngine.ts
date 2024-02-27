@@ -23,10 +23,6 @@ import {
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter.js";
 
 import { version as VERSION } from "../package.json";
-import {
-  IsPositionAllowedFn,
-  PathfindingOptions,
-} from "./Pathfinding/Pathfinding.js";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
 import {
   GridEngineHeadless,
@@ -58,12 +54,9 @@ import {
 import {
   CharacterShift,
   CharacterShiftAction,
-  CharLayer,
   FollowOptions,
   IGridEngine,
-  LayerPosition,
   PathfindingResult,
-  Position,
 } from "./IGridEngine.js";
 import {
   ArrayTilemap,
@@ -75,6 +68,11 @@ import { TiledTile } from "./GridTilemap/TiledTilemap/TiledTile.js";
 import { GridEngineState } from "./GridEngineState.js";
 import { GridCharacterState } from "./GridCharacter/GridCharacterState.js";
 import { GridEngineStatePhaser } from "./GridEnginePhaser/GridEngineStatePhaser.js";
+import {
+  IsPositionAllowedFn,
+  PathfindingOptions,
+} from "./Pathfinding/PathfindingOptions.js";
+import { CharLayer, LayerPosition, Position } from "./Position.js";
 
 export {
   ArrayTilemap,

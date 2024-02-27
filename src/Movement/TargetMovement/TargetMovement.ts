@@ -1,7 +1,10 @@
 import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy.js";
 import { DistanceUtilsFactory } from "./../../Utils/DistanceUtilsFactory/DistanceUtilsFactory.js";
 import {
-  LayerVecPos,
+  PathfindingOptions,
+  IsPositionAllowedFn,
+} from "./../../Pathfinding/PathfindingOptions.js";
+import {
   ShortestPath,
   ShortestPathAlgorithmType,
 } from "./../../Pathfinding/ShortestPathAlgorithm.js";
@@ -15,14 +18,13 @@ import { Retryable } from "./Retryable/Retryable.js";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy.js";
 import { CharLayer, LayerPosition, Position } from "../../GridEngine.js";
 import { filter, Subject, take } from "rxjs";
-import {
-  IsPositionAllowedFn,
-  Pathfinding,
-  PathfindingOptions,
-} from "../../Pathfinding/Pathfinding.js";
+import { Pathfinding } from "../../Pathfinding/Pathfinding.js";
 import { Concrete } from "../../Utils/TypeUtils.js";
 import { Bfs } from "../../Pathfinding/Bfs/Bfs.js";
-import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
+import {
+  LayerPositionUtils,
+  LayerVecPos,
+} from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 /**
  * @category Pathfinding

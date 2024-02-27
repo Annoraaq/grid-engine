@@ -1,6 +1,10 @@
-import { LayerPosition } from "../../GridEngine.js";
+import { CharLayer, LayerPosition } from "../../Position.js";
 import { Vector2 } from "../Vector2/Vector2.js";
-import { LayerVecPos } from "./../../Pathfinding/ShortestPathAlgorithm.js";
+export interface LayerVecPos {
+  position: Vector2;
+  layer: CharLayer;
+}
+
 export class LayerPositionUtils {
   static equal(position: LayerVecPos, otherPosition: LayerVecPos): boolean {
     return (

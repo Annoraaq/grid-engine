@@ -1,14 +1,13 @@
 import { directionFromPos, isDiagonal } from "../../Direction/Direction.js";
-import {
-  Direction,
-  NumberOfDirections,
-  PathfindingOptions,
-} from "../../GridEngineHeadless.js";
+import { Direction, NumberOfDirections } from "../../GridEngineHeadless.js";
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
 import { DistanceUtilsFactory } from "../../Utils/DistanceUtilsFactory/DistanceUtilsFactory.js";
-import { LayerPositionUtils } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
+import {
+  LayerPositionUtils,
+  LayerVecPos,
+} from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 import { Jps4 } from "../Jps4/Jps4.js";
-import { LayerVecPos } from "../ShortestPathAlgorithm.js";
+import { PathfindingOptions } from "../PathfindingOptions.js";
 
 export class Jps8 extends Jps4 {
   constructor(gridTilemap: GridTilemap, po: PathfindingOptions = {}) {
@@ -16,9 +15,103 @@ export class Jps8 extends Jps4 {
     this.distanceUtils = DistanceUtilsFactory.create(NumberOfDirections.EIGHT);
   }
 
-  protected getForced(parent: LayerVecPos, node: LayerVecPos): LayerVecPos[] {
-    const res: LayerVecPos[] = [];
+  protected getForced(
+    parent: LayerVecPos,
+    node: LayerVecPos,
+  ): Set<LayerVecPos> {
+    const res = new Set<LayerVecPos>();
 
+    // if parent is more than one step away (jump), take the closest one:
+    const newParent = this.posInDir(
+      node,
+      this.distanceUtils.direction(node.position, parent.position),
+    );
+    const { topLeft, downLeft, top, bottom, topRight, downRight } =
+      this.normalizedPositions(newParent, node);
+
+    const dir = this.distanceUtils.direction(parent.position, node.position);
+
+    if (isDiagonal(dir)) {
+      if (this.blockOrTrans(newParent, topLeft)) {
+        this.addIfNotBlocked(res, node, top);
+        this.addIfNotBlocked(res, node, topRight);
+
+        if (this.blockOrTrans(downLeft, topLeft)) {
+          this.addIfNotBlocked(res, node, topLeft);
+        }
+      }
+
+      if (this.blockOrTrans(newParent, downLeft)) {
+        this.addIfNotBlocked(res, node, bottom);
+        this.addIfNotBlocked(res, node, downRight);
+
+        if (this.blockOrTrans(topLeft, downLeft)) {
+          this.addIfNotBlocked(res, node, downLeft);
+        }
+      }
+
+      if (this.blockOrTrans(topLeft, top)) {
+        this.addIfNotBlocked(res, node, top);
+      }
+
+      if (this.blockOrTrans(downLeft, bottom)) {
+        this.addIfNotBlocked(res, node, bottom);
+      }
+
+      if (this.blockOrTrans(topLeft, topRight)) {
+        this.addIfNotBlocked(res, node, topRight);
+      }
+
+      if (this.blockOrTrans(downLeft, downRight)) {
+        this.addIfNotBlocked(res, node, downRight);
+      }
+    } else {
+      if (
+        this.blockOrTrans(newParent, top) ||
+        this.blockOrTrans(top, topRight)
+      ) {
+        this.addIfNotBlocked(res, node, topRight);
+      }
+      if (
+        this.blockOrTrans(newParent, bottom) ||
+        this.blockOrTrans(bottom, downRight)
+      ) {
+        this.addIfNotBlocked(res, node, downRight);
+      }
+
+      if (
+        this.blockOrTrans(newParent, topLeft) &&
+        this.blockOrTrans(newParent, top)
+      ) {
+        this.addIfNotBlocked(res, node, top);
+        this.addIfNotBlocked(res, node, topLeft);
+      }
+      if (
+        this.blockOrTrans(newParent, downLeft) &&
+        this.blockOrTrans(newParent, bottom)
+      ) {
+        this.addIfNotBlocked(res, node, bottom);
+        this.addIfNotBlocked(res, node, downLeft);
+      }
+
+      if (
+        this.blockOrTrans(topLeft, top) &&
+        this.blockOrTrans(newParent, top)
+      ) {
+        this.addIfNotBlocked(res, node, top);
+      }
+      if (
+        this.blockOrTrans(downLeft, bottom) &&
+        this.blockOrTrans(newParent, bottom)
+      ) {
+        this.addIfNotBlocked(res, node, bottom);
+      }
+    }
+
+    return res;
+  }
+
+  protected hasForced(parent: LayerVecPos, node: LayerVecPos): boolean {
     // if parent is more than one step away (jump), take the closest one:
 
     const newParent = this.posInDir(
@@ -30,96 +123,130 @@ export class Jps8 extends Jps4 {
 
     const dir = this.distanceUtils.direction(parent.position, node.position);
 
-    const blockOrTrans = (src: LayerVecPos, dest: LayerVecPos) => {
-      return (
-        this.isBlocking(src, dest) ||
-        this.getTransition(dest.position, dest.layer) !== undefined
-      );
-    };
-
     if (isDiagonal(dir)) {
-      if (blockOrTrans(parent, topLeft) && !this.isBlocking(node, top)) {
-        res.push(top);
+      if (this.blockOrTrans(newParent, topLeft)) {
+        if (
+          !this.blockOrTrans(node, top) ||
+          !this.blockOrTrans(node, topRight)
+        ) {
+          return true;
+        }
+
+        if (this.blockOrTrans(downLeft, topLeft)) {
+          if (!this.blockOrTrans(node, topLeft)) {
+            return true;
+          }
+        }
       }
 
-      if (
-        blockOrTrans(parent, topLeft) &&
-        (blockOrTrans(parent, downLeft) || blockOrTrans(downLeft, topLeft)) &&
-        !this.isBlocking(node, topLeft)
-      ) {
-        res.push(topLeft);
+      if (this.blockOrTrans(newParent, downLeft)) {
+        if (
+          !this.blockOrTrans(node, bottom) ||
+          !this.blockOrTrans(node, downRight)
+        ) {
+          return true;
+        }
+
+        if (this.blockOrTrans(topLeft, downLeft)) {
+          if (!this.blockOrTrans(node, downLeft)) {
+            return true;
+          }
+        }
       }
 
-      if (blockOrTrans(parent, downLeft) && !this.isBlocking(node, bottom)) {
-        res.push(bottom);
+      if (this.blockOrTrans(topLeft, top)) {
+        if (!this.blockOrTrans(node, top)) {
+          return true;
+        }
       }
 
-      if (
-        blockOrTrans(parent, downLeft) &&
-        (blockOrTrans(parent, topLeft) || blockOrTrans(topLeft, downLeft)) &&
-        !this.isBlocking(node, downLeft)
-      ) {
-        res.push(downLeft);
+      if (this.blockOrTrans(downLeft, bottom)) {
+        if (!this.blockOrTrans(node, bottom)) {
+          return true;
+        }
+      }
+
+      if (this.blockOrTrans(topLeft, topRight)) {
+        if (!this.blockOrTrans(node, topRight)) {
+          return true;
+        }
+      }
+
+      if (this.blockOrTrans(downLeft, downRight)) {
+        if (!this.blockOrTrans(node, downRight)) {
+          return true;
+        }
       }
     } else {
       if (
-        blockOrTrans(parent, top) &&
-        (blockOrTrans(parent, topLeft) || blockOrTrans(topLeft, top))
+        this.blockOrTrans(newParent, top) ||
+        this.blockOrTrans(top, topRight)
       ) {
-        if (!this.isBlocking(node, topLeft)) {
-          res.push(topLeft);
+        if (!this.blockOrTrans(node, topRight)) {
+          return true;
         }
-        if (!this.isBlocking(node, top)) {
-          res.push(top);
+      }
+      if (
+        this.blockOrTrans(newParent, bottom) ||
+        this.blockOrTrans(bottom, downRight)
+      ) {
+        if (!this.blockOrTrans(node, downRight)) {
+          return true;
         }
       }
 
       if (
-        blockOrTrans(parent, top) &&
-        (blockOrTrans(parent, topLeft) ||
-          blockOrTrans(topLeft, top) ||
-          blockOrTrans(top, topRight)) &&
-        !this.isBlocking(node, topRight)
+        this.blockOrTrans(newParent, topLeft) &&
+        this.blockOrTrans(newParent, top)
       ) {
-        res.push(topRight);
+        if (
+          !this.blockOrTrans(node, top) ||
+          !this.blockOrTrans(node, topLeft)
+        ) {
+          return true;
+        }
+      }
+      if (
+        this.blockOrTrans(newParent, downLeft) &&
+        this.blockOrTrans(newParent, bottom)
+      ) {
+        if (
+          !this.blockOrTrans(node, bottom) ||
+          !this.blockOrTrans(node, downLeft)
+        ) {
+          return true;
+        }
       }
 
       if (
-        blockOrTrans(parent, bottom) &&
-        (blockOrTrans(parent, downLeft) || blockOrTrans(downLeft, top))
+        this.blockOrTrans(topLeft, top) &&
+        this.blockOrTrans(newParent, top)
       ) {
-        if (!this.isBlocking(node, downLeft)) {
-          res.push(downLeft);
-        }
-        if (!this.isBlocking(node, bottom)) {
-          res.push(bottom);
+        if (!this.blockOrTrans(node, top)) {
+          return true;
         }
       }
-
       if (
-        blockOrTrans(parent, bottom) &&
-        (blockOrTrans(parent, downLeft) ||
-          blockOrTrans(topLeft, bottom) ||
-          blockOrTrans(top, downRight)) &&
-        !this.isBlocking(node, downRight)
+        this.blockOrTrans(downLeft, bottom) &&
+        this.blockOrTrans(newParent, bottom)
       ) {
-        res.push(downRight);
+        if (!this.blockOrTrans(node, bottom)) {
+          return true;
+        }
       }
     }
 
-    return res;
+    return false;
   }
 
   protected prune(parent: LayerVecPos, node: LayerVecPos): LayerVecPos[] {
-    const { right, topRight, downRight } = this.normalizedPositions(
-      parent,
-      node,
-    );
+    const { top, right, topRight, downRight, bottom } =
+      this.normalizedPositions(parent, node);
     const forced = this.getForced(parent, node);
     const dir = directionFromPos(parent.position, node.position);
 
     if (isDiagonal(dir)) {
-      return [right, topRight, downRight, ...forced];
+      return [top, right, topRight, downRight, bottom, ...forced];
     }
     return [right, ...forced];
   }
@@ -131,8 +258,12 @@ export class Jps8 extends Jps4 {
     dist: number,
   ): { p: LayerVecPos; dist: number } | undefined {
     const dir = this.distanceUtils.direction(parent.position, node.position);
+    const parentDirPos = this.getTilePosInDir(
+      node,
+      this.distanceUtils.direction(node.position, parent.position),
+    );
     if (
-      this.isBlocking(parent, node) &&
+      this.isBlocking(parentDirPos, node) &&
       !(
         LayerPositionUtils.equal(node, stopNode) &&
         this.options.ignoreBlockedTarget
@@ -149,7 +280,7 @@ export class Jps8 extends Jps4 {
     if (this.getTransition(node.position, parent.layer) !== undefined) {
       return { p: node, dist };
     }
-    if (this.getForced(parent, node).length > 0) {
+    if (this.hasForced(parent, node)) {
       return { p: node, dist };
     }
     this.updateClosestToTarget(node, stopNode);

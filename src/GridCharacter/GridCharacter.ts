@@ -1,5 +1,7 @@
-import { LayerPositionUtils } from "./../Utils/LayerPositionUtils/LayerPositionUtils.js";
-import { LayerVecPos } from "./../Pathfinding/ShortestPathAlgorithm.js";
+import {
+  LayerPositionUtils,
+  LayerVecPos,
+} from "./../Utils/LayerPositionUtils/LayerPositionUtils.js";
 import {
   directionVector,
   NumberOfDirections,

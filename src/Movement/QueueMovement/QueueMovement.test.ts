@@ -4,7 +4,6 @@ import {
   QueueMovementConfig,
   QueuedPathBlockedStrategy,
 } from "./QueueMovement.js";
-import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm.js";
 import {
   CharConfig,
   GridCharacter,
@@ -17,6 +16,7 @@ import {
 import { Tilemap } from "../../GridTilemap/Tilemap.js";
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
 import { CollisionStrategy } from "../../Collisions/CollisionStrategy.js";
+import { LayerVecPos } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 const CHUNKS_PER_SECOND = 2;
 
