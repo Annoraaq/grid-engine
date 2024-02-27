@@ -8,7 +8,6 @@ import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy.js";
 import { MovementInfo } from "./Movement/Movement.js";
 import { CharacterIndex, FrameRow } from "./GridCharacter/CharacterAnimation/CharacterAnimation.js";
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter.js";
-import { IsPositionAllowedFn, PathfindingOptions } from "./Pathfinding/Pathfinding.js";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
 import { GridEngineHeadless, TileSizePerSecond, GridEngineConfigHeadless, CollisionConfig, CharacterDataHeadless } from "./GridEngineHeadless.js";
 import { PhaserTilemap, TiledProject } from "./GridTilemap/Phaser/PhaserTilemap.js";
@@ -16,7 +15,7 @@ import { Orientation, Tile, TileLayer, Tilemap } from "./GridTilemap/Tilemap.js"
 import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer.js";
 import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile.js";
 import { QueueMovementConfig, QueuedPathBlockedStrategy, Finished as QueueMovementFinished, QueueMovementResult, QueueMovementEntry } from "./Movement/QueueMovement/QueueMovement.js";
-import { CharacterShift, CharacterShiftAction, CharLayer, FollowOptions, IGridEngine, LayerPosition, PathfindingResult, Position } from "./IGridEngine.js";
+import { CharacterShift, CharacterShiftAction, FollowOptions, IGridEngine, PathfindingResult } from "./IGridEngine.js";
 import { ArrayTilemap, ArrayTilemapInputLayer } from "./GridTilemap/ArrayTilemap/ArrayTilemap.js";
 import { TiledTilemap } from "./GridTilemap/TiledTilemap/TiledTilemap.js";
 import { TiledLayer } from "./GridTilemap/TiledTilemap/TiledLayer.js";
@@ -24,6 +23,8 @@ import { TiledTile } from "./GridTilemap/TiledTilemap/TiledTile.js";
 import { GridEngineState } from "./GridEngineState.js";
 import { GridCharacterState } from "./GridCharacter/GridCharacterState.js";
 import { GridEngineStatePhaser } from "./GridEnginePhaser/GridEngineStatePhaser.js";
+import { IsPositionAllowedFn, PathfindingOptions } from "./Pathfinding/PathfindingOptions.js";
+import { CharLayer, LayerPosition, Position } from "./Position.js";
 export { ArrayTilemap, ArrayTilemapInputLayer, CharacterDataHeadless, CharacterFilteringOptions, CharacterShift, CharacterShiftAction, CharLayer, CollisionConfig, CollisionStrategy, Direction, Finished, FollowOptions, FrameRow, GridCharacterState, GridEngineConfigHeadless, GridEngineHeadless, GridEngineState, IGridEngine, IsPositionAllowedFn, LayerPosition, MovementInfo, MoveToConfig, MoveToInfo, MoveToResult, NoPathFoundStrategy, NumberOfDirections, Orientation, PathBlockedStrategy, PathfindingOptions, PathfindingResult, Position, PositionChange, PhaserTile, PhaserTileLayer, PhaserTilemap, QueueMovementConfig, QueueMovementEntry, QueueMovementFinished, QueueMovementResult, QueuedPathBlockedStrategy, ShortestPathAlgorithmType, Tile, TiledProject, TiledTilemap, TiledLayer, TiledTile, TileLayer, Tilemap, TileSizePerSecond, directionFromPos, };
 /**
  * Configuration object for initializing GridEngine.

@@ -8,12 +8,13 @@ import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy.js";
 import { MovementInfo } from "./Movement/Movement.js";
 import { FrameRow } from "./GridCharacter/CharacterAnimation/CharacterAnimation.js";
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter.js";
-import { IsPositionAllowedFn, PathfindingOptions } from "./Pathfinding/Pathfinding.js";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
 import { Tilemap } from "./GridTilemap/Tilemap.js";
-import { CharacterShift, CharLayer, FollowOptions, IGridEngine, LayerPosition, PathfindingResult, Position } from "./IGridEngine.js";
+import { CharacterShift, FollowOptions, IGridEngine, PathfindingResult } from "./IGridEngine.js";
 import { QueueMovementConfig, QueueMovementEntry, Finished as QueueMovementFinished } from "./Movement/QueueMovement/QueueMovement.js";
 import { GridEngineState } from "./GridEngineState.js";
+import { IsPositionAllowedFn, PathfindingOptions } from "./Pathfinding/PathfindingOptions.js";
+import { CharLayer, LayerPosition, Position } from "./Position.js";
 export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, MovementInfo, PositionChange, IsPositionAllowedFn, PathfindingOptions, ShortestPathAlgorithmType, };
 export type TileSizePerSecond = number;
 /**

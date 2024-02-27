@@ -1,4 +1,4 @@
-import { LayerVecPos } from "./../Pathfinding/ShortestPathAlgorithm.js";
+import { LayerVecPos } from "./../Utils/LayerPositionUtils/LayerPositionUtils.js";
 import { NumberOfDirections } from "./../Direction/Direction.js";
 import { Direction } from "../Direction/Direction.js";
 import { Subject } from "rxjs";

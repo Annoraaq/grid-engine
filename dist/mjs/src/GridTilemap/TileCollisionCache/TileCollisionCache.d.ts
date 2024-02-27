@@ -2,7 +2,7 @@ import { Direction } from "../../Direction/Direction.js";
 import { GridTilemap } from "../GridTilemap.js";
 import { Tilemap } from "../Tilemap.js";
 import { Rect } from "../../Utils/Rect/Rect.js";
-import { CharLayer } from "../../IGridEngine.js";
+import { CharLayer } from "../../Position.js";
 export declare class TileCollisionCache {
     private tilemap;
     private gridTilemap;

@@ -1,12 +1,13 @@
 import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy.js";
-import { LayerVecPos, ShortestPathAlgorithmType } from "./../../Pathfinding/ShortestPathAlgorithm.js";
+import { IsPositionAllowedFn } from "./../../Pathfinding/PathfindingOptions.js";
+import { ShortestPathAlgorithmType } from "./../../Pathfinding/ShortestPathAlgorithm.js";
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
 import { GridCharacter } from "../../GridCharacter/GridCharacter.js";
 import { Movement, MovementInfo } from "../Movement.js";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy.js";
 import { CharLayer, LayerPosition, Position } from "../../GridEngine.js";
 import { Subject } from "rxjs";
-import { IsPositionAllowedFn } from "../../Pathfinding/Pathfinding.js";
+import { LayerVecPos } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 /**
  * @category Pathfinding
  */

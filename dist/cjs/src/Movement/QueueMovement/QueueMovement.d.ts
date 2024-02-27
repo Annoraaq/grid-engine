@@ -1,11 +1,11 @@
 import { Direction } from "../../Direction/Direction.js";
 import { GridCharacter } from "../../GridCharacter/GridCharacter.js";
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
-import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm.js";
 import { Movement, MovementInfo } from "../Movement.js";
 import { Subject } from "rxjs";
-import { CharLayer, LayerPosition, Position } from "../../IGridEngine.js";
 import { Concrete } from "../../Utils/TypeUtils.js";
+import { LayerVecPos } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
+import { CharLayer, LayerPosition, Position } from "../../Position.js";
 /**
  * @category Queue Movement
  */

@@ -1,8 +1,8 @@
 import { CharLayer, Direction } from "../GridEngine.js";
 import { GridTilemap } from "../GridTilemap/GridTilemap.js";
 import { Vector2 } from "../Utils/Vector2/Vector2.js";
-import { PathfindingOptions } from "./Pathfinding.js";
 import { Concrete } from "../Utils/TypeUtils.js";
+import { PathfindingOptions } from "./PathfindingOptions.js";
 export interface LayerVecPos {
     position: Vector2;
     layer: CharLayer;

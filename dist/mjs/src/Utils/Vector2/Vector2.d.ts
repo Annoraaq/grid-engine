@@ -1,4 +1,4 @@
-import { Position } from "../../GridEngine.js";
+import { Position } from "../../Position.js";
 export declare class Vector2 {
     static get ZERO(): Vector2;
     static get ONE(): Vector2;
