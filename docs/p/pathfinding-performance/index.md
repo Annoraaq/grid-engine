@@ -54,6 +54,8 @@ If there was a simple answer to this question there would only be a single suppo
 
 If you need path weights/costs (see [tile costs](../../p/tile-properties/#pathfinding-costs)), you have to use A\*. The other algorithms are not capable of dealing with tile costs. However, if you do not need tile costs A\* might not be your first choice due to slower performance.
 
+If you need pathfinding for path widths/heights or characters with a tile height/width of more than 1, you can't use JPS.
+
 I would recommend JPS for most of you, because it has the best results in the benchmarks I ran (for more details on that, check out the [benchmark section](#benchmarks) below). Just keep in mind that you have the flexibility to change the algorithm to see if it works better in your case.
 
 ## Activate caching
