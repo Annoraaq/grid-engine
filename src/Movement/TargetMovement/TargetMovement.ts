@@ -500,7 +500,6 @@ export class TargetMovement implements Movement {
   }
 
   private calcShortestPath(shortestPath?: ShortestPath): void {
-    console.log("calc");
     shortestPath = shortestPath ?? this.getShortestPath();
     this.posOnPath = 0;
     this.shortestPath = shortestPath.path;
