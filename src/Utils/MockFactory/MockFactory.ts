@@ -3,9 +3,9 @@ import { NumberOfDirections } from "../../GridEngine.js";
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
 import { Vector2 } from "../Vector2/Vector2.js";
 import { Random, MersenneTwister19937 } from "random-js";
-import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm.js";
 import { TileLayer, Tile, Tilemap } from "../../GridTilemap/Tilemap.js";
 import { MockTile, MockTileLayer, MockTilemap } from "./MockTilemap.js";
+import { LayerVecPos } from "../LayerPositionUtils/LayerPositionUtils.js";
 
 export interface LayerData {
   name?: string;
@@ -144,93 +144,93 @@ export function mockRandomMap(
   return mockLayeredBlockMap([{ layer, blockMap: map }]);
 }
 
-export function getBlockingProps(char: string): Record<string, string> {
+export function getBlockingProps(char: string): Record<string, boolean> {
   switch (char) {
     case "_":
       return {};
     case "#":
       return {
-        ge_collide: "true",
+        ge_collide: true,
       };
     case "→":
       return {
-        ge_collide_up: "true",
-        ge_collide_right: "true",
-        ge_collide_down: "true",
-        "ge_collide_up-right": "true",
-        "ge_collide_up-left": "true",
-        "ge_collide_down-right": "true",
-        "ge_collide_down-left": "true",
+        ge_collide_up: true,
+        ge_collide_right: true,
+        ge_collide_down: true,
+        "ge_collide_up-right": true,
+        "ge_collide_up-left": true,
+        "ge_collide_down-right": true,
+        "ge_collide_down-left": true,
       };
     case "←":
       return {
-        ge_collide_up: "true",
-        ge_collide_down: "true",
-        ge_collide_left: "true",
-        "ge_collide_up-right": "true",
-        "ge_collide_up-left": "true",
-        "ge_collide_down-right": "true",
-        "ge_collide_down-left": "true",
+        ge_collide_up: true,
+        ge_collide_down: true,
+        ge_collide_left: true,
+        "ge_collide_up-right": true,
+        "ge_collide_up-left": true,
+        "ge_collide_down-right": true,
+        "ge_collide_down-left": true,
       };
     case "↑":
       return {
-        ge_collide_up: "true",
-        ge_collide_right: "true",
-        ge_collide_left: "true",
-        "ge_collide_up-right": "true",
-        "ge_collide_up-left": "true",
-        "ge_collide_down-right": "true",
-        "ge_collide_down-left": "true",
+        ge_collide_up: true,
+        ge_collide_right: true,
+        ge_collide_left: true,
+        "ge_collide_up-right": true,
+        "ge_collide_up-left": true,
+        "ge_collide_down-right": true,
+        "ge_collide_down-left": true,
       };
     case "↓":
       return {
-        ge_collide_right: "true",
-        ge_collide_down: "true",
-        ge_collide_left: "true",
-        "ge_collide_up-right": "true",
-        "ge_collide_up-left": "true",
-        "ge_collide_down-right": "true",
-        "ge_collide_down-left": "true",
+        ge_collide_right: true,
+        ge_collide_down: true,
+        ge_collide_left: true,
+        "ge_collide_up-right": true,
+        "ge_collide_up-left": true,
+        "ge_collide_down-right": true,
+        "ge_collide_down-left": true,
       };
     case "↖":
       return {
-        ge_collide_right: "true",
-        ge_collide_down: "true",
-        ge_collide_up: "true",
-        ge_collide_left: "true",
-        "ge_collide_up-right": "true",
-        "ge_collide_up-left": "true",
-        "ge_collide_down-left": "true",
+        ge_collide_right: true,
+        ge_collide_down: true,
+        ge_collide_up: true,
+        ge_collide_left: true,
+        "ge_collide_up-right": true,
+        "ge_collide_up-left": true,
+        "ge_collide_down-left": true,
       };
     case "↗":
       return {
-        ge_collide_right: "true",
-        ge_collide_down: "true",
-        ge_collide_up: "true",
-        ge_collide_left: "true",
-        "ge_collide_up-right": "true",
-        "ge_collide_up-left": "true",
-        "ge_collide_down-right": "true",
+        ge_collide_right: true,
+        ge_collide_down: true,
+        ge_collide_up: true,
+        ge_collide_left: true,
+        "ge_collide_up-right": true,
+        "ge_collide_up-left": true,
+        "ge_collide_down-right": true,
       };
     case "↘":
       return {
-        ge_collide_right: "true",
-        ge_collide_down: "true",
-        ge_collide_up: "true",
-        ge_collide_left: "true",
-        "ge_collide_up-right": "true",
-        "ge_collide_down-right": "true",
-        "ge_collide_down-left": "true",
+        ge_collide_right: true,
+        ge_collide_down: true,
+        ge_collide_up: true,
+        ge_collide_left: true,
+        "ge_collide_up-right": true,
+        "ge_collide_down-right": true,
+        "ge_collide_down-left": true,
       };
     case "↙":
       return {
-        ge_collide_right: "true",
-        ge_collide_down: "true",
-        ge_collide_up: "true",
-        ge_collide_left: "true",
-        "ge_collide_up-left": "true",
-        "ge_collide_down-right": "true",
-        "ge_collide_down-left": "true",
+        ge_collide_right: true,
+        ge_collide_down: true,
+        ge_collide_up: true,
+        ge_collide_left: true,
+        "ge_collide_up-left": true,
+        "ge_collide_down-right": true,
+        "ge_collide_down-left": true,
       };
   }
   return {};
