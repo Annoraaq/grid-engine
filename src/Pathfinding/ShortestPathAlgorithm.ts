@@ -162,16 +162,17 @@ export abstract class ShortestPathAlgorithm {
 
     if (!positionAllowed) return true;
 
-    const hbtf = this.hasBlockingTileFrom(
-      src,
-      dest,
-      this.options.pathWidth,
-      this.options.pathHeight,
-      this.options.ignoreMapBounds,
-      this.gridTilemap,
-    );
+    const tileBlocking =
+      !this.options.ignoreTiles &&
+      this.hasBlockingTileFrom(
+        src,
+        dest,
+        this.options.pathWidth,
+        this.options.pathHeight,
+        this.options.ignoreMapBounds,
+        this.gridTilemap,
+      );
 
-    const tileBlocking = !this.options.ignoreTiles && hbtf;
     if (tileBlocking) return true;
 
     const charBlocking = this.hasBlockingCharFrom(
