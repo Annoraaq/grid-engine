@@ -1,7 +1,7 @@
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
 import { Vector2 } from "../Vector2/Vector2.js";
-import { LayerVecPos } from "../../Pathfinding/ShortestPathAlgorithm.js";
 import { TileLayer, Tile, Tilemap } from "../../GridTilemap/Tilemap.js";
+import { LayerVecPos } from "../LayerPositionUtils/LayerPositionUtils.js";
 export interface LayerData {
     name?: string;
     properties?: Record<string, string>;
@@ -39,7 +39,7 @@ export declare function mockCharMap(gridTilemap: GridTilemap, blockMaps: Array<{
     blockMap: string[];
 }>): void;
 export declare function mockRandomMap(layer: string | undefined, width: number, height: number, density?: number, seed?: number): Tilemap;
-export declare function getBlockingProps(char: string): Record<string, string>;
+export declare function getBlockingProps(char: string): Record<string, boolean>;
 export declare function mockBlockMap(blockMap: string[], charLayer?: string, isometric?: boolean, costMap?: Array<Array<number | TileCost>>): Tilemap;
 export declare function mockLayeredBlockMap(blockMaps: Array<{
     layer: string | undefined;

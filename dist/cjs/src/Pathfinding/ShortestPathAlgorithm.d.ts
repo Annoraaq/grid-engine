@@ -1,12 +1,9 @@
-import { CharLayer, Direction } from "../GridEngine.js";
 import { GridTilemap } from "../GridTilemap/GridTilemap.js";
 import { Vector2 } from "../Utils/Vector2/Vector2.js";
+import { Direction } from "../Direction/Direction.js";
 import { Concrete } from "../Utils/TypeUtils.js";
+import { LayerVecPos } from "../Utils/LayerPositionUtils/LayerPositionUtils.js";
 import { PathfindingOptions } from "./PathfindingOptions.js";
-export interface LayerVecPos {
-    position: Vector2;
-    layer: CharLayer;
-}
 /**
  * BFS: (Breadth first search) Simple algorithm. It can find the shortest path
  * in O(4ᵈ) (resp O(8ᵈ) for 8 directions). d is the length of the shortest path.
@@ -44,4 +41,11 @@ export declare abstract class ShortestPathAlgorithm {
     getReverseNeighbors(pos: LayerVecPos, dest: LayerVecPos): LayerVecPos[];
     private hasBlockingCharFrom;
     private hasBlockingTileFrom;
+    /**
+     * This method is not the prettiest, but it minimizes the positions that have
+     * to be checked in order to determine if a position is blocked for a
+     * multi-tile character.
+     */
+    private isBlockingMultiTile;
+    private checkLine;
 }
