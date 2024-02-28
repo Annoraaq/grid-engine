@@ -336,4 +336,48 @@ describe("FollowMovement", () => {
       );
     },
   );
+
+  it("should show a warning if char tileHeight > 1 when using JPS", () => {
+    console.warn = jest.fn();
+    const charPos = { position: new Vector2(1, 1), layer: "layer1" };
+    const char = new GridCharacter("char", {
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+      tilemap: gridTilemap,
+      tileHeight: 2,
+    });
+    char.setTilePosition(charPos);
+    followMovement = new FollowMovement(char, gridTilemap, targetChar, {
+      considerCosts: true,
+      shortestPathAlgorithm: "JPS",
+    });
+
+    expect(console.warn).toHaveBeenCalledWith(
+      `GridEngine: Pathfinding algorithm 'JPS' can only be used for ` +
+        `characters with 'tileWidth' and 'tileHeight' of 1`,
+    );
+  });
+
+  it("should show a warning if char tileWidth > 1 when using JPS", () => {
+    console.warn = jest.fn();
+    const charPos = { position: new Vector2(1, 1), layer: "layer1" };
+    const char = new GridCharacter("char", {
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+      tilemap: gridTilemap,
+      tileWidth: 2,
+    });
+    char.setTilePosition(charPos);
+    followMovement = new FollowMovement(char, gridTilemap, targetChar, {
+      considerCosts: true,
+      shortestPathAlgorithm: "JPS",
+    });
+
+    expect(console.warn).toHaveBeenCalledWith(
+      `GridEngine: Pathfinding algorithm 'JPS' can only be used for ` +
+        `characters with 'tileWidth' and 'tileHeight' of 1`,
+    );
+  });
 });

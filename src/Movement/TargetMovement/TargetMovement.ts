@@ -268,6 +268,16 @@ export class TargetMovement implements Movement {
           `with A* algorithm.`,
       );
     }
+    if (
+      this.character.getTileWidth() > 1 ||
+      (this.character.getTileHeight() > 1 &&
+        this.shortestPathAlgorithm === "JPS")
+    ) {
+      console.warn(
+        `GridEngine: Pathfinding algorithm 'JPS' can only be used for ` +
+          `characters with 'tileWidth' and 'tileHeight' of 1`,
+      );
+    }
 
     this.considerCosts = config?.considerCosts || false;
 
@@ -490,6 +500,7 @@ export class TargetMovement implements Movement {
   }
 
   private calcShortestPath(shortestPath?: ShortestPath): void {
+    console.log("calc");
     shortestPath = shortestPath ?? this.getShortestPath();
     this.posOnPath = 0;
     this.shortestPath = shortestPath.path;

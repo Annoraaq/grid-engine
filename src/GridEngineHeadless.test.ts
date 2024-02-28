@@ -1358,6 +1358,9 @@ describe("GridEngineHeadless", () => {
   });
 
   describe("pathfinding", () => {
+    beforeEach(() => {
+      console.warn = jest.fn();
+    });
     it("should delegate to pathfinding", () => {
       gridEngineHeadless.create(
         // prettier-ignore
@@ -1485,6 +1488,48 @@ describe("GridEngineHeadless", () => {
         );
       },
     );
+
+    it("should show a warning if pathWidth > 1 when using JPS", () => {
+      gridEngineHeadless.create(mockBlockMap([""], "charLayer"), {
+        characters: [{ id: "player" }],
+      });
+      const source = layerPos(0, 0, "charLayer");
+      const dest = layerPos(4, 4, "charLayer");
+      const options: PathfindingOptions = {
+        pathWidth: 2,
+      };
+
+      gridEngineHeadless.findShortestPath(source, dest, {
+        ...options,
+        shortestPathAlgorithm: "JPS",
+      });
+
+      expect(console.warn).toHaveBeenCalledWith(
+        `GridEngine: Pathfinding options 'pathWidth' and 'pathHeight' > 1 ` +
+          `cannot be used with algorithm 'JPS'.`,
+      );
+    });
+
+    it("should show a warning if pathHeight > 1 when using JPS", () => {
+      gridEngineHeadless.create(mockBlockMap([""], "charLayer"), {
+        characters: [{ id: "player" }],
+      });
+      const source = layerPos(0, 0, "charLayer");
+      const dest = layerPos(4, 4, "charLayer");
+      const options: PathfindingOptions = {
+        pathHeight: 2,
+      };
+
+      gridEngineHeadless.findShortestPath(source, dest, {
+        ...options,
+        shortestPathAlgorithm: "JPS",
+      });
+
+      expect(console.warn).toHaveBeenCalledWith(
+        `GridEngine: Pathfinding options 'pathWidth' and 'pathHeight' > 1 ` +
+          `cannot be used with algorithm 'JPS'.`,
+      );
+    });
   });
 
   describe("QueueMovement", () => {
