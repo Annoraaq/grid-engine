@@ -54,6 +54,16 @@ export class FollowMovement implements Movement {
           `with A* algorithm.`,
       );
     }
+    if (
+      character.getTileWidth() > 1 ||
+      (character.getTileHeight() > 1 &&
+        this.options.shortestPathAlgorithm === "JPS")
+    ) {
+      console.warn(
+        `GridEngine: Pathfinding algorithm 'JPS' can only be used for ` +
+          `characters with 'tileWidth' and 'tileHeight' of 1`,
+      );
+    }
     this.character = character;
 
     this.updateTarget(

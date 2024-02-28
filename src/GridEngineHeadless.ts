@@ -1002,6 +1002,16 @@ export class GridEngineHeadless implements IGridEngine {
           ` algorithm '${algo}'. It can only be used with A* algorithm.`,
       );
     }
+    const nonDefaultPathWidth =
+      options.pathWidth !== undefined && options.pathWidth !== 1;
+    const nonDefaultPathHeight =
+      options.pathHeight !== undefined && options.pathHeight !== 1;
+    if ((nonDefaultPathWidth || nonDefaultPathHeight) && algo === "JPS") {
+      console.warn(
+        `GridEngine: Pathfinding options 'pathWidth' and 'pathHeight' > 1 ` +
+          `cannot be used with algorithm 'JPS'.`,
+      );
+    }
     const pathfinding = new Pathfinding(this.gridTilemap);
     const res = pathfinding.findShortestPath(
       LayerPositionUtils.toInternal(source),

@@ -2468,6 +2468,52 @@ describe("TargetMovement", () => {
     },
   );
 
+  it("should show a warning if char tileWidth > 1 when using JPS", () => {
+    console.warn = jest.fn();
+    const charPos = layerPos(new Vector2(1, 1));
+    const mockChar = createMockChar("char1", charPos, {
+      ...TEST_CHAR_CONFIG,
+      tilemap: gridTilemap,
+      tileWidth: 2,
+    });
+    const targetPos = {
+      position: new Vector2(3, 1),
+      layer: "lowerCharLayer",
+    };
+
+    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+      config: { algorithm: "JPS" },
+    });
+
+    expect(console.warn).toHaveBeenCalledWith(
+      `GridEngine: Pathfinding algorithm 'JPS' can only be used for ` +
+        `characters with 'tileWidth' and 'tileHeight' of 1`,
+    );
+  });
+
+  it("should show a warning if char tileHeight > 1 when using JPS", () => {
+    console.warn = jest.fn();
+    const charPos = layerPos(new Vector2(1, 1));
+    const mockChar = createMockChar("char1", charPos, {
+      ...TEST_CHAR_CONFIG,
+      tilemap: gridTilemap,
+      tileHeight: 2,
+    });
+    const targetPos = {
+      position: new Vector2(3, 1),
+      layer: "lowerCharLayer",
+    };
+
+    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+      config: { algorithm: "JPS" },
+    });
+
+    expect(console.warn).toHaveBeenCalledWith(
+      `GridEngine: Pathfinding algorithm 'JPS' can only be used for ` +
+        `characters with 'tileWidth' and 'tileHeight' of 1`,
+    );
+  });
+
   it(
     "should not show a warning if considerCost pathfinding option is used " +
       "with A*",

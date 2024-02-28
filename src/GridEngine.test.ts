@@ -1647,6 +1647,62 @@ describe("GridEngine", () => {
         );
       },
     );
+
+    it("should show a warning if pathWidth > 1 when using JPS", () => {
+      gridEngine.create(createDefaultMockWithLayer(undefined), {
+        characters: [
+          {
+            id: "player",
+          },
+        ],
+      });
+      const source = {
+        position: { x: 1, y: 2 },
+        charLayer: "sourceCharLayer",
+      };
+      const dest = { position: { x: 10, y: 20 }, charLayer: "destCharLayer" };
+      const options: PathfindingOptions = {
+        pathWidth: 2,
+      };
+
+      gridEngine.findShortestPath(source, dest, {
+        ...options,
+        shortestPathAlgorithm: "JPS",
+      });
+
+      expect(console.warn).toHaveBeenCalledWith(
+        `GridEngine: Pathfinding options 'pathWidth' and 'pathHeight' > 1 ` +
+          `cannot be used with algorithm 'JPS'.`,
+      );
+    });
+
+    it("should show a warning if pathHeight > 1 when using JPS", () => {
+      gridEngine.create(createDefaultMockWithLayer(undefined), {
+        characters: [
+          {
+            id: "player",
+          },
+        ],
+      });
+      const source = {
+        position: { x: 1, y: 2 },
+        charLayer: "sourceCharLayer",
+      };
+      const dest = { position: { x: 10, y: 20 }, charLayer: "destCharLayer" };
+      const options: PathfindingOptions = {
+        pathHeight: 2,
+      };
+
+      gridEngine.findShortestPath(source, dest, {
+        ...options,
+        shortestPathAlgorithm: "JPS",
+      });
+
+      expect(console.warn).toHaveBeenCalledWith(
+        `GridEngine: Pathfinding options 'pathWidth' and 'pathHeight' > 1 ` +
+          `cannot be used with algorithm 'JPS'.`,
+      );
+    });
   });
 
   describe("QueueMovement", () => {
