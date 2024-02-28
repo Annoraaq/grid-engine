@@ -8,12 +8,12 @@ import {
 import { CharBlockCache } from "./CharBlockCache/CharBlockCache.js";
 import { Rect } from "../Utils/Rect/Rect.js";
 import { CharId, GridCharacter } from "../GridCharacter/GridCharacter.js";
-import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm.js";
 import { CollisionStrategy } from "../Collisions/CollisionStrategy.js";
 import { CharLayer } from "../GridEngine.js";
 import { CHAR_LAYER_PROP_NAME, TileLayer, Tilemap } from "./Tilemap.js";
 import { TileCollisionCache } from "./TileCollisionCache/TileCollisionCache.js";
 import { Vector2 } from "../Utils/Vector2/Vector2.js";
+import { LayerVecPos } from "../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 const TILE_COST_PROPERTY_NAME = "ge_cost";
 export class GridTilemap {

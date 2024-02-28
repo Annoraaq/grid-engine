@@ -126,18 +126,12 @@ export abstract class ShortestPathAlgorithm {
       };
     });
 
-    // console.log("---", transitionMappedNeighbors);
     return transitionMappedNeighbors.filter((neighborPos) => {
-      const ib = this.isBlocking(pos, neighborPos);
-      // console.log("ib", neighborPos, ib);
-
-      // console.log("nn", LayerPositionUtils.equal(neighborPos, dest));
-      const t =
-        !ib ||
+      return (
+        !this.isBlocking(pos, neighborPos) ||
         (this.options.ignoreBlockedTarget &&
-          LayerPositionUtils.equal(neighborPos, dest));
-      // console.log("check neigh", neighborPos, t);
-      return t;
+          LayerPositionUtils.equal(neighborPos, dest))
+      );
     });
   }
 
@@ -181,6 +175,7 @@ export abstract class ShortestPathAlgorithm {
     if (tileBlocking) return true;
 
     const charBlocking = this.hasBlockingCharFrom(
+      src,
       dest,
       this.options.pathWidth,
       this.options.pathHeight,
@@ -248,26 +243,34 @@ export abstract class ShortestPathAlgorithm {
   }
 
   private hasBlockingCharFrom(
-    pos: LayerVecPos,
+    src: LayerVecPos,
+    dest: LayerVecPos,
     pathWidth: number,
     pathHeight: number,
     collisionGroups: string[],
     ignoredChars: CharId[],
     gridTilemap: GridTilemap,
   ): boolean {
-    for (let x = pos.position.x; x < pos.position.x + pathWidth; x++) {
-      for (let y = pos.position.y; y < pos.position.y + pathHeight; y++) {
-        const res = gridTilemap.hasBlockingChar(
-          new Vector2(x, y),
-          pos.layer,
-          collisionGroups,
-          new Set(ignoredChars),
-        );
-
-        if (res) return true;
-      }
+    const isBlocking = (pos: Vector2) => {
+      return gridTilemap.hasBlockingChar(
+        pos,
+        dest.layer,
+        collisionGroups,
+        new Set(ignoredChars),
+      );
+    };
+    if (pathWidth === 1 && pathHeight === 1) {
+      return isBlocking(dest.position);
     }
-    return false;
+
+    const dir = directionFromPos(src.position, dest.position);
+    return this.isBlockingMultiTile(
+      src,
+      dir,
+      pathWidth,
+      pathHeight,
+      isBlocking,
+    );
   }
 
   private hasBlockingTileFrom(
@@ -287,16 +290,32 @@ export abstract class ShortestPathAlgorithm {
       );
     }
 
-    // TODO shortcut for single size path
     const dir = directionFromPos(src.position, dest.position);
-    // if (
-    //   dest.position.x === 2 &&
-    //   dest.position.y === 0 &&
-    //   dest.layer === "testCharLayer"
-    // ) {
-    //   console.log("DIR checki", dir);
-    // }
+    const isBlocking = (pos: Vector2) => {
+      return gridTilemap.hasBlockingTile(pos, dest.layer, dir, ignoreMapBounds);
+    };
 
+    return this.isBlockingMultiTile(
+      src,
+      dir,
+      pathWidth,
+      pathHeight,
+      isBlocking,
+    );
+  }
+
+  /**
+   * This method is not the prettiest, but it minimizes the positions that have
+   * to be checked in order to determine if a position is blocked for a
+   * multi-tile character.
+   */
+  private isBlockingMultiTile(
+    src: LayerVecPos,
+    dir: Direction,
+    pathWidth: number,
+    pathHeight: number,
+    isBlocking: (pos: Vector2) => boolean,
+  ) {
     const right: Line = {
       src: new Vector2(src.position.x + pathWidth, src.position.y),
       dest: new Vector2(
@@ -320,135 +339,98 @@ export abstract class ShortestPathAlgorithm {
       ),
     };
 
-    // 1. get the border from dir
     switch (dir) {
       case Direction.RIGHT: {
-        return this.checkDir(right, gridTilemap, dest, dir, ignoreMapBounds);
+        return this.checkLine(right, isBlocking);
       }
       case Direction.LEFT: {
-        // console.log("check left");
-        return this.checkDir(left, gridTilemap, dest, dir, ignoreMapBounds);
+        return this.checkLine(left, isBlocking);
       }
       case Direction.UP: {
-        // console.log("check up");
-        return this.checkDir(up, gridTilemap, dest, dir, ignoreMapBounds);
+        return this.checkLine(up, isBlocking);
       }
       case Direction.DOWN: {
-        // console.log("check down");
-        return this.checkDir(down, gridTilemap, dest, dir, ignoreMapBounds);
+        return this.checkLine(down, isBlocking);
       }
       case Direction.UP_LEFT: {
-        // console.log("check up left");
-        const upRes = this.checkDir(
-          { src: up.src, dest: new Vector2(up.dest.x - 1, up.dest.y) },
-          gridTilemap,
-          dest,
-          dir,
-          ignoreMapBounds,
+        return (
+          // up
+          this.checkLine(
+            { src: up.src, dest: new Vector2(up.dest.x - 1, up.dest.y) },
+            isBlocking,
+          ) ||
+          // left
+          this.checkLine(
+            {
+              src: new Vector2(left.src.x, left.src.y - 1),
+              dest: new Vector2(left.dest.x, left.dest.y - 1),
+            },
+            isBlocking,
+          )
         );
-        const leftRes = this.checkDir(
-          {
-            src: new Vector2(left.src.x, left.src.y - 1),
-            dest: new Vector2(left.dest.x, left.dest.y - 1),
-          },
-          gridTilemap,
-          dest,
-          dir,
-          ignoreMapBounds,
-        );
-        // TODO optimize: only check leftRes if upRes did not return true.
-        return upRes || leftRes;
       }
       case Direction.UP_RIGHT: {
-        // console.log("check up right");
-        const upRes = this.checkDir(
-          {
-            src: new Vector2(up.src.x + 1, up.src.y),
-            dest: up.dest,
-          },
-          gridTilemap,
-          dest,
-          dir,
-          ignoreMapBounds,
+        return (
+          // up
+          this.checkLine(
+            {
+              src: new Vector2(up.src.x + 1, up.src.y),
+              dest: up.dest,
+            },
+            isBlocking,
+          ) ||
+          // right
+          this.checkLine(
+            {
+              src: new Vector2(right.src.x, right.src.y - 1),
+              dest: new Vector2(right.dest.x, right.dest.y - 1),
+            },
+            isBlocking,
+          )
         );
-        const rightRes = this.checkDir(
-          {
-            src: new Vector2(right.src.x, right.src.y - 1),
-            dest: new Vector2(right.dest.x, right.dest.y - 1),
-          },
-          gridTilemap,
-          dest,
-          dir,
-          ignoreMapBounds,
-        );
-        return upRes || rightRes;
       }
       case Direction.DOWN_LEFT: {
-        // console.log("check down left");
-        const leftRes = this.checkDir(
-          {
-            src: new Vector2(left.src.x, left.src.y + 1),
-            dest: new Vector2(left.dest.x, left.dest.y + 1),
-          },
-          gridTilemap,
-          dest,
-          dir,
-          ignoreMapBounds,
+        return (
+          // left
+          this.checkLine(
+            {
+              src: new Vector2(left.src.x, left.src.y + 1),
+              dest: new Vector2(left.dest.x, left.dest.y + 1),
+            },
+            isBlocking,
+          ) ||
+          // down
+          this.checkLine(
+            { src: down.src, dest: new Vector2(down.dest.x - 1, down.dest.y) },
+            isBlocking,
+          )
         );
-        const downRes = this.checkDir(
-          { src: down.src, dest: new Vector2(down.dest.x - 1, down.dest.y) },
-          gridTilemap,
-          dest,
-          dir,
-          ignoreMapBounds,
-        );
-        return downRes || leftRes;
       }
       case Direction.DOWN_RIGHT: {
-        // console.log("checkdown", {
-        //   src: down.src,
-        //   dest: new Vector2(down.dest.x + 1, down.dest.y),
-        // });
-        const downRes = this.checkDir(
-          { src: new Vector2(down.src.x + 1, down.src.y), dest: down.dest },
-          gridTilemap,
-          dest,
-          dir,
-          ignoreMapBounds,
+        return (
+          // down
+          this.checkLine(
+            { src: new Vector2(down.src.x + 1, down.src.y), dest: down.dest },
+            isBlocking,
+          ) ||
+          // right
+          this.checkLine(
+            {
+              src: new Vector2(right.src.x, right.src.y + 1),
+              dest: new Vector2(right.dest.x, right.dest.y + 1),
+            },
+            isBlocking,
+          )
         );
-        // console.log("checkright");
-        const rightRes = this.checkDir(
-          {
-            src: new Vector2(right.src.x, right.src.y + 1),
-            dest: new Vector2(right.dest.x, right.dest.y + 1),
-          },
-          gridTilemap,
-          dest,
-          dir,
-          ignoreMapBounds,
-        );
-
-        return downRes || rightRes;
       }
     }
     return false;
   }
 
-  private checkDir(
-    line: Line,
-    gridTilemap: GridTilemap,
-    dest: LayerVecPos,
-    dir: Direction,
-    ignoreMapBounds: boolean,
-  ) {
+  private checkLine(line: Line, isBlocking: (pos: Vector2) => boolean) {
     for (let x = line.src.x; x <= line.dest.x; x++) {
       for (let y = line.src.y; y <= line.dest.y; y++) {
-        const res = gridTilemap.hasBlockingTile(
-          new Vector2(x, y),
-          dest.layer,
-          dir,
-          ignoreMapBounds,
-        );
+        const res = isBlocking(new Vector2(x, y));
         if (res) return true;
       }
     }
