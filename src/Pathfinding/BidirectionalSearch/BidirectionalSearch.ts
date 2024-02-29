@@ -1,6 +1,8 @@
-import { LayerPositionUtils } from "./../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 import {
+  LayerPositionUtils,
   LayerVecPos,
+} from "./../../Utils/LayerPositionUtils/LayerPositionUtils.js";
+import {
   ShortestPathAlgorithm,
   ShortestPathResult,
 } from "../ShortestPathAlgorithm.js";

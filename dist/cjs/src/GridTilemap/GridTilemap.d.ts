@@ -1,11 +1,11 @@
 import { Direction } from "./../Direction/Direction.js";
 import { Rect } from "../Utils/Rect/Rect.js";
 import { GridCharacter } from "../GridCharacter/GridCharacter.js";
-import { LayerVecPos } from "../Pathfinding/ShortestPathAlgorithm.js";
 import { CollisionStrategy } from "../Collisions/CollisionStrategy.js";
 import { CharLayer } from "../GridEngine.js";
 import { Tilemap } from "./Tilemap.js";
 import { Vector2 } from "../Utils/Vector2/Vector2.js";
+import { LayerVecPos } from "../Utils/LayerPositionUtils/LayerPositionUtils.js";
 export declare class GridTilemap {
     private tilemap;
     private collisionTilePropertyName;
