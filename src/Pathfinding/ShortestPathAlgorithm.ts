@@ -18,12 +18,9 @@ export interface LayerVecPos {
 }
 
 /**
- * BFS: (Breadth first search) Simple algorithm. It can find the shortest path
- * in O(4ᵈ) (resp O(8ᵈ) for 8 directions). d is the length of the shortest path.
- *
- * BIDIRECTIONAL_SEARCH: This algorithm starts 2 BFS, one from the start and
- * one from the end position. It has a performance of O(4^(d/2))
- * (resp O(8^(d/2))).
+ * For guidance on picking the right algorithm check out
+ * {@link https://annoraaq.github.io/grid-engine/p/pathfinding-performance/|
+ * pathfinding performance}.
  *
  * @category Pathfinding
  */
