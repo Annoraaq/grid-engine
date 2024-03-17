@@ -22,6 +22,7 @@ import { DistanceUtils } from "../../Utils/DistanceUtils.js";
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
 import { VectorUtils } from "../../Utils/VectorUtils.js";
 import { PathfindingOptions } from "../PathfindingOptions.js";
+import { Position } from "../../Position.js";
 
 interface ShortestPathTuple {
   previous: Map<string, LayerVecPos>;
@@ -40,7 +41,8 @@ export class Jps4 extends ShortestPathAlgorithm {
   };
   private smallestDistToTarget = 0;
 
-  private steps = 0;
+  protected steps = 0;
+  protected visits: Position[] = [];
 
   private maxFrontierSize = 0;
 

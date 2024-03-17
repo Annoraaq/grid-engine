@@ -1,6 +1,7 @@
 import { directionFromPos, isDiagonal } from "../../Direction/Direction.js";
 import { Direction, NumberOfDirections } from "../../GridEngineHeadless.js";
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
+import { CharLayer } from "../../Position.js";
 import { DistanceUtilsFactory } from "../../Utils/DistanceUtilsFactory/DistanceUtilsFactory.js";
 import {
   LayerPositionUtils,
@@ -8,12 +9,22 @@ import {
 } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 import { Jps4 } from "../Jps4/Jps4.js";
 import { PathfindingOptions } from "../PathfindingOptions.js";
+import { ShortestPathResult } from "../ShortestPathAlgorithm.js";
 
 export class Jps8 extends Jps4 {
   constructor(gridTilemap: GridTilemap, po: PathfindingOptions = {}) {
     super(gridTilemap, po);
     this.distanceUtils = DistanceUtilsFactory.create(NumberOfDirections.EIGHT);
   }
+  findShortestPathImpl(
+    startPos: LayerVecPos,
+    targetPos: LayerVecPos,
+  ): ShortestPathResult {
+    this.jumpCache = new JumpCache();
+    return super.findShortestPathImpl(startPos, targetPos);
+  }
+
+  private jumpCache: JumpCache = new JumpCache();
 
   protected getForced(
     parent: LayerVecPos,
@@ -257,6 +268,9 @@ export class Jps8 extends Jps4 {
     stopNode: LayerVecPos,
     dist: number,
   ): { p: LayerVecPos; dist: number } | undefined {
+    const memo = this.jumpCache.get(parent, node);
+    if (memo !== null) return memo;
+
     const dir = this.distanceUtils.direction(parent.position, node.position);
     const parentDirPos = this.getTilePosInDir(
       node,
@@ -269,19 +283,24 @@ export class Jps8 extends Jps4 {
         this.options.ignoreBlockedTarget
       )
     ) {
+      this.jumpCache.set(parent, node, undefined);
       return undefined;
     }
     if (LayerPositionUtils.equal(node, stopNode)) {
-      return { p: node, dist };
+      this.jumpCache.set(parent, node, { p: node, dist: 1 });
+      return { p: node, dist: 1 };
     }
     if (dist >= this.maxJumpSize) {
+      this.jumpCache.set(parent, node, { p: node, dist: 1 });
       return { p: node, dist };
     }
     if (this.getTransition(node.position, parent.layer) !== undefined) {
-      return { p: node, dist };
+      this.jumpCache.set(parent, node, { p: node, dist: 1 });
+      return { p: node, dist: 1 };
     }
     if (this.hasForced(parent, node)) {
-      return { p: node, dist };
+      this.jumpCache.set(parent, node, { p: node, dist: 1 });
+      return { p: node, dist: 1 };
     }
     this.updateClosestToTarget(node, stopNode);
 
@@ -294,7 +313,8 @@ export class Jps8 extends Jps4 {
           dist + 1,
         ) !== undefined
       ) {
-        return { p: node, dist };
+        this.jumpCache.set(parent, node, { p: node, dist: 1 });
+        return { p: node, dist: 1 };
       }
       if (
         this.jump(
@@ -304,7 +324,8 @@ export class Jps8 extends Jps4 {
           dist + 1,
         ) !== undefined
       ) {
-        return { p: node, dist };
+        this.jumpCache.set(parent, node, { p: node, dist: 1 });
+        return { p: node, dist: 1 };
       }
     } else if (dir === Direction.DOWN_LEFT) {
       if (
@@ -315,7 +336,8 @@ export class Jps8 extends Jps4 {
           dist + 1,
         ) !== undefined
       ) {
-        return { p: node, dist };
+        this.jumpCache.set(parent, node, { p: node, dist: 1 });
+        return { p: node, dist: 1 };
       }
       if (
         this.jump(
@@ -325,7 +347,8 @@ export class Jps8 extends Jps4 {
           dist + 1,
         ) !== undefined
       ) {
-        return { p: node, dist };
+        this.jumpCache.set(parent, node, { p: node, dist: 1 });
+        return { p: node, dist: 1 };
       }
     } else if (dir === Direction.UP_RIGHT) {
       if (
@@ -336,7 +359,8 @@ export class Jps8 extends Jps4 {
           dist + 1,
         ) !== undefined
       ) {
-        return { p: node, dist };
+        this.jumpCache.set(parent, node, { p: node, dist: 1 });
+        return { p: node, dist: 1 };
       }
       if (
         this.jump(
@@ -346,7 +370,8 @@ export class Jps8 extends Jps4 {
           dist + 1,
         ) !== undefined
       ) {
-        return { p: node, dist };
+        this.jumpCache.set(parent, node, { p: node, dist: 1 });
+        return { p: node, dist: 1 };
       }
     } else if (dir === Direction.DOWN_RIGHT) {
       if (
@@ -357,7 +382,8 @@ export class Jps8 extends Jps4 {
           dist + 1,
         ) !== undefined
       ) {
-        return { p: node, dist };
+        this.jumpCache.set(parent, node, { p: node, dist: 1 });
+        return { p: node, dist: 1 };
       }
       if (
         this.jump(
@@ -367,18 +393,126 @@ export class Jps8 extends Jps4 {
           dist + 1,
         ) !== undefined
       ) {
-        return { p: node, dist };
+        this.jumpCache.set(parent, node, { p: node, dist: 1 });
+        return { p: node, dist: 1 };
       }
     }
 
-    return this.jump(
+    const res = this.jump(
       node,
-      this.getTilePosInDir(
-        node,
-        directionFromPos(parent.position, node.position),
-      ),
+      this.getTilePosInDir(node, dir),
       stopNode,
       dist + 1,
     );
+
+    if (res) {
+      const clone = {
+        p: res?.p,
+        dist: res?.dist + 1,
+      };
+      this.jumpCache.set(parent, node, clone);
+      return clone;
+    }
+    this.jumpCache.set(parent, node, res);
+    return res;
+  }
+}
+
+class JumpCache {
+  private memo: Map<
+    /* parentX */ number,
+    Map<
+      /* parentY */ number,
+      Map<
+        /* parentLayer */ CharLayer,
+        Map<
+          /* nodeX */ number,
+          Map<
+            /*nodeY*/ number,
+            Map<
+              /* nodeLayer */ CharLayer,
+              { p: LayerVecPos; dist: number } | null
+            >
+          >
+        >
+      >
+    >
+  > = new Map();
+
+  set(
+    parent: LayerVecPos,
+    node: LayerVecPos,
+    val: { p: LayerVecPos; dist: number } | undefined,
+  ) {
+    let pX = this.memo.get(parent.position.x);
+    if (!pX) {
+      pX = new Map();
+      this.memo.set(parent.position.x, pX);
+    }
+
+    let pY = pX.get(parent.position.y);
+    if (!pY) {
+      pY = new Map();
+      pX.set(parent.position.y, pY);
+    }
+
+    let pL = pY.get(parent.layer);
+    if (!pL) {
+      pL = new Map();
+      pY.set(parent.layer, pL);
+    }
+
+    let nX = pL.get(node.position.x);
+    if (!nX) {
+      nX = new Map();
+      pL.set(node.position.x, nX);
+    }
+
+    let nY = nX.get(node.position.y);
+    if (!nY) {
+      nY = new Map();
+      nX.set(node.position.y, nY);
+    }
+
+    const nL = nY.get(node.layer);
+    if (!nL) {
+      if (val === undefined) {
+        nY.set(node.layer, null);
+      } else {
+        nY.set(node.layer, val);
+      }
+    }
+  }
+
+  /**
+   * Returns null if no entry was found. undefined is a valid cached result.
+   */
+  get(
+    parent: LayerVecPos,
+    node: LayerVecPos,
+  ): { p: LayerVecPos; dist: number } | undefined | null {
+    const pX = this.memo.get(parent.position.x);
+    if (!pX) return null;
+
+    const pY = pX.get(parent.position.y);
+    if (!pY) return null;
+
+    const pL = pY.get(parent.layer);
+    if (!pL) return null;
+
+    const nX = pL.get(node.position.x);
+    if (!nX) return null;
+
+    const nY = nX.get(node.position.y);
+    if (!nY) return null;
+
+    const nL = nY.get(node.layer);
+    if (nL === undefined) {
+      return null;
+    } else if (nL === null) {
+      return undefined;
+    }
+
+    return nL;
   }
 }
