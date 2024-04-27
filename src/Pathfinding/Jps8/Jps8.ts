@@ -21,7 +21,6 @@ export class Jps8 extends Jps4 {
     startPos: LayerVecPos,
     targetPos: LayerVecPos,
   ): ShortestPathResult {
-    this.visited = new Set();
     this.jumpCache = new JumpCache();
     return super.findShortestPathImpl(startPos, targetPos);
   }
