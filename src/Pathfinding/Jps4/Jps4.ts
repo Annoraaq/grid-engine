@@ -7,21 +7,16 @@ import {
   Direction,
   directionFromPos,
   directionVector,
-  isHorizontal,
-  isVertical,
-  NumberOfDirections,
-  turnClockwise,
 } from "../../Direction/Direction.js";
 import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 import {
   LayerPositionUtils,
   LayerVecPos,
 } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
-import { DistanceUtilsFactory } from "../../Utils/DistanceUtilsFactory/DistanceUtilsFactory.js";
-import { DistanceUtils } from "../../Utils/DistanceUtils.js";
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
 import { VectorUtils } from "../../Utils/VectorUtils.js";
 import { PathfindingOptions } from "../PathfindingOptions.js";
+import { Position } from "../../Position.js";
 
 interface ShortestPathTuple {
   previous: Map<string, LayerVecPos>;
@@ -40,30 +35,15 @@ export class Jps4 extends ShortestPathAlgorithm {
   };
   private smallestDistToTarget = 0;
 
-  private steps = 0;
+  protected steps = 0;
+  protected visits: Position[] = [];
 
   private maxFrontierSize = 0;
 
   protected maxJumpSize = 0;
 
-  private turnOrder = {
-    [Direction.RIGHT]: 0,
-    [Direction.DOWN_RIGHT]: 1,
-    [Direction.DOWN]: 2,
-    [Direction.DOWN_LEFT]: 3,
-    [Direction.LEFT]: 4,
-    [Direction.UP_LEFT]: 5,
-    [Direction.UP]: 6,
-    [Direction.UP_RIGHT]: 7,
-  };
-
-  private turnTimes: Map<Direction, Map<number, Direction>> = createTurnTimes();
-
-  protected distanceUtils: DistanceUtils;
-
   constructor(gridTilemap: GridTilemap, po: PathfindingOptions = {}) {
     super(gridTilemap, po);
-    this.distanceUtils = DistanceUtilsFactory.create(NumberOfDirections.FOUR);
   }
 
   findShortestPathImpl(
@@ -166,12 +146,12 @@ export class Jps4 extends ShortestPathAlgorithm {
   }
 
   protected addIfNotBlocked(
-    set: Set<LayerVecPos>,
+    arr: LayerVecPos[],
     src: LayerVecPos,
     target: LayerVecPos,
   ) {
     if (!this.blockOrTrans(src, target)) {
-      set.add(target);
+      arr.push(target);
     }
   }
 
@@ -182,7 +162,7 @@ export class Jps4 extends ShortestPathAlgorithm {
     );
   }
 
-  private getNeighborsInternal(
+  protected getNeighborsInternal(
     node: LayerVecPos,
     parent: LayerVecPos | undefined,
     stopNode: LayerVecPos,
@@ -194,26 +174,54 @@ export class Jps4 extends ShortestPathAlgorithm {
       }));
     }
 
-    const pruned = this.prune(parent, node).map((unblockedNeighbor) => {
-      const transition = this.getTransition(
-        unblockedNeighbor.position,
-        node.layer,
-      );
-      return {
-        position: unblockedNeighbor.position,
-        layer: transition || node.layer,
-      };
-    });
+    const pruned = this.prune(parent, node)
+      .filter(
+        (neighbor) => !this.isBlockingIgnoreTarget(node, neighbor, stopNode),
+      )
+      .map((unblockedNeighbor) => {
+        const transition = this.getTransition(
+          unblockedNeighbor.position,
+          node.layer,
+        );
+        return {
+          position: unblockedNeighbor.position,
+          layer: transition || node.layer,
+        };
+      });
 
     const successors: { p: LayerVecPos; dist: number }[] = [];
     for (const p of pruned) {
-      const j = this.jump(node, p, stopNode, 1);
-      if (j) {
-        successors.push(j);
+      if (this.isHorizontal(node.position, p.position)) {
+        successors.push({ p, dist: 1 });
+      } else {
+        const j = this.jump(
+          node,
+          p,
+          stopNode,
+          1,
+          directionFromPos(node.position, p.position),
+        );
+        if (j) {
+          successors.push(j);
+        }
       }
     }
 
     return successors;
+  }
+
+  private isBlockingIgnoreTarget(
+    src: LayerVecPos,
+    target: LayerVecPos,
+    stopNode: LayerVecPos,
+  ): boolean {
+    return (
+      this.isBlocking(src, target) &&
+      !(
+        this.options.ignoreBlockedTarget &&
+        LayerPositionUtils.equal(target, stopNode)
+      )
+    );
   }
 
   protected jump(
@@ -221,15 +229,9 @@ export class Jps4 extends ShortestPathAlgorithm {
     node: LayerVecPos,
     stopNode: LayerVecPos,
     dist: number,
+    dir: Direction,
   ): { p: LayerVecPos; dist: number } | undefined {
-    const dir = this.distanceUtils.direction(parent.position, node.position);
-    if (
-      this.isBlocking(parent, node) &&
-      !(
-        LayerPositionUtils.equal(node, stopNode) &&
-        this.options.ignoreBlockedTarget
-      )
-    ) {
+    if (this.isBlockingIgnoreTarget(parent, node, stopNode)) {
       return undefined;
     }
     if (LayerPositionUtils.equal(node, stopNode)) {
@@ -241,7 +243,6 @@ export class Jps4 extends ShortestPathAlgorithm {
     if (this.getTransition(node.position, parent.layer) !== undefined) {
       return { p: node, dist };
     }
-    if (isHorizontal(dir)) return { p: node, dist };
     if (this.hasForced(parent, node)) {
       return { p: node, dist };
     }
@@ -249,78 +250,62 @@ export class Jps4 extends ShortestPathAlgorithm {
     this.updateClosestToTarget(node, stopNode);
     return this.jump(
       node,
-      this.getTilePosInDir(
-        node,
-        directionFromPos(parent.position, node.position),
-      ),
+      this.getTilePosInDir(node, dir),
       stopNode,
       dist + 1,
+      dir,
     );
+  }
+
+  private isHorizontal(p1: Position, p2: Position): boolean {
+    return p1.y === p2.y;
   }
 
   protected getForced(
     parent: LayerVecPos,
     node: LayerVecPos,
-  ): Set<LayerVecPos> {
-    const res = new Set<LayerVecPos>();
+    downLeft: LayerVecPos,
+    bottom: LayerVecPos,
+    topLeft: LayerVecPos,
+    top: LayerVecPos,
+  ): LayerVecPos[] {
+    const res: LayerVecPos[] = [];
 
-    // if parent is more than one step away (jump), take the closest one:
-    const newParent = this.posInDir(
-      node,
-      this.distanceUtils.direction(node.position, parent.position),
-    );
-    const { topLeft, downLeft, top, bottom } = this.normalizedPositions(
-      newParent,
-      node,
-    );
+    const newParent = parent;
 
-    const dir = this.distanceUtils.direction(parent.position, node.position);
-    if (isVertical(dir)) {
-      if (
-        this.blockOrTrans(newParent, downLeft) ||
-        this.blockOrTrans(downLeft, bottom)
-      ) {
-        this.addIfNotBlocked(res, node, bottom);
-      }
-      if (
-        this.blockOrTrans(newParent, topLeft) ||
-        this.blockOrTrans(topLeft, top)
-      ) {
-        this.addIfNotBlocked(res, node, top);
-      }
+    if (
+      this.blockOrTrans(newParent, downLeft) ||
+      this.blockOrTrans(downLeft, bottom)
+    ) {
+      this.addIfNotBlocked(res, node, bottom);
+    }
+    if (
+      this.blockOrTrans(newParent, topLeft) ||
+      this.blockOrTrans(topLeft, top)
+    ) {
+      this.addIfNotBlocked(res, node, top);
     }
 
     return res;
   }
 
   protected hasForced(parent: LayerVecPos, node: LayerVecPos): boolean {
-    // if parent is more than one step away (jump), take the closest one:
-    const newParent = this.posInDir(
-      node,
-      this.distanceUtils.direction(node.position, parent.position),
-    );
     const { topLeft, downLeft, top, bottom } = this.normalizedPositions(
-      newParent,
+      parent,
       node,
     );
 
-    const dir = this.distanceUtils.direction(parent.position, node.position);
-    if (isVertical(dir)) {
-      if (
-        this.blockOrTrans(newParent, downLeft) ||
-        this.blockOrTrans(downLeft, bottom)
-      ) {
-        if (!this.blockOrTrans(node, bottom)) {
-          return true;
-        }
+    if (
+      this.blockOrTrans(parent, downLeft) ||
+      this.blockOrTrans(downLeft, bottom)
+    ) {
+      if (!this.blockOrTrans(node, bottom)) {
+        return true;
       }
-      if (
-        this.blockOrTrans(newParent, topLeft) ||
-        this.blockOrTrans(topLeft, top)
-      ) {
-        if (!this.blockOrTrans(node, top)) {
-          return true;
-        }
+    }
+    if (this.blockOrTrans(parent, topLeft) || this.blockOrTrans(topLeft, top)) {
+      if (!this.blockOrTrans(node, top)) {
+        return true;
       }
     }
 
@@ -328,14 +313,17 @@ export class Jps4 extends ShortestPathAlgorithm {
   }
 
   protected prune(parent: LayerVecPos, node: LayerVecPos): LayerVecPos[] {
-    const { right, top, bottom } = this.normalizedPositions(parent, node);
-    const forced = this.getForced(parent, node);
-    const dir = directionFromPos(parent.position, node.position);
-
-    if (isHorizontal(dir)) {
+    const { right, top, bottom, downLeft, topLeft } = this.normalizedPositions(
+      parent,
+      node,
+    );
+    if (this.isHorizontal(parent.position, node.position)) {
       return [right, top, bottom];
     }
-    return [right, ...forced];
+    return [
+      right,
+      ...this.getForced(parent, node, downLeft, bottom, topLeft, top),
+    ];
   }
 
   protected normalizedPositions(
@@ -344,51 +332,109 @@ export class Jps4 extends ShortestPathAlgorithm {
   ): {
     topLeft: LayerVecPos;
     downLeft: LayerVecPos;
-    downRight: LayerVecPos;
-    topRight: LayerVecPos;
     top: LayerVecPos;
     bottom: LayerVecPos;
     right: LayerVecPos;
   } {
-    const dir = directionFromPos(parent.position, node.position);
-
-    return {
-      topLeft: this.posInDir(
-        node,
-        this.turnTimes.get(Direction.UP_LEFT)?.get(this.turnOrder[dir]) ||
-          Direction.UP_LEFT,
-      ),
-      downLeft: this.posInDir(
-        node,
-        this.turnTimes.get(Direction.DOWN_LEFT)?.get(this.turnOrder[dir]) ||
-          Direction.DOWN_LEFT,
-      ),
-      downRight: this.posInDir(
-        node,
-        this.turnTimes.get(Direction.DOWN_RIGHT)?.get(this.turnOrder[dir]) ||
-          Direction.DOWN_RIGHT,
-      ),
-      topRight: this.posInDir(
-        node,
-        this.turnTimes.get(Direction.UP_RIGHT)?.get(this.turnOrder[dir]) ||
-          Direction.UP_RIGHT,
-      ),
-      top: this.posInDir(
-        node,
-        this.turnTimes.get(Direction.UP)?.get(this.turnOrder[dir]) ||
-          Direction.UP,
-      ),
-      bottom: this.posInDir(
-        node,
-        this.turnTimes.get(Direction.DOWN)?.get(this.turnOrder[dir]) ||
-          Direction.DOWN,
-      ),
-      right: this.posInDir(
-        node,
-        this.turnTimes.get(Direction.RIGHT)?.get(this.turnOrder[dir]) ||
-          Direction.RIGHT,
-      ),
-    };
+    // case 1 p->n:
+    if (parent.position.x < node.position.x) {
+      return {
+        topLeft: {
+          position: new Vector2(node.position.x - 1, node.position.y - 1),
+          layer: node.layer,
+        },
+        downLeft: {
+          position: new Vector2(node.position.x - 1, node.position.y + 1),
+          layer: node.layer,
+        },
+        top: {
+          position: new Vector2(node.position.x, node.position.y - 1),
+          layer: node.layer,
+        },
+        bottom: {
+          position: new Vector2(node.position.x, node.position.y + 1),
+          layer: node.layer,
+        },
+        right: {
+          position: new Vector2(node.position.x + 1, node.position.y),
+          layer: node.layer,
+        },
+      };
+      // case 2 n<-p:
+    } else if (parent.position.x > node.position.x) {
+      return {
+        topLeft: {
+          position: new Vector2(node.position.x + 1, node.position.y + 1),
+          layer: node.layer,
+        },
+        downLeft: {
+          position: new Vector2(node.position.x + 1, node.position.y - 1),
+          layer: node.layer,
+        },
+        top: {
+          position: new Vector2(node.position.x, node.position.y + 1),
+          layer: node.layer,
+        },
+        bottom: {
+          position: new Vector2(node.position.x, node.position.y - 1),
+          layer: node.layer,
+        },
+        right: {
+          position: new Vector2(node.position.x - 1, node.position.y),
+          layer: node.layer,
+        },
+      };
+      // case 3 p
+      //        n
+    } else if (parent.position.y < node.position.y) {
+      return {
+        topLeft: {
+          position: new Vector2(node.position.x + 1, node.position.y - 1),
+          layer: node.layer,
+        },
+        downLeft: {
+          position: new Vector2(node.position.x - 1, node.position.y - 1),
+          layer: node.layer,
+        },
+        top: {
+          position: new Vector2(node.position.x + 1, node.position.y),
+          layer: node.layer,
+        },
+        bottom: {
+          position: new Vector2(node.position.x - 1, node.position.y),
+          layer: node.layer,
+        },
+        right: {
+          position: new Vector2(node.position.x, node.position.y + 1),
+          layer: node.layer,
+        },
+      };
+      // case 4 n
+      //        p
+    } else {
+      return {
+        topLeft: {
+          position: new Vector2(node.position.x - 1, node.position.y + 1),
+          layer: node.layer,
+        },
+        downLeft: {
+          position: new Vector2(node.position.x + 1, node.position.y + 1),
+          layer: node.layer,
+        },
+        top: {
+          position: new Vector2(node.position.x - 1, node.position.y),
+          layer: node.layer,
+        },
+        bottom: {
+          position: new Vector2(node.position.x + 1, node.position.y),
+          layer: node.layer,
+        },
+        right: {
+          position: new Vector2(node.position.x, node.position.y - 1),
+          layer: node.layer,
+        },
+      };
+    }
   }
 
   protected posInDir(pos: LayerVecPos, dir: Direction): LayerVecPos {
@@ -433,31 +479,4 @@ export class Jps4 extends ShortestPathAlgorithm {
 
 function safeGet(map: Map<string, number>, position: LayerVecPos): number {
   return map.get(LayerPositionUtils.toString(position)) ?? Number.MAX_VALUE;
-}
-
-function createTurnTimes(): Map<Direction, Map<number, Direction>> {
-  const dirs = [
-    Direction.RIGHT,
-    Direction.DOWN_RIGHT,
-    Direction.DOWN,
-    Direction.DOWN_LEFT,
-    Direction.LEFT,
-    Direction.UP_LEFT,
-    Direction.UP,
-    Direction.UP_RIGHT,
-  ];
-  const dirMap: Map<Direction, Map<number, Direction>> = new Map();
-
-  for (let i = 0; i < dirs.length; i++) {
-    const subMap: Map<number, Direction> = new Map();
-    let currentDir = dirs[i];
-    subMap.set(0, currentDir);
-    for (let j = 1; j <= 7; j++) {
-      currentDir = turnClockwise(currentDir);
-      subMap.set(j, currentDir);
-    }
-    dirMap.set(dirs[i], subMap);
-  }
-
-  return dirMap;
 }
