@@ -277,7 +277,6 @@ export class Jps8 extends Jps4 {
     return [right, ...forced];
   }
 
-  private visited: Set<string> = new Set();
   protected jump(
     parent: LayerVecPos,
     node: LayerVecPos,
@@ -287,14 +286,6 @@ export class Jps8 extends Jps4 {
   ): { p: LayerVecPos; dist: number } | undefined {
     const memo = this.jumpCache.get(parent, node);
     if (memo !== null) return memo;
-    // const str = `${LayerPositionUtils.toString(
-    //   parent,
-    // )}#${LayerPositionUtils.toString(node)}`;
-    // if (this.visited.has(str)) {
-    //   console.log("already contains", str);
-    // }
-    // this.visited.add(str);
-    // const dir = directionFromPos(parent.position, node.position);
     if (
       this.isBlocking(parent, node) &&
       !(
