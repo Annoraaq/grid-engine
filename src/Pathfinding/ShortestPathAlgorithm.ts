@@ -4,6 +4,7 @@ import { Vector2 } from "../Utils/Vector2/Vector2.js";
 import {
   Direction,
   directionFromPos,
+  directionVector,
   NumberOfDirections,
 } from "../Direction/Direction.js";
 import { Concrete } from "../Utils/TypeUtils.js";
@@ -46,6 +47,8 @@ export interface ShortestPathResult {
 
 export abstract class ShortestPathAlgorithm {
   protected options: Concrete<PathfindingOptions>;
+
+  private ignoredCharsSet: Set<CharId>;
 
   findShortestPath(
     startPos: LayerVecPos,
@@ -101,6 +104,7 @@ export abstract class ShortestPathAlgorithm {
       considerCosts,
       calculateClosestToTarget,
     };
+    this.ignoredCharsSet = new Set(ignoredChars);
   }
 
   getNeighbors(pos: LayerVecPos, dest: LayerVecPos): LayerVecPos[] {
@@ -178,7 +182,7 @@ export abstract class ShortestPathAlgorithm {
       this.options.pathWidth,
       this.options.pathHeight,
       this.options.collisionGroups,
-      this.options.ignoredChars,
+      this.ignoredCharsSet,
       this.gridTilemap,
     );
 
@@ -194,6 +198,14 @@ export abstract class ShortestPathAlgorithm {
   }
 
   getTilePosInDir(pos: LayerVecPos, dir: Direction): LayerVecPos {
+    if (this.options.ignoreLayers) {
+      return {
+        position: pos.position.add(
+          directionVector(this.gridTilemap.toMapDirection(dir)),
+        ),
+        layer: pos.layer,
+      };
+    }
     return this.gridTilemap.getTilePosInDirection(pos, dir);
   }
 
@@ -246,20 +258,26 @@ export abstract class ShortestPathAlgorithm {
     pathWidth: number,
     pathHeight: number,
     collisionGroups: string[],
-    ignoredChars: CharId[],
+    ignoredChars: Set<CharId>,
     gridTilemap: GridTilemap,
   ): boolean {
+    if (pathWidth === 1 && pathHeight === 1) {
+      return gridTilemap.hasBlockingChar(
+        dest.position,
+        dest.layer,
+        collisionGroups,
+        ignoredChars,
+      );
+    }
+
     const isBlocking = (pos: Vector2) => {
       return gridTilemap.hasBlockingChar(
         pos,
         dest.layer,
         collisionGroups,
-        new Set(ignoredChars),
+        ignoredChars,
       );
     };
-    if (pathWidth === 1 && pathHeight === 1) {
-      return isBlocking(dest.position);
-    }
 
     const dir = directionFromPos(src.position, dest.position);
     return this.isBlockingMultiTile(

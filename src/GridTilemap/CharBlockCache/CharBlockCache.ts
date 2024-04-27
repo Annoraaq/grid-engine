@@ -19,7 +19,7 @@ import { CollisionStrategy } from "../../Collisions/CollisionStrategy.js";
 import { LayerVecPos } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 export class CharBlockCache {
-  private tilePosToCharacters: Map<string, Set<GridCharacter>> = new Map();
+  private tilePosToCharacters: Cache = new Cache();
   private charRemoved$ = new Subject<string>();
 
   constructor(
@@ -35,8 +35,7 @@ export class CharBlockCache {
     ignoredCollisionGroups = new Set<string>(),
   ): boolean {
     if (collisionGroups.length === 0) return false;
-    const posStr = this.posToString(pos, layer);
-    const charSet = this.tilePosToCharacters.get(posStr);
+    const charSet = this.tilePosToCharacters.get(pos, layer);
     return !!(
       charSet &&
       charSet.size > 0 &&
@@ -72,9 +71,8 @@ export class CharBlockCache {
   }
 
   getCharactersAt(pos: Vector2, layer?: string): Set<GridCharacter> {
-    const posStr = this.posToString(pos, layer);
-    const characters = this.tilePosToCharacters.get(posStr);
-    return new Set(characters);
+    const characters = this.tilePosToCharacters.get(pos, layer);
+    return characters || new Set();
   }
 
   addCharacter(character: GridCharacter): void {
@@ -92,11 +90,12 @@ export class CharBlockCache {
     this.deleteTilePositions(character.getNextTilePos(), character);
   }
 
-  private add(pos: string, character: GridCharacter): void {
-    if (!this.tilePosToCharacters.has(pos)) {
-      this.tilePosToCharacters.set(pos, new Set());
+  private add(pos: Vector2, layer: CharLayer, character: GridCharacter): void {
+    const set = this.tilePosToCharacters.get(pos, layer);
+    if (!set) {
+      this.tilePosToCharacters.set(pos, layer, new Set([character]));
     }
-    this.tilePosToCharacters.get(pos)?.add(character);
+    set?.add(character);
   }
 
   private addTilePosSetSub(character: GridCharacter) {
@@ -148,7 +147,7 @@ export class CharBlockCache {
 
   private addTilePositions(pos: LayerVecPos, character: GridCharacter): void {
     this.forEachCharTile(pos, character, (x, y) => {
-      this.add(this.posToString(new Vector2(x, y), pos.layer), character);
+      this.add(new Vector2(x, y), pos.layer, character);
     });
   }
 
@@ -158,7 +157,7 @@ export class CharBlockCache {
   ): void {
     this.forEachCharTile(pos, character, (x, y) => {
       this.tilePosToCharacters
-        .get(this.posToString(new Vector2(x, y), pos.layer))
+        .get(new Vector2(x, y), pos.layer)
         ?.delete(character);
     });
   }
@@ -201,5 +200,44 @@ export class CharBlockCache {
 
   private posToString(pos: Position, layer: CharLayer): string {
     return `${pos.x}#${pos.y}#${layer}`;
+  }
+}
+
+class Cache {
+  private memo: Map<
+    /* parentX */ number,
+    Map<
+      /* parentY */ number,
+      Map</* parentLayer */ CharLayer, Set<GridCharacter>>
+    >
+  > = new Map();
+
+  set(pos: Vector2, layer: CharLayer, val: Set<GridCharacter>) {
+    let pX = this.memo.get(pos.x);
+    if (!pX) {
+      pX = new Map();
+      this.memo.set(pos.x, pX);
+    }
+
+    let pY = pX.get(pos.y);
+    if (!pY) {
+      pY = new Map();
+      pX.set(pos.y, pY);
+    }
+
+    pY.set(layer, val);
+  }
+
+  /**
+   * Returns null if no entry was found. undefined is a valid cached result.
+   */
+  get(pos: Vector2, layer: CharLayer): Set<GridCharacter> | undefined {
+    const pX = this.memo.get(pos.x);
+    if (!pX) return undefined;
+
+    const pY = pX.get(pos.y);
+    if (!pY) return undefined;
+
+    return pY.get(layer);
   }
 }
