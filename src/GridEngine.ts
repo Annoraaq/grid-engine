@@ -73,6 +73,14 @@ import {
   PathfindingOptions,
 } from "./Pathfinding/PathfindingOptions.js";
 import { CharLayer, LayerPosition, Position } from "./Position.js";
+import { Concrete } from "./Utils/TypeUtils.js";
+import { GridCharacterStatePhaser } from "./GridEnginePhaser/GridCharacterStatePhaser.js";
+import {
+  RawTiledLayer,
+  RawTiledTileset,
+  RawTiledTilesetTile,
+  RawTiledTilesetTileProp,
+} from "./GridTilemap/TiledTilemap/TiledMap.js";
 
 export {
   ArrayTilemap,
@@ -84,14 +92,17 @@ export {
   CharLayer,
   CollisionConfig,
   CollisionStrategy,
+  Concrete,
   Direction,
   Finished,
   FollowOptions,
   FrameRow,
   GridCharacterState,
+  GridCharacterStatePhaser,
   GridEngineConfigHeadless,
   GridEngineHeadless,
   GridEngineState,
+  GridEngineStatePhaser,
   IGridEngine,
   IsPositionAllowedFn,
   LayerPosition,
@@ -115,6 +126,10 @@ export {
   QueueMovementFinished,
   QueueMovementResult,
   QueuedPathBlockedStrategy,
+  RawTiledLayer,
+  RawTiledTileset,
+  RawTiledTilesetTile,
+  RawTiledTilesetTileProp,
   ShortestPathAlgorithmType,
   Tile,
   TiledProject,
