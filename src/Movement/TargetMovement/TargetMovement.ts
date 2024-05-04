@@ -269,9 +269,8 @@ export class TargetMovement implements Movement {
       );
     }
     if (
-      this.character.getTileWidth() > 1 ||
-      (this.character.getTileHeight() > 1 &&
-        this.shortestPathAlgorithm === "JPS")
+      this.shortestPathAlgorithm === "JPS" &&
+      (this.character.getTileWidth() > 1 || this.character.getTileHeight() > 1)
     ) {
       console.warn(
         `GridEngine: Pathfinding algorithm 'JPS' can only be used for ` +
