@@ -29,6 +29,8 @@ const bg512PlotData8Dir  = plotData('bg512-avg-8-dir');
 
 # Pathfinding Performance
 
+> **_NOTE:_** The content of this article has been reworked completely in April 2024. A lot has changed. The TL;DR: JPS is now the recommended choice for 4-directional movements since it's performance has been increased significantly. It has been removed for 8-directional movements though, since the old version was not giving correct results and the new one is by far the slowest option.
+
 Pathfinding is expensive. Therefore it can quickly cause performance issues. In Grid Engine, every time you are calling
 [findShortestPath][find-shortest-path],
 [moveTo][move-to], or
