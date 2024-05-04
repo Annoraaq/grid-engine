@@ -45,7 +45,7 @@
     "tiled-property-flattener": "^1.1.1"
   },
   "peerDependencies": {
-    "phaser": "~3.70.0"
+    "phaser": "~3.80.1"
   },
   "devDependencies": {
     "@babel/core": "^7.23.2",
