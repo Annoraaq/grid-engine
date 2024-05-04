@@ -29,7 +29,7 @@ export enum NoPathFoundStrategy {
   /**
    * Tries each of {@link MoveToConfig.alternativeTargets}. If there does not
    * exist a path to any of these targets, {@link
-   * MoveToConfig.noPathFoundAlternativeTargetsStrategy} determines the fallback
+   * MoveToConfig.noPathFoundAlternativeTargetsFallbackStrategy} determines the fallback
    * strategy.
    */
   ALTERNATIVE_TARGETS = "ALTERNATIVE_TARGETS",
