@@ -337,6 +337,24 @@ describe("FollowMovement", () => {
     },
   );
 
+  it("should not show a warning if char tileHeight > 1 and non JPS", () => {
+    console.warn = jest.fn();
+    const charPos = { position: new Vector2(1, 1), layer: "layer1" };
+    const char = new GridCharacter("char", {
+      speed: 3,
+      collidesWithTiles: true,
+      numberOfDirections: NumberOfDirections.FOUR,
+      tilemap: gridTilemap,
+      tileHeight: 2,
+    });
+    char.setTilePosition(charPos);
+    followMovement = new FollowMovement(char, gridTilemap, targetChar, {
+      shortestPathAlgorithm: "BFS",
+    });
+
+    expect(console.warn).not.toHaveBeenCalled();
+  });
+
   it("should show a warning if char tileHeight > 1 when using JPS", () => {
     console.warn = jest.fn();
     const charPos = { position: new Vector2(1, 1), layer: "layer1" };
@@ -349,7 +367,6 @@ describe("FollowMovement", () => {
     });
     char.setTilePosition(charPos);
     followMovement = new FollowMovement(char, gridTilemap, targetChar, {
-      considerCosts: true,
       shortestPathAlgorithm: "JPS",
     });
 
@@ -371,7 +388,6 @@ describe("FollowMovement", () => {
     });
     char.setTilePosition(charPos);
     followMovement = new FollowMovement(char, gridTilemap, targetChar, {
-      considerCosts: true,
       shortestPathAlgorithm: "JPS",
     });
 

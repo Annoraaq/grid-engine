@@ -2468,6 +2468,26 @@ describe("TargetMovement", () => {
     },
   );
 
+  it("should not show a warning if char tileWidth > 1 and non JPS", () => {
+    console.warn = jest.fn();
+    const charPos = layerPos(new Vector2(1, 1));
+    const mockChar = createMockChar("char1", charPos, {
+      ...TEST_CHAR_CONFIG,
+      tilemap: gridTilemap,
+      tileWidth: 2,
+    });
+    const targetPos = {
+      position: new Vector2(3, 1),
+      layer: "lowerCharLayer",
+    };
+
+    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+      config: { algorithm: "BFS" },
+    });
+
+    expect(console.warn).not.toHaveBeenCalled();
+  });
+
   it("should show a warning if char tileWidth > 1 when using JPS", () => {
     console.warn = jest.fn();
     const charPos = layerPos(new Vector2(1, 1));
