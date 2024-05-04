@@ -26,14 +26,14 @@ export interface MoveToConfig {
      */
     pathBlockedStrategy?: PathBlockedStrategy;
     /**
-     * Only relevant if {@link MoveToConfig.noPathFoundStrategy} is set to {@link NoPathFoundStrategy.RETRY}.
+     * Only relevant if {@link noPathFoundStrategy} is set to {@link NoPathFoundStrategy.RETRY}.
      *
      * It sets the time in milliseconds that the pathfinding algorithm will wait
      * until the next retry.
      */
     noPathFoundRetryBackoffMs?: number;
     /**
-     * Only relevant if {@link MoveToConfig.noPathFoundStrategy} is set to {@link NoPathFoundStrategy.RETRY}.
+     * Only relevant if {@link noPathFoundStrategy} is set to {@link NoPathFoundStrategy.RETRY}.
      *
      * It sets the maximum amount of retries before giving up.
      */
@@ -101,16 +101,16 @@ export interface MoveToConfig {
      */
     considerCosts?: boolean;
     /**
-     * Only relevant if {@link MoveToConfig.pathBlockedStrategy} is set to {@link
-     * PathBlockedStrategy.ALTERNATIVE_TARGETS}.
+     * Only relevant if {@link MoveToConfig.noPathFoundStrategy} is set to {@link
+     * NoPathFoundStrategy.ALTERNATIVE_TARGETS}.
      *
      * It provides a list of alternative targets that are considered if the main
      * target is not reachable. That list is processed in order.
      */
     alternativeTargets?: LayerPosition[];
     /**
-     * Only relevant if {@link MoveToConfig.pathBlockedStrategy} is set to {@link
-     * PathBlockedStrategy.ALTERNATIVE_TARGETS}.
+     * Only relevant if {@link MoveToConfig.noPathFoundStrategy} is set to {@link
+     * NoPathFoundStrategy.ALTERNATIVE_TARGETS}.
      *
      * In case all these targets are blocked this is the fallback strategy.
      */
