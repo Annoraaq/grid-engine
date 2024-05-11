@@ -6,7 +6,7 @@ To help us diagnose the issue efficiently, please provide a minimal reproducing 
 
 Here's how you can achieve this:
 
-1. **Use CodeSandbox:**  [https://codesandbox.io/](https://codesandbox.io/) is a great platform for creating isolated development environments. You can use the following pre-configured template as a starting point: [codesandbox example template](https://codesandbox.io/p/github/Annoraaq/template-esbuild-ts/main?file=%2Fsrc%2Fscenes%2FPreloader.ts%3A37%2C28) This template includes Phaser and GridEngine pre-installed.
+1. **Use CodeSandbox:**  [https://codesandbox.io/](https://codesandbox.io/) is a great platform for creating isolated development environments. You can use the following pre-configured template as a starting point: [codesandbox example template](https://codesandbox.io/p/github/Annoraaq/template-esbuild-ts/main?file=%2Fsrc%2Fscenes%2FPreloader.ts%3A37%2C28). This template includes Phaser and GridEngine pre-installed.
 
 2. **Replicate the Bug:**  Within this CodeSandbox project, write minimal code that replicates the bug you encountered in your main project. Focus on reproducing the core functionality that exhibits the issue.
 
