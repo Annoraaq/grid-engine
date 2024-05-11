@@ -1,6 +1,6 @@
 # Bug Reports
 
-## Reproducing the Bug (Required)
+## Reproducing the Bug
 
 To help us diagnose the issue efficiently, please provide a minimal reproducing example. This is a small, standalone project that demonstrates the bug using only GridEngine and minimal external dependencies. The goal is to isolate the problem from any potential conflicts within your main project.
 
