@@ -78,8 +78,8 @@ describe("FollowMovement", () => {
           maxPathLength: Infinity,
           ignoreLayers: false,
           considerCosts: false,
+          ignoredChars: [targetChar.getId()],
         },
-        ignoreBlockedTarget: true,
       },
     );
   });
@@ -103,8 +103,8 @@ describe("FollowMovement", () => {
         maxPathLength: Infinity,
         ignoreLayers: false,
         considerCosts: false,
+        ignoredChars: [targetChar.getId()],
       },
-      ignoreBlockedTarget: true,
     });
   });
 
@@ -152,8 +152,8 @@ describe("FollowMovement", () => {
           maxPathLength: 100,
           ignoreLayers: true,
           considerCosts: false,
+          ignoredChars: [targetChar.getId()],
         },
-        ignoreBlockedTarget: true,
       },
     );
   });
@@ -236,8 +236,8 @@ describe("FollowMovement", () => {
           maxPathLength: Infinity,
           ignoreLayers: false,
           considerCosts: false,
+          ignoredChars: [targetChar.getId()],
         },
-        ignoreBlockedTarget: true,
       },
     );
   });
@@ -260,8 +260,8 @@ describe("FollowMovement", () => {
           maxPathLength: Infinity,
           ignoreLayers: false,
           considerCosts: true,
+          ignoredChars: [targetChar.getId()],
         },
-        ignoreBlockedTarget: true,
       },
     );
   });

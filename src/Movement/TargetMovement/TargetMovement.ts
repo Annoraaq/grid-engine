@@ -10,7 +10,7 @@ import {
 } from "./../../Pathfinding/ShortestPathAlgorithm.js";
 import { DistanceUtils } from "./../../Utils/DistanceUtils.js";
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
-import { GridCharacter } from "../../GridCharacter/GridCharacter.js";
+import { CharId, GridCharacter } from "../../GridCharacter/GridCharacter.js";
 import { Direction } from "../../Direction/Direction.js";
 import { Movement, MovementInfo } from "../Movement.js";
 import { Vector2 } from "../../Utils/Vector2/Vector2.js";
@@ -147,6 +147,11 @@ export interface MoveToConfig {
    * In case all these targets are blocked this is the fallback strategy.
    */
   noPathFoundAlternativeTargetsFallbackStrategy?: NoPathFoundStrategy;
+
+  /**
+   * Set of characters to ignore at collision checking.
+   */
+  ignoredChars?: CharId[];
 }
 
 /**
@@ -218,6 +223,7 @@ export class TargetMovement implements Movement {
     "BIDIRECTIONAL_SEARCH";
   private maxPathLength = Infinity;
   private considerCosts = false;
+  private ignoredChars: CharId[] = [];
 
   constructor(
     private character: GridCharacter,
@@ -286,6 +292,7 @@ export class TargetMovement implements Movement {
       character.getNumberOfDirections(),
     );
     this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
+    this.ignoredChars = config?.ignoredChars ?? [];
     this.finished$ = new Subject<Finished>();
     this.setCharacter(character);
   }
@@ -323,7 +330,7 @@ export class TargetMovement implements Movement {
       numberOfDirections: this.character.getNumberOfDirections(),
       isPositionAllowed: this.isPositionAllowed,
       collisionGroups: this.character.getCollisionGroups(),
-      ignoredChars: [this.character.getId()],
+      ignoredChars: [this.character.getId(), ...this.ignoredChars],
       ignoreTiles: !this.character.collidesWithTiles(),
       ignoreMapBounds: this.character.getIgnoreMissingTiles(),
       ignoreBlockedTarget: this.ignoreBlockedTarget,

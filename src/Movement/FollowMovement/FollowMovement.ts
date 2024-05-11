@@ -107,6 +107,7 @@ export class FollowMovement implements Movement {
     const useFacingDir =
       this.options.facingDirection !== Direction.NONE &&
       this.options.distance === 0;
+    // TODO: consider multi-tile
     if (useFacingDir) {
       const turnCount =
         dirToNumber[this.options.facingDirection] +
@@ -134,8 +135,8 @@ export class FollowMovement implements Movement {
           maxPathLength: this.options.maxPathLength,
           ignoreLayers: this.options.ignoreLayers,
           considerCosts: this.options.considerCosts,
+          ignoredChars: [this.charToFollow.getId()],
         },
-        ignoreBlockedTarget: true,
       },
     );
   }
