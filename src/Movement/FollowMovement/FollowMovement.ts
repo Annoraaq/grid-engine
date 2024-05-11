@@ -103,22 +103,44 @@ export class FollowMovement implements Movement {
     };
   }
 
+  private getFacingPos(): Position {
+    const turnCount =
+      dirToNumber[this.options.facingDirection] +
+      dirToNumber[this.charToFollow.getFacingDirection()];
+
+    const newDir: Direction = turnClockwise(Direction.UP, turnCount);
+
+    const refPos = {
+      x: this.charToFollow.getTilePos().position.x,
+      y: this.charToFollow.getTilePos().position.y,
+    };
+    if (newDir === Direction.RIGHT) {
+      refPos.x += this.charToFollow.getTileWidth() - 1;
+    } else if (newDir === Direction.DOWN) {
+      refPos.y += this.charToFollow.getTileWidth() - 1;
+    } else if (newDir === Direction.DOWN_LEFT) {
+      refPos.y += this.charToFollow.getTileWidth() - 1;
+    } else if (newDir === Direction.DOWN_RIGHT) {
+      refPos.y += this.charToFollow.getTileWidth() - 1;
+      refPos.x += this.charToFollow.getTileWidth() - 1;
+    } else if (newDir === Direction.UP_RIGHT) {
+      refPos.x += this.charToFollow.getTileWidth() - 1;
+    }
+    return this.gridTilemap.getTilePosInDirection(
+      {
+        position: new Vector2(refPos),
+        layer: this.charToFollow.getTilePos().layer,
+      },
+      newDir,
+    ).position;
+  }
+
   private updateTarget(targetPos: Position, targetLayer: CharLayer): void {
     const useFacingDir =
       this.options.facingDirection !== Direction.NONE &&
       this.options.distance === 0;
-    // TODO: consider multi-tile
     if (useFacingDir) {
-      const turnCount =
-        dirToNumber[this.options.facingDirection] +
-        dirToNumber[this.charToFollow.getFacingDirection()];
-
-      const newDir: Direction = turnClockwise(Direction.UP, turnCount);
-
-      targetPos = this.gridTilemap.getTilePosInDirection(
-        { position: new Vector2(targetPos), layer: targetLayer },
-        newDir,
-      ).position;
+      targetPos = this.getFacingPos();
     }
     this.targetMovement = new TargetMovement(
       this.character,

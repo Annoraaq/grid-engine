@@ -198,6 +198,73 @@ describe("FollowMovement", () => {
     },
   );
 
+  it.each([
+    {
+      dir: Direction.DOWN,
+      wantPos: { position: { x: 2, y: 1 }, layer: "layer1" },
+    },
+    {
+      dir: Direction.DOWN_LEFT,
+      wantPos: { position: { x: 2, y: 0 }, layer: "layer1" },
+    },
+    {
+      dir: Direction.DOWN_RIGHT,
+      wantPos: { position: { x: 2, y: 3 }, layer: "layer1" },
+    },
+    {
+      dir: Direction.UP,
+      wantPos: { position: { x: 5, y: 1 }, layer: "layer1" },
+    },
+    {
+      dir: Direction.UP_LEFT,
+      wantPos: { position: { x: 5, y: 0 }, layer: "layer1" },
+    },
+    {
+      dir: Direction.UP_RIGHT,
+      wantPos: { position: { x: 5, y: 3 }, layer: "layer1" },
+    },
+    {
+      dir: Direction.LEFT,
+      wantPos: { position: { x: 3, y: 0 }, layer: "layer1" },
+    },
+    {
+      dir: Direction.RIGHT,
+      wantPos: { position: { x: 3, y: 3 }, layer: "layer1" },
+    },
+  ])(
+    "should update added multi-tile character with facing direction '$dir'",
+    ({ dir, wantPos }) => {
+      const targetChar = new GridCharacter("targetChar", {
+        speed: 3,
+        collidesWithTiles: true,
+        numberOfDirections: NumberOfDirections.EIGHT,
+        tilemap: gridTilemap,
+        tileWidth: 2,
+        tileHeight: 2,
+      });
+
+      const targetCharPos = { position: new Vector2(3, 1), layer: "layer1" };
+      targetChar.setTilePosition(targetCharPos);
+      targetChar.turnTowards(Direction.RIGHT);
+      followMovement = new FollowMovement(char, gridTilemap, targetChar, {
+        distance: 0,
+        noPathFoundStrategy: NoPathFoundStrategy.STOP,
+        maxPathLength: 100,
+        ignoreLayers: true,
+        facingDirection: dir,
+      });
+      followMovement.update(100);
+      expect(TargetMovement).toHaveBeenCalledWith(
+        char,
+        gridTilemap,
+        wantPos,
+        expect.objectContaining({
+          distance: 0,
+        }),
+      );
+    },
+  );
+
   it("should not update facing direction if distance > 0", () => {
     targetChar.turnTowards(Direction.RIGHT);
     followMovement = new FollowMovement(char, gridTilemap, targetChar, {
