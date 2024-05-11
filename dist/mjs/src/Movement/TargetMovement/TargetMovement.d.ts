@@ -2,7 +2,7 @@ import { NoPathFoundStrategy } from "./../../Pathfinding/NoPathFoundStrategy.js"
 import { IsPositionAllowedFn } from "./../../Pathfinding/PathfindingOptions.js";
 import { ShortestPathAlgorithmType } from "./../../Pathfinding/ShortestPathAlgorithm.js";
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
-import { GridCharacter } from "../../GridCharacter/GridCharacter.js";
+import { CharId, GridCharacter } from "../../GridCharacter/GridCharacter.js";
 import { Movement, MovementInfo } from "../Movement.js";
 import { PathBlockedStrategy } from "../../Pathfinding/PathBlockedStrategy.js";
 import { CharLayer, LayerPosition, Position } from "../../GridEngine.js";
@@ -115,6 +115,10 @@ export interface MoveToConfig {
      * In case all these targets are blocked this is the fallback strategy.
      */
     noPathFoundAlternativeTargetsFallbackStrategy?: NoPathFoundStrategy;
+    /**
+     * Set of characters to ignore at collision checking.
+     */
+    ignoredChars?: CharId[];
 }
 /**
  * @category Pathfinding
@@ -183,6 +187,7 @@ export declare class TargetMovement implements Movement {
     private shortestPathAlgorithm;
     private maxPathLength;
     private considerCosts;
+    private ignoredChars;
     constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerVecPos, { config, ignoreBlockedTarget, distance }?: Options);
     setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void;
     getPathBlockedStrategy(): PathBlockedStrategy;
