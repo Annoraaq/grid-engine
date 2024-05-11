@@ -1875,6 +1875,51 @@ describe("TargetMovement", () => {
     );
   });
 
+  it("should not consider ignored blocking chars", () => {
+    const charPos = layerPos(new Vector2(1, 0));
+    const targetPos = layerPos(new Vector2(1, 2));
+    const mockChar = createMockChar("char", charPos, {
+      ...TEST_CHAR_CONFIG,
+      tilemap: gridTilemap,
+    });
+
+    const blockMap = [
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".s..",
+          "ccc.",
+          ".t..",
+        ],
+      },
+    ];
+    tilemapMock = mockLayeredBlockMap(blockMap);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES,
+    );
+    mockCharMap(gridTilemap, blockMap);
+    gridTilemap.addCharacter(mockChar);
+
+    targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+      config: {
+        algorithm: shortestPathAlgo,
+        ignoredChars: [mockChar.getId()],
+      },
+    });
+
+    expectWalkedPath(
+      targetMovement,
+      mockChar,
+      createPath([
+        [1, 1],
+        [1, 2],
+      ]),
+    );
+  });
+
   it("should not collide with tiles", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const targetPos = layerPos(new Vector2(1, 2));
