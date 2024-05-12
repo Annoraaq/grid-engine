@@ -21,13 +21,12 @@ const maze4PlotData  = plotData('maze-avg-4-4');
 const maze8PlotData  = plotData('maze-avg-4-8');
 const maze16PlotData  = plotData('maze-avg-4-16');
 const maze32PlotData  = plotData('maze-avg-4-32');
-const roomsPlotData8Dir  = plotData('rooms-avg-8-dir');
-const daoPlotData8Dir  = plotData('dao-avg-8-dir');
-const bg512PlotData8Dir  = plotData('bg512-avg-8-dir');
 
 </script>
 
 # Pathfinding Performance
+
+> **_NOTE:_** The content of this article has been reworked completely in April 2024. A lot has changed. The TL;DR: JPS is now the recommended choice for 4-directional movements since it's performance has been increased significantly. It has been removed for 8-directional movements though, since the old version was not giving correct results and the new one is by far the slowest option.
 
 Pathfinding is expensive. Therefore it can quickly cause performance issues. In Grid Engine, every time you are calling
 [findShortestPath][find-shortest-path],
@@ -94,11 +93,11 @@ A\* seems to be quite good on small paths. However, it becomes unacceptably slow
 
 ### 8 Directions
 
-Here JPS is superior on some map structures (rooms for example). It also seems to be a good choice for small path lengths (<= ~200). For longer paths BFS or Bidirectional Search seem to be good options.
+JPS has such a bad performance for 8 directions, that I strongly discourage using it. It remains an open question if the bad performance is due to the implementation in Grid Engine or if the algorithm is generally not performing well on 8 directions with partial obstacles. You should go with BFS or Bidirectional Search if you don't need path weights.
 
 ## Benchmark Results
 
-### 4 directions, all path lengths
+### 4 directions
 
 #### Baldurs Gate
 
@@ -135,76 +134,6 @@ Here JPS is superior on some map structures (rooms for example). It also seems t
 #### Mazes (corridor witdth: 32)
 
 <Plot :rawPlotData="maze32PlotData" />
-
----
-
-### 4 directions, path length <= 100
-
-#### Baldurs Gate
-
-<Plot :rawPlotData="bg512PlotData.slice(0,6)" />
-
-#### Dragon Age Origin
-
-<Plot :rawPlotData="roomsPlotData.slice(0,6)" />
-
-#### Rooms
-
-<Plot :rawPlotData="daoPlotData.slice(0,6)" />
-
-#### Mazes (corridor witdth: 1)
-
-<Plot :rawPlotData="maze1PlotData.slice(0,6)" />
-
-#### Mazes (corridor witdth: 2)
-
-<Plot :rawPlotData="maze2PlotData.slice(0,6)" />
-
-#### Mazes (corridor witdth: 4)
-
-<Plot :rawPlotData="maze4PlotData.slice(0,6)" />
-
-#### Mazes (corridor witdth: 8)
-
-<Plot :rawPlotData="maze8PlotData.slice(0,6)" />
-
-#### Mazes (corridor witdth: 16)
-
-<Plot :rawPlotData="maze16PlotData.slice(0,6)" />
-
-#### Mazes (corridor witdth: 32)
-
-<Plot :rawPlotData="maze32PlotData.slice(0,6)" />
-
----
-
-### 8 Directions, all path lengths
-
-#### Baldurs Gate
-
-<Plot :rawPlotData="bg512PlotData8Dir" />
-
-#### Dragon Age Origin
-
-<Plot :rawPlotData="daoPlotData8Dir" />
-
-#### Rooms
-
-<Plot :rawPlotData="roomsPlotData8Dir" />
-
-### 8 Directions, path length <= 100
-
-#### Baldurs Gate
-
-<Plot :rawPlotData="bg512PlotData8Dir.slice(0,6)" />
-
-#### Dragon Age Origin
-
-<Plot :rawPlotData="daoPlotData8Dir.slice(0,6)" />
-
-#### Rooms
-
-<Plot :rawPlotData="roomsPlotData8Dir.slice(0,6)" />
 
 [find-shortest-path]: https://annoraaq.github.io/grid-engine/api/interfaces/IGridEngine.html#findShortestPath
 [move-to]: https://annoraaq.github.io/grid-engine/api/interfaces/IGridEngine.html#moveTo
