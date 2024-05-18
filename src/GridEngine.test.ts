@@ -937,6 +937,7 @@ describe("GridEngine", () => {
   });
 
   it("should follow a char", () => {
+    const isPosAllowedFn = () => false;
     gridEngine.create(createDefaultMockWithLayer(undefined), {
       characters: [
         {
@@ -954,6 +955,9 @@ describe("GridEngine", () => {
       closestPointIfBlocked: true,
       maxPathLength: 10000,
       ignoreLayers: true,
+      isPositionAllowedFn: isPosAllowedFn,
+      ignoredChars: ["test"],
+      considerCosts: true,
     });
 
     expect(gridEngine.getMovement("player")).toEqual({
@@ -966,6 +970,9 @@ describe("GridEngine", () => {
         maxPathLength: 10000,
         ignoreLayers: true,
         shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
+        ignoredChars: ["test"],
+        isPositionAllowedFn: isPosAllowedFn,
+        considerCosts: true,
       },
     });
   });
@@ -996,6 +1003,9 @@ describe("GridEngine", () => {
         maxPathLength: Infinity,
         ignoreLayers: false,
         shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
+        ignoredChars: [],
+        isPositionAllowedFn: expect.anything(),
+        considerCosts: false,
       },
     });
   });

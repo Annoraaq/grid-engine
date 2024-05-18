@@ -828,7 +828,7 @@ describe("GridEngineHeadless", () => {
 
     expect(gridEngineHeadless.getMovement("player")).toEqual({
       type: "Follow",
-      config: expect.objectContaining({
+      config: {
         charToFollow: "player2",
         distance: 0,
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
@@ -839,7 +839,7 @@ describe("GridEngineHeadless", () => {
         ignoredChars: [],
         isPositionAllowedFn: expect.anything(),
         considerCosts: false,
-      }),
+      },
     });
   });
 
