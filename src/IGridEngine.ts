@@ -11,9 +11,12 @@ import {
 } from "./Movement/QueueMovement/QueueMovement.js";
 import { Observable } from "rxjs";
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter.js";
-import { PositionChange } from "./GridCharacter/GridCharacter.js";
+import { CharId, PositionChange } from "./GridCharacter/GridCharacter.js";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
-import { PathfindingOptions } from "./Pathfinding/PathfindingOptions.js";
+import {
+  IsPositionAllowedFn,
+  PathfindingOptions,
+} from "./Pathfinding/PathfindingOptions.js";
 import { CharLayer, LayerPosition, Position } from "./Position.js";
 
 /**
@@ -117,6 +120,32 @@ export interface FollowOptions {
    * ```
    */
   facingDirection?: Direction;
+
+  /**
+   * Function to specify whether a certain position is allowed for pathfinding.
+   * If the function returns false, the tile will be consindered as blocked.
+   *
+   * It can be used to restrict pathfinding to specific regions.
+   *
+   * Beware that this method can become a performance bottleneck easily. So be
+   * careful and keep it as efficient as possible. An asymptotic runtime
+   * complexity of O(1) is recommended.
+   */
+  isPositionAllowedFn?: IsPositionAllowedFn;
+
+  /**
+   * Only considered by A* algorithm.
+   * If set to `true`, pathfinding will consider costs. Costs are set via tile
+   * properties.
+   *
+   * @default false
+   */
+  considerCosts?: boolean;
+
+  /**
+   * Set of characters to ignore at collision checking.
+   */
+  ignoredChars?: CharId[];
 }
 
 /**
