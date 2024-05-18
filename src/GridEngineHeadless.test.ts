@@ -791,11 +791,15 @@ describe("GridEngineHeadless", () => {
     gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
       characters: [{ id: "player" }, { id: "player2" }],
     });
+    const isPosAllowedFn = () => false;
     gridEngineHeadless.follow("player", "player2", {
       distance: 7,
       closestPointIfBlocked: true,
       maxPathLength: 10000,
       ignoreLayers: true,
+      isPositionAllowedFn: isPosAllowedFn,
+      ignoredChars: ["test"],
+      considerCosts: true,
     });
 
     expect(gridEngineHeadless.getMovement("player")).toEqual({
@@ -808,6 +812,9 @@ describe("GridEngineHeadless", () => {
         shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
         maxPathLength: 10000,
         ignoreLayers: true,
+        ignoredChars: ["test"],
+        isPositionAllowedFn: isPosAllowedFn,
+        considerCosts: true,
       },
     });
   });
@@ -821,7 +828,7 @@ describe("GridEngineHeadless", () => {
 
     expect(gridEngineHeadless.getMovement("player")).toEqual({
       type: "Follow",
-      config: {
+      config: expect.objectContaining({
         charToFollow: "player2",
         distance: 0,
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
@@ -829,7 +836,10 @@ describe("GridEngineHeadless", () => {
         shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
         maxPathLength: Infinity,
         ignoreLayers: false,
-      },
+        ignoredChars: [],
+        isPositionAllowedFn: expect.anything(),
+        considerCosts: false,
+      }),
     });
   });
 
@@ -842,7 +852,7 @@ describe("GridEngineHeadless", () => {
 
     expect(gridEngineHeadless.getMovement("player")).toEqual({
       type: "Follow",
-      config: {
+      config: expect.objectContaining({
         charToFollow: "player2",
         distance: 0,
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
@@ -850,7 +860,9 @@ describe("GridEngineHeadless", () => {
         shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
         maxPathLength: Infinity,
         ignoreLayers: false,
-      },
+        ignoredChars: [],
+        isPositionAllowedFn: expect.anything(),
+      }),
     });
   });
 

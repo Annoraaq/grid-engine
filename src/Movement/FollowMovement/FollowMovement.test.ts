@@ -79,6 +79,7 @@ describe("FollowMovement", () => {
           ignoreLayers: false,
           considerCosts: false,
           ignoredChars: [targetChar.getId()],
+          isPositionAllowedFn: expect.anything(),
         },
       },
     );
@@ -104,6 +105,7 @@ describe("FollowMovement", () => {
         ignoreLayers: false,
         considerCosts: false,
         ignoredChars: [targetChar.getId()],
+        isPositionAllowedFn: expect.anything(),
       },
     });
   });
@@ -153,6 +155,7 @@ describe("FollowMovement", () => {
           ignoreLayers: true,
           considerCosts: false,
           ignoredChars: [targetChar.getId()],
+          isPositionAllowedFn: expect.anything(),
         },
       },
     );
@@ -304,15 +307,22 @@ describe("FollowMovement", () => {
           ignoreLayers: false,
           considerCosts: false,
           ignoredChars: [targetChar.getId()],
+          isPositionAllowedFn: expect.anything(),
         },
       },
     );
   });
 
   it("should update added character with considerCosts", () => {
+    const posAllowedFn = () => true;
     followMovement = new FollowMovement(char, gridTilemap, targetChar, {
       shortestPathAlgorithm: "A_STAR",
       considerCosts: true,
+      noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+      maxPathLength: 100,
+      ignoreLayers: true,
+      ignoredChars: ["anotherTestChar"],
+      isPositionAllowedFn: posAllowedFn,
     });
     followMovement.update(100);
     expect(TargetMovement).toHaveBeenCalledWith(
@@ -323,39 +333,19 @@ describe("FollowMovement", () => {
         distance: 1,
         config: {
           algorithm: "A_STAR",
-          noPathFoundStrategy: NoPathFoundStrategy.STOP,
-          maxPathLength: Infinity,
-          ignoreLayers: false,
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+          maxPathLength: 100,
+          ignoreLayers: true,
           considerCosts: true,
-          ignoredChars: [targetChar.getId()],
+          ignoredChars: [targetChar.getId(), "anotherTestChar"],
+          isPositionAllowedFn: posAllowedFn,
         },
       },
     );
   });
 
-  it("should show movement information", () => {
-    followMovement = new FollowMovement(char, gridTilemap, targetChar, {
-      distance: 7,
-      noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
-    });
-    expect(followMovement.getInfo()).toEqual({
-      type: "Follow",
-      config: {
-        charToFollow: targetChar.getId(),
-        distance: 7,
-        noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
-        maxPathLength: Infinity,
-        ignoreLayers: false,
-        facingDirection: Direction.NONE,
-        shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
-      },
-    });
-  });
-
-  it("should show facingDirection in movement information", () => {
-    followMovement = new FollowMovement(char, gridTilemap, targetChar, {
-      facingDirection: Direction.LEFT,
-    });
+  it("should show default movement information", () => {
+    followMovement = new FollowMovement(char, gridTilemap, targetChar);
     expect(followMovement.getInfo()).toEqual({
       type: "Follow",
       config: {
@@ -364,8 +354,41 @@ describe("FollowMovement", () => {
         noPathFoundStrategy: NoPathFoundStrategy.STOP,
         maxPathLength: Infinity,
         ignoreLayers: false,
-        facingDirection: Direction.LEFT,
+        facingDirection: Direction.NONE,
         shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
+        isPositionAllowedFn: expect.anything(),
+        ignoredChars: [],
+        considerCosts: false,
+      },
+    });
+  });
+
+  it("should show movement information", () => {
+    const posAllowedFn = () => false;
+    followMovement = new FollowMovement(char, gridTilemap, targetChar, {
+      distance: 7,
+      noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+      maxPathLength: 100,
+      shortestPathAlgorithm: "A_STAR",
+      ignoreLayers: true,
+      considerCosts: true,
+      facingDirection: Direction.LEFT,
+      isPositionAllowedFn: posAllowedFn,
+      ignoredChars: ["test"],
+    });
+    expect(followMovement.getInfo()).toEqual({
+      type: "Follow",
+      config: {
+        charToFollow: targetChar.getId(),
+        distance: 7,
+        noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        maxPathLength: 100,
+        ignoreLayers: true,
+        facingDirection: Direction.LEFT,
+        shortestPathAlgorithm: "A_STAR",
+        isPositionAllowedFn: posAllowedFn,
+        ignoredChars: ["test"],
+        considerCosts: true,
       },
     });
   });

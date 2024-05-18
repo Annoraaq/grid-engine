@@ -1,12 +1,13 @@
 import { filter, takeUntil, take } from "rxjs/operators";
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
-import { GridCharacter } from "../../GridCharacter/GridCharacter.js";
+import { CharId, GridCharacter } from "../../GridCharacter/GridCharacter.js";
 import { TargetMovement } from "../TargetMovement/TargetMovement.js";
 import { Movement, MovementInfo } from "../Movement.js";
 import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 import {
   CharLayer,
   Direction,
+  IsPositionAllowedFn,
   Position,
   ShortestPathAlgorithmType,
 } from "../../GridEngine.js";
@@ -22,6 +23,8 @@ export interface Options {
   ignoreLayers?: boolean;
   considerCosts?: boolean;
   facingDirection?: Direction;
+  isPositionAllowedFn?: IsPositionAllowedFn;
+  ignoredChars?: CharId[];
 }
 
 export class FollowMovement implements Movement {
@@ -42,6 +45,8 @@ export class FollowMovement implements Movement {
       ignoreLayers: false,
       considerCosts: options.considerCosts || false,
       facingDirection: Direction.NONE,
+      isPositionAllowedFn: () => true,
+      ignoredChars: [],
     };
     this.options = { ...defaultOptions, ...options };
     if (
@@ -99,6 +104,9 @@ export class FollowMovement implements Movement {
         ignoreLayers: this.options.ignoreLayers,
         facingDirection: this.options.facingDirection,
         shortestPathAlgorithm: this.options.shortestPathAlgorithm,
+        considerCosts: this.options.considerCosts,
+        isPositionAllowedFn: this.options.isPositionAllowedFn,
+        ignoredChars: this.options.ignoredChars,
       },
     };
   }
@@ -157,7 +165,11 @@ export class FollowMovement implements Movement {
           maxPathLength: this.options.maxPathLength,
           ignoreLayers: this.options.ignoreLayers,
           considerCosts: this.options.considerCosts,
-          ignoredChars: [this.charToFollow.getId()],
+          ignoredChars: [
+            this.charToFollow.getId(),
+            ...this.options.ignoredChars,
+          ],
+          isPositionAllowedFn: this.options.isPositionAllowedFn,
         },
       },
     );

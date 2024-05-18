@@ -792,6 +792,9 @@ export class GridEngineHeadless implements IGridEngine {
         shortestPathAlgorithm: options.algorithm ?? "BIDIRECTIONAL_SEARCH",
         ignoreLayers: !!options.ignoreLayers,
         facingDirection: options.facingDirection ?? Direction.NONE,
+        considerCosts: options.considerCosts ?? false,
+        isPositionAllowedFn: options.isPositionAllowedFn ?? (() => true),
+        ignoredChars: options.ignoredChars ?? [],
       },
     );
     gridChar.setMovement(followMovement);
