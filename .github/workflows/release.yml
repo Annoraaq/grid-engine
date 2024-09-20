@@ -22,10 +22,10 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: '15'
           
@@ -43,7 +43,7 @@ jobs:
       - name: build
         run: npm run build
 
-      - uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
+      - uses: EndBug/add-and-commit@v9 # You can change this to use a specific version
         with:
           # Determines the way the action fills missing author name and email. Three options are available:
           # - github_actor -> UserName <UserName@users.noreply.github.com>
@@ -58,7 +58,7 @@ jobs:
 
       - run: npm run docs
 
-      - uses: EndBug/add-and-commit@v7
+      - uses: EndBug/add-and-commit@v9
         with:
           default_author: github_actions
           message: 'build docs'
