@@ -245,6 +245,23 @@ export interface CharacterData extends CharacterDataHeadless {
    * @defaultValue `0`
    */
   offsetY?: number;
+
+  /**
+   * A custom y-offset for the sprite/container depth. In GridEngine the depth
+   * sorting of characters depends on their character layer and on their y pixel
+   * position. By setting a depthOffset you can change the y pixel position for
+   * the depth sorting without changing the actual y pixel position.
+   *
+   * For example: Consider two characters A and B that are on the same character
+   * layer. If char A is on y pixel position 100 and char B is on y pixel
+   * position 120, then char B would be rendered in front of char A. If you set
+   * `depthOffset = -50` for char B then char A would be rendered on top of char
+   * B instead (because the depth relevant y pos of char B is 120 - 50 = 80 and
+   * that of char A is 100).
+   *
+   * @defaultValue `0`
+   */
+  depthOffset?: number;
 }
 
 /**
@@ -474,6 +491,18 @@ export class GridEngine implements IGridEngine {
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     gridChar.setOffsetY(offsetY);
+  }
+
+  /**
+   * @returns depth-offset for a character.
+   *
+   * @category Character
+   */
+  getDepthOffset(charId: string): number {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.getDepthOffset();
   }
 
   /**
