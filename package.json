@@ -16,7 +16,7 @@
     "build-types": "tsc -p tsconfig.emit-cjs.json && tsc -p tsconfig.emit-esm.json",
     "build": "npm run build-web && npm run build-esm && npm run build-cjs && npm run build-types && node createPackageJsons.cjs",
     "build-speedtest": "esbuild speedtests/run.ts --bundle --format=cjs --target=node18 --platform=node --outfile=speedtests/run.cjs",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint": "eslint .",
     "serve": "esbuild src/main-iife.ts --servedir=serve --outfile=serve/js/GridEngine.js --bundle --target=es2016 --external:phaser",
     "docs": "typedoc src/GridEngine.ts --excludePrivate --excludeProtected --readme none --excludeInternal --out docs/public/api --sort kind --sort alphabetical --categorizeByGroup false",
     "docs:dev": "vitepress dev docs",
@@ -50,6 +50,8 @@
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@babel/preset-env": "^7.26.0",
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.14.0",
     "@stryker-mutator/core": "^8.6.0",
     "@stryker-mutator/jest-runner": "^8.6.0",
     "@types/jest": "^29.5.14",
