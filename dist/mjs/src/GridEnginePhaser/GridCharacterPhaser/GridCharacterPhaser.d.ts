@@ -8,6 +8,7 @@ export declare class GridCharacterPhaser {
     private tilemap;
     private geHeadless;
     private customOffset;
+    private depthOffset;
     private sprite?;
     private layerOverlaySprite?;
     private container?;
@@ -32,6 +33,7 @@ export declare class GridCharacterPhaser {
     getAnimation(): CharacterAnimation | undefined;
     setAnimation(animation: CharacterAnimation): void;
     update(_delta: number): void;
+    getDepthOffset(): number;
     private getEngineOffset;
     private updatePixelPos;
     private getGameObj;
