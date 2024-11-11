@@ -701,6 +701,33 @@ describe("GridCharacterPhaser", () => {
       );
     });
 
+    it("sets depth of sprite with offset", () => {
+      const depthOffset = -5;
+      const startPos = { x: 2, y: 2 };
+      const charData = {
+        startPosition: startPos,
+        numberOfDirections: NumberOfDirections.EIGHT,
+        charLayer: "testCharLayer",
+        depthOffset,
+      };
+      const charLayerDepth = 1;
+      const { gridCharPhaser } = createChar(charData, false, true);
+
+      gridEngineHeadless.move("charID", Direction.RIGHT);
+      gridEngineHeadless.update(1000, 10);
+      gridCharPhaser.update(10);
+
+      checkSpriteDepth(
+        spriteMock,
+        spriteMock.displayHeight,
+        charLayerDepth,
+        "0000",
+        depthOffset,
+      );
+
+      expect(gridCharPhaser.getDepthOffset()).toBe(depthOffset);
+    });
+
     it("should set depth of sprite on char layer", () => {
       const startPos = { x: 2, y: 2 };
       const charData = {
@@ -882,8 +909,9 @@ function checkSpriteDepth(
   height: number,
   charLayerDepth: number,
   zeroPrefix: string,
+  depthOffset = 0,
 ) {
-  const pixelDepth = gameObject.y + height;
+  const pixelDepth = gameObject.y + height + depthOffset;
   expect(gameObject.setDepth).toHaveBeenCalledWith(
     +`${charLayerDepth}.${zeroPrefix}${pixelDepth}`,
   );

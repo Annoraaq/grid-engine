@@ -275,6 +275,21 @@ describe("GridEngine", () => {
     expect(gridEngine.getOffsetY("player")).toEqual(offsetY);
   });
 
+  it("should use depth offset", () => {
+    const depthOffset = -5;
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 3,
+          depthOffset,
+        },
+      ],
+    });
+    expect(gridEngine.getDepthOffset("player")).toEqual(depthOffset);
+  });
+
   describe("collision config", () => {
     it("should use config collides", () => {
       gridEngine.create(createDefaultMockWithLayer(undefined), {

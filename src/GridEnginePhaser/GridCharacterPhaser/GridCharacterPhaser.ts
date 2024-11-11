@@ -19,6 +19,7 @@ import { LayerVecPos } from "../../Utils/LayerPositionUtils/LayerPositionUtils.j
 
 export class GridCharacterPhaser {
   private customOffset = new Vector2(0, 0);
+  private depthOffset = 0;
 
   private sprite?: Phaser.GameObjects.Sprite;
   private layerOverlaySprite?: Phaser.GameObjects.Sprite;
@@ -47,6 +48,8 @@ export class GridCharacterPhaser {
       charData.offsetX || 0,
       charData.offsetY || 0,
     );
+
+    this.depthOffset = charData.depthOffset ?? 0;
 
     this.sprite = charData.sprite;
     this.container = charData.container;
@@ -149,6 +152,10 @@ export class GridCharacterPhaser {
 
   update(_delta: number): void {
     this.updateGridChar();
+  }
+
+  getDepthOffset(): number {
+    return this.depthOffset;
   }
 
   private getEngineOffset(): Vector2 {
@@ -302,7 +309,7 @@ export class GridCharacterPhaser {
 
   private getPaddedPixelDepthSprite(sprite: Phaser.GameObjects.Sprite): number {
     return Utils.shiftPad(
-      sprite.y + sprite.displayHeight,
+      sprite.y + sprite.displayHeight + this.depthOffset,
       GridTilemapPhaser.Z_INDEX_PADDING,
     );
   }
