@@ -302,7 +302,7 @@ export class GridTilemap {
     direction?: Direction,
   ): boolean {
     const tile = this.tilemap.getTileAt(pos.x, pos.y, layerName);
-    if (!tile) return false;
+    if (!tile) return true;
     return !!(
       tile.getProperty(this.collisionTilePropertyName) ||
       (direction &&
