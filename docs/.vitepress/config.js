@@ -30,6 +30,7 @@ export default defineConfig({
         items: [
           { text: 'Introduction', link: '/p/introduction/index.md' },
           { text: 'Installation', link: '/p/installation/index.md' },
+          { text: 'Create Your First Game', link: '/p/create-first-game/index.md' },
         ]
       },
       {
