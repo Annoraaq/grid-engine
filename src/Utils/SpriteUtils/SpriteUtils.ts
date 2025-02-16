@@ -1,7 +1,7 @@
 export class SpriteUtils {
   static copyOverImportantProperties(
     source: Phaser.GameObjects.Sprite,
-    target: Phaser.GameObjects.Sprite
+    target: Phaser.GameObjects.Sprite,
   ): void {
     target.x = source.x;
     target.y = source.y;

@@ -4,7 +4,7 @@ export class Retryable {
   constructor(
     private backoffMs: number,
     private maxRetries: number,
-    private onFinished: () => any
+    private onFinished: () => any,
   ) {}
 
   retry(elapsed: number, fn: () => any): void {
