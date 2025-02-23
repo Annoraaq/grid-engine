@@ -117,6 +117,13 @@ export default defineConfig({
       },
       { text: 'Troubleshooting', link: '/p/known-errors/index.md' },
       { text: 'Migrate to Version 2', link: '/p/migrate-to-2/index.md' },
+      {
+        text: 'Contribute',
+        collapsed: true,
+        items: [
+          { text: 'Local development', link: '/p/local-dev/index.md' },
+        ]
+      },
     ],
 
     socialLinks: [
