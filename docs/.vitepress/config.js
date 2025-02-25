@@ -121,7 +121,8 @@ export default defineConfig({
         text: 'Contribute',
         collapsed: true,
         items: [
-          { text: 'Local development', link: '/p/local-dev/index.md' },
+          { text: 'Contribution Guidelines', link: '/p/contrib-guidelines/index.md' },
+          { text: 'Local Development', link: '/p/local-dev/index.md' },
         ]
       },
     ],
