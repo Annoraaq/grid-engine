@@ -559,6 +559,18 @@ export declare class GridEngineHeadless implements IGridEngine {
      * @beta
      */
     setState(state: GridEngineState): void;
+    /**
+     * {@inheritDoc IGridEngine.revertCurrentMovement}
+     *
+     * @category Basic Movement
+     */
+    revertCurrentMovement(charId: string): void;
+    /**
+     * {@inheritDoc IGridEngine.isCurrentMovementReverted}
+     *
+     * @category Basic Movement
+     */
+    isCurrentMovementReverted(charId: string): boolean;
     private charRemoved;
     private initGuard;
     private createUninitializedErr;

@@ -587,6 +587,18 @@ export declare class GridEngine implements IGridEngine {
      * @category Pathfinding
      */
     getTileCost(position: Position, charLayer?: string, srcDirection?: Direction): number;
+    /**
+     * {@inheritDoc IGridEngine.revertCurrentMovement}
+     *
+     * @category Basic Movement
+     */
+    revertCurrentMovement(charId: string): void;
+    /**
+     * {@inheritDoc IGridEngine.isCurrentMovementReverted}
+     *
+     * @category Basic Movement
+     */
+    isCurrentMovementReverted(charId: string): boolean;
     private setConfigDefaults;
     private initGuard;
     private createUninitializedErr;
