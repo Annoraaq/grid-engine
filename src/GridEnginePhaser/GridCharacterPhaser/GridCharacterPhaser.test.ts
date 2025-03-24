@@ -616,6 +616,32 @@ describe("GridCharacterPhaser", () => {
         expect(gridCharPhaser.getSprite()?.x).toBe(expectedXPos);
         expect(gridCharPhaser.getSprite()?.y).toBe(expectedYPos);
       });
+
+      it("should update sprite pixel pos for reverted movement", () => {
+        const { gridCharPhaser } = createChar(charData, false);
+        gridEngineHeadless.setSpeed("charID", 1);
+        gridEngineHeadless.setPosition("charID", charTilePos, "lowerCharLayer");
+        gridEngineHeadless.move("charID", Direction.RIGHT);
+        gridEngineHeadless.update(1000, 500);
+        gridCharPhaser.update(500);
+        gridEngineHeadless.revertCurrentMovement("charID");
+        gridEngineHeadless.update(1500, 250);
+        gridCharPhaser.update(250);
+
+        const scaledTileSize = 16 * 3;
+        const expectedXPos =
+          charTilePos.x * scaledTileSize +
+          expectedXEngineOffset() +
+          charData.offsetX +
+          scaledTileSize * 0.25;
+        const expectedYPos =
+          charTilePos.y * scaledTileSize +
+          expectedYEngineOffset() +
+          charData.offsetY;
+
+        expect(gridCharPhaser.getSprite()?.x).toBe(expectedXPos);
+        expect(gridCharPhaser.getSprite()?.y).toBe(expectedYPos);
+      });
     });
 
     describe("update sprite pixel pos isometric", () => {

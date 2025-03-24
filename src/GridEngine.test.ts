@@ -447,6 +447,20 @@ describe("GridEngine", () => {
       expect(gridEngine.getMovementProgress("player")).toEqual(500);
     });
 
+    it("should revert movement", () => {
+      const speed = 4;
+      const halfWayMs = 1000 / speed / 2;
+      gridEngine.move("player", Direction.LEFT);
+      gridEngine.update(1000, halfWayMs);
+      expect(gridEngine.getMovementProgress("player")).toEqual(500);
+      expect(gridEngine.isCurrentMovementReverted("player")).toEqual(false);
+      gridEngine.revertCurrentMovement("player");
+      gridEngine.update(1000 + halfWayMs, halfWayMs / 2);
+      expect(gridEngine.getFacingDirection("player")).toEqual(Direction.RIGHT);
+      expect(gridEngine.getMovementProgress("player")).toEqual(750);
+      expect(gridEngine.isCurrentMovementReverted("player")).toEqual(true);
+    });
+
     test.each([
       Direction.DOWN_LEFT,
       Direction.DOWN_RIGHT,
@@ -2412,6 +2426,12 @@ describe("GridEngine", () => {
       expectCharUnknownException(() =>
         gridEngine.clearEnqueuedMovements(UNKNOWN_CHAR_ID),
       );
+      expectCharUnknownException(() =>
+        gridEngine.revertCurrentMovement(UNKNOWN_CHAR_ID),
+      );
+      expectCharUnknownException(() =>
+        gridEngine.isCurrentMovementReverted(UNKNOWN_CHAR_ID),
+      );
     });
 
     it("should throw error if follow is invoked", () => {
@@ -2562,6 +2582,12 @@ describe("GridEngine", () => {
       );
       expectUninitializedException(() =>
         gridEngine.getTileCost({ x: 0, y: 0 }),
+      );
+      expectUninitializedException(() =>
+        gridEngine.revertCurrentMovement(SOME_CHAR_ID),
+      );
+      expectUninitializedException(() =>
+        gridEngine.isCurrentMovementReverted(SOME_CHAR_ID),
       );
     });
   });
