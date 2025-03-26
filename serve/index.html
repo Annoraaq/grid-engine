@@ -45,29 +45,15 @@
           sprite: playerSprite,
           walkingAnimationMapping: 6,
           startPosition: { x: 3, y: 3 },
-          speed: 0.3,
         },
       ],
     };
 
     this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
-    this.gridEngine.positionChangeStarted().subscribe((p) => {
-      console.log("started", p);
-    });
-
-    this.gridEngine.positionChangeFinished().subscribe((p) => {
-      console.log("finished", p);
-    });
   }
 
   function update() {
     const cursors = this.input.keyboard.createCursorKeys();
-    const space = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.SPACE,
-    );
-    if (Phaser.Input.Keyboard.JustDown(space)) {
-      this.gridEngine.revertCurrentMovement("player");
-    }
 
     if (cursors.left.isDown) {
       this.gridEngine.move("player", "left");

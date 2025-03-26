@@ -12,7 +12,7 @@
     "dev": "prettier --write src/ && eslint src/",
     "build-web": "esbuild src/main-iife.ts --bundle --minify --external:phaser --target=es2016 --outfile=dist/GridEngine.min.js",
     "build-esm": "esbuild src/main-esm.ts --bundle --minify --format=esm --external:phaser --target=es2016 --outfile=dist/GridEngine.esm.min.js",
-    "build-cjs": "esbuild src/main-esm.ts --bundle  --format=cjs --external:phaser --target=node18 --platform=node --outfile=dist/GridEngine.min.cjs",
+    "build-cjs": "esbuild src/main-esm.ts --bundle  --minify --format=cjs --external:phaser --target=node18 --platform=node --outfile=dist/GridEngine.min.cjs",
     "build-types": "tsc -p tsconfig.emit-cjs.json && tsc -p tsconfig.emit-esm.json",
     "build": "npm run build-web && npm run build-esm && npm run build-cjs && npm run build-types && node createPackageJsons.cjs",
     "build-speedtest": "esbuild speedtests/run.ts --bundle --format=cjs --target=node18 --platform=node --outfile=speedtests/run.cjs",
