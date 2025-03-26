@@ -1072,6 +1072,24 @@ export class GridEngine implements IGridEngine {
     return this.geHeadless.getTileCost(position, charLayer, srcDirection);
   }
 
+  /**
+   * {@inheritDoc IGridEngine.revertCurrentMovement}
+   *
+   * @category Basic Movement
+   */
+  revertCurrentMovement(charId: string): void {
+    this.geHeadless.revertCurrentMovement(charId);
+  }
+
+  /**
+   * {@inheritDoc IGridEngine.isCurrentMovementReverted}
+   *
+   * @category Basic Movement
+   */
+  isCurrentMovementReverted(charId: string): boolean {
+    return this.geHeadless.isCurrentMovementReverted(charId);
+  }
+
   private setConfigDefaults(
     config: GridEngineConfig,
   ): Omit<

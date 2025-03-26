@@ -13,7 +13,11 @@ import { CharacterAnimation } from "../../GridCharacter/CharacterAnimation/Chara
 import { Utils } from "../../Utils/Utils/Utils.js";
 import { Subject } from "rxjs";
 import { filter, takeUntil } from "rxjs/operators";
-import { Direction, directionVector } from "../../Direction/Direction.js";
+import {
+  Direction,
+  directionVector,
+  oppositeDirection,
+} from "../../Direction/Direction.js";
 import { GridTilemapPhaser } from "../GridTilemapPhaser/GridTilemapPhaser.js";
 import { LayerVecPos } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
@@ -171,7 +175,18 @@ export class GridCharacterPhaser {
   }
 
   private updatePixelPos() {
-    const tp = new Vector2(this.geHeadless.getPosition(this.charData.id));
+    let tp = new Vector2(this.geHeadless.getPosition(this.charData.id));
+    if (this.geHeadless.isCurrentMovementReverted(this.charData.id)) {
+      tp = new Vector2(
+        this.geHeadless.getTilePosInDirection(
+          this.geHeadless.getPosition(this.charData.id),
+          this.geHeadless.getCharLayer(this.charData.id),
+          oppositeDirection(
+            this.geHeadless.getFacingDirection(this.charData.id),
+          ),
+        ).position,
+      );
+    }
     const movementProgressProportional =
       this.geHeadless.getMovementProgress(this.charData.id) / 1000;
 

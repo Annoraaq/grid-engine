@@ -33,7 +33,10 @@
     const playerSprite = this.add.sprite(0, 0, "player");
     playerSprite.scale = 1.5;
     this.cameras.main.startFollow(playerSprite, true);
-    this.cameras.main.setFollowOffset(-playerSprite.width, -playerSprite.height);
+    this.cameras.main.setFollowOffset(
+      -playerSprite.width,
+      -playerSprite.height,
+    );
 
     const gridEngineConfig = {
       characters: [
@@ -41,7 +44,7 @@
           id: "player",
           sprite: playerSprite,
           walkingAnimationMapping: 6,
-          startPosition: {x: 3, y: 3},
+          startPosition: { x: 3, y: 3 },
         },
       ],
     };
@@ -51,6 +54,7 @@
 
   function update() {
     const cursors = this.input.keyboard.createCursorKeys();
+
     if (cursors.left.isDown) {
       this.gridEngine.move("player", "left");
     } else if (cursors.right.isDown) {

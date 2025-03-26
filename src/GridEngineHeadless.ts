@@ -1359,6 +1359,30 @@ export class GridEngineHeadless implements IGridEngine {
     }
   }
 
+  /**
+   * {@inheritDoc IGridEngine.revertCurrentMovement}
+   *
+   * @category Basic Movement
+   */
+  revertCurrentMovement(charId: string): void {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.revertCurrentMovement();
+  }
+
+  /**
+   * {@inheritDoc IGridEngine.isCurrentMovementReverted}
+   *
+   * @category Basic Movement
+   */
+  isCurrentMovementReverted(charId: string): boolean {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.isCurrentMovementReverted();
+  }
+
   private charRemoved(charId: string): Observable<string> {
     if (!this.charRemoved$) throw this.createUninitializedErr();
     return this.charRemoved$?.pipe(

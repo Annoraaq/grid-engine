@@ -74,6 +74,7 @@ export class GridCharacter {
   private numberOfDirections: NumberOfDirections;
   private tileWidth: number;
   private tileHeight: number;
+  private currentMovementReverted = false;
 
   constructor(
     private id: string,
@@ -139,6 +140,7 @@ export class GridCharacter {
   }
 
   setTilePosition(tilePosition: LayerVecPos): void {
+    this.currentMovementReverted = false;
     if (this.isMoving()) {
       this.movementStopped$.next(this.movementDirection);
     }
@@ -159,6 +161,7 @@ export class GridCharacter {
 
   getNextTilePos(): LayerVecPos {
     if (!this.isMoving()) return this.tilePos;
+    if (this.currentMovementReverted) return this.tilePos;
     let layer: CharLayer = this.tilePos.layer;
     const nextPos = this.tilePosInDirection(
       this.tilePos.position,
@@ -245,6 +248,21 @@ export class GridCharacter {
         this.ignoreMissingTiles,
       );
     });
+  }
+
+  revertCurrentMovement() {
+    if (this.isMoving()) {
+      this.currentMovementReverted = true;
+      this.movementDirection = oppositeDirection(this.movementDirection);
+      this.movementStopped$.next(this.facingDirection);
+      this.facingDirection = this.movementDirection;
+      this.movementProgress = MAX_MOVEMENT_PROGRESS - this.movementProgress;
+      this.movementStarted$.next(this.facingDirection);
+    }
+  }
+
+  isCurrentMovementReverted(): boolean {
+    return this.currentMovementReverted;
   }
 
   private isCharBlocking(
@@ -453,6 +471,7 @@ export class GridCharacter {
 
   private startMoving(direction: Direction): void {
     if (direction === Direction.NONE) return;
+    this.currentMovementReverted = false;
     if (direction != this.movementDirection) {
       this.movementStarted$.next(direction);
     }
@@ -480,6 +499,7 @@ export class GridCharacter {
     this.tilePos = this.getNextTilePos();
     this.movementDirection = Direction.NONE;
     this.movementStopped$.next(lastMovementDir);
+    this.currentMovementReverted = false;
     this.fire(this.positionChangeFinished$, exitTile, enterTile);
   }
 

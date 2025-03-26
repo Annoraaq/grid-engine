@@ -1,4 +1,8 @@
-import { CharConfig, GridCharacter } from "./GridCharacter.js";
+import {
+  CharConfig,
+  GridCharacter,
+  MAX_MOVEMENT_PROGRESS,
+} from "./GridCharacter.js";
 import { Direction, NumberOfDirections } from "../Direction/Direction.js";
 import { take } from "rxjs/operators";
 import { Movement } from "../Movement/Movement.js";
@@ -1267,6 +1271,137 @@ describe("GridCharacter", () => {
         "collisionGroup1",
         "collisionGroup2",
       ]);
+    });
+  });
+
+  describe("revert movement", () => {
+    it("does nothing if not moving", () => {
+      const { gridCharacter } = createDefaultTilemapMock("lowerCharLayer");
+      expect(gridCharacter.getTilePos()).toEqual({
+        position: new Vector2(0, 0),
+        layer: "lowerCharLayer",
+      });
+
+      const movementStarted$ = gridCharacter.movementStarted();
+      const movementStartedMock = jest.fn();
+      movementStarted$.subscribe(movementStartedMock);
+
+      const firstUpdateMs = QUARTER_SECOND;
+      const secondUpdateMs = QUARTER_SECOND / 2;
+
+      gridCharacter.update(firstUpdateMs);
+
+      expect(gridCharacter.isCurrentMovementReverted()).toEqual(false);
+
+      gridCharacter.revertCurrentMovement();
+      gridCharacter.update(secondUpdateMs);
+
+      expect(gridCharacter.getMovementDirection()).toEqual(Direction.NONE);
+      expect(gridCharacter.getMovementProgress()).toEqual(0);
+
+      expect(movementStartedMock).not.toHaveBeenCalled();
+      expect(gridCharacter.isCurrentMovementReverted()).toEqual(false);
+    });
+
+    it("reverts movement", () => {
+      const { gridCharacter } = createDefaultTilemapMock("lowerCharLayer");
+      expect(gridCharacter.getTilePos()).toEqual({
+        position: new Vector2(0, 0),
+        layer: "lowerCharLayer",
+      });
+
+      const movementStarted$ = gridCharacter.movementStarted();
+      const movementStartedMock = jest.fn();
+      movementStarted$.subscribe(movementStartedMock);
+
+      const movementStopped$ = gridCharacter.movementStopped();
+      const movementStoppedMock = jest.fn();
+      movementStopped$.subscribe(movementStoppedMock);
+
+      const posChangeStarted$ = gridCharacter.positionChangeStarted();
+      const posChangeStartedMock = jest.fn();
+      posChangeStarted$.subscribe(posChangeStartedMock);
+
+      const posChangeFinished$ = gridCharacter.positionChangeFinished();
+      const posChangeFinishedMock = jest.fn();
+      posChangeFinished$.subscribe(posChangeFinishedMock);
+
+      gridCharacter.move(Direction.DOWN);
+
+      const firstUpdateMs = QUARTER_SECOND;
+      const secondUpdateMs = QUARTER_SECOND / 2;
+
+      gridCharacter.update(firstUpdateMs);
+
+      expect(gridCharacter.getMovementProgress()).toEqual(
+        Math.floor(gridCharacter.getSpeed() * firstUpdateMs),
+      );
+      expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.DOWN);
+      expect(gridCharacter.isCurrentMovementReverted()).toEqual(false);
+
+      gridCharacter.revertCurrentMovement();
+      gridCharacter.update(secondUpdateMs);
+
+      expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
+      expect(gridCharacter.getMovementProgress()).toEqual(
+        MAX_MOVEMENT_PROGRESS -
+          gridCharacter.getSpeed() * firstUpdateMs +
+          gridCharacter.getSpeed() * secondUpdateMs,
+      );
+
+      expect(movementStartedMock).toHaveBeenCalledTimes(2);
+      expect(movementStartedMock).toHaveBeenLastCalledWith(Direction.UP);
+      expect(movementStoppedMock).toHaveBeenCalledTimes(1);
+      expect(movementStoppedMock).toHaveBeenCalledWith(Direction.DOWN);
+      expect(posChangeStartedMock).toHaveBeenCalledTimes(1);
+      expect(posChangeStartedMock).toHaveBeenLastCalledWith({
+        enterLayer: "lowerCharLayer",
+        enterTile: new Vector2(0, 1),
+        exitLayer: "lowerCharLayer",
+        exitTile: new Vector2(0, 0),
+      });
+      expect(gridCharacter.isCurrentMovementReverted()).toEqual(true);
+      expect(gridCharacter.getNextTilePos()).toEqual({
+        position: new Vector2(0, 0),
+        layer: "lowerCharLayer",
+      });
+
+      gridCharacter.update(QUARTER_SECOND);
+      expect(gridCharacter.isCurrentMovementReverted()).toEqual(false);
+      expect(posChangeFinishedMock).toHaveBeenCalledTimes(1);
+      expect(posChangeFinishedMock).toHaveBeenLastCalledWith({
+        enterLayer: "lowerCharLayer",
+        enterTile: new Vector2(0, 0),
+        exitLayer: "lowerCharLayer",
+        exitTile: new Vector2(0, 0),
+      });
+      expect(movementStoppedMock).toHaveBeenCalledTimes(2);
+      expect(movementStoppedMock).toHaveBeenLastCalledWith(Direction.UP);
+    });
+
+    it("cancels on setTilePosition", () => {
+      const newTilePos = new Vector2(3, 4);
+      const { gridCharacter } = createDefaultTilemapMock("lowerCharLayer");
+      expect(gridCharacter.getTilePos()).toEqual({
+        position: new Vector2(0, 0),
+        layer: "lowerCharLayer",
+      });
+
+      gridCharacter.move(Direction.DOWN);
+
+      gridCharacter.update(QUARTER_SECOND);
+      gridCharacter.revertCurrentMovement();
+
+      expect(gridCharacter.isCurrentMovementReverted()).toEqual(true);
+
+      gridCharacter.setTilePosition({
+        position: newTilePos,
+        layer: "someLayer",
+      });
+
+      expect(gridCharacter.isCurrentMovementReverted()).toEqual(false);
     });
   });
 });

@@ -68,6 +68,7 @@ export default defineConfig({
           { text: 'Radius Movement', link: '/examples/radius-movement/index.md' },
           { text: 'Random Movement', link: '/examples/random-movement/index.md' },
           { text: 'Queue Directions Movement', link: '/examples/queue-directions-movement/index.md' },
+          { text: 'Revert Current Movement', link: '/examples/revert-current-movement/index.md' },
           {
             text: "Char Layers",
             collapsed: false,

@@ -69,6 +69,9 @@ describe("GridEngineHeadless", () => {
     expect(gridEngineHeadless.getIgnoreCollisionGroups("player")).toEqual([]);
     expect(gridEngineHeadless.getLabels("player")).toEqual([]);
     expect(gridEngineHeadless.getMovementProgress("player")).toEqual(0);
+    expect(gridEngineHeadless.isCurrentMovementReverted("player")).toEqual(
+      false,
+    );
   });
 
   it("should init player with collisionGroups", () => {
@@ -255,6 +258,26 @@ describe("GridEngineHeadless", () => {
       gridEngineHeadless.move("player", Direction.LEFT);
       gridEngineHeadless.update(1000, halfWayMs);
       expect(gridEngineHeadless.getMovementProgress("player")).toEqual(500);
+    });
+
+    it("should revert movement", () => {
+      const speed = 4;
+      const halfWayMs = 1000 / speed / 2;
+      gridEngineHeadless.move("player", Direction.LEFT);
+      gridEngineHeadless.update(1000, halfWayMs);
+      expect(gridEngineHeadless.getMovementProgress("player")).toEqual(500);
+      expect(gridEngineHeadless.isCurrentMovementReverted("player")).toEqual(
+        false,
+      );
+      gridEngineHeadless.revertCurrentMovement("player");
+      gridEngineHeadless.update(1000 + halfWayMs, halfWayMs / 2);
+      expect(gridEngineHeadless.getFacingDirection("player")).toEqual(
+        Direction.RIGHT,
+      );
+      expect(gridEngineHeadless.getMovementProgress("player")).toEqual(750);
+      expect(gridEngineHeadless.isCurrentMovementReverted("player")).toEqual(
+        true,
+      );
     });
 
     it("should move player orthogonally", () => {
@@ -2281,6 +2304,12 @@ describe("GridEngineHeadless", () => {
       expectCharUnknownException(() =>
         gridEngineHeadless.clearEnqueuedMovements(UNKNOWN_CHAR_ID),
       );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.revertCurrentMovement(UNKNOWN_CHAR_ID),
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.isCurrentMovementReverted(UNKNOWN_CHAR_ID),
+      );
     });
 
     it("should throw error if follow is invoked", () => {
@@ -2442,6 +2471,12 @@ describe("GridEngineHeadless", () => {
       );
       expectUninitializedException(() =>
         gridEngineHeadless.getTileCost({ x: 1, y: 1 }),
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.revertCurrentMovement(SOME_CHAR_ID),
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.isCurrentMovementReverted(SOME_CHAR_ID),
       );
     });
   });

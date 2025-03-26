@@ -56,6 +56,7 @@ export declare class GridCharacter {
     private numberOfDirections;
     private tileWidth;
     private tileHeight;
+    private currentMovementReverted;
     constructor(id: string, config: CharConfig);
     getId(): string;
     getSpeed(): number;
@@ -76,6 +77,8 @@ export declare class GridCharacter {
     getMovementDirection(): Direction;
     isBlockingDirection(direction: Direction): boolean;
     isTileBlocking(direction: Direction, layerInDirection: CharLayer): boolean;
+    revertCurrentMovement(): void;
+    isCurrentMovementReverted(): boolean;
     private isCharBlocking;
     isMoving(): boolean;
     turnTowards(direction: Direction): void;

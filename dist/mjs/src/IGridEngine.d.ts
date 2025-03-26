@@ -592,4 +592,19 @@ export interface IGridEngine {
      * @category Pathfinding
      */
     getTileCost(position: Position, charLayer?: string, srcDirection?: Direction): number;
+    /**
+     * Reverts the current movement of a character. This makes the character turn
+     * around immediately and move in the opposite direction.
+     *
+     * @category Basic Movement
+     */
+    revertCurrentMovement(charId: string): void;
+    /**
+     * Returns whether the current movement has been reverted. Note that as soon
+     * as the character reaches the tile from which they started before the
+     * movement got reverted, this returns `false` again.
+     *
+     * @category Basic Movement
+     */
+    isCurrentMovementReverted(charId: string): boolean;
 }
