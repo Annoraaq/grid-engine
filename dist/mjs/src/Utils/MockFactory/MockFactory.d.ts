@@ -31,7 +31,10 @@ export interface CostMapLayer {
     costMap: CostMap;
 }
 export declare function createSpriteMock(): Phaser.GameObjects.Sprite;
-export declare function createContainerMock(x?: number, y?: number, height?: number): Phaser.GameObjects.Container;
+export declare function createContainerMock(x?: number, y?: number, bounds?: {
+    height: number;
+    y: number;
+}): Phaser.GameObjects.Container;
 export declare function createMockLayer(layerData: LayerData): TileLayer;
 export declare function layerPos(vec: Vector2, layer?: string): LayerVecPos;
 export declare function mockCharMap(gridTilemap: GridTilemap, blockMaps: Array<{

@@ -12,7 +12,7 @@ export declare class GridCharacterPhaser {
     private sprite?;
     private layerOverlaySprite?;
     private container?;
-    private cachedContainerHeight;
+    private cachedContainerBounds?;
     private newSpriteSet$;
     private destroy$;
     private walkingAnimationMapping?;
