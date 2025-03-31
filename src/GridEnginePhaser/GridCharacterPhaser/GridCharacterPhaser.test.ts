@@ -382,7 +382,8 @@ describe("GridCharacterPhaser", () => {
 
     it("should set depth of container", () => {
       const height = 21;
-      const containerMock = createContainerMock(0, 20, height);
+      const boundsY = -10;
+      const containerMock = createContainerMock(0, 20, { height, y: boundsY });
       const startPos = { x: 2, y: 2 };
       const charData = {
         container: containerMock,
@@ -395,12 +396,19 @@ describe("GridCharacterPhaser", () => {
 
       gridCharPhaser.setSprite(newSpriteMock);
 
-      checkSpriteDepth(containerMock, height, uppermostCharLayerDepth, "0000");
+      checkSpriteDepth(
+        containerMock,
+        height,
+        uppermostCharLayerDepth,
+        "0000",
+        0,
+        boundsY,
+      );
     });
 
     it("should set depth of container when reset", () => {
       const height = 21;
-      const containerMock = createContainerMock(0, 20, height);
+      const containerMock = createContainerMock(0, 20, { height, y: 0 });
       const startPos = { x: 2, y: 2 };
       const charData = {
         container: containerMock,
@@ -410,7 +418,10 @@ describe("GridCharacterPhaser", () => {
       const uppermostCharLayerDepth = 1;
       const { gridCharPhaser } = createChar(charData, false);
       const newContainerHeight = 40;
-      const newContainerMock = createContainerMock(0, 20, newContainerHeight);
+      const newContainerMock = createContainerMock(0, 20, {
+        height: newContainerHeight,
+        y: 0,
+      });
       gridCharPhaser.setContainer(newContainerMock);
       gridCharPhaser.update(1);
 
@@ -778,7 +789,7 @@ describe("GridCharacterPhaser", () => {
 
     it("should set depth of container", () => {
       const height = 21;
-      const containerMock = createContainerMock(0, 20, height);
+      const containerMock = createContainerMock(0, 20, { height, y: 0 });
       const startPos = { x: 2, y: 2 };
       const charData = {
         container: containerMock,
@@ -792,6 +803,32 @@ describe("GridCharacterPhaser", () => {
       gridCharPhaser.update(10);
 
       checkSpriteDepth(containerMock, height, uppermostCharLayerDepth, "0000");
+    });
+
+    it("should set depth of container with depth offset", () => {
+      const depthOffset = -5;
+      const height = 21;
+      const containerMock = createContainerMock(0, 20, { height, y: 0 });
+      const startPos = { x: 2, y: 2 };
+      const charData = {
+        container: containerMock,
+        startPosition: startPos,
+        charLayer: "testCharLayer",
+        depthOffset,
+      };
+      const uppermostCharLayerDepth = 1;
+      const { gridCharPhaser } = createChar(charData, false);
+
+      gridEngineHeadless.move("charID", Direction.RIGHT);
+      gridCharPhaser.update(10);
+
+      checkSpriteDepth(
+        containerMock,
+        height,
+        uppermostCharLayerDepth,
+        "0000",
+        depthOffset,
+      );
     });
 
     describe("for overlay sprite", () => {
@@ -936,8 +973,9 @@ function checkSpriteDepth(
   charLayerDepth: number,
   zeroPrefix: string,
   depthOffset = 0,
+  boundsY = 0,
 ) {
-  const pixelDepth = gameObject.y + height + depthOffset;
+  const pixelDepth = gameObject.y + height + depthOffset + boundsY;
   expect(gameObject.setDepth).toHaveBeenCalledWith(
     +`${charLayerDepth}.${zeroPrefix}${pixelDepth}`,
   );
