@@ -65,14 +65,17 @@ export function createSpriteMock(): Phaser.GameObjects.Sprite {
 export function createContainerMock(
   x = 0,
   y = 0,
-  height = 0,
+  bounds: {
+    height: number;
+    y: number;
+  } = { height: 0, y: 0 },
 ): Phaser.GameObjects.Container {
   return {
     x,
     y,
     displayHeight: 0,
     setDepth: jest.fn(),
-    getBounds: jest.fn(() => ({ height })),
+    getBounds: jest.fn(() => bounds),
   } as unknown as Phaser.GameObjects.Container;
 }
 
