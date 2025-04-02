@@ -155,7 +155,7 @@ Let's add "Fluffy" to our game!
 
 ![Our player character named Fluffy](../../img/fluffy.gif "Fluffy")
 
-Download [fluffy.png](../../assets/fluffy.png) and put it into the `public/assets` directory.
+Download [fluffy.png](assets/fluffy.png) and put it into the `public/assets` directory.
 
 We make sure that our character spritesheet is available in our game scene by preloading it:
 
