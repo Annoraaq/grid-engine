@@ -189,9 +189,9 @@ export declare class TargetMovement implements Movement {
     private considerCosts;
     private ignoredChars;
     constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerVecPos, { config, ignoreBlockedTarget, distance }?: Options);
+    init(): void;
     setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void;
     getPathBlockedStrategy(): PathBlockedStrategy;
-    private setCharacter;
     private getPathfindingOptions;
     update(delta: number): void;
     finishedObs(): Subject<Finished>;

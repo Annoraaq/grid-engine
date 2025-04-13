@@ -46,6 +46,10 @@ export class RandomMovement implements Movement {
     );
   }
 
+  init(): void {
+    // do nothing
+  }
+
   update(delta: number): void {
     if (this.shouldContinueWalkingCurrentDirection()) {
       this.character.move(this.currentMovementDirection);
