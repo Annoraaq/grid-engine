@@ -25,7 +25,6 @@ export interface Options {
   facingDirection?: Direction;
   isPositionAllowedFn?: IsPositionAllowedFn;
   ignoredChars?: CharId[];
-  followImmediately?: boolean;
 }
 
 export class FollowMovement implements Movement {
@@ -48,7 +47,6 @@ export class FollowMovement implements Movement {
       facingDirection: Direction.NONE,
       isPositionAllowedFn: () => true,
       ignoredChars: [],
-      followImmediately: false,
     };
     this.options = { ...defaultOptions, ...options };
     if (
