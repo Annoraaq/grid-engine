@@ -21,6 +21,7 @@ export declare class FollowMovement implements Movement {
     private targetMovement?;
     private options;
     constructor(character: GridCharacter, gridTilemap: GridTilemap, charToFollow: GridCharacter, options?: Options);
+    init(): void;
     update(delta: number): void;
     getInfo(): MovementInfo;
     private getFacingPos;

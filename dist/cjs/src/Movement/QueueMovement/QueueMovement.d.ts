@@ -105,6 +105,7 @@ export declare class QueueMovement implements Movement {
     private distanceUtils;
     private pathBlockedWaitElapsed;
     constructor(character: GridCharacter, tilemap: GridTilemap);
+    init(): void;
     update(delta: number): void;
     getInfo(): MovementInfo;
     enqueue(positions: Array<LayerVecPos | Direction>, config?: QueueMovementConfig): void;

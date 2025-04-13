@@ -1,4 +1,5 @@
 export interface Movement {
+    init(): void;
     update(delta: number): void;
     getInfo(): MovementInfo;
 }
