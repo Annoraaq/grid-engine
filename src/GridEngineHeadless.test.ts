@@ -38,6 +38,7 @@ import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy.js";
 import {
   createMockLayer,
   mockBlockMap,
+  mockLayeredBlockMap,
   updateLayer,
 } from "./Utils/MockFactory/MockFactory.js";
 import { MockTilemap } from "./Utils/MockFactory/MockTilemap.js";
@@ -811,12 +812,26 @@ describe("GridEngineHeadless", () => {
   });
 
   it("should follow a char", () => {
-    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
-      characters: [{ id: "player" }, { id: "player2" }],
+    const tm = mockLayeredBlockMap([
+      {
+        layer: undefined,
+        blockMap: [
+          // prettier-ignore
+          "...",
+          "...",
+          "...",
+        ],
+      },
+    ]);
+    gridEngineHeadless.create(tm, {
+      characters: [
+        { id: "player" },
+        { id: "player2", startPosition: { x: 2, y: 2 } },
+      ],
     });
-    const isPosAllowedFn = () => false;
+    const isPosAllowedFn = () => true;
     gridEngineHeadless.follow("player", "player2", {
-      distance: 7,
+      distance: 1,
       closestPointIfBlocked: true,
       maxPathLength: 10000,
       ignoreLayers: true,
@@ -829,7 +844,7 @@ describe("GridEngineHeadless", () => {
       type: "Follow",
       config: {
         charToFollow: "player2",
-        distance: 7,
+        distance: 1,
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         facingDirection: Direction.NONE,
         shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
@@ -840,6 +855,8 @@ describe("GridEngineHeadless", () => {
         considerCosts: true,
       },
     });
+    gridEngineHeadless.update(100, 1000);
+    expect(gridEngineHeadless.getPosition("player")).toEqual(new Vector2(0, 2));
   });
 
   it("should follow a char with default values", () => {

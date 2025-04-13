@@ -294,19 +294,9 @@ export class TargetMovement implements Movement {
     this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
     this.ignoredChars = config?.ignoredChars ?? [];
     this.finished$ = new Subject<Finished>();
-    this.setCharacter(character);
   }
 
-  setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void {
-    this.pathBlockedStrategy = pathBlockedStrategy;
-  }
-
-  getPathBlockedStrategy(): PathBlockedStrategy {
-    return this.pathBlockedStrategy;
-  }
-
-  private setCharacter(character: GridCharacter): void {
-    this.character = character;
+  init() {
     this.noPathFoundRetryable.reset();
     this.pathBlockedRetryable.reset();
     this.pathBlockedWaitElapsed = 0;
@@ -320,6 +310,14 @@ export class TargetMovement implements Movement {
       .subscribe(() => {
         this.stop(MoveToResult.MOVEMENT_TERMINATED);
       });
+  }
+
+  setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void {
+    this.pathBlockedStrategy = pathBlockedStrategy;
+  }
+
+  getPathBlockedStrategy(): PathBlockedStrategy {
+    return this.pathBlockedStrategy;
   }
 
   private getPathfindingOptions(): Concrete<PathfindingOptions> {
@@ -363,6 +361,7 @@ export class TargetMovement implements Movement {
     } else {
       this.pathBlockedWaitElapsed = 0;
     }
+    this.updatePosOnPath();
 
     if (this.hasArrived()) {
       this.stop(MoveToResult.SUCCESS);

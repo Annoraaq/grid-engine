@@ -74,6 +74,7 @@ describe("QueueMovement", () => {
     });
     const queueMovement = new QueueMovement(mockChar, gridTilemap);
     mockChar.setMovement(queueMovement);
+    queueMovement.init();
 
     const finishedObsCallbackMock = jest.fn();
     const finishedObsCompleteMock = jest.fn();

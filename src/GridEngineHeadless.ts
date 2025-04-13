@@ -471,6 +471,7 @@ export class GridEngineHeadless implements IGridEngine {
       },
     );
     gridChar.setMovement(targetMovement);
+    targetMovement.init();
     return targetMovement.finishedObs().pipe(
       map((finished: Finished) => ({
         charId,
@@ -798,6 +799,7 @@ export class GridEngineHeadless implements IGridEngine {
       },
     );
     gridChar.setMovement(followMovement);
+    followMovement.init();
   }
 
   /**
@@ -1182,6 +1184,7 @@ export class GridEngineHeadless implements IGridEngine {
     } else {
       queueMovement = new QueueMovement(gridChar, this.gridTilemap);
       gridChar.setMovement(queueMovement);
+      queueMovement.init();
       queueMovement
         .finished()
         .pipe(

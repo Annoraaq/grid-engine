@@ -133,6 +133,7 @@ describe("TargetMovement", () => {
       },
       { config: { algorithm: shortestPathAlgo } },
     );
+    targetMovement.init();
     targetMovement.update(100);
 
     expect(mockChar.getMovementDirection()).toEqual(Direction.RIGHT);
@@ -161,6 +162,7 @@ describe("TargetMovement", () => {
         distance: 12,
       },
     );
+    targetMovement.init();
 
     expect(targetMovement.getInfo()).toEqual({
       type: "Target",
@@ -196,6 +198,7 @@ describe("TargetMovement", () => {
       layerPos(new Vector2(3, 3)),
       { config: { algorithm: shortestPathAlgo } },
     );
+    targetMovement.init();
     targetMovement.update(1000);
     mockChar.update(1000);
     expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 2)));
@@ -222,6 +225,7 @@ describe("TargetMovement", () => {
       layerPos(new Vector2(1, 1)),
       { config: { algorithm: shortestPathAlgo } },
     );
+    targetMovement.init();
     targetMovement.update(1000);
     mockChar.update(1000);
     expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(2, 3)));
@@ -248,6 +252,7 @@ describe("TargetMovement", () => {
       layerPos(new Vector2(3, 1)),
       { config: { algorithm: shortestPathAlgo } },
     );
+    targetMovement.init();
     targetMovement.update(100);
     expect(mockChar.isMoving()).toBe(false);
   });
@@ -285,6 +290,7 @@ describe("TargetMovement", () => {
         },
       },
     );
+    targetMovement.init();
 
     chunkUpdate(targetMovement, mockChar, 2 * CHUNKS_PER_SECOND);
 
@@ -321,6 +327,7 @@ describe("TargetMovement", () => {
         noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
       },
     });
+    targetMovement.init();
     targetMovement.update(100);
     mockChar.update(100);
 
@@ -359,6 +366,7 @@ describe("TargetMovement", () => {
         },
       },
     );
+    targetMovement.init();
     chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
 
     expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
@@ -401,6 +409,7 @@ describe("TargetMovement", () => {
         },
       },
     );
+    targetMovement.init();
 
     targetMovement.update(1000);
     mockChar.update(1000);
@@ -442,6 +451,7 @@ describe("TargetMovement", () => {
         },
       },
     );
+    targetMovement.init();
 
     chunkUpdate(targetMovement, mockChar, 2 * CHUNKS_PER_SECOND);
 
@@ -492,6 +502,7 @@ describe("TargetMovement", () => {
         },
       },
     );
+    targetMovement.init();
 
     targetMovement.update(1000);
     mockChar.update(1000);
@@ -526,6 +537,7 @@ describe("TargetMovement", () => {
       layerPos(new Vector2(1, 3)),
       { config: { algorithm: shortestPathAlgo } },
     );
+    targetMovement.init();
     targetMovement.update(1000);
     mockChar.update(1000);
 
@@ -564,6 +576,7 @@ describe("TargetMovement", () => {
       layerPos(new Vector2(1, 3)),
       { config: { algorithm: shortestPathAlgo } },
     );
+    targetMovement.init();
 
     expectWalkedPath(
       targetMovement,
@@ -612,6 +625,7 @@ describe("TargetMovement", () => {
           },
         },
       );
+      targetMovement.init();
       targetMovement.update(100);
       mockChar.update(100);
 
@@ -674,6 +688,7 @@ describe("TargetMovement", () => {
           },
         },
       );
+      targetMovement.init();
       targetMovement.update(100);
       mockChar.update(100);
 
@@ -735,6 +750,7 @@ describe("TargetMovement", () => {
           },
         },
       );
+      targetMovement.init();
       const finishedObsCallbackMock = jest.fn();
       const finishedObsCompleteMock = jest.fn();
       targetMovement.finishedObs().subscribe({
@@ -810,6 +826,7 @@ describe("TargetMovement", () => {
           },
         },
       );
+      targetMovement.init();
       targetMovement.update(1);
       mockChar.update(1);
       targetMovement.update(1);
@@ -852,6 +869,7 @@ describe("TargetMovement", () => {
           },
         },
       );
+      targetMovement.init();
       targetMovement.update(1);
       mockChar.update(1);
       targetMovement.update(1);
@@ -912,6 +930,7 @@ describe("TargetMovement", () => {
           },
         },
       );
+      targetMovement.init();
       const finishedObsCallbackMock = jest.fn();
       const finishedObsCompleteMock = jest.fn();
       targetMovement.finishedObs().subscribe({
@@ -1008,6 +1027,7 @@ describe("TargetMovement", () => {
         pathBlockedWaitTimeoutMs: 2000,
       },
     });
+    targetMovement.init();
 
     blockPath(charPos, targetPos);
 
@@ -1063,6 +1083,7 @@ describe("TargetMovement", () => {
         pathBlockedWaitTimeoutMs: 2000,
       },
     });
+    targetMovement.init();
 
     blockPath(charPos, targetPos);
 
@@ -1113,6 +1134,7 @@ describe("TargetMovement", () => {
           pathBlockedStrategy: PathBlockedStrategy.RETRY,
         },
       });
+      targetMovement.init();
 
       updateLayer(
         tilemapMock,
@@ -1179,6 +1201,7 @@ describe("TargetMovement", () => {
           pathBlockedStrategy: PathBlockedStrategy.RETRY,
         },
       });
+      targetMovement.init();
 
       blockPath(charPos, targetPos);
 
@@ -1230,6 +1253,7 @@ describe("TargetMovement", () => {
           pathBlockedRetryBackoffMs: 150,
         },
       });
+      targetMovement.init();
       blockPath(charPos, targetPos);
 
       targetMovement.update(100);
@@ -1284,6 +1308,7 @@ describe("TargetMovement", () => {
           pathBlockedMaxRetries: 2,
         },
       });
+      targetMovement.init();
       blockPath(charPos, targetPos);
 
       const finishedObsCallbackMock = jest.fn();
@@ -1338,6 +1363,7 @@ describe("TargetMovement", () => {
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: { algorithm: shortestPathAlgo },
     });
+    targetMovement.init();
     targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
     blockPath(charPos, targetPos);
 
@@ -1394,6 +1420,7 @@ describe("TargetMovement", () => {
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: { algorithm: shortestPathAlgo },
     });
+    targetMovement.init();
     targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
 
     expect(mockChar.isMoving()).toBe(false);
@@ -1411,6 +1438,7 @@ describe("TargetMovement", () => {
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: { algorithm: shortestPathAlgo },
     });
+    targetMovement.init();
     targetMovement.setPathBlockedStrategy(PathBlockedStrategy.STOP);
 
     expect(mockChar.isMoving()).toBe(false);
@@ -1435,6 +1463,7 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(0, 0)),
         { config: { algorithm: shortestPathAlgo } },
       );
+      targetMovement.init();
       const mockCall = jest.fn();
       targetMovement.finishedObs().subscribe(mockCall);
 
@@ -1455,6 +1484,7 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(0, 0)),
         { config: { algorithm: shortestPathAlgo } },
       );
+      targetMovement.init();
       const mockCall = jest.fn();
       targetMovement.finishedObs().subscribe(mockCall);
 
@@ -1470,6 +1500,7 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(0, 0)),
         { config: { algorithm: shortestPathAlgo } },
       );
+      targetMovement.init();
       targetMovement.finishedObs().subscribe({ complete: mockCall });
       mockChar.setMovement(undefined);
       expect(mockCall).toHaveBeenCalled();
@@ -1481,6 +1512,7 @@ describe("TargetMovement", () => {
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: { algorithm: shortestPathAlgo },
       });
+      targetMovement.init();
       targetMovement.finishedObs().subscribe(mockCall);
 
       targetMovement.update(100);
@@ -1498,6 +1530,7 @@ describe("TargetMovement", () => {
       const targetPos = charPos;
       const mockCall = jest.fn();
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos);
+      targetMovement.init();
       targetMovement.finishedObs().subscribe(mockCall);
       targetMovement.update(1000);
       mockChar.update(1000);
@@ -1522,6 +1555,7 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(1, 1)),
         { config: { algorithm: shortestPathAlgo } },
       );
+      targetMovement.init();
       targetMovement.update(100);
       mockChar.update(100);
 
@@ -1543,6 +1577,7 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(3, 1)),
         { config: { algorithm: shortestPathAlgo } },
       );
+      targetMovement.init();
       targetMovement.update(100);
       mockChar.update(100);
 
@@ -1564,6 +1599,7 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(1, 3)),
         { config: { algorithm: shortestPathAlgo } },
       );
+      targetMovement.init();
       targetMovement.update(100);
       mockChar.update(100);
 
@@ -1585,6 +1621,7 @@ describe("TargetMovement", () => {
         layerPos(new Vector2(3, 3)),
         { config: { algorithm: shortestPathAlgo } },
       );
+      targetMovement.init();
       targetMovement.update(100);
       mockChar.update(100);
 
@@ -1626,6 +1663,7 @@ describe("TargetMovement", () => {
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
       });
+      targetMovement.init();
       targetMovement.update(100);
       mockChar.update(100);
 
@@ -1679,6 +1717,7 @@ describe("TargetMovement", () => {
         ignoreLayers: true,
       },
     });
+    targetMovement.init();
 
     targetMovement.update(1000);
     mockChar.update(1000);
@@ -1730,6 +1769,7 @@ describe("TargetMovement", () => {
         algorithm: shortestPathAlgo,
       },
     });
+    targetMovement.init();
 
     expectWalkedPath(
       targetMovement,
@@ -1767,6 +1807,7 @@ describe("TargetMovement", () => {
         isPositionAllowedFn: allowedFn,
       },
     });
+    targetMovement.init();
 
     expectWalkedPath(
       targetMovement,
@@ -1815,6 +1856,7 @@ describe("TargetMovement", () => {
         algorithm: shortestPathAlgo,
       },
     });
+    targetMovement.init();
 
     expectWalkedPath(
       targetMovement,
@@ -1864,6 +1906,7 @@ describe("TargetMovement", () => {
         algorithm: shortestPathAlgo,
       },
     });
+    targetMovement.init();
 
     expectWalkedPath(
       targetMovement,
@@ -1909,6 +1952,7 @@ describe("TargetMovement", () => {
         ignoredChars: [mockChar.getId()],
       },
     });
+    targetMovement.init();
 
     expectWalkedPath(
       targetMovement,
@@ -1951,6 +1995,7 @@ describe("TargetMovement", () => {
         algorithm: shortestPathAlgo,
       },
     });
+    targetMovement.init();
 
     expectWalkedPath(
       targetMovement,
@@ -1990,6 +2035,7 @@ describe("TargetMovement", () => {
       },
       ignoreBlockedTarget: true,
     });
+    targetMovement.init();
 
     expectWalkedPath(targetMovement, mockChar, createPath([[1, 1]]));
   });
@@ -2029,6 +2075,7 @@ describe("TargetMovement", () => {
         maxPathLength: 3,
       },
     });
+    targetMovement.init();
 
     targetMovement.update(1000);
     mockChar.update(1000);
@@ -2077,6 +2124,7 @@ describe("TargetMovement", () => {
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
       });
+      targetMovement.init();
 
       expectWalkedPath(
         targetMovement,
@@ -2124,6 +2172,7 @@ describe("TargetMovement", () => {
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
       });
+      targetMovement.init();
 
       // This is only one possible shortest path. When the shortest path
       // algorithm changes, this test could break.
@@ -2154,6 +2203,7 @@ describe("TargetMovement", () => {
           isPositionAllowedFn: allowedFn,
         },
       });
+      targetMovement.init();
 
       expectWalkedPath(
         targetMovement,
@@ -2203,6 +2253,7 @@ describe("TargetMovement", () => {
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
       });
+      targetMovement.init();
 
       expectWalkedPath(
         targetMovement,
@@ -2254,6 +2305,7 @@ describe("TargetMovement", () => {
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
       });
+      targetMovement.init();
 
       expectWalkedPath(
         targetMovement,
@@ -2301,6 +2353,7 @@ describe("TargetMovement", () => {
           noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
       });
+      targetMovement.init();
 
       expectWalkedPath(targetMovement, mockChar, createPath([[1, 1]]));
     });
@@ -2342,6 +2395,7 @@ describe("TargetMovement", () => {
           },
         },
       );
+      targetMovement.init();
 
       const finishedObsCallbackMock = jest.fn();
       const finishedObsCompleteMock = jest.fn();
@@ -2420,6 +2474,7 @@ describe("TargetMovement", () => {
           alternativeTargets,
         },
       });
+      targetMovement.init();
 
       expectWalkedPath(
         targetMovement,
@@ -2474,6 +2529,7 @@ describe("TargetMovement", () => {
             NoPathFoundStrategy.CLOSEST_REACHABLE,
         },
       });
+      targetMovement.init();
 
       expectWalkedPath(
         targetMovement,
@@ -2505,6 +2561,7 @@ describe("TargetMovement", () => {
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: { ...options, algorithm },
       });
+      targetMovement.init();
 
       expect(console.warn).toHaveBeenCalledWith(
         `GridEngine: Pathfinding option 'considerCosts' cannot be used with ` +
@@ -2529,6 +2586,7 @@ describe("TargetMovement", () => {
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: { algorithm: "BFS" },
     });
+    targetMovement.init();
 
     expect(console.warn).not.toHaveBeenCalled();
   });
@@ -2549,6 +2607,7 @@ describe("TargetMovement", () => {
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: { algorithm: "JPS" },
     });
+    targetMovement.init();
 
     expect(console.warn).toHaveBeenCalledWith(
       `GridEngine: Pathfinding algorithm 'JPS' can only be used for ` +
@@ -2572,6 +2631,7 @@ describe("TargetMovement", () => {
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
       config: { algorithm: "JPS" },
     });
+    targetMovement.init();
 
     expect(console.warn).toHaveBeenCalledWith(
       `GridEngine: Pathfinding algorithm 'JPS' can only be used for ` +
@@ -2611,6 +2671,7 @@ describe("TargetMovement", () => {
     const mockChar = createMockChar("char1", charPos);
 
     targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos);
+    targetMovement.init();
     expect(targetMovement.getInfo().state?.pathAhead).toEqual([
       { position: { x: 1, y: 1 }, charLayer: "lowerCharLayer" },
       { position: { x: 1, y: 2 }, charLayer: "lowerCharLayer" },

@@ -13,6 +13,7 @@ import { LayerVecPos } from "../../Utils/LayerPositionUtils/LayerPositionUtils.j
 const mockTargetMovement = {
   setCharacter: jest.fn(),
   update: jest.fn(),
+  init: jest.fn(),
 };
 
 jest.mock("../TargetMovement/TargetMovement", () => ({
@@ -63,6 +64,7 @@ describe("FollowMovement", () => {
     // @ts-ignore
     TargetMovement.mockClear();
     followMovement = new FollowMovement(char, gridTilemap, targetChar);
+    followMovement.init();
   });
 
   it("should set character", () => {
@@ -141,6 +143,7 @@ describe("FollowMovement", () => {
       maxPathLength: 100,
       ignoreLayers: true,
     });
+    followMovement.init();
     followMovement.update(100);
     expect(TargetMovement).toHaveBeenCalledWith(
       char,
@@ -189,6 +192,7 @@ describe("FollowMovement", () => {
         ignoreLayers: true,
         facingDirection: dir,
       });
+      followMovement.init();
       followMovement.update(100);
       expect(TargetMovement).toHaveBeenCalledWith(
         char,
@@ -256,6 +260,7 @@ describe("FollowMovement", () => {
         ignoreLayers: true,
         facingDirection: dir,
       });
+      followMovement.init();
       followMovement.update(100);
       expect(TargetMovement).toHaveBeenCalledWith(
         char,
@@ -277,6 +282,7 @@ describe("FollowMovement", () => {
       ignoreLayers: true,
       facingDirection: Direction.DOWN,
     });
+    followMovement.init();
     followMovement.update(100);
     expect(TargetMovement).toHaveBeenCalledWith(
       char,
@@ -293,6 +299,7 @@ describe("FollowMovement", () => {
       distance: 7,
       noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
     });
+    followMovement.init();
     followMovement.update(100);
     expect(TargetMovement).toHaveBeenCalledWith(
       char,
@@ -324,6 +331,7 @@ describe("FollowMovement", () => {
       ignoredChars: ["anotherTestChar"],
       isPositionAllowedFn: posAllowedFn,
     });
+    followMovement.init();
     followMovement.update(100);
     expect(TargetMovement).toHaveBeenCalledWith(
       char,

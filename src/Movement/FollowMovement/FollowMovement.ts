@@ -25,6 +25,7 @@ export interface Options {
   facingDirection?: Direction;
   isPositionAllowedFn?: IsPositionAllowedFn;
   ignoredChars?: CharId[];
+  followImmediately?: boolean;
 }
 
 export class FollowMovement implements Movement {
@@ -47,6 +48,7 @@ export class FollowMovement implements Movement {
       facingDirection: Direction.NONE,
       isPositionAllowedFn: () => true,
       ignoredChars: [],
+      followImmediately: false,
     };
     this.options = { ...defaultOptions, ...options };
     if (
@@ -68,8 +70,9 @@ export class FollowMovement implements Movement {
           `characters with 'tileWidth' and 'tileHeight' of 1`,
       );
     }
-    this.character = character;
+  }
 
+  init(): void {
     this.updateTarget(
       this.charToFollow.getTilePos().position,
       this.charToFollow.getTilePos().layer,
@@ -173,5 +176,6 @@ export class FollowMovement implements Movement {
         },
       },
     );
+    this.targetMovement.init();
   }
 }

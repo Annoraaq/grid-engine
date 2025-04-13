@@ -136,6 +136,9 @@ export class QueueMovement implements Movement {
     this.distanceUtils = DistanceUtilsFactory.create(
       character.getNumberOfDirections(),
     );
+  }
+
+  init(): void {
     this.character
       .autoMovementSet()
       .pipe(
