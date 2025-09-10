@@ -3,7 +3,8 @@ import {
   ShortestPathResult,
 } from "../ShortestPathAlgorithm.js";
 import { VectorUtils } from "../../Utils/VectorUtils.js";
-import { MinFibonacciHeap } from "mnemonist/fibonacci-heap";
+import { MinFibonacciHeap } from "mnemonist";
+
 import {
   LayerPositionUtils,
   LayerVecPos,
