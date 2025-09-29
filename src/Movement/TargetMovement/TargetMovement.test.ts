@@ -37,7 +37,7 @@ const CHUNKS_PER_SECOND = 2;
 describe("TargetMovement", () => {
   let targetMovement: TargetMovement;
   let tilemapMock;
-  let gridTilemap;
+  let gridTilemap: GridTilemap;
   let shortestPathAlgo: ShortestPathAlgorithmType;
 
   function createMockChar(
@@ -1508,21 +1508,27 @@ describe("TargetMovement", () => {
 
     it("should fire when char arrives", () => {
       const mockCall = jest.fn();
-      const targetPos = charPos;
+      const targetPos = { position: new Vector2(0, 0), layer: "testCharLayer" };
+      gridTilemap.setTransition(
+        new Vector2(0, 0),
+        "lowerCharLayer",
+        "testCharLayer",
+      );
       targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
         config: { algorithm: shortestPathAlgo },
       });
+      mockChar.setMovement(targetMovement);
       targetMovement.init();
       targetMovement.finishedObs().subscribe(mockCall);
 
-      targetMovement.update(100);
+      mockChar.update(100);
       mockChar.update(100);
 
       expect(mockCall).toHaveBeenCalledWith({
-        position: mockChar.getTilePos().position,
+        position: targetPos.position,
         result: MoveToResult.SUCCESS,
         description: "Successfully arrived.",
-        layer: "lowerCharLayer",
+        layer: "testCharLayer",
       });
     });
 

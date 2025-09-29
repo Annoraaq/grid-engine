@@ -458,10 +458,10 @@ export class TargetMovement implements Movement {
 
   private stop(result?: MoveToResult): void {
     this.finished$.next({
-      position: this.character.getTilePos().position,
+      position: this.character.getNextTilePos().position,
       result,
       description: this.resultToReason(result),
-      layer: this.character.getTilePos().layer,
+      layer: this.character.getNextTilePos().layer,
     });
     this.finished$.complete();
     this.stopped = true;
