@@ -73,7 +73,7 @@
     "ts-jest": "^29.4.6",
     "typedoc": "^0.28.15",
     "typescript": "^5.9.3",
-    "vitepress": "^0.1.1",
+    "vitepress": "^1.6.4",
     "vue": "^3.5.26",
     "vue-chartjs": "^5.3.3"
   },
