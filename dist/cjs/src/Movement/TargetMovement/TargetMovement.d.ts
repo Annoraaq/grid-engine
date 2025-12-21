@@ -9,6 +9,15 @@ import { CharLayer, LayerPosition, Position } from "../../GridEngine.js";
 import { Subject } from "rxjs";
 import { LayerVecPos } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 /**
+ * Defines when the observable returned by {@link TargetMovement.finishedObs}
+ * should emit the finished event.
+ *
+ * 'START_MOVEMENT' - Emit event when player starts the last position change (one field away from target).
+ * 'END_MOVEMENT' - Emit event when player reached the target position (stopped moving).
+ * 'BOTH' - Emit event at both times.
+ **/
+export type FinishedEvent = "START_MOVEMENT" | "END_MOVEMENT" | "BOTH";
+/**
  * @category Pathfinding
  */
 export interface MoveToConfig {
@@ -119,6 +128,18 @@ export interface MoveToConfig {
      * Set of characters to ignore at collision checking.
      */
     ignoredChars?: CharId[];
+    /**
+     * Defines when the observable returned by {@link TargetMovement.finishedObs}
+     * should emit the finished event.
+     *
+     * 'START_MOVEMENT' - Emit event when player starts the last position change (one field away from target).
+     * 'END_MOVEMENT' - Emit event when player reached the target position (stopped moving).
+     * 'BOTH' - Emit event at both times.
+     *
+     *
+     * @default 'START_MOVEMENT'
+     */
+    emitFinishedEvent?: FinishedEvent;
 }
 /**
  * @category Pathfinding
@@ -141,6 +162,7 @@ export interface Finished {
     result?: MoveToResult;
     description?: string;
     layer: CharLayer;
+    finishedEvent: Omit<FinishedEvent, "BOTH">;
 }
 export interface Options {
     distance?: number;
@@ -188,12 +210,14 @@ export declare class TargetMovement implements Movement {
     private maxPathLength;
     private considerCosts;
     private ignoredChars;
+    private emitFinishedEvent;
     constructor(character: GridCharacter, tilemap: GridTilemap, targetPos: LayerVecPos, { config, ignoreBlockedTarget, distance }?: Options);
     init(): void;
     setPathBlockedStrategy(pathBlockedStrategy: PathBlockedStrategy): void;
     getPathBlockedStrategy(): PathBlockedStrategy;
     private getPathfindingOptions;
     update(delta: number): void;
+    private hasClosestToTarget;
     finishedObs(): Subject<Finished>;
     getInfo(): MoveToInfo;
     private resultToReason;
