@@ -376,6 +376,96 @@ describe("TargetMovement", () => {
     expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
   });
 
+  it("should turn towards target if distance is reached", () => {
+    const charPos = layerPos(new Vector2(3, 0));
+    const mockChar = createMockChar("char", charPos);
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..#p",
+          ".t#.",
+          ".##.",
+          "....",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES,
+    );
+
+    targetMovement = new TargetMovement(
+      mockChar,
+      gridTilemap,
+      layerPos(new Vector2(1, 1)),
+      {
+        distance: 4,
+        config: {
+          algorithm: shortestPathAlgo,
+        },
+      },
+    );
+    targetMovement.init();
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
+
+    expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 3)));
+    expect(mockChar.getFacingDirection()).toEqual(Direction.UP);
+
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
+
+    expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 3)));
+  });
+
+  it("should turn towards target if closest to target is reached", () => {
+    const charPos = layerPos(new Vector2(1, 0));
+    const mockChar = createMockChar("char", charPos);
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          ".p#.",
+          "..#.",
+          "..#.",
+          "..#t",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES,
+    );
+
+    targetMovement = new TargetMovement(
+      mockChar,
+      gridTilemap,
+      layerPos(new Vector2(3, 3)),
+      {
+        config: {
+          algorithm: shortestPathAlgo,
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        },
+      },
+    );
+    targetMovement.init();
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
+
+    expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 3)));
+    expect(mockChar.getFacingDirection()).toEqual(Direction.RIGHT);
+  });
+
   it("should move if closestToTarget is further than distance", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
@@ -786,6 +876,7 @@ describe("TargetMovement", () => {
         description:
           "NoPathFoundStrategy RETRY: Maximum retries of 2 exceeded.",
         layer: "lowerCharLayer",
+        finishedEvent: "START_MOVEMENT",
       });
       expect(finishedObsCompleteMock).toHaveBeenCalled();
     });
@@ -962,6 +1053,7 @@ describe("TargetMovement", () => {
         result: MoveToResult.NO_PATH_FOUND,
         description: "NoPathFoundStrategy STOP: No path found.",
         layer: "lowerCharLayer",
+        finishedEvent: "START_MOVEMENT",
       });
       expect(finishedObsCompleteMock).toHaveBeenCalled();
     });
@@ -1050,6 +1142,7 @@ describe("TargetMovement", () => {
       result: MoveToResult.PATH_BLOCKED_WAIT_TIMEOUT,
       description: "PathBlockedStrategy WAIT: Wait timeout of 2000ms exceeded.",
       layer: "lowerCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).toHaveBeenCalled();
   });
@@ -1332,6 +1425,7 @@ describe("TargetMovement", () => {
         description:
           "PathBlockedStrategy RETRY: Maximum retries of 2 exceeded.",
         layer: "lowerCharLayer",
+        finishedEvent: "START_MOVEMENT",
       });
       expect(finishedObsCompleteMock).toHaveBeenCalled();
     });
@@ -1385,6 +1479,7 @@ describe("TargetMovement", () => {
       result: MoveToResult.PATH_BLOCKED,
       description: `PathBlockedStrategy STOP: Path blocked.`,
       layer: "lowerCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).toHaveBeenCalled();
   });
@@ -1474,6 +1569,7 @@ describe("TargetMovement", () => {
         description:
           "Movement of character has been replaced before destination was reached.",
         layer: "lowerCharLayer",
+        finishedEvent: "START_MOVEMENT",
       });
     });
 
@@ -1506,7 +1602,7 @@ describe("TargetMovement", () => {
       expect(mockCall).toHaveBeenCalled();
     });
 
-    it("should fire when char arrives", () => {
+    it("should fire when char does last step", () => {
       const mockCall = jest.fn();
       const targetPos = { position: new Vector2(0, 0), layer: "testCharLayer" };
       gridTilemap.setTransition(
@@ -1529,6 +1625,7 @@ describe("TargetMovement", () => {
         result: MoveToResult.SUCCESS,
         description: "Successfully arrived.",
         layer: "testCharLayer",
+        finishedEvent: "START_MOVEMENT",
       });
     });
 
@@ -1543,6 +1640,73 @@ describe("TargetMovement", () => {
       targetMovement.update(1000);
       mockChar.update(1000);
       expect(mockCall).toHaveBeenCalledTimes(1);
+    });
+
+    it("should fire after char does last step", () => {
+      const mockCall = jest.fn();
+      const targetPos = {
+        position: new Vector2(2, 0),
+        layer: "lowerCharLayer",
+      };
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        config: {
+          algorithm: shortestPathAlgo,
+          emitFinishedEvent: "END_MOVEMENT",
+        },
+      });
+      mockChar.setMovement(targetMovement);
+      targetMovement.init();
+      targetMovement.finishedObs().subscribe(mockCall);
+
+      mockChar.update(500);
+      mockChar.update(500);
+      mockChar.update(500);
+
+      expect(mockCall).toHaveBeenCalledWith({
+        position: targetPos.position,
+        result: MoveToResult.SUCCESS,
+        description: "Successfully arrived.",
+        layer: "lowerCharLayer",
+        finishedEvent: "END_MOVEMENT",
+      });
+    });
+
+    it("should fire before and after char does last step", () => {
+      const mockCall = jest.fn();
+      const targetPos = {
+        position: new Vector2(2, 0),
+        layer: "lowerCharLayer",
+      };
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        config: {
+          algorithm: shortestPathAlgo,
+          emitFinishedEvent: "BOTH",
+        },
+      });
+      mockChar.setMovement(targetMovement);
+      targetMovement.init();
+      targetMovement.finishedObs().subscribe(mockCall);
+
+      mockChar.update(500);
+      mockChar.update(200);
+      expect(mockCall).toHaveBeenCalledWith({
+        position: targetPos.position,
+        result: MoveToResult.SUCCESS,
+        description: "Successfully arrived.",
+        layer: "lowerCharLayer",
+        finishedEvent: "START_MOVEMENT",
+      });
+      expect(mockCall).toHaveBeenCalledTimes(1);
+
+      mockChar.update(500);
+
+      expect(mockCall).toHaveBeenCalledWith({
+        position: targetPos.position,
+        result: MoveToResult.SUCCESS,
+        description: "Successfully arrived.",
+        layer: "lowerCharLayer",
+        finishedEvent: "END_MOVEMENT",
+      });
     });
   });
 
@@ -2434,6 +2598,7 @@ describe("TargetMovement", () => {
         result: MoveToResult.NO_PATH_FOUND,
         description: "NoPathFoundStrategy STOP: No path found.",
         layer: "lowerCharLayer",
+        finishedEvent: "START_MOVEMENT",
       });
       expect(finishedObsCompleteMock).toHaveBeenCalled();
     });

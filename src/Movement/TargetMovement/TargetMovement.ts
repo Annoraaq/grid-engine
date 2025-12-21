@@ -27,6 +27,16 @@ import {
 } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 /**
+ * Defines when the observable returned by {@link TargetMovement.finishedObs}
+ * should emit the finished event.
+ *
+ * 'START_MOVEMENT' - Emit event when player starts the last position change (one field away from target).
+ * 'END_MOVEMENT' - Emit event when player reached the target position (stopped moving).
+ * 'BOTH' - Emit event at both times.
+ **/
+export type FinishedEvent = "START_MOVEMENT" | "END_MOVEMENT" | "BOTH";
+
+/**
  * @category Pathfinding
  */
 export interface MoveToConfig {
@@ -152,6 +162,19 @@ export interface MoveToConfig {
    * Set of characters to ignore at collision checking.
    */
   ignoredChars?: CharId[];
+
+  /**
+   * Defines when the observable returned by {@link TargetMovement.finishedObs}
+   * should emit the finished event.
+   *
+   * 'START_MOVEMENT' - Emit event when player starts the last position change (one field away from target).
+   * 'END_MOVEMENT' - Emit event when player reached the target position (stopped moving).
+   * 'BOTH' - Emit event at both times.
+   *
+   *
+   * @default 'START_MOVEMENT'
+   */
+  emitFinishedEvent?: FinishedEvent;
 }
 
 /**
@@ -176,6 +199,7 @@ export interface Finished {
   result?: MoveToResult;
   description?: string;
   layer: CharLayer;
+  finishedEvent: Omit<FinishedEvent, "BOTH">;
 }
 
 export interface Options {
@@ -224,6 +248,7 @@ export class TargetMovement implements Movement {
   private maxPathLength = Infinity;
   private considerCosts = false;
   private ignoredChars: CharId[] = [];
+  private emitFinishedEvent: FinishedEvent;
 
   constructor(
     private character: GridCharacter,
@@ -293,6 +318,7 @@ export class TargetMovement implements Movement {
     );
     this.pathBlockedWaitTimeoutMs = config?.pathBlockedWaitTimeoutMs || -1;
     this.ignoredChars = config?.ignoredChars ?? [];
+    this.emitFinishedEvent = config?.emitFinishedEvent || "START_MOVEMENT";
     this.finished$ = new Subject<Finished>();
   }
 
@@ -366,7 +392,10 @@ export class TargetMovement implements Movement {
     if (this.hasArrived()) {
       this.stop(MoveToResult.SUCCESS);
       if (this.existsDistToTarget()) {
-        this.turnTowardsTarget();
+        const nextTile = this.shortestPath[this.shortestPath.length - 1];
+        this.turnTowardsTarget(nextTile.position);
+      } else if (this.hasClosestToTarget()) {
+        this.turnTowardsTarget(this.targetPos.position);
       }
     } else if (
       !this.isBlocking(
@@ -376,6 +405,10 @@ export class TargetMovement implements Movement {
     ) {
       this.moveCharOnPath();
     }
+  }
+
+  private hasClosestToTarget(): boolean {
+    return this.distOffset > 0;
   }
 
   finishedObs(): Subject<Finished> {
@@ -457,23 +490,53 @@ export class TargetMovement implements Movement {
   }
 
   private stop(result?: MoveToResult): void {
-    this.finished$.next({
+    const finished: Finished = {
       position: this.character.getNextTilePos().position,
       result,
       description: this.resultToReason(result),
       layer: this.character.getNextTilePos().layer,
-    });
-    this.finished$.complete();
+      finishedEvent: "START_MOVEMENT",
+    };
+    if (this.emitFinishedEvent === "START_MOVEMENT") {
+      this.finished$.next(finished);
+      this.finished$.complete();
+    } else if (this.emitFinishedEvent === "END_MOVEMENT") {
+      this.character
+        .movementStopped()
+        .pipe(take(1))
+        .subscribe(() => {
+          this.finished$.next({
+            ...finished,
+            finishedEvent: "END_MOVEMENT",
+          });
+          this.finished$.complete();
+        });
+    } else if (this.emitFinishedEvent === "BOTH") {
+      this.finished$.next(finished);
+      this.character
+        .movementStopped()
+        .pipe(take(1))
+        .subscribe(() => {
+          this.finished$.next({
+            ...finished,
+            finishedEvent: "END_MOVEMENT",
+          });
+          this.finished$.complete();
+        });
+    }
     this.stopped = true;
   }
 
-  private turnTowardsTarget(): void {
-    const nextTile = this.shortestPath[this.posOnPath + 1];
-    const dir = this.getDir(
-      this.character.getNextTilePos().position,
-      nextTile.position,
-    );
-    this.character.turnTowards(dir);
+  private turnTowardsTarget(pos: Vector2): void {
+    const dir = this.getDir(this.character.getNextTilePos().position, pos);
+    // The character is still moving, so we need to wait until it has stopped,
+    // because it can't turn while in movement.
+    this.character
+      .movementStopped()
+      .pipe(take(1))
+      .subscribe(() => {
+        this.character.turnTowards(dir);
+      });
   }
 
   private existsDistToTarget(): boolean {

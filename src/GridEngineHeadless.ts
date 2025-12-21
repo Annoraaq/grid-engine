@@ -479,6 +479,7 @@ export class GridEngineHeadless implements IGridEngine {
         result: finished.result,
         description: finished.description,
         layer: finished.layer,
+        finishedEvent: finished.finishedEvent,
       })),
     );
   }
