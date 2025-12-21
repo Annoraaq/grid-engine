@@ -653,6 +653,7 @@ describe("GridEngine", () => {
           result: "NO_PATH_FOUND",
           description: "NoPathFoundStrategy STOP: No path found.",
           layer: undefined,
+          finishedEvent: "START_MOVEMENT",
         });
         done();
       });
