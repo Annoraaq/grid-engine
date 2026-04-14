@@ -61,7 +61,7 @@
     "canvas": "^3.2.0",
     "csv-parse": "^6.2.1",
     "esbuild": "^0.28.0",
-    "eslint": "^10.2.0",
+    "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jest": "^29.5.0",
     "jest": "^30.2.0",
