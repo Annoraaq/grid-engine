@@ -2,7 +2,7 @@ import { Tile } from "../Tilemap.js";
 import { RawTiledTileset } from "./TiledMap.js";
 
 export class TiledTile implements Tile {
-  private props = {};
+  private props: Record<string, any> = {};
   constructor(tilesets: RawTiledTileset[], tileId: number) {
     const correctTileset = tilesets.find((ts) => {
       if (!ts.tiles) return false;

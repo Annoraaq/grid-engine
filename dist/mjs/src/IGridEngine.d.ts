@@ -562,7 +562,7 @@ export interface IGridEngine {
      *
      * @category Queue Movement
      */
-    addQueueMovements(charId: string, positions: Array<LayerPosition | Direction>, options?: QueueMovementConfig): any;
+    addQueueMovements(charId: string, positions: Array<LayerPosition | Direction>, options?: QueueMovementConfig): void;
     /**
      * Returns all enqueued movements for the given character.
      *

@@ -21,9 +21,9 @@ import { createPhaserTilemapStub } from "../../Utils/MockFactory/MockPhaserTilem
 
 describe("GridCharacterPhaser", () => {
   let gridEngineHeadless: GridEngineHeadless;
-  let overlaySpriteMock;
-  let sceneMock;
-  let spriteMock;
+  let overlaySpriteMock: Phaser.GameObjects.Sprite;
+  let sceneMock: Phaser.Scene;
+  let spriteMock: Phaser.GameObjects.Sprite;
 
   beforeEach(() => {
     spriteMock = createSpriteMock();
@@ -35,11 +35,11 @@ describe("GridCharacterPhaser", () => {
       displayHeight: 21,
       y: 20,
       setDepth: jest.fn(),
-    };
+    } as unknown as Phaser.GameObjects.Sprite;
     sceneMock = {
       sys: { events: { once: jest.fn(), on: jest.fn() } },
       add: { sprite: jest.fn().mockReturnValue(overlaySpriteMock) },
-    };
+    } as unknown as Phaser.Scene;
     gridEngineHeadless = new GridEngineHeadless();
   });
 
@@ -292,7 +292,7 @@ describe("GridCharacterPhaser", () => {
 
       (oldAnimation?.frameChange() as any).next(13);
       expect(newSpriteMock.setFrame).not.toHaveBeenCalledWith(13);
-      spriteMock.setFrame.mockReset();
+      (spriteMock.setFrame as jest.Mock).mockReset();
       (gridCharPhaser.getAnimation()?.frameChange() as any).next(13);
       expect(gridCharPhaser.getAnimation()?.isEnabled()).toBe(true);
       expect(newSpriteMock.setFrame).toHaveBeenCalledWith(13);
@@ -490,8 +490,8 @@ describe("GridCharacterPhaser", () => {
     });
 
     describe("update sprite pixel pos", () => {
-      let charData;
-      let charTilePos;
+      let charData: { offsetX: number; offsetY: number };
+      let charTilePos: Vector2;
       beforeEach(() => {
         charData = {
           offsetX: 10,
@@ -656,8 +656,8 @@ describe("GridCharacterPhaser", () => {
     });
 
     describe("update sprite pixel pos isometric", () => {
-      let charData;
-      let charTilePos;
+      let charData: Partial<CharacterData>;
+      let charTilePos: Vector2;
       beforeEach(() => {
         charData = {
           offsetX: 10,
@@ -681,7 +681,7 @@ describe("GridCharacterPhaser", () => {
         const expectedYPos =
           gridTilemapPhaser.tilePosToPixelPos(charTilePos).y +
           expectedYEngineOffset() +
-          charData.offsetY +
+          (charData.offsetY ?? 0) +
           gridTilemapPhaser.getTileDistance(Direction.UP).y * -0.25;
 
         expect(gridCharPhaser.getSprite()?.x).toBe(0);
@@ -703,12 +703,12 @@ describe("GridCharacterPhaser", () => {
         const expectedXPos =
           gridTilemapPhaser.tilePosToPixelPos(charTilePos).x +
           expectedXEngineOffset() +
-          charData.offsetX +
+          (charData.offsetX ?? 0) +
           gridTilemapPhaser.getTileDistance(Direction.UP_LEFT).x * -0.25;
         const expectedYPos =
           gridTilemapPhaser.tilePosToPixelPos(charTilePos).y +
           expectedYEngineOffset() +
-          charData.offsetY +
+          (charData.offsetY ?? 0) +
           gridTilemapPhaser.getTileDistance(Direction.UP_LEFT).y * -0.25;
 
         expect(gridCharPhaser.getSprite()?.x).toBe(expectedXPos);
@@ -862,7 +862,7 @@ describe("GridCharacterPhaser", () => {
   });
 
   describe("turn towards", () => {
-    let gridCharPhaser;
+    let gridCharPhaser: GridCharacterPhaser;
     beforeEach(() => {
       const startPos = { x: 2, y: 2 };
       const charData = {

@@ -22,7 +22,8 @@ import {
 } from "./GridCharacter/CharacterAnimation/CharacterAnimation.js";
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter.js";
 
-import { version as VERSION } from "../package.json";
+import pkg from "../package.json";
+const VERSION = (pkg as any).version;
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
 import {
   GridEngineHeadless,

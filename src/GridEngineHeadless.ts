@@ -30,7 +30,8 @@ import {
   filterCharacters,
 } from "./GridCharacter/CharacterFilter/CharacterFilter.js";
 
-import { version as VERSION } from "../package.json";
+import pkg from "../package.json";
+const VERSION = (pkg as any).version;
 import { Pathfinding } from "./Pathfinding/Pathfinding.js";
 import { LayerPositionUtils } from "./Utils/LayerPositionUtils/LayerPositionUtils.js";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
@@ -268,8 +269,10 @@ export interface CharacterDataHeadless {
   tileHeight?: number;
 }
 
-interface ConcreteConfig
-  extends Omit<Required<GridEngineConfigHeadless>, "collisionGroupRelation"> {
+interface ConcreteConfig extends Omit<
+  Required<GridEngineConfigHeadless>,
+  "collisionGroupRelation"
+> {
   collisionGroupRelation?: Record<string, string[]>;
 }
 

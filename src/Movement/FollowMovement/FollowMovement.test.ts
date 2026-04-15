@@ -401,7 +401,7 @@ describe("FollowMovement", () => {
     });
   });
 
-  test.each(["BFS", "BIDIRECTIONAL_SEARCH", "JPS"])(
+  test.each(["BFS", "BIDIRECTIONAL_SEARCH", "JPS"] as const)(
     "should show a warning if considerCost pathfinding option is used with" +
       " algorithm different than A*",
     (algorithm: ShortestPathAlgorithmType) => {

@@ -1,10 +1,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "moduleResolution": "node",
+    "moduleResolution": "Node16",
     "emitDeclarationOnly": true,
-    "module": "esnext",
+    "module": "Node16",
     "outDir": "dist/mjs",
     "target": "es2016"
-  },
+  }
 }

@@ -21,6 +21,7 @@ import {
   mockCharMap,
   updateLayer,
 } from "../../Utils/MockFactory/MockFactory.js";
+import { Tile, Tilemap } from "../../GridTilemap/Tilemap.js";
 import {
   LayerPositionUtils,
   LayerVecPos,
@@ -36,7 +37,7 @@ const CHUNKS_PER_SECOND = 2;
 
 describe("TargetMovement", () => {
   let targetMovement: TargetMovement;
-  let tilemapMock;
+  let tilemapMock: Tilemap;
   let gridTilemap: GridTilemap;
   let shortestPathAlgo: ShortestPathAlgorithmType;
 
@@ -1067,12 +1068,15 @@ describe("TargetMovement", () => {
       throw "TargetPos needs to be (1,2)";
     }
 
-    tilemapMock
+    const tile = tilemapMock
       .getLayers()
       .find((l) => l.getName() == charPos.layer)
-      .getData()[charPos.position.y + 1][charPos.position.x].properties[
-      "ge_collide"
-    ] = "true";
+      ?.getData()[charPos.position.y + 1][charPos.position.x] as Tile & {
+      properties: Record<string, string | undefined>;
+    };
+    if (tile) {
+      tile.properties["ge_collide"] = "true";
+    }
   }
 
   function unblockPath(charPos: LayerVecPos, targetPos: LayerVecPos) {
@@ -1082,12 +1086,15 @@ describe("TargetMovement", () => {
     if (targetPos.position.x != 1 || targetPos.position.y != 2) {
       throw "TargetPos needs to be (1,2)";
     }
-    tilemapMock
+    const tile = tilemapMock
       .getLayers()
       .find((l) => l.getName() == charPos.layer)
-      .getData()[charPos.position.y + 1][charPos.position.x].properties[
-      "ge_collide"
-    ] = undefined;
+      ?.getData()[charPos.position.y + 1][charPos.position.x] as Tile & {
+      properties: Record<string, string | undefined>;
+    };
+    if (tile) {
+      tile.properties["ge_collide"] = undefined;
+    }
   }
 
   it("should timeout on strategy WAIT", () => {
@@ -1543,7 +1550,7 @@ describe("TargetMovement", () => {
   });
 
   describe("finished observable", () => {
-    let mockChar;
+    let mockChar: GridCharacter;
     let charPos: LayerVecPos;
 
     beforeEach(() => {
@@ -2714,7 +2721,7 @@ describe("TargetMovement", () => {
     });
   });
 
-  test.each(["BFS", "BIDIRECTIONAL_SEARCH", "JPS"])(
+  test.each(["BFS", "BIDIRECTIONAL_SEARCH", "JPS"] as const)(
     "should show a warning if considerCost pathfinding option is used with" +
       " algorithm different than A*",
     (algorithm: ShortestPathAlgorithmType) => {

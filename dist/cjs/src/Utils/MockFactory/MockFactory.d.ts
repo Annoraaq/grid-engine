@@ -52,7 +52,7 @@ export declare function mockLayeredBlockMap(blockMaps: Array<{
 }>, isometric?: boolean, costMaps?: CostMapLayer[]): Tilemap;
 export declare function tileCostProps(costMap: CostMapLayer, r: number, c: number): Record<string, number>;
 export declare function createAllowedFn(map: string[], ignoreBounds?: boolean): ({ x, y }: {
-    x: any;
-    y: any;
+    x: number;
+    y: number;
 }, _charLayer: any) => boolean;
-export declare function updateLayer(tilemapMock: any, blockMap: string[], layer?: string): void;
+export declare function updateLayer(tilemapMock: Tilemap, blockMap: string[], layer?: string): void;

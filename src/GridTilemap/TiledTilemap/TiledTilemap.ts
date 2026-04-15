@@ -1,5 +1,6 @@
 import { Orientation, Tile, TileLayer, Tilemap } from "../Tilemap.js";
 import { TiledLayer } from "./TiledLayer.js";
+import { RawTiledTilemap } from "./TiledMap.js";
 
 export const CHAR_LAYER_PROP_NAME = "ge_charLayer";
 
@@ -12,29 +13,30 @@ export const CHAR_LAYER_PROP_NAME = "ge_charLayer";
  */
 export class TiledTilemap implements Tilemap {
   private layers: TileLayer[] = [];
-  constructor(private rawTilemap: any) {
-    this.layers = this.rawTilemap.layers?.map(
-      (l) => new TiledLayer(this.rawTilemap.tilesets, l),
-    );
+  constructor(private rawTilemap: RawTiledTilemap) {
+    this.layers =
+      this.rawTilemap.layers?.map(
+        (l) => new TiledLayer(this.rawTilemap.tilesets ?? [], l),
+      ) ?? [];
   }
 
   hasTileAt(x: number, y: number, layer: string): boolean {
     // These two checks are for performance, not correctness.
-    if (x < 0 || x >= this.rawTilemap.width) return false;
-    if (y < 0 || y >= this.rawTilemap.height) return false;
+    if (x < 0 || x >= (this.rawTilemap.width ?? 0)) return false;
+    if (y < 0 || y >= (this.rawTilemap.height ?? 0)) return false;
 
     if (!this.rawTilemap.layers) return false;
     const tilemapLayer = this.rawTilemap.layers.find((l) => l.name === layer);
 
     if (!tilemapLayer) return false;
 
-    const linearPos = y * this.rawTilemap.width + x;
-    return tilemapLayer.data[linearPos] > 0;
+    const linearPos = y * (this.rawTilemap.width ?? 0) + x;
+    return (tilemapLayer?.data?.[linearPos] ?? 0) > 0;
   }
 
   getTileAt(x: number, y: number, layer: string): Tile | undefined {
-    if (x < 0 || x >= this.rawTilemap.width) return undefined;
-    if (y < 0 || y >= this.rawTilemap.height) return undefined;
+    if (x < 0 || x >= (this.rawTilemap.width ?? 0)) return undefined;
+    if (y < 0 || y >= (this.rawTilemap.height ?? 0)) return undefined;
 
     if (!this.rawTilemap.layers) return undefined;
     const tilemapLayer = this.layers.find(
@@ -53,10 +55,10 @@ export class TiledTilemap implements Tilemap {
   }
 
   getWidth(): number {
-    return this.rawTilemap.width;
+    return this.rawTilemap.width ?? 0;
   }
 
   getHeight(): number {
-    return this.rawTilemap.height;
+    return this.rawTilemap.height ?? 0;
   }
 }

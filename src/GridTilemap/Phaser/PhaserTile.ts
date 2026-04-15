@@ -31,6 +31,8 @@ export class PhaserTile implements Tile {
   }
 
   private getType(): string | undefined {
-    return this.phaserTile.tileset?.tileData[this.phaserTile.index - 1]?.type;
+    return (this.phaserTile.tileset?.tileData as Record<number, any>)[
+      this.phaserTile.index - 1
+    ]?.type;
   }
 }

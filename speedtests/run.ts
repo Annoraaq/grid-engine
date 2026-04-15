@@ -1,10 +1,11 @@
-import { BfsSpeed } from "./tests/BfsSpeed";
-import { BidirSpeed } from "./tests/BidirSpeed";
+import { BfsSpeed } from "./tests/BfsSpeed.js";
+import { BidirSpeed } from "./tests/BidirSpeed.js";
+// @ts-ignore
 import { GridEngineHeadless as GridEngineNew } from "../dist/GridEngine.esm.min.js";
 // @ts-ignore
 import { GridEngineHeadless as GridEngineOld } from "./old/dist/GridEngine.esm.min.js";
-import { RoomsTilemap } from "./RoomsTilemap";
-import { GridEngineHeadless } from "../src/GridEngineHeadless";
+import { RoomsTilemap } from "./RoomsTilemap.js";
+import { GridEngineHeadless } from "../src/GridEngineHeadless.js";
 
 export interface SpeedTestResult {
   result: number;
@@ -42,7 +43,7 @@ for (const t of speedTests) {
         compRes.resultOld.result
       }. New speed: ${compRes.resultNew.result}. Tolerance: ${
         compRes.resultOld.tolerance * 100
-      }%`
+      }%`,
     );
     hasFailed = true;
   } else {
@@ -53,7 +54,7 @@ for (const t of speedTests) {
         compRes.resultOld.result
       }. New speed: ${compRes.resultNew.result}. Tolerance: ${
         compRes.resultOld.tolerance * 100
-      }%`
+      }%`,
     );
   }
 }

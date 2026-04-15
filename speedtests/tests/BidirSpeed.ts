@@ -1,4 +1,4 @@
-import { GridEngineHeadless } from "../../src/GridEngineHeadless";
+import { GridEngineHeadless } from "../../src/GridEngineHeadless.js";
 
 export const BidirSpeed = {
   name: "Bidir Speed",
@@ -21,7 +21,7 @@ export const BidirSpeed = {
       },
       {
         shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH",
-      }
+      },
     );
 
     const end = performance.now();

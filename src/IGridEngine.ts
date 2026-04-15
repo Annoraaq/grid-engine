@@ -656,7 +656,7 @@ export interface IGridEngine {
     charId: string,
     positions: Array<LayerPosition | Direction>,
     options?: QueueMovementConfig,
-  );
+  ): void;
 
   /**
    * Returns all enqueued movements for the given character.

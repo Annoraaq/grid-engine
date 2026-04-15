@@ -136,9 +136,13 @@ export class CharacterAnimation {
     direction: Direction,
   ): FrameRow | undefined {
     if (!this.walkingAnimationMapping) return;
+    if (typeof this.walkingAnimationMapping === "number") return;
+    if (direction === Direction.NONE) return;
+    const fallbackDirection = this.fallbackDirection(direction);
+    if (fallbackDirection === Direction.NONE) return;
     return (
       this.walkingAnimationMapping[direction] ||
-      this.walkingAnimationMapping[this.fallbackDirection(direction)]
+      this.walkingAnimationMapping[fallbackDirection]
     );
   }
 

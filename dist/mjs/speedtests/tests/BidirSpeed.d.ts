@@ -1,4 +1,4 @@
-import { GridEngineHeadless } from "../../src/GridEngineHeadless";
+import { GridEngineHeadless } from "../../src/GridEngineHeadless.js";
 export declare const BidirSpeed: {
     name: string;
     run: (gridEngine: GridEngineHeadless) => {

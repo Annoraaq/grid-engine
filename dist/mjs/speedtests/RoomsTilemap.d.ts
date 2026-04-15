@@ -1,4 +1,4 @@
-import { Tilemap, Orientation, TileLayer, Tile } from "../src/GridEngine";
+import { Tilemap, Orientation, TileLayer, Tile } from "../src/GridEngine.js";
 export declare class RoomsTilemap implements Tilemap {
     private height;
     private width;

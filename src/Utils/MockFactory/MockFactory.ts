@@ -320,26 +320,36 @@ export function tileCostProps(
 }
 
 export function createAllowedFn(map: string[], ignoreBounds = false) {
-  return ({ x, y }, _charLayer) => {
+  return ({ x, y }: { x: number; y: number }, _charLayer: any) => {
     if (x < 0 || x >= map[0].length) return ignoreBounds;
     if (y < 0 || y >= map.length) return ignoreBounds;
     return map[y][x] != "#";
   };
 }
 
-export function updateLayer(tilemapMock, blockMap: string[], layer?: string) {
+export function updateLayer(
+  tilemapMock: Tilemap,
+  blockMap: string[],
+  layer?: string,
+) {
   for (let r = 0; r < blockMap.length; r++) {
     for (let c = 0; c < blockMap[r].length; c++) {
       if (blockMap[r][c] == "#") {
-        tilemapMock
+        const tile = tilemapMock
           .getLayers()
           .find((l) => l.getName() == layer)
-          .getData()[r][c].properties["ge_collide"] = "true";
+          ?.getData()[r][c] as Tile & {
+          properties: Record<string, string | undefined>;
+        };
+        tile.properties["ge_collide"] = "true";
       } else {
-        tilemapMock
+        const tile = tilemapMock
           .getLayers()
           .find((l) => l.getName() == layer)
-          .getData()[r][c].properties["ge_collide"] = undefined;
+          ?.getData()[r][c] as Tile & {
+          properties: Record<string, string | undefined>;
+        };
+        tile.properties["ge_collide"] = undefined;
       }
     }
   }

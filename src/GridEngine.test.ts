@@ -56,10 +56,10 @@ import { GridEngineStatePhaser } from "./GridEnginePhaser/GridEngineStatePhaser.
 
 describe("GridEngine", () => {
   let gridEngine: GridEngine;
-  let sceneMock;
+  let sceneMock: Phaser.Scene;
   let playerSpriteMock: Phaser.GameObjects.Sprite;
   let containerMock: Phaser.GameObjects.Container;
-  let consoleLogBackup;
+  let consoleLogBackup: (...data: any[]) => void;
 
   afterEach(() => {
     console.log = consoleLogBackup;
@@ -90,7 +90,7 @@ describe("GridEngine", () => {
     sceneMock = {
       sys: { events: { once: jest.fn(), on: jest.fn() } },
       add: { sprite: jest.fn().mockReturnValue(mockNewSprite) },
-    };
+    } as unknown as Phaser.Scene;
 
     playerSpriteMock = createSpriteMock();
     containerMock = createContainerMock();
@@ -819,7 +819,7 @@ describe("GridEngine", () => {
       );
     });
 
-    test.each(["BFS", "BIDIRECTIONAL_SEARCH", "JPS"])(
+    test.each(["BFS", "BIDIRECTIONAL_SEARCH", "JPS"] as const)(
       "should show a warning if considerCost pathfinding option is used with" +
         " algorithm different than A*",
       (algorithm: ShortestPathAlgorithmType) => {
@@ -1126,7 +1126,9 @@ describe("GridEngine", () => {
         },
       ],
     };
-    mock.tilesets[0].tileData[-1] = { type: "SomeTiledClass" };
+    (mock.tilesets[0].tileData as Record<number, any>)[-1] = {
+      type: "SomeTiledClass",
+    };
     gridEngine.create(mock, {
       characters: [{ id: "player" }],
       tiledProject,
@@ -1361,7 +1363,7 @@ describe("GridEngine", () => {
     });
 
     describe("steppedOn", () => {
-      let nextMock;
+      let nextMock: jest.Mock;
       const player = "player1";
       const nonMatchingChar = "non matching char";
       const expectedLayer = "anyLayer";
@@ -1624,7 +1626,7 @@ describe("GridEngine", () => {
       });
     });
 
-    test.each(["BFS", "BIDIRECTIONAL_SEARCH", "JPS"])(
+    test.each(["BFS", "BIDIRECTIONAL_SEARCH", "JPS"] as const)(
       "should show a warning if considerCost pathfinding option is used with" +
         " algorithm different than A*",
       (algorithm: ShortestPathAlgorithmType) => {

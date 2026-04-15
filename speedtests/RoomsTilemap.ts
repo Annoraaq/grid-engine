@@ -1,4 +1,4 @@
-import { Tilemap, Orientation, TileLayer, Tile } from "../src/GridEngine";
+import { Tilemap, Orientation, TileLayer, Tile } from "../src/GridEngine.js";
 const fs = require("fs");
 const CHAR_LAYER_PROP_NAME = "ge_charLayer";
 const MIN_CHAR_CODE = "z".charCodeAt(0) + 1;
@@ -64,7 +64,10 @@ export class RoomsTilemap implements Tilemap {
 
 class RoomsTileLayer implements TileLayer {
   private data: Array<Array<Tile | undefined>> = [];
-  constructor(rows: string[], private name: string) {
+  constructor(
+    rows: string[],
+    private name: string,
+  ) {
     for (const row of rows) {
       const rowArr: Tile[] = [];
       for (let c = 0; c < row.length; c++) {
@@ -104,7 +107,7 @@ type CollisionArr = [
   boolean, // up-left
   boolean, // up-right
   boolean, // down-left
-  boolean // down-right
+  boolean, // down-right
 ];
 
 class RoomsTile implements Tile {

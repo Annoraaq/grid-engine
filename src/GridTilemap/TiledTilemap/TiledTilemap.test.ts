@@ -1,6 +1,7 @@
 import { TiledTilemap } from "./TiledTilemap.js";
 import * as cloudCityTilemap from "../../Testing/testdata/tilemaps/cloud_city.json";
 import { TiledLayer } from "./TiledLayer.js";
+import { RawTiledLayer } from "./TiledMap.js";
 
 describe("TiledTilemap", () => {
   let tilemap: TiledTilemap;
@@ -71,7 +72,9 @@ describe("TiledTilemap", () => {
 
   it("gets layers", () => {
     expect(tilemap.getLayers()).toEqual(
-      jsonTilemap.layers.map((l) => new TiledLayer(jsonTilemap.tilesets, l)),
+      jsonTilemap.layers.map(
+        (l: RawTiledLayer) => new TiledLayer(jsonTilemap.tilesets, l),
+      ),
     );
   });
 });

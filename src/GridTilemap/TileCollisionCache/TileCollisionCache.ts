@@ -98,7 +98,7 @@ export class TileCollisionCache {
             true,
           );
           if (blockedUndefined) {
-            bitmap = setBitAt(bitmap, dirToBitmapNo[1]);
+            bitmap = setBitAt(bitmap, dirToBitmapNo[Direction.NONE]);
           }
           layerArr[c][r] = bitmap;
         }

@@ -1,4 +1,5 @@
 import { Orientation, Tile, TileLayer, Tilemap } from "../Tilemap.js";
+import { RawTiledTilemap } from "./TiledMap.js";
 export declare const CHAR_LAYER_PROP_NAME = "ge_charLayer";
 /**
  * Simple implementation of the Tilemap interface, using a parsed version of a
@@ -10,7 +11,7 @@ export declare const CHAR_LAYER_PROP_NAME = "ge_charLayer";
 export declare class TiledTilemap implements Tilemap {
     private rawTilemap;
     private layers;
-    constructor(rawTilemap: any);
+    constructor(rawTilemap: RawTiledTilemap);
     hasTileAt(x: number, y: number, layer: string): boolean;
     getTileAt(x: number, y: number, layer: string): Tile | undefined;
     getOrientation(): Orientation;

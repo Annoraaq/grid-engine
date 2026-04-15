@@ -1,4 +1,4 @@
-import { GridEngineHeadless } from "../../src/GridEngineHeadless";
+import { GridEngineHeadless } from "../../src/GridEngineHeadless.js";
 
 export const BfsSpeed = {
   name: "Bfs Speed",
@@ -21,7 +21,7 @@ export const BfsSpeed = {
       },
       {
         shortestPathAlgorithm: "BFS",
-      }
+      },
     );
 
     const end = performance.now();

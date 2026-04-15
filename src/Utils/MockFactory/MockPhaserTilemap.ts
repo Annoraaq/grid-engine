@@ -17,7 +17,7 @@ export function createPhaserTilemapStub(
   // @ts-ignore
   scene.sys.init(game);
   const tileset = new Phaser.Tilemaps.Tileset("Test tileset", 0);
-  tileset.tileData[-1] = { type: "SomeTiledClass" };
+  (tileset.tileData as Record<string, any>)[-1] = { type: "SomeTiledClass" };
   const mapData = parseBlockMap(blockMap, costMap);
   mapData.tilesets = [tileset];
   const tm = new Phaser.Tilemaps.Tilemap(scene, mapData);

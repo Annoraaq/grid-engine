@@ -3,6 +3,7 @@ export interface RawTiledTilemap {
   height?: number;
   orientation?: string;
   layers?: RawTiledLayer[];
+  tilesets?: RawTiledTileset[];
 }
 
 export interface RawTiledLayer {

@@ -46,7 +46,7 @@ import { GridEngineState } from "./GridEngineState.js";
 
 describe("GridEngineHeadless", () => {
   let gridEngineHeadless: GridEngineHeadless;
-  let consoleLogBackup;
+  let consoleLogBackup: (...data: any[]) => void;
 
   afterEach(() => {
     console.log = consoleLogBackup;
@@ -661,7 +661,7 @@ describe("GridEngineHeadless", () => {
       );
     });
 
-    test.each(["BFS", "BIDIRECTIONAL_SEARCH", "JPS"])(
+    test.each(["BFS", "BIDIRECTIONAL_SEARCH", "JPS"] as const)(
       "should show a warning if considerCost pathfinding option is used with" +
         " algorithm different than A*",
       (algorithm: ShortestPathAlgorithmType) => {
@@ -1196,7 +1196,7 @@ describe("GridEngineHeadless", () => {
     });
 
     describe("steppedOn", () => {
-      let nextMock;
+      let nextMock: jest.Mock;
       const player = "player1";
       const nonMatchingChar = "non matching char";
       const expectedLayer = "anyLayer";
@@ -1493,7 +1493,7 @@ describe("GridEngineHeadless", () => {
       });
     });
 
-    test.each(["BFS", "BIDIRECTIONAL_SEARCH", "JPS"])(
+    test.each(["BFS", "BIDIRECTIONAL_SEARCH", "JPS"] as const)(
       "should show a warning if considerCost pathfinding option is used with" +
         " algorithm different than A*",
       (algorithm: ShortestPathAlgorithmType) => {

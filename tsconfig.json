@@ -1,20 +1,14 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es6",
     "declaration": true,
     "allowJs": false,
-    "downlevelIteration": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["node", "jest"],
+    "skipLibCheck": true
   },
-  "include": [
-    "**/*.ts",
-    "jest.config.js",
-    ".eslintrc.cjs"
-  ],
-  "exclude": [
-    "./dist/**/*",
-    "./speedtests/old/**/*"
-  ]
+  "include": ["**/*.ts", "jest.config.js", ".eslintrc.cjs"],
+  "exclude": ["./dist/**/*", "./speedtests/old/**/*"]
 }
