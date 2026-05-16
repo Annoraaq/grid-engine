@@ -1,13 +1,8 @@
 import { createPhaserTilemapStub } from "../../Utils/MockFactory/MockPhaserTilemap.js";
-import * as Phaser from "phaser";
 import { PhaserTilemap } from "./PhaserTilemap.js";
 import { PhaserTileLayer } from "./PhaserTileLayer.js";
 import { PhaserTile } from "./PhaserTile.js";
-
-// Hack to get Phaser included at runtime
-((_a) => {
-  // do nothing
-})(Phaser);
+import { Tilemaps } from "phaser";
 
 describe("PhaserTilemap", () => {
   it("should get tile size", () => {
@@ -31,7 +26,7 @@ describe("PhaserTilemap", () => {
     const phaserTilemap = new PhaserTilemap(tilemap);
     expect(phaserTilemap.getOrientation()).toEqual("orthogonal");
 
-    tilemap.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC.toString();
+    tilemap.orientation = Tilemaps.Orientation.ISOMETRIC.toString();
     expect(phaserTilemap.getOrientation()).toEqual("isometric");
   });
 

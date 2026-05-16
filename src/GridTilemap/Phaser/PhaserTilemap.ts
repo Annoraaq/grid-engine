@@ -1,6 +1,7 @@
 import { TileLayer, Orientation, Tile, Tilemap } from "../Tilemap.js";
 import { PhaserTile } from "./PhaserTile.js";
 import { PhaserTileLayer } from "./PhaserTileLayer.js";
+import { Tilemaps } from "phaser";
 
 export interface TiledProject {
   propertyTypes: Array<{
@@ -50,7 +51,7 @@ export class PhaserTilemap implements Tilemap {
     // of a string. Therefore the intentional type coercion here.
     if (
       this.phaserTilemap.orientation ==
-      Phaser.Tilemaps.Orientation.ISOMETRIC.toString()
+      Tilemaps.Orientation.ISOMETRIC.toString()
     ) {
       return "isometric";
     }
