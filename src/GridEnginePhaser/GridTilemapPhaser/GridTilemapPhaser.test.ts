@@ -1,8 +1,8 @@
-import * as Phaser from "phaser";
 import { GridTilemapPhaser } from "./GridTilemapPhaser.js";
 import { Direction } from "../../Direction/Direction.js";
 import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 import { createPhaserTilemapStub } from "../../Utils/MockFactory/MockPhaserTilemap.js";
+import { Tilemaps } from "phaser";
 
 describe("GridTilemapPhaser", () => {
   let gridTilemap: GridTilemapPhaser;
@@ -171,7 +171,7 @@ describe("GridTilemapPhaser", () => {
   });
 
   it("should provide tile distance for isometric maps on orthogonal dirs", () => {
-    tm.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC.toString();
+    tm.orientation = Tilemaps.Orientation.ISOMETRIC.toString();
     const scaleFactor = 3;
     const scaledTileWidth = 16 * scaleFactor;
     const scaledTileHeight = 16 * scaleFactor;
@@ -224,7 +224,7 @@ describe("GridTilemapPhaser", () => {
           ],
         ]),
       );
-      tm.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC.toString();
+      tm.orientation = Tilemaps.Orientation.ISOMETRIC.toString();
       gridTilemap = new GridTilemapPhaser(tm);
     });
 
@@ -269,7 +269,7 @@ describe("GridTilemapPhaser", () => {
           ],
         ]),
       );
-      tm.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC.toString();
+      tm.orientation = Tilemaps.Orientation.ISOMETRIC.toString();
       tm.layers[1].properties = [
         ...tm.layers[1].properties,
         {

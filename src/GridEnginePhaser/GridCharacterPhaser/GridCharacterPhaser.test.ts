@@ -2,7 +2,6 @@ import { CharacterAnimation } from "./../../GridCharacter/CharacterAnimation/Cha
 import { trackEmit } from "../../Testing/Utils.js";
 import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 import { GridCharacterPhaser } from "./GridCharacterPhaser.js";
-import * as Phaser from "phaser";
 import { Direction, NumberOfDirections } from "../../Direction/Direction.js";
 import { CharacterData, GridEngineHeadless } from "../../GridEngine.js";
 import {
@@ -13,11 +12,7 @@ import { take } from "rxjs/operators";
 import { PhaserTilemap } from "../../GridTilemap/Phaser/PhaserTilemap.js";
 import { GridTilemapPhaser } from "../GridTilemapPhaser/GridTilemapPhaser.js";
 import { createPhaserTilemapStub } from "../../Utils/MockFactory/MockPhaserTilemap.js";
-
-// Hack to get Phaser included at runtime
-((_a) => {
-  // do nothing
-})(Phaser);
+import { Tilemaps } from "phaser";
 
 describe("GridCharacterPhaser", () => {
   let gridEngineHeadless: GridEngineHeadless;
@@ -87,7 +82,7 @@ describe("GridCharacterPhaser", () => {
       ]),
     );
     if (isometric) {
-      tm.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC.toString();
+      tm.orientation = Tilemaps.Orientation.ISOMETRIC.toString();
     }
     const phaserTilemap = new PhaserTilemap(tm);
     gridEngineHeadless.create(phaserTilemap, {

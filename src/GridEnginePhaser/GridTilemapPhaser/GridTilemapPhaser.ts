@@ -2,6 +2,7 @@ import { CharLayer, Direction } from "../../GridEngine.js";
 import { Utils } from "../../Utils/Utils/Utils.js";
 import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 import { VectorUtils } from "../../Utils/VectorUtils.js";
+import { Tilemaps } from "phaser";
 
 export class GridTilemapPhaser {
   private static readonly ALWAYS_TOP_PROP_NAME = "ge_alwaysTop";
@@ -63,8 +64,7 @@ export class GridTilemapPhaser {
     // Against the documentation of phaser, tilemap seems to be a number instead
     // of a string. Therefore the intentional type coercion here.
     return (
-      this.tilemap.orientation ==
-      Phaser.Tilemaps.Orientation.ISOMETRIC.toString()
+      this.tilemap.orientation == Tilemaps.Orientation.ISOMETRIC.toString()
     );
   }
 

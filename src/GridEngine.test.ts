@@ -7,12 +7,7 @@ import {
   QueueMovementConfig,
   QueuedPathBlockedStrategy,
 } from "./Movement/QueueMovement/QueueMovement.js";
-import * as Phaser from "phaser";
-
-// Hack to get Phaser included at runtime
-((_a) => {
-  // do nothing
-})(Phaser);
+import { Tilemaps } from "phaser";
 
 const mockNewSprite = {
   setCrop: jest.fn(),
@@ -527,7 +522,7 @@ describe("GridEngine", () => {
           ],
         ]),
       );
-      mock.orientation = Phaser.Tilemaps.Orientation.ISOMETRIC.toString();
+      mock.orientation = Tilemaps.Orientation.ISOMETRIC.toString();
       gridEngine.create(mock, {
         characters: [{ id: "player", startPosition: { x: 1, y: 1 } }],
       });
