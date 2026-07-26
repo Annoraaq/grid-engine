@@ -78,7 +78,9 @@ export class AStar extends ShortestPathAlgorithm {
     const layerIndex = this.gridTilemap.getLayerIndex(pos.layer);
     const shiftedX = pos.position.x + MAX_NEGATIVE_COORD_OFFSET;
     const shiftedY = pos.position.y + MAX_NEGATIVE_COORD_OFFSET;
-    return layerIndex * this.planeSize + shiftedY * this.spatialWidth + shiftedX;
+    return (
+      layerIndex * this.planeSize + shiftedY * this.spatialWidth + shiftedX
+    );
   }
 
   private shortestPathBfs(

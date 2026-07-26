@@ -651,11 +651,7 @@ describe("A*", () => {
         ],
       },
     ]);
-    gridTilemap.setTransition(
-      new Vector2(1, 0),
-      undefined,
-      LOWER_CHAR_LAYER,
-    );
+    gridTilemap.setTransition(new Vector2(1, 0), undefined, LOWER_CHAR_LAYER);
 
     const algo = new AStar(gridTilemap);
     const result = algo.findShortestPath(

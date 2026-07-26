@@ -7,7 +7,10 @@ import {
   mockLayeredBlockMap,
   updateLayer,
 } from "../Utils/MockFactory/MockFactory.js";
-import { MockTilemap, MockTileLayer } from "../Utils/MockFactory/MockTilemap.js";
+import {
+  MockTilemap,
+  MockTileLayer,
+} from "../Utils/MockFactory/MockTilemap.js";
 import { Tilemap } from "./Tilemap.js";
 import { Rect } from "../Utils/Rect/Rect.js";
 import { LayerVecPos } from "../Utils/LayerPositionUtils/LayerPositionUtils.js";
