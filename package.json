@@ -15,7 +15,7 @@
     "build-cjs": "esbuild src/main-esm.ts --bundle  --minify --format=cjs --external:phaser --target=node18 --platform=node --outfile=dist/GridEngine.min.cjs",
     "build-types": "tsc -p tsconfig.emit-cjs.json && tsc -p tsconfig.emit-esm.json",
     "build": "npm run build-web && npm run build-esm && npm run build-cjs && npm run build-types && node createPackageJsons.cjs",
-    "build-speedtest": "esbuild speedtests/run.ts --bundle --format=cjs --target=node18 --platform=node --outfile=speedtests/run.cjs",
+    "build-speedtest": "esbuild speedtests/run.ts --bundle --format=cjs --target=node18 --platform=node --alias:phaser=./speedtests/phaser-node-shim.js --outfile=speedtests/run.cjs",
     "lint": "eslint .",
     "serve": "esbuild src/main-iife.ts --servedir=serve --outfile=serve/js/GridEngine.js --bundle --target=es2016 --alias:phaser=./src/phaser-shim.js",
     "docs": "typedoc src/GridEngine.ts --excludePrivate --excludeProtected --readme none --excludeInternal --out docs/public/api --sort kind --sort alphabetical --categorizeByGroup false",
