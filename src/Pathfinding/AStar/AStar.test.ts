@@ -622,4 +622,91 @@ describe("A*", () => {
     expect(shortestPath.steps).toEqual(1700);
     expect(shortestPath.path.length).toEqual(114);
   });
+
+  it("should distinguish between undefined layer and first char layer", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: LOWER_CHAR_LAYER,
+        blockMap: [
+          // prettier-ignore
+          "....",
+          "....",
+        ],
+      },
+    ]);
+
+    expect(gridTilemap.getLayerIndex(undefined)).not.toEqual(
+      gridTilemap.getLayerIndex(LOWER_CHAR_LAYER),
+    );
+  });
+
+  it("should find path when starting on undefined layer and transitioning to first char layer", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: LOWER_CHAR_LAYER,
+        blockMap: [
+          // prettier-ignore
+          "....",
+          "....",
+        ],
+      },
+    ]);
+    gridTilemap.setTransition(new Vector2(1, 0), undefined, LOWER_CHAR_LAYER);
+
+    const algo = new AStar(gridTilemap);
+    const result = algo.findShortestPath(
+      { position: new Vector2(0, 0), layer: undefined },
+      { position: new Vector2(0, 0), layer: LOWER_CHAR_LAYER },
+    );
+
+    expect(result.path).toEqual([
+      { position: new Vector2(0, 0), layer: undefined },
+      { position: new Vector2(1, 0), layer: LOWER_CHAR_LAYER },
+      { position: new Vector2(0, 0), layer: LOWER_CHAR_LAYER },
+    ]);
+  });
+
+  it("should generate safe integer node IDs for high layer indices", () => {
+    const layers = Array.from({ length: 92 }, (_, i) => ({
+      layer: `layer_${i}`,
+      blockMap: ["..", ".."],
+    }));
+    const gridTilemap = createTilemap(layers);
+
+    const pos1 = { position: new Vector2(0, 0), layer: "layer_91" };
+    const pos2 = { position: new Vector2(1, 0), layer: "layer_91" };
+
+    const algo = new AStar(gridTilemap);
+    // @ts-ignore (private method access for testing)
+    const id1 = algo.getNodeId(pos1);
+    // @ts-ignore
+    const id2 = algo.getNodeId(pos2);
+
+    expect(Number.isSafeInteger(id1)).toBe(true);
+    expect(Number.isSafeInteger(id2)).toBe(true);
+    expect(id1).not.toEqual(id2);
+  });
+
+  it("should find path with negative coordinates when ignoring map bounds", () => {
+    const gridTilemap = createTilemap([
+      {
+        layer: LOWER_CHAR_LAYER,
+        blockMap: ["....", "...."],
+      },
+    ]);
+    const algo = new AStar(gridTilemap, {
+      ignoreMapBounds: true,
+    });
+
+    const shortestPath = algo.findShortestPath(
+      layerPos(new Vector2(-2, -3)),
+      layerPos(new Vector2(0, -3)),
+    );
+
+    expect(shortestPath.path).toEqual([
+      layerPos(new Vector2(-2, -3)),
+      layerPos(new Vector2(-1, -3)),
+      layerPos(new Vector2(0, -3)),
+    ]);
+  });
 });

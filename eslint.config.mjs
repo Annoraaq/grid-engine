@@ -27,6 +27,7 @@ export default [{
         "**/speedtests",
         "**/babel.config.cjs",
         "**/jest.config.js",
+        "**/phaser-shim.js",
     ],
 }, ...compat.extends("eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier").map(config => ({
     ...config,
