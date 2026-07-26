@@ -7,7 +7,7 @@ import {
   mockLayeredBlockMap,
   updateLayer,
 } from "../Utils/MockFactory/MockFactory.js";
-import { MockTilemap } from "../Utils/MockFactory/MockTilemap.js";
+import { MockTilemap, MockTileLayer } from "../Utils/MockFactory/MockTilemap.js";
 import { Tilemap } from "./Tilemap.js";
 import { Rect } from "../Utils/Rect/Rect.js";
 import { LayerVecPos } from "../Utils/LayerPositionUtils/LayerPositionUtils.js";
@@ -1274,6 +1274,49 @@ describe("GridTilemap", () => {
         "cGroup3",
       ]),
     ).toBe(false);
+  });
+
+  it("should invalidate charLayerIndices cache when invalidateFrameCache is called", () => {
+    const layer1 = new MockTileLayer("charLayer1", {
+      ge_charLayer: "charLayer1",
+    });
+    const tm = new MockTilemap([layer1]);
+    const gTilemap = new GridTilemap(
+      tm,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES,
+    );
+
+    // Populate the charLayerIndices cache
+    expect(gTilemap.getLayerIndex("charLayer1")).toBe(1);
+    expect(gTilemap.getLayerIndex("charLayer2")).toBe(0);
+
+    // Dynamically add a new char layer to the tilemap
+    const layer2 = new MockTileLayer("charLayer2", {
+      ge_charLayer: "charLayer2",
+    });
+    tm.getLayers().push(layer2);
+
+    // Invalidate frame cache
+    gTilemap.invalidateFrameCache();
+
+    // Verify that the new layer index is reflected after invalidation
+    expect(gTilemap.getLayerIndex("charLayer2")).toBe(2);
+  });
+
+  describe("getLayerIndex", () => {
+    it("should return 0 for undefined layer", () => {
+      expect(gridTilemap.getLayerIndex(undefined)).toBe(0);
+    });
+
+    it("should return 0 for unknown layer", () => {
+      expect(gridTilemap.getLayerIndex("unknownLayer")).toBe(0);
+    });
+
+    it("should return 1-based indices for char layers", () => {
+      expect(gridTilemap.getLayerIndex("charLayer1")).toBe(1);
+      expect(gridTilemap.getLayerIndex("charLayer2")).toBe(2);
+    });
   });
 
   function createChar(

@@ -293,6 +293,7 @@ export class GridTilemap {
 
   invalidateFrameCache() {
     this.collisionRelevantLayersFrameCache.clear();
+    this.charLayerIndices = undefined;
   }
 
   // This method is performance critical for pathfinding.
@@ -359,6 +360,28 @@ export class GridTilemap {
       if (layer.isCharLayer()) return layer.getProperty(CHAR_LAYER_PROP_NAME);
     }
     return undefined;
+  }
+
+  getWidth(): number {
+    return this.tilemap.getWidth();
+  }
+
+  getHeight(): number {
+    return this.tilemap.getHeight();
+  }
+
+  private charLayerIndices?: Map<string, number>;
+
+  getLayerIndex(layerName: string | undefined): number {
+    if (!layerName) return 0;
+    if (!this.charLayerIndices) {
+      this.charLayerIndices = new Map<string, number>();
+      const names = this.getCharLayerNames();
+      for (let i = 0; i < names.length; i++) {
+        this.charLayerIndices.set(names[i], i + 1);
+      }
+    }
+    return this.charLayerIndices.get(layerName) ?? 0;
   }
 
   private getCharLayerNames(): string[] {
