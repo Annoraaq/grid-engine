@@ -153,6 +153,7 @@ export class GridTilemap {
   }
 
   getTransition(pos: Vector2, fromLayer?: string): string | undefined {
+    if (this.transitions.size === 0) return undefined;
     const transitions = this.transitions.get(pos.toString());
 
     if (transitions) {
