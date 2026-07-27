@@ -73,19 +73,35 @@ export class BidirectionalSearch extends ShortestPathAlgorithm {
   constructor(gridTilemap: GridTilemap, options: PathfindingOptions = {}) {
     super(gridTilemap, options);
 
+    const mapWidth = Number.isFinite(this.gridTilemap.getWidth())
+      ? this.gridTilemap.getWidth()
+      : 1000;
+    const mapHeight = Number.isFinite(this.gridTilemap.getHeight())
+      ? this.gridTilemap.getHeight()
+      : 1000;
+
     this.spatialWidth = Math.max(
-      this.gridTilemap.getWidth() + 2 * MAX_NEGATIVE_COORD_OFFSET,
+      mapWidth + 2 * MAX_NEGATIVE_COORD_OFFSET,
       MIN_SPATIAL_DIMENSION,
     );
     const spatialHeight = Math.max(
-      this.gridTilemap.getHeight() + 2 * MAX_NEGATIVE_COORD_OFFSET,
+      mapHeight + 2 * MAX_NEGATIVE_COORD_OFFSET,
       MIN_SPATIAL_DIMENSION,
     );
     this.planeSize = this.spatialWidth * spatialHeight;
   }
 
+  private getLayerIndex(layerName?: string): number {
+    if (!layerName) return 0;
+    let hash = 0;
+    for (let i = 0; i < layerName.length; i++) {
+      hash = (hash * 31 + layerName.charCodeAt(i)) & 0xffff;
+    }
+    return hash + 1;
+  }
+
   private getNodeId(pos: LayerVecPos): number {
-    const layerIndex = this.gridTilemap.getLayerIndex(pos.layer);
+    const layerIndex = this.getLayerIndex(pos.layer);
     const shiftedX = pos.position.x + MAX_NEGATIVE_COORD_OFFSET;
     const shiftedY = pos.position.y + MAX_NEGATIVE_COORD_OFFSET;
     return (
@@ -116,6 +132,7 @@ export class BidirectionalSearch extends ShortestPathAlgorithm {
   private equal(layerPos1: LayerVecPos, layerPos2: LayerVecPos): boolean {
     if (!VectorUtils.equal(layerPos1.position, layerPos2.position))
       return false;
+    if (this.options.ignoreLayers) return true;
     return layerPos1.layer === layerPos2.layer;
   }
 
@@ -197,7 +214,7 @@ export class BidirectionalSearch extends ShortestPathAlgorithm {
 
       steps++;
       stopBfs.step(
-        this.getReverseNeighbors(stopBfsNode, stopNode),
+        this.getReverseNeighbors(stopBfsNode, startNode),
         stopBfsNode,
         stopBfsDist,
       );
@@ -206,7 +223,7 @@ export class BidirectionalSearch extends ShortestPathAlgorithm {
           previous: startBfs.previous,
           previous2: stopBfs.previous,
           closestToTarget: this.maybeClosestToTarget(stopNode),
-          matchingPos: startBfs.minMatchingNode,
+          matchingPos: stopBfs.minMatchingNode,
           steps,
           maxPathLengthReached: false,
         };
