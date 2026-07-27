@@ -42,12 +42,19 @@ export class AStar extends ShortestPathAlgorithm {
 
     // Calculate total coordinate span for X and Y axes, ensuring enough room for
     // negative coordinates (via MAX_NEGATIVE_COORD_OFFSET) and map bounds.
+    const mapWidth = Number.isFinite(this.gridTilemap.getWidth())
+      ? this.gridTilemap.getWidth()
+      : 0;
+    const mapHeight = Number.isFinite(this.gridTilemap.getHeight())
+      ? this.gridTilemap.getHeight()
+      : 0;
+
     this.spatialWidth = Math.max(
-      this.gridTilemap.getWidth() + 2 * MAX_NEGATIVE_COORD_OFFSET,
+      mapWidth + 2 * MAX_NEGATIVE_COORD_OFFSET,
       MIN_SPATIAL_DIMENSION,
     );
     const spatialHeight = Math.max(
-      this.gridTilemap.getHeight() + 2 * MAX_NEGATIVE_COORD_OFFSET,
+      mapHeight + 2 * MAX_NEGATIVE_COORD_OFFSET,
       MIN_SPATIAL_DIMENSION,
     );
 

@@ -34,10 +34,10 @@ export class Bfs extends ShortestPathAlgorithm {
 
     const mapWidth = Number.isFinite(this.gridTilemap.getWidth())
       ? this.gridTilemap.getWidth()
-      : 1000;
+      : 0;
     const mapHeight = Number.isFinite(this.gridTilemap.getHeight())
       ? this.gridTilemap.getHeight()
-      : 1000;
+      : 0;
 
     this.spatialWidth = Math.max(
       mapWidth + 2 * MAX_NEGATIVE_COORD_OFFSET,
