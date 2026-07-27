@@ -206,7 +206,7 @@ export class BidirectionalSearch extends ShortestPathAlgorithm {
           previous: startBfs.previous,
           previous2: stopBfs.previous,
           closestToTarget: this.maybeClosestToTarget(stopNode),
-          matchingPos: startBfs.minMatchingNode,
+          matchingPos: stopBfs.minMatchingNode,
           steps,
           maxPathLengthReached: false,
         };
