@@ -8,10 +8,12 @@ import {
 } from "../ShortestPathAlgorithm.js";
 import { VectorUtils } from "../../Utils/VectorUtils.js";
 import { Queue } from "../../Datastructures/Queue/Queue.js";
+import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
+import { PathfindingOptions } from "../PathfindingOptions.js";
 
 interface ShortestPathTuple {
-  previous: Map<string, LayerVecPos>;
-  previous2: Map<string, LayerVecPos>;
+  previous: Map<number, LayerVecPos>;
+  previous2: Map<number, LayerVecPos>;
   closestToTarget?: LayerVecPos;
   matchingPos?: LayerVecPos;
   steps: number;
@@ -23,16 +25,21 @@ interface QueueEntry {
   dist: number;
 }
 
-type Previous = Map<string, LayerVecPos>;
+type Previous = Map<number, LayerVecPos>;
+
+const MAX_NEGATIVE_COORD_OFFSET = 100_000;
+const MIN_SPATIAL_DIMENSION = 2 * MAX_NEGATIVE_COORD_OFFSET;
 
 class Bfs {
-  previous = new Map<string, LayerVecPos>();
-  visited = new Map<string, number>();
+  previous = new Map<number, LayerVecPos>();
+  visited = new Map<number, number>();
   queue = new Queue<QueueEntry>();
   otherBfs?: Bfs;
   minMatchingNode: LayerVecPos | undefined;
   private minMatching = Infinity;
   private lastDist = 0;
+
+  constructor(private getNodeId: (pos: LayerVecPos) => number) {}
 
   isNewFrontier(): boolean {
     const el = this.queue.peek();
@@ -42,12 +49,12 @@ class Bfs {
   step(neighbors: LayerVecPos[], node: LayerVecPos, dist: number): void {
     this.lastDist = dist;
     for (const neighbor of neighbors) {
-      const nStr = LayerPositionUtils.toString(neighbor);
-      if (!this.visited.has(nStr)) {
-        this.previous.set(nStr, node);
+      const nId = this.getNodeId(neighbor);
+      if (!this.visited.has(nId)) {
+        this.previous.set(nId, node);
         this.queue.enqueue({ node: neighbor, dist: dist + 1 });
-        this.visited.set(nStr, dist + 1);
-        const n = this.otherBfs?.visited.get(nStr);
+        this.visited.set(nId, dist + 1);
+        const n = this.otherBfs?.visited.get(nId);
         if (n !== undefined) {
           if (n < this.minMatching) {
             this.minMatching = n;
@@ -60,6 +67,32 @@ class Bfs {
 }
 
 export class BidirectionalSearch extends ShortestPathAlgorithm {
+  private spatialWidth: number;
+  private planeSize: number;
+
+  constructor(gridTilemap: GridTilemap, options: PathfindingOptions = {}) {
+    super(gridTilemap, options);
+
+    this.spatialWidth = Math.max(
+      this.gridTilemap.getWidth() + 2 * MAX_NEGATIVE_COORD_OFFSET,
+      MIN_SPATIAL_DIMENSION,
+    );
+    const spatialHeight = Math.max(
+      this.gridTilemap.getHeight() + 2 * MAX_NEGATIVE_COORD_OFFSET,
+      MIN_SPATIAL_DIMENSION,
+    );
+    this.planeSize = this.spatialWidth * spatialHeight;
+  }
+
+  private getNodeId(pos: LayerVecPos): number {
+    const layerIndex = this.gridTilemap.getLayerIndex(pos.layer);
+    const shiftedX = pos.position.x + MAX_NEGATIVE_COORD_OFFSET;
+    const shiftedY = pos.position.y + MAX_NEGATIVE_COORD_OFFSET;
+    return (
+      layerIndex * this.planeSize + shiftedY * this.spatialWidth + shiftedX
+    );
+  }
+
   findShortestPathImpl(
     startPos: LayerVecPos,
     targetPos: LayerVecPos,
@@ -99,8 +132,9 @@ export class BidirectionalSearch extends ShortestPathAlgorithm {
         maxPathLengthReached: false,
       };
     }
-    const startBfs = new Bfs();
-    const stopBfs = new Bfs();
+    const getId = (pos: LayerVecPos) => this.getNodeId(pos);
+    const startBfs = new Bfs(getId);
+    const stopBfs = new Bfs(getId);
     let steps = 0;
     startBfs.otherBfs = stopBfs;
     stopBfs.otherBfs = startBfs;
@@ -112,8 +146,8 @@ export class BidirectionalSearch extends ShortestPathAlgorithm {
     );
     startBfs.queue.enqueue({ node: startNode, dist: 0 });
     stopBfs.queue.enqueue({ node: stopNode, dist: 0 });
-    startBfs.visited.set(LayerPositionUtils.toString(startNode), 0);
-    stopBfs.visited.set(LayerPositionUtils.toString(stopNode), 0);
+    startBfs.visited.set(this.getNodeId(startNode), 0);
+    stopBfs.visited.set(this.getNodeId(stopNode), 0);
 
     while (
       this.shouldStop(startBfs.queue.size() > 0, stopBfs.queue.size() > 0)
@@ -172,7 +206,7 @@ export class BidirectionalSearch extends ShortestPathAlgorithm {
           previous: startBfs.previous,
           previous2: stopBfs.previous,
           closestToTarget: this.maybeClosestToTarget(stopNode),
-          matchingPos: stopBfs.minMatchingNode,
+          matchingPos: startBfs.minMatchingNode,
           steps,
           maxPathLengthReached: false,
         };
@@ -239,7 +273,7 @@ export class BidirectionalSearch extends ShortestPathAlgorithm {
     let currentNode: LayerVecPos | undefined = stopNode;
     ret.push(currentNode);
     while (!this.equal(currentNode, startNode)) {
-      currentNode = previous.get(LayerPositionUtils.toString(currentNode));
+      currentNode = previous.get(this.getNodeId(currentNode));
       if (!currentNode) return [];
       ret.push(currentNode);
     }
