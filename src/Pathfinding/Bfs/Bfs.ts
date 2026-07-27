@@ -54,9 +54,10 @@ export class Bfs extends ShortestPathAlgorithm {
     layerMap: Map<string | undefined, number>,
     layerName?: string,
   ): number {
+    if (layerName === undefined) return 0;
     let idx = layerMap.get(layerName);
     if (idx === undefined) {
-      idx = layerMap.size;
+      idx = layerMap.size + 1;
       layerMap.set(layerName, idx);
     }
     return idx;
