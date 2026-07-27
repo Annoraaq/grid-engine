@@ -1,11 +1,15 @@
 import { BfsSpeed } from "./tests/BfsSpeed.js";
 import { BidirSpeed } from "./tests/BidirSpeed.js";
+import { AStarSpeed } from "./tests/AStarSpeed.js";
+import { Jps4Speed } from "./tests/Jps4Speed.js";
+import { Jps8Speed } from "./tests/Jps8Speed.js";
 // @ts-ignore
 import { GridEngineHeadless as GridEngineNew } from "../dist/GridEngine.esm.min.js";
 // @ts-ignore
 import { GridEngineHeadless as GridEngineOld } from "./old/dist/GridEngine.esm.min.js";
 import { RoomsTilemap } from "./RoomsTilemap.js";
 import { GridEngineHeadless } from "../src/GridEngineHeadless.js";
+import path from "path";
 
 export interface SpeedTestResult {
   result: number;
@@ -23,38 +27,41 @@ interface Result {
   resultNew: SpeedTestResult;
 }
 
-const geTm = new RoomsTilemap("8room_000.map");
+const mapPath = path.join(process.cwd(), "speedtests", "8room_000.map");
+const geTm = new RoomsTilemap(mapPath);
 const geOld = new GridEngineOld();
 const geNew = new GridEngineNew();
 
 geOld.create(geTm, { characters: [], cacheTileCollisions: true });
 geNew.create(geTm, { characters: [], cacheTileCollisions: true });
 
-const speedTests: SpeedTest[] = [BfsSpeed, BidirSpeed];
+const speedTests: SpeedTest[] = [
+  AStarSpeed,
+  Jps4Speed,
+  Jps8Speed,
+  BfsSpeed,
+  BidirSpeed,
+];
 
 let hasFailed = false;
 for (const t of speedTests) {
   const compRes = compare(t);
+  const oldTime = compRes.resultOld.result.toFixed(2);
+  const newTime = compRes.resultNew.result.toFixed(2);
+  const speedup = (
+    ((compRes.resultOld.result - compRes.resultNew.result) /
+      compRes.resultOld.result) *
+    100
+  ).toFixed(1);
+
   if (compRes.failed) {
     console.log(
-      `Test "${
-        t.name
-      }" failed. Difference was larger than tolerance. Speed of master branch: ${
-        compRes.resultOld.result
-      }. New speed: ${compRes.resultNew.result}. Tolerance: ${
-        compRes.resultOld.tolerance * 100
-      }%`,
+      `Test "${t.name}" SLOWER. Old: ${oldTime}ms, New: ${newTime}ms (${speedup}% change)`,
     );
     hasFailed = true;
   } else {
     console.log(
-      `Test "${
-        t.name
-      }" succeeded. Difference was not larger than tolerance. Speed of master branch: ${
-        compRes.resultOld.result
-      }. New speed: ${compRes.resultNew.result}. Tolerance: ${
-        compRes.resultOld.tolerance * 100
-      }%`,
+      `Test "${t.name}" PASSED. Old: ${oldTime}ms, New: ${newTime}ms (${speedup}% faster)`,
     );
   }
 }
@@ -64,7 +71,7 @@ if (hasFailed) {
 }
 
 function compare(speedTest: SpeedTest): Result {
-  const TEST_RUNS = 3;
+  const TEST_RUNS = 5;
   let oldResSum = 0;
   let newResSum = 0;
   let allTolerance = 0;
