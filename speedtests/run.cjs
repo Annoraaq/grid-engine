@@ -1,6 +1,8 @@
+var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
@@ -10,6 +12,14 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // speedtests/run.ts
@@ -67,6 +77,101 @@ var BidirSpeed = {
       },
       {
         shortestPathAlgorithm: "BIDIRECTIONAL_SEARCH"
+      }
+    );
+    const end = performance.now();
+    const timeMs = end - start;
+    return {
+      result: timeMs,
+      tolerance: 0.1
+    };
+  }
+};
+
+// speedtests/tests/AStarSpeed.ts
+var AStarSpeed = {
+  name: "AStar Speed",
+  run: (gridEngine) => {
+    const startX = 4;
+    const startY = 188;
+    const endX = 465;
+    const endY = 511;
+    const start = performance.now();
+    gridEngine.findShortestPath(
+      {
+        position: { x: startX, y: startY },
+        charLayer: void 0
+      },
+      {
+        position: { x: endX, y: endY },
+        charLayer: void 0
+      },
+      {
+        shortestPathAlgorithm: "A_STAR"
+      }
+    );
+    const end = performance.now();
+    const timeMs = end - start;
+    return {
+      result: timeMs,
+      tolerance: 0.1
+    };
+  }
+};
+
+// speedtests/tests/Jps4Speed.ts
+var Jps4Speed = {
+  name: "JPS4 Speed",
+  run: (gridEngine) => {
+    const startX = 4;
+    const startY = 188;
+    const endX = 465;
+    const endY = 511;
+    const start = performance.now();
+    gridEngine.findShortestPath(
+      {
+        position: { x: startX, y: startY },
+        charLayer: void 0
+      },
+      {
+        position: { x: endX, y: endY },
+        charLayer: void 0
+      },
+      {
+        shortestPathAlgorithm: "JPS",
+        numberOfDirections: 4
+      }
+    );
+    const end = performance.now();
+    const timeMs = end - start;
+    return {
+      result: timeMs,
+      tolerance: 0.1
+    };
+  }
+};
+
+// speedtests/tests/Jps8Speed.ts
+var Jps8Speed = {
+  name: "JPS8 Speed",
+  run: (gridEngine) => {
+    const startX = 4;
+    const startY = 188;
+    const endX = 465;
+    const endY = 511;
+    const start = performance.now();
+    gridEngine.findShortestPath(
+      {
+        position: { x: startX, y: startY },
+        charLayer: void 0
+      },
+      {
+        position: { x: endX, y: endY },
+        charLayer: void 0
+      },
+      {
+        shortestPathAlgorithm: "JPS",
+        numberOfDirections: 8
       }
     );
     const end = performance.now();
@@ -13549,23 +13654,23 @@ var CHAR_LAYER_PROP_NAME = "ge_charLayer";
 var MIN_CHAR_CODE = "z".charCodeAt(0) + 1;
 var MAX_CHAR_CODE = MIN_CHAR_CODE + 255;
 var RoomsTilemap = class {
-  constructor(path) {
+  constructor(path2) {
     this.height = 0;
     this.width = 0;
     this.layersByName = /* @__PURE__ */ new Map();
     this.layers = [];
     this.layersByName = /* @__PURE__ */ new Map();
-    if (Array.isArray(path)) {
-      path.forEach((p) => this.addLayer(p));
+    if (Array.isArray(path2)) {
+      path2.forEach((p) => this.addLayer(p));
     } else {
-      this.addLayer(path);
+      this.addLayer(path2);
     }
   }
-  addLayer(path) {
-    const lastPartArr = path.split("/")[path.split("/").length - 1].split(".");
+  addLayer(path2) {
+    const lastPartArr = path2.split("/")[path2.split("/").length - 1].split(".");
     const layerName = lastPartArr[0];
     try {
-      const rawData = fs2.readFileSync(path, "utf8");
+      const rawData = fs2.readFileSync(path2, "utf8");
       const rows = rawData.split("\n");
       this.height = Number(rows[1].split(" ")[1]);
       this.width = Number(rows[2].split(" ")[1]);
@@ -13699,23 +13804,34 @@ function charToArr(char) {
 }
 
 // speedtests/run.ts
-var geTm = new RoomsTilemap("8room_000.map");
+var import_path = __toESM(require("path"), 1);
+var mapPath = import_path.default.join(process.cwd(), "speedtests", "8room_000.map");
+var geTm = new RoomsTilemap(mapPath);
 var geOld = new Nr2();
 var geNew = new In();
 geOld.create(geTm, { characters: [], cacheTileCollisions: true });
 geNew.create(geTm, { characters: [], cacheTileCollisions: true });
-var speedTests = [BfsSpeed, BidirSpeed];
+var speedTests = [
+  AStarSpeed,
+  Jps4Speed,
+  Jps8Speed,
+  BfsSpeed,
+  BidirSpeed
+];
 var hasFailed = false;
 for (const t of speedTests) {
   const compRes = compare(t);
+  const oldTime = compRes.resultOld.result.toFixed(2);
+  const newTime = compRes.resultNew.result.toFixed(2);
+  const speedup = ((compRes.resultOld.result - compRes.resultNew.result) / compRes.resultOld.result * 100).toFixed(1);
   if (compRes.failed) {
     console.log(
-      `Test "${t.name}" failed. Difference was larger than tolerance. Speed of master branch: ${compRes.resultOld.result}. New speed: ${compRes.resultNew.result}. Tolerance: ${compRes.resultOld.tolerance * 100}%`
+      `Test "${t.name}" SLOWER. Old: ${oldTime}ms, New: ${newTime}ms (${speedup}% change)`
     );
     hasFailed = true;
   } else {
     console.log(
-      `Test "${t.name}" succeeded. Difference was not larger than tolerance. Speed of master branch: ${compRes.resultOld.result}. New speed: ${compRes.resultNew.result}. Tolerance: ${compRes.resultOld.tolerance * 100}%`
+      `Test "${t.name}" PASSED. Old: ${oldTime}ms, New: ${newTime}ms (${speedup}% faster)`
     );
   }
 }
@@ -13723,7 +13839,7 @@ if (hasFailed) {
   process.exit(1);
 }
 function compare(speedTest) {
-  const TEST_RUNS = 3;
+  const TEST_RUNS = 5;
   let oldResSum = 0;
   let newResSum = 0;
   let allTolerance = 0;
