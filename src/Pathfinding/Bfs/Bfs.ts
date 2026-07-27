@@ -5,12 +5,13 @@ import {
 import { VectorUtils } from "../../Utils/VectorUtils.js";
 import { Queue } from "../../Datastructures/Queue/Queue.js";
 import {
-  LayerPositionUtils,
   LayerVecPos,
 } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
+import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
+import { PathfindingOptions } from "../PathfindingOptions.js";
 
 interface ShortestPathTuple {
-  previous: Map<string, LayerVecPos>;
+  previous: Map<number, LayerVecPos>;
   closestToTarget: LayerVecPos;
   steps: number;
   maxPathLengthReached: boolean;
@@ -21,14 +22,66 @@ interface QueueEntry {
   dist: number;
 }
 
+const MAX_NEGATIVE_COORD_OFFSET = 100_000;
+const MIN_SPATIAL_DIMENSION = 2 * MAX_NEGATIVE_COORD_OFFSET;
+
 export class Bfs extends ShortestPathAlgorithm {
+  private spatialWidth: number;
+  private planeSize: number;
+
+  constructor(gridTilemap: GridTilemap, options: PathfindingOptions = {}) {
+    super(gridTilemap, options);
+
+    const mapWidth = Number.isFinite(this.gridTilemap.getWidth())
+      ? this.gridTilemap.getWidth()
+      : 1000;
+    const mapHeight = Number.isFinite(this.gridTilemap.getHeight())
+      ? this.gridTilemap.getHeight()
+      : 1000;
+
+    this.spatialWidth = Math.max(
+      mapWidth + 2 * MAX_NEGATIVE_COORD_OFFSET,
+      MIN_SPATIAL_DIMENSION,
+    );
+    const spatialHeight = Math.max(
+      mapHeight + 2 * MAX_NEGATIVE_COORD_OFFSET,
+      MIN_SPATIAL_DIMENSION,
+    );
+    this.planeSize = this.spatialWidth * spatialHeight;
+  }
+
+  private getLayerIndex(
+    layerMap: Map<string | undefined, number>,
+    layerName?: string,
+  ): number {
+    let idx = layerMap.get(layerName);
+    if (idx === undefined) {
+      idx = layerMap.size;
+      layerMap.set(layerName, idx);
+    }
+    return idx;
+  }
+
+  private getNodeId(
+    pos: LayerVecPos,
+    layerMap: Map<string | undefined, number>,
+  ): number {
+    const layerIndex = this.getLayerIndex(layerMap, pos.layer);
+    const shiftedX = pos.position.x + MAX_NEGATIVE_COORD_OFFSET;
+    const shiftedY = pos.position.y + MAX_NEGATIVE_COORD_OFFSET;
+    return (
+      layerIndex * this.planeSize + shiftedY * this.spatialWidth + shiftedX
+    );
+  }
+
   findShortestPathImpl(
     startPos: LayerVecPos,
     targetPos: LayerVecPos,
   ): ShortestPathResult {
-    const shortestPath = this.shortestPathBfs(startPos, targetPos);
+    const layerMap = new Map<string | undefined, number>();
+    const shortestPath = this.shortestPathBfs(startPos, targetPos, layerMap);
     return {
-      path: this.returnPath(shortestPath.previous, startPos, targetPos),
+      path: this.returnPath(shortestPath.previous, startPos, targetPos, layerMap),
       closestToTarget: shortestPath.closestToTarget,
       steps: shortestPath.steps,
       maxPathLengthReached: shortestPath.maxPathLengthReached,
@@ -39,15 +92,17 @@ export class Bfs extends ShortestPathAlgorithm {
   private equal(layerPos1: LayerVecPos, layerPos2: LayerVecPos): boolean {
     if (!VectorUtils.equal(layerPos1.position, layerPos2.position))
       return false;
+    if (this.options.ignoreLayers) return true;
     return layerPos1.layer === layerPos2.layer;
   }
 
   private shortestPathBfs(
     startNode: LayerVecPos,
     stopNode: LayerVecPos,
+    layerMap: Map<string | undefined, number>,
   ): ShortestPathTuple {
-    const previous = new Map<string, LayerVecPos>();
-    const visited = new Set<string>();
+    const previous = new Map<number, LayerVecPos>();
+    const visited = new Set<number>();
     const queue: Queue<QueueEntry> = new Queue();
     let closestToTarget: LayerVecPos = startNode;
     let smallestDistToTarget: number = this.distance(
@@ -56,7 +111,7 @@ export class Bfs extends ShortestPathAlgorithm {
     );
     let steps = 0;
     queue.enqueue({ node: startNode, dist: 0 });
-    visited.add(LayerPositionUtils.toString(startNode));
+    visited.add(this.getNodeId(startNode, layerMap));
 
     while (queue.size() > 0) {
       const dequeued = queue.dequeue();
@@ -87,10 +142,11 @@ export class Bfs extends ShortestPathAlgorithm {
       }
 
       for (const neighbor of this.getNeighbors(node, stopNode)) {
-        if (!visited.has(LayerPositionUtils.toString(neighbor))) {
-          previous.set(LayerPositionUtils.toString(neighbor), node);
+        const neighborId = this.getNodeId(neighbor, layerMap);
+        if (!visited.has(neighborId)) {
+          previous.set(neighborId, node);
           queue.enqueue({ node: neighbor, dist: dist + 1 });
-          visited.add(LayerPositionUtils.toString(neighbor));
+          visited.add(neighborId);
         }
       }
     }
@@ -98,15 +154,16 @@ export class Bfs extends ShortestPathAlgorithm {
   }
 
   private returnPath(
-    previous: Map<string, LayerVecPos>,
+    previous: Map<number, LayerVecPos>,
     startNode: LayerVecPos,
     stopNode: LayerVecPos,
+    layerMap: Map<string | undefined, number>,
   ): LayerVecPos[] {
     const ret: LayerVecPos[] = [];
     let currentNode: LayerVecPos | undefined = stopNode;
     ret.push(currentNode);
     while (!this.equal(currentNode, startNode)) {
-      currentNode = previous.get(LayerPositionUtils.toString(currentNode));
+      currentNode = previous.get(this.getNodeId(currentNode, layerMap));
       if (!currentNode) return [];
       ret.push(currentNode);
     }
