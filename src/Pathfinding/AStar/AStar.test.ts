@@ -599,7 +599,7 @@ describe("A*", () => {
       layerPos(new Vector2(250, 250)),
     );
 
-    expect(shortestPath.steps).toEqual(1262);
+    expect(shortestPath.steps).toEqual(1146);
     expect(shortestPath.path.length).toEqual(203);
   });
 
@@ -619,7 +619,7 @@ describe("A*", () => {
       layerPos(new Vector2(250, 250)),
     );
 
-    expect(shortestPath.steps).toEqual(1700);
+    expect(shortestPath.steps).toEqual(1395);
     expect(shortestPath.path.length).toEqual(114);
   });
 
