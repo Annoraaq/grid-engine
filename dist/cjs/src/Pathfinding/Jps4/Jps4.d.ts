@@ -14,7 +14,10 @@ export declare class Jps4 extends ShortestPathAlgorithm {
     protected visits: Position[];
     private maxFrontierSize;
     protected maxJumpSize: number;
+    private spatialWidth;
+    private planeSize;
     constructor(gridTilemap: GridTilemap, po?: PathfindingOptions);
+    protected getNodeId(pos: LayerVecPos): number;
     findShortestPathImpl(startPos: LayerVecPos, targetPos: LayerVecPos): ShortestPathResult;
     private shortestPath;
     protected updateClosestToTarget(node: LayerVecPos, stopNode: LayerVecPos): void;

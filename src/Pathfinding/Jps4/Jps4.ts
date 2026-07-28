@@ -18,17 +18,25 @@ import { VectorUtils } from "../../Utils/VectorUtils.js";
 import { PathfindingOptions } from "../PathfindingOptions.js";
 import { Position } from "../../Position.js";
 
+interface HeapEntry {
+  node: LayerVecPos;
+  id: number;
+}
+
 interface ShortestPathTuple {
-  previous: Map<string, LayerVecPos>;
+  previous: Map<number, LayerVecPos>;
   closestToTarget: LayerVecPos;
   steps: number;
   maxPathLengthReached: boolean;
 }
 
+const MAX_NEGATIVE_COORD_OFFSET = 100_000;
+const MIN_SPATIAL_DIMENSION = 2 * MAX_NEGATIVE_COORD_OFFSET;
+
 export class Jps4 extends ShortestPathAlgorithm {
-  private openSet: MinFibonacciHeap<LayerVecPos> = new MinFibonacciHeap();
-  private g: Map<string, number> = new Map<string, number>();
-  private f: Map<string, number> = new Map<string, number>();
+  private openSet: MinFibonacciHeap<HeapEntry> = new MinFibonacciHeap();
+  private g: Map<number, number> = new Map<number, number>();
+  private f: Map<number, number> = new Map<number, number>();
   private closestToTarget: LayerVecPos = {
     position: new Vector2(0, 0),
     layer: undefined,
@@ -42,8 +50,37 @@ export class Jps4 extends ShortestPathAlgorithm {
 
   protected maxJumpSize = 0;
 
+  private spatialWidth: number;
+  private planeSize: number;
+
   constructor(gridTilemap: GridTilemap, po: PathfindingOptions = {}) {
     super(gridTilemap, po);
+
+    const mapWidth = Number.isFinite(this.gridTilemap.getWidth())
+      ? this.gridTilemap.getWidth()
+      : 0;
+    const mapHeight = Number.isFinite(this.gridTilemap.getHeight())
+      ? this.gridTilemap.getHeight()
+      : 0;
+
+    this.spatialWidth = Math.max(
+      mapWidth + 2 * MAX_NEGATIVE_COORD_OFFSET,
+      MIN_SPATIAL_DIMENSION,
+    );
+    const spatialHeight = Math.max(
+      mapHeight + 2 * MAX_NEGATIVE_COORD_OFFSET,
+      MIN_SPATIAL_DIMENSION,
+    );
+    this.planeSize = this.spatialWidth * spatialHeight;
+  }
+
+  protected getNodeId(pos: LayerVecPos): number {
+    const layerIndex = this.gridTilemap.getLayerIndex(pos.layer);
+    const shiftedX = pos.position.x + MAX_NEGATIVE_COORD_OFFSET;
+    const shiftedY = pos.position.y + MAX_NEGATIVE_COORD_OFFSET;
+    return (
+      layerIndex * this.planeSize + shiftedY * this.spatialWidth + shiftedX
+    );
   }
 
   findShortestPathImpl(
@@ -66,28 +103,32 @@ export class Jps4 extends ShortestPathAlgorithm {
     stopNode: LayerVecPos,
   ): ShortestPathTuple {
     this.steps = 0;
-    const previous = new Map<string, LayerVecPos>();
-    this.g = new Map<string, number>();
-    this.f = new Map<string, number>();
+    const previous = new Map<number, LayerVecPos>();
+    this.g = new Map<number, number>();
+    this.f = new Map<number, number>();
     this.closestToTarget = startNode;
     this.smallestDistToTarget = this.distance(
       startNode.position,
       stopNode.position,
     );
 
-    this.openSet = new MinFibonacciHeap(
-      (a, b) => safeGet(this.f, a) - safeGet(this.f, b),
+    this.openSet = new MinFibonacciHeap<HeapEntry>(
+      (a, b) =>
+        (this.f.get(a.id) ?? Number.MAX_VALUE) -
+        (this.f.get(b.id) ?? Number.MAX_VALUE),
     );
 
-    this.openSet.push(startNode);
-    const sourceStr = LayerPositionUtils.toString(startNode);
-    this.g.set(sourceStr, 0);
-    this.f.set(sourceStr, this.distance(startNode.position, stopNode.position));
+    const startId = this.getNodeId(startNode);
+    this.openSet.push({ node: startNode, id: startId });
+    this.g.set(startId, 0);
+    this.f.set(startId, this.distance(startNode.position, stopNode.position));
 
     this.maxFrontierSize = Math.max(this.maxFrontierSize, this.openSet.size);
     while (this.openSet.size > 0) {
-      const current = this.openSet.pop();
-      if (!current) break;
+      const currentEntry = this.openSet.pop();
+      if (!currentEntry) break;
+      const current = currentEntry.node;
+      const currentId = currentEntry.id;
       this.steps++;
 
       if (LayerPositionUtils.equal(current, stopNode)) {
@@ -99,7 +140,7 @@ export class Jps4 extends ShortestPathAlgorithm {
         };
       }
 
-      if (safeGet(this.g, current) + 1 > this.options.maxPathLength) {
+      if ((this.g.get(currentId) ?? Number.MAX_VALUE) + 1 > this.options.maxPathLength) {
         return {
           previous: new Map(),
           closestToTarget: this.closestToTarget,
@@ -112,19 +153,19 @@ export class Jps4 extends ShortestPathAlgorithm {
 
       for (const neighbor of this.getNeighborsInternal(
         current,
-        previous.get(LayerPositionUtils.toString(current)),
+        previous.get(currentId),
         stopNode,
       )) {
-        const pStr = LayerPositionUtils.toString(neighbor.p);
-        const tentativeG = safeGet(this.g, current) + neighbor.dist;
-        if (!this.g.has(pStr) || tentativeG < safeGet(this.g, neighbor.p)) {
-          previous.set(pStr, current);
-          this.g.set(pStr, tentativeG);
+        const pId = this.getNodeId(neighbor.p);
+        const tentativeG = (this.g.get(currentId) ?? Number.MAX_VALUE) + neighbor.dist;
+        if (!this.g.has(pId) || tentativeG < (this.g.get(pId) ?? Number.MAX_VALUE)) {
+          previous.set(pId, current);
+          this.g.set(pId, tentativeG);
           this.f.set(
-            pStr,
+            pId,
             tentativeG + this.distance(neighbor.p.position, stopNode.position),
           );
-          this.openSet.push(neighbor.p);
+          this.openSet.push({ node: neighbor.p, id: pId });
         }
       }
     }
@@ -445,7 +486,7 @@ export class Jps4 extends ShortestPathAlgorithm {
   }
 
   private returnPath(
-    previous: Map<string, LayerVecPos>,
+    previous: Map<number, LayerVecPos>,
     startNode: LayerVecPos,
     stopNode: LayerVecPos,
   ): LayerVecPos[] {
@@ -453,7 +494,7 @@ export class Jps4 extends ShortestPathAlgorithm {
     let currentNode: LayerVecPos | undefined = stopNode;
     ret.push(currentNode);
     while (!LayerPositionUtils.equal(currentNode, startNode)) {
-      const prevNode = previous.get(LayerPositionUtils.toString(currentNode));
+      const prevNode = previous.get(this.getNodeId(currentNode));
       if (!prevNode) {
         return [];
       }
