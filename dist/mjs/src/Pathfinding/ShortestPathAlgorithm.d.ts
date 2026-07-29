@@ -30,6 +30,7 @@ export declare abstract class ShortestPathAlgorithm {
     findShortestPath(startPos: LayerVecPos, targetPos: LayerVecPos): ShortestPathResult;
     abstract findShortestPathImpl(startPos: LayerVecPos, targetPos: LayerVecPos): ShortestPathResult;
     constructor(gridTilemap: GridTilemap, { shortestPathAlgorithm, pathWidth, pathHeight, numberOfDirections, isPositionAllowed, collisionGroups, ignoredChars, ignoreTiles, ignoreMapBounds, ignoreBlockedTarget, maxPathLength, ignoreLayers, considerCosts, calculateClosestToTarget, }?: PathfindingOptions);
+    private distanceUtils;
     getNeighbors(pos: LayerVecPos, dest: LayerVecPos): LayerVecPos[];
     getTransition(pos: Vector2, fromLayer?: string): string | undefined;
     getCosts(src: Vector2, dest: LayerVecPos): number;

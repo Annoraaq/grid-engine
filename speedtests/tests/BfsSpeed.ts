@@ -1,5 +1,7 @@
 import { GridEngineHeadless } from "../../src/GridEngineHeadless.js";
 
+const ITERATIONS = 5;
+
 export const BfsSpeed = {
   name: "Bfs Speed",
   run: (gridEngine: GridEngineHeadless) => {
@@ -10,19 +12,21 @@ export const BfsSpeed = {
 
     const start = performance.now();
 
-    gridEngine.findShortestPath(
-      {
-        position: { x: startX, y: startY },
-        charLayer: undefined,
-      },
-      {
-        position: { x: endX, y: endY },
-        charLayer: undefined,
-      },
-      {
-        shortestPathAlgorithm: "BFS",
-      },
-    );
+    for (let i = 0; i < ITERATIONS; i++) {
+      gridEngine.findShortestPath(
+        {
+          position: { x: startX, y: startY },
+          charLayer: undefined,
+        },
+        {
+          position: { x: endX, y: endY },
+          charLayer: undefined,
+        },
+        {
+          shortestPathAlgorithm: "BFS",
+        },
+      );
+    }
 
     const end = performance.now();
 

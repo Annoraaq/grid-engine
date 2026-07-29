@@ -1,5 +1,7 @@
 import { GridEngineHeadless } from "../../src/GridEngineHeadless.js";
 
+const ITERATIONS = 5;
+
 export const Jps4Speed = {
   name: "JPS4 Speed",
   run: (gridEngine: GridEngineHeadless) => {
@@ -10,20 +12,22 @@ export const Jps4Speed = {
 
     const start = performance.now();
 
-    gridEngine.findShortestPath(
-      {
-        position: { x: startX, y: startY },
-        charLayer: undefined,
-      },
-      {
-        position: { x: endX, y: endY },
-        charLayer: undefined,
-      },
-      {
-        shortestPathAlgorithm: "JPS",
-        numberOfDirections: 4,
-      },
-    );
+    for (let i = 0; i < ITERATIONS; i++) {
+      gridEngine.findShortestPath(
+        {
+          position: { x: startX, y: startY },
+          charLayer: undefined,
+        },
+        {
+          position: { x: endX, y: endY },
+          charLayer: undefined,
+        },
+        {
+          shortestPathAlgorithm: "JPS",
+          numberOfDirections: 4,
+        },
+      );
+    }
 
     const end = performance.now();
 
