@@ -5,13 +5,14 @@ import {
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
 import { PathfindingOptions } from "../PathfindingOptions.js";
 import { VectorUtils } from "../../Utils/VectorUtils.js";
-import { MinFibonacciHeap } from "mnemonist";
+import { MinHeap } from "mnemonist";
 
 import { LayerVecPos } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 
 interface HeapEntry {
   node: LayerVecPos;
   id: number;
+  g: number;
 }
 
 interface ShortestPathTuple {
@@ -42,12 +43,19 @@ export class AStar extends ShortestPathAlgorithm {
 
     // Calculate total coordinate span for X and Y axes, ensuring enough room for
     // negative coordinates (via MAX_NEGATIVE_COORD_OFFSET) and map bounds.
+    const mapWidth = Number.isFinite(this.gridTilemap.getWidth())
+      ? this.gridTilemap.getWidth()
+      : 0;
+    const mapHeight = Number.isFinite(this.gridTilemap.getHeight())
+      ? this.gridTilemap.getHeight()
+      : 0;
+
     this.spatialWidth = Math.max(
-      this.gridTilemap.getWidth() + 2 * MAX_NEGATIVE_COORD_OFFSET,
+      mapWidth + 2 * MAX_NEGATIVE_COORD_OFFSET,
       MIN_SPATIAL_DIMENSION,
     );
     const spatialHeight = Math.max(
-      this.gridTilemap.getHeight() + 2 * MAX_NEGATIVE_COORD_OFFSET,
+      mapHeight + 2 * MAX_NEGATIVE_COORD_OFFSET,
       MIN_SPATIAL_DIMENSION,
     );
 
@@ -90,9 +98,10 @@ export class AStar extends ShortestPathAlgorithm {
     const previous = new Map<number, LayerVecPos>();
     const g = new Map<number, number>();
     const f = new Map<number, number>();
-    const openSet = new MinFibonacciHeap<HeapEntry>(
+    const openSet = new MinHeap<HeapEntry>(
       (a, b) =>
-        (f.get(a.id) ?? Number.MAX_VALUE) - (f.get(b.id) ?? Number.MAX_VALUE),
+        (f.get(a.id) ?? Number.MAX_VALUE) -
+        (f.get(b.id) ?? Number.MAX_VALUE),
     );
     let closestToTarget: LayerVecPos = startNode;
     let smallestDistToTarget: number = this.distance(
@@ -102,15 +111,19 @@ export class AStar extends ShortestPathAlgorithm {
     let steps = 0;
 
     const startNodeId = this.getNodeId(startNode);
-    openSet.push({ node: startNode, id: startNodeId });
+    openSet.push({ node: startNode, id: startNodeId, g: 0 });
     g.set(startNodeId, 0);
     f.set(startNodeId, this.distance(startNode.position, stopNode.position));
 
     while (openSet.size > 0) {
       const currentEntry = openSet.pop();
       if (!currentEntry) break;
-      const current = currentEntry.node;
       const currentId = currentEntry.id;
+      const currentG = g.get(currentId);
+      if (currentG === undefined || currentEntry.g > currentG) {
+        continue;
+      }
+      const current = currentEntry.node;
       steps++;
 
       const distToTarget = this.distance(current.position, stopNode.position);
@@ -128,10 +141,7 @@ export class AStar extends ShortestPathAlgorithm {
         };
       }
 
-      if (
-        (g.get(currentId) ?? Number.MAX_VALUE) + 1 >
-        this.options.maxPathLength
-      ) {
+      if (currentG + 1 > this.options.maxPathLength) {
         return {
           previous: new Map(),
           closestToTarget,
@@ -142,20 +152,16 @@ export class AStar extends ShortestPathAlgorithm {
 
       for (const neighbor of this.getNeighbors(current, stopNode)) {
         const neighborId = this.getNodeId(neighbor);
-        const tentativeG =
-          (g.get(currentId) ?? Number.MAX_VALUE) +
-          this.getCosts(current.position, neighbor);
-        if (
-          !g.has(neighborId) ||
-          tentativeG < (g.get(neighborId) ?? Number.MAX_VALUE)
-        ) {
+        const tentativeG = currentG + this.getCosts(current.position, neighbor);
+        const neighborG = g.get(neighborId);
+        if (neighborG === undefined || tentativeG < neighborG) {
           previous.set(neighborId, current);
           g.set(neighborId, tentativeG);
           f.set(
             neighborId,
             tentativeG + this.distance(neighbor.position, stopNode.position),
           );
-          openSet.push({ node: neighbor, id: neighborId });
+          openSet.push({ node: neighbor, id: neighborId, g: tentativeG });
         }
       }
     }
