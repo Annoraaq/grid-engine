@@ -105,35 +105,38 @@ export abstract class ShortestPathAlgorithm {
       calculateClosestToTarget,
     };
     this.ignoredCharsSet = new Set(ignoredChars);
-  }
-
-  getNeighbors(pos: LayerVecPos, dest: LayerVecPos): LayerVecPos[] {
-    const distanceUtils = DistanceUtilsFactory.create(
+    this.distanceUtils = DistanceUtilsFactory.create(
       this.options.numberOfDirections ?? NumberOfDirections.FOUR,
     );
-    const neighbours = distanceUtils.neighbors(pos.position);
-    const transitionMappedNeighbors = neighbours.map((unblockedNeighbor) => {
-      let transition = pos.layer;
-      if (!this.options.ignoreLayers) {
-        transition = this.gridTilemap.getTransition(
-          unblockedNeighbor,
-          pos.layer,
-        );
-      }
+  }
 
-      return {
-        position: unblockedNeighbor,
+  private distanceUtils;
+
+  getNeighbors(pos: LayerVecPos, dest: LayerVecPos): LayerVecPos[] {
+    const rawNeighbors = this.distanceUtils.neighbors(pos.position);
+    const result: LayerVecPos[] = [];
+    const ignoreLayers = this.options.ignoreLayers;
+    const ignoreBlockedTarget = this.options.ignoreBlockedTarget;
+
+    for (let i = 0; i < rawNeighbors.length; i++) {
+      const neighborPos = rawNeighbors[i];
+      const transition = ignoreLayers
+        ? pos.layer
+        : this.gridTilemap.getTransition(neighborPos, pos.layer);
+      const neighbor: LayerVecPos = {
+        position: neighborPos,
         layer: transition || pos.layer,
       };
-    });
 
-    return transitionMappedNeighbors.filter((neighborPos) => {
-      return (
-        !this.isBlocking(pos, neighborPos) ||
-        (this.options.ignoreBlockedTarget &&
-          LayerPositionUtils.equal(neighborPos, dest))
-      );
-    });
+      if (
+        !this.isBlocking(pos, neighbor) ||
+        (ignoreBlockedTarget && LayerPositionUtils.equal(neighbor, dest))
+      ) {
+        result.push(neighbor);
+      }
+    }
+
+    return result;
   }
 
   getTransition(pos: Vector2, fromLayer?: string): string | undefined {
