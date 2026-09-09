@@ -59,7 +59,7 @@
     "@typescript-eslint/parser": "8.58.2",
     "babel-jest": "^30.2.0",
     "canvas": "^3.2.0",
-    "csv-parse": "^6.2.1",
+    "csv-parse": "^7.0.2",
     "esbuild": "^0.28.0",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
