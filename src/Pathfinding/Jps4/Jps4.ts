@@ -517,7 +517,3 @@ export class Jps4 extends ShortestPathAlgorithm {
     } while (!VectorUtils.equal(current.position, target.position));
   }
 }
-
-function safeGet(map: Map<string, number>, position: LayerVecPos): number {
-  return map.get(LayerPositionUtils.toString(position)) ?? Number.MAX_VALUE;
-}
