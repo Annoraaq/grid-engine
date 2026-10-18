@@ -199,7 +199,7 @@ export interface Finished {
   result?: MoveToResult;
   description?: string;
   layer: CharLayer;
-  finishedEvent: Omit<FinishedEvent, "BOTH">;
+  finishedEvent: Exclude<FinishedEvent, "BOTH">;
 }
 
 export interface Options {
@@ -390,13 +390,13 @@ export class TargetMovement implements Movement {
     this.updatePosOnPath();
 
     if (this.hasArrived()) {
-      this.stop(MoveToResult.SUCCESS);
       if (this.existsDistToTarget()) {
         const nextTile = this.shortestPath[this.shortestPath.length - 1];
         this.turnTowardsTarget(nextTile.position);
       } else if (this.hasClosestToTarget()) {
         this.turnTowardsTarget(this.targetPos.position);
       }
+      this.stop(MoveToResult.SUCCESS);
     } else if (
       !this.isBlocking(
         this.nextTileOnPath()?.position,
@@ -501,42 +501,47 @@ export class TargetMovement implements Movement {
       this.finished$.next(finished);
       this.finished$.complete();
     } else if (this.emitFinishedEvent === "END_MOVEMENT") {
-      this.character
-        .movementStopped()
-        .pipe(take(1))
-        .subscribe(() => {
-          this.finished$.next({
-            ...finished,
-            finishedEvent: "END_MOVEMENT",
-          });
-          this.finished$.complete();
-        });
+      this.emitEndMovement(finished);
     } else if (this.emitFinishedEvent === "BOTH") {
       this.finished$.next(finished);
-      this.character
-        .movementStopped()
-        .pipe(take(1))
-        .subscribe(() => {
-          this.finished$.next({
-            ...finished,
-            finishedEvent: "END_MOVEMENT",
-          });
-          this.finished$.complete();
-        });
+      this.emitEndMovement(finished);
     }
     this.stopped = true;
   }
 
+  private emitEndMovement(finished: Finished): void {
+    const endFinished: Finished = {
+      ...finished,
+      finishedEvent: "END_MOVEMENT",
+    };
+    if (this.character.isMoving()) {
+      this.character
+        .movementStopped()
+        .pipe(take(1))
+        .subscribe(() => {
+          this.finished$.next(endFinished);
+          this.finished$.complete();
+        });
+    } else {
+      this.finished$.next(endFinished);
+      this.finished$.complete();
+    }
+  }
+
   private turnTowardsTarget(pos: Vector2): void {
     const dir = this.getDir(this.character.getNextTilePos().position, pos);
-    // The character is still moving, so we need to wait until it has stopped,
-    // because it can't turn while in movement.
-    this.character
-      .movementStopped()
-      .pipe(take(1))
-      .subscribe(() => {
-        this.character.turnTowards(dir);
-      });
+    if (this.character.isMoving()) {
+      // The character is still moving, so we need to wait until it has stopped,
+      // because it can't turn while in movement.
+      this.character
+        .movementStopped()
+        .pipe(take(1))
+        .subscribe(() => {
+          this.character.turnTowards(dir);
+        });
+    } else {
+      this.character.turnTowards(dir);
+    }
   }
 
   private existsDistToTarget(): boolean {

@@ -162,7 +162,7 @@ export interface Finished {
     result?: MoveToResult;
     description?: string;
     layer: CharLayer;
-    finishedEvent: Omit<FinishedEvent, "BOTH">;
+    finishedEvent: Exclude<FinishedEvent, "BOTH">;
 }
 export interface Options {
     distance?: number;
@@ -225,6 +225,7 @@ export declare class TargetMovement implements Movement {
     private moveCharOnPath;
     private nextTileOnPath;
     private stop;
+    private emitEndMovement;
     private turnTowardsTarget;
     private existsDistToTarget;
     private hasArrived;
