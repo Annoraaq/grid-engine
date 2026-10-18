@@ -467,6 +467,67 @@ describe("TargetMovement", () => {
     expect(mockChar.getFacingDirection()).toEqual(Direction.RIGHT);
   });
 
+  it("should turn towards target if distance is already reached without moving", () => {
+    const charPos = layerPos(new Vector2(1, 1));
+    const mockChar = createMockChar("char", charPos);
+
+    targetMovement = new TargetMovement(
+      mockChar,
+      gridTilemap,
+      layerPos(new Vector2(1, 0)),
+      {
+        distance: 1,
+        config: {
+          algorithm: shortestPathAlgo,
+        },
+      },
+    );
+    targetMovement.init();
+    targetMovement.update(100);
+
+    expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
+    expect(mockChar.getFacingDirection()).toEqual(Direction.UP);
+  });
+
+  it("should turn towards target if already at closest to target without moving", () => {
+    const charPos = layerPos(new Vector2(1, 3));
+    const mockChar = createMockChar("char", charPos);
+    tilemapMock = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..#.",
+          "..#.",
+          "..#.",
+          ".p#t",
+        ],
+      },
+    ]);
+    gridTilemap = new GridTilemap(
+      tilemapMock,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES,
+    );
+
+    targetMovement = new TargetMovement(
+      mockChar,
+      gridTilemap,
+      layerPos(new Vector2(3, 3)),
+      {
+        config: {
+          algorithm: shortestPathAlgo,
+          noPathFoundStrategy: NoPathFoundStrategy.CLOSEST_REACHABLE,
+        },
+      },
+    );
+    targetMovement.init();
+    targetMovement.update(100);
+
+    expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 3)));
+    expect(mockChar.getFacingDirection()).toEqual(Direction.RIGHT);
+  });
+
   it("should move if closestToTarget is further than distance", () => {
     const charPos = layerPos(new Vector2(1, 0));
     const mockChar = createMockChar("char", charPos);
@@ -1708,6 +1769,63 @@ describe("TargetMovement", () => {
       mockChar.update(500);
 
       expect(mockCall).toHaveBeenCalledWith({
+        position: targetPos.position,
+        result: MoveToResult.SUCCESS,
+        description: "Successfully arrived.",
+        layer: "lowerCharLayer",
+        finishedEvent: "END_MOVEMENT",
+      });
+    });
+
+    it("should fire END_MOVEMENT when char takes no step", () => {
+      const mockCall = jest.fn();
+      const targetPos = charPos;
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        config: {
+          algorithm: shortestPathAlgo,
+          emitFinishedEvent: "END_MOVEMENT",
+        },
+      });
+      mockChar.setMovement(targetMovement);
+      targetMovement.init();
+      targetMovement.finishedObs().subscribe(mockCall);
+
+      mockChar.update(100);
+
+      expect(mockCall).toHaveBeenCalledTimes(1);
+      expect(mockCall).toHaveBeenCalledWith({
+        position: targetPos.position,
+        result: MoveToResult.SUCCESS,
+        description: "Successfully arrived.",
+        layer: "lowerCharLayer",
+        finishedEvent: "END_MOVEMENT",
+      });
+    });
+
+    it("should fire START_MOVEMENT and END_MOVEMENT when char takes no step with BOTH", () => {
+      const mockCall = jest.fn();
+      const targetPos = charPos;
+      targetMovement = new TargetMovement(mockChar, gridTilemap, targetPos, {
+        config: {
+          algorithm: shortestPathAlgo,
+          emitFinishedEvent: "BOTH",
+        },
+      });
+      mockChar.setMovement(targetMovement);
+      targetMovement.init();
+      targetMovement.finishedObs().subscribe(mockCall);
+
+      mockChar.update(100);
+
+      expect(mockCall).toHaveBeenCalledTimes(2);
+      expect(mockCall).toHaveBeenNthCalledWith(1, {
+        position: targetPos.position,
+        result: MoveToResult.SUCCESS,
+        description: "Successfully arrived.",
+        layer: "lowerCharLayer",
+        finishedEvent: "START_MOVEMENT",
+      });
+      expect(mockCall).toHaveBeenNthCalledWith(2, {
         position: targetPos.position,
         result: MoveToResult.SUCCESS,
         description: "Successfully arrived.",
