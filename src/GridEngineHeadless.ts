@@ -18,7 +18,7 @@ import {
   NumberOfDirections,
 } from "./Direction/Direction.js";
 import { RandomMovement } from "./Movement/RandomMovement/RandomMovement.js";
-import { Observable, Subject, merge } from "rxjs";
+import { Observable, Subject } from "rxjs";
 import { take, takeUntil, filter, map, mergeWith } from "rxjs/operators";
 import { Vector2 } from "./Utils/Vector2/Vector2.js";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy.js";
@@ -1191,11 +1191,7 @@ export class GridEngineHeadless implements IGridEngine {
       queueMovement.init();
       queueMovement
         .finished()
-        .pipe(
-          takeUntil(
-            merge(this.charRemoved(charId), gridChar.autoMovementSet()),
-          ),
-        )
+        .pipe(takeUntil(this.charRemoved(charId)))
         .subscribe((finished: QueueMovementFinished) => {
           this.queueMovementFinished$?.next({ charId, ...finished });
         });
