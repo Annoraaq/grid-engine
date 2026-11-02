@@ -27,7 +27,7 @@ interface Result {
   resultNew: SpeedTestResult;
 }
 
-const mapPath = path.join(process.cwd(), "speedtests", "8room_000.map");
+const mapPath = path.join(__dirname, "8room_000.map");
 const geTm = new RoomsTilemap(mapPath);
 const geOld = new GridEngineOld();
 const geNew = new GridEngineNew();
