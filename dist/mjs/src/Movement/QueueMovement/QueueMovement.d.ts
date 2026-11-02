@@ -6,6 +6,7 @@ import { Subject } from "rxjs";
 import { Concrete } from "../../Utils/TypeUtils.js";
 import { LayerVecPos } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 import { CharLayer, LayerPosition, Position } from "../../Position.js";
+import { FinishedEvent } from "../TargetMovement/TargetMovement.js";
 /**
  * @category Queue Movement
  */
@@ -50,6 +51,17 @@ export interface QueueMovementConfig {
      * @default `false`
      */
     skipInvalidPositions?: boolean;
+    /**
+     * Defines when the observable returned by {@link QueueMovement.finished}
+     * should emit the finished event.
+     *
+     * 'START_MOVEMENT' - Emit event when player starts the last position change (one field away from target).
+     * 'END_MOVEMENT' - Emit event when player reached the target position (stopped moving).
+     * 'BOTH' - Emit event at both times.
+     *
+     * @default 'START_MOVEMENT'
+     */
+    emitFinishedEvent?: FinishedEvent;
 }
 /**
  * Determines what happens if the next position on the enqueued path is blocked.
@@ -85,6 +97,7 @@ export interface Finished {
     result?: QueueMovementResult;
     description?: string;
     layer: CharLayer;
+    finishedEvent: Exclude<FinishedEvent, "BOTH">;
 }
 interface QueueEntry {
     command: LayerVecPos | Direction;
@@ -104,6 +117,8 @@ export declare class QueueMovement implements Movement {
     private finished$;
     private distanceUtils;
     private pathBlockedWaitElapsed;
+    private pendingEndMovementSub?;
+    private shouldCompleteOnEndMovement;
     constructor(character: GridCharacter, tilemap: GridTilemap);
     init(): void;
     update(delta: number): void;
@@ -122,6 +137,8 @@ export declare class QueueMovement implements Movement {
     private finishPathBlocked;
     private finishBlockedWaitTimeout;
     private finish;
+    private emitEndMovement;
+    private cancelPendingEndMovement;
     private getDir;
     private posToStr;
 }

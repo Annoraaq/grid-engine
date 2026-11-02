@@ -25,6 +25,7 @@ const DEFAULT_CONFIG: QueueMovementConfig = {
   pathBlockedStrategy: QueuedPathBlockedStrategy.STOP,
   pathBlockedWaitTimeoutMs: -1,
   skipInvalidPositions: false,
+  emitFinishedEvent: "START_MOVEMENT",
 };
 
 interface TestData {
@@ -145,6 +146,7 @@ describe("QueueMovement", () => {
       pathBlockedStrategy: QueuedPathBlockedStrategy.SKIP,
       pathBlockedWaitTimeoutMs: 10,
       skipInvalidPositions: true,
+      emitFinishedEvent: "END_MOVEMENT",
     };
     expect(queueMovement.size()).toEqual(0);
     queueMovement.enqueue([
@@ -205,6 +207,7 @@ describe("QueueMovement", () => {
       result: "SUCCESS",
       description: "",
       layer: "testCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
@@ -230,6 +233,7 @@ describe("QueueMovement", () => {
       result: "SUCCESS",
       description: "",
       layer: "testCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
@@ -258,6 +262,7 @@ describe("QueueMovement", () => {
       description:
         "Position (2, 1, testCharLayer) is not reachable from (1, 0, testCharLayer).",
       layer: "testCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
@@ -282,6 +287,7 @@ describe("QueueMovement", () => {
       result: "SUCCESS",
       description: "",
       layer: "testCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
@@ -305,6 +311,7 @@ describe("QueueMovement", () => {
       description:
         "Position (2, 1, testCharLayer) is not reachable from (1, 0, testCharLayer).",
       layer: "testCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
@@ -326,6 +333,7 @@ describe("QueueMovement", () => {
       result: "MOVEMENT_TERMINATED",
       description: "New automatic movement has been set to character.",
       layer: "testCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
@@ -364,6 +372,7 @@ describe("QueueMovement", () => {
       description:
         "Position (2, 0, testCharLayer) is not reachable from (1, 0, testCharLayer).",
       layer: "testCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
@@ -387,6 +396,7 @@ describe("QueueMovement", () => {
       description:
         "Position (2, 0, someOtherLayer) is not reachable from (1, 0, testCharLayer).",
       layer: "testCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
@@ -417,6 +427,7 @@ describe("QueueMovement", () => {
       result: "SUCCESS",
       description: "",
       layer: "someOtherLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
@@ -449,6 +460,7 @@ describe("QueueMovement", () => {
       result: "PATH_BLOCKED",
       description: "Position (2, 0, testCharLayer) is blocked.",
       layer: "testCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
@@ -495,6 +507,7 @@ describe("QueueMovement", () => {
       result: "PATH_BLOCKED",
       description: "Position (2, 0, someOtherLayer) is blocked.",
       layer: "testCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
@@ -549,6 +562,7 @@ describe("QueueMovement", () => {
       result: "PATH_BLOCKED",
       description: "Position (2, 1, testCharLayer) is blocked.",
       layer: "testCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
@@ -614,6 +628,7 @@ describe("QueueMovement", () => {
       result: "PATH_BLOCKED",
       description: "Position (3, 0, testCharLayer) is blocked.",
       layer: "testCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
@@ -648,6 +663,7 @@ describe("QueueMovement", () => {
       result: "SUCCESS",
       description: "",
       layer: "testCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
@@ -681,6 +697,7 @@ describe("QueueMovement", () => {
       result: "SUCCESS",
       description: "",
       layer: "testCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
@@ -723,6 +740,7 @@ describe("QueueMovement", () => {
         "Position (2, 0, testCharLayer) is blocked and the wait timeout of " +
         "1001 ms has been exceeded.",
       layer: "testCharLayer",
+      finishedEvent: "START_MOVEMENT",
     });
     expect(finishedObsCompleteMock).not.toHaveBeenCalled();
     expect(queueMovement.size()).toBe(0);
@@ -778,5 +796,213 @@ describe("QueueMovement", () => {
     expect(queueMovement.size()).toEqual(2);
     queueMovement.clear();
     expect(queueMovement.size()).toEqual(0);
+  });
+
+  describe("emitFinishedEvent", () => {
+    it("should fire after char finishes last step with END_MOVEMENT", () => {
+      const { mockChar, queueMovement, finishedObsCallbackMock } =
+        initQueueMovement();
+      queueMovement.enqueue([layerPos(1, 0), layerPos(1, 1)], {
+        emitFinishedEvent: "END_MOVEMENT",
+      });
+
+      queueMovement.finished().subscribe(() => {
+        mockChar.turnTowards(Direction.LEFT);
+      });
+
+      mockChar.update(500);
+      mockChar.update(500);
+      expect(finishedObsCallbackMock).not.toHaveBeenCalled();
+      expect(mockChar.isMoving()).toBe(true);
+
+      mockChar.update(500);
+      expect(finishedObsCallbackMock).not.toHaveBeenCalled();
+
+      mockChar.update(500);
+      expect(mockChar.isMoving()).toBe(false);
+      expect(mockChar.getTilePos()).toEqual(layerPos(1, 1));
+      expect(finishedObsCallbackMock).toHaveBeenCalledTimes(1);
+      expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+        position: layerPos(1, 1).position,
+        result: "SUCCESS",
+        description: "",
+        layer: "testCharLayer",
+        finishedEvent: "END_MOVEMENT",
+      });
+      expect(mockChar.getFacingDirection()).toEqual(Direction.LEFT);
+    });
+
+    it("should fire before and after char does last step with BOTH", () => {
+      const { mockChar, queueMovement, finishedObsCallbackMock } =
+        initQueueMovement();
+      queueMovement.enqueue([layerPos(1, 0), layerPos(1, 1)], {
+        emitFinishedEvent: "BOTH",
+      });
+
+      mockChar.update(500);
+      mockChar.update(500);
+      expect(finishedObsCallbackMock).toHaveBeenCalledTimes(1);
+      expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+        position: layerPos(1, 1).position,
+        result: "SUCCESS",
+        description: "",
+        layer: "testCharLayer",
+        finishedEvent: "START_MOVEMENT",
+      });
+
+      mockChar.update(500);
+      mockChar.update(500);
+      expect(finishedObsCallbackMock).toHaveBeenCalledTimes(2);
+      expect(finishedObsCallbackMock).toHaveBeenLastCalledWith({
+        position: layerPos(1, 1).position,
+        result: "SUCCESS",
+        description: "",
+        layer: "testCharLayer",
+        finishedEvent: "END_MOVEMENT",
+      });
+    });
+
+    it("should fire END_MOVEMENT immediately if char takes no step (blocked on first step)", () => {
+      const tilemapMock = mockLayeredBlockMap([
+        {
+          layer: "testCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".#.",
+            "...",
+          ],
+        },
+      ]);
+      const { mockChar, queueMovement, finishedObsCallbackMock } =
+        initQueueMovement(tilemapMock);
+      queueMovement.enqueue([layerPos(1, 0)], {
+        emitFinishedEvent: "END_MOVEMENT",
+      });
+
+      mockChar.update(500);
+
+      expect(mockChar.isMoving()).toBe(false);
+      expect(finishedObsCallbackMock).toHaveBeenCalledTimes(1);
+      expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+        position: layerPos(0, 0).position,
+        result: "PATH_BLOCKED",
+        description: "Position (1, 0, testCharLayer) is blocked.",
+        layer: "testCharLayer",
+        finishedEvent: "END_MOVEMENT",
+      });
+    });
+
+    it("should fire END_MOVEMENT immediately if char takes no step (invalid first step)", () => {
+      const { mockChar, queueMovement, finishedObsCallbackMock } =
+        initQueueMovement();
+      queueMovement.enqueue([layerPos(2, 1)], {
+        emitFinishedEvent: "END_MOVEMENT",
+      });
+
+      mockChar.update(500);
+
+      expect(mockChar.isMoving()).toBe(false);
+      expect(finishedObsCallbackMock).toHaveBeenCalledTimes(1);
+      expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+        position: layerPos(0, 0).position,
+        result: "INVALID_NEXT_POS",
+        description:
+          "Position (2, 1, testCharLayer) is not reachable from (0, 0, testCharLayer).",
+        layer: "testCharLayer",
+        finishedEvent: "END_MOVEMENT",
+      });
+    });
+
+    it("should cancel pending END_MOVEMENT if new movements are enqueued before stopping", () => {
+      const { mockChar, queueMovement, finishedObsCallbackMock } =
+        initQueueMovement();
+      queueMovement.enqueue([layerPos(1, 0)], {
+        emitFinishedEvent: "END_MOVEMENT",
+      });
+
+      mockChar.update(500);
+      expect(finishedObsCallbackMock).not.toHaveBeenCalled();
+
+      queueMovement.enqueue([layerPos(1, 1)], {
+        emitFinishedEvent: "END_MOVEMENT",
+      });
+
+      mockChar.update(500);
+      expect(finishedObsCallbackMock).not.toHaveBeenCalled();
+
+      mockChar.update(500);
+      mockChar.update(500);
+
+      expect(finishedObsCallbackMock).toHaveBeenCalledTimes(1);
+      expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+        position: layerPos(1, 1).position,
+        result: "SUCCESS",
+        description: "",
+        layer: "testCharLayer",
+        finishedEvent: "END_MOVEMENT",
+      });
+    });
+
+    it("should still emit SUCCESS on END_MOVEMENT if movement is replaced during last step", () => {
+      const {
+        mockChar,
+        queueMovement,
+        finishedObsCallbackMock,
+        finishedObsCompleteMock,
+      } = initQueueMovement();
+      queueMovement.enqueue([layerPos(1, 0)], {
+        emitFinishedEvent: "END_MOVEMENT",
+      });
+
+      mockChar.update(500);
+      expect(finishedObsCallbackMock).not.toHaveBeenCalled();
+
+      mockChar.setMovement(undefined);
+      expect(finishedObsCallbackMock).not.toHaveBeenCalled();
+      expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+
+      mockChar.update(500);
+
+      expect(finishedObsCallbackMock).toHaveBeenCalledTimes(1);
+      expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+        position: layerPos(1, 0).position,
+        result: "SUCCESS",
+        description: "",
+        layer: "testCharLayer",
+        finishedEvent: "END_MOVEMENT",
+      });
+      expect(finishedObsCompleteMock).toHaveBeenCalled();
+    });
+
+    it("should emit MOVEMENT_TERMINATED on END_MOVEMENT if movement is replaced while queue is not empty", () => {
+      const {
+        mockChar,
+        queueMovement,
+        finishedObsCallbackMock,
+        finishedObsCompleteMock,
+      } = initQueueMovement();
+      queueMovement.enqueue([layerPos(1, 0), layerPos(1, 1)], {
+        emitFinishedEvent: "END_MOVEMENT",
+      });
+
+      mockChar.update(500);
+      expect(finishedObsCallbackMock).not.toHaveBeenCalled();
+
+      mockChar.setMovement(undefined);
+      expect(finishedObsCallbackMock).not.toHaveBeenCalled();
+      expect(finishedObsCompleteMock).not.toHaveBeenCalled();
+
+      mockChar.update(500);
+
+      expect(finishedObsCallbackMock).toHaveBeenCalledTimes(1);
+      expect(finishedObsCallbackMock).toHaveBeenCalledWith({
+        position: layerPos(1, 0).position,
+        result: "MOVEMENT_TERMINATED",
+        description: "New automatic movement has been set to character.",
+        layer: "testCharLayer",
+        finishedEvent: "END_MOVEMENT",
+      });
+      expect(finishedObsCompleteMock).toHaveBeenCalled();
+    });
   });
 });

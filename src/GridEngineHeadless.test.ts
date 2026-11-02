@@ -1591,6 +1591,7 @@ describe("GridEngineHeadless", () => {
       pathBlockedStrategy: QueuedPathBlockedStrategy.STOP,
       pathBlockedWaitTimeoutMs: -1,
       skipInvalidPositions: false,
+      emitFinishedEvent: "START_MOVEMENT",
     };
 
     it("should enqueue and finish", () => {
@@ -1659,6 +1660,7 @@ describe("GridEngineHeadless", () => {
           y: 1,
         },
         result: "SUCCESS",
+        finishedEvent: "START_MOVEMENT",
       });
     });
 
@@ -1748,6 +1750,7 @@ describe("GridEngineHeadless", () => {
           y: 0,
         },
         result: "SUCCESS",
+        finishedEvent: "START_MOVEMENT",
       });
     });
 

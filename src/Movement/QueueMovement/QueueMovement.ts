@@ -8,13 +8,14 @@ import { GridCharacter } from "../../GridCharacter/GridCharacter.js";
 import { GridTilemap } from "../../GridTilemap/GridTilemap.js";
 import { Vector2 } from "../../Utils/Vector2/Vector2.js";
 import { Movement, MovementInfo } from "../Movement.js";
-import { Subject } from "rxjs";
+import { Subject, Subscription } from "rxjs";
 import { filter, take } from "rxjs/operators";
 import { DistanceUtilsFactory } from "../../Utils/DistanceUtilsFactory/DistanceUtilsFactory.js";
 import { DistanceUtils } from "../../Utils/DistanceUtils.js";
 import { Concrete } from "../../Utils/TypeUtils.js";
 import { LayerVecPos } from "../../Utils/LayerPositionUtils/LayerPositionUtils.js";
 import { CharLayer, LayerPosition, Position } from "../../Position.js";
+import { FinishedEvent } from "../TargetMovement/TargetMovement.js";
 
 /**
  * @category Queue Movement
@@ -63,6 +64,18 @@ export interface QueueMovementConfig {
    * @default `false`
    */
   skipInvalidPositions?: boolean;
+
+  /**
+   * Defines when the observable returned by {@link QueueMovement.finished}
+   * should emit the finished event.
+   *
+   * 'START_MOVEMENT' - Emit event when player starts the last position change (one field away from target).
+   * 'END_MOVEMENT' - Emit event when player reached the target position (stopped moving).
+   * 'BOTH' - Emit event at both times.
+   *
+   * @default 'START_MOVEMENT'
+   */
+  emitFinishedEvent?: FinishedEvent;
 }
 
 /**
@@ -108,6 +121,7 @@ export interface Finished {
   result?: QueueMovementResult;
   description?: string;
   layer: CharLayer;
+  finishedEvent: Exclude<FinishedEvent, "BOTH">;
 }
 
 interface QueueEntry {
@@ -128,6 +142,8 @@ export class QueueMovement implements Movement {
   private finished$ = new Subject<Finished>();
   private distanceUtils: DistanceUtils;
   private pathBlockedWaitElapsed = 0;
+  private pendingEndMovementSub?: Subscription;
+  private shouldCompleteOnEndMovement = false;
 
   constructor(
     private character: GridCharacter,
@@ -149,7 +165,11 @@ export class QueueMovement implements Movement {
         if (this.queue.size() > 0) {
           this.finishMovementTerminated();
         }
-        this.finished$.complete();
+        if (this.pendingEndMovementSub) {
+          this.shouldCompleteOnEndMovement = true;
+        } else {
+          this.finished$.complete();
+        }
       });
   }
 
@@ -179,6 +199,7 @@ export class QueueMovement implements Movement {
       pathBlockedWaitTimeoutMs: config?.pathBlockedWaitTimeoutMs || -1,
       ignoreInvalidPositions: config.ignoreInvalidPositions ?? false,
       skipInvalidPositions: config.skipInvalidPositions ?? false,
+      emitFinishedEvent: config.emitFinishedEvent || "START_MOVEMENT",
     };
 
     for (const pos of positions) {
@@ -202,6 +223,10 @@ export class QueueMovement implements Movement {
       if (!config.ignoreInvalidPositions || isNeighborPos) {
         this.queue.enqueue(newEntry);
       }
+    }
+
+    if (this.queue.size() > 0) {
+      this.cancelPendingEndMovement();
     }
   }
 
@@ -236,13 +261,13 @@ export class QueueMovement implements Movement {
 
     if (!nextConfig.skipInvalidPositions) {
       if (!this.isNeighborPos(nextPos)) {
-        this.finishInvalidNextPos(nextPos);
+        this.finishInvalidNextPos(nextPos, nextConfig.emitFinishedEvent);
         return;
       }
     } else {
       nextPos = this.getNextValidPosition();
       if (!nextPos) {
-        this.finishInvalidNextPos(nextPos);
+        this.finishInvalidNextPos(nextPos, nextConfig.emitFinishedEvent);
         return;
       }
     }
@@ -256,7 +281,7 @@ export class QueueMovement implements Movement {
       )
     ) {
       if (nextConfig.pathBlockedStrategy === QueuedPathBlockedStrategy.STOP) {
-        this.finishPathBlocked(nextPos);
+        this.finishPathBlocked(nextPos, nextConfig.emitFinishedEvent);
       } else if (
         nextConfig.pathBlockedStrategy === QueuedPathBlockedStrategy.SKIP
       ) {
@@ -274,6 +299,7 @@ export class QueueMovement implements Movement {
           this.finishBlockedWaitTimeout(
             nextPos,
             nextConfig.pathBlockedWaitTimeoutMs,
+            nextConfig.emitFinishedEvent,
           );
         }
       }
@@ -286,7 +312,7 @@ export class QueueMovement implements Movement {
     );
 
     if (this.isLastMovement()) {
-      this.finish("SUCCESS", "", nextPos);
+      this.finish("SUCCESS", "", nextPos, nextConfig.emitFinishedEvent);
     }
   }
   private getNextValidPosition(): LayerVecPos | undefined {
@@ -332,13 +358,20 @@ export class QueueMovement implements Movement {
   }
 
   private finishMovementTerminated(): void {
+    const emitFinishedEvent =
+      this.queue.peek()?.config.emitFinishedEvent ?? "START_MOVEMENT";
     this.finish(
       "MOVEMENT_TERMINATED",
       "New automatic movement has been set to character.",
+      undefined,
+      emitFinishedEvent,
     );
   }
 
-  private finishInvalidNextPos(nextPos: LayerVecPos | undefined): void {
+  private finishInvalidNextPos(
+    nextPos: LayerVecPos | undefined,
+    emitFinishedEvent: FinishedEvent,
+  ): void {
     if (nextPos) {
       this.finish(
         "INVALID_NEXT_POS",
@@ -347,6 +380,8 @@ export class QueueMovement implements Movement {
         )} is not reachable from ${this.posToStr(
           this.character.getNextTilePos(),
         )}.`,
+        undefined,
+        emitFinishedEvent,
       );
     } else {
       this.finish(
@@ -354,26 +389,36 @@ export class QueueMovement implements Movement {
         `No enqueued position is reachable from ${this.posToStr(
           this.character.getNextTilePos(),
         )}.`,
+        undefined,
+        emitFinishedEvent,
       );
     }
   }
 
-  private finishPathBlocked(nextPos: LayerVecPos): void {
+  private finishPathBlocked(
+    nextPos: LayerVecPos,
+    emitFinishedEvent: FinishedEvent,
+  ): void {
     this.finish(
       "PATH_BLOCKED",
       `Position ${this.posToStr(nextPos)} is blocked.`,
+      undefined,
+      emitFinishedEvent,
     );
   }
 
   private finishBlockedWaitTimeout(
     nextPos: LayerVecPos,
     pathBlockedWaitTimeoutMs: number,
+    emitFinishedEvent: FinishedEvent,
   ): void {
     this.finish(
       "PATH_BLOCKED_WAIT_TIMEOUT",
       `Position ${this.posToStr(
         nextPos,
       )} is blocked and the wait timeout of ${pathBlockedWaitTimeoutMs} ms has been exceeded.`,
+      undefined,
+      emitFinishedEvent,
     );
   }
 
@@ -381,14 +426,51 @@ export class QueueMovement implements Movement {
     result: QueueMovementResult,
     description = "",
     nextPos: LayerVecPos = this.character.getNextTilePos(),
+    emitFinishedEvent: FinishedEvent = "START_MOVEMENT",
   ): void {
     this.queue = new Queue<QueueEntry>();
-    this.finished$.next({
+    this.cancelPendingEndMovement();
+    const finished: Finished = {
       position: nextPos.position,
       result,
       description,
       layer: nextPos.layer,
-    });
+      finishedEvent: "START_MOVEMENT",
+    };
+    if (emitFinishedEvent === "START_MOVEMENT") {
+      this.finished$.next(finished);
+    } else if (emitFinishedEvent === "END_MOVEMENT") {
+      this.emitEndMovement(finished);
+    } else if (emitFinishedEvent === "BOTH") {
+      this.finished$.next(finished);
+      this.emitEndMovement(finished);
+    }
+  }
+
+  private emitEndMovement(finished: Finished): void {
+    const endFinished: Finished = {
+      ...finished,
+      finishedEvent: "END_MOVEMENT",
+    };
+    if (this.character.isMoving()) {
+      this.pendingEndMovementSub = this.character
+        .movementStopped()
+        .pipe(take(1))
+        .subscribe(() => {
+          this.pendingEndMovementSub = undefined;
+          this.finished$.next(endFinished);
+          if (this.shouldCompleteOnEndMovement) {
+            this.finished$.complete();
+          }
+        });
+    } else {
+      this.finished$.next(endFinished);
+    }
+  }
+
+  private cancelPendingEndMovement(): void {
+    this.pendingEndMovementSub?.unsubscribe();
+    this.pendingEndMovementSub = undefined;
   }
 
   private getDir(from: Vector2, to: Vector2): Direction {
