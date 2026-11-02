@@ -15409,7 +15409,7 @@ function charToArr(char) {
 
 // speedtests/run.ts
 var import_path = __toESM(require("path"), 1);
-var mapPath = import_path.default.join(process.cwd(), "speedtests", "8room_000.map");
+var mapPath = import_path.default.join(__dirname, "8room_000.map");
 var geTm = new RoomsTilemap(mapPath);
 var geOld = new Mn2();
 var geNew = new In();
