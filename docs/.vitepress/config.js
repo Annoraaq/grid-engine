@@ -91,6 +91,7 @@ export default defineConfig({
             text: "Pathfinding",
             collapsed: false,
             items: [
+              { text: 'Fleeing', link: '/examples/fleeing/index.md' },
               { text: 'Following', link: '/examples/following/index.md' },
               { text: 'Following Facing Direction', link: '/examples/following-facing-direction/index.md' },
               { text: 'Move To', link: '/examples/move-to/index.md' },

@@ -1,5 +1,6 @@
 import { CollisionStrategy } from "./Collisions/CollisionStrategy.js";
 import { FollowMovement } from "./Movement/FollowMovement/FollowMovement.js";
+import { FleeMovement } from "./Movement/FleeMovement/FleeMovement.js";
 import {
   Finished,
   MoveToConfig,
@@ -40,6 +41,7 @@ import { Tilemap } from "./GridTilemap/Tilemap.js";
 import {
   CharacterShift,
   CharacterShiftAction,
+  FleeOptions,
   FollowOptions,
   IGridEngine,
   PathfindingResult,
@@ -804,6 +806,38 @@ export class GridEngineHeadless implements IGridEngine {
     );
     gridChar.setMovement(followMovement);
     followMovement.init();
+  }
+
+  /**
+   * {@inheritDoc IGridEngine.flee}
+   *
+   * @category Pathfinding
+   */
+  flee(charId: string, charIdToAvoid: string, options: FleeOptions): void {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    const gridCharToAvoid = this.gridCharacters?.get(charIdToAvoid);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    if (!gridCharToAvoid) throw this.createCharUnknownErr(charIdToAvoid);
+    if (!this.gridTilemap) throw this.createUninitializedErr();
+    const fleeMovement = new FleeMovement(
+      gridChar,
+      this.gridTilemap,
+      gridCharToAvoid,
+      {
+        distance: options.distance,
+        farthestPointIfBlocked: options.farthestPointIfBlocked ?? true,
+        maxPathLength: options.maxPathLength ?? Infinity,
+        ignoreLayers: !!options.ignoreLayers,
+        isPositionAllowedFn: options.isPositionAllowedFn ?? (() => true),
+        ignoredChars: options.ignoredChars ?? [],
+        pathBlockedStrategy:
+          options.pathBlockedStrategy ?? PathBlockedStrategy.RETRY,
+        pathBlockedRetryBackoffMs: options.pathBlockedRetryBackoffMs ?? 200,
+      },
+    );
+    gridChar.setMovement(fleeMovement);
+    fleeMovement.init();
   }
 
   /**

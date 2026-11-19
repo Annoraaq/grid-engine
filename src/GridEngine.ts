@@ -55,6 +55,7 @@ import {
 import {
   CharacterShift,
   CharacterShiftAction,
+  FleeOptions,
   FollowOptions,
   IGridEngine,
   PathfindingResult,
@@ -96,6 +97,7 @@ export {
   Concrete,
   Direction,
   Finished,
+  FleeOptions,
   FollowOptions,
   FrameRow,
   GridCharacterState,
@@ -738,6 +740,15 @@ export class GridEngine implements IGridEngine {
       options = distance;
     }
     this.geHeadless.follow(charId, charIdToFollow, options);
+  }
+
+  /**
+   * {@inheritDoc IGridEngine.flee}
+   *
+   * @category Pathfinding
+   */
+  flee(charId: string, charIdToAvoid: string, options: FleeOptions): void {
+    this.geHeadless.flee(charId, charIdToAvoid, options);
   }
 
   /**
