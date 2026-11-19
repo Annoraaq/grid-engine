@@ -4,4 +4,5 @@ export interface GridCharacterStatePhaser extends GridCharacterState {
   offsetX: number;
   offsetY: number;
   depthLayer?: string;
+  spotWalk?: boolean;
 }

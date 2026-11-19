@@ -10,6 +10,8 @@ export declare class GridCharacterPhaser {
     private customOffset;
     private depthOffset;
     private depthLayer?;
+    private spotWalk;
+    private spotWalkProgress;
     private sprite?;
     private layerOverlaySprite?;
     private container?;
@@ -33,7 +35,9 @@ export declare class GridCharacterPhaser {
     turnTowards(direction: Direction): void;
     getAnimation(): CharacterAnimation | undefined;
     setAnimation(animation: CharacterAnimation): void;
-    update(_delta: number): void;
+    update(delta: number): void;
+    isSpotWalking(): boolean;
+    setSpotWalk(enabled: boolean): void;
     getDepthOffset(): number;
     getDepthLayer(): string | undefined;
     setDepthLayer(depthLayer?: string): void;

@@ -85,6 +85,7 @@ export default defineConfig({
             items: [
               { text: 'Custom Walking Animation', link: '/examples/custom-walking-animation/index.md' },
               { text: 'Custom Walking Animation Mapping', link: '/examples/custom-walking-animation-mapping/index.md' },
+              { text: 'Spot Walk', link: '/examples/spot-walk/index.md' },
             ]
           },
           {
