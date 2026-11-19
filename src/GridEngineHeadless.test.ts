@@ -802,6 +802,78 @@ describe("GridEngineHeadless", () => {
     expect(chars).toEqual(["player"]);
   });
 
+  it("should filter chars at position by labels", () => {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
+      characters: [
+        {
+          id: "player1",
+          startPosition: { x: 5, y: 4 },
+          charLayer: "layer",
+          labels: ["label1", "label2"],
+        },
+        {
+          id: "player2",
+          startPosition: { x: 5, y: 4 },
+          charLayer: "layer",
+          labels: ["label2"],
+        },
+        {
+          id: "player3",
+          startPosition: { x: 5, y: 4 },
+          charLayer: "layer",
+          labels: [],
+        },
+        {
+          id: "player4",
+          startPosition: { x: 1, y: 1 },
+          charLayer: "layer",
+          labels: ["label1", "label2"],
+        },
+      ],
+    });
+
+    expect(
+      gridEngineHeadless.getCharactersAt({ x: 5, y: 4 }, "layer", {
+        labels: { withOneOfLabels: ["label1", "label2"] },
+      }),
+    ).toEqual(["player1", "player2"]);
+
+    expect(
+      gridEngineHeadless.getCharactersAt({ x: 5, y: 4 }, "layer", {
+        labels: { withAllLabels: ["label1", "label2"] },
+      }),
+    ).toEqual(["player1"]);
+
+    expect(
+      gridEngineHeadless.getCharactersAt({ x: 5, y: 4 }, "layer", {
+        labels: { withNoneLabels: ["label1", "label2"] },
+      }),
+    ).toEqual(["player3"]);
+  });
+
+  it("should filter chars at position by labels without layer", () => {
+    gridEngineHeadless.create(new MockTilemap([createMockLayer({})]), {
+      characters: [
+        {
+          id: "player1",
+          startPosition: { x: 5, y: 4 },
+          labels: ["label1"],
+        },
+        {
+          id: "player2",
+          startPosition: { x: 5, y: 4 },
+          labels: ["label2"],
+        },
+      ],
+    });
+
+    expect(
+      gridEngineHeadless.getCharactersAt({ x: 5, y: 4 }, undefined, {
+        labels: { withAllLabels: ["label1"] },
+      }),
+    ).toEqual(["player1"]);
+  });
+
   it("should check if char is registered", () => {
     createDefaultGridEngine();
     gridEngineHeadless.addCharacter({

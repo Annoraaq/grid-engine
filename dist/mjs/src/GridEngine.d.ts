@@ -419,7 +419,7 @@ export declare class GridEngine implements IGridEngine {
      *
      * @category Tilemap
      */
-    getCharactersAt(position: Position, layer?: string): string[];
+    getCharactersAt(position: Position, layer?: string, options?: CharacterFilteringOptions): string[];
     /**
      * {@inheritDoc IGridEngine.setPosition}
      *
