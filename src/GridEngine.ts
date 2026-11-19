@@ -785,8 +785,12 @@ export class GridEngine implements IGridEngine {
    *
    * @category Tilemap
    */
-  getCharactersAt(position: Position, layer?: string): string[] {
-    return this.geHeadless.getCharactersAt(position, layer);
+  getCharactersAt(
+    position: Position,
+    layer?: string,
+    options?: CharacterFilteringOptions,
+  ): string[] {
+    return this.geHeadless.getCharactersAt(position, layer, options);
   }
 
   /**

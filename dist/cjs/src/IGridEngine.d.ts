@@ -376,12 +376,13 @@ export interface IGridEngine {
      */
     turnTowards(charId: string, direction: Direction): void;
     /**
-     * Finds the identifiers of all characters at the provided tile position.
+     * Finds the identifiers of all characters at the provided tile position,
+     * satisfying the provided filtering options.
      * @returns The identifiers of all characters on this tile.
      *
      * @category Tilemap
      */
-    getCharactersAt(position: Position, layer?: string): string[];
+    getCharactersAt(position: Position, layer?: string, options?: CharacterFilteringOptions): string[];
     /**
      * Places the character with the given id to the provided tile position. If
      * that character is moving, the movement is stopped. The

@@ -860,14 +860,20 @@ export class GridEngineHeadless implements IGridEngine {
    *
    * @category Tilemap
    */
-  getCharactersAt(position: Position, layer?: string): string[] {
+  getCharactersAt(
+    position: Position,
+    layer?: string,
+    options?: CharacterFilteringOptions,
+  ): string[] {
     this.initGuard();
     if (!this.gridTilemap) return [];
-    const characters = this.gridTilemap.getCharactersAt(
-      new Vector2(position),
-      layer,
+    const characters = Array.from(
+      this.gridTilemap.getCharactersAt(new Vector2(position), layer),
     );
-    return Array.from(characters).map((char) => char.getId());
+    const filteredChars = options
+      ? filterCharacters(characters, options)
+      : characters;
+    return filteredChars.map((char) => char.getId());
   }
 
   /**

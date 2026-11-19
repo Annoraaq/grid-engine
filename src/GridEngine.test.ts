@@ -951,6 +951,31 @@ describe("GridEngine", () => {
     expect(chars).toEqual(["player"]);
   });
 
+  it("should filter chars at position by labels", () => {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
+      characters: [
+        {
+          id: "player1",
+          startPosition: { x: 5, y: 4 },
+          charLayer: "layer",
+          sprite: playerSpriteMock,
+          labels: ["label1", "label2"],
+        },
+        {
+          id: "player2",
+          startPosition: { x: 5, y: 4 },
+          charLayer: "layer",
+          sprite: playerSpriteMock,
+          labels: ["label2"],
+        },
+      ],
+    });
+    const chars = gridEngine.getCharactersAt(new Vector2(5, 4), "layer", {
+      labels: { withAllLabels: ["label1", "label2"] },
+    });
+    expect(chars).toEqual(["player1"]);
+  });
+
   it("should check if char is registered", () => {
     gridEngine.addCharacter({
       id: "player2",
