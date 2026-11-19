@@ -10,6 +10,7 @@ export class GridTilemapPhaser {
   private static readonly HEIGHT_SHIFT_PROP_NAME = "ge_heightShift";
   static readonly Z_INDEX_PADDING = 7;
   private charLayerDepths = new Map<CharLayer, number>();
+  private layerDepths = new Map<string, number>();
 
   constructor(private tilemap: Phaser.Tilemaps.Tilemap) {
     this.setLayerDepths();
@@ -27,6 +28,10 @@ export class GridTilemapPhaser {
 
   getDepthOfCharLayer(layerName: CharLayer): number {
     return this.charLayerDepths.get(layerName) ?? 0;
+  }
+
+  getDepthOfLayer(layerName: string): number | undefined {
+    return this.layerDepths.get(layerName);
   }
 
   tilePosToPixelPos(tilePosition: Vector2): Vector2 {
@@ -97,7 +102,9 @@ export class GridTilemapPhaser {
     });
     this.charLayerDepths.set(undefined, offset);
     alwaysOnTopLayers.forEach((layer, layerIndex) => {
-      layer.tilemapLayer.setDepth(layerIndex + 1 + offset);
+      const depth = layerIndex + 1 + offset;
+      layer.tilemapLayer.setDepth(depth);
+      this.layerDepths.set(layer.name, depth);
     });
 
     layersToDelete.forEach((layer) => layer.destroy());
@@ -105,6 +112,7 @@ export class GridTilemapPhaser {
 
   private setDepth(layerData: Phaser.Tilemaps.LayerData, depth: number): void {
     layerData.tilemapLayer.setDepth(depth);
+    this.layerDepths.set(layerData.name, depth);
     if (this.isCharLayer(layerData)) {
       this.charLayerDepths.set(
         this.getLayerProp(layerData, GridTilemapPhaser.CHAR_LAYER_PROP_NAME),

@@ -9,6 +9,7 @@ export declare class GridCharacterPhaser {
     private geHeadless;
     private customOffset;
     private depthOffset;
+    private depthLayer?;
     private sprite?;
     private layerOverlaySprite?;
     private container?;
@@ -34,6 +35,8 @@ export declare class GridCharacterPhaser {
     setAnimation(animation: CharacterAnimation): void;
     update(_delta: number): void;
     getDepthOffset(): number;
+    getDepthLayer(): string | undefined;
+    setDepthLayer(depthLayer?: string): void;
     private getEngineOffset;
     private updatePixelPos;
     private getGameObj;
@@ -43,6 +46,7 @@ export declare class GridCharacterPhaser {
     private updateDepth;
     private setSpriteDepth;
     private setContainerDepth;
+    private getBaseDepth;
     private getPaddedPixelDepthContainer;
     private getPaddedPixelDepthSprite;
     private getTransitionLayer;

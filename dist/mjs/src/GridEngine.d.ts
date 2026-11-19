@@ -140,6 +140,13 @@ export interface CharacterData extends CharacterDataHeadless {
      * @defaultValue `0`
      */
     depthOffset?: number;
+    /**
+     * If set, defines the rendering order (z-index, depth) of the character by
+     * tying it to the depth of the given tilemap layer name (e.g. a layer name in
+     * Tiled). The rendering order given by the character layer is ignored in that
+     * case, while collisions remain governed by the character layer.
+     */
+    depthLayer?: string;
 }
 /**
  * @category Main Modules
@@ -276,6 +283,21 @@ export declare class GridEngine implements IGridEngine {
      * @category Character
      */
     getDepthOffset(charId: string): number;
+    /**
+     * @returns The tilemap layer name used for the character's rendering depth,
+     * or `undefined` if depth is coupled to the character layer.
+     *
+     * @category Character
+     */
+    getDepthLayer(charId: string): string | undefined;
+    /**
+     * Sets the tilemap layer name used for the character's rendering depth,
+     * detaching rendering order from the character layer. Pass `undefined` to
+     * couple rendering depth to the character layer again.
+     *
+     * @category Character
+     */
+    setDepthLayer(charId: string, depthLayer?: string): void;
     /**
      * {@inheritDoc IGridEngine.collidesWithTiles}
      *
