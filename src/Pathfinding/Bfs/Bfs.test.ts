@@ -572,4 +572,190 @@ describe("Bfs", () => {
     expect(shortestPath.steps).toEqual(34195);
     expect(shortestPath.path.length).toEqual(114);
   });
+
+  describe("findFleePath", () => {
+    it("should return start position when already at minDistance", () => {
+      const gridTilemap = createTilemap([
+        {
+          layer: LOWER_CHAR_LAYER,
+          blockMap: [".....", ".....", "....."],
+        },
+      ]);
+      const algo = new Bfs(gridTilemap);
+
+      const res = algo.findFleePath(
+        layerPos(new Vector2(3, 0)),
+        layerPos(new Vector2(0, 0)),
+        3,
+      );
+
+      expect(res.path).toEqual([layerPos(new Vector2(3, 0))]);
+      expect(res.farthestFromTarget).toEqual(layerPos(new Vector2(3, 0)));
+      expect(res.maxPathLengthReached).toBe(false);
+    });
+
+    it("should flee directly away from avoid position", () => {
+      const gridTilemap = createTilemap([
+        {
+          layer: LOWER_CHAR_LAYER,
+          blockMap: [
+            ".....",
+            ".....",
+            ".....",
+          ],
+        },
+      ]);
+      const algo = new Bfs(gridTilemap);
+
+      const res = algo.findFleePath(
+        layerPos(new Vector2(1, 1)),
+        layerPos(new Vector2(0, 1)),
+        3,
+      );
+
+      expect(res.path).toEqual([
+        layerPos(new Vector2(1, 1)),
+        layerPos(new Vector2(2, 1)),
+        layerPos(new Vector2(3, 1)),
+      ]);
+      expect(res.maxPathLengthReached).toBe(false);
+    });
+
+    it("should navigate around walls to reach minDistance", () => {
+      const gridTilemap = createTilemap([
+        {
+          layer: LOWER_CHAR_LAYER,
+          blockMap: [
+            ".#...",
+            ".#...",
+            ".....",
+          ],
+        },
+      ]);
+      const algo = new Bfs(gridTilemap);
+
+      const res = algo.findFleePath(
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(0, 0)),
+        3,
+      );
+
+      expect(res.path).toEqual([
+        layerPos(new Vector2(0, 1)),
+        layerPos(new Vector2(0, 2)),
+        layerPos(new Vector2(1, 2)),
+      ]);
+    });
+
+    it("should return farthest reachable tile when cornered", () => {
+      const gridTilemap = createTilemap([
+        {
+          layer: LOWER_CHAR_LAYER,
+          blockMap: [
+            "####",
+            "#..#",
+            "#..#",
+            "####",
+          ],
+        },
+      ]);
+      const algo = new Bfs(gridTilemap);
+
+      const res = algo.findFleePath(
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(1, 1)),
+        5,
+      );
+
+      expect(res.path).toEqual([]);
+      expect(res.farthestFromTarget).toEqual(layerPos(new Vector2(2, 2)));
+      expect(res.pathToFarthest).toEqual([
+        layerPos(new Vector2(1, 2)),
+        layerPos(new Vector2(2, 2)),
+      ]);
+      expect(res.maxPathLengthReached).toBe(false);
+    });
+
+    it("should respect maxPathLength", () => {
+      const gridTilemap = createTilemap([
+        {
+          layer: LOWER_CHAR_LAYER,
+          blockMap: ["......"],
+        },
+      ]);
+      const algo = new Bfs(gridTilemap, { maxPathLength: 2 });
+
+      const res = algo.findFleePath(
+        layerPos(new Vector2(1, 0)),
+        layerPos(new Vector2(0, 0)),
+        5,
+      );
+
+      expect(res.path).toEqual([]);
+      expect(res.maxPathLengthReached).toBe(true);
+      expect(res.farthestFromTarget).toEqual(layerPos(new Vector2(3, 0)));
+      expect(res.pathToFarthest).toEqual([
+        layerPos(new Vector2(1, 0)),
+        layerPos(new Vector2(2, 0)),
+        layerPos(new Vector2(3, 0)),
+      ]);
+    });
+
+    it("should use Chebyshev distance in 8-direction mode", () => {
+      const gridTilemap = createTilemap([
+        {
+          layer: LOWER_CHAR_LAYER,
+          blockMap: [
+            "....",
+            "....",
+            "....",
+            "....",
+          ],
+        },
+      ]);
+      const algo = new Bfs(gridTilemap, {
+        numberOfDirections: NumberOfDirections.EIGHT,
+      });
+
+      const res = algo.findFleePath(
+        layerPos(new Vector2(1, 1)),
+        layerPos(new Vector2(0, 0)),
+        3,
+      );
+
+      expect(res.path).toEqual([
+        layerPos(new Vector2(1, 1)),
+        layerPos(new Vector2(2, 2)),
+        layerPos(new Vector2(3, 3)),
+      ]);
+    });
+
+    it("should respect isPositionAllowed", () => {
+      const gridTilemap = createTilemap([
+        {
+          layer: LOWER_CHAR_LAYER,
+          blockMap: [
+            ".....",
+            ".....",
+            ".....",
+          ],
+        },
+      ]);
+      const algo = new Bfs(gridTilemap, {
+        isPositionAllowed: createAllowedFn(["..###", "..###", "....."]),
+      });
+
+      const res = algo.findFleePath(
+        layerPos(new Vector2(1, 0)),
+        layerPos(new Vector2(0, 0)),
+        3,
+      );
+
+      expect(res.path).toEqual([
+        layerPos(new Vector2(1, 0)),
+        layerPos(new Vector2(1, 1)),
+        layerPos(new Vector2(1, 2)),
+      ]);
+    });
+  });
 });

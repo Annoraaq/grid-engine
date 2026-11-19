@@ -21,6 +21,14 @@ interface QueueEntry {
   dist: number;
 }
 
+export interface FleePathResult {
+  path: LayerVecPos[];
+  farthestFromTarget: LayerVecPos;
+  pathToFarthest: LayerVecPos[];
+  steps: number;
+  maxPathLengthReached: boolean;
+}
+
 export class Bfs extends ShortestPathAlgorithm {
   findShortestPathImpl(
     startPos: LayerVecPos,
@@ -33,6 +41,106 @@ export class Bfs extends ShortestPathAlgorithm {
       steps: shortestPath.steps,
       maxPathLengthReached: shortestPath.maxPathLengthReached,
       algorithmUsed: "BFS",
+    };
+  }
+
+  findFleePath(
+    startPos: LayerVecPos,
+    avoidPos: LayerVecPos,
+    minDistance: number,
+  ): FleePathResult {
+    if (this.options.ignoreLayers) {
+      this.gridTilemap.fixCacheLayer(startPos.layer);
+    }
+    const res = this.findFleePathImpl(startPos, avoidPos, minDistance);
+    this.gridTilemap.unfixCacheLayers();
+    return res;
+  }
+
+  private findFleePathImpl(
+    startNode: LayerVecPos,
+    avoidNode: LayerVecPos,
+    minDistance: number,
+  ): FleePathResult {
+    const previous = new Map<string, LayerVecPos>();
+    const visited = new Set<string>();
+    const queue: Queue<QueueEntry> = new Queue();
+    let farthestFromTarget: LayerVecPos = startNode;
+    let largestDistFromTarget: number = this.distance(
+      startNode.position,
+      avoidNode.position,
+    );
+    let steps = 0;
+
+    queue.enqueue({ node: startNode, dist: 0 });
+    visited.add(LayerPositionUtils.toString(startNode));
+
+    while (queue.size() > 0) {
+      const dequeued = queue.dequeue();
+      steps++;
+      if (!dequeued) break;
+      const { node, dist } = dequeued;
+
+      if (dist > this.options.maxPathLength) {
+        return {
+          path: [],
+          farthestFromTarget,
+          pathToFarthest: this.returnPath(
+            previous,
+            startNode,
+            farthestFromTarget,
+          ),
+          steps,
+          maxPathLengthReached: true,
+        };
+      }
+
+      const distFromAvoid = this.distance(node.position, avoidNode.position);
+      if (distFromAvoid > largestDistFromTarget) {
+        largestDistFromTarget = distFromAvoid;
+        farthestFromTarget = node;
+      }
+
+      if (distFromAvoid >= minDistance) {
+        const path = this.returnPath(previous, startNode, node);
+        return {
+          path,
+          farthestFromTarget: node,
+          pathToFarthest: path,
+          steps,
+          maxPathLengthReached: false,
+        };
+      }
+
+      const neighbors = this.getNeighbors(node, avoidNode);
+      neighbors.sort((a, b) => {
+        const gridDiff =
+          this.distance(b.position, avoidNode.position) -
+          this.distance(a.position, avoidNode.position);
+        if (gridDiff !== 0) return gridDiff;
+        const aDx = a.position.x - avoidNode.position.x;
+        const aDy = a.position.y - avoidNode.position.y;
+        const bDx = b.position.x - avoidNode.position.x;
+        const bDy = b.position.y - avoidNode.position.y;
+        return bDx * bDx + bDy * bDy - (aDx * aDx + aDy * aDy);
+      });
+
+      for (const neighbor of neighbors) {
+        const key = LayerPositionUtils.toString(neighbor);
+        if (!visited.has(key)) {
+          previous.set(key, node);
+          queue.enqueue({ node: neighbor, dist: dist + 1 });
+          visited.add(key);
+        }
+      }
+    }
+
+    return {
+      path: [],
+      farthestFromTarget,
+      pathToFarthest: this.returnPath(previous, startNode, farthestFromTarget),
+      steps,
+      maxPathLengthReached: false,
     };
   }
 

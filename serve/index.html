@@ -1,68 +1,255 @@
-<style>
-  body {
-    background: black;
-  }
-</style>
-<div id="game"></div>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Grid Engine - Flee Movement Demo (#525)</title>
+    <style>
+      body {
+        margin: 0;
+        background: #111;
+        color: #eee;
+        font-family: system-ui, -apple-system, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      #controls {
+        width: 720px;
+        box-sizing: border-box;
+        padding: 12px 16px;
+        background: #1e1e24;
+        border-bottom: 1px solid #333;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+      }
+      button {
+        padding: 6px 10px;
+        border: 1px solid #555;
+        border-radius: 4px;
+        background: #2b2b35;
+        color: #eee;
+        cursor: pointer;
+        font-size: 13px;
+      }
+      button:hover {
+        background: #3a3a48;
+      }
+      button.active {
+        background: #3b82f6;
+        border-color: #60a5fa;
+        color: #fff;
+        font-weight: 600;
+      }
+      #status {
+        font-size: 13px;
+        color: #cbd5e1;
+      }
+      code {
+        background: #111;
+        padding: 2px 5px;
+        border-radius: 3px;
+        color: #93c5fd;
+      }
+      .hint {
+        font-size: 12px;
+        color: #94a3b8;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="controls">
+      <div class="row">
+        <strong>Flee <code>distance</code>:</strong>
+        <button data-distance="2">2</button>
+        <button data-distance="3" class="active">3</button>
+        <button data-distance="4">4</button>
+        <button data-distance="5">5</button>
+        <strong style="margin-left: 10px"><code>farthestPointIfBlocked</code>:</strong>
+        <button id="toggle-farthest" class="active">true</button>
+        <button id="reset-btn" style="margin-left: auto">Reset Herd</button>
+      </div>
+      <div id="status">Loading...</div>
+      <div class="hint">
+        Use Arrow keys to walk toward the 5&times;5 crowd of NPCs. Each NPC uses
+        <code>gridEngine.flee(npcId, "player", { distance, farthestPointIfBlocked })</code>
+        to scatter and route around obstacles.
+      </div>
+    </div>
+    <div id="game"></div>
 
-<script src="js/phaser-4.0.0.min.js"></script>
-<script src="js/GridEngine.js"></script>
-<script src="js/getBasicConfig.js"></script>
+    <script src="js/phaser-4.0.0.min.js"></script>
+    <script src="js/GridEngine.js"></script>
+    <script src="js/getBasicConfig.js"></script>
 
-<script>
-  const config = getBasicConfig(preload, create, update);
-  const game = new Phaser.Game(config);
+    <script>
+      const config = getBasicConfig(preload, create, update);
+      const game = new Phaser.Game(config);
 
-  function preload() {
-    this.load.image("tiles", "assets/cloud_tileset.png");
-    this.load.tilemapTiledJSON("cloud-city-map", "assets/cloud_city.json");
+      let activeScene;
+      let cursors;
+      let fleeDistance = 3;
+      let farthestPointIfBlocked = true;
+      const npcIds = [];
 
-    this.load.spritesheet("player", "assets/characters.png", {
-      frameWidth: 52,
-      frameHeight: 72,
-    });
-  }
+      const HERD_X_START = 12;
+      const HERD_X_END = 16;
+      const HERD_Y_START = 11;
+      const HERD_Y_END = 15;
+      const PLAYER_START = { x: 14, y: 8 };
 
-  function create() {
-    const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
-    cloudCityTilemap.addTilesetImage("Cloud City", "tiles");
-    for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-      const layer = cloudCityTilemap.createLayer(i, "Cloud City", 0, 0);
-      layer.scale = 3;
-    }
-    const playerSprite = this.add.sprite(0, 0, "player");
-    playerSprite.scale = 1.5;
-    this.cameras.main.startFollow(playerSprite, true);
-    this.cameras.main.setFollowOffset(
-      -playerSprite.width,
-      -playerSprite.height,
-    );
+      function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
 
-    const gridEngineConfig = {
-      characters: [
-        {
-          id: "player",
-          sprite: playerSprite,
-          walkingAnimationMapping: 6,
-          startPosition: { x: 3, y: 3 },
-        },
-      ],
-    };
+      function preload() {
+        this.load.image("tiles", "assets/cloud_tileset.png");
+        this.load.tilemapTiledJSON("cloud-city-map", "assets/cloud_city.json");
+        this.load.spritesheet("player", "assets/characters.png", {
+          frameWidth: 52,
+          frameHeight: 72,
+        });
+      }
 
-    this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
-  }
+      function create() {
+        activeScene = this;
+        const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
+        cloudCityTilemap.addTilesetImage("Cloud City", "tiles");
+        for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
+          const layer = cloudCityTilemap.createLayer(i, "Cloud City", 0, 0);
+          layer.scale = 3;
+        }
 
-  function update() {
-    const cursors = this.input.keyboard.createCursorKeys();
+        const playerSprite = this.add.sprite(0, 0, "player");
+        playerSprite.scale = 1.5;
 
-    if (cursors.left.isDown) {
-      this.gridEngine.move("player", "left");
-    } else if (cursors.right.isDown) {
-      this.gridEngine.move("player", "right");
-    } else if (cursors.up.isDown) {
-      this.gridEngine.move("player", "up");
-    } else if (cursors.down.isDown) {
-      this.gridEngine.move("player", "down");
-    }
-  }
-</script>
+        this.cameras.main.startFollow(playerSprite, true);
+        this.cameras.main.setFollowOffset(
+          -playerSprite.width,
+          -playerSprite.height,
+        );
+
+        const gridEngineConfig = {
+          characters: [
+            {
+              id: "player",
+              sprite: playerSprite,
+              walkingAnimationMapping: 6,
+              startPosition: { ...PLAYER_START },
+              speed: 5,
+            },
+          ],
+        };
+
+        npcIds.length = 0;
+        for (let x = HERD_X_START; x <= HERD_X_END; x++) {
+          for (let y = HERD_Y_START; y <= HERD_Y_END; y++) {
+            const id = `npc_${x}_${y}`;
+            npcIds.push({ id, startPosition: { x, y } });
+            const spr = this.add.sprite(0, 0, "player");
+            spr.scale = 1.5;
+            gridEngineConfig.characters.push({
+              id,
+              sprite: spr,
+              walkingAnimationMapping: getRandomInt(0, 5),
+              startPosition: { x, y },
+              speed: 4,
+            });
+          }
+        }
+
+        this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
+        applyFleeToAll();
+
+        cursors = this.input.keyboard.createCursorKeys();
+        setupControls();
+        updateStatus();
+      }
+
+      function applyFleeToAll() {
+        if (!activeScene) return;
+        for (const { id } of npcIds) {
+          activeScene.gridEngine.flee(id, "player", {
+            distance: fleeDistance,
+            farthestPointIfBlocked,
+          });
+        }
+      }
+
+      function resetHerd() {
+        if (!activeScene) return;
+        activeScene.gridEngine.stopMovement("player");
+        activeScene.gridEngine.setPosition("player", PLAYER_START);
+        for (const { id, startPosition } of npcIds) {
+          activeScene.gridEngine.stopMovement(id);
+          activeScene.gridEngine.setPosition(id, startPosition);
+        }
+        applyFleeToAll();
+        updateStatus();
+      }
+
+      function setupControls() {
+        document.querySelectorAll("button[data-distance]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            fleeDistance = Number(btn.dataset.distance);
+            document
+              .querySelectorAll("button[data-distance]")
+              .forEach((b) =>
+                b.classList.toggle("active", Number(b.dataset.distance) === fleeDistance),
+              );
+            applyFleeToAll();
+            updateStatus();
+          });
+        });
+
+        const toggleBtn = document.getElementById("toggle-farthest");
+        toggleBtn.addEventListener("click", () => {
+          farthestPointIfBlocked = !farthestPointIfBlocked;
+          toggleBtn.textContent = String(farthestPointIfBlocked);
+          toggleBtn.classList.toggle("active", farthestPointIfBlocked);
+          applyFleeToAll();
+          updateStatus();
+        });
+
+        document
+          .getElementById("reset-btn")
+          .addEventListener("click", resetHerd);
+      }
+
+      function updateStatus() {
+        if (!activeScene) return;
+        const pos = activeScene.gridEngine.getPosition("player");
+        const fleeingCount = npcIds.filter(({ id }) =>
+          activeScene.gridEngine.isMoving(id),
+        ).length;
+        document.getElementById("status").innerHTML =
+          `Player: <code>(${pos.x}, ${pos.y})</code> &nbsp;|&nbsp; ` +
+          `NPCs: <code>${npcIds.length}</code> &nbsp;|&nbsp; ` +
+          `Currently fleeing: <code>${fleeingCount}</code> &nbsp;|&nbsp; ` +
+          `distance: <code>${fleeDistance}</code>`;
+      }
+
+      function update() {
+        if (!cursors) return;
+        if (cursors.left.isDown) {
+          this.gridEngine.move("player", "left");
+        } else if (cursors.right.isDown) {
+          this.gridEngine.move("player", "right");
+        } else if (cursors.up.isDown) {
+          this.gridEngine.move("player", "up");
+        } else if (cursors.down.isDown) {
+          this.gridEngine.move("player", "down");
+        }
+        updateStatus();
+      }
+    </script>
+  </body>
+</html>
