@@ -826,6 +826,85 @@ describe("GridCharacterPhaser", () => {
       );
     });
 
+    describe("for depthLayer", () => {
+      it("should set depth of sprite using depthLayer instead of charLayer", () => {
+        const startPos = { x: 2, y: 2 };
+        const charData = {
+          startPosition: startPos,
+          charLayer: "testCharLayer",
+          depthLayer: "lowerCharLayer",
+        };
+        const lowerLayerDepth = 0;
+        const { gridCharPhaser } = createChar(charData, false);
+
+        gridEngineHeadless.move("charID", Direction.RIGHT);
+        gridEngineHeadless.update(1000, 10);
+        gridCharPhaser.update(10);
+
+        expect(gridCharPhaser.getDepthLayer()).toBe("lowerCharLayer");
+        checkSpriteDepth(
+          spriteMock,
+          spriteMock.displayHeight,
+          lowerLayerDepth,
+          "0000",
+        );
+      });
+
+      it("should set depth of container using depthLayer instead of charLayer", () => {
+        const height = 21;
+        const containerMock = createContainerMock(0, 20, { height, y: 0 });
+        const startPos = { x: 2, y: 2 };
+        const charData = {
+          container: containerMock,
+          startPosition: startPos,
+          charLayer: "testCharLayer",
+          depthLayer: "lowerCharLayer",
+        };
+        const lowerLayerDepth = 0;
+        const { gridCharPhaser } = createChar(charData, false);
+
+        gridEngineHeadless.move("charID", Direction.RIGHT);
+        gridCharPhaser.update(10);
+
+        checkSpriteDepth(containerMock, height, lowerLayerDepth, "0000");
+      });
+
+      it("should update depth immediately when setDepthLayer is called and revert on undefined", () => {
+        const startPos = { x: 2, y: 2 };
+        const charData = {
+          startPosition: startPos,
+          charLayer: "testCharLayer",
+        };
+        const { gridCharPhaser } = createChar(charData, false);
+
+        expect(gridCharPhaser.getDepthLayer()).toBeUndefined();
+
+        (spriteMock.setDepth as jest.Mock).mockClear();
+        gridCharPhaser.setDepthLayer("lowerCharLayer");
+        expect(gridCharPhaser.getDepthLayer()).toBe("lowerCharLayer");
+        checkSpriteDepth(spriteMock, spriteMock.displayHeight, 0, "0000");
+
+        (spriteMock.setDepth as jest.Mock).mockClear();
+        gridCharPhaser.setDepthLayer(undefined);
+        expect(gridCharPhaser.getDepthLayer()).toBeUndefined();
+        checkSpriteDepth(spriteMock, spriteMock.displayHeight, 1, "0000");
+      });
+
+      it("should fall back to charLayer depth if depthLayer does not exist", () => {
+        const startPos = { x: 2, y: 2 };
+        const charData = {
+          startPosition: startPos,
+          charLayer: "testCharLayer",
+          depthLayer: "nonExistentLayer",
+        };
+        const { gridCharPhaser } = createChar(charData, false);
+
+        gridCharPhaser.update(10);
+
+        checkSpriteDepth(spriteMock, spriteMock.displayHeight, 1, "0000");
+      });
+    });
+
     describe("for overlay sprite", () => {
       it("should set depth of pos above", () => {
         const startPos = { x: 2, y: 2 };

@@ -24,6 +24,7 @@ import { LayerVecPos } from "../../Utils/LayerPositionUtils/LayerPositionUtils.j
 export class GridCharacterPhaser {
   private customOffset = new Vector2(0, 0);
   private depthOffset = 0;
+  private depthLayer?: string;
 
   private sprite?: Phaser.GameObjects.Sprite;
   private layerOverlaySprite?: Phaser.GameObjects.Sprite;
@@ -54,6 +55,7 @@ export class GridCharacterPhaser {
     );
 
     this.depthOffset = charData.depthOffset ?? 0;
+    this.depthLayer = charData.depthLayer;
 
     this.sprite = charData.sprite;
     this.container = charData.container;
@@ -160,6 +162,15 @@ export class GridCharacterPhaser {
 
   getDepthOffset(): number {
     return this.depthOffset;
+  }
+
+  getDepthLayer(): string | undefined {
+    return this.depthLayer;
+  }
+
+  setDepthLayer(depthLayer?: string): void {
+    this.depthLayer = depthLayer;
+    this.updateDepth();
   }
 
   private getEngineOffset(): Vector2 {
@@ -298,8 +309,7 @@ export class GridCharacterPhaser {
     position: LayerVecPos,
   ): void {
     sprite.setDepth(
-      this.tilemap.getDepthOfCharLayer(this.getTransitionLayer(position)) +
-        this.getPaddedPixelDepthSprite(sprite),
+      this.getBaseDepth(position) + this.getPaddedPixelDepthSprite(sprite),
     );
   }
 
@@ -308,9 +318,19 @@ export class GridCharacterPhaser {
     position: LayerVecPos,
   ): void {
     container.setDepth(
-      this.tilemap.getDepthOfCharLayer(this.getTransitionLayer(position)) +
+      this.getBaseDepth(position) +
         this.getPaddedPixelDepthContainer(container),
     );
+  }
+
+  private getBaseDepth(position: LayerVecPos): number {
+    if (this.depthLayer !== undefined) {
+      const layerDepth = this.tilemap.getDepthOfLayer(this.depthLayer);
+      if (layerDepth !== undefined) {
+        return layerDepth;
+      }
+    }
+    return this.tilemap.getDepthOfCharLayer(this.getTransitionLayer(position));
   }
 
   private getPaddedPixelDepthContainer(

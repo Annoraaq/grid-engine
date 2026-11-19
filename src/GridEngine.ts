@@ -263,6 +263,14 @@ export interface CharacterData extends CharacterDataHeadless {
    * @defaultValue `0`
    */
   depthOffset?: number;
+
+  /**
+   * If set, defines the rendering order (z-index, depth) of the character by
+   * tying it to the depth of the given tilemap layer name (e.g. a layer name in
+   * Tiled). The rendering order given by the character layer is ignored in that
+   * case, while collisions remain governed by the character layer.
+   */
+  depthLayer?: string;
 }
 
 /**
@@ -504,6 +512,33 @@ export class GridEngine implements IGridEngine {
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getDepthOffset();
+  }
+
+  /**
+   * @returns The tilemap layer name used for the character's rendering depth,
+   * or `undefined` if depth is coupled to the character layer.
+   *
+   * @category Character
+   */
+  getDepthLayer(charId: string): string | undefined {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.getDepthLayer();
+  }
+
+  /**
+   * Sets the tilemap layer name used for the character's rendering depth,
+   * detaching rendering order from the character layer. Pass `undefined` to
+   * couple rendering depth to the character layer again.
+   *
+   * @category Character
+   */
+  setDepthLayer(charId: string, depthLayer?: string): void {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.setDepthLayer(depthLayer);
   }
 
   /**
@@ -1027,11 +1062,15 @@ export class GridEngine implements IGridEngine {
    */
   getState(): GridEngineStatePhaser {
     return {
-      characters: this.geHeadless.getState().characters.map((c) => ({
-        ...c,
-        offsetX: this.getOffsetX(c.id),
-        offsetY: this.getOffsetY(c.id),
-      })),
+      characters: this.geHeadless.getState().characters.map((c) => {
+        const depthLayer = this.getDepthLayer(c.id);
+        return {
+          ...c,
+          offsetX: this.getOffsetX(c.id),
+          offsetY: this.getOffsetY(c.id),
+          ...(depthLayer !== undefined ? { depthLayer } : {}),
+        };
+      }),
     };
   }
 
@@ -1054,6 +1093,7 @@ export class GridEngine implements IGridEngine {
         if (char) {
           char.setOffsetX(charState.offsetX);
           char.setOffsetY(charState.offsetY);
+          char.setDepthLayer(charState.depthLayer);
         }
       }
     }

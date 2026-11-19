@@ -59,6 +59,9 @@ describe("GridTilemapPhaser", () => {
     expect(tm.layers[0].tilemapLayer.depth).toBe(0);
     expect(tm.layers[1].tilemapLayer.depth).toBe(2);
     expect(tm.layers[2].tilemapLayer.depth).toBe(1);
+    expect(gridTilemap.getDepthOfLayer("lowerCharLayer")).toBe(0);
+    expect(gridTilemap.getDepthOfLayer("alwaysOnTopLayer")).toBe(2);
+    expect(gridTilemap.getDepthOfLayer("upperCharLayer")).toBe(1);
   });
 
   it("should consider charLayers", () => {
@@ -77,6 +80,10 @@ describe("GridTilemapPhaser", () => {
     expect(tm.layers[2].tilemapLayer.depth).toBe(2);
     expect(gridTilemap.getDepthOfCharLayer("lowerCharLayer")).toEqual(0);
     expect(gridTilemap.getDepthOfCharLayer("upperCharLayer")).toEqual(2);
+    expect(gridTilemap.getDepthOfLayer("lowerCharLayer")).toEqual(0);
+    expect(gridTilemap.getDepthOfLayer("noCharLayer")).toEqual(1);
+    expect(gridTilemap.getDepthOfLayer("upperCharLayer")).toEqual(2);
+    expect(gridTilemap.getDepthOfLayer("unknownLayer")).toBeUndefined();
   });
 
   it("should return highest non-char layer for undefined layer", () => {

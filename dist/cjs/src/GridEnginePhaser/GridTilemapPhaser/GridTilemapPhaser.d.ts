@@ -7,10 +7,12 @@ export declare class GridTilemapPhaser {
     private static readonly HEIGHT_SHIFT_PROP_NAME;
     static readonly Z_INDEX_PADDING = 7;
     private charLayerDepths;
+    private layerDepths;
     constructor(tilemap: Phaser.Tilemaps.Tilemap);
     getTileWidth(): number;
     getTileHeight(): number;
     getDepthOfCharLayer(layerName: CharLayer): number;
+    getDepthOfLayer(layerName: string): number | undefined;
     tilePosToPixelPos(tilePosition: Vector2): Vector2;
     getTileDistance(direction: Direction): Vector2;
     private getTileSize;

@@ -2406,6 +2406,12 @@ describe("GridEngine", () => {
       expectCharUnknownException(() => gridEngine.getOffsetY(UNKNOWN_CHAR_ID));
       expectCharUnknownException(() => gridEngine.getOffsetX(UNKNOWN_CHAR_ID));
       expectCharUnknownException(() =>
+        gridEngine.getDepthLayer(UNKNOWN_CHAR_ID),
+      );
+      expectCharUnknownException(() =>
+        gridEngine.setDepthLayer(UNKNOWN_CHAR_ID, "someLayer"),
+      );
+      expectCharUnknownException(() =>
         gridEngine.getContainer(UNKNOWN_CHAR_ID),
       );
       expectCharUnknownException(() => gridEngine.getSpeed(UNKNOWN_CHAR_ID));
@@ -2548,6 +2554,12 @@ describe("GridEngine", () => {
       );
       expectUninitializedException(() => gridEngine.getOffsetY(SOME_CHAR_ID));
       expectUninitializedException(() => gridEngine.getOffsetX(SOME_CHAR_ID));
+      expectUninitializedException(() =>
+        gridEngine.getDepthLayer(SOME_CHAR_ID),
+      );
+      expectUninitializedException(() =>
+        gridEngine.setDepthLayer(SOME_CHAR_ID, "someLayer"),
+      );
       expectUninitializedException(() => gridEngine.getContainer(SOME_CHAR_ID));
       expectUninitializedException(() => gridEngine.getSpeed(SOME_CHAR_ID));
       expectUninitializedException(() => gridEngine.getMovement(SOME_CHAR_ID));
@@ -2626,5 +2638,61 @@ describe("GridEngine", () => {
     gridEngine.setOffsetY("player", offsetY);
     expect(gridEngine.getOffsetX("player")).toEqual(offsetX);
     expect(gridEngine.getOffsetY("player")).toEqual(offsetY);
+  });
+
+  it("should set/get depthLayer", () => {
+    gridEngine.create(
+      createPhaserTilemapStub(
+        new Map([
+          ["lowerLayer", ["...", "..."]],
+          ["upperLayer", ["...", "..."]],
+        ]),
+      ),
+      {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            charLayer: "upperLayer",
+            depthLayer: "lowerLayer",
+          },
+        ],
+      },
+    );
+    expect(gridEngine.getDepthLayer("player")).toEqual("lowerLayer");
+    gridEngine.setDepthLayer("player", "upperLayer");
+    expect(gridEngine.getDepthLayer("player")).toEqual("upperLayer");
+    gridEngine.setDepthLayer("player", undefined);
+    expect(gridEngine.getDepthLayer("player")).toBeUndefined();
+  });
+
+  it("should get and set depthLayer in state", () => {
+    gridEngine.create(
+      createPhaserTilemapStub(
+        new Map([
+          ["lowerLayer", ["...", "..."]],
+          ["upperLayer", ["...", "..."]],
+        ]),
+      ),
+      {
+        characters: [
+          {
+            id: "char1",
+            sprite: playerSpriteMock,
+            charLayer: "upperLayer",
+            depthLayer: "lowerLayer",
+          },
+        ],
+      },
+    );
+
+    const state = gridEngine.getState();
+    expect(state.characters[0].depthLayer).toEqual("lowerLayer");
+
+    gridEngine.setDepthLayer("char1", undefined);
+    expect(gridEngine.getDepthLayer("char1")).toBeUndefined();
+
+    gridEngine.setState(state);
+    expect(gridEngine.getDepthLayer("char1")).toEqual("lowerLayer");
   });
 });
