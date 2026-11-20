@@ -2437,6 +2437,12 @@ describe("GridEngine", () => {
         gridEngine.setDepthLayer(UNKNOWN_CHAR_ID, "someLayer"),
       );
       expectCharUnknownException(() =>
+        gridEngine.isSpotWalking(UNKNOWN_CHAR_ID),
+      );
+      expectCharUnknownException(() =>
+        gridEngine.setSpotWalk(UNKNOWN_CHAR_ID, true),
+      );
+      expectCharUnknownException(() =>
         gridEngine.getContainer(UNKNOWN_CHAR_ID),
       );
       expectCharUnknownException(() => gridEngine.getSpeed(UNKNOWN_CHAR_ID));
@@ -2585,6 +2591,12 @@ describe("GridEngine", () => {
       expectUninitializedException(() =>
         gridEngine.setDepthLayer(SOME_CHAR_ID, "someLayer"),
       );
+      expectUninitializedException(() =>
+        gridEngine.isSpotWalking(SOME_CHAR_ID),
+      );
+      expectUninitializedException(() =>
+        gridEngine.setSpotWalk(SOME_CHAR_ID, true),
+      );
       expectUninitializedException(() => gridEngine.getContainer(SOME_CHAR_ID));
       expectUninitializedException(() => gridEngine.getSpeed(SOME_CHAR_ID));
       expectUninitializedException(() => gridEngine.getMovement(SOME_CHAR_ID));
@@ -2719,5 +2731,45 @@ describe("GridEngine", () => {
 
     gridEngine.setState(state);
     expect(gridEngine.getDepthLayer("char1")).toEqual("lowerLayer");
+  });
+
+  it("should set/get spotWalk", () => {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
+      characters: [
+        {
+          id: "player",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 0,
+          spotWalk: true,
+        },
+      ],
+    });
+    expect(gridEngine.isSpotWalking("player")).toBe(true);
+    gridEngine.setSpotWalk("player", false);
+    expect(gridEngine.isSpotWalking("player")).toBe(false);
+    gridEngine.setSpotWalk("player", true);
+    expect(gridEngine.isSpotWalking("player")).toBe(true);
+  });
+
+  it("should get and set spotWalk in state", () => {
+    gridEngine.create(createDefaultMockWithLayer(undefined), {
+      characters: [
+        {
+          id: "char1",
+          sprite: playerSpriteMock,
+          walkingAnimationMapping: 0,
+          spotWalk: true,
+        },
+      ],
+    });
+
+    const state = gridEngine.getState();
+    expect(state.characters[0].spotWalk).toBe(true);
+
+    gridEngine.setSpotWalk("char1", false);
+    expect(gridEngine.isSpotWalking("char1")).toBe(false);
+
+    gridEngine.setState(state);
+    expect(gridEngine.isSpotWalking("char1")).toBe(true);
   });
 });

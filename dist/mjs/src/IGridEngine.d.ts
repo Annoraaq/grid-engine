@@ -6,6 +6,7 @@ import { Observable } from "rxjs";
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter.js";
 import { CharId, PositionChange } from "./GridCharacter/GridCharacter.js";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
+import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy.js";
 import { IsPositionAllowedFn, PathfindingOptions } from "./Pathfinding/PathfindingOptions.js";
 import { CharLayer, LayerPosition, Position } from "./Position.js";
 /**
@@ -124,6 +125,75 @@ export interface FollowOptions {
      * Set of characters to ignore at collision checking.
      */
     ignoredChars?: CharId[];
+}
+/**
+ * @category Pathfinding
+ */
+export interface FleeOptions {
+    /**
+     * Minimum distance to keep from `charIdToAvoid` in
+     * {@link https://en.wikipedia.org/wiki/Taxicab_geometry | manhattan distance}
+     * in case of 4 direction mode and
+     * {@link https://en.wikipedia.org/wiki/Chebyshev_distance | Chebyshev distance}
+     * in case of 8 direction mode.
+     *
+     * When `charIdToAvoid` is closer than this distance, `charId` will move
+     * along a shortest path to a position with at least this distance.
+     */
+    distance: number;
+    /**
+     * If set to `true`, `charId` will move to the farthest reachable point from
+     * `charIdToAvoid` in case no position with at least {@link FleeOptions.distance}
+     * is reachable (e.g. when cornered).
+     *
+     * @default true
+     */
+    farthestPointIfBlocked?: boolean;
+    /**
+     * If this is set, the algorithm will stop once it reaches a path length of
+     * this value. This is useful to avoid running out of memory on large or
+     * infinite maps.
+     */
+    maxPathLength?: number;
+    /**
+     * If set to `true`, pathfinding will only be performed on the char layer of
+     * the start position. If you don't use char layers, activating this setting
+     * can improve pathfinding performance.
+     *
+     * @default false
+     */
+    ignoreLayers?: boolean;
+    /**
+     * Function to specify whether a certain position is allowed for pathfinding.
+     * If the function returns false, the tile will be considered as blocked.
+     *
+     * It can be used to restrict fleeing to specific regions.
+     *
+     * Beware that this method can become a performance bottleneck easily. So be
+     * careful and keep it as efficient as possible. An asymptotic runtime
+     * complexity of O(1) is recommended.
+     */
+    isPositionAllowedFn?: IsPositionAllowedFn;
+    /**
+     * Set of characters to ignore at collision checking.
+     */
+    ignoredChars?: CharId[];
+    /**
+     * Determines what happens if a previously calculated escape path is suddenly
+     * blocked (for example, by another fleeing character).
+     *
+     * @default PathBlockedStrategy.RETRY
+     */
+    pathBlockedStrategy?: PathBlockedStrategy;
+    /**
+     * Only relevant if {@link FleeOptions.pathBlockedStrategy} is set to
+     * {@link PathBlockedStrategy.RETRY}.
+     *
+     * Sets the time in milliseconds to wait before recalculating a blocked path.
+     *
+     * @default 200
+     */
+    pathBlockedRetryBackoffMs?: number;
 }
 /**
  * Result of a modification of the internal characters array
@@ -350,6 +420,19 @@ export interface IGridEngine {
      */
     follow(charId: string, charIdToFollow: string, distance?: number, closestPointIfBlocked?: boolean): void;
     follow(charId: string, charIdToFollow: string, distance?: FollowOptions | number, closestPointIfBlocked?: boolean): void;
+    /**
+     * Character `charId` will move away from `charIdToAvoid` on a shortest path
+     * to any reachable position that has at least the specified `distance` to
+     * `charIdToAvoid`. Whenever `charIdToAvoid` enters that radius, `charId`
+     * will flee again.
+     *
+     * @param charId ID of character that should flee
+     * @param charIdToAvoid ID of character to avoid
+     * @param options Configuration options for fleeing
+     *
+     * @category Pathfinding
+     */
+    flee(charId: string, charIdToAvoid: string, options: FleeOptions): void;
     /**
      * @returns True if the character is currently moving.
      *

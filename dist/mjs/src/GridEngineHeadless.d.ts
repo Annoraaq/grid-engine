@@ -10,7 +10,7 @@ import { FrameRow } from "./GridCharacter/CharacterAnimation/CharacterAnimation.
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter.js";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
 import { Tilemap } from "./GridTilemap/Tilemap.js";
-import { CharacterShift, FollowOptions, IGridEngine, PathfindingResult } from "./IGridEngine.js";
+import { CharacterShift, FleeOptions, FollowOptions, IGridEngine, PathfindingResult } from "./IGridEngine.js";
 import { QueueMovementConfig, QueueMovementEntry, Finished as QueueMovementFinished } from "./Movement/QueueMovement/QueueMovement.js";
 import { GridEngineState } from "./GridEngineState.js";
 import { IsPositionAllowedFn, PathfindingOptions } from "./Pathfinding/PathfindingOptions.js";
@@ -352,6 +352,12 @@ export declare class GridEngineHeadless implements IGridEngine {
      */
     follow(charId: string, charIdToFollow: string, options?: FollowOptions): void;
     follow(charId: string, charIdToFollow: string, distance?: number, closestPointIfBlocked?: boolean): void;
+    /**
+     * {@inheritDoc IGridEngine.flee}
+     *
+     * @category Pathfinding
+     */
+    flee(charId: string, charIdToAvoid: string, options: FleeOptions): void;
     /**
      * {@inheritDoc IGridEngine.isMoving}
      *

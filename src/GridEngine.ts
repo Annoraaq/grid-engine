@@ -273,6 +273,16 @@ export interface CharacterData extends CharacterDataHeadless {
    * case, while collisions remain governed by the character layer.
    */
   depthLayer?: string;
+
+  /**
+   * If `true`, the character continuously plays its walking animation in place
+   * while not moving, using its current facing direction and movement speed.
+   * Only has an effect when built-in walking animations are enabled via
+   * {@link CharacterData.walkingAnimationMapping}.
+   *
+   * @defaultValue `false`
+   */
+  spotWalk?: boolean;
 }
 
 /**
@@ -597,6 +607,32 @@ export class GridEngine implements IGridEngine {
 
     const animation = gridChar.getAnimation();
     animation?.setWalkingAnimationMapping(walkingAnimationMapping);
+  }
+
+  /**
+   * @returns `true` if spot walk is enabled for the character.
+   *
+   * @category Character
+   */
+  isSpotWalking(charId: string): boolean {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.isSpotWalking();
+  }
+
+  /**
+   * Enables or disables spot walk for a character. When enabled, the character
+   * continuously plays its built-in walking animation in place while not moving,
+   * using its current facing direction and movement speed.
+   *
+   * @category Character
+   */
+  setSpotWalk(charId: string, enabled: boolean): void {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.setSpotWalk(enabled);
   }
 
   /** @internal */
@@ -1079,11 +1115,13 @@ export class GridEngine implements IGridEngine {
     return {
       characters: this.geHeadless.getState().characters.map((c) => {
         const depthLayer = this.getDepthLayer(c.id);
+        const spotWalk = this.isSpotWalking(c.id);
         return {
           ...c,
           offsetX: this.getOffsetX(c.id),
           offsetY: this.getOffsetY(c.id),
           ...(depthLayer !== undefined ? { depthLayer } : {}),
+          ...(spotWalk ? { spotWalk } : {}),
         };
       }),
     };
@@ -1109,6 +1147,7 @@ export class GridEngine implements IGridEngine {
           char.setOffsetX(charState.offsetX);
           char.setOffsetY(charState.offsetY);
           char.setDepthLayer(charState.depthLayer);
+          char.setSpotWalk(charState.spotWalk ?? false);
         }
       }
     }

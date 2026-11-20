@@ -15,7 +15,7 @@ import { Orientation, Tile, TileLayer, Tilemap } from "./GridTilemap/Tilemap.js"
 import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer.js";
 import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile.js";
 import { QueueMovementConfig, QueuedPathBlockedStrategy, Finished as QueueMovementFinished, QueueMovementResult, QueueMovementEntry } from "./Movement/QueueMovement/QueueMovement.js";
-import { CharacterShift, CharacterShiftAction, FollowOptions, IGridEngine, PathfindingResult } from "./IGridEngine.js";
+import { CharacterShift, CharacterShiftAction, FleeOptions, FollowOptions, IGridEngine, PathfindingResult } from "./IGridEngine.js";
 import { ArrayTilemap, ArrayTilemapInputLayer } from "./GridTilemap/ArrayTilemap/ArrayTilemap.js";
 import { TiledTilemap } from "./GridTilemap/TiledTilemap/TiledTilemap.js";
 import { TiledLayer } from "./GridTilemap/TiledTilemap/TiledLayer.js";
@@ -28,7 +28,7 @@ import { CharLayer, LayerPosition, Position } from "./Position.js";
 import { Concrete } from "./Utils/TypeUtils.js";
 import { GridCharacterStatePhaser } from "./GridEnginePhaser/GridCharacterStatePhaser.js";
 import { RawTiledLayer, RawTiledTileset, RawTiledTilesetTile, RawTiledTilesetTileProp } from "./GridTilemap/TiledTilemap/TiledMap.js";
-export { ArrayTilemap, ArrayTilemapInputLayer, CharacterDataHeadless, CharacterFilteringOptions, CharacterShift, CharacterShiftAction, CharLayer, CollisionConfig, CollisionStrategy, Concrete, Direction, Finished, FollowOptions, FrameRow, GridCharacterState, GridCharacterStatePhaser, GridEngineConfigHeadless, GridEngineHeadless, GridEngineState, GridEngineStatePhaser, IGridEngine, IsPositionAllowedFn, LayerPosition, MovementInfo, MoveToConfig, MoveToInfo, MoveToResult, NoPathFoundStrategy, NumberOfDirections, Orientation, PathBlockedStrategy, PathfindingOptions, PathfindingResult, Position, PositionChange, PhaserTile, PhaserTileLayer, PhaserTilemap, QueueMovementConfig, QueueMovementEntry, QueueMovementFinished, QueueMovementResult, QueuedPathBlockedStrategy, RawTiledLayer, RawTiledTileset, RawTiledTilesetTile, RawTiledTilesetTileProp, ShortestPathAlgorithmType, Tile, TiledProject, TiledTilemap, TiledLayer, TiledTile, TileLayer, Tilemap, TileSizePerSecond, directionFromPos, };
+export { ArrayTilemap, ArrayTilemapInputLayer, CharacterDataHeadless, CharacterFilteringOptions, CharacterShift, CharacterShiftAction, CharLayer, CollisionConfig, CollisionStrategy, Concrete, Direction, Finished, FleeOptions, FollowOptions, FrameRow, GridCharacterState, GridCharacterStatePhaser, GridEngineConfigHeadless, GridEngineHeadless, GridEngineState, GridEngineStatePhaser, IGridEngine, IsPositionAllowedFn, LayerPosition, MovementInfo, MoveToConfig, MoveToInfo, MoveToResult, NoPathFoundStrategy, NumberOfDirections, Orientation, PathBlockedStrategy, PathfindingOptions, PathfindingResult, Position, PositionChange, PhaserTile, PhaserTileLayer, PhaserTilemap, QueueMovementConfig, QueueMovementEntry, QueueMovementFinished, QueueMovementResult, QueuedPathBlockedStrategy, RawTiledLayer, RawTiledTileset, RawTiledTilesetTile, RawTiledTilesetTileProp, ShortestPathAlgorithmType, Tile, TiledProject, TiledTilemap, TiledLayer, TiledTile, TileLayer, Tilemap, TileSizePerSecond, directionFromPos, };
 /**
  * Configuration object for initializing GridEngine.
  *
@@ -147,6 +147,15 @@ export interface CharacterData extends CharacterDataHeadless {
      * case, while collisions remain governed by the character layer.
      */
     depthLayer?: string;
+    /**
+     * If `true`, the character continuously plays its walking animation in place
+     * while not moving, using its current facing direction and movement speed.
+     * Only has an effect when built-in walking animations are enabled via
+     * {@link CharacterData.walkingAnimationMapping}.
+     *
+     * @defaultValue `false`
+     */
+    spotWalk?: boolean;
 }
 /**
  * @category Main Modules
@@ -327,6 +336,20 @@ export declare class GridEngine implements IGridEngine {
      * @category Character
      */
     setWalkingAnimationMapping(charId: string, walkingAnimationMapping?: WalkingAnimationMapping | number): void;
+    /**
+     * @returns `true` if spot walk is enabled for the character.
+     *
+     * @category Character
+     */
+    isSpotWalking(charId: string): boolean;
+    /**
+     * Enables or disables spot walk for a character. When enabled, the character
+     * continuously plays its built-in walking animation in place while not moving,
+     * using its current facing direction and movement speed.
+     *
+     * @category Character
+     */
+    setSpotWalk(charId: string, enabled: boolean): void;
     /** @internal */
     update(time: number, delta: number): void;
     /**
@@ -390,6 +413,12 @@ export declare class GridEngine implements IGridEngine {
      */
     follow(charId: string, charIdToFollow: string, options?: FollowOptions): void;
     follow(charId: string, charIdToFollow: string, distance?: number, closestPointIfBlocked?: boolean): void;
+    /**
+     * {@inheritDoc IGridEngine.flee}
+     *
+     * @category Pathfinding
+     */
+    flee(charId: string, charIdToAvoid: string, options: FleeOptions): void;
     /**
      * {@inheritDoc IGridEngine.isMoving}
      *

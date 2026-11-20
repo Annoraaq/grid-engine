@@ -1029,6 +1029,198 @@ describe("GridCharacterPhaser", () => {
     });
   });
 
+  describe("spot walk", () => {
+    // For walkingAnimationMapping: 0 with texture width 240, sprite width 20 (charsInRow = 4, framesInRow = 12):
+    // DOWN: rightFoot = 0, standing = 1, leftFoot = 2
+    // LEFT: rightFoot = 12, standing = 13, leftFoot = 14
+    const DOWN_RIGHT_FOOT = 0;
+    const DOWN_STANDING = 1;
+    const DOWN_LEFT_FOOT = 2;
+    const LEFT_STANDING = 13;
+    const LEFT_LEFT_FOOT = 14;
+
+    it("should default to false", () => {
+      const { gridCharPhaser } = createChar({}, false);
+      expect(gridCharPhaser.isSpotWalking()).toBe(false);
+    });
+
+    it("should cycle walking frames in place based on character speed", () => {
+      const { gridCharPhaser } = createChar(
+        {
+          walkingAnimationMapping: 0,
+          speed: 1,
+          spotWalk: true,
+        },
+        false,
+      );
+
+      expect(gridCharPhaser.isSpotWalking()).toBe(true);
+      const initialX = spriteMock.x;
+      const initialY = spriteMock.y;
+
+      // 0..500ms -> leftFoot
+      gridCharPhaser.update(250);
+      expect(spriteMock.frame.name).toBe(DOWN_LEFT_FOOT);
+      expect(spriteMock.x).toBe(initialX);
+      expect(spriteMock.y).toBe(initialY);
+
+      // >500ms -> standing (and flips lastFootLeft)
+      gridCharPhaser.update(300);
+      expect(spriteMock.frame.name).toBe(DOWN_STANDING);
+
+      // wraps past 1000ms -> rightFoot
+      gridCharPhaser.update(500);
+      expect(spriteMock.frame.name).toBe(DOWN_RIGHT_FOOT);
+
+      // >500ms -> standing
+      gridCharPhaser.update(500);
+      expect(spriteMock.frame.name).toBe(DOWN_STANDING);
+
+      // wraps again -> leftFoot
+      gridCharPhaser.update(500);
+      expect(spriteMock.frame.name).toBe(DOWN_LEFT_FOOT);
+    });
+
+    it("should scale animation rate with character speed", () => {
+      const { gridCharPhaser } = createChar(
+        {
+          walkingAnimationMapping: 0,
+          speed: 2,
+          spotWalk: true,
+        },
+        false,
+      );
+
+      // At speed 2, 125ms = 250 progress (<= 500) -> leftFoot
+      gridCharPhaser.update(125);
+      expect(spriteMock.frame.name).toBe(DOWN_LEFT_FOOT);
+
+      // +150ms = 550 progress (> 500) -> standing
+      gridCharPhaser.update(150);
+      expect(spriteMock.frame.name).toBe(DOWN_STANDING);
+
+      // +250ms = 50 progress (<= 500) -> rightFoot
+      gridCharPhaser.update(250);
+      expect(spriteMock.frame.name).toBe(DOWN_RIGHT_FOOT);
+    });
+
+    it("should not animate when speed is 0", () => {
+      const { gridCharPhaser } = createChar(
+        {
+          walkingAnimationMapping: 0,
+          spotWalk: true,
+        },
+        false,
+      );
+      gridEngineHeadless.setSpeed("charID", 0);
+
+      (spriteMock.setFrame as jest.Mock).mockClear();
+      gridCharPhaser.update(250);
+      expect(spriteMock.setFrame).not.toHaveBeenCalled();
+    });
+
+    it("should follow facing direction changes while spot walking", () => {
+      const { gridCharPhaser } = createChar(
+        {
+          walkingAnimationMapping: 0,
+          speed: 1,
+          spotWalk: true,
+        },
+        false,
+      );
+
+      gridCharPhaser.turnTowards(Direction.LEFT);
+      expect(spriteMock.frame.name).toBe(LEFT_STANDING);
+
+      gridCharPhaser.update(250);
+      expect(spriteMock.frame.name).toBe(LEFT_LEFT_FOOT);
+    });
+
+    it("should reset to standing frame when disabled while idle", () => {
+      const { gridCharPhaser } = createChar(
+        {
+          walkingAnimationMapping: 0,
+          speed: 1,
+          spotWalk: true,
+        },
+        false,
+      );
+
+      gridCharPhaser.update(250);
+      expect(spriteMock.frame.name).toBe(DOWN_LEFT_FOOT);
+
+      gridCharPhaser.setSpotWalk(false);
+      expect(gridCharPhaser.isSpotWalking()).toBe(false);
+      expect(spriteMock.frame.name).toBe(DOWN_STANDING);
+
+      (spriteMock.setFrame as jest.Mock).mockClear();
+      gridCharPhaser.update(250);
+      expect(spriteMock.setFrame).not.toHaveBeenCalled();
+    });
+
+    it("should not override frame when disabled while moving", () => {
+      const { gridCharPhaser } = createChar(
+        {
+          walkingAnimationMapping: 0,
+          speed: 1,
+          spotWalk: true,
+        },
+        false,
+      );
+
+      gridEngineHeadless.move("charID", Direction.DOWN);
+      gridEngineHeadless.update(1000, 250);
+      gridCharPhaser.update(250);
+      expect(spriteMock.frame.name).toBe(DOWN_LEFT_FOOT);
+
+      gridCharPhaser.setSpotWalk(false);
+      expect(spriteMock.frame.name).toBe(DOWN_LEFT_FOOT);
+    });
+
+    it("should resume spot walking cleanly after real movement finishes", () => {
+      const { gridCharPhaser } = createChar(
+        {
+          walkingAnimationMapping: 0,
+          speed: 1,
+          spotWalk: true,
+        },
+        false,
+      );
+
+      gridEngineHeadless.move("charID", Direction.DOWN);
+      gridEngineHeadless.update(1000, 250);
+      gridCharPhaser.update(250);
+      expect(spriteMock.frame.name).toBe(DOWN_LEFT_FOOT);
+
+      gridEngineHeadless.update(1250, 500);
+      gridCharPhaser.update(500);
+      expect(spriteMock.frame.name).toBe(DOWN_STANDING);
+
+      // Finish moving to the next tile
+      gridEngineHeadless.update(1750, 250);
+      expect(gridEngineHeadless.isMoving("charID")).toBe(false);
+
+      // Spot walk resumes with the alternate foot
+      gridCharPhaser.update(250);
+      expect(spriteMock.frame.name).toBe(DOWN_RIGHT_FOOT);
+    });
+
+    it("should not animate when walkingAnimationMapping is undefined", () => {
+      const { gridCharPhaser } = createChar(
+        {
+          walkingAnimationMapping: undefined,
+          speed: 1,
+          spotWalk: true,
+        },
+        false,
+      );
+
+      (spriteMock.setFrame as jest.Mock).mockClear();
+      gridCharPhaser.update(250);
+      expect(spriteMock.setFrame).not.toHaveBeenCalled();
+    });
+  });
+
   function expectedXEngineOffset(): number {
     const tileWidth = 16;
     const scale = 3;

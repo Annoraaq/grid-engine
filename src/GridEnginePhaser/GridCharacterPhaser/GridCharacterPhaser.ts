@@ -25,6 +25,8 @@ export class GridCharacterPhaser {
   private customOffset = new Vector2(0, 0);
   private depthOffset = 0;
   private depthLayer?: string;
+  private spotWalk = false;
+  private spotWalkProgress = 0;
 
   private sprite?: Phaser.GameObjects.Sprite;
   private layerOverlaySprite?: Phaser.GameObjects.Sprite;
@@ -56,6 +58,7 @@ export class GridCharacterPhaser {
 
     this.depthOffset = charData.depthOffset ?? 0;
     this.depthLayer = charData.depthLayer;
+    this.spotWalk = charData.spotWalk ?? false;
 
     this.sprite = charData.sprite;
     this.container = charData.container;
@@ -156,8 +159,23 @@ export class GridCharacterPhaser {
     this.animation = animation;
   }
 
-  update(_delta: number): void {
-    this.updateGridChar();
+  update(delta: number): void {
+    this.updateGridChar(delta);
+  }
+
+  isSpotWalking(): boolean {
+    return this.spotWalk;
+  }
+
+  setSpotWalk(enabled: boolean): void {
+    if (this.spotWalk === enabled) return;
+    this.spotWalk = enabled;
+    this.spotWalkProgress = 0;
+    if (!enabled && !this.geHeadless.isMoving(this.charData.id)) {
+      this.animation?.setStandingFrame(
+        this.geHeadless.getFacingDirection(this.charData.id),
+      );
+    }
   }
 
   getDepthOffset(): number {
@@ -226,20 +244,43 @@ export class GridCharacterPhaser {
     return this.container || this.sprite;
   }
 
-  private updateGridChar() {
+  private updateGridChar(delta = 0) {
     this.updatePixelPos();
-    if (this.sprite && this.geHeadless.isMoving(this.charData.id)) {
-      const hasWalkedHalfATile =
-        this.geHeadless.getMovementProgress(this.charData.id) >
-        MAX_MOVEMENT_PROGRESS / 2;
-      this.getAnimation()?.updateCharacterFrame(
-        this.geHeadless.getFacingDirection(this.charData.id),
-        hasWalkedHalfATile,
-        Number(this.sprite.frame.name),
-      );
+    this.updateAnimation(delta);
+    this.updateDepth();
+  }
+
+  private updateAnimation(delta: number) {
+    if (!this.sprite) return;
+    const progress = this.getAnimationProgress(delta);
+    if (progress === undefined) return;
+
+    const hasWalkedHalfATile = progress > MAX_MOVEMENT_PROGRESS / 2;
+    this.getAnimation()?.updateCharacterFrame(
+      this.geHeadless.getFacingDirection(this.charData.id),
+      hasWalkedHalfATile,
+      Number(this.sprite.frame.name),
+    );
+  }
+
+  private getAnimationProgress(delta: number): number | undefined {
+    if (this.geHeadless.isMoving(this.charData.id)) {
+      this.spotWalkProgress = 0;
+      return this.geHeadless.getMovementProgress(this.charData.id);
     }
 
-    this.updateDepth();
+    if (this.spotWalk && delta > 0) {
+      const speed = this.geHeadless.getSpeed(this.charData.id);
+      if (speed > 0) {
+        this.spotWalkProgress =
+          (this.spotWalkProgress +
+            (delta / 1000) * speed * MAX_MOVEMENT_PROGRESS) %
+          MAX_MOVEMENT_PROGRESS;
+        return this.spotWalkProgress;
+      }
+    }
+
+    return undefined;
   }
 
   private resetAnimation(sprite: Phaser.GameObjects.Sprite) {
