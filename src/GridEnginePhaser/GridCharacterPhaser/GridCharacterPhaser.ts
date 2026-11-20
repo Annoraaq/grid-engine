@@ -246,36 +246,41 @@ export class GridCharacterPhaser {
 
   private updateGridChar(delta = 0) {
     this.updatePixelPos();
-    if (this.sprite) {
-      if (this.geHeadless.isMoving(this.charData.id)) {
-        this.spotWalkProgress = 0;
-        const hasWalkedHalfATile =
-          this.geHeadless.getMovementProgress(this.charData.id) >
-          MAX_MOVEMENT_PROGRESS / 2;
-        this.getAnimation()?.updateCharacterFrame(
-          this.geHeadless.getFacingDirection(this.charData.id),
-          hasWalkedHalfATile,
-          Number(this.sprite.frame.name),
-        );
-      } else if (this.spotWalk && delta > 0) {
-        const speed = this.geHeadless.getSpeed(this.charData.id);
-        if (speed > 0) {
-          this.spotWalkProgress =
-            (this.spotWalkProgress +
-              (delta / 1000) * speed * MAX_MOVEMENT_PROGRESS) %
-            MAX_MOVEMENT_PROGRESS;
-          const hasWalkedHalfATile =
-            this.spotWalkProgress > MAX_MOVEMENT_PROGRESS / 2;
-          this.getAnimation()?.updateCharacterFrame(
-            this.geHeadless.getFacingDirection(this.charData.id),
-            hasWalkedHalfATile,
-            Number(this.sprite.frame.name),
-          );
-        }
+    this.updateAnimation(delta);
+    this.updateDepth();
+  }
+
+  private updateAnimation(delta: number) {
+    if (!this.sprite) return;
+    const progress = this.getAnimationProgress(delta);
+    if (progress === undefined) return;
+
+    const hasWalkedHalfATile = progress > MAX_MOVEMENT_PROGRESS / 2;
+    this.getAnimation()?.updateCharacterFrame(
+      this.geHeadless.getFacingDirection(this.charData.id),
+      hasWalkedHalfATile,
+      Number(this.sprite.frame.name),
+    );
+  }
+
+  private getAnimationProgress(delta: number): number | undefined {
+    if (this.geHeadless.isMoving(this.charData.id)) {
+      this.spotWalkProgress = 0;
+      return this.geHeadless.getMovementProgress(this.charData.id);
+    }
+
+    if (this.spotWalk && delta > 0) {
+      const speed = this.geHeadless.getSpeed(this.charData.id);
+      if (speed > 0) {
+        this.spotWalkProgress =
+          (this.spotWalkProgress +
+            (delta / 1000) * speed * MAX_MOVEMENT_PROGRESS) %
+          MAX_MOVEMENT_PROGRESS;
+        return this.spotWalkProgress;
       }
     }
 
-    this.updateDepth();
+    return undefined;
   }
 
   private resetAnimation(sprite: Phaser.GameObjects.Sprite) {

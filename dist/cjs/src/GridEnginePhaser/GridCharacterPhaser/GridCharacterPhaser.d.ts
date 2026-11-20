@@ -45,6 +45,8 @@ export declare class GridCharacterPhaser {
     private updatePixelPos;
     private getGameObj;
     private updateGridChar;
+    private updateAnimation;
+    private getAnimationProgress;
     private resetAnimation;
     private updateOverlaySprite;
     private updateDepth;
