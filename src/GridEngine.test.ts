@@ -2841,4 +2841,32 @@ describe("GridEngine", () => {
     gridEngine.setState(state);
     expect(gridEngine.isSpotWalking("char1")).toBe(true);
   });
+
+  it("should use custom isTileBlocking from config", () => {
+    gridEngine.create(
+      createPhaserTilemapStub(new Map([["someLayer", [".#.", "..."]]])),
+      {
+        characters: [
+          {
+            id: "player",
+            sprite: playerSpriteMock,
+            startPosition: { x: 0, y: 0 },
+            charLayer: "someLayer",
+          },
+        ],
+        isTileBlocking: (pos) => pos.x === 0 && pos.y === 1,
+      },
+    );
+
+    // (1, 0) is blocked in the tilemap, but allowed by custom isTileBlocking
+    expect(gridEngine.isTileBlocked({ x: 1, y: 0 }, "someLayer")).toBe(false);
+    // (0, 1) is passable in the tilemap, but blocked by custom isTileBlocking
+    expect(gridEngine.isTileBlocked({ x: 0, y: 1 }, "someLayer")).toBe(true);
+
+    gridEngine.move("player", Direction.DOWN);
+    expect(gridEngine.isMoving("player")).toBe(false);
+
+    gridEngine.move("player", Direction.RIGHT);
+    expect(gridEngine.isMoving("player")).toBe(true);
+  });
 });

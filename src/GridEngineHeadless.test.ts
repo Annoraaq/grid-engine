@@ -2698,6 +2698,83 @@ describe("GridEngineHeadless", () => {
     );
   });
 
+  describe("custom isTileBlocking", () => {
+    it("should use custom isTileBlocking for movement, isTileBlocked, and pathfinding", () => {
+      const tilemap = mockBlockMap([
+        // prettier-ignore
+        ".#.",
+        "...",
+        "...",
+      ]);
+      // Custom rule: ignore ge_collide on (1, 0), block (0, 1), and allow only entering (2, 0) from LEFT (moving RIGHT)
+      gridEngineHeadless.create(tilemap, {
+        characters: [{ id: "player", startPosition: { x: 0, y: 0 } }],
+        isTileBlocking: (pos, _charLayer, direction) => {
+          if (pos.x === 0 && pos.y === 1) return true;
+          if (pos.x === 2 && pos.y === 0) return direction !== Direction.LEFT;
+          return false;
+        },
+      });
+
+      // (1, 0) has ge_collide in tilemap, but custom callback returns false
+      expect(gridEngineHeadless.isTileBlocked({ x: 1, y: 0 })).toBe(false);
+      // (0, 1) has no ge_collide, but custom callback returns true
+      expect(gridEngineHeadless.isTileBlocked({ x: 0, y: 1 })).toBe(true);
+
+      // Moving down to (0, 1) is blocked
+      gridEngineHeadless.move("player", Direction.DOWN);
+      expect(gridEngineHeadless.isMoving("player")).toBe(false);
+
+      // Moving right to (1, 0) succeeds despite ge_collide tile
+      gridEngineHeadless.move("player", Direction.RIGHT);
+      expect(gridEngineHeadless.isMoving("player")).toBe(true);
+      gridEngineHeadless.update(0, 100);
+      gridEngineHeadless.update(0, 200);
+      expect(gridEngineHeadless.getPosition("player")).toEqual({ x: 1, y: 0 });
+
+      // Moving right to (2, 0) enters from Direction.LEFT -> allowed
+      gridEngineHeadless.move("player", Direction.RIGHT);
+      expect(gridEngineHeadless.isMoving("player")).toBe(true);
+      gridEngineHeadless.update(0, 100);
+      gridEngineHeadless.update(0, 200);
+      expect(gridEngineHeadless.getPosition("player")).toEqual({ x: 2, y: 0 });
+
+      // Pathfinding from (0, 0) to (0, 2) must route around custom-blocked (0, 1)
+      const pathRes = gridEngineHeadless.findShortestPath(
+        { position: { x: 0, y: 0 }, charLayer: undefined },
+        { position: { x: 0, y: 2 }, charLayer: undefined },
+      );
+      expect(pathRes.path.map((p) => p.position)).toEqual([
+        { x: 0, y: 0 },
+        { x: 1, y: 0 },
+        { x: 1, y: 1 },
+        { x: 1, y: 2 },
+        { x: 0, y: 2 },
+      ]);
+    });
+
+    it("should respect cacheTileCollisions and rebuildTileCollisionCache with custom isTileBlocking", () => {
+      const tilemap = mockBlockMap([
+        // prettier-ignore
+        "...",
+        "...",
+      ]);
+      let blocked = true;
+      gridEngineHeadless.create(tilemap, {
+        characters: [{ id: "player", startPosition: { x: 0, y: 0 } }],
+        cacheTileCollisions: true,
+        isTileBlocking: (pos) => pos.x === 1 && pos.y === 0 && blocked,
+      });
+
+      expect(gridEngineHeadless.isTileBlocked({ x: 1, y: 0 })).toBe(true);
+      blocked = false;
+      // Still cached as blocked
+      expect(gridEngineHeadless.isTileBlocked({ x: 1, y: 0 })).toBe(true);
+      gridEngineHeadless.rebuildTileCollisionCache(0, 0, 3, 2);
+      expect(gridEngineHeadless.isTileBlocked({ x: 1, y: 0 })).toBe(false);
+    });
+  });
+
   function createDefaultGridEngine() {
     gridEngineHeadless.create(
       // prettier-ignore

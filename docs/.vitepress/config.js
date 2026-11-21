@@ -57,6 +57,7 @@ export default defineConfig({
           { text: 'Basic Movement', link: '/examples/basic-movement/index.md' },
           { text: 'Collision Groups', link: '/examples/collision-groups/index.md' },
           { text: 'Crowd', link: '/examples/crowd/index.md' },
+          { text: 'Custom Tile Collision', link: '/examples/custom-tile-collision/index.md' },
           { text: 'Facing Direction', link: '/examples/facing-direction/index.md' },
           { text: 'Fixed Facing Direction', link: '/examples/fixed-facing/index.md' },
           { text: 'Height Shift', link: '/examples/height-shift/index.md' },

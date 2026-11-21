@@ -41,6 +41,7 @@ import {
   TiledProject,
 } from "./GridTilemap/Phaser/PhaserTilemap.js";
 import {
+  IsTileBlockingFn,
   Orientation,
   Tile,
   TileLayer,
@@ -111,6 +112,7 @@ export {
   GridEngineStatePhaser,
   IGridEngine,
   IsPositionAllowedFn,
+  IsTileBlockingFn,
   LayerPosition,
   MovementBlocked,
   MovementInfo,
@@ -297,7 +299,7 @@ export class GridEngine implements IGridEngine {
   private geHeadless: GridEngineHeadless = new GridEngineHeadless(false);
   private config?: Omit<
     Required<GridEngineConfig>,
-    "tiledProject" | "collisionGroupRelation"
+    "tiledProject" | "collisionGroupRelation" | "isTileBlocking"
   >;
   private gridCharacters?: Map<string, GridCharacterPhaser>;
   private gridTilemap?: GridTilemapPhaser;
@@ -1229,7 +1231,7 @@ export class GridEngine implements IGridEngine {
     config: GridEngineConfig,
   ): Omit<
     Required<GridEngineConfig>,
-    "tiledProject" | "collisionGroupRelation"
+    "tiledProject" | "collisionGroupRelation" | "isTileBlocking"
   > {
     return {
       collisionTilePropertyName: "ge_collide",

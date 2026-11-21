@@ -7,6 +7,8 @@ import { CharLayer } from "../../Position.js";
 
 const BITMAP_POS_HAS_TILE = 0;
 const BITMAP_POS_NO_DIRECTION = 1;
+const IGNORE_HAS_TILE_OFFSET = 9;
+const ALL_DIRS_MASK = 0x1ff; // 9 bits: no-direction + 8 directions
 const dirToBitmapNo: Record<Direction, number> = {
   [Direction.NONE]: 1,
   [Direction.LEFT]: 2,
@@ -30,15 +32,8 @@ export class TileCollisionCache {
     string | undefined /* LayerVecPos */,
     /** Bitmap to store blocking information
      * 0 => hasTile
-     * 1 => dir === undefined
-     * 2 => LEFT
-     * 3 => UP_LEFT
-     * 4 => UP
-     * 5 => UP_RIGHT
-     * 6 => RIGHT
-     * 7 => DOWN_RIGHT
-     * 8 => DOWN
-     * 9 => DOWN_LEFT
+     * 1..9 => ignoreHasTile = true (1 => undefined, 2..9 => LEFT..DOWN_LEFT)
+     * 10..18 => ignoreHasTile = false (10 => undefined, 11..18 => LEFT..DOWN_LEFT)
      */
     number[][]
   > = new Map();
@@ -100,6 +95,40 @@ export class TileCollisionCache {
           if (blockedUndefined) {
             bitmap = setBitAt(bitmap, dirToBitmapNo[Direction.NONE]);
           }
+
+          if (this.gridTilemap.hasCustomTileBlocking()) {
+            for (const dir of directions()) {
+              const blocked = this.gridTilemap.hasBlockingTileUncached(
+                new Vector2(c, r),
+                cl?.getName(),
+                dir,
+                false,
+              );
+              if (blocked) {
+                bitmap = setBitAt(
+                  bitmap,
+                  dirToBitmapNo[dir] + IGNORE_HAS_TILE_OFFSET,
+                );
+              }
+            }
+            const blockedUndefinedWithMissing =
+              this.gridTilemap.hasBlockingTileUncached(
+                new Vector2(c, r),
+                cl?.getName(),
+                undefined,
+                false,
+              );
+            if (blockedUndefinedWithMissing) {
+              bitmap = setBitAt(
+                bitmap,
+                BITMAP_POS_NO_DIRECTION + IGNORE_HAS_TILE_OFFSET,
+              );
+            }
+          } else if (!hasTile) {
+            bitmap |= ALL_DIRS_MASK << (1 + IGNORE_HAS_TILE_OFFSET);
+          } else {
+            bitmap |= (bitmap & (ALL_DIRS_MASK << 1)) << IGNORE_HAS_TILE_OFFSET;
+          }
           layerArr[c][r] = bitmap;
         }
       }
@@ -123,11 +152,11 @@ export class TileCollisionCache {
     const arr = this.fixedLayer || this.tileCollisionCache.get(layer);
     const cached = arr?.[x]?.[y];
     if (cached === undefined) return undefined;
-    if (!ignoreHasTile && !getBitAt(cached, BITMAP_POS_HAS_TILE)) return true;
+    const offset = ignoreHasTile ? 0 : IGNORE_HAS_TILE_OFFSET;
     if (direction === undefined) {
-      return getBitAt(cached, BITMAP_POS_NO_DIRECTION);
+      return getBitAt(cached, BITMAP_POS_NO_DIRECTION + offset);
     }
-    return getBitAt(cached, dirToBitmapNo[direction]);
+    return getBitAt(cached, dirToBitmapNo[direction] + offset);
   }
 }
 

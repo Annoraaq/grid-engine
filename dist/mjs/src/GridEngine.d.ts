@@ -11,7 +11,7 @@ import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/Chara
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
 import { GridEngineHeadless, TileSizePerSecond, GridEngineConfigHeadless, CollisionConfig, CharacterDataHeadless } from "./GridEngineHeadless.js";
 import { PhaserTilemap, TiledProject } from "./GridTilemap/Phaser/PhaserTilemap.js";
-import { Orientation, Tile, TileLayer, Tilemap } from "./GridTilemap/Tilemap.js";
+import { IsTileBlockingFn, Orientation, Tile, TileLayer, Tilemap } from "./GridTilemap/Tilemap.js";
 import { PhaserTileLayer } from "./GridTilemap/Phaser/PhaserTileLayer.js";
 import { PhaserTile } from "./GridTilemap/Phaser/PhaserTile.js";
 import { QueueMovementConfig, QueuedPathBlockedStrategy, Finished as QueueMovementFinished, QueueMovementResult, QueueMovementEntry } from "./Movement/QueueMovement/QueueMovement.js";
@@ -28,7 +28,7 @@ import { CharLayer, LayerPosition, Position } from "./Position.js";
 import { Concrete } from "./Utils/TypeUtils.js";
 import { GridCharacterStatePhaser } from "./GridEnginePhaser/GridCharacterStatePhaser.js";
 import { RawTiledLayer, RawTiledTileset, RawTiledTilesetTile, RawTiledTilesetTileProp } from "./GridTilemap/TiledTilemap/TiledMap.js";
-export { ArrayTilemap, ArrayTilemapInputLayer, CharacterDataHeadless, CharacterFilteringOptions, CharacterShift, CharacterShiftAction, CharLayer, CollisionConfig, CollisionStrategy, Concrete, Direction, Finished, FleeOptions, FollowOptions, FrameRow, GridCharacterState, GridCharacterStatePhaser, GridEngineConfigHeadless, GridEngineHeadless, GridEngineState, GridEngineStatePhaser, IGridEngine, IsPositionAllowedFn, LayerPosition, MovementBlocked, MovementInfo, MoveToConfig, MoveToInfo, MoveToResult, NoPathFoundStrategy, NumberOfDirections, Orientation, PathBlockedStrategy, PathfindingOptions, PathfindingResult, Position, PositionChange, PhaserTile, PhaserTileLayer, PhaserTilemap, QueueMovementConfig, QueueMovementEntry, QueueMovementFinished, QueueMovementResult, QueuedPathBlockedStrategy, RawTiledLayer, RawTiledTileset, RawTiledTilesetTile, RawTiledTilesetTileProp, ShortestPathAlgorithmType, Tile, TiledProject, TiledTilemap, TiledLayer, TiledTile, TileLayer, Tilemap, TileSizePerSecond, directionFromPos, };
+export { ArrayTilemap, ArrayTilemapInputLayer, CharacterDataHeadless, CharacterFilteringOptions, CharacterShift, CharacterShiftAction, CharLayer, CollisionConfig, CollisionStrategy, Concrete, Direction, Finished, FleeOptions, FollowOptions, FrameRow, GridCharacterState, GridCharacterStatePhaser, GridEngineConfigHeadless, GridEngineHeadless, GridEngineState, GridEngineStatePhaser, IGridEngine, IsPositionAllowedFn, IsTileBlockingFn, LayerPosition, MovementBlocked, MovementInfo, MoveToConfig, MoveToInfo, MoveToResult, NoPathFoundStrategy, NumberOfDirections, Orientation, PathBlockedStrategy, PathfindingOptions, PathfindingResult, Position, PositionChange, PhaserTile, PhaserTileLayer, PhaserTilemap, QueueMovementConfig, QueueMovementEntry, QueueMovementFinished, QueueMovementResult, QueuedPathBlockedStrategy, RawTiledLayer, RawTiledTileset, RawTiledTilesetTile, RawTiledTilesetTileProp, ShortestPathAlgorithmType, Tile, TiledProject, TiledTilemap, TiledLayer, TiledTile, TileLayer, Tilemap, TileSizePerSecond, directionFromPos, };
 /**
  * Configuration object for initializing GridEngine.
  *
