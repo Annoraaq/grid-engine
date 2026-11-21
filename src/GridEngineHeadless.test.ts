@@ -1230,7 +1230,7 @@ describe("GridEngineHeadless", () => {
         charId: "player",
         direction: Direction.LEFT,
         position: { x: -1, y: 0 },
-        layer: "someLayer",
+        layer: undefined,
       });
     });
 
