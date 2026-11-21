@@ -6,6 +6,7 @@ export interface GridCharacterState {
     id: CharId;
     position: LayerPosition;
     facingDirection: Direction;
+    fixedFacing?: boolean;
     speed: number;
     movementProgress: number;
     collisionConfig: CollisionConfig;

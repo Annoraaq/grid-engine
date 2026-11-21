@@ -22,6 +22,7 @@ export interface CharConfig {
     collisionGroups?: string[];
     ignoreCollisionGroups?: string[];
     facingDirection?: Direction;
+    fixedFacing?: boolean;
     ignoreMissingTiles?: boolean;
     labels?: string[];
     numberOfDirections: NumberOfDirections;
@@ -45,6 +46,7 @@ export declare class GridCharacter {
     private autoMovementSet$;
     private lastMovementImpulse;
     private facingDirection;
+    private fixedFacing;
     private movement?;
     private collidesWithTilesInternal;
     private collisionGroups;
@@ -84,6 +86,8 @@ export declare class GridCharacter {
     turnTowards(direction: Direction): void;
     private changeFacingDirection;
     getFacingDirection(): Direction;
+    isFixedFacing(): boolean;
+    setFixedFacing(fixedFacing: boolean): void;
     getFacingPosition(): Vector2;
     addCollisionGroup(collisionGroup: string): void;
     setCollisionGroups(collisionGroups: string[]): void;

@@ -36,6 +36,7 @@ export interface CharConfig {
   collisionGroups?: string[];
   ignoreCollisionGroups?: string[];
   facingDirection?: Direction;
+  fixedFacing?: boolean;
   ignoreMissingTiles?: boolean;
   labels?: string[];
   numberOfDirections: NumberOfDirections;
@@ -63,6 +64,7 @@ export class GridCharacter {
   private autoMovementSet$ = new Subject<Movement | undefined>();
   private lastMovementImpulse = Direction.NONE;
   private facingDirection: Direction = Direction.DOWN;
+  private fixedFacing: boolean;
   private movement?: Movement;
   private collidesWithTilesInternal: boolean;
   private collisionGroups: Set<string>;
@@ -93,6 +95,7 @@ export class GridCharacter {
     this.labels = new Set<string>(config.labels || []);
 
     this.numberOfDirections = config.numberOfDirections;
+    this.fixedFacing = config.fixedFacing ?? false;
 
     if (config.facingDirection) {
       this.turnTowards(config.facingDirection);
@@ -197,7 +200,9 @@ export class GridCharacter {
     if (direction == Direction.NONE) return;
     if (this.isMoving()) return;
     if (this.isBlockingDirection(direction)) {
-      this.changeFacingDirection(direction);
+      if (!this.fixedFacing) {
+        this.changeFacingDirection(direction);
+      }
     } else {
       this.startMoving(direction);
     }
@@ -253,11 +258,14 @@ export class GridCharacter {
   revertCurrentMovement() {
     if (this.isMoving()) {
       this.currentMovementReverted = true;
+      const prevMovementDirection = this.movementDirection;
       this.movementDirection = oppositeDirection(this.movementDirection);
-      this.movementStopped$.next(this.facingDirection);
-      this.facingDirection = this.movementDirection;
+      this.movementStopped$.next(prevMovementDirection);
+      if (!this.fixedFacing) {
+        this.facingDirection = this.movementDirection;
+      }
       this.movementProgress = MAX_MOVEMENT_PROGRESS - this.movementProgress;
-      this.movementStarted$.next(this.facingDirection);
+      this.movementStarted$.next(this.movementDirection);
     }
   }
 
@@ -302,6 +310,14 @@ export class GridCharacter {
 
   getFacingDirection(): Direction {
     return this.facingDirection;
+  }
+
+  isFixedFacing(): boolean {
+    return this.fixedFacing;
+  }
+
+  setFixedFacing(fixedFacing: boolean): void {
+    this.fixedFacing = fixedFacing;
   }
 
   getFacingPosition(): Vector2 {
@@ -476,7 +492,9 @@ export class GridCharacter {
       this.movementStarted$.next(direction);
     }
     this.movementDirection = direction;
-    this.facingDirection = direction;
+    if (!this.fixedFacing) {
+      this.facingDirection = direction;
+    }
     this.fire(this.positionChangeStarted$, this.tilePos, this.getNextTilePos());
   }
 

@@ -58,6 +58,7 @@ export default defineConfig({
           { text: 'Collision Groups', link: '/examples/collision-groups/index.md' },
           { text: 'Crowd', link: '/examples/crowd/index.md' },
           { text: 'Facing Direction', link: '/examples/facing-direction/index.md' },
+          { text: 'Fixed Facing Direction', link: '/examples/fixed-facing/index.md' },
           { text: 'Height Shift', link: '/examples/height-shift/index.md' },
           { text: 'Ice Movement', link: '/examples/ice-movement/index.md' },
           { text: 'Is Moving', link: '/examples/is-moving/index.md' },

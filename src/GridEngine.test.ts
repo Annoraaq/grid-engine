@@ -1096,6 +1096,22 @@ describe("GridEngine", () => {
     expect(facingDirection).toEqual(Direction.LEFT);
   });
 
+  it("should delegate getMovementDirection", () => {
+    expect(gridEngine.getMovementDirection("player")).toEqual(Direction.NONE);
+    gridEngine.move("player", Direction.DOWN);
+    expect(gridEngine.getMovementDirection("player")).toEqual(Direction.DOWN);
+  });
+
+  it("should delegate isFixedFacing and setFixedFacing", () => {
+    expect(gridEngine.isFixedFacing("player")).toBe(false);
+    gridEngine.setFixedFacing("player", true);
+    expect(gridEngine.isFixedFacing("player")).toBe(true);
+    gridEngine.turnTowards("player", Direction.UP);
+    gridEngine.move("player", Direction.DOWN);
+    expect(gridEngine.getMovementDirection("player")).toEqual(Direction.DOWN);
+    expect(gridEngine.getFacingDirection("player")).toEqual(Direction.UP);
+  });
+
   it("should delegate getTransition", () => {
     gridEngine.setTransition({ x: 3, y: 4 }, "fromLayer", "toLayer");
     expect(gridEngine.getTransition({ x: 3, y: 4 }, "fromLayer")).toEqual(
@@ -2392,7 +2408,16 @@ describe("GridEngine", () => {
         gridEngine.getMovementProgress(UNKNOWN_CHAR_ID),
       );
       expectCharUnknownException(() =>
+        gridEngine.getMovementDirection(UNKNOWN_CHAR_ID),
+      );
+      expectCharUnknownException(() =>
         gridEngine.getFacingDirection(UNKNOWN_CHAR_ID),
+      );
+      expectCharUnknownException(() =>
+        gridEngine.isFixedFacing(UNKNOWN_CHAR_ID),
+      );
+      expectCharUnknownException(() =>
+        gridEngine.setFixedFacing(UNKNOWN_CHAR_ID, true),
       );
       expectCharUnknownException(() =>
         gridEngine.turnTowards(UNKNOWN_CHAR_ID, Direction.LEFT),
@@ -2532,7 +2557,16 @@ describe("GridEngine", () => {
         gridEngine.getMovementProgress(SOME_CHAR_ID),
       );
       expectUninitializedException(() =>
+        gridEngine.getMovementDirection(SOME_CHAR_ID),
+      );
+      expectUninitializedException(() =>
         gridEngine.getFacingDirection(SOME_CHAR_ID),
+      );
+      expectUninitializedException(() =>
+        gridEngine.isFixedFacing(SOME_CHAR_ID),
+      );
+      expectUninitializedException(() =>
+        gridEngine.setFixedFacing(SOME_CHAR_ID, true),
       );
       expectUninitializedException(() =>
         gridEngine.turnTowards(SOME_CHAR_ID, Direction.LEFT),

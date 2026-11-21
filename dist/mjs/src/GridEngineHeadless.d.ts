@@ -142,6 +142,15 @@ export interface CharacterDataHeadless {
      */
     facingDirection?: Direction;
     /**
+     * If `true`, the character's facing direction stays fixed and does not
+     * automatically change when moving or bumping into obstacles. Explicit calls
+     * to {@link GridEngineHeadless.turnTowards} still update the facing
+     * direction.
+     *
+     * @defaultValue `false`
+     */
+    fixedFacing?: boolean;
+    /**
      * Set to false, if character should not collide (neither with the tilemap,
      * nor with other characters). For more control, pass a
      * {@link CollisionConfig} object.
@@ -365,11 +374,29 @@ export declare class GridEngineHeadless implements IGridEngine {
      */
     isMoving(charId: string): boolean;
     /**
+     * {@inheritDoc IGridEngine.getMovementDirection}
+     *
+     * @category Character
+     */
+    getMovementDirection(charId: string): Direction;
+    /**
      * {@inheritDoc IGridEngine.getFacingDirection}
      *
      * @category Character
      */
     getFacingDirection(charId: string): Direction;
+    /**
+     * {@inheritDoc IGridEngine.isFixedFacing}
+     *
+     * @category Character
+     */
+    isFixedFacing(charId: string): boolean;
+    /**
+     * {@inheritDoc IGridEngine.setFixedFacing}
+     *
+     * @category Character
+     */
+    setFixedFacing(charId: string, enabled: boolean): void;
     /**
      * {@inheritDoc IGridEngine.getFacingPosition}
      *

@@ -986,6 +986,58 @@ describe("GridEngineHeadless", () => {
     expect(facingDirection).toEqual(Direction.LEFT);
   });
 
+  it("should delegate getMovementDirection", () => {
+    createDefaultGridEngine();
+    expect(gridEngineHeadless.getMovementDirection("player")).toEqual(
+      Direction.NONE,
+    );
+    gridEngineHeadless.move("player", Direction.DOWN);
+    expect(gridEngineHeadless.getMovementDirection("player")).toEqual(
+      Direction.DOWN,
+    );
+  });
+
+  it("should support fixedFacing via config and setter", () => {
+    gridEngineHeadless.create(mockBlockMap(["....", "....", "...."]), {
+      characters: [
+        {
+          id: "player",
+          facingDirection: Direction.UP,
+          fixedFacing: true,
+        },
+      ],
+    });
+
+    expect(gridEngineHeadless.isFixedFacing("player")).toBe(true);
+    gridEngineHeadless.move("player", Direction.DOWN);
+    expect(gridEngineHeadless.getMovementDirection("player")).toEqual(
+      Direction.DOWN,
+    );
+    expect(gridEngineHeadless.getFacingDirection("player")).toEqual(
+      Direction.UP,
+    );
+
+    gridEngineHeadless.setFixedFacing("player", false);
+    expect(gridEngineHeadless.isFixedFacing("player")).toBe(false);
+  });
+
+  it("should include and restore fixedFacing in getState and setState", () => {
+    createDefaultGridEngine();
+    expect(
+      gridEngineHeadless.getState().characters[0].fixedFacing,
+    ).toBeUndefined();
+
+    gridEngineHeadless.setFixedFacing("player", true);
+    const state = gridEngineHeadless.getState();
+    expect(state.characters[0].fixedFacing).toBe(true);
+
+    gridEngineHeadless.setFixedFacing("player", false);
+    expect(gridEngineHeadless.isFixedFacing("player")).toBe(false);
+
+    gridEngineHeadless.setState(state);
+    expect(gridEngineHeadless.isFixedFacing("player")).toBe(true);
+  });
+
   it("should delegate getTransition", () => {
     createDefaultGridEngine();
     gridEngineHeadless.setTransition({ x: 3, y: 4 }, "fromLayer", "toLayer");
@@ -2342,7 +2394,16 @@ describe("GridEngineHeadless", () => {
         gridEngineHeadless.getMovementProgress(UNKNOWN_CHAR_ID),
       );
       expectCharUnknownException(() =>
+        gridEngineHeadless.getMovementDirection(UNKNOWN_CHAR_ID),
+      );
+      expectCharUnknownException(() =>
         gridEngineHeadless.getFacingDirection(UNKNOWN_CHAR_ID),
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.isFixedFacing(UNKNOWN_CHAR_ID),
+      );
+      expectCharUnknownException(() =>
+        gridEngineHeadless.setFixedFacing(UNKNOWN_CHAR_ID, true),
       );
       expectCharUnknownException(() =>
         gridEngineHeadless.turnTowards(UNKNOWN_CHAR_ID, Direction.LEFT),
@@ -2473,7 +2534,16 @@ describe("GridEngineHeadless", () => {
         gridEngineHeadless.getMovementProgress(SOME_CHAR_ID),
       );
       expectUninitializedException(() =>
+        gridEngineHeadless.getMovementDirection(SOME_CHAR_ID),
+      );
+      expectUninitializedException(() =>
         gridEngineHeadless.getFacingDirection(SOME_CHAR_ID),
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.isFixedFacing(SOME_CHAR_ID),
+      );
+      expectUninitializedException(() =>
+        gridEngineHeadless.setFixedFacing(SOME_CHAR_ID, true),
       );
       expectUninitializedException(() =>
         gridEngineHeadless.turnTowards(SOME_CHAR_ID, Direction.LEFT),

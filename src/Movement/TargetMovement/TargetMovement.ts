@@ -529,6 +529,7 @@ export class TargetMovement implements Movement {
   }
 
   private turnTowardsTarget(pos: Vector2): void {
+    if (this.character.isFixedFacing()) return;
     const dir = this.getDir(this.character.getNextTilePos().position, pos);
     if (this.character.isMoving()) {
       // The character is still moving, so we need to wait until it has stopped,
@@ -537,7 +538,9 @@ export class TargetMovement implements Movement {
         .movementStopped()
         .pipe(take(1))
         .subscribe(() => {
-          this.character.turnTowards(dir);
+          if (!this.character.isFixedFacing()) {
+            this.character.turnTowards(dir);
+          }
         });
     } else {
       this.character.turnTowards(dir);

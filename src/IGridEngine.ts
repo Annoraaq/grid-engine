@@ -503,12 +503,38 @@ export interface IGridEngine {
    */
   isMoving(charId: string): boolean;
   /**
+   * @returns Direction the character is currently moving in, or
+   *  {@link Direction.NONE} if the character is not moving.
+   *
+   * @category Character
+   */
+  getMovementDirection(charId: string): Direction;
+
+  /**
    * @returns Direction the character is currently facing. At time of creation
    *  this is `down`.
    *
    * @category Character
    */
   getFacingDirection(charId: string): Direction;
+
+  /**
+   * @returns `true` if the character's facing direction is fixed and does not
+   *  automatically change when moving.
+   *
+   * @category Character
+   */
+  isFixedFacing(charId: string): boolean;
+
+  /**
+   * Enables or disables fixed facing direction for the character. When enabled,
+   * moving or bumping into obstacles will not change the character's facing
+   * direction. Explicit calls to {@link turnTowards} still update the facing
+   * direction.
+   *
+   * @category Character
+   */
+  setFixedFacing(charId: string, enabled: boolean): void;
 
   /**
    * @returns Position the character is currently facing.

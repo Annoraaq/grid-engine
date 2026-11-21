@@ -426,11 +426,29 @@ export declare class GridEngine implements IGridEngine {
      */
     isMoving(charId: string): boolean;
     /**
+     * {@inheritDoc IGridEngine.getMovementDirection}
+     *
+     * @category Character
+     */
+    getMovementDirection(charId: string): Direction;
+    /**
      * {@inheritDoc IGridEngine.getFacingDirection}
      *
      * @category Character
      */
     getFacingDirection(charId: string): Direction;
+    /**
+     * {@inheritDoc IGridEngine.isFixedFacing}
+     *
+     * @category Character
+     */
+    isFixedFacing(charId: string): boolean;
+    /**
+     * {@inheritDoc IGridEngine.setFixedFacing}
+     *
+     * @category Character
+     */
+    setFixedFacing(charId: string, enabled: boolean): void;
     /**
      * {@inheritDoc IGridEngine.getFacingPosition}
      *

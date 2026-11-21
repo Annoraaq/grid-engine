@@ -205,14 +205,15 @@ export class GridCharacterPhaser {
 
   private updatePixelPos() {
     let tp = new Vector2(this.geHeadless.getPosition(this.charData.id));
+    const movementDirection = this.geHeadless.getMovementDirection(
+      this.charData.id,
+    );
     if (this.geHeadless.isCurrentMovementReverted(this.charData.id)) {
       tp = new Vector2(
         this.geHeadless.getTilePosInDirection(
           this.geHeadless.getPosition(this.charData.id),
           this.geHeadless.getCharLayer(this.charData.id),
-          oppositeDirection(
-            this.geHeadless.getFacingDirection(this.charData.id),
-          ),
+          oppositeDirection(movementDirection),
         ).position,
       );
     }
@@ -224,11 +225,9 @@ export class GridCharacterPhaser {
       .add(this.getEngineOffset())
       .add(this.customOffset);
     const newPixelPos = basePixelPos.add(
-      directionVector(
-        this.geHeadless.getFacingDirection(this.charData.id),
-      ).multiply(
+      directionVector(movementDirection).multiply(
         this.tilemap
-          .getTileDistance(this.geHeadless.getFacingDirection(this.charData.id))
+          .getTileDistance(movementDirection)
           .scalarMult(movementProgressProportional),
       ),
     );

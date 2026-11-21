@@ -489,6 +489,55 @@ describe("TargetMovement", () => {
     expect(mockChar.getFacingDirection()).toEqual(Direction.UP);
   });
 
+  it("should not turn towards target when fixedFacing is true", () => {
+    const charPos = layerPos(new Vector2(1, 2));
+    const mockChar = createMockChar("char", charPos);
+    mockChar.turnTowards(Direction.LEFT);
+    mockChar.setFixedFacing(true);
+
+    targetMovement = new TargetMovement(
+      mockChar,
+      gridTilemap,
+      layerPos(new Vector2(1, 0)),
+      {
+        distance: 1,
+        config: {
+          algorithm: shortestPathAlgo,
+        },
+      },
+    );
+    targetMovement.init();
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
+    chunkUpdate(targetMovement, mockChar, CHUNKS_PER_SECOND);
+
+    expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
+    expect(mockChar.getFacingDirection()).toEqual(Direction.LEFT);
+  });
+
+  it("should not turn towards target if distance is already reached and fixedFacing is true", () => {
+    const charPos = layerPos(new Vector2(1, 1));
+    const mockChar = createMockChar("char", charPos);
+    mockChar.turnTowards(Direction.LEFT);
+    mockChar.setFixedFacing(true);
+
+    targetMovement = new TargetMovement(
+      mockChar,
+      gridTilemap,
+      layerPos(new Vector2(1, 0)),
+      {
+        distance: 1,
+        config: {
+          algorithm: shortestPathAlgo,
+        },
+      },
+    );
+    targetMovement.init();
+    targetMovement.update(100);
+
+    expect(mockChar.getTilePos()).toEqual(layerPos(new Vector2(1, 1)));
+    expect(mockChar.getFacingDirection()).toEqual(Direction.LEFT);
+  });
+
   it("should turn towards target if already at closest to target without moving", () => {
     const charPos = layerPos(new Vector2(1, 3));
     const mockChar = createMockChar("char", charPos);
