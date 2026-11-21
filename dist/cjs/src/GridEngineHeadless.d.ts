@@ -1,6 +1,6 @@
 import { CollisionStrategy } from "./Collisions/CollisionStrategy.js";
 import { Finished, MoveToConfig, MoveToResult } from "./Movement/TargetMovement/TargetMovement.js";
-import { PositionChange } from "./GridCharacter/GridCharacter.js";
+import { MovementBlocked, PositionChange } from "./GridCharacter/GridCharacter.js";
 import { Direction, NumberOfDirections } from "./Direction/Direction.js";
 import { Observable } from "rxjs";
 import { NoPathFoundStrategy } from "./Pathfinding/NoPathFoundStrategy.js";
@@ -15,7 +15,7 @@ import { QueueMovementConfig, QueueMovementEntry, Finished as QueueMovementFinis
 import { GridEngineState } from "./GridEngineState.js";
 import { IsPositionAllowedFn, PathfindingOptions } from "./Pathfinding/PathfindingOptions.js";
 import { CharLayer, LayerPosition, Position } from "./Position.js";
-export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, MovementInfo, PositionChange, IsPositionAllowedFn, PathfindingOptions, ShortestPathAlgorithmType, };
+export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, MovementBlocked, MovementInfo, PositionChange, IsPositionAllowedFn, PathfindingOptions, ShortestPathAlgorithmType, };
 export type TileSizePerSecond = number;
 /**
  * Configuration object for initializing GridEngineHeadless.
@@ -206,6 +206,7 @@ export declare class GridEngineHeadless implements IGridEngine {
     private isCreatedInternal;
     private movementStopped$?;
     private movementStarted$?;
+    private movementBlocked$?;
     private directionChanged$?;
     private positionChangeStarted$?;
     private positionChangeFinished$?;
@@ -502,6 +503,14 @@ export declare class GridEngineHeadless implements IGridEngine {
         charId: string;
         direction: Direction;
     }>;
+    /**
+     * {@inheritDoc IGridEngine.movementBlocked}
+     *
+     * @category Character
+     */
+    movementBlocked(): Observable<{
+        charId: string;
+    } & MovementBlocked>;
     /**
      * {@inheritDoc IGridEngine.directionChanged}
      *

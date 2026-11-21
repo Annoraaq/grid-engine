@@ -1216,6 +1216,46 @@ describe("GridEngineHeadless", () => {
       expect(nextMock).not.toHaveBeenCalled();
     });
 
+    it("should get chars movementBlocked observable", async () => {
+      createDefaultGridEngine();
+
+      const prom = gridEngineHeadless
+        .movementBlocked()
+        .pipe(take(1))
+        .toPromise();
+
+      gridEngineHeadless.move("player", Direction.LEFT);
+
+      expect(await prom).toEqual({
+        charId: "player",
+        direction: Direction.LEFT,
+        position: { x: -1, y: 0 },
+        layer: undefined,
+      });
+    });
+
+    it("should unsubscribe from movementBlocked if char removed", () => {
+      createDefaultGridEngine();
+
+      const nextMock = jest.fn();
+      gridEngineHeadless.movementBlocked().subscribe({
+        complete: jest.fn(),
+        next: nextMock,
+      });
+
+      gridEngineHeadless.move("player", Direction.LEFT);
+      gridEngineHeadless.removeCharacter("player");
+      expect(() => gridEngineHeadless.move("player", Direction.LEFT)).toThrow();
+
+      expect(nextMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("should throw error if movementBlocked is called before create", () => {
+      expect(() => gridEngineHeadless.movementBlocked()).toThrow(
+        "GridEngine not initialized. You need to call create() first.",
+      );
+    });
+
     it("should get chars directionChanged observable", async () => {
       createDefaultGridEngine();
 

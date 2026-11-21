@@ -4,7 +4,7 @@ import { Finished, MoveToConfig } from "./Movement/TargetMovement/TargetMovement
 import { QueueMovementConfig, QueueMovementEntry, Finished as QueueMovementFinished } from "./Movement/QueueMovement/QueueMovement.js";
 import { Observable } from "rxjs";
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter.js";
-import { CharId, PositionChange } from "./GridCharacter/GridCharacter.js";
+import { CharId, MovementBlocked, PositionChange } from "./GridCharacter/GridCharacter.js";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
 import { PathBlockedStrategy } from "./Pathfinding/PathBlockedStrategy.js";
 import { IsPositionAllowedFn, PathfindingOptions } from "./Pathfinding/PathfindingOptions.js";
@@ -604,6 +604,22 @@ export interface IGridEngine {
         charId: string;
         direction: Direction;
     }>;
+    /**
+     * @returns Observable that emits whenever a character attempts to move in a
+     *  direction that is blocked by a tile or another character. This includes
+     *  both stationary movement attempts via {@link move} and walking into a
+     *  blocked tile while already moving.
+     *
+     * Note that if {@link move} is called on every frame (e.g. inside Phaser's
+     * `update` loop while a key is held down), this observable will emit on every
+     * frame while the character pushes against the obstacle. Use RxJS operators
+     * such as `throttleTime` if you need to limit the emission rate.
+     *
+     * @category Character
+     */
+    movementBlocked(): Observable<{
+        charId: string;
+    } & MovementBlocked>;
     /**
      * @returns Observable that will notify about every change of direction that
      *  is not part of a movement. This is the case if the character tries to walk
