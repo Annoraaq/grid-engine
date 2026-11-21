@@ -38,7 +38,7 @@ import { Pathfinding } from "./Pathfinding/Pathfinding.js";
 import { LayerPositionUtils } from "./Utils/LayerPositionUtils/LayerPositionUtils.js";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
 import { GridTilemap } from "./GridTilemap/GridTilemap.js";
-import { Tilemap } from "./GridTilemap/Tilemap.js";
+import { IsTileBlockingFn, Tilemap } from "./GridTilemap/Tilemap.js";
 import {
   CharacterShift,
   CharacterShiftAction,
@@ -77,6 +77,7 @@ export {
   MovementInfo,
   PositionChange,
   IsPositionAllowedFn,
+  IsTileBlockingFn,
   PathfindingOptions,
   ShortestPathAlgorithmType,
 };
@@ -143,6 +144,19 @@ export interface GridEngineConfigHeadless {
    * collides with itself.
    */
   collisionGroupRelation?: Record<string, string[]>;
+
+  /**
+   * Custom function to determine whether a tile is blocking.
+   *
+   * When provided, this replaces GridEngine's default tile collision logic
+   * (including missing-tile checks and `ge_collide` tile properties).
+   *
+   * Beware that this function is called frequently (especially during
+   * pathfinding), so keep it as fast as possible. If your custom collision
+   * logic is static or changes infrequently, you can combine it with
+   * {@link GridEngineConfigHeadless.cacheTileCollisions}.
+   */
+  isTileBlocking?: IsTileBlockingFn;
 }
 
 /**
@@ -285,9 +299,10 @@ export interface CharacterDataHeadless {
 
 interface ConcreteConfig extends Omit<
   Required<GridEngineConfigHeadless>,
-  "collisionGroupRelation"
+  "collisionGroupRelation" | "isTileBlocking"
 > {
   collisionGroupRelation?: Record<string, string[]>;
+  isTileBlocking?: IsTileBlockingFn;
 }
 
 /**
@@ -396,6 +411,7 @@ export class GridEngineHeadless implements IGridEngine {
       this.config.characterCollisionStrategy,
       this.recordToMap(this.config.collisionGroupRelation),
       this.config.cacheTileCollisions,
+      this.config.isTileBlocking,
     );
     this.addCharacters();
   }

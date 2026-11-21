@@ -9,13 +9,13 @@ import { MovementInfo } from "./Movement/Movement.js";
 import { FrameRow } from "./GridCharacter/CharacterAnimation/CharacterAnimation.js";
 import { CharacterFilteringOptions } from "./GridCharacter/CharacterFilter/CharacterFilter.js";
 import { ShortestPathAlgorithmType } from "./Pathfinding/ShortestPathAlgorithm.js";
-import { Tilemap } from "./GridTilemap/Tilemap.js";
+import { IsTileBlockingFn, Tilemap } from "./GridTilemap/Tilemap.js";
 import { CharacterShift, FleeOptions, FollowOptions, IGridEngine, PathfindingResult } from "./IGridEngine.js";
 import { QueueMovementConfig, QueueMovementEntry, Finished as QueueMovementFinished } from "./Movement/QueueMovement/QueueMovement.js";
 import { GridEngineState } from "./GridEngineState.js";
 import { IsPositionAllowedFn, PathfindingOptions } from "./Pathfinding/PathfindingOptions.js";
 import { CharLayer, LayerPosition, Position } from "./Position.js";
-export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, MovementBlocked, MovementInfo, PositionChange, IsPositionAllowedFn, PathfindingOptions, ShortestPathAlgorithmType, };
+export { CollisionStrategy, CharacterFilteringOptions, Direction, MoveToConfig, MoveToResult, Finished, FrameRow, NumberOfDirections, NoPathFoundStrategy, PathBlockedStrategy, MovementBlocked, MovementInfo, PositionChange, IsPositionAllowedFn, IsTileBlockingFn, PathfindingOptions, ShortestPathAlgorithmType, };
 export type TileSizePerSecond = number;
 /**
  * Configuration object for initializing GridEngineHeadless.
@@ -72,6 +72,18 @@ export interface GridEngineConfigHeadless {
      * collides with itself.
      */
     collisionGroupRelation?: Record<string, string[]>;
+    /**
+     * Custom function to determine whether a tile is blocking.
+     *
+     * When provided, this replaces GridEngine's default tile collision logic
+     * (including missing-tile checks and `ge_collide` tile properties).
+     *
+     * Beware that this function is called frequently (especially during
+     * pathfinding), so keep it as fast as possible. If your custom collision
+     * logic is static or changes infrequently, you can combine it with
+     * {@link GridEngineConfigHeadless.cacheTileCollisions}.
+     */
+    isTileBlocking?: IsTileBlockingFn;
 }
 /**
  * @category Configuration

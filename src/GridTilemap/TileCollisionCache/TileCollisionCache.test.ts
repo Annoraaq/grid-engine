@@ -311,4 +311,66 @@ describe("TileCollisionCache", () => {
       tileCollisionCache.isBlockingFrom(1, 0, "upperCharLayer", undefined),
     ).toBe(false);
   });
+
+  it("caches custom isTileBlocking separately for ignoreHasTile true and false", () => {
+    const tm = mockLayeredBlockMap([
+      {
+        layer: "lowerCharLayer",
+        blockMap: [
+          // prettier-ignore
+          "..",
+          "..",
+        ],
+      },
+    ]);
+    tm.hasTileAt = (x, y) => !(x === 1 && y === 1);
+
+    const gridTilemap = new GridTilemap(
+      tm,
+      "ge_collide",
+      CollisionStrategy.BLOCK_TWO_TILES,
+      undefined,
+      false,
+      (pos, _charLayer, direction, ignoreMissingTiles) => {
+        if (pos.x === 0 && pos.y === 0) {
+          return !ignoreMissingTiles && direction === Direction.LEFT;
+        }
+        // Passable even though hasTileAt is false at (1, 1)
+        if (pos.x === 1 && pos.y === 1) {
+          return false;
+        }
+        return false;
+      },
+    );
+    const tileCollisionCache = new TileCollisionCache(tm, gridTilemap);
+    tileCollisionCache.rebuild();
+
+    expect(
+      tileCollisionCache.isBlockingFrom(
+        0,
+        0,
+        "lowerCharLayer",
+        Direction.LEFT,
+        false,
+      ),
+    ).toBe(true);
+    expect(
+      tileCollisionCache.isBlockingFrom(
+        0,
+        0,
+        "lowerCharLayer",
+        Direction.LEFT,
+        true,
+      ),
+    ).toBe(false);
+    expect(
+      tileCollisionCache.isBlockingFrom(
+        1,
+        1,
+        "lowerCharLayer",
+        undefined,
+        false,
+      ),
+    ).toBe(false);
+  });
 });

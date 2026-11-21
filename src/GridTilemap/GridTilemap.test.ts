@@ -1322,6 +1322,199 @@ describe("GridTilemap", () => {
     });
   });
 
+  describe("custom isTileBlocking", () => {
+    it("should delegate tile blocking checks to custom function", () => {
+      const tm = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".#",
+            "..",
+          ],
+        },
+      ]);
+      const isTileBlocking = jest.fn(
+        (pos, charLayer, direction, ignoreMissingTiles) => {
+          if (pos.x === 0 && pos.y === 0) return true;
+          if (pos.x === 1 && pos.y === 0) return false;
+          if (pos.x === 0 && pos.y === 1) return direction === Direction.LEFT;
+          if (pos.x === 1 && pos.y === 1) return !ignoreMissingTiles;
+          return false;
+        },
+      );
+      const customGridTilemap = new GridTilemap(
+        tm,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES,
+        undefined,
+        false,
+        isTileBlocking,
+      );
+
+      expect(customGridTilemap.hasCustomTileBlocking()).toBe(true);
+      expect(
+        customGridTilemap.hasBlockingTile(new Vector2(0, 0), "lowerCharLayer"),
+      ).toBe(true);
+      expect(isTileBlocking).toHaveBeenCalledWith(
+        { x: 0, y: 0 },
+        "lowerCharLayer",
+        undefined,
+        undefined,
+      );
+
+      // Overrides ge_collide: true tile at (1, 0)
+      expect(
+        customGridTilemap.hasBlockingTile(new Vector2(1, 0), "lowerCharLayer"),
+      ).toBe(false);
+
+      // Direction-dependent blocking
+      expect(
+        customGridTilemap.hasBlockingTile(
+          new Vector2(0, 1),
+          "lowerCharLayer",
+          Direction.LEFT,
+        ),
+      ).toBe(true);
+      expect(
+        customGridTilemap.hasBlockingTile(
+          new Vector2(0, 1),
+          "lowerCharLayer",
+          Direction.RIGHT,
+        ),
+      ).toBe(false);
+
+      // ignoreMissingTiles forwarded
+      expect(
+        customGridTilemap.hasBlockingTile(
+          new Vector2(1, 1),
+          "lowerCharLayer",
+          undefined,
+          false,
+        ),
+      ).toBe(true);
+      expect(
+        customGridTilemap.hasBlockingTile(
+          new Vector2(1, 1),
+          "lowerCharLayer",
+          undefined,
+          true,
+        ),
+      ).toBe(false);
+
+      // Also controls missing/out-of-bounds tiles
+      expect(
+        customGridTilemap.hasBlockingTile(
+          new Vector2(5, 5),
+          "lowerCharLayer",
+          undefined,
+          false,
+        ),
+      ).toBe(false);
+    });
+
+    it("should work with tile collision cache enabled", () => {
+      const tm = mockLayeredBlockMap([
+        {
+          layer: "lowerCharLayer",
+          blockMap: [
+            // prettier-ignore
+            ".#",
+            "..",
+          ],
+        },
+      ]);
+      // Make (1, 1) have no tile
+      tm.getTileAt = (x, y, layer) => {
+        if (x === 1 && y === 1) return undefined;
+        return MockTilemap.prototype.getTileAt.call(tm, x, y, layer);
+      };
+      tm.hasTileAt = (x, y, layer) => {
+        if (x === 1 && y === 1) return false;
+        return MockTilemap.prototype.hasTileAt.call(tm, x, y, layer);
+      };
+
+      let blockOrigin = true;
+      const isTileBlocking = jest.fn(
+        (pos, _charLayer, direction, ignoreMissingTiles) => {
+          if (pos.x === 0 && pos.y === 0) return blockOrigin;
+          // Override missing tile at (1, 1) to be passable even when ignoreMissingTiles is false
+          if (pos.x === 1 && pos.y === 1) return false;
+          // Differentiate ignoreMissingTiles at (0, 1)
+          if (pos.x === 0 && pos.y === 1) return !ignoreMissingTiles;
+          // Directional at (1, 0)
+          if (pos.x === 1 && pos.y === 0) return direction === Direction.UP;
+          return false;
+        },
+      );
+
+      const customGridTilemap = new GridTilemap(
+        tm,
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES,
+        undefined,
+        true,
+        isTileBlocking,
+      );
+
+      isTileBlocking.mockClear();
+
+      expect(
+        customGridTilemap.hasBlockingTile(new Vector2(0, 0), "lowerCharLayer"),
+      ).toBe(true);
+      expect(
+        customGridTilemap.hasBlockingTile(
+          new Vector2(1, 1),
+          "lowerCharLayer",
+          undefined,
+          false,
+        ),
+      ).toBe(false);
+      expect(
+        customGridTilemap.hasBlockingTile(
+          new Vector2(0, 1),
+          "lowerCharLayer",
+          undefined,
+          false,
+        ),
+      ).toBe(true);
+      expect(
+        customGridTilemap.hasBlockingTile(
+          new Vector2(0, 1),
+          "lowerCharLayer",
+          undefined,
+          true,
+        ),
+      ).toBe(false);
+      expect(
+        customGridTilemap.hasBlockingTile(
+          new Vector2(1, 0),
+          "lowerCharLayer",
+          Direction.UP,
+          false,
+        ),
+      ).toBe(true);
+      expect(
+        customGridTilemap.hasBlockingTile(
+          new Vector2(1, 0),
+          "lowerCharLayer",
+          Direction.DOWN,
+          false,
+        ),
+      ).toBe(false);
+
+      // Should have been served from cache
+      expect(isTileBlocking).not.toHaveBeenCalled();
+
+      // Rebuilding cache picks up dynamic changes
+      blockOrigin = false;
+      customGridTilemap.rebuildTileCollisionCache();
+      expect(
+        customGridTilemap.hasBlockingTile(new Vector2(0, 0), "lowerCharLayer"),
+      ).toBe(false);
+    });
+  });
+
   function createChar(
     id: string,
     gridTilemap: GridTilemap,

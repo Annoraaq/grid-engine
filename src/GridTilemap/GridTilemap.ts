@@ -10,7 +10,12 @@ import { Rect } from "../Utils/Rect/Rect.js";
 import { CharId, GridCharacter } from "../GridCharacter/GridCharacter.js";
 import { CollisionStrategy } from "../Collisions/CollisionStrategy.js";
 import { CharLayer } from "../GridEngine.js";
-import { CHAR_LAYER_PROP_NAME, TileLayer, Tilemap } from "./Tilemap.js";
+import {
+  CHAR_LAYER_PROP_NAME,
+  IsTileBlockingFn,
+  TileLayer,
+  Tilemap,
+} from "./Tilemap.js";
 import { TileCollisionCache } from "./TileCollisionCache/TileCollisionCache.js";
 import { Vector2 } from "../Utils/Vector2/Vector2.js";
 import { LayerVecPos } from "../Utils/LayerPositionUtils/LayerPositionUtils.js";
@@ -46,6 +51,7 @@ export class GridTilemap {
     collisionStrategy: CollisionStrategy,
     collisionGroupRelation: Map<string, Set<string>> | undefined = undefined,
     private useTileCollisionCache = false,
+    private isTileBlockingFn?: IsTileBlockingFn,
   ) {
     this.charBlockCache = new CharBlockCache(
       collisionStrategy,
@@ -111,6 +117,10 @@ export class GridTilemap {
     this.tileCollisionCache?.rebuild(rect);
   }
 
+  hasCustomTileBlocking(): boolean {
+    return !!this.isTileBlockingFn;
+  }
+
   // Performance critical method.
   hasBlockingTileUncached(
     pos: Vector2,
@@ -118,6 +128,14 @@ export class GridTilemap {
     direction?: Direction,
     ignoreHasTile?: boolean,
   ): boolean {
+    if (this.isTileBlockingFn) {
+      return this.isTileBlockingFn(
+        { x: pos.x, y: pos.y },
+        charLayer,
+        direction,
+        ignoreHasTile,
+      );
+    }
     if (!ignoreHasTile && this.hasNoTileUncached(pos, charLayer)) return true;
 
     // Keep out of loop for performance.
