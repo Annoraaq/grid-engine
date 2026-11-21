@@ -63,6 +63,7 @@ export default defineConfig({
           { text: 'Ice Movement', link: '/examples/ice-movement/index.md' },
           { text: 'Is Moving', link: '/examples/is-moving/index.md' },
           { text: 'Isometric', link: '/examples/isometric/index.md' },
+          { text: 'Movement Blocked', link: '/examples/movement-blocked/index.md' },
           { text: 'One-Way Collision', link: '/examples/one-way-collision/index.md' },
           { text: 'Phaser Containers', link: '/examples/phaser-container/index.md' },
           { text: 'Position Changed', link: '/examples/position-changed/index.md' },

@@ -1505,4 +1505,266 @@ describe("GridCharacter", () => {
       expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
     });
   });
+
+  describe("movementBlocked", () => {
+    it("should emit when stationary and blocked by a tile", () => {
+      const { gridCharacter, gridTilemap } =
+        createDefaultTilemapMock("lowerCharLayer");
+      gridTilemap.hasBlockingTile = jest.fn().mockReturnValue(true);
+
+      const events: any[] = [];
+      let facingDuringCallback: Direction | undefined;
+      gridCharacter.movementBlocked().subscribe((event) => {
+        events.push(event);
+        facingDuringCallback = gridCharacter.getFacingDirection();
+      });
+
+      gridCharacter.move(Direction.RIGHT);
+
+      expect(events).toEqual([
+        {
+          direction: Direction.RIGHT,
+          position: new Vector2(1, 0),
+          layer: "lowerCharLayer",
+        },
+      ]);
+      expect(facingDuringCallback).toEqual(Direction.RIGHT);
+    });
+
+    it("should emit when stationary and blocked by another character", () => {
+      const { gridCharacter, gridTilemap } = createDefaultTilemapMock(
+        "lowerCharLayer",
+        { collisionGroups: ["group1"] },
+      );
+      const otherChar = new GridCharacter("other", {
+        speed: 3,
+        collidesWithTiles: true,
+        collisionGroups: ["group1"],
+        numberOfDirections: NumberOfDirections.FOUR,
+        tilemap: gridTilemap,
+        charLayer: "lowerCharLayer",
+      });
+      otherChar.setTilePosition({
+        position: new Vector2(1, 0),
+        layer: "lowerCharLayer",
+      });
+      gridTilemap.addCharacter(otherChar);
+
+      const blockedMock = jest.fn();
+      gridCharacter.movementBlocked().subscribe(blockedMock);
+
+      gridCharacter.move(Direction.RIGHT);
+
+      expect(blockedMock).toHaveBeenCalledTimes(1);
+      expect(blockedMock).toHaveBeenCalledWith({
+        direction: Direction.RIGHT,
+        position: new Vector2(1, 0),
+        layer: "lowerCharLayer",
+      });
+    });
+
+    it("should emit when walking continuously into a blocked tile", () => {
+      const gridTilemap = new GridTilemap(
+        mockBlockMap(
+          [
+            // prettier-ignore
+            "..#",
+            "...",
+            "...",
+          ],
+          "lowerCharLayer",
+        ),
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES,
+      );
+      const gridCharacter = new GridCharacter("player", {
+        speed: 4,
+        collidesWithTiles: true,
+        numberOfDirections: NumberOfDirections.FOUR,
+        tilemap: gridTilemap,
+        charLayer: "lowerCharLayer",
+      });
+      gridTilemap.addCharacter(gridCharacter);
+
+      const callOrder: string[] = [];
+      let stateDuringBlocked: { pos: Vector2; moving: boolean } | undefined;
+
+      gridCharacter.movementStopped().subscribe(() => {
+        callOrder.push("movementStopped");
+      });
+      gridCharacter.positionChangeFinished().subscribe(() => {
+        callOrder.push("positionChangeFinished");
+      });
+      gridCharacter.movementBlocked().subscribe((event) => {
+        callOrder.push("movementBlocked");
+        stateDuringBlocked = {
+          pos: gridCharacter.getTilePos().position,
+          moving: gridCharacter.isMoving(),
+        };
+        expect(event).toEqual({
+          direction: Direction.RIGHT,
+          position: new Vector2(2, 0),
+          layer: "lowerCharLayer",
+        });
+      });
+
+      gridCharacter.move(Direction.RIGHT);
+      gridCharacter.update(100);
+      // Still holding RIGHT as we cross into (1, 0) where (2, 0) is blocked
+      gridCharacter.move(Direction.RIGHT);
+      gridCharacter.update(200);
+
+      expect(callOrder).toEqual([
+        "movementStopped",
+        "positionChangeFinished",
+        "movementBlocked",
+      ]);
+      expect(stateDuringBlocked).toEqual({
+        pos: new Vector2(1, 0),
+        moving: false,
+      });
+    });
+
+    it("should not emit when stopping naturally in front of a blocked tile", () => {
+      const gridTilemap = new GridTilemap(
+        mockBlockMap(
+          [
+            // prettier-ignore
+            "..#",
+            "...",
+            "...",
+          ],
+          "lowerCharLayer",
+        ),
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES,
+      );
+      const gridCharacter = new GridCharacter("player", {
+        speed: 4,
+        collidesWithTiles: true,
+        numberOfDirections: NumberOfDirections.FOUR,
+        tilemap: gridTilemap,
+        charLayer: "lowerCharLayer",
+      });
+      gridTilemap.addCharacter(gridCharacter);
+
+      const blockedMock = jest.fn();
+      gridCharacter.movementBlocked().subscribe(blockedMock);
+
+      gridCharacter.move(Direction.RIGHT);
+      gridCharacter.update(100);
+      // No move() impulse on arrival frame
+      gridCharacter.update(200);
+
+      expect(gridCharacter.getTilePos().position).toEqual(new Vector2(1, 0));
+      expect(blockedMock).not.toHaveBeenCalled();
+    });
+
+    it("should include transition layer when blocked on a transition tile", () => {
+      const gridTilemap = new GridTilemap(
+        mockLayeredBlockMap([
+          {
+            layer: "lower",
+            blockMap: [
+              // prettier-ignore
+              "...",
+              "...",
+            ],
+          },
+          {
+            layer: "upper",
+            blockMap: [
+              // prettier-ignore
+              ".#.",
+              "...",
+            ],
+          },
+        ]),
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES,
+      );
+      gridTilemap.setTransition(new Vector2(1, 0), "lower", "upper");
+      const gridCharacter = new GridCharacter("player", {
+        speed: 4,
+        collidesWithTiles: true,
+        numberOfDirections: NumberOfDirections.FOUR,
+        tilemap: gridTilemap,
+        charLayer: "lower",
+      });
+      gridTilemap.addCharacter(gridCharacter);
+
+      const blockedMock = jest.fn();
+      gridCharacter.movementBlocked().subscribe(blockedMock);
+
+      gridCharacter.move(Direction.RIGHT);
+
+      expect(blockedMock).toHaveBeenCalledTimes(1);
+      expect(blockedMock).toHaveBeenCalledWith({
+        direction: Direction.RIGHT,
+        position: new Vector2(1, 0),
+        layer: "upper",
+      });
+    });
+
+    it("should still emit when fixedFacing is enabled", () => {
+      const { gridCharacter, gridTilemap } =
+        createDefaultTilemapMock("lowerCharLayer");
+      gridTilemap.hasBlockingTile = jest.fn().mockReturnValue(true);
+      gridCharacter.turnTowards(Direction.UP);
+      gridCharacter.setFixedFacing(true);
+
+      const blockedMock = jest.fn();
+      gridCharacter.movementBlocked().subscribe(blockedMock);
+
+      gridCharacter.move(Direction.LEFT);
+
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
+      expect(blockedMock).toHaveBeenCalledTimes(1);
+      expect(blockedMock).toHaveBeenCalledWith({
+        direction: Direction.LEFT,
+        position: new Vector2(-1, 0),
+        layer: "lowerCharLayer",
+      });
+    });
+
+    it("should not emit if positionChangeFinished teleports character", () => {
+      const gridTilemap = new GridTilemap(
+        mockBlockMap(
+          [
+            // prettier-ignore
+            "..#",
+            "...",
+            "...",
+          ],
+          "lowerCharLayer",
+        ),
+        "ge_collide",
+        CollisionStrategy.BLOCK_TWO_TILES,
+      );
+      const gridCharacter = new GridCharacter("player", {
+        speed: 4,
+        collidesWithTiles: true,
+        numberOfDirections: NumberOfDirections.FOUR,
+        tilemap: gridTilemap,
+        charLayer: "lowerCharLayer",
+      });
+      gridTilemap.addCharacter(gridCharacter);
+
+      const blockedMock = jest.fn();
+      gridCharacter.movementBlocked().subscribe(blockedMock);
+      gridCharacter.positionChangeFinished().subscribe(() => {
+        gridCharacter.setTilePosition({
+          position: new Vector2(0, 1),
+          layer: "lowerCharLayer",
+        });
+      });
+
+      gridCharacter.move(Direction.RIGHT);
+      gridCharacter.update(100);
+      gridCharacter.move(Direction.RIGHT);
+      gridCharacter.update(200);
+
+      expect(blockedMock).not.toHaveBeenCalled();
+    });
+  });
 });

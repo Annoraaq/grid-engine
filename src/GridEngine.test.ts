@@ -1302,6 +1302,41 @@ describe("GridEngine", () => {
       expect(nextMock).not.toHaveBeenCalled();
     });
 
+    it("should get chars movementBlocked observable", async () => {
+      gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+        characters: [{ id: "player", sprite: playerSpriteMock }],
+      });
+
+      const prom = gridEngine.movementBlocked().pipe(take(1)).toPromise();
+
+      gridEngine.move("player", Direction.LEFT);
+
+      expect(await prom).toEqual({
+        charId: "player",
+        direction: Direction.LEFT,
+        position: { x: -1, y: 0 },
+        layer: "someLayer",
+      });
+    });
+
+    it("should unsubscribe from movementBlocked if char removed", () => {
+      gridEngine.create(createDefaultMockWithLayer("someLayer"), {
+        characters: [{ id: "player", sprite: playerSpriteMock }],
+      });
+
+      const nextMock = jest.fn();
+      gridEngine.movementBlocked().subscribe({
+        complete: jest.fn(),
+        next: nextMock,
+      });
+
+      gridEngine.move("player", Direction.LEFT);
+      gridEngine.removeCharacter("player");
+      expect(() => gridEngine.move("player", Direction.LEFT)).toThrow();
+
+      expect(nextMock).toHaveBeenCalledTimes(1);
+    });
+
     it("should get chars directionChanged observable", async () => {
       gridEngine.create(createDefaultMockWithLayer("someLayer"), {
         characters: [{ id: "player", sprite: playerSpriteMock }],

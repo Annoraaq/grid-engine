@@ -6,7 +6,10 @@ import {
   MoveToInfo,
   MoveToResult,
 } from "./Movement/TargetMovement/TargetMovement.js";
-import { PositionChange } from "./GridCharacter/GridCharacter.js";
+import {
+  MovementBlocked,
+  PositionChange,
+} from "./GridCharacter/GridCharacter.js";
 import {
   Direction,
   NumberOfDirections,
@@ -109,6 +112,7 @@ export {
   IGridEngine,
   IsPositionAllowedFn,
   LayerPosition,
+  MovementBlocked,
   MovementInfo,
   MoveToConfig,
   MoveToInfo,
@@ -1036,6 +1040,15 @@ export class GridEngine implements IGridEngine {
    */
   movementStopped(): Observable<{ charId: string; direction: Direction }> {
     return this.geHeadless.movementStopped();
+  }
+
+  /**
+   * {@inheritDoc IGridEngine.movementBlocked}
+   *
+   * @category Character
+   */
+  movementBlocked(): Observable<{ charId: string } & MovementBlocked> {
+    return this.geHeadless.movementBlocked();
   }
 
   /**

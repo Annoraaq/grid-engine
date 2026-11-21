@@ -30,6 +30,12 @@ export interface PositionChange {
   enterLayer: CharLayer;
 }
 
+export interface MovementBlocked {
+  direction: Direction;
+  position: Position;
+  layer: CharLayer;
+}
+
 export interface CharConfig {
   charLayer?: string;
   collidesWithTiles: boolean;
@@ -57,6 +63,7 @@ export class GridCharacter {
   private speed: number;
   private movementStarted$ = new Subject<Direction>();
   private movementStopped$ = new Subject<Direction>();
+  private movementBlocked$ = new Subject<MovementBlocked>();
   private directionChanged$ = new Subject<Direction>();
   private positionChangeStarted$ = new Subject<PositionChange>();
   private positionChangeFinished$ = new Subject<PositionChange>();
@@ -203,6 +210,7 @@ export class GridCharacter {
       if (!this.fixedFacing) {
         this.changeFacingDirection(direction);
       }
+      this.fireMovementBlocked(direction);
     } else {
       this.startMoving(direction);
     }
@@ -392,6 +400,10 @@ export class GridCharacter {
     return this.movementStopped$;
   }
 
+  movementBlocked(): Subject<MovementBlocked> {
+    return this.movementBlocked$;
+  }
+
   directionChanged(): Subject<Direction> {
     return this.directionChanged$;
   }
@@ -466,7 +478,14 @@ export class GridCharacter {
           this.updateCharacterPosition(delta * proportionToWalk);
         }
       } else {
+        const blockedDirection =
+          this.lastMovementImpulse !== Direction.NONE
+            ? this.lastMovementImpulse
+            : undefined;
         this.stopMoving();
+        if (blockedDirection && this.lastMovementImpulse === blockedDirection) {
+          this.fireMovementBlocked(blockedDirection);
+        }
       }
     }
   }
@@ -527,6 +546,18 @@ export class GridCharacter {
     { position: enterTile, layer: enterLayer }: LayerVecPos,
   ): void {
     subject.next({ exitTile, enterTile, exitLayer, enterLayer });
+  }
+
+  private fireMovementBlocked(direction: Direction): void {
+    const blockedTile = this.tilemap.getTilePosInDirection(
+      this.getNextTilePos(),
+      direction,
+    );
+    this.movementBlocked$.next({
+      direction,
+      position: blockedTile.position,
+      layer: blockedTile.layer,
+    });
   }
 
   private someCharTile(predicate: (x: number, y: number) => boolean): boolean {

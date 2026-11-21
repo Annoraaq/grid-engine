@@ -16,6 +16,11 @@ export interface PositionChange {
     exitLayer: CharLayer;
     enterLayer: CharLayer;
 }
+export interface MovementBlocked {
+    direction: Direction;
+    position: Position;
+    layer: CharLayer;
+}
 export interface CharConfig {
     charLayer?: string;
     collidesWithTiles: boolean;
@@ -39,6 +44,7 @@ export declare class GridCharacter {
     private speed;
     private movementStarted$;
     private movementStopped$;
+    private movementBlocked$;
     private directionChanged$;
     private positionChangeStarted$;
     private positionChangeFinished$;
@@ -105,6 +111,7 @@ export declare class GridCharacter {
     getNumberOfDirections(): NumberOfDirections;
     movementStarted(): Subject<Direction>;
     movementStopped(): Subject<Direction>;
+    movementBlocked(): Subject<MovementBlocked>;
     directionChanged(): Subject<Direction>;
     tilePositionSet(): Subject<LayerVecPos>;
     positionChangeStarted(): Subject<PositionChange>;
@@ -124,5 +131,6 @@ export declare class GridCharacter {
     private shouldContinueMoving;
     private stopMoving;
     private fire;
+    private fireMovementBlocked;
     private someCharTile;
 }

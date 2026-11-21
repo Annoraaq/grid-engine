@@ -10,6 +10,7 @@ import {
 import {
   CharConfig,
   GridCharacter,
+  MovementBlocked,
   PositionChange,
 } from "./GridCharacter/GridCharacter.js";
 import {
@@ -72,6 +73,7 @@ export {
   NumberOfDirections,
   NoPathFoundStrategy,
   PathBlockedStrategy,
+  MovementBlocked,
   MovementInfo,
   PositionChange,
   IsPositionAllowedFn,
@@ -298,6 +300,7 @@ export class GridEngineHeadless implements IGridEngine {
   private isCreatedInternal = false;
   private movementStopped$?: Subject<{ charId: string; direction: Direction }>;
   private movementStarted$?: Subject<{ charId: string; direction: Direction }>;
+  private movementBlocked$?: Subject<{ charId: string } & MovementBlocked>;
   private directionChanged$?: Subject<{ charId: string; direction: Direction }>;
   private positionChangeStarted$?: Subject<{ charId: string } & PositionChange>;
   private positionChangeFinished$?: Subject<
@@ -370,6 +373,7 @@ export class GridEngineHeadless implements IGridEngine {
       charId: string;
       direction: Direction;
     }>();
+    this.movementBlocked$ = new Subject<{ charId: string } & MovementBlocked>();
     this.directionChanged$ = new Subject<{
       charId: string;
       direction: Direction;
@@ -626,6 +630,12 @@ export class GridEngineHeadless implements IGridEngine {
       .pipe(takeUntil(this.charRemoved(id)))
       .subscribe((direction: Direction) => {
         this.movementStarted$?.next({ charId: id, direction });
+      });
+    gridChar
+      .movementBlocked()
+      .pipe(takeUntil(this.charRemoved(id)))
+      .subscribe((movementBlocked: MovementBlocked) => {
+        this.movementBlocked$?.next({ charId: id, ...movementBlocked });
       });
     gridChar
       .directionChanged()
@@ -1197,6 +1207,16 @@ export class GridEngineHeadless implements IGridEngine {
   movementStopped(): Observable<{ charId: string; direction: Direction }> {
     if (!this.movementStopped$) throw this.createUninitializedErr();
     return this.movementStopped$;
+  }
+
+  /**
+   * {@inheritDoc IGridEngine.movementBlocked}
+   *
+   * @category Character
+   */
+  movementBlocked(): Observable<{ charId: string } & MovementBlocked> {
+    if (!this.movementBlocked$) throw this.createUninitializedErr();
+    return this.movementBlocked$;
   }
 
   /**
