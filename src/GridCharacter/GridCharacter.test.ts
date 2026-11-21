@@ -1404,4 +1404,105 @@ describe("GridCharacter", () => {
       expect(gridCharacter.isCurrentMovementReverted()).toEqual(false);
     });
   });
+
+  describe("fixedFacing", () => {
+    it("should default fixedFacing to false", () => {
+      const { gridCharacter } = createDefaultTilemapMock("lowerCharLayer");
+      expect(gridCharacter.isFixedFacing()).toBe(false);
+    });
+
+    it("should initialize fixedFacing from config", () => {
+      const { gridCharacter } = createDefaultTilemapMock("lowerCharLayer", {
+        facingDirection: Direction.UP,
+        fixedFacing: true,
+      });
+
+      expect(gridCharacter.isFixedFacing()).toBe(true);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
+    });
+
+    it("should keep facing direction and facing position while moving in another direction", () => {
+      const { gridCharacter } = createDefaultTilemapMock("lowerCharLayer");
+      gridCharacter.setTilePosition({
+        position: new Vector2(2, 2),
+        layer: "lowerCharLayer",
+      });
+      gridCharacter.turnTowards(Direction.UP);
+      gridCharacter.setFixedFacing(true);
+
+      gridCharacter.move(Direction.DOWN);
+      expect(gridCharacter.getMovementDirection()).toEqual(Direction.DOWN);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
+
+      gridCharacter.update(1000);
+      expect(gridCharacter.getTilePos().position).toEqual(new Vector2(2, 3));
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
+      expect(gridCharacter.getFacingPosition()).toEqual(new Vector2(2, 2));
+    });
+
+    it("should not change facing direction or emit directionChanged when blocked", () => {
+      const { gridCharacter, gridTilemap } =
+        createDefaultTilemapMock("lowerCharLayer");
+      gridTilemap.hasBlockingTile = jest.fn().mockReturnValue(true);
+      gridCharacter.turnTowards(Direction.UP);
+      gridCharacter.setFixedFacing(true);
+
+      const dirChangedMock = jest.fn();
+      gridCharacter.directionChanged().subscribe(dirChangedMock);
+
+      gridCharacter.move(Direction.LEFT);
+
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
+      expect(dirChangedMock).not.toHaveBeenCalled();
+    });
+
+    it("should still allow explicit turnTowards when fixedFacing is true", () => {
+      const { gridCharacter } = createDefaultTilemapMock("lowerCharLayer");
+      gridCharacter.turnTowards(Direction.UP);
+      gridCharacter.setFixedFacing(true);
+
+      const dirChangedMock = jest.fn();
+      gridCharacter.directionChanged().subscribe(dirChangedMock);
+
+      gridCharacter.turnTowards(Direction.RIGHT);
+
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
+      expect(dirChangedMock).toHaveBeenCalledTimes(1);
+      expect(dirChangedMock).toHaveBeenCalledWith(Direction.RIGHT);
+    });
+
+    it("should keep facing direction and emit movement directions on revertCurrentMovement", () => {
+      const { gridCharacter } = createDefaultTilemapMock("lowerCharLayer");
+      gridCharacter.turnTowards(Direction.LEFT);
+      gridCharacter.setFixedFacing(true);
+
+      const movementStartedMock = jest.fn();
+      const movementStoppedMock = jest.fn();
+      gridCharacter.movementStarted().subscribe(movementStartedMock);
+      gridCharacter.movementStopped().subscribe(movementStoppedMock);
+
+      gridCharacter.move(Direction.DOWN);
+      gridCharacter.update(QUARTER_SECOND);
+      gridCharacter.revertCurrentMovement();
+
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.LEFT);
+      expect(gridCharacter.getMovementDirection()).toEqual(Direction.UP);
+      expect(movementStoppedMock).toHaveBeenCalledWith(Direction.DOWN);
+      expect(movementStartedMock).toHaveBeenLastCalledWith(Direction.UP);
+    });
+
+    it("should resume updating facing direction when fixedFacing is disabled", () => {
+      const { gridCharacter } = createDefaultTilemapMock("lowerCharLayer");
+      gridCharacter.turnTowards(Direction.UP);
+      gridCharacter.setFixedFacing(true);
+
+      gridCharacter.move(Direction.RIGHT);
+      gridCharacter.update(1000);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.UP);
+
+      gridCharacter.setFixedFacing(false);
+      gridCharacter.move(Direction.RIGHT);
+      expect(gridCharacter.getFacingDirection()).toEqual(Direction.RIGHT);
+    });
+  });
 });

@@ -220,6 +220,16 @@ export interface CharacterDataHeadless {
   facingDirection?: Direction;
 
   /**
+   * If `true`, the character's facing direction stays fixed and does not
+   * automatically change when moving or bumping into obstacles. Explicit calls
+   * to {@link GridEngineHeadless.turnTowards} still update the facing
+   * direction.
+   *
+   * @defaultValue `false`
+   */
+  fixedFacing?: boolean;
+
+  /**
    * Set to false, if character should not collide (neither with the tilemap,
    * nor with other characters). For more control, pass a
    * {@link CollisionConfig} object.
@@ -567,6 +577,7 @@ export class GridEngineHeadless implements IGridEngine {
       ignoreCollisionGroups: [],
       charLayer: charData.charLayer,
       facingDirection: charData.facingDirection,
+      fixedFacing: charData.fixedFacing,
       labels: charData.labels,
       numberOfDirections:
         charData.numberOfDirections ?? this.config.numberOfDirections,
@@ -853,6 +864,18 @@ export class GridEngineHeadless implements IGridEngine {
   }
 
   /**
+   * {@inheritDoc IGridEngine.getMovementDirection}
+   *
+   * @category Character
+   */
+  getMovementDirection(charId: string): Direction {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.getMovementDirection();
+  }
+
+  /**
    * {@inheritDoc IGridEngine.getFacingDirection}
    *
    * @category Character
@@ -862,6 +885,30 @@ export class GridEngineHeadless implements IGridEngine {
     const gridChar = this.gridCharacters?.get(charId);
     if (!gridChar) throw this.createCharUnknownErr(charId);
     return gridChar.getFacingDirection();
+  }
+
+  /**
+   * {@inheritDoc IGridEngine.isFixedFacing}
+   *
+   * @category Character
+   */
+  isFixedFacing(charId: string): boolean {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    return gridChar.isFixedFacing();
+  }
+
+  /**
+   * {@inheritDoc IGridEngine.setFixedFacing}
+   *
+   * @category Character
+   */
+  setFixedFacing(charId: string, enabled: boolean): void {
+    this.initGuard();
+    const gridChar = this.gridCharacters?.get(charId);
+    if (!gridChar) throw this.createCharUnknownErr(charId);
+    gridChar.setFixedFacing(enabled);
   }
 
   /**
@@ -1335,6 +1382,7 @@ export class GridEngineHeadless implements IGridEngine {
           id,
           position: LayerPositionUtils.fromInternal(char.getTilePos()),
           facingDirection: char.getFacingDirection(),
+          ...(char.isFixedFacing() ? { fixedFacing: true } : {}),
           speed: char.getSpeed(),
           labels: char.getLabels(),
           movementProgress: char.getMovementProgress(),
@@ -1381,6 +1429,7 @@ export class GridEngineHeadless implements IGridEngine {
           }
           char.setSpeed(charState.speed);
           char.turnTowards(charState.facingDirection);
+          char.setFixedFacing(charState.fixedFacing ?? false);
           if (charState.collisionConfig.collisionGroups) {
             char.setCollisionGroups(charState.collisionConfig.collisionGroups);
           }

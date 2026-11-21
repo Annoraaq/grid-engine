@@ -797,12 +797,39 @@ export class GridEngine implements IGridEngine {
   }
 
   /**
+   * {@inheritDoc IGridEngine.getMovementDirection}
+   *
+   * @category Character
+   */
+  getMovementDirection(charId: string): Direction {
+    return this.geHeadless.getMovementDirection(charId);
+  }
+
+  /**
    * {@inheritDoc IGridEngine.getFacingDirection}
    *
    * @category Character
    */
   getFacingDirection(charId: string): Direction {
     return this.geHeadless.getFacingDirection(charId);
+  }
+
+  /**
+   * {@inheritDoc IGridEngine.isFixedFacing}
+   *
+   * @category Character
+   */
+  isFixedFacing(charId: string): boolean {
+    return this.geHeadless.isFixedFacing(charId);
+  }
+
+  /**
+   * {@inheritDoc IGridEngine.setFixedFacing}
+   *
+   * @category Character
+   */
+  setFixedFacing(charId: string, enabled: boolean): void {
+    this.geHeadless.setFixedFacing(charId, enabled);
   }
 
   /**

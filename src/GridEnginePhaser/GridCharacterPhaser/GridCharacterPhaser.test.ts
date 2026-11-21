@@ -1221,6 +1221,83 @@ describe("GridCharacterPhaser", () => {
     });
   });
 
+  describe("fixedFacing", () => {
+    it("should interpolate pixel position in movement direction while animating fixed facing direction", () => {
+      const { gridCharPhaser } = createChar(
+        {
+          walkingAnimationMapping: {
+            [Direction.UP]: { leftFoot: 10, standing: 11, rightFoot: 12 },
+            [Direction.DOWN]: { leftFoot: 0, standing: 1, rightFoot: 2 },
+            [Direction.LEFT]: { leftFoot: 3, standing: 4, rightFoot: 5 },
+            [Direction.RIGHT]: { leftFoot: 6, standing: 7, rightFoot: 8 },
+          },
+          speed: 1,
+          facingDirection: Direction.UP,
+          fixedFacing: true,
+        },
+        false,
+      );
+
+      const initialX = spriteMock.x;
+      const initialY = spriteMock.y;
+      expect(spriteMock.frame.name).toBe(11);
+
+      // Move DOWN while facing UP
+      gridEngineHeadless.move("charID", Direction.DOWN);
+      gridEngineHeadless.update(1000, 250);
+      gridCharPhaser.update(250);
+
+      // Pixel position should move downward (+y), not upward (-y)
+      expect(spriteMock.x).toBe(initialX);
+      expect(spriteMock.y).toBe(initialY + 12);
+      // Walking animation should play UP's leftFoot frame
+      expect(spriteMock.frame.name).toBe(10);
+
+      // Past half a tile: standing frame of UP
+      gridEngineHeadless.update(1500, 500);
+      gridCharPhaser.update(500);
+      expect(spriteMock.y).toBe(initialY + 36);
+      expect(spriteMock.frame.name).toBe(11);
+    });
+
+    it("should interpolate reverted movement using movement direction while keeping fixed facing animation", () => {
+      const { gridCharPhaser } = createChar(
+        {
+          walkingAnimationMapping: {
+            [Direction.UP]: { leftFoot: 10, standing: 11, rightFoot: 12 },
+            [Direction.DOWN]: { leftFoot: 0, standing: 1, rightFoot: 2 },
+            [Direction.LEFT]: { leftFoot: 3, standing: 4, rightFoot: 5 },
+            [Direction.RIGHT]: { leftFoot: 6, standing: 7, rightFoot: 8 },
+          },
+          speed: 1,
+          facingDirection: Direction.LEFT,
+          fixedFacing: true,
+        },
+        false,
+      );
+
+      const initialY = spriteMock.y;
+
+      gridEngineHeadless.move("charID", Direction.DOWN);
+      gridEngineHeadless.update(1000, 250);
+      gridCharPhaser.update(250);
+      expect(spriteMock.y).toBe(initialY + 12);
+      expect(spriteMock.frame.name).toBe(3);
+
+      // Revert movement: movementDirection becomes UP, progress becomes 750
+      gridEngineHeadless.revertCurrentMovement("charID");
+      gridCharPhaser.update(0);
+      expect(spriteMock.y).toBe(initialY + 12);
+      expect(spriteMock.frame.name).toBe(4);
+
+      // Advance 125ms further back toward start tile
+      gridEngineHeadless.update(1125, 125);
+      gridCharPhaser.update(125);
+      expect(spriteMock.y).toBe(initialY + 6);
+      expect(spriteMock.frame.name).toBe(4);
+    });
+  });
+
   function expectedXEngineOffset(): number {
     const tileWidth = 16;
     const scale = 3;
