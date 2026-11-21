@@ -2728,13 +2728,15 @@ describe("GridEngineHeadless", () => {
       // Moving right to (1, 0) succeeds despite ge_collide tile
       gridEngineHeadless.move("player", Direction.RIGHT);
       expect(gridEngineHeadless.isMoving("player")).toBe(true);
-      gridEngineHeadless.update(0, 1000);
+      gridEngineHeadless.update(0, 100);
+      gridEngineHeadless.update(0, 200);
       expect(gridEngineHeadless.getPosition("player")).toEqual({ x: 1, y: 0 });
 
       // Moving right to (2, 0) enters from Direction.LEFT -> allowed
       gridEngineHeadless.move("player", Direction.RIGHT);
       expect(gridEngineHeadless.isMoving("player")).toBe(true);
-      gridEngineHeadless.update(0, 1000);
+      gridEngineHeadless.update(0, 100);
+      gridEngineHeadless.update(0, 200);
       expect(gridEngineHeadless.getPosition("player")).toEqual({ x: 2, y: 0 });
 
       // Pathfinding from (0, 0) to (0, 2) must route around custom-blocked (0, 1)
